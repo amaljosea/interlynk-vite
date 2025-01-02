@@ -11,7 +11,7 @@ import SbomList from 'views/Dashboard/Products/components/SbomList'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { Flex, useDisclosure } from '@chakra-ui/react'
-import { Link as Olink, Portal, SimpleGrid, Stack } from '@chakra-ui/react'
+import { Link as Olink, Portal, Stack } from '@chakra-ui/react'
 import { Divider, Grid, GridItem, Icon, IconButton } from '@chakra-ui/react'
 import { Box, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
@@ -167,12 +167,13 @@ const VersionsTable = (props) => {
     childKey: 'reprocess_sbom'
   })
 
-  const onFilterSev = async (value, id) => {
+  const onFilterSev = async (value, id, link) => {
     const selectedSBOM = nodes?.find((item) => item?.id === id)
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
     if (selectedSBOM?.sbomParts?.length > 0) {
       prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
     }
+    navigate(link)
   }
 
   const handleListSbom = (row) => {
@@ -297,7 +298,6 @@ const VersionsTable = (props) => {
           </Grid>
         )
       },
-      width: '250px',
       wrap: true,
       sortable: true
     },
@@ -321,8 +321,7 @@ const VersionsTable = (props) => {
             </Tag>
           </Link>
         )
-      },
-      width: '130px'
+      }
     },
     // LICENSES
     {
@@ -341,15 +340,16 @@ const VersionsTable = (props) => {
             <TagLabel mx={'auto'}>{stats?.compLicenseCount}</TagLabel>
           </Tag>
         )
-      },
-      width: '100px'
+      }
     },
     // VULNERABILITIES
     {
       id: 'VULNERABILITIES',
       name: 'VULNERABILITIES',
+      width: '20%',
       selector: (row) => {
         const { stats, id, vulnRunStatus } = row
+        const notStarted = vulnRunStatus === 'NOT_STARTED'
         const link = generateProductVersionDetailPageUrlFromCurrentUrl({
           sbomid: id,
           paramsObj: {
@@ -357,43 +357,48 @@ const VersionsTable = (props) => {
           }
         })
         return (
-          <SimpleGrid gap={1} columns={[3, 5]}>
-            <Link to={link} onClick={() => onFilterSev(['critical'], id)}>
-              <VulnBadge color='red' label='Critical' status={vulnRunStatus}>
-                {vulnRunStatus === 'NOT_STARTED'
-                  ? '-'
-                  : stats?.vulnStats?.critical || 0}
-              </VulnBadge>
-            </Link>
-            <Link to={link} onClick={() => onFilterSev(['high'], id)}>
-              <VulnBadge color='orange' label='High' status={vulnRunStatus}>
-                {vulnRunStatus === 'NOT_STARTED'
-                  ? '-'
-                  : stats?.vulnStats?.high || 0}
-              </VulnBadge>
-            </Link>
-            <Link to={link} onClick={() => onFilterSev(['medium'], id)}>
-              <VulnBadge color='yellow' label='Medium' status={vulnRunStatus}>
-                {vulnRunStatus === 'NOT_STARTED'
-                  ? '-'
-                  : stats?.vulnStats?.medium || 0}
-              </VulnBadge>
-            </Link>
-            <Link to={link} onClick={() => onFilterSev(['low'], id)}>
-              <VulnBadge color='green' label='Low' status={vulnRunStatus}>
-                {vulnRunStatus === 'NOT_STARTED'
-                  ? '-'
-                  : stats?.vulnStats?.low || 0}
-              </VulnBadge>
-            </Link>
-            <Link to={link} onClick={() => onFilterSev(['unknown'], id)}>
-              <VulnBadge color='gray' label='Unknown' status={vulnRunStatus}>
-                {vulnRunStatus === 'NOT_STARTED'
-                  ? '-'
-                  : stats?.vulnStats?.unknown || 0}
-              </VulnBadge>
-            </Link>
-          </SimpleGrid>
+          <Flex gap={1} flexWrap={'wrap'} my={4}>
+            <VulnBadge
+              color='red'
+              label='Critical'
+              status={vulnRunStatus}
+              onClick={() => onFilterSev(['critical'], id, link)}
+            >
+              {notStarted ? '-' : stats?.vulnStats?.critical || 0}
+            </VulnBadge>
+            <VulnBadge
+              color='orange'
+              label='High'
+              status={vulnRunStatus}
+              onClick={() => onFilterSev(['high'], id, link)}
+            >
+              {notStarted ? '-' : stats?.vulnStats?.high || 0}
+            </VulnBadge>
+            <VulnBadge
+              color='yellow'
+              label='Medium'
+              status={vulnRunStatus}
+              onClick={() => onFilterSev(['medium'], id, link)}
+            >
+              {notStarted ? '-' : stats?.vulnStats?.medium || 0}
+            </VulnBadge>
+            <VulnBadge
+              color='green'
+              label='Low'
+              status={vulnRunStatus}
+              onClick={() => onFilterSev(['low'], id)}
+            >
+              {notStarted ? '-' : stats?.vulnStats?.low || 0}
+            </VulnBadge>
+            <VulnBadge
+              color='gray'
+              label='Unknown'
+              status={vulnRunStatus}
+              onClick={() => onFilterSev(['unknown'], id, link)}
+            >
+              {notStarted ? '-' : stats?.vulnStats?.unknown || 0}
+            </VulnBadge>
+          </Flex>
         )
       }
     },
@@ -401,10 +406,11 @@ const VersionsTable = (props) => {
     {
       id: 'STATUSES',
       name: 'STATUSES',
+      width: '20%',
       selector: (row) => {
         const { vulnerabilityMetrics } = row
         return (
-          <SimpleGrid gap={1} my={3} columns={[3, 5]} flexWrap={'wrap'}>
+          <Flex gap={1} flexWrap={'wrap'} my={4}>
             <VulnBadge color='gray' label='Unspecified'>
               {vulnerabilityMetrics?.unspecifiedCount}
             </VulnBadge>
@@ -420,7 +426,7 @@ const VersionsTable = (props) => {
             <VulnBadge color='green' label='Not Affected'>
               {vulnerabilityMetrics?.notAffectedCount}
             </VulnBadge>
-          </SimpleGrid>
+          </Flex>
         )
       },
       omit: signedUrlParams
@@ -439,7 +445,6 @@ const VersionsTable = (props) => {
           </Tooltip>
         )
       },
-      width: '150px',
       right: 'true',
       sortable: true
     },
@@ -458,7 +463,6 @@ const VersionsTable = (props) => {
         )
       },
       sortable: true,
-      width: '150px',
       right: 'true'
     },
     // ACTIONS

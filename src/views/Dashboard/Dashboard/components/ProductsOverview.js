@@ -1,6 +1,5 @@
-import React from 'react'
 import DataTable from 'react-data-table-component'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { getFullDate, normalizeSBOMVersion, timeSince } from 'utils'
 import { customStyles } from 'utils'
 
@@ -17,6 +16,7 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const ProductsOverview = ({ loading, title, data }) => {
+  const navigate = useNavigate()
   const { dispatch } = useGlobalState()
   const { prodDispatch, prodVulnDispatch } = dispatch
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
@@ -48,9 +48,10 @@ const ProductsOverview = ({ loading, title, data }) => {
     })
   }
 
-  const onFilterSev = (value) => {
+  const onFilterSev = (value, link) => {
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
     prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
+    navigate(link)
   }
 
   const removeDuplicates = (versions) => {
@@ -77,7 +78,6 @@ const ProductsOverview = ({ loading, title, data }) => {
       id: 'PRODUCT',
       name: 'PRODUCT',
       wrap: true,
-      width: '150px',
       selector: (row) => {
         const { id, project } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
@@ -137,7 +137,6 @@ const ProductsOverview = ({ loading, title, data }) => {
       id: 'COMPONENTS',
       name: 'COMPONENTS',
       wrap: true,
-      width: '130px',
       selector: (row) => {
         const { id, project, stats } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
@@ -171,7 +170,6 @@ const ProductsOverview = ({ loading, title, data }) => {
       id: 'LICENSES',
       name: 'LICENSES',
       wrap: true,
-      width: '100px',
       selector: (row) => {
         const { id, project, stats } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
@@ -198,7 +196,7 @@ const ProductsOverview = ({ loading, title, data }) => {
     {
       id: 'VULNERABILITIES',
       name: 'VULNERABILITIES',
-      width: '380px',
+      width: '32%',
       selector: (row) => {
         const { id, project, stats } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
@@ -210,53 +208,41 @@ const ProductsOverview = ({ loading, title, data }) => {
             tab: 'vulnerabilities'
           }
         })
+        const getLink = (value) =>
+          uniqueSbom ? onFilterSev([value], link) : null
         return (
-          <Flex direction={'row'} flexWrap={'wrap'} gap={1} my={2}>
-            <Link
-              to={link}
-              style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
-              onClick={() => (uniqueSbom ? onFilterSev(['critical']) : null)}
+          <Flex flexWrap={'wrap'} gap={1} my={3}>
+            <VulnBadge
+              color='red'
+              label='Critical'
+              onClick={() => getLink('critical')}
             >
-              <VulnBadge color='red' label='Critical'>
-                {stats?.vulnStats?.critical || 0}
-              </VulnBadge>
-            </Link>
-            <Link
-              to={link}
-              style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
-              onClick={() => (uniqueSbom ? onFilterSev(['high']) : null)}
+              {stats?.vulnStats?.critical || 0}
+            </VulnBadge>
+            <VulnBadge
+              color='orange'
+              label='High'
+              onClick={() => getLink('high')}
             >
-              <VulnBadge color='orange' label='High'>
-                {stats?.vulnStats?.high || 0}
-              </VulnBadge>
-            </Link>
-            <Link
-              to={link}
-              style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
-              onClick={() => (uniqueSbom ? onFilterSev(['medium']) : null)}
+              {stats?.vulnStats?.high || 0}
+            </VulnBadge>
+            <VulnBadge
+              color='yellow'
+              label='Medium'
+              onClick={() => getLink('medium')}
             >
-              <VulnBadge color='yellow' label='Medium'>
-                {stats?.vulnStats?.medium || 0}
-              </VulnBadge>
-            </Link>
-            <Link
-              to={link}
-              style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
-              onClick={() => (uniqueSbom ? onFilterSev(['low']) : null)}
+              {stats?.vulnStats?.medium || 0}
+            </VulnBadge>
+            <VulnBadge color='green' label='Low' onClick={() => getLink('low')}>
+              {stats?.vulnStats?.low || 0}
+            </VulnBadge>
+            <VulnBadge
+              color='gray'
+              label='Unknown'
+              onClick={() => getLink('unknown')}
             >
-              <VulnBadge color='green' label='Low'>
-                {stats?.vulnStats?.low || 0}
-              </VulnBadge>
-            </Link>
-            <Link
-              to={link}
-              style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
-              onClick={() => (uniqueSbom ? onFilterSev(['unknown']) : null)}
-            >
-              <VulnBadge color='gray' label='Unknown'>
-                {stats?.vulnStats?.unknown || 0}
-              </VulnBadge>
-            </Link>
+              {stats?.vulnStats?.unknown || 0}
+            </VulnBadge>
           </Flex>
         )
       }
@@ -267,7 +253,6 @@ const ProductsOverview = ({ loading, title, data }) => {
       name: 'IMPORTED',
       wrap: true,
       right: 'true',
-      width: '150px',
       selector: (row) => {
         const { createdAt } = row
         return (

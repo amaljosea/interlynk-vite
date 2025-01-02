@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { customStyles, getSignedUrlParams } from 'utils'
 import { ProductGeneralTabs } from 'utils/TabsObjects'
 
@@ -29,6 +29,7 @@ import PartsSubHeader from './Components/tableSubHeaders/PartsSubHeader'
 
 const Parts = ({ data }) => {
   const params = useParams()
+  const navigate = useNavigate()
   const { colorMode } = useColorMode()
   const partsContext = usePartsContext()
   const sbomId = params.sbomid
@@ -82,11 +83,12 @@ const Parts = ({ data }) => {
 
   const onSelectPart = () => partsContext.push()
 
-  const onFilterSev = (part, value) => {
+  const onFilterSev = (part, value, link) => {
     prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
     prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
     onSelectPart(part)
+    navigate(link)
   }
 
   const shouldPoll = sbomParts?.some(

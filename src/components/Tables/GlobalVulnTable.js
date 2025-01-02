@@ -153,7 +153,7 @@ const GlobalVulnTable = (props) => {
       selector: (row) => {
         const { metrics } = row
         return (
-          <Stack fontWeight={'medium'} direction={'row'} my={2}>
+          <Flex gap={1} flexWrap={'wrap'} my={4}>
             <VulnBadge color='gray' label='Unspecified'>
               {metrics?.unspecifiedCount}
             </VulnBadge>
@@ -169,7 +169,7 @@ const GlobalVulnTable = (props) => {
             <VulnBadge color='green' label='Not Affected'>
               {metrics?.notAffectedCount}
             </VulnBadge>
-          </Stack>
+          </Flex>
         )
       },
       width: '22%',

@@ -18,16 +18,14 @@ const VulnBadge = ({ color, children, label, status, onClick }) => {
   return (
     <Tooltip label={label} placement='top'>
       <Tag
-        width={'16'}
+        width={'60px'}
         onClick={onClick}
-        cursor={'pointer'}
         colorScheme={color}
-        p={sbomId ? 0 : 'inherit'}
         variant={isStatus ? 'solid' : 'subtle'}
+        cursor={onClick ? 'pointer' : 'default'}
       >
         <TagLabel
           mx={'auto'}
-          p={sbomId ? 0 : 'inherit'}
           fontSize={[sbomId ? '12px' : '13px', sbomId ? '13px' : '14px']}
         >
           {status === 'IN_PROGRESS' ? (

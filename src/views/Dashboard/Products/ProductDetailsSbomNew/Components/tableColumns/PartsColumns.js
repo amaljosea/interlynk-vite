@@ -2,9 +2,9 @@ import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { GetIcon, isValidPurl } from 'utils'
 
-import { Tag, TagLabel } from '@chakra-ui/react'
+import { Flex, Tag, TagLabel } from '@chakra-ui/react'
 import { IconButton, Link, Portal, Stack, Text } from '@chakra-ui/react'
-import { Grid, GridItem, SimpleGrid } from '@chakra-ui/react'
+import { Grid, GridItem } from '@chakra-ui/react'
 import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 
 import LynkAction from 'components/Misc/LynkAction'
@@ -170,63 +170,48 @@ const PartsColumns = (
             paramsObj: { tab: 'vulnerabilities', parts: true }
           })
           return (
-            <SimpleGrid gap={1} width={'100%'} columns={5}>
-              <Link
-                to={link}
-                onClick={() => {
-                  onFilterSev(part, ['critical'])
-                  navigate(link)
-                }}
+            <Flex gap={1} flexWrap={'wrap'} my={4}>
+              <VulnBadge
+                color='red'
+                label='Critical'
+                status={vulnRunStatus}
+                onClick={() => onFilterSev(part, ['critical'], link)}
               >
-                <VulnBadge color='red' label='Critical' status={vulnRunStatus}>
-                  {part?.stats?.vulnStats?.critical || 0}
-                </VulnBadge>
-              </Link>
-              <Link
-                to={link}
-                onClick={() => {
-                  onFilterSev(part, ['high'])
-                  navigate(link)
-                }}
+                {part?.stats?.vulnStats?.critical || 0}
+              </VulnBadge>
+              <VulnBadge
+                color='orange'
+                label='High'
+                status={vulnRunStatus}
+                onClick={() => onFilterSev(part, ['high'], link)}
               >
-                <VulnBadge color='orange' label='High' status={vulnRunStatus}>
-                  {part?.stats?.vulnStats?.high || 0}
-                </VulnBadge>
-              </Link>
-              <Link
-                to={link}
-                onClick={() => {
-                  onFilterSev(part, ['medium'])
-                  navigate(link)
-                }}
+                {part?.stats?.vulnStats?.high || 0}
+              </VulnBadge>
+              <VulnBadge
+                color='yellow'
+                label='Medium'
+                status={vulnRunStatus}
+                onClick={() => onFilterSev(part, ['medium'], link)}
               >
-                <VulnBadge color='yellow' label='Medium' status={vulnRunStatus}>
-                  {part?.stats?.vulnStats?.medium || 0}
-                </VulnBadge>
-              </Link>
-              <Link
-                to={link}
-                onClick={() => {
-                  onFilterSev(part, ['low'])
-                  navigate(link)
-                }}
+                {part?.stats?.vulnStats?.medium || 0}
+              </VulnBadge>
+              <VulnBadge
+                color='green'
+                label='Low'
+                status={vulnRunStatus}
+                onClick={() => onFilterSev(part, ['low'], link)}
               >
-                <VulnBadge color='green' label='Low' status={vulnRunStatus}>
-                  {part?.stats?.vulnStats?.low || 0}
-                </VulnBadge>
-              </Link>
-              <Link
-                to={link}
-                onClick={() => {
-                  onFilterSev(part, ['unknown'])
-                  navigate(link)
-                }}
+                {part?.stats?.vulnStats?.low || 0}
+              </VulnBadge>
+              <VulnBadge
+                color='gray'
+                label='Unknown'
+                status={vulnRunStatus}
+                onClick={() => onFilterSev(part, ['unknown'], link)}
               >
-                <VulnBadge color='gray' label='Unknown' status={vulnRunStatus}>
-                  {part?.stats?.vulnStats?.unknown || 0}
-                </VulnBadge>
-              </Link>
-            </SimpleGrid>
+                {part?.stats?.vulnStats?.unknown || 0}
+              </VulnBadge>
+            </Flex>
           )
         },
         width: '26.8%'
