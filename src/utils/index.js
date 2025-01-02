@@ -99,7 +99,7 @@ export const getFullDateTime = (date) => {
 
 //Get the formatted current date and time
 export const currentDateTime = (dateFormat = 'MMMM dd, yyyy hh:mm a') => {
-  const now = new Date(dateFormat)
+  const now = new Date()
   const utcDate = toZonedTime(now, 'UTC')
   return formatWithTZ(utcDate, dateFormat) + ' UTC'
 }
