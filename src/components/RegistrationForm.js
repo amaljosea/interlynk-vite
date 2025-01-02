@@ -1,7 +1,8 @@
 import { useMutation } from '@apollo/client'
-import React, { useState } from 'react'
+import DOMPurify from 'dompurify'
+import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { validPassword, validateEmail } from 'utils'
+import { nameRegex, validPassword, validateEmail } from 'utils'
 
 import { CheckCircleIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import {
@@ -24,6 +25,7 @@ import {
 } from '@chakra-ui/react'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useDebounce } from 'hooks/useDebounce'
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -62,6 +64,7 @@ const RegistrationForm = () => {
   const [invalidPassword, setInvalidPassword] = useState(false)
   const [passError, setPassError] = useState('')
   const [isSuccess, setIsSuccess] = useState(false)
+  const [nameError, setNameError] = useState('')
 
   const [orgRegister, { loading }] = useMutation(RegisterUser)
 
@@ -70,7 +73,8 @@ const RegistrationForm = () => {
     password === '' ||
     confirmPassword === '' ||
     emailError !== '' ||
-    password !== confirmPassword
+    password !== confirmPassword ||
+    name.length < 2
 
   const handleCheckEmail = () => {
     if (!validateEmail(email)) {
@@ -158,6 +162,38 @@ const RegistrationForm = () => {
     }
   }
 
+  // Debounce the name input to avoid throwing the error as soon as user starts typing in
+  const debouncedName = useDebounce(name, 2000)
+
+  // Validate the debounced value
+  useEffect(() => {
+    if (debouncedName.length > 0 && debouncedName.length < 2) {
+      if (debouncedName.length < 2) {
+        setNameError('Input must be between 2 and 256 characters')
+      } else {
+        setNameError('')
+      }
+    }
+  }, [debouncedName])
+
+  // Handle name input change
+  const handleNameChange = (e) => {
+    const { value } = e.target
+    const sanitizedValue = DOMPurify.sanitize(value)
+    setName(sanitizedValue)
+    if (value.length > 256) {
+      setNameError('Input must be between 2 and 256 characters')
+    } else if (value.startsWith(' ')) {
+      setNameError('A name must begin with a letter')
+    } else if (!nameRegex.test(value) && value.length > 0) {
+      setNameError(
+        'Only letters, numbers, spaces, dashes, and underscores are allowed'
+      )
+    } else {
+      setNameError('')
+    }
+  }
+
   if (isSuccess) {
     return (
       <Flex
@@ -205,15 +241,16 @@ const RegistrationForm = () => {
       )}
       <Stack pt={8} direction={'column'} gap={3} width={'100%'}>
         {/* NAME */}
-        <FormControl>
+        <FormControl isInvalid={nameError !== ''}>
           <FormLabel htmlFor='organization'>Name</FormLabel>
           <Input
             type='text'
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={handleNameChange}
             placeholder='Enter name'
             autoComplete='off'
           />
+          {nameError !== '' && <FormErrorMessage>{nameError}</FormErrorMessage>}
         </FormControl>
         {/* EMAIL */}
         <FormControl isRequired isInvalid={emailError !== ''}>
@@ -300,7 +337,7 @@ const RegistrationForm = () => {
           isLoading={loading}
           onClick={handleSubmit}
           loadingText='Submitting'
-          disabled={isInvalid || loading || error}
+          disabled={isInvalid || loading || error || nameError}
         >
           Register
         </Button>

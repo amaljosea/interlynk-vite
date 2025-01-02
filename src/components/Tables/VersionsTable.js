@@ -41,7 +41,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetVersionsTable, ShareVersionTable } from 'graphQL/Queries'
 
-import {  FaPlus } from 'react-icons/fa6'
+import { FaPlus } from 'react-icons/fa6'
 import { HiOutlineDuplicate } from 'react-icons/hi'
 import { IoMdWarning } from 'react-icons/io'
 import { LuArchive, LuGitCompare } from 'react-icons/lu'

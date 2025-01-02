@@ -42,11 +42,11 @@ import {
 
 import { BiTrash } from 'react-icons/bi'
 import { FaCheck } from 'react-icons/fa6'
+import { FiCheckCircle } from 'react-icons/fi'
 
 import CheckModal from './CheckModal'
 import CopyModal from './CopyModal'
 import SigningModal from './SigningModal'
-import { FiCheckCircle } from 'react-icons/fi'
 
 const SbomActions = ({ sbom }) => {
   const { showToast } = useCustomToast()

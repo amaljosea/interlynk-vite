@@ -1179,3 +1179,6 @@ export const valueToText = (action, event, orig, updated) => {
     return `${updated?.substring(0, 100)}...`
   }
 }
+
+//Validate name for registration and profile edit
+export const nameRegex = /^[a-zA-Z0-9 _-]+$/

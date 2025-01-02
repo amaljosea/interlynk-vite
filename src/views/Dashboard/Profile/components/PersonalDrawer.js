@@ -1,7 +1,8 @@
 import { useMutation } from '@apollo/client'
+import DOMPurify from 'dompurify'
 import Cookies from 'js-cookie'
 import { useEffect, useState } from 'react'
-import { validPassword } from 'utils'
+import { nameRegex, validPassword } from 'utils'
 
 import { EditIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import {
@@ -82,13 +83,23 @@ const PersonalDrawer = ({ isOpen, onClose, inputRef }) => {
 
   const handleNameChange = (e) => {
     const { value } = e.target
-    setNewUserName(value)
+    const sanitizedValue = DOMPurify.sanitize(value)
+    setNewUserName(sanitizedValue)
+
     if (value.length < 2 || value.length > 256) {
       setNameError('Input must be between 2 and 256 characters')
+      setIsSaveDisabled(true)
     } else if (value.startsWith(' ')) {
       setNameError('A name must begin with a letter')
+      setIsSaveDisabled(true)
+    } else if (!nameRegex.test(value)) {
+      setNameError(
+        'Only letters, numbers, spaces, dashes, and underscores are allowed'
+      )
+      setIsSaveDisabled(true)
     } else {
       setNameError('')
+      setIsSaveDisabled(false)
     }
   }
 
