@@ -1,8 +1,15 @@
-import { Grid } from '@chakra-ui/react'
+import { Grid, useTheme } from '@chakra-ui/react'
 
 import { SingleGraph } from './SingleGraph'
 
 export const GraphUi = ({ dataForGraph }) => {
+  const theme = useTheme()
+  const updatedDataForGraph = dataForGraph.map((item) => ({
+    ...item,
+    totalVulnerabilityCount:
+      item.vulnerabilityCount + item.vulnerabilityNotAffectedCount
+  }))
+
   return (
     <Grid
       mt={4}
@@ -31,11 +38,11 @@ export const GraphUi = ({ dataForGraph }) => {
         ]}
       />
       <SingleGraph
-        data={dataForGraph}
+        data={updatedDataForGraph}
         lines={[
           {
-            dataKey: 'vulnerabilityCount',
-            name: 'Total'
+            dataKey: 'totalVulnerabilityCount',
+            name: 'Total Vulnerabilities'
           },
           {
             dataKey: 'vulnerabilityCriticalCount',
@@ -50,8 +57,7 @@ export const GraphUi = ({ dataForGraph }) => {
           {
             dataKey: 'vulnerabilityMediumCount',
             name: 'Medium',
-            // eslint-disable-next-line
-            stroke: '#cbbb08'
+            stroke: theme.colors.yellow[400]
           },
           {
             dataKey: 'vulnerabilityLowCount',
@@ -62,6 +68,40 @@ export const GraphUi = ({ dataForGraph }) => {
             dataKey: 'vulnerabilityUnknownSevCount',
             name: 'Unknown',
             stroke: 'gray'
+          }
+        ]}
+      />
+      <SingleGraph
+        data={updatedDataForGraph}
+        lines={[
+          {
+            dataKey: 'totalVulnerabilityCount',
+            name: 'Total'
+          },
+          {
+            dataKey: 'vulnerabilityUnspecifiedCount',
+            name: 'Unspecified',
+            stroke: 'gray'
+          },
+          {
+            dataKey: 'vulnerabilityInTriageCount',
+            name: 'In Triage',
+            stroke: theme.colors.cyan[400]
+          },
+          {
+            dataKey: 'vulnerabilityAffectedCount',
+            name: 'Affected',
+            stroke: 'red'
+          },
+          {
+            dataKey: 'vulnerabilityFixedCount',
+            name: 'Fixed',
+            stroke: 'blue'
+          },
+          {
+            dataKey: 'vulnerabilityNotAffectedCount',
+            name: 'Not Affected',
+            stroke: 'green'
           }
         ]}
       />

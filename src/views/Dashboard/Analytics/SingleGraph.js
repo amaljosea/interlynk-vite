@@ -51,7 +51,7 @@ export const SingleGraph = ({ data, lines }) => {
             key={item.name}
             type='monotone'
             stroke={primaryBlueText}
-            activeDot={{ r: 8 }}
+            activeDot={{ r: 5 }}
             {...item}
           />
         ))}
