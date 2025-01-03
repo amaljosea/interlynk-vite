@@ -1,5 +1,7 @@
 import { useMutation } from '@apollo/client'
+import DOMPurify from 'dompurify'
 import { useEffect, useState } from 'react'
+import { nameRegex } from 'utils'
 
 import {
   Drawer,
@@ -9,7 +11,13 @@ import {
   DrawerHeader,
   DrawerOverlay
 } from '@chakra-ui/react'
-import { Button, FormControl, FormLabel, Input } from '@chakra-ui/react'
+import {
+  Button,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input
+} from '@chakra-ui/react'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -22,9 +30,39 @@ const OrgDrawer = ({ isOpen, onClose }) => {
 
   const { showToast } = useCustomToast()
   const { organization: orgData } = useGlobalState()
-  const { secondaryTextInverse } = useThemeColor(['secondaryTextInverse'])
+  const { secondaryTextInverse, primaryErrorColor } = useThemeColor([
+    'secondaryTextInverse',
+    'primaryErrorColor'
+  ])
 
   const [orgName, setOrgName] = useState('')
+  const [nameError, setNameError] = useState('')
+  const [isSaveDisabled, setIsSaveDisabled] = useState(false)
+
+  const handleOrgNameChange = (e) => {
+    const { value } = e.target
+    const sanitizedValue = DOMPurify.sanitize(value)
+    setOrgName(sanitizedValue)
+
+    if (value.length < 2 || value.length > 256) {
+      setNameError('Input must be between 2 and 256 characters')
+      setIsSaveDisabled(true)
+      return
+    } else if (value.startsWith(' ')) {
+      setNameError('Organisation name must begin with a letter')
+      setIsSaveDisabled(true)
+      return
+    } else if (!nameRegex.test(value)) {
+      setNameError(
+        'Only letters, numbers, spaces, dashes, and underscores are allowed'
+      )
+      setIsSaveDisabled(true)
+      return
+    } else {
+      setNameError('')
+      setIsSaveDisabled(false)
+    }
+  }
 
   const handleUpdateOrgName = async () => {
     if (orgData?.name === orgName) {
@@ -68,20 +106,22 @@ const OrgDrawer = ({ isOpen, onClose }) => {
         </DrawerHeader>
 
         <DrawerBody>
-          <FormControl mb={4}>
+          <FormControl id='name' mb={4} isInvalid={nameError !== ''}>
             <FormLabel mb='8px' textColor={secondaryTextInverse}>
               Name
             </FormLabel>
             <Input
               value={orgName}
               placeholder='Enter organization name'
-              onChange={(e) => setOrgName(e.target.value)}
+              onChange={handleOrgNameChange}
+              borderColor={nameError ? primaryErrorColor : 'inherit'}
             />
+            <FormErrorMessage>{nameError}</FormErrorMessage>
           </FormControl>
           <Button
             colorScheme='blue'
             isLoading={updateLoading}
-            isDisabled={orgName === ''}
+            isDisabled={orgName === '' || isSaveDisabled}
             onClick={handleUpdateOrgName}
             title='Update organization name'
           >
