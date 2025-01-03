@@ -498,6 +498,18 @@ const CheckModal = (props) => {
             <FormLabel>Select</FormLabel>
             <Input value={comp} onChange={handleComponentChange} />
           </FormControl>
+          {/* Environment Select */}
+          {!ruleExists && (
+            <EnvironmentSelector
+              ruleExists={ruleExists}
+              envLoading={envLoading}
+              defaultEnv={defaultEnv}
+              options={options}
+              selectedEnvironments={selectedEnvironments}
+              handleCheckboxChange={handleCheckboxChange}
+              fixed={resolved}
+            />
+          )}
 
           {comp !== '' && componentList.length > 0 && (
             <Box
@@ -538,57 +550,99 @@ const CheckModal = (props) => {
       )}
 
       {shortDesc === 'Document creation timestamp' && (
-        <FormControl isRequired isDisabled={resolved}>
-          <FormLabel>Created At</FormLabel>
-          <Input
-            placeholder='Select Time'
-            size='md'
-            type='datetime-local'
-            value={timestamp}
-            onChange={(e) => console.log(e.target.value)}
-          />
-        </FormControl>
+        <>
+          <FormControl isRequired isDisabled={resolved}>
+            <FormLabel>Created At</FormLabel>
+            <Input
+              placeholder='Select Time'
+              size='md'
+              type='datetime-local'
+              value={timestamp}
+              onChange={(e) => console.log(e.target.value)}
+            />
+          </FormControl>
+          {/* Environment Select */}
+          {!ruleExists && (
+            <EnvironmentSelector
+              ruleExists={ruleExists}
+              envLoading={envLoading}
+              defaultEnv={defaultEnv}
+              options={options}
+              selectedEnvironments={selectedEnvironments}
+              handleCheckboxChange={handleCheckboxChange}
+              fixed={resolved}
+            />
+          )}
+        </>
       )}
 
       {(shortDesc === 'Component has a type' ||
         shortDesc === 'Component has a valid type') && (
-        <FormControl isDisabled={resolved}>
-          <FormLabel>
-            <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-              <Text>Type</Text>
-              <Tooltip label='Component Type'>
-                <Icon as={InfoIcon} color={primaryBlueText} />
-              </Tooltip>
-            </Flex>
-          </FormLabel>
-          <Select
-            id='type'
-            name='type'
-            value={compType}
-            onChange={(e) => setCompType(e.target.value)}
-          >
-            <option value=''>-- Select --</option>
-            {componentTypes?.map((item, index) => (
-              <option
-                key={index}
-                value={item}
-                style={{ textTransform: 'capitalize' }}
-              >
-                {item}
-              </option>
-            ))}
-          </Select>
-        </FormControl>
+        <>
+          <FormControl isDisabled={resolved}>
+            <FormLabel>
+              <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+                <Text>Type</Text>
+                <Tooltip label='Component Type'>
+                  <Icon as={InfoIcon} color={primaryBlueText} />
+                </Tooltip>
+              </Flex>
+            </FormLabel>
+            <Select
+              id='type'
+              name='type'
+              value={compType}
+              onChange={(e) => setCompType(e.target.value)}
+            >
+              <option value=''>-- Select --</option>
+              {componentTypes?.map((item, index) => (
+                <option
+                  key={index}
+                  value={item}
+                  style={{ textTransform: 'capitalize' }}
+                >
+                  {item}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+          {/* Environment Select */}
+          {!ruleExists && (
+            <EnvironmentSelector
+              ruleExists={ruleExists}
+              envLoading={envLoading}
+              defaultEnv={defaultEnv}
+              options={options}
+              selectedEnvironments={selectedEnvironments}
+              handleCheckboxChange={handleCheckboxChange}
+              fixed={resolved}
+            />
+          )}
+        </>
       )}
 
       {shortDesc === 'Component has a version' && (
-        <FormControl isRequired isDisabled={resolved}>
-          <FormLabel>Version</FormLabel>
-          <Input
-            value={compVersion}
-            onChange={(e) => setCompVersion(e.target.value)}
-          />
-        </FormControl>
+        <>
+          <FormControl isRequired isDisabled={resolved}>
+            <FormLabel>Version</FormLabel>
+            <Input
+              value={compVersion}
+              onChange={(e) => setCompVersion(e.target.value)}
+            />
+          </FormControl>
+          {/* Environment Select */}
+          {!ruleExists && (
+            <EnvironmentSelector
+              ruleExists={ruleExists}
+              envLoading={envLoading}
+              defaultEnv={defaultEnv}
+              options={options}
+              selectedEnvironments={selectedEnvironments}
+              handleCheckboxChange={handleCheckboxChange}
+              fixed={resolved}
+            />
+          )}
+        </>
       )}
 
       {isComponentSupport && (
@@ -629,17 +683,32 @@ const CheckModal = (props) => {
               options={options}
               selectedEnvironments={selectedEnvironments}
               handleCheckboxChange={handleCheckboxChange}
+              fixed={resolved}
             />
           )}
         </Stack>
       )}
 
       {isComponentLicense && (
-        <LicenseField
-          sbomView={false}
-          resolved={resolved}
-          license={licensesExp}
-        />
+        <>
+          <LicenseField
+            sbomView={false}
+            resolved={resolved}
+            license={licensesExp}
+          />
+          {/* Environment Select */}
+          {!ruleExists && (
+            <EnvironmentSelector
+              ruleExists={ruleExists}
+              envLoading={envLoading}
+              defaultEnv={defaultEnv}
+              options={options}
+              selectedEnvironments={selectedEnvironments}
+              handleCheckboxChange={handleCheckboxChange}
+              fixed={resolved}
+            />
+          )}
+        </>
       )}
     </LynkModal>
   )

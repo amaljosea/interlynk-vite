@@ -333,6 +333,7 @@ const AuthorModal = ({ isOpen, onClose }) => {
             options={options}
             selectedEnvironments={selectedEnvironments}
             handleCheckboxChange={handleCheckboxChange}
+            fixed={authorData?.name || authorData?.email}
           />
         )}
       </Flex>

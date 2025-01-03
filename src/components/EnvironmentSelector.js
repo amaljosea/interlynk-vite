@@ -15,10 +15,10 @@ const EnvironmentSelector = ({
   defaultEnv,
   options = [],
   selectedEnvironments = [],
-  handleCheckboxChange
+  handleCheckboxChange,
+  fixed
 }) => {
   if (ruleExists) return null
-  console.log(ruleExists)
 
   return (
     <FormControl mt={2}>
@@ -52,6 +52,7 @@ const EnvironmentSelector = ({
           {options.map((option) => (
             <Checkbox
               key={option.value}
+              isDisabled={fixed}
               isChecked={selectedEnvironments.some(
                 (env) => env.value === option.value
               )}

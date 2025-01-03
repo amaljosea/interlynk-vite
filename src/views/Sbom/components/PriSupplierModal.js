@@ -385,6 +385,7 @@ const PriSupplierModal = (props) => {
               options={options}
               selectedEnvironments={selectedEnvironments}
               handleCheckboxChange={handleCheckboxChange}
+              fixed={resolved}
             />
           )}
         </Flex>

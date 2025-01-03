@@ -354,6 +354,7 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
             options={options}
             selectedEnvironments={selectedEnvironments}
             handleCheckboxChange={handleCheckboxChange}
+            fixed={resolved}
           />
         )}
       </Flex>
