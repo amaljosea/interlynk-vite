@@ -5163,3 +5163,28 @@ export const GetCustomVuln = gql`
     }
   }
 `
+
+export const GetProjectMetrics = gql`
+  query GetProjectMetrics(
+    $projectIds: [Uuid!]
+    $projectGroupIds: [Uuid!]
+    $startDate: ISO8601Date
+    $endDate: ISO8601Date
+  ) {
+    dailyMetrics {
+      projectMetrics(
+        projectIds: $projectIds
+        projectGroupIds: $projectGroupIds
+        startDate: $startDate
+        endDate: $endDate
+      ) {
+        nodes {
+          createdAt
+          date
+          defectDensity
+          id
+        }
+      }
+    }
+  }
+`

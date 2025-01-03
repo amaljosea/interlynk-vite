@@ -1,5 +1,4 @@
 import { gql, useQuery } from '@apollo/client'
-import React from 'react'
 
 import { Center, Icon, SimpleGrid } from '@chakra-ui/react'
 
@@ -7,6 +6,8 @@ import CustomLoader from 'components/CustomLoader'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useThemeColor } from 'hooks/useThemeColors'
+
+import { GetProjectMetrics } from 'graphQL/Queries'
 
 import { TfiBarChart } from 'react-icons/tfi'
 
@@ -81,7 +82,15 @@ export const Graphs = ({ filters }) => {
     skip: !filters.version || !startDate || !endDate || !orgView
   })
 
-  if (!filters.version.length || !filters.duration) {
+  const { data: metrics, loading: prodLoading } = useQuery(GetProjectMetrics, {
+    skip: filters?.product?.length > 0 ? false : true,
+    variables: {
+      projectGroupIds: filters.product?.map((p) => p.value)
+    }
+  })
+  const { nodes: prodMetrics } = metrics?.dailyMetrics?.projectMetrics || ''
+
+  if (!filters.product.length || !filters.duration) {
     return (
       <SimpleGrid width={'100%'} columns={2} spacing={24}>
         {[1, 2, 3, 4].map((_, index) => (
@@ -105,7 +114,7 @@ export const Graphs = ({ filters }) => {
     dates
   })
 
-  if (loading) {
+  if (loading || prodLoading) {
     return <CustomLoader />
   }
 
@@ -113,5 +122,5 @@ export const Graphs = ({ filters }) => {
     return 'Error!'
   }
 
-  return <GraphUi dataForGraph={dataForGraph} />
+  return <GraphUi dataForGraph={dataForGraph} projectMetrics={prodMetrics} />
 }

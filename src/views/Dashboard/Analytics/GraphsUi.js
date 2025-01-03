@@ -2,7 +2,7 @@ import { Grid, useTheme } from '@chakra-ui/react'
 
 import { SingleGraph } from './SingleGraph'
 
-export const GraphUi = ({ dataForGraph }) => {
+export const GraphUi = ({ dataForGraph, projectMetrics }) => {
   const theme = useTheme()
   const updatedDataForGraph = dataForGraph.map((item) => ({
     ...item,
@@ -111,6 +111,15 @@ export const GraphUi = ({ dataForGraph }) => {
           {
             dataKey: 'averageVulnerabilityDuration',
             name: 'Patch Velocity'
+          }
+        ]}
+      />
+      <SingleGraph
+        data={projectMetrics}
+        lines={[
+          {
+            dataKey: 'defectDensity',
+            name: 'Defect Density'
           }
         ]}
       />
