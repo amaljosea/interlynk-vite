@@ -161,7 +161,7 @@ const buildTree = (path, leafNode) => {
   }
 }
 
-const TreeView = ({ isOpen, onClose, component }) => {
+const TreeView = ({ isOpen, onClose, component, isPrimary }) => {
   const params = useParams()
   const { dispatch } = useGlobalState()
   const { prodCompDispatch } = dispatch
@@ -407,6 +407,12 @@ const TreeView = ({ isOpen, onClose, component }) => {
                       </Flex>
                     </Flex>
                   </Flex>
+                  {!pathToPrimary && !isPrimary && (
+                    <Text fontSize={'sm'}>
+                      ** No relationship and path is specified between this
+                      component and the primary component.
+                    </Text>
+                  )}
                   <Tree
                     draggable
                     data={tree}

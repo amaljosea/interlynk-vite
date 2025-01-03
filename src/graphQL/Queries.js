@@ -1855,16 +1855,11 @@ export const GetPrimaryComponent = gql`
     $projectId: Uuid!
     $sbomId: Uuid!
     $primary: Boolean
-    $field: ComponentOrderByFields!
-    $direction: OrderByDirection!
+    $orderBy: ComponentOrderByInput
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       id
-      components(
-        sbomId: $sbomId
-        primary: $primary
-        orderBy: { field: $field, direction: $direction }
-      ) {
+      components(sbomId: $sbomId, primary: $primary, orderBy: $orderBy) {
         totalCount
         nodes {
           id

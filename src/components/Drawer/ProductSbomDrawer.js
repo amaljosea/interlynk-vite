@@ -30,11 +30,9 @@ import { GetAllSboms, GetPrimaryComponent } from 'graphQL/Queries'
 
 function ProductSbomDrawer({ sbom, isOpen, onClose }) {
   const params = useParams()
-  const { prodCompState, sbomState } = useGlobalState()
+  const { sbomState } = useGlobalState()
   const { showToast } = useCustomToast()
   const customerView = isCustomerView()
-
-  const { field, direction } = prodCompState
 
   const { primaryErrorColor, primaryBlueText } = useThemeColor([
     'primaryErrorColor',
@@ -47,9 +45,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
     variables: {
       projectId: params?.productid,
       sbomId: sbom?.id,
-      primary: true,
-      field,
-      direction
+      primary: true
     }
   })
 
