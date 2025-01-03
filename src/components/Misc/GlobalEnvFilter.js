@@ -56,7 +56,7 @@ const GlobalEnvFilter = () => {
       <Flex gap={2} alignItems='center'>
         <Tooltip label='Default' placement='left'>
           <IconButton
-            size='sm'
+            size='md'
             icon={<FaInbox />}
             sx={{ fontWeight: 400 }}
             borderColor={borderColor}
@@ -68,7 +68,7 @@ const GlobalEnvFilter = () => {
         </Tooltip>
         <Tooltip label='Development' placement='left'>
           <IconButton
-            size='sm'
+            size='md'
             icon={<FaCode />}
             sx={{ fontWeight: 400 }}
             borderColor={borderColor}
@@ -80,7 +80,7 @@ const GlobalEnvFilter = () => {
         </Tooltip>
         <Tooltip label='Production' placement='left'>
           <IconButton
-            size='sm'
+            size='md'
             icon={<FaDesktop />}
             sx={{ fontWeight: 400 }}
             borderColor={borderColor}
