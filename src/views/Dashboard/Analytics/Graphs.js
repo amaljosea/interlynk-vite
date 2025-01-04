@@ -7,71 +7,23 @@ import CustomLoader from 'components/CustomLoader'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { GetProjectMetrics } from 'graphQL/Queries'
+import {
+  GetDailyMetrics,
+  GetProjectMetrics,
+  GetProjectVulnMetrics
+} from 'graphQL/Queries'
 
 import { TfiBarChart } from 'react-icons/tfi'
 
 import { GraphUi } from './GraphsUi'
 import { formatForGraph, getDays } from './utils'
 
-const DAILY_METRICS_QUERY = gql`
-  query DailyMetrics(
-    $projectNames: [String!]
-    $projectGroupIds: [Uuid!]
-    $sbomIds: [Uuid!]
-    $startDate: ISO8601Date
-    $endDate: ISO8601Date
-    $level: OrganizationMetricLevelEnum
-  ) {
-    dailyMetrics {
-      sbomMetrics(
-        level: $level
-        projectNames: $projectNames
-        projectGroupIds: $projectGroupIds
-        sbomIds: $sbomIds
-        startDate: $startDate
-        endDate: $endDate
-      ) {
-        nodes {
-          componentsCount
-          date
-          licensesCount
-          policiesCount
-          policyResultDetectedCount
-          policyResultErrorCount
-          policyResultNotDetectedCount
-          policyResultPassedCount
-          policyRuleViolationFailCount
-          policyRuleViolationInformCount
-          policyRuleViolationPassCount
-          policyRuleViolationWarnCount
-          policyViolationsCount
-          vulnerabilityAffectedCount
-          vulnerabilityCount
-          vulnerabilityCriticalCount
-          vulnerabilityFixedCount
-          vulnerabilityHighCount
-          vulnerabilityInTriageCount
-          vulnerabilityLowCount
-          vulnerabilityMediumCount
-          vulnerabilityNotAffectedCount
-          vulnerabilityUnknownSevCount
-          vulnerabilityUnspecifiedCount
-          averageVulnerabilityDuration
-          aggregator
-          policyResultSkippedCount
-        }
-      }
-    }
-  }
-`
-
 export const Graphs = ({ filters }) => {
   const { orgView } = useGlobalQueryContext()
   const { startDate, endDate } = filters?.duration || {}
   const { headingTextSecondary } = useThemeColor(['headingTextSecondary'])
 
-  const { data, loading, error } = useQuery(DAILY_METRICS_QUERY, {
+  const { data, loading, error } = useQuery(GetDailyMetrics, {
     variables: {
       sbomIds: filters.version?.map((p) => p.value),
       projectNames: filters?.env?.value ? [filters?.env?.value] : [],
@@ -89,6 +41,18 @@ export const Graphs = ({ filters }) => {
     }
   })
   const { nodes: prodMetrics } = metrics?.dailyMetrics?.projectMetrics || ''
+
+  const { data: vulnMetrics, loading: vulnloading } = useQuery(
+    GetProjectVulnMetrics,
+    {
+      skip: filters?.product?.length > 0 ? false : true,
+      variables: {
+        projectGroupIds: filters.product?.map((p) => p.value)
+      }
+    }
+  )
+  const { nodes: prodVulnMetrics } =
+    vulnMetrics?.dailyMetrics?.projectMetrics || ''
 
   if (!filters.product.length || !filters.duration) {
     return (
@@ -122,5 +86,11 @@ export const Graphs = ({ filters }) => {
     return 'Error!'
   }
 
-  return <GraphUi dataForGraph={dataForGraph} projectMetrics={prodMetrics} />
+  return (
+    <GraphUi
+      dataForGraph={dataForGraph}
+      projectMetrics={prodMetrics}
+      prodVulnMetrics={prodVulnMetrics}
+    />
+  )
 }

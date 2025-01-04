@@ -5164,6 +5164,58 @@ export const GetCustomVuln = gql`
   }
 `
 
+export const GetDailyMetrics = gql`
+  query GetDailyMetrics(
+    $projectNames: [String!]
+    $projectGroupIds: [Uuid!]
+    $sbomIds: [Uuid!]
+    $startDate: ISO8601Date
+    $endDate: ISO8601Date
+    $level: OrganizationMetricLevelEnum
+  ) {
+    dailyMetrics {
+      sbomMetrics(
+        level: $level
+        projectNames: $projectNames
+        projectGroupIds: $projectGroupIds
+        sbomIds: $sbomIds
+        startDate: $startDate
+        endDate: $endDate
+      ) {
+        nodes {
+          componentsCount
+          date
+          licensesCount
+          policiesCount
+          policyResultDetectedCount
+          policyResultErrorCount
+          policyResultNotDetectedCount
+          policyResultPassedCount
+          policyRuleViolationFailCount
+          policyRuleViolationInformCount
+          policyRuleViolationPassCount
+          policyRuleViolationWarnCount
+          policyViolationsCount
+          vulnerabilityAffectedCount
+          vulnerabilityCount
+          vulnerabilityCriticalCount
+          vulnerabilityFixedCount
+          vulnerabilityHighCount
+          vulnerabilityInTriageCount
+          vulnerabilityLowCount
+          vulnerabilityMediumCount
+          vulnerabilityNotAffectedCount
+          vulnerabilityUnknownSevCount
+          vulnerabilityUnspecifiedCount
+          averageVulnerabilityDuration
+          aggregator
+          policyResultSkippedCount
+        }
+      }
+    }
+  }
+`
+
 export const GetProjectMetrics = gql`
   query GetProjectMetrics(
     $projectIds: [Uuid!]
@@ -5183,6 +5235,53 @@ export const GetProjectMetrics = gql`
           date
           defectDensity
           id
+        }
+      }
+    }
+  }
+`
+
+export const GetProjectVulnMetrics = gql`
+  query GetProjectVulnMetrics(
+    $projectIds: [Uuid!]
+    $projectGroupIds: [Uuid!]
+    $startDate: ISO8601Date
+    $endDate: ISO8601Date
+    $vulnIds: [Uuid!]
+  ) {
+    dailyMetrics {
+      projectVulnMtrics(
+        projectIds: $projectIds
+        projectGroupIds: $projectGroupIds
+        startDate: $startDate
+        endDate: $endDate
+        vulnIds: $vulnIds
+      ) {
+        totalCount
+        nodes {
+          createdAt
+          date
+          id
+          organizationId
+          projectId
+          statusAgeAffected
+          statusAgeFixed
+          statusAgeInTriage
+          statusAgeNotAffected
+          statusAgeResolved
+          statusAgeUnspecified
+          updatedAt
+          vulnId
+          project {
+            id
+          }
+          organization {
+            id
+          }
+          vuln {
+            id
+            vulnId
+          }
         }
       }
     }
