@@ -6,7 +6,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaCode, FaDesktop, FaInbox } from 'react-icons/fa6'
+import { LuInbox, LuPackage, LuShapes } from 'react-icons/lu'
 
 const EnvList = ({ data }) => {
   const params = useParams()
@@ -59,7 +59,7 @@ const EnvList = ({ data }) => {
         >
           <Button
             size='sm'
-            leftIcon={<FaInbox />}
+            leftIcon={<LuInbox size={16} />}
             borderColor={borderColor}
             title='Default environment'
             variant={variant('default')}
@@ -80,7 +80,7 @@ const EnvList = ({ data }) => {
         >
           <Button
             size='sm'
-            leftIcon={<FaCode />}
+            leftIcon={<LuShapes size={16} />}
             borderColor={borderColor}
             title='Development environment'
             variant={variant('development')}
@@ -101,7 +101,7 @@ const EnvList = ({ data }) => {
         >
           <Button
             size='sm'
-            leftIcon={<FaDesktop />}
+            leftIcon={<LuPackage size={16} />}
             borderColor={borderColor}
             title='Production environment'
             variant={variant('production')}

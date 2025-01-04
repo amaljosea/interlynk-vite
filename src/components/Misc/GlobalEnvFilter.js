@@ -8,7 +8,7 @@ import { useProjectGroup } from 'hooks/useProjectGroup'
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaCode, FaDesktop, FaInbox } from 'react-icons/fa6'
+import { LuInbox, LuPackage, LuShapes } from 'react-icons/lu'
 
 const GlobalEnvFilter = () => {
   const params = useParams()
@@ -45,7 +45,6 @@ const GlobalEnvFilter = () => {
   return (
     <Flex width='100%' alignItems={'center'} justifyContent={'space-between'}>
       <Button
-        size='sm'
         colorScheme='blue'
         textTransform={'capitalize'}
         _hover={{ colorScheme: 'blue' }}
@@ -56,8 +55,7 @@ const GlobalEnvFilter = () => {
       <Flex gap={2} alignItems='center'>
         <Tooltip label='Default' placement='left'>
           <IconButton
-            size='md'
-            icon={<FaInbox />}
+            icon={<LuInbox size={20} />}
             sx={{ fontWeight: 400 }}
             borderColor={borderColor}
             title='Default environment'
@@ -68,8 +66,7 @@ const GlobalEnvFilter = () => {
         </Tooltip>
         <Tooltip label='Development' placement='left'>
           <IconButton
-            size='md'
-            icon={<FaCode />}
+            icon={<LuShapes size={20} />}
             sx={{ fontWeight: 400 }}
             borderColor={borderColor}
             title='Development environment'
@@ -80,8 +77,7 @@ const GlobalEnvFilter = () => {
         </Tooltip>
         <Tooltip label='Production' placement='left'>
           <IconButton
-            size='md'
-            icon={<FaDesktop />}
+            icon={<LuPackage size={20} />}
             sx={{ fontWeight: 400 }}
             borderColor={borderColor}
             title='Production environment'
