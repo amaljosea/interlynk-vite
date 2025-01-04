@@ -11,8 +11,17 @@ import {
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-const CustomizedAxisTick = ({ x, y, payload, xOffset = 0, tickFormatter }) => {
-  const { cyanColor } = useThemeColor(['cyanColor'])
+const CustomizedAxisTick = ({
+  x,
+  y,
+  payload,
+  xOffset = 0,
+  yOffset = 0,
+  tickFormatter
+}) => {
+  const { primaryTextColorWithOpacity } = useThemeColor([
+    'primaryTextColorWithOpacity'
+  ])
   const formattedValue = tickFormatter
     ? tickFormatter(payload.value)
     : payload.value
@@ -21,11 +30,10 @@ const CustomizedAxisTick = ({ x, y, payload, xOffset = 0, tickFormatter }) => {
     <g transform={`translate(${x},${y})`}>
       <text
         x={xOffset}
-        y={0}
-        dy={16}
+        y={yOffset}
         textAnchor='end'
-        fill={cyanColor}
         transform='scale(.7)'
+        fill={primaryTextColorWithOpacity}
       >
         {formattedValue}
       </text>
@@ -40,6 +48,7 @@ const dateFormatter = (dateString) => {
 
 export const SingleGraph = ({ data, lines, syncId, percentage = false }) => {
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+
   const conditionalFormatter = (value) => {
     const formattedValue = parseFloat(value).toFixed(0)
     return percentage ? `${formattedValue}%` : formattedValue
@@ -52,22 +61,24 @@ export const SingleGraph = ({ data, lines, syncId, percentage = false }) => {
         <XAxis
           dataKey='date'
           tickFormatter={(date) => dateFormatter(date)}
-          tick={<CustomizedAxisTick tickFormatter={dateFormatter} />}
-          xOffset={50}
-          padding={{ right: 30 }}
+          tick={
+            <CustomizedAxisTick
+            yOffset={20}
+            xOffset={22}
+            tickFormatter={dateFormatter}
+            />
+          }
         />
         <YAxis
-          tick={<CustomizedAxisTick />}
-          padding={{ top: 30 }}
           tickFormatter={conditionalFormatter}
+          tick={<CustomizedAxisTick x={5} y={5} />}
         />
         <Tooltip
-          labelFormatter={(label) => dateFormatter(label)}
           formatter={conditionalFormatter}
-          // eslint-disable-next-line
-          labelStyle={{ color: '#4A5568' }}
+          labelStyle={{ color: primaryBlueText }}
+          labelFormatter={(label) => dateFormatter(label)}
         />
-        <Legend wrapperStyle={{ fontSize: 15 }} />
+        <Legend wrapperStyle={{ fontSize: 15, paddingTop: '12px' }} />
         {lines.map((item) => (
           <Line
             key={item.name}

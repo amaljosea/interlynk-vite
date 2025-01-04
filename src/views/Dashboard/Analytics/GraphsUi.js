@@ -1,15 +1,9 @@
 import { Box, Grid, Text, useTheme } from '@chakra-ui/react'
 
-import { useThemeColor } from 'hooks/useThemeColors'
-
 import { SingleGraph } from './SingleGraph'
 
-export const GraphUi = ({ dataForGraph, prodMetrics, prodVulnMetrics }) => {
+export const GraphUi = ({ dataForGraph, projectMetrics, prodVulnMetrics }) => {
   const theme = useTheme()
-  const { primaryBlueText, grayText } = useThemeColor([
-    'primaryBlueText',
-    'grayText'
-  ])
 
   const updatedDataForGraph = dataForGraph.map((item) => {
     const {
@@ -33,7 +27,6 @@ export const GraphUi = ({ dataForGraph, prodMetrics, prodVulnMetrics }) => {
 
   return (
     <Grid
-      mt={4}
       gap={12}
       width={'100%'}
       alignItems={'center'}
@@ -44,7 +37,7 @@ export const GraphUi = ({ dataForGraph, prodMetrics, prodVulnMetrics }) => {
         <Text fontSize='lg' fontWeight='bold' mb={2}>
           Component Count
         </Text>
-        <Text fontSize='sm' color={grayText} mb={4}>
+        <Text fontSize='sm' mb={4}>
           Number of components in included versions over time
         </Text>
         <SingleGraph
@@ -62,7 +55,7 @@ export const GraphUi = ({ dataForGraph, prodMetrics, prodVulnMetrics }) => {
         <Text fontSize='lg' fontWeight='bold' mb={2}>
           License Count
         </Text>
-        <Text fontSize='sm' color={grayText} mb={4}>
+        <Text fontSize='sm' mb={4}>
           Number of unique licenses included in versions over time
         </Text>
         <SingleGraph
@@ -80,7 +73,7 @@ export const GraphUi = ({ dataForGraph, prodMetrics, prodVulnMetrics }) => {
         <Text fontSize='lg' fontWeight='bold' mb={2}>
           Vulnerabilities by Severity
         </Text>
-        <Text fontSize='sm' color={grayText} mb={4}>
+        <Text fontSize='sm' mb={4}>
           Number of vulnerabilities in included versions grouped by their
           severity
         </Text>
@@ -89,32 +82,33 @@ export const GraphUi = ({ dataForGraph, prodMetrics, prodVulnMetrics }) => {
           lines={[
             {
               dataKey: 'totalVulnerabilityCount',
-              name: 'Total'
+              name: 'Total',
+              stroke: theme.colors.gray[50]
             },
             {
               dataKey: 'vulnerabilityCriticalCount',
               name: 'Critical',
-              stroke: 'red'
+              stroke: theme.colors.red[500]
             },
             {
               dataKey: 'vulnerabilityHighCount',
               name: 'High',
-              stroke: 'orange'
+              stroke: theme.colors.orange[500]
             },
             {
               dataKey: 'vulnerabilityMediumCount',
               name: 'Medium',
-              stroke: theme.colors.yellow[400]
+              stroke: theme.colors.yellow[500]
             },
             {
               dataKey: 'vulnerabilityLowCount',
               name: 'Low',
-              stroke: 'green'
+              stroke: theme.colors.green[500]
             },
             {
               dataKey: 'vulnerabilityUnknownSevCount',
               name: 'Unknown',
-              stroke: 'gray'
+              stroke: theme.colors.gray[500]
             }
           ]}
           syncId={'vulns'}
@@ -125,7 +119,7 @@ export const GraphUi = ({ dataForGraph, prodMetrics, prodVulnMetrics }) => {
         <Text fontSize='lg' fontWeight='bold' mb={2}>
           Vulnerabilities by Status
         </Text>
-        <Text fontSize='sm' color={grayText} mb={4}>
+        <Text fontSize='sm' mb={4}>
           Number of vulnerabilities in included versions grouped by their
           vulnerabilty status
         </Text>
@@ -134,32 +128,33 @@ export const GraphUi = ({ dataForGraph, prodMetrics, prodVulnMetrics }) => {
           lines={[
             {
               dataKey: 'totalVulnerabilityCount',
-              name: 'Total'
+              name: 'Total',
+              stroke: theme.colors.gray[50]
             },
             {
               dataKey: 'vulnerabilityUnspecifiedCount',
               name: 'Unspecified',
-              stroke: 'gray'
+              stroke: theme.colors.gray[500]
             },
             {
               dataKey: 'vulnerabilityInTriageCount',
               name: 'In Triage',
-              stroke: theme.colors.cyan[400]
+              stroke: theme.colors.cyan[500]
             },
             {
               dataKey: 'vulnerabilityAffectedCount',
               name: 'Affected',
-              stroke: 'red'
+              stroke: theme.colors.red[500]
             },
             {
               dataKey: 'vulnerabilityFixedCount',
               name: 'Fixed',
-              stroke: 'blue'
+              stroke: theme.colors.blue[500]
             },
             {
               dataKey: 'vulnerabilityNotAffectedCount',
               name: 'Not Affected',
-              stroke: 'green'
+              stroke: theme.colors.green[500]
             }
           ]}
           syncId={'vulns'}
@@ -170,11 +165,11 @@ export const GraphUi = ({ dataForGraph, prodMetrics, prodVulnMetrics }) => {
         <Text fontSize='lg' fontWeight='bold' mb={2}>
           Defect Density
         </Text>
-        <Text fontSize='sm' color={grayText} mb={4}>
+        <Text fontSize='sm' mb={4}>
           Percentage of identified vulnerabilities that are updated or patched
         </Text>
         <SingleGraph
-          data={prodMetrics}
+          data={projectMetrics}
           lines={[
             {
               dataKey: 'defectDensity',
@@ -188,7 +183,7 @@ export const GraphUi = ({ dataForGraph, prodMetrics, prodVulnMetrics }) => {
         <Text fontSize='lg' fontWeight='bold' mb={2}>
           Patch Velocity
         </Text>
-        <Text fontSize='sm' color={grayText} mb={4}>
+        <Text fontSize='sm' mb={4}>
           Duration from vulnerability identification to when it is updated or
           patched
         </Text>
@@ -208,7 +203,7 @@ export const GraphUi = ({ dataForGraph, prodMetrics, prodVulnMetrics }) => {
         <Text fontSize='lg' fontWeight='bold' mb={2}>
           Deploy Velocity
         </Text>
-        <Text fontSize='sm' color={grayText} mb={4}>
+        <Text fontSize='sm' mb={4}>
           Duration from when an update or patch is available to complete
           implementation in devices deployed in the field, to the extent known
         </Text>
@@ -218,27 +213,27 @@ export const GraphUi = ({ dataForGraph, prodMetrics, prodVulnMetrics }) => {
             {
               dataKey: 'statusAgeUnspecified',
               name: 'Unspecified',
-              stroke: 'gray'
+              stroke: theme.colors.gray[500]
             },
             {
               dataKey: 'statusAgeInTriage',
               name: 'In Triage',
-              stroke: theme.colors.cyan[400]
+              stroke: theme.colors.cyan[500]
             },
             {
               dataKey: 'statusAgeAffected',
               name: 'Affected',
-              stroke: 'red'
+              stroke: theme.colors.red[500]
             },
             {
               dataKey: 'statusAgeFixed',
               name: 'Fixed',
-              stroke: 'blue'
+              stroke: theme.colors.blue[500]
             },
             {
               dataKey: 'statusAgeNotAffected',
               name: 'Not Affected',
-              stroke: 'green'
+              stroke: theme.colors.green[500]
             }
           ]}
         />
