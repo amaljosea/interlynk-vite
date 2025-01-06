@@ -3,7 +3,7 @@ import React from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getSignedUrlParams } from 'utils'
 
-import { Flex, SimpleGrid, Stat, StatLabel, StatNumber } from '@chakra-ui/react'
+import { Flex, Stat, StatLabel, StatNumber } from '@chakra-ui/react'
 
 // Custom components
 import Card from 'components/Card/Card.js'
@@ -128,7 +128,7 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
   }
 
   return (
-    <Card width='100%' h={'97px'}>
+    <Card width='100%' h={'120px'} justifyContent='center'>
       <CardBody>
         <Flex width={'100%'} gap={3} align='center'>
           <IconBox h={12} w={12} color={primaryBlueText} bg={secondaryBgColor}>
@@ -143,7 +143,7 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
               {title}
             </StatLabel>
             {title === 'Vulnerabilities' ? (
-              <SimpleGrid gap={1} width={'100%'} columns={5}>
+              <Flex flexWrap={'wrap'} gap={1}>
                 <VulnBadge
                   color='red'
                   label='Critical'
@@ -184,9 +184,9 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
                 >
                   {status === 'NOT_STARTED' ? '-' : amount?.unknown || 0}
                 </VulnBadge>
-              </SimpleGrid>
+              </Flex>
             ) : title === 'Policy Results' ? (
-              <SimpleGrid gap={1} width={'100%'} columns={6}>
+              <Flex flexWrap={'wrap'} gap={1}>
                 <VulnBadge color='red' status={policyStatus} label='Fail'>
                   {amount?.failedCount || 0}
                 </VulnBadge>
@@ -196,16 +196,7 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
                 <VulnBadge color='blue' status={policyStatus} label='Inform'>
                   {amount?.informCount || 0}
                 </VulnBadge>
-                <VulnBadge color='green' status={policyStatus} label='Pass'>
-                  {amount?.passedCount || 0}
-                </VulnBadge>
-                <VulnBadge color='gray' status={policyStatus} label='Skipped'>
-                  {amount?.skippedCount || 0}
-                </VulnBadge>
-                <VulnBadge color='orange' status={policyStatus} label='Error'>
-                  {amount?.errorCount || 0}
-                </VulnBadge>
-              </SimpleGrid>
+              </Flex>
             ) : (
               <StatNumber fontSize='lg' color={primaryTextColor}>
                 {amount || 0}
