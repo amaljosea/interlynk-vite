@@ -355,8 +355,9 @@ const Components = ({ sbomData }) => {
       {GRAPH.isOpen && (
         <TreeView
           isOpen={GRAPH.isOpen}
-          onClose={GRAPH.onClose}
           component={activeComp}
+          onClose={GRAPH.onClose}
+          isPrimary={activeComp?.primary ? true : false}
         />
       )}
 
