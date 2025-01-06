@@ -68,29 +68,46 @@ export const Graphs = ({ filters }) => {
         statusAgeFixed = 0,
         statusAgeNotAffected = 0,
         statusAgeResolved = 0,
-        statusAgeUnspecified = 0
+        statusAgeUnspecified = 0,
+        statusAgeInTriage = 0
       } = node
 
       if (!result[date]) {
         result[date] = {
           date,
-          statusAge: 0,
-          statusCount: 0
+          statusCount: 0,
+          statusAgePresent: 0,
+          statusAgeResolved: 0,
+          statusAgePresentAverage: 0.0,
+          statusAgeResolvedAverage: 0.0
         }
       }
-
-      result[date].statusAge +=
-        statusAgeAffected +
-        statusAgeFixed +
-        statusAgeResolved +
-        statusAgeUnspecified
       result[date].statusCount += 1
+      if (
+        statusAgeUnspecified > 0 ||
+        statusAgeAffected > 0 ||
+        statusAgeInTriage > 0
+      ) {
+        result[date].statusAgePresent +=
+          statusAgeUnspecified + statusAgeAffected + statusAgeInTriage
+      } else {
+        result[date].statusAgeResolved += statusAgeResolved
+      }
     })
 
     return Object.values(result).map((entry) => ({
       date: entry.date,
-      statusAgeAverage:
-        entry.statusCount > 0 ? entry.statusAge / entry.statusCount : 0
+      statusAgePresent: entry.statusAgePresent,
+      statusAgeResolved: entry.statusAgeResolved,
+      statusCount: entry.statusCount,
+      statusAgePresentAverage:
+        entry.statusCount === 0
+          ? 0
+          : entry.statusAgePresent / entry.statusCount,
+      statusAgeResolvedAverage:
+        entry.statusCount === 0
+          ? 0
+          : entry.statusAgeResolved / entry.statusCount
     }))
   }
   const prodVulnMetricProcessed = processVulnMetricsByDate(

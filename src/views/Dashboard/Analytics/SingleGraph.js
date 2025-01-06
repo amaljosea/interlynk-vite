@@ -46,11 +46,18 @@ const dateFormatter = (dateString) => {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
-export const SingleGraph = ({ data, lines, syncId, percentage = false }) => {
+export const SingleGraph = ({
+  data,
+  lines,
+  syncId,
+  averages = false,
+  percentage = false
+}) => {
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   const conditionalFormatter = (value) => {
-    const formattedValue = parseFloat(value).toFixed(0)
+    const precision = averages ? 2 : 0
+    const formattedValue = parseFloat(value).toFixed(precision)
     return percentage ? `${formattedValue}%` : formattedValue
   }
 

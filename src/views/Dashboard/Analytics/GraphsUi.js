@@ -177,10 +177,17 @@ export const GraphUi = ({ dataForGraph, projectMetrics, prodVulnMetrics }) => {
           data={prodVulnMetrics}
           lines={[
             {
-              dataKey: 'statusAgeAverage',
-              name: 'Average Update Duration'
+              dataKey: 'statusAgePresentAverage',
+              name: 'Identified (Average Days)',
+              stroke: theme.colors.red[400]
+            },
+            {
+              dataKey: 'statusAgeResolvedAverage',
+              name: 'Patch Velocity (Average Days)',
+              stroke: theme.colors.green[500]
             }
           ]}
+          averages={true}
         />
       </Box>
 
@@ -196,7 +203,7 @@ export const GraphUi = ({ dataForGraph, projectMetrics, prodVulnMetrics }) => {
           lines={[
             {
               dataKey: 'updatedVulnerabilityRate',
-              name: 'Patch Velocity'
+              name: 'Defect Density'
             }
           ]}
           percentage={true}
