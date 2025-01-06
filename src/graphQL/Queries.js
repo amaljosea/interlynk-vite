@@ -5164,52 +5164,35 @@ export const GetCustomVuln = gql`
   }
 `
 
-export const GetDailyMetrics = gql`
-  query GetDailyMetrics(
-    $projectNames: [String!]
-    $projectGroupIds: [Uuid!]
-    $sbomIds: [Uuid!]
-    $startDate: ISO8601Date
-    $endDate: ISO8601Date
-    $level: OrganizationMetricLevelEnum
+export const GetCustomVulns = gql`
+  query GetCustomVulns(
+    $after: String
+    $before: String
+    $first: Int
+    $last: Int
   ) {
-    dailyMetrics {
-      sbomMetrics(
-        level: $level
-        projectNames: $projectNames
-        projectGroupIds: $projectGroupIds
-        sbomIds: $sbomIds
-        startDate: $startDate
-        endDate: $endDate
-      ) {
+    organization {
+      customVulns(after: $after, before: $before, first: $first, last: $last) {
+        totalCount
         nodes {
-          componentsCount
-          date
-          licensesCount
-          policiesCount
-          policyResultDetectedCount
-          policyResultErrorCount
-          policyResultNotDetectedCount
-          policyResultPassedCount
-          policyRuleViolationFailCount
-          policyRuleViolationInformCount
-          policyRuleViolationPassCount
-          policyRuleViolationWarnCount
-          policyViolationsCount
-          vulnerabilityAffectedCount
-          vulnerabilityCount
-          vulnerabilityCriticalCount
-          vulnerabilityFixedCount
-          vulnerabilityHighCount
-          vulnerabilityInTriageCount
-          vulnerabilityLowCount
-          vulnerabilityMediumCount
-          vulnerabilityNotAffectedCount
-          vulnerabilityUnknownSevCount
-          vulnerabilityUnspecifiedCount
-          averageVulnerabilityDuration
-          aggregator
-          policyResultSkippedCount
+          cpe
+          createdAt
+          desc
+          id
+          lastModifiedAt
+          organizationId
+          publishedAt
+          purl
+          reportedAt
+          sev
+          updatedAt
+          vulnIdentifier
+        }
+        pageInfo {
+          endCursor
+          hasNextPage
+          hasPreviousPage
+          startCursor
         }
       }
     }
@@ -5284,6 +5267,58 @@ export const GetProjectVulnMetrics = gql`
             id
             vulnId
           }
+        }
+      }
+    }
+  }
+`
+
+export const GetDailyMetrics = gql`
+  query GetDailyMetrics(
+    $projectNames: [String!]
+    $projectGroupIds: [Uuid!]
+    $sbomIds: [Uuid!]
+    $startDate: ISO8601Date
+    $endDate: ISO8601Date
+    $level: OrganizationMetricLevelEnum
+  ) {
+    dailyMetrics {
+      sbomMetrics(
+        level: $level
+        projectNames: $projectNames
+        projectGroupIds: $projectGroupIds
+        sbomIds: $sbomIds
+        startDate: $startDate
+        endDate: $endDate
+      ) {
+        nodes {
+          componentsCount
+          date
+          licensesCount
+          policiesCount
+          policyResultDetectedCount
+          policyResultErrorCount
+          policyResultNotDetectedCount
+          policyResultPassedCount
+          policyRuleViolationFailCount
+          policyRuleViolationInformCount
+          policyRuleViolationPassCount
+          policyRuleViolationWarnCount
+          policyViolationsCount
+          vulnerabilityAffectedCount
+          vulnerabilityCount
+          vulnerabilityCriticalCount
+          vulnerabilityFixedCount
+          vulnerabilityHighCount
+          vulnerabilityInTriageCount
+          vulnerabilityLowCount
+          vulnerabilityMediumCount
+          vulnerabilityNotAffectedCount
+          vulnerabilityUnknownSevCount
+          vulnerabilityUnspecifiedCount
+          averageVulnerabilityDuration
+          aggregator
+          policyResultSkippedCount
         }
       }
     }

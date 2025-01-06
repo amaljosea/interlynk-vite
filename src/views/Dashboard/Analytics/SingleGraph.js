@@ -63,9 +63,9 @@ export const SingleGraph = ({ data, lines, syncId, percentage = false }) => {
           tickFormatter={(date) => dateFormatter(date)}
           tick={
             <CustomizedAxisTick
-            yOffset={20}
-            xOffset={22}
-            tickFormatter={dateFormatter}
+              yOffset={20}
+              xOffset={22}
+              tickFormatter={dateFormatter}
             />
           }
         />

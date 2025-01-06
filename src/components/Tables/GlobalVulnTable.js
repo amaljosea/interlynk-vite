@@ -4,7 +4,7 @@ import { customStyles, getFullDate, linkURl, timeSince } from 'utils'
 import SubHeader from 'views/Dashboard/Vulnerabilities/components/SubHeader'
 
 import { ExternalLinkIcon } from '@chakra-ui/icons'
-import { Badge, Flex, Icon, Stack, Text, useDisclosure } from '@chakra-ui/react'
+import { Badge, Flex, Icon, Stack, Text } from '@chakra-ui/react'
 import { Tooltip } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 
@@ -13,7 +13,6 @@ import CvssTag from 'components/Misc/CvssTag'
 import EpssTag from 'components/Misc/EpssTag'
 import SeverityTag from 'components/Misc/SeverityTag'
 import VulnBadge from 'components/Misc/VulnBadge'
-import CustomVuln from 'components/Modal/CustomVuln'
 
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -22,8 +21,6 @@ import Pagination from '../Pagination'
 
 const GlobalVulnTable = (props) => {
   const { vulns, loading, paginationProps, filters, setFilters } = props
-
-  const { isOpen, onOpen, onClose } = useDisclosure()
 
   const { field } = filters
   const { generateProductVulnerabilityDetailPageUrlFromCurrentUrl } =
@@ -65,7 +62,7 @@ const GlobalVulnTable = (props) => {
                             vulnerabilityid: id
                           }
                         )
-                      : `/${path}/vulnerabilities?vulnId=${id}`
+                      : `/${path}/vulnerabilities?tab=productVulnerabilities&vulnId=${id}`
                   }
                   onClick={() => localStorage.setItem('activeVuln', vulnId)}
                 >
@@ -234,7 +231,7 @@ const GlobalVulnTable = (props) => {
 
   // HEADER
   const subHeaderComponent = (
-    <SubHeader filters={filters} setFilters={setFilters} onOpen={onOpen} />
+    <SubHeader filters={filters} setFilters={setFilters} />
   )
 
   // SORTING
@@ -249,29 +246,23 @@ const GlobalVulnTable = (props) => {
   const data = vulns?.map((row, index) => ({ ...row, key: index }))
 
   return (
-    <>
-      {/* TABLE */}
-      <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
-          columns={columns}
-          data={data}
-          keyField='key'
-          onSort={handleSort}
-          defaultSortFieldId={field}
-          customStyles={customStyles(headingTextColor)}
-          progressPending={loading}
-          progressComponent={<CustomLoader />}
-          subHeader
-          subHeaderComponent={subHeaderComponent}
-          responsive
-          persistTableHead
-        />
-        <Pagination {...paginationProps} />
-      </Flex>
-
-      {/* CUSTOM VULNS */}
-      {isOpen && <CustomVuln isOpen={isOpen} onClose={onClose} />}
-    </>
+    <Flex flexDir={'column'} width={'100%'}>
+      <DataTable
+        columns={columns}
+        data={data}
+        keyField='key'
+        onSort={handleSort}
+        defaultSortFieldId={field}
+        customStyles={customStyles(headingTextColor)}
+        progressPending={loading}
+        progressComponent={<CustomLoader />}
+        subHeader
+        subHeaderComponent={subHeaderComponent}
+        responsive
+        persistTableHead
+      />
+      <Pagination {...paginationProps} />
+    </Flex>
   )
 }
 

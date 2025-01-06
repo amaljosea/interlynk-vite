@@ -57,7 +57,9 @@ const SidebarContent = ({ routes }) => {
     const toPath =
       path === '/settings'
         ? `${layout}${path}?tab=${!organization ? 'organization' : 'users'}`
-        : layout + path
+        : path === '/vulnerabilities'
+          ? `${layout}${path}?tab=productVulnerabilities`
+          : layout + path
 
     return (
       <Tooltip key={name} label={name} placement='right'>
