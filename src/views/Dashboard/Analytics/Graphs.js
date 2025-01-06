@@ -47,7 +47,9 @@ export const Graphs = ({ filters }) => {
     {
       skip: filters?.product?.length > 0 ? false : true,
       variables: {
-        projectGroupIds: filters.product?.map((p) => p.value)
+        projectGroupIds: filters.product?.map((p) => p.value),
+        startDate,
+        endDate: endDate
       }
     }
   )

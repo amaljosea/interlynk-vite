@@ -9,7 +9,8 @@ export const GraphUi = ({ dataForGraph, projectMetrics, prodVulnMetrics }) => {
     const {
       vulnerabilityCount,
       vulnerabilityNotAffectedCount,
-      vulnerabilityUnspecifiedCount
+      vulnerabilityAffectedCount,
+      vulnerabilityFixedCount
     } = item
     const totalVulnerabilityCount =
       vulnerabilityCount + vulnerabilityNotAffectedCount
@@ -20,7 +21,10 @@ export const GraphUi = ({ dataForGraph, projectMetrics, prodVulnMetrics }) => {
       updatedVulnerabilityRate:
         totalVulnerabilityCount === 0
           ? 0
-          : ((totalVulnerabilityCount - vulnerabilityUnspecifiedCount) * 100) /
+          : ((vulnerabilityNotAffectedCount +
+              vulnerabilityAffectedCount +
+              vulnerabilityFixedCount) *
+              100) /
             totalVulnerabilityCount
     }
   })
@@ -83,7 +87,7 @@ export const GraphUi = ({ dataForGraph, projectMetrics, prodVulnMetrics }) => {
             {
               dataKey: 'totalVulnerabilityCount',
               name: 'Total',
-              stroke: theme.colors.gray[50]
+              stroke: theme.colors.gray[500]
             },
             {
               dataKey: 'vulnerabilityCriticalCount',
@@ -129,7 +133,7 @@ export const GraphUi = ({ dataForGraph, projectMetrics, prodVulnMetrics }) => {
             {
               dataKey: 'totalVulnerabilityCount',
               name: 'Total',
-              stroke: theme.colors.gray[50]
+              stroke: theme.colors.gray[500]
             },
             {
               dataKey: 'vulnerabilityUnspecifiedCount',
@@ -163,10 +167,11 @@ export const GraphUi = ({ dataForGraph, projectMetrics, prodVulnMetrics }) => {
 
       <Box textAlign='center'>
         <Text fontSize='lg' fontWeight='bold' mb={2}>
-          Defect Density
+          Patch Velocity
         </Text>
         <Text fontSize='sm' mb={4}>
-          Percentage of identified vulnerabilities that are updated or patched
+          Duration from vulnerability identification to when it is updated or
+          patched
         </Text>
         <SingleGraph
           data={projectMetrics}
@@ -181,11 +186,10 @@ export const GraphUi = ({ dataForGraph, projectMetrics, prodVulnMetrics }) => {
 
       <Box textAlign='center'>
         <Text fontSize='lg' fontWeight='bold' mb={2}>
-          Patch Velocity
+          Defect Density
         </Text>
         <Text fontSize='sm' mb={4}>
-          Duration from vulnerability identification to when it is updated or
-          patched
+          Percentage of identified vulnerabilities that are updated or patched
         </Text>
         <SingleGraph
           data={updatedDataForGraph}

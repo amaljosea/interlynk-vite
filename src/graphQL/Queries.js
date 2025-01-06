@@ -5248,6 +5248,7 @@ export const GetProjectVulnMetrics = gql`
     $startDate: ISO8601Date
     $endDate: ISO8601Date
     $vulnIds: [Uuid!]
+    $first: Int = 10000 # Request a high number of entries
   ) {
     dailyMetrics {
       projectVulnMtrics(
@@ -5256,6 +5257,7 @@ export const GetProjectVulnMetrics = gql`
         startDate: $startDate
         endDate: $endDate
         vulnIds: $vulnIds
+        first: $first # Fetch as many items as possible
       ) {
         totalCount
         nodes {
