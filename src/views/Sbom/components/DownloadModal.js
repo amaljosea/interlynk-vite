@@ -279,12 +279,12 @@ const DownloadModal = (props) => {
     {
       name: 'NTIA Minimum Elements',
       loading: ntiaLoading,
-      score: ntiaData?.length > 0 ? Math.round(ntiaData[0].score) : 0
+      score: ntiaData?.length > 0 ? Math.round(ntiaData[0]?.score) : 0
     },
     {
       name: 'FDA Cybersecurity Compliance',
       loading: fdaLoading,
-      score: fdaData?.length > 0 ? Math.round(fdaData[0].score) : 0
+      score: fdaData?.length > 0 ? Math.round(fdaData[0]?.score) : 0
     },
     {
       name: 'BSI TR-03183',
@@ -453,7 +453,11 @@ const DownloadModal = (props) => {
                     isLoading={item?.loading}
                     isDisabled={item?.score === 0}
                   >
-                    {item?.score === 0 ? `Coming Soon..` : `${item?.score} %`}
+                    {item?.score || item?.score === 0
+                      ? item.score === 0
+                        ? `Coming Soon..`
+                        : `${item.score} %`
+                      : `N/A`}
                   </Button>
                 </Flex>
               ))}
