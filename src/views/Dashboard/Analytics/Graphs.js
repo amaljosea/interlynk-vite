@@ -53,8 +53,49 @@ export const Graphs = ({ filters }) => {
       }
     }
   )
-  const { nodes: prodVulnMetrics } =
-    vulnMetrics?.dailyMetrics?.projectMetrics || ''
+
+  const processVulnMetricsByDate = (data) => {
+    if (!data || !Array.isArray(data.nodes)) {
+      return []
+    }
+
+    const result = {}
+
+    data.nodes.forEach((node) => {
+      const {
+        date,
+        statusAgeAffected = 0,
+        statusAgeFixed = 0,
+        statusAgeNotAffected = 0,
+        statusAgeResolved = 0,
+        statusAgeUnspecified = 0
+      } = node
+
+      if (!result[date]) {
+        result[date] = {
+          date,
+          statusAge: 0,
+          statusCount: 0
+        }
+      }
+
+      result[date].statusAge +=
+        statusAgeAffected +
+        statusAgeFixed +
+        statusAgeResolved +
+        statusAgeUnspecified
+      result[date].statusCount += 1
+    })
+
+    return Object.values(result).map((entry) => ({
+      date: entry.date,
+      statusAgeAverage:
+        entry.statusCount > 0 ? entry.statusAge / entry.statusCount : 0
+    }))
+  }
+  const prodVulnMetricProcessed = processVulnMetricsByDate(
+    vulnMetrics?.dailyMetrics?.projectVulnMetrics
+  )
 
   if (!filters.product.length || !filters.duration) {
     return (
@@ -92,7 +133,7 @@ export const Graphs = ({ filters }) => {
     <GraphUi
       dataForGraph={dataForGraph}
       projectMetrics={prodMetrics}
-      prodVulnMetrics={prodVulnMetrics}
+      prodVulnMetrics={prodVulnMetricProcessed}
     />
   )
 }

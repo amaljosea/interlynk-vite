@@ -5251,7 +5251,7 @@ export const GetProjectVulnMetrics = gql`
     $first: Int = 10000 # Request a high number of entries
   ) {
     dailyMetrics {
-      projectVulnMtrics(
+      projectVulnMetrics(
         projectIds: $projectIds
         projectGroupIds: $projectGroupIds
         startDate: $startDate

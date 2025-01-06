@@ -174,11 +174,11 @@ export const GraphUi = ({ dataForGraph, projectMetrics, prodVulnMetrics }) => {
           patched
         </Text>
         <SingleGraph
-          data={projectMetrics}
+          data={prodVulnMetrics}
           lines={[
             {
-              dataKey: 'defectDensity',
-              name: 'Defect Density'
+              dataKey: 'statusAgeAverage',
+              name: 'Average Update Duration'
             }
           ]}
         />
