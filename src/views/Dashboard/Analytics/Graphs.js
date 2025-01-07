@@ -23,6 +23,11 @@ export const Graphs = ({ filters }) => {
   const { startDate, endDate } = filters?.duration || {}
   const { headingTextSecondary } = useThemeColor(['headingTextSecondary'])
 
+  const { dates } = getDays({
+    startDate,
+    endDate
+  })
+
   const { data, loading, error } = useQuery(GetDailyMetrics, {
     variables: {
       sbomIds: filters.version?.map((p) => p.value),
@@ -60,6 +65,17 @@ export const Graphs = ({ filters }) => {
     }
 
     const result = {}
+
+    dates.forEach((date) => {
+      result[date] = {
+        date,
+        statusCount: 0,
+        statusAgePresent: 0,
+        statusAgeResolved: 0,
+        statusAgePresentAverage: 0.0,
+        statusAgeResolvedAverage: 0.0
+      }
+    })
 
     data.nodes.forEach((node) => {
       const {
@@ -127,11 +143,6 @@ export const Graphs = ({ filters }) => {
   }
 
   const nodes = data?.dailyMetrics?.sbomMetrics?.nodes || []
-
-  const { dates } = getDays({
-    startDate,
-    endDate
-  })
 
   const { dataForGraph } = formatForGraph({
     nodes,
