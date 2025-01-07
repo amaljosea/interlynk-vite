@@ -158,9 +158,12 @@ const LegalTable = () => {
           alignItems={'center'}
           gap={2}
           my={3}
-          hidden={row?.url ? false : true}
+          hidden={!row?.url}
         >
-          <Link to={row?.url} target={'_blank'}>
+          <Link
+            to={row?.url.startsWith('http') ? row.url : `https://${row.url}`}
+            target={'_blank'}
+          >
             <Icon
               as={ExternalLinkIcon}
               h={'16px'}
@@ -168,7 +171,9 @@ const LegalTable = () => {
               color={primaryBlueText}
             />
           </Link>
-          <Text color={primaryTextColor}>{row?.url}</Text>
+          <Text color={primaryTextColor}>
+            {row?.url.startsWith('http') ? row.url : `https://${row.url}`}
+          </Text>
         </Flex>
       ),
       wrap: true
