@@ -368,6 +368,7 @@ const Checks = ({ sbomData }) => {
               recheck={handleRecheck}
               isOpen={DOC_AUTHOR.isOpen}
               onClose={DOC_AUTHOR.onClose}
+              ruleExists={ruleExists}
             />
           )}
 

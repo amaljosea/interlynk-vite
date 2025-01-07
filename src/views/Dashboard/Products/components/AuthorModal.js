@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { validatePhoneNumber } from 'utils'
@@ -18,7 +18,7 @@ import { useProjectGroup } from 'hooks/useProjectGroup'
 import useQueryParam from 'hooks/useQueryParam'
 
 import { AutomationRuleCreate, authorCreate } from 'graphQL/Mutation'
-import { GetCheckResults, GetExistingRules } from 'graphQL/Queries'
+import { GetCheckResults } from 'graphQL/Queries'
 
 import { FaUserPlus } from 'react-icons/fa6'
 
@@ -35,7 +35,7 @@ const TextInput = ({ name, value, onChange, placeholder }) => {
   )
 }
 
-const AuthorModal = ({ isOpen, onClose }) => {
+const AuthorModal = ({ isOpen, onClose, ruleExists }) => {
   const params = useParams()
   const navigate = useNavigate()
   const activeTab = useQueryParam('tab')
@@ -69,22 +69,14 @@ const AuthorModal = ({ isOpen, onClose }) => {
   const { status, organizationRule, sbom } = nodes?.length ? nodes[0] : []
   const { friendlyId, shortDesc } = organizationRule?.rule || ''
 
+  const resolved = status === 'resolved'
+
   const { AUTOMATION_RULES } = ProductDetailsTabs
   const link = generateProductDetailPageUrlFromCurrentUrl({
     paramsObj: {
       tab: AUTOMATION_RULES
     }
   })
-
-  const { data, loading: existingRulesLoading } = useQuery(GetExistingRules, {
-    skip: isOpen ? false : true,
-    variables: {
-      id: params?.productid,
-      checkIdentifier: friendlyId
-    }
-  })
-
-  const ruleExists = data?.project?.automationRules?.nodes?.length > 0
 
   const initialData = {
     name: '',
@@ -224,9 +216,7 @@ const AuthorModal = ({ isOpen, onClose }) => {
         const allErrors = results.flatMap(
           (res) => res?.data?.automationRuleCreate?.errors || []
         )
-
         if (allErrors.length > 0) {
-          onClose()
           showToast({
             description: `Unable to create rule for one or more projects. Please try again.`,
             status: 'error'
@@ -234,10 +224,11 @@ const AuthorModal = ({ isOpen, onClose }) => {
         } else {
           handleAddAuthor()
           showToast({
-            description: 'Rule added successfully for all selected projects.',
+            description: 'Rule added successfully.',
             status: 'success'
           })
         }
+        onClose()
       } catch (error) {
         console.error('Error during rule creation:', error)
         showToast({
@@ -273,7 +264,7 @@ const AuthorModal = ({ isOpen, onClose }) => {
       title={`Add Author`}
       onClose={handleClose}
       onSubmit={handleAddAuthor}
-      hidden={status === 'resolved'}
+      hidden={resolved}
       leftFooterContent={
         !isFreeTier && (
           <Button
@@ -284,7 +275,7 @@ const AuthorModal = ({ isOpen, onClose }) => {
             isLoading={ruleLoading || loading}
             colorScheme={ruleExists ? 'green' : 'blue'}
             title={`${ruleExists ? 'View' : 'Save as'} Rule`}
-            isDisabled={!authorData?.name || !authorData?.email}
+            isDisabled={!authorData?.name}
           >
             {ruleExists ? 'View' : 'Save as'} Rule
           </Button>
@@ -293,7 +284,7 @@ const AuthorModal = ({ isOpen, onClose }) => {
     >
       <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
         {error && <LynkAlert msg={error} />}
-        <FormControl isRequired isDisabled={status === 'resolved'}>
+        <FormControl isRequired isDisabled={resolved}>
           <FormLabel htmlFor='name'>Name</FormLabel>
           <TextInput
             type='text'
@@ -303,7 +294,7 @@ const AuthorModal = ({ isOpen, onClose }) => {
             onChange={handleChange}
           />
         </FormControl>
-        <FormControl isDisabled={status === 'resolved'}>
+        <FormControl isDisabled={resolved}>
           <FormLabel htmlFor='email'>Email</FormLabel>
           <Input
             type='email'
@@ -314,7 +305,7 @@ const AuthorModal = ({ isOpen, onClose }) => {
             placeholder='Add email address'
           />
         </FormControl>
-        <FormControl isInvalid={isValidPhoneNumber}>
+        <FormControl isInvalid={isValidPhoneNumber} isDisabled={resolved}>
           <FormLabel htmlFor='phone'>Phone</FormLabel>
           <Input
             type='text'
@@ -325,7 +316,7 @@ const AuthorModal = ({ isOpen, onClose }) => {
             placeholder='Add phone number'
           />
         </FormControl>
-        {!ruleExists && !existingRulesLoading && (
+        {!ruleExists && (
           <EnvironmentSelector
             ruleExists={ruleExists}
             envLoading={envLoading}
@@ -333,7 +324,7 @@ const AuthorModal = ({ isOpen, onClose }) => {
             options={options}
             selectedEnvironments={selectedEnvironments}
             handleCheckboxChange={handleCheckboxChange}
-            fixed={authorData?.name || authorData?.email}
+            fixed={resolved}
           />
         )}
       </Flex>
