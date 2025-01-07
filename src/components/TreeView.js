@@ -13,6 +13,7 @@ import {
   IconButton,
   Spinner,
   Stack,
+  Tag,
   Text,
   Tooltip
 } from '@chakra-ui/react'
@@ -408,10 +409,18 @@ const TreeView = ({ isOpen, onClose, component, isPrimary }) => {
                     </Flex>
                   </Flex>
                   {!pathToPrimary && !isPrimary && (
-                    <Text fontSize={'sm'}>
-                      ** No relationship and path is specified between this
-                      component and the primary component.
-                    </Text>
+                    <Tag
+                      colorScheme='yellow'
+                      textAlign={'right'}
+                      sx={{
+                        w: 'fit-content',
+                        fontSize: 'xs',
+                        wordBreak: 'break-all'
+                      }}
+                    >
+                      No relationship specified between this component and the
+                      primary component
+                    </Tag>
                   )}
                   <Tree
                     draggable
