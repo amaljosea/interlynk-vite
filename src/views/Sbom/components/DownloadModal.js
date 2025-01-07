@@ -2,8 +2,7 @@ import { gql, useLazyQuery, useQuery } from '@apollo/client'
 import { client } from 'context/ApolloWrapper'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getSignedUrlParams, truncatedValue } from 'utils'
-import { isCustomerView } from 'utils'
+import { getSignedUrlParams, isCustomerView, truncatedValue } from 'utils'
 
 import { DownloadIcon } from '@chakra-ui/icons'
 import {
@@ -27,12 +26,13 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
+  DownloadSBOM,
+  GetComponentData,
   GetProductManufacturer,
   GetSbomQualityScores,
+  GetVulnData,
   SignedSbomDownload
 } from 'graphQL/Queries'
-import { DownloadSBOM } from 'graphQL/Queries'
-import { GetComponentData, GetVulnData } from 'graphQL/Queries'
 
 import ComplianceChecks from './ComplianceChecks'
 import { downloadSbomPdf } from './SbomPdf'
@@ -71,6 +71,11 @@ const DownloadModal = (props) => {
   })
 
   const productDescription = data?.projectGroup.description
+
+  const { activeCompliances } = organization || ''
+  const compliance = activeCompliances?.find((item) => item?.scoreEnabled)
+  const isUnspecified =
+    compliance === undefined || compliance?.complianceType === 'unspecified'
 
   const [spec, setSpec] = useState('CycloneDX')
   const [format, setFormat] = useState('json')
@@ -277,16 +282,19 @@ const DownloadModal = (props) => {
 
   const checklists = [
     {
+      id: 'ntia',
       name: 'NTIA Minimum Elements',
       loading: ntiaLoading,
       score: ntiaData?.length > 0 ? Math.round(ntiaData[0]?.score) : 0
     },
     {
+      id: 'fda',
       name: 'FDA Cybersecurity Compliance',
       loading: fdaLoading,
       score: fdaData?.length > 0 ? Math.round(fdaData[0]?.score) : 0
     },
     {
+      id: 'bsi',
       name: 'BSI TR-03183',
       loading: false,
       score: 0
@@ -299,6 +307,7 @@ const DownloadModal = (props) => {
       : `${truncatedValue(productName, 14)}-${version}.${type}.${format}`
 
   const pdfFileName = `${truncatedValue(productName, 14)}-${version}.${format}`
+  const isHidden = signedUrlParams || format === 'pdf' || isUnspecified
 
   if (prodDescErr) {
     showToast({
@@ -420,49 +429,55 @@ const DownloadModal = (props) => {
             </HStack>
           </FormControl>
 
-          <Divider hidden={signedUrlParams || format === 'pdf'} />
-          <Flex
-            sx={{ flexDir: 'column', gap: 4 }}
-            display={!signedUrlParams ? 'flex' : 'none'}
-          >
-            <Flex alignItems='center' justifyContent='space-between'>
-              <Text fontWeight={'medium'}>Compliance Checks</Text>
-              <Text
-                color={primaryBlueText}
-                onClick={DETAILS.onOpen}
-                sx={{ fontSize: 'sm', cursor: 'pointer', fontWeight: 'medium' }}
-              >
-                View Details
-              </Text>
-            </Flex>
-            <Flex gap={4} flexDir={'column'} alignItems='flex-start'>
-              {checklists.map((item, index) => (
-                <Flex
-                  key={index}
-                  justifyContent={'space-between'}
-                  sx={{ w: '100%', alignItems: 'center' }}
+          <Divider hidden={isHidden} />
+          {!isUnspecified && (
+            <Flex
+              sx={{ flexDir: 'column', gap: 4 }}
+              display={!signedUrlParams ? 'flex' : 'none'}
+            >
+              <Flex alignItems='center' justifyContent='space-between'>
+                <Text fontWeight={'medium'}>Compliance Checks</Text>
+                <Text
+                  color={primaryBlueText}
+                  onClick={DETAILS.onOpen}
+                  sx={{
+                    fontSize: 'sm',
+                    cursor: 'pointer',
+                    fontWeight: 'medium'
+                  }}
                 >
-                  <Text fontSize={'sm'} color={primaryTextColor}>
-                    {item?.name}
-                  </Text>
-                  <Button
-                    size='xs'
-                    minW={'60px'}
-                    cursor={'default'}
-                    title='Compliance score'
-                    isLoading={item?.loading}
-                    isDisabled={item?.score === 0}
-                  >
-                    {item?.score || item?.score === 0
-                      ? item.score === 0
-                        ? `Coming Soon..`
-                        : `${item.score} %`
-                      : `N/A`}
-                  </Button>
-                </Flex>
-              ))}
+                  View Details
+                </Text>
+              </Flex>
+              <Flex gap={4} flexDir={'column'} alignItems='flex-start'>
+                {checklists
+                  ?.filter((item) => item?.id === compliance?.complianceType)
+                  ?.map((item, index) => (
+                    <Flex
+                      key={index}
+                      justifyContent={'space-between'}
+                      sx={{ w: '100%', alignItems: 'center' }}
+                    >
+                      <Text fontSize={'sm'} color={primaryTextColor}>
+                        {item?.name}
+                      </Text>
+                      <Button
+                        size='xs'
+                        minW={'60px'}
+                        cursor={'default'}
+                        title='Compliance score'
+                        isLoading={item?.loading}
+                        isDisabled={item?.score === 0}
+                      >
+                        {item?.score === 0
+                          ? `Coming Soon..`
+                          : `${item?.score} %`}
+                      </Button>
+                    </Flex>
+                  ))}
+              </Flex>
             </Flex>
-          </Flex>
+          )}
         </Flex>
       </LynkModal>
 

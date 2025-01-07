@@ -79,22 +79,26 @@ const ComplianceModal = ({ data, isOpen, onClose }) => {
 
   useEffect(() => {
     if (list?.length > 0) {
-      const result = list?.map((item) => ({
-        value: item?.id,
-        active: item?.isEnabled,
-        label: item?.complianceType?.toUpperCase()
-      }))
+      const result = list
+        ?.filter((item) => item?.complianceType !== 'unspecified')
+        ?.map((item) => ({
+          value: item?.id,
+          active: item?.isEnabled,
+          label: item?.complianceType?.toUpperCase()
+        }))
       setOptions(result)
     }
   }, [list])
 
   useEffect(() => {
     if (isOpen && data?.length > 0) {
-      const activeItems = data?.map((item) => ({
-        value: item?.id,
-        active: item?.isEnabled,
-        label: item?.complianceType?.toUpperCase()
-      }))
+      const activeItems = data
+        ?.filter((item) => item?.complianceType !== 'unspecified')
+        ?.map((item) => ({
+          value: item?.id,
+          active: item?.isEnabled,
+          label: item?.complianceType?.toUpperCase()
+        }))
       setValue(activeItems)
     }
   }, [data, isOpen])

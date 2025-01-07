@@ -19,6 +19,7 @@ import { SettingsTag } from 'components/Misc/SettingsTag'
 import { ProgressBar } from 'components/ProgressBar'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useGlobalState } from 'hooks/useGlobalState'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProjectGroup } from 'hooks/useProjectGroup'
 import { useSbomScores } from 'hooks/useSbomScores'
@@ -30,7 +31,7 @@ import { GetProjectSettings } from 'graphQL/Queries'
 import { FaBug, FaCubes, FaLongArrowAltRight, FaRobot } from 'react-icons/fa'
 import { FaCircleCheck, FaTag } from 'react-icons/fa6'
 
-const SbomDetails = ({ sbomData }) => {
+const SbomDetails = ({ sbomData, compliances }) => {
   const params = useParams()
   const navigate = useNavigate()
   const partsContext = usePartsContext()
@@ -69,14 +70,19 @@ const SbomDetails = ({ sbomData }) => {
     partsContext.pop()
   }
 
-  const {
-    qualityScore,
-    reportFormat,
-    loading: scoreLoading
-  } = useSbomScores({
+  const { organization } = useGlobalState()
+  const { activeCompliances } = organization || ''
+  const result = activeCompliances?.find((item) => item?.scoreEnabled)
+  const isUnspecified =
+    result === undefined || result?.complianceType === 'unspecified'
+
+  const { qualityScore, loading: scoreLoading } = useSbomScores({
     sbomId,
     projectId: projectId,
-    skip: !shouldShowDemoFeatures
+    skip: !shouldShowDemoFeatures,
+    format: isUnspecified
+      ? undefined
+      : compliances?.complianceType?.toUpperCase()
   })
 
   const {
@@ -263,7 +269,7 @@ const SbomDetails = ({ sbomData }) => {
               </Card>
             </GridItem>
             {!isFreeTier && (
-              <GridItem colSpan={4}>
+              <GridItem colSpan={isUnspecified ? 8 : 4}>
                 <ProgressBar
                   value={healthScore}
                   loading={scoreLoading}
@@ -271,13 +277,15 @@ const SbomDetails = ({ sbomData }) => {
                 />
               </GridItem>
             )}
-            <GridItem colSpan={isFreeTier ? 6 : 4}>
-              <ProgressBar
-                value={qualityScore}
-                loading={scoreLoading}
-                text={`SBOM Quality Score ${reportFormat && `(${reportFormat})`}`}
-              />
-            </GridItem>
+            {!isUnspecified && (
+              <GridItem colSpan={isFreeTier ? 6 : 4}>
+                <ProgressBar
+                  value={qualityScore}
+                  loading={scoreLoading}
+                  text={`SBOM Quality Score ${`(${result?.complianceType?.toUpperCase()})`}`}
+                />
+              </GridItem>
+            )}
           </Grid>
         </Flex>
       </Flex>

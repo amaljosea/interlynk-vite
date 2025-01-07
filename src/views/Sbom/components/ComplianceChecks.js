@@ -19,13 +19,13 @@ import {
 import CustomLoader from 'components/CustomLoader'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { recheckHealth } from 'graphQL/Mutation'
 
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
 
-const tabs = ['NTIA', 'FDA', 'BSI']
 const sbomCategory = ['Timestamp', 'Supplier Name', 'Unique ID', 'Author']
 
 const ComplianceChecks = (props) => {
@@ -48,6 +48,12 @@ const ComplianceChecks = (props) => {
       'primaryBlueText',
       'sameSecondaryText'
     ])
+
+  const { organization } = useGlobalState()
+  const { activeCompliances } = organization || ''
+  const tabs = activeCompliances
+    ?.filter((item) => item?.complianceType !== 'unspecified')
+    ?.map((item) => item?.complianceType)
 
   const [tab, setTab] = useState(activeTab || 0)
   const onTabChange = (value) => setTab(value)
@@ -187,19 +193,28 @@ const ComplianceChecks = (props) => {
           <Text fontSize={'sm'} fontWeight={'medium'}>
             General Details
           </Text>
-          {sbomData?.map((item, index) => (
-            <ComplianceReport key={index} item={item} />
-          ))}
+          {sbomData ? (
+            sbomData?.map((item, index) => (
+              <ComplianceReport key={index} item={item} />
+            ))
+          ) : (
+            <Text color={sameSecondaryText}>No record to display</Text>
+          )}
           <Text mt={3} fontSize={'sm'} fontWeight={'medium'}>
             Component Details
           </Text>
-          {compData?.map((item, index) => (
-            <ComplianceReport key={index} item={item} />
-          ))}
-          <Divider mt={1} />
+          {compData ? (
+            compData?.map((item, index) => (
+              <ComplianceReport key={index} item={item} />
+            ))
+          ) : (
+            <Text color={sameSecondaryText}>No record to display</Text>
+          )}
+          <Divider mt={1} hidden={!data} />
         </Flex>
         <Flex
           mt={1}
+          hidden={!data}
           width={'100%'}
           alignItems={'center'}
           justifyContent={'space-between'}
@@ -209,7 +224,9 @@ const ComplianceChecks = (props) => {
           </Text>
           <Tag w={'60px'} title='Compliance score'>
             <TagLabel ml={'auto'}>
-              {data?.score === 0 ? 'N/A' : `${Math.round(data?.score)} %`}
+              {data?.score === 0 || data?.score?.includes('NaN')
+                ? 'N/A'
+                : `${Math.round(data?.score)} %`}
             </TagLabel>
           </Tag>
         </Flex>

@@ -1,4 +1,4 @@
-import { Flex, Skeleton, Text } from '@chakra-ui/react'
+import { SkeletonText, Text } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -17,10 +17,7 @@ const SbomInfo = ({ data, error, loading }) => {
   if (loading) {
     return (
       <Card>
-        <Flex alignItems={'center'} gap={6}>
-          <Skeleton width={'100%'} height='30px' />
-          <Skeleton width={'100%'} height='30px' />
-        </Flex>
+        <SkeletonText width={'100%'} noOfLines={2} skeletonHeight={'22px'} />
       </Card>
     )
   }

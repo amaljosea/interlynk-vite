@@ -56,15 +56,17 @@ const Compliance = () => {
         <Flex gap={2} alignItems={'center'}>
           <Text fontWeight={'medium'}>Applicable Compliance :</Text>
           <Flex gap={2} alignItems={'center'}>
-            {activeCompliances?.map((item) => (
-              <Tag
-                key={item?.id}
-                colorScheme='orange'
-                textTransform={'uppercase'}
-              >
-                {item?.complianceType}
-              </Tag>
-            ))}
+            {activeCompliances
+              ?.filter((item) => item?.complianceType !== 'unspecified')
+              ?.map((item) => (
+                <Tag
+                  key={item?.id}
+                  colorScheme='orange'
+                  textTransform={'uppercase'}
+                >
+                  {item?.complianceType}
+                </Tag>
+              ))}
           </Flex>
           <ActiveBtn
             hidden={!canEdit}

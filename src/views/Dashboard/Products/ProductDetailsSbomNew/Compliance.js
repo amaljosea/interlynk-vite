@@ -25,8 +25,7 @@ import Card from 'components/Card/Card'
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { GetSbomQualityScores } from 'graphQL/Queries'
-import { ActiveCompliances } from 'graphQL/Queries'
+import { ActiveCompliances, GetSbomQualityScores } from 'graphQL/Queries'
 
 const Compliance = ({ sbomData }) => {
   const params = useParams()
@@ -133,10 +132,15 @@ const Compliance = ({ sbomData }) => {
     onOpen()
   }
 
-  const filterData = activeCompliances?.map((item) => {
-    const activeItems = data?.find((row) => row?.type === item?.complianceType)
-    return activeItems
-  })
+  const filterData = activeCompliances
+    ?.filter((item) => item?.complianceType !== 'unspecified')
+    ?.map((item) => {
+      const activeItems = data?.find(
+        (row) => row?.type === item?.complianceType
+      )
+      return activeItems
+    })
+
   const tabs = filterData?.map((item) => item?.type)
 
   if (loading) {
@@ -196,7 +200,9 @@ const Compliance = ({ sbomData }) => {
                 title='Compliance score'
                 onClick={() => onCheck(index)}
               >
-                {item?.score === '0 %' ? 'N/A' : item?.score}
+                {item?.score === '0 %' || item?.score === 'NaN %'
+                  ? 'N/A'
+                  : item?.score}
               </Button>
             </Flex>
           </Card>

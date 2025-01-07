@@ -5,8 +5,13 @@ import { getSignedUrlParams } from 'utils'
 import { getComponentHealthScoreFromLocalData } from 'utils/getComponentHealthScoreFromLocalData'
 
 const QUERY = gql`
-  query SingleSbomScore($projectId: Uuid!, $sbomId: Uuid!, $sbomIds: [ID!]!) {
-    complianceReports(sbomIds: $sbomIds) {
+  query SingleSbomScore(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $sbomIds: [ID!]!
+    $reportFormat: ComplianceReportFormat
+  ) {
+    complianceReports(sbomIds: $sbomIds, reportFormat: $reportFormat) {
       nodes {
         score
         reportFormat
@@ -52,13 +57,14 @@ export const calculateHealthScore = (sbom) => {
   }
 }
 
-export const useSbomScores = ({ projectId, sbomId }) => {
+export const useSbomScores = ({ projectId, sbomId, format }) => {
   const { data, loading } = useQuery(QUERY, {
     skip: sbomId && !signedUrlParams ? false : true,
     variables: {
       projectId,
       sbomId,
-      sbomIds: [sbomId]
+      sbomIds: [sbomId],
+      reportFormat: format
     }
   })
 
