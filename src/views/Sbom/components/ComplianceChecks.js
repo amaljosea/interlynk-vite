@@ -4,7 +4,15 @@ import { useParams } from 'react-router-dom'
 import { complianceData } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
-import { Box, Divider, Flex, Stack, Text, Tooltip } from '@chakra-ui/react'
+import {
+  Box,
+  Center,
+  Divider,
+  Flex,
+  Stack,
+  Text,
+  Tooltip
+} from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 import {
@@ -224,15 +232,31 @@ const ComplianceChecks = (props) => {
           </Text>
           <Tag w={'60px'} title='Compliance score'>
             <TagLabel ml={'auto'}>
-              {data?.score === 0 || data?.score?.includes('NaN')
-                ? 'N/A'
-                : `${Math.round(data?.score)} %`}
+              {data?.score === 0 ? 'N/A' : `${Math.round(data?.score)} %`}
             </TagLabel>
           </Tag>
         </Flex>
         {data?.score === 0 && <RunAlert />}
       </Flex>
     )
+  }
+
+  const getLoading = (type) => {
+    switch (type) {
+      case 'fda':
+        return fdaLoading
+      case 'ntia':
+        return ntiaLoading
+    }
+  }
+
+  const getData = (type) => {
+    switch (type) {
+      case 'fda':
+        return fda
+      case 'ntia':
+        return ntia
+    }
   }
 
   return (
@@ -277,19 +301,20 @@ const ComplianceChecks = (props) => {
               ))}
             </TabList>
             <TabPanels pos={'relative'} top={14} overflowX={'hidden'}>
-              <TabPanel>
-                <ScoreBoard loading={ntiaLoading} data={ntia} />
-              </TabPanel>
-              <TabPanel>
-                <ScoreBoard loading={fdaLoading} data={fda} />
-              </TabPanel>
-              <TabPanel>
-                <Flex alignItems={'center'} justifyContent={'center'}>
-                  <Text py={24} color={sameSecondaryText}>
-                    Coming Soon...
-                  </Text>
-                </Flex>
-              </TabPanel>
+              {tabs?.map((item, index) => (
+                <TabPanel key={index}>
+                  {item === 'bsi' ? (
+                    <Center py={24} color={sameSecondaryText}>
+                      Coming Soon...
+                    </Center>
+                  ) : (
+                    <ScoreBoard
+                      loading={getLoading(item)}
+                      data={getData(item)}
+                    />
+                  )}
+                </TabPanel>
+              ))}
             </TabPanels>
           </Tabs>
         </DrawerBody>

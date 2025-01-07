@@ -31,7 +31,7 @@ import { GetProjectSettings } from 'graphQL/Queries'
 import { FaBug, FaCubes, FaLongArrowAltRight, FaRobot } from 'react-icons/fa'
 import { FaCircleCheck, FaTag } from 'react-icons/fa6'
 
-const SbomDetails = ({ sbomData, compliances }) => {
+const SbomDetails = ({ sbomData }) => {
   const params = useParams()
   const navigate = useNavigate()
   const partsContext = usePartsContext()
@@ -72,7 +72,9 @@ const SbomDetails = ({ sbomData, compliances }) => {
 
   const { organization } = useGlobalState()
   const { activeCompliances } = organization || ''
+
   const result = activeCompliances?.find((item) => item?.scoreEnabled)
+
   const isUnspecified =
     result === undefined || result?.complianceType === 'unspecified'
 
@@ -80,9 +82,7 @@ const SbomDetails = ({ sbomData, compliances }) => {
     sbomId,
     projectId: projectId,
     skip: !shouldShowDemoFeatures,
-    format: isUnspecified
-      ? undefined
-      : compliances?.complianceType?.toUpperCase()
+    format: isUnspecified ? undefined : result?.complianceType?.toUpperCase()
   })
 
   const {
