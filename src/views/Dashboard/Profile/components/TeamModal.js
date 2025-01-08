@@ -2,14 +2,8 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { validateEmail } from 'utils'
 
-import {
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Select,
-  Stack
-} from '@chakra-ui/react'
+import { Input, Select, Stack } from '@chakra-ui/react'
+import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
@@ -30,6 +24,12 @@ const TeamModal = ({ isOpen, onClose, data, changeRole }) => {
   const { data: roles } = useQuery(GetRoles, { skip: isOpen ? false : true })
 
   const [inviteUsers] = useMutation(InviteUser)
+
+  const onChaneEmail = (e) => {
+    const value = e.target.value?.trim()
+    setEmail(value)
+    setError('')
+  }
 
   const handleAdd = async () => {
     try {
@@ -76,10 +76,7 @@ const TeamModal = ({ isOpen, onClose, data, changeRole }) => {
             type='text'
             value={email}
             textTransform={'lowercase'}
-            onChange={(e) => {
-              setEmail(e.target.value)
-              setError('')
-            }}
+            onChange={onChaneEmail}
           />
           {email !== '' && !validateEmail(email) && (
             <FormErrorMessage>Email is invalid</FormErrorMessage>
