@@ -246,6 +246,7 @@ const GlobalVulnTable = (props) => {
         keyField='key'
         onSort={handleSort}
         defaultSortFieldId={field}
+        defaultSortAsc={false}
         customStyles={customStyles(headingTextColor)}
         progressPending={loading}
         progressComponent={<CustomLoader />}
