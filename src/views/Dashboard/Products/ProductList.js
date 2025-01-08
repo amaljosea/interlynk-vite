@@ -14,7 +14,7 @@ import { GetProductTable } from 'graphQL/Queries'
 
 function ProductList() {
   const { setIsOpen } = useTour()
-  const { dispatch } = useGlobalState()
+  const { dispatch, prodState } = useGlobalState()
   const { prodDispatch, prodCompDispatch, prodVulnDispatch } = dispatch
 
   const product = useQueryParam('id')
@@ -24,8 +24,8 @@ function ProductList() {
   })
 
   const [filters, setFilters] = useState({
-    field: 'PROJECT_GROUPS_UPDATED_AT',
-    direction: 'DESC',
+    field: prodState?.field,
+    direction: prodState?.direction,
     enabled: true,
     labelIds: []
   })

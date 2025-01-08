@@ -94,7 +94,7 @@ const ProductTable = (props) => {
     'primaryErrorColor'
   ])
 
-  const { search, field } = filters
+  const { search, field, direction } = filters
 
   const { setEnvName, setClearSelect, dispatch, envName } = useGlobalState()
 
@@ -557,6 +557,13 @@ const ProductTable = (props) => {
       field: column?.id,
       direction: sortDirection.toUpperCase()
     }))
+    prodDispatch({
+      type: 'SET_SORT_ORDER',
+      payload: {
+        field: column?.id,
+        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      }
+    })
   }
 
   const dataTableProps = {
@@ -565,7 +572,7 @@ const ProductTable = (props) => {
     onSort: handleSort,
     customStyles: customStyles(headingTextColor, semiTransparentBorder),
     defaultSortFieldId: field,
-    defaultSortAsc: false,
+    defaultSortAsc: direction === 'ASC' ? true : false,
     subHeader: true,
     subHeaderComponent: subHeaderComponent,
     progressPending: loading,
