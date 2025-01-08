@@ -1,17 +1,13 @@
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
+import { PackageURL } from 'packageurl-js'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import ReactSelect from 'react-select'
+// import ReactSelect from 'react-select'
 import { getSignedUrlParams } from 'utils'
+import { validateCPEString } from 'utils/cpeUtils'
 
-import {
-  FormControl,
-  FormLabel,
-  Input,
-  Select,
-  Stack,
-  Textarea
-} from '@chakra-ui/react'
+import { Input, Select, Stack, Textarea } from '@chakra-ui/react'
+import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 import LynkDate from 'components/LynkDate'
@@ -19,20 +15,19 @@ import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useSelect } from 'hooks/useSelect'
 
+// import { useSelect } from 'hooks/useSelect'
 import { CustomVulnCreate } from 'graphQL/Mutation'
-import { GetAllComponents } from 'graphQL/Queries'
-import { GetTotalComponents } from 'graphQL/Queries'
-import { CveLookup } from 'graphQL/Queries'
+import { GetAllComponents, GetTotalComponents } from 'graphQL/Queries'
 
+// import { CveLookup } from 'graphQL/Queries'
 import { FaBug } from 'react-icons/fa6'
 
 const severities = ['Critical', 'High', 'Medium', 'Low', 'Unknown']
 
 const CustomVuln = ({ isOpen, onClose }) => {
   const params = useParams()
-  const { style } = useSelect('field')
+  // const { style } = useSelect('field')
   const { showToast } = useCustomToast()
   const { prodCompState } = useGlobalState()
   const signedUrlParams = getSignedUrlParams()
@@ -46,7 +41,7 @@ const CustomVuln = ({ isOpen, onClose }) => {
   }
 
   const [createVuln, { loading }] = useMutation(CustomVulnCreate)
-  const [lookup] = useLazyQuery(CveLookup)
+  // const [lookup] = useLazyQuery(CveLookup)
   const { data: compData } = useQuery(GetTotalComponents, {
     skip: isOpen && params?.sbomid ? false : true,
     variables: { ...compState }
@@ -67,9 +62,11 @@ const CustomVuln = ({ isOpen, onClose }) => {
   const { nodes } = components || ''
 
   const [error, setError] = useState('')
-  const [cve, setCve] = useState(null)
-  const [searchText, setSearchText] = useState('')
-  const [cveList, setCveList] = useState([])
+  // const [cve, setCve] = useState(null)
+  // const [searchText, setSearchText] = useState('')
+  // const [cveList, setCveList] = useState([])
+  const [purlError, setPurlError] = useState('')
+  const [cpeError, setCpeError] = useState('')
   const [formData, setFormData] = useState({
     vulnIdentifier: undefined,
     desc: undefined,
@@ -91,48 +88,69 @@ const CustomVuln = ({ isOpen, onClose }) => {
       ...prev,
       [name]: value === '' ? undefined : value
     }))
+    name === 'purl' && setPurlError('')
+    name === 'cpe' && setCpeError('')
     setError('')
   }
 
-  const onChangeLookup = (item) => {
-    setFormData((prev) => ({
-      ...prev,
-      vulnIdentifier: item?.value || undefined,
-      desc: item?.desc || undefined,
-      sev: item?.severity || undefined,
-      publishedAt: item?.published || undefined,
-      lastModifiedAt: item?.lastModified || undefined
-    }))
-  }
-
-  const onInputChange = (value) => {
-    setSearchText(value)
-    if (value !== '') {
-      lookup({
-        variables: {
-          cveId: value
-        }
-      }).then((res) => {
-        const { cveLookup } = res?.data || ''
-        if (cveLookup && cveLookup?.length > 0) {
-          setCveList(() =>
-            cveLookup?.map((item) => ({
-              label: item?.cveId,
-              value: item?.cveId,
-              desc: item?.description,
-              severity: item?.severity,
-              published: item?.published,
-              lastModified: item?.lastModified
-            }))
-          )
-        } else {
-          setCveList([{ label: value, value: value }])
-        }
-      })
-    } else {
-      setCveList([])
+  const onBlurPurl = (e) => {
+    if (e.target.value !== '') {
+      try {
+        PackageURL.fromString(e.target.value)
+        setPurlError('')
+      } catch (ex) {
+        setPurlError(ex?.message)
+      }
     }
   }
+
+  const onBlurCpe = (e) => {
+    if (e.target.value !== '') {
+      const validation = validateCPEString(e.target.value)
+      const { isValid, error } = validation || ''
+      setCpeError(isValid ? '' : error)
+    }
+  }
+
+  // const onChangeLookup = (item) => {
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     vulnIdentifier: item?.value || undefined,
+  //     desc: item?.desc || undefined,
+  //     sev: item?.severity || undefined,
+  //     publishedAt: item?.published || undefined,
+  //     lastModifiedAt: item?.lastModified || undefined
+  //   }))
+  // }
+
+  // const onInputChange = (value) => {
+  //   setSearchText(value)
+  //   if (value !== '') {
+  //     lookup({
+  //       variables: {
+  //         cveId: value
+  //       }
+  //     }).then((res) => {
+  //       const { cveLookup } = res?.data || ''
+  //       if (cveLookup && cveLookup?.length > 0) {
+  //         setCveList(() =>
+  //           cveLookup?.map((item) => ({
+  //             label: item?.cveId,
+  //             value: item?.cveId,
+  //             desc: item?.description,
+  //             severity: item?.severity,
+  //             published: item?.published,
+  //             lastModified: item?.lastModified
+  //           }))
+  //         )
+  //       } else {
+  //         setCveList([{ label: value, value: value }])
+  //       }
+  //     })
+  //   } else {
+  //     setCveList([])
+  //   }
+  // }
 
   const handleDateChange = (type, newDate) => {
     const isValidDate = newDate && !isNaN(newDate)
@@ -158,6 +176,8 @@ const CustomVuln = ({ isOpen, onClose }) => {
     })
   }
 
+  const isDisabled = error !== '' || purlError !== '' || cpeError !== ''
+
   useEffect(() => {
     if (components) {
       const component = components?.nodes?.find(
@@ -177,6 +197,7 @@ const CustomVuln = ({ isOpen, onClose }) => {
       onClose={onClose}
       buttonText={'Save'}
       isLoading={loading}
+      disabled={isDisabled}
       onSubmit={handleSubmit}
       hidden={signedUrlParams}
       title='Add Custom Vulerability'
@@ -265,25 +286,29 @@ const CustomVuln = ({ isOpen, onClose }) => {
             onChange={(newDate) => handleDateChange('lastModifiedAt', newDate)}
           />
         </FormControl>
-        <FormControl>
+        <FormControl isInvalid={purlError !== ''}>
           <FormLabel htmlFor='purl'>PURL</FormLabel>
           <Input
             name='purl'
             fontSize={'sm'}
+            onBlur={onBlurPurl}
             value={formData?.purl}
             onChange={handleChange}
             placeholder='Ex. pkg:npm/example-package@1.0.0?platform=linux#src'
           />
+          <FormErrorMessage>{purlError}</FormErrorMessage>
         </FormControl>
-        <FormControl>
+        <FormControl isInvalid={cpeError !== ''}>
           <FormLabel htmlFor='cpe'>CPE</FormLabel>
           <Input
             name='cpe'
             fontSize={'sm'}
+            onBlur={onBlurCpe}
             value={formData?.cpe}
             onChange={handleChange}
             placeholder='Ex. cpe:2.3:a:examplevendor:uniqueproduct:1.0.0:*:*:*:*:*:*:*'
           />
+          <FormErrorMessage>{cpeError}</FormErrorMessage>
         </FormControl>
         {!compLoading && nodes && (
           <FormControl>
