@@ -1,17 +1,16 @@
 import { gql, useQuery } from '@apollo/client'
 import { useParams } from 'react-router-dom'
 import { calculateDuration, getFullDateTime } from 'utils'
-import { timeSince } from 'utils'
+import { formatString, timeSince } from 'utils'
 
 import {
   Accordion,
   AccordionButton,
   AccordionIcon,
   AccordionItem,
-  AccordionPanel,
-  Tooltip
+  AccordionPanel
 } from '@chakra-ui/react'
-import { Flex, SimpleGrid, Stack, Text } from '@chakra-ui/react'
+import { Flex, SimpleGrid, Stack, Text, Tooltip } from '@chakra-ui/react'
 import { List, ListIcon, ListItem } from '@chakra-ui/react'
 import {
   Drawer,
@@ -73,8 +72,6 @@ const GetActivities = gql`
 const runType = {
   vuln_scan: 'Vulnerability Scan',
   comp_vuln_scan: 'Component Vulnerability Scan',
-  policy_scan: 'Policy Scan',
-  library_scan: 'Library Scan',
   automation_scan: 'Automation Run',
   checks_scan: 'Checks Run',
   labelling_scan: 'Internal Labeling'
@@ -147,7 +144,7 @@ const SystemLogs = ({ isOpen, onClose }) => {
         <MdCheckCircle fontSize={20} color={primarySuccessColor} />
         <Stack spacing={1} alignItems={'flex-start'}>
           <Text fontSize={14} textAlign={'left'} color={headingTextColor}>
-            {runType[row?.runType]}
+            {runType[row?.runType] || formatString(row?.runType)}
           </Text>
           <Text
             fontSize={'xs'}

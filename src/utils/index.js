@@ -71,6 +71,13 @@ import {
 import { MdDelete, MdOutlineArchive, MdOutlineUnarchive } from 'react-icons/md'
 import { VscDebugRerun } from 'react-icons/vsc'
 
+export const formatString = (input) => {
+  return input
+    ?.split('_')
+    ?.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    ?.join(' ')
+}
+
 const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
 //Get formatted time accounting the time zone
