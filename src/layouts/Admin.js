@@ -171,12 +171,12 @@ export default function Admin() {
   }, [authToken, navigate])
 
   useEffect(() => {
-    if (location.pathname.startsWith('/vendor')) {
+    if (location.pathname === '/vendor') {
       navigate('/vendor/dashboard')
       sessionStorage.removeItem('awsToken')
       sessionStorage.removeItem('signedUrlParams')
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
