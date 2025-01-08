@@ -142,7 +142,7 @@ const ExpandedComponent = (props) => {
             <Text
               sx={textStyle}
               cursor={'pointer'}
-              onClick={() => onCheckPurl(data)}
+              onClick={() => (customerView ? null : onCheckPurl(data))}
             >
               {data?.purl ? decodeURI(data?.purl) : 'N/A'}
             </Text>
@@ -153,7 +153,7 @@ const ExpandedComponent = (props) => {
               <Text
                 sx={textStyle}
                 cursor={'pointer'}
-                onClick={() => onCheckCpe(data)}
+                onClick={() => (customerView ? null : onCheckCpe(data))}
               >
                 {data?.cpes[0]}
               </Text>
