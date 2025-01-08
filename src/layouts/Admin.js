@@ -5,7 +5,7 @@ import Cookies from 'js-cookie'
 import { jwtDecode } from 'jwt-decode'
 import { KBarProvider } from 'kbar'
 import React, { useEffect } from 'react'
-import { Outlet, redirect, useNavigate, useParams } from 'react-router-dom'
+import { Outlet, useNavigate, useParams } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
 import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 
@@ -172,10 +172,11 @@ export default function Admin() {
 
   useEffect(() => {
     if (location.pathname.startsWith('/vendor')) {
-      redirect('/vendor/dashboard')
+      navigate('/vendor/dashboard')
       sessionStorage.removeItem('awsToken')
       sessionStorage.removeItem('signedUrlParams')
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
