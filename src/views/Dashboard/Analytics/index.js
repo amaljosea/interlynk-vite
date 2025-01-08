@@ -24,7 +24,6 @@ const Analytics = () => {
     if (envName) {
       setFilters((filtersOld) => ({
         ...filtersOld,
-        product: [],
         version: []
       }))
     }

@@ -1,4 +1,4 @@
-import { gql, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 
 import { Center, Icon, SimpleGrid } from '@chakra-ui/react'
 
@@ -130,7 +130,7 @@ export const Graphs = ({ filters }) => {
     vulnMetrics?.dailyMetrics?.projectVulnMetrics
   )
 
-  if (!filters.product.length || !filters.duration) {
+  if (!filters.product.length || !filters.version.length || !filters.duration) {
     return (
       <SimpleGrid width={'100%'} columns={2} spacing={24}>
         {[1, 2, 3, 4].map((_, index) => (
@@ -149,7 +149,7 @@ export const Graphs = ({ filters }) => {
     dates
   })
 
-  if (loading || prodLoading) {
+  if (loading || prodLoading || vulnloading) {
     return <CustomLoader />
   }
 
