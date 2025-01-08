@@ -371,7 +371,7 @@ const ProductTable = (props) => {
           >
             <Tooltip label={getFormat(name)} placement='top'>
               <Olink
-                href={getLink(name)}
+                href={name ? getLink(name) : '#'}
                 isExternal={getLink(name) === '#' ? false : true}
               >
                 <IconBox
@@ -385,7 +385,7 @@ const ProductTable = (props) => {
                 </IconBox>
               </Olink>
             </Tooltip>
-            <Flex gap={2} flexWrap={'wrap'} flexDirection={'column'}>
+            <Stack spacing={1}>
               <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
                 <Text
                   fontSize={16}
@@ -409,7 +409,7 @@ const ProductTable = (props) => {
               <Text color={primaryTextColor} pr={32} wordBreak={'break-all'}>
                 {description}
               </Text>
-            </Flex>
+            </Stack>
           </Flex>
         )
       },
