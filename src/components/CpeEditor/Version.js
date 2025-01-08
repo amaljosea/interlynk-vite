@@ -55,7 +55,7 @@ const Version = ({ disabled, version, onChange, onBlur }) => {
   }, [version])
 
   return (
-    <FormControl isDisabled={disabled}>
+    <FormControl isRequired isDisabled={disabled}>
       <FormLabel>Version</FormLabel>
       <LynkSelect
         name='version'

@@ -4,7 +4,7 @@ const Part = ({ disabled, part, onBlur, onChange }) => {
   const inputProps = { size: 'md', fontSize: 'sm', name: 'part' }
 
   return (
-    <FormControl isDisabled={disabled}>
+    <FormControl isRequired isDisabled={disabled}>
       <FormLabel htmlFor='parts'>Part</FormLabel>
       <Select
         {...inputProps}

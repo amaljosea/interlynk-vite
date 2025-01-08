@@ -55,7 +55,7 @@ const Vendor = ({ disabled, vendor, onChange, onBlur }) => {
   }, [vendor])
 
   return (
-    <FormControl isDisabled={disabled}>
+    <FormControl isRequired isDisabled={disabled}>
       <FormLabel>Vendor</FormLabel>
       <LynkSelect
         name='vendor'

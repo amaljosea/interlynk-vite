@@ -296,7 +296,7 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
         title={'CPE Details'}
         onSubmit={handleComUpdate}
         hidden={status === 'resolved'}
-        disabled={isInvalid || loading}
+        disabled={loading || isInvalid}
         leftFooterContent={!isFreeTier && <ActionBtn />}
       >
         {component && (
