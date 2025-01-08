@@ -1,9 +1,7 @@
 import { timeSince } from 'utils'
 
-import { ExternalLinkIcon } from '@chakra-ui/icons'
 import {
   Flex,
-  Icon,
   Link,
   Tag,
   TagLabel,
@@ -12,6 +10,8 @@ import {
   Tooltip,
   Tr
 } from '@chakra-ui/react'
+
+import ExternalNavIcon from 'components/Icons/ExternalNavIcon'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -59,7 +59,7 @@ function AdvisoryLogRow(props) {
         <Flex align='center' py='.2rem' minWidth='100%' flexWrap='nowrap'>
           <Link href={link} target='_blank'>
             <Flex direction='row' gap={2} alignItems={'flex-start'}>
-              <Icon as={ExternalLinkIcon} h={'16px'} w={'16px'} me='5px' />
+              <ExternalNavIcon styles={{ me: '5px' }} />
               <Flex flexDirection={'column'} alignItems={'self-start'} gap={2}>
                 <Text
                   fontSize='sm'

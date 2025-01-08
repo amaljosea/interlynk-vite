@@ -3,12 +3,12 @@ import { Link, useParams } from 'react-router-dom'
 import { customStyles, getFullDate, linkURl, timeSince } from 'utils'
 import SubHeader from 'views/Dashboard/Vulnerabilities/components/SubHeader'
 
-import { ExternalLinkIcon } from '@chakra-ui/icons'
-import { Badge, Flex, Icon, Stack, Text } from '@chakra-ui/react'
+import { Badge, Flex, Stack, Text } from '@chakra-ui/react'
 import { Tooltip } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import ExternalNavIcon from 'components/Icons/ExternalNavIcon'
 import CvssTag from 'components/Misc/CvssTag'
 import EpssTag from 'components/Misc/EpssTag'
 import SeverityTag from 'components/Misc/SeverityTag'
@@ -45,14 +45,7 @@ const GlobalVulnTable = (props) => {
         return (
           <Stack spacing={1} my={2}>
             <Flex direction='row' alignItems={'flex-start'} gap={2} my={3}>
-              <Link to={linkURl(source, vulnId)} target={'_blank'}>
-                <Icon
-                  as={ExternalLinkIcon}
-                  h={'16px'}
-                  w={'16px'}
-                  color={primaryBlueText}
-                />
-              </Link>
+              <ExternalNavIcon href={linkURl(source, vulnId)} />
               <Stack>
                 <Link
                   to={

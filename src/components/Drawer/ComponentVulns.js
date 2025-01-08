@@ -3,9 +3,8 @@ import DataTable from 'react-data-table-component'
 import { useNavigate } from 'react-router-dom'
 import { customStyles, linkURl, statusColor } from 'utils'
 
-import { ExternalLinkIcon } from '@chakra-ui/icons'
 import { Tag, TagLabel } from '@chakra-ui/react'
-import { Flex, Icon, Link, Stack, Text, Tooltip } from '@chakra-ui/react'
+import { Flex, Stack, Text, Tooltip } from '@chakra-ui/react'
 import {
   Drawer,
   DrawerBody,
@@ -16,6 +15,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import ExternalNavIcon from 'components/Icons/ExternalNavIcon'
 import CompInfo from 'components/Misc/CompInfo'
 import SeverityTag from 'components/Misc/SeverityTag'
 import Pagination from 'components/Pagination'
@@ -68,12 +68,7 @@ const ComponentVulns = ({ data, isOpen, onClose }) => {
         return (
           <Flex alignItems={'center'} gap={2} my={3}>
             <Tooltip label={vuln.source === 'osv' ? 'OSV View' : 'NVD View'}>
-              <Link href={linkURl(vuln.source, vuln.vulnId)} target={'_blank'}>
-                <Icon
-                  as={ExternalLinkIcon}
-                  sx={{ w: '16px', h: '16px', color: primaryBlueText }}
-                />
-              </Link>
+              <ExternalNavIcon href={linkURl(vuln.source, vuln.vulnId)} />
             </Tooltip>
             <Text
               my={2}

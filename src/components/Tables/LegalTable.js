@@ -1,20 +1,13 @@
 import { useMutation, useQuery } from '@apollo/client'
 import React, { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { Link } from 'react-router-dom'
 import { customStyles, getFullDate, timeSince } from 'utils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import LegalModal from 'views/Dashboard/Profile/components/LegalModal'
 
-import {
-  EmailIcon,
-  ExternalLinkIcon,
-  InfoIcon,
-  PhoneIcon
-} from '@chakra-ui/icons'
+import { EmailIcon, InfoIcon, PhoneIcon } from '@chakra-ui/icons'
 import {
   Flex,
-  Icon,
   Menu,
   MenuItem,
   MenuList,
@@ -27,6 +20,7 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
+import ExternalNavIcon from 'components/Icons/ExternalNavIcon'
 import LynkAction from 'components/Misc/LynkAction'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -160,17 +154,9 @@ const LegalTable = () => {
           my={3}
           hidden={!row?.url}
         >
-          <Link
-            to={row?.url.startsWith('http') ? row.url : `https://${row.url}`}
-            target={'_blank'}
-          >
-            <Icon
-              as={ExternalLinkIcon}
-              h={'16px'}
-              w={'16px'}
-              color={primaryBlueText}
-            />
-          </Link>
+          <ExternalNavIcon
+            href={row?.url.startsWith('http') ? row.url : `https://${row.url}`}
+          />
           <Text color={primaryTextColor}>
             {row?.url.startsWith('http') ? row.url : `https://${row.url}`}
           </Text>

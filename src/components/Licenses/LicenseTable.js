@@ -3,11 +3,9 @@ import DataTable from 'react-data-table-component'
 import { customStyles, truncatedValue } from 'utils'
 import { parseLicenseString } from 'utils'
 
-import { ExternalLinkIcon } from '@chakra-ui/icons'
 import {
   Flex,
   IconButton,
-  Link,
   Portal,
   Text,
   Tooltip,
@@ -18,6 +16,7 @@ import { Grid, GridItem } from '@chakra-ui/react'
 import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import ExternalNavIcon from 'components/Icons/ExternalNavIcon'
 import LynkAction from 'components/Misc/LynkAction'
 
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -31,9 +30,10 @@ import { SubHeaderComponent } from './SubHeaderComponent'
 
 const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
   const [activeRow, setActiveRow] = useState(null)
-  const { headingTextColor, primaryTextColor, primaryBlueText } = useThemeColor(
-    ['headingTextColor', 'primaryTextColor', 'primaryBlueText']
-  )
+  const { headingTextColor, primaryTextColor } = useThemeColor([
+    'headingTextColor',
+    'primaryTextColor'
+  ])
 
   const updateLic = useHasPermission({
     parentKey: 'view_license',
@@ -108,18 +108,9 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
                   </Tooltip>
                 )}
                 {url && (
-                  <Link
+                  <ExternalNavIcon
                     href={shortId ? url.replace('.json', '.html') : url}
-                    isExternal
-                    color={primaryBlueText}
-                    fontSize={'sm'}
-                    fontWeight={'normal'}
-                    display={'flex'}
-                    alignItems={'center'}
-                    gap={1}
-                  >
-                    <ExternalLinkIcon />
-                  </Link>
+                  />
                 )}
               </Flex>
             </GridItem>

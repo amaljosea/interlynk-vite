@@ -3,12 +3,10 @@ import { useMemo } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles, linkURl, statusColor } from 'utils'
 
-import { ExternalLinkIcon } from '@chakra-ui/icons'
 import {
   Box,
   Flex,
   Heading,
-  Icon,
   Link,
   Stack,
   Text,
@@ -17,6 +15,7 @@ import {
 import { Tag, TagLabel } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import ExternalNavIcon from 'components/Icons/ExternalNavIcon'
 import SeverityTag from 'components/Misc/SeverityTag'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -27,17 +26,8 @@ import { IntersectingVulns } from 'graphQL/Queries'
 import { BsCircleHalf } from 'react-icons/bs'
 
 const StepTwo = ({ sbomId, currentSbomId }) => {
-  const {
-    headingTextColor,
-    primaryTextColor,
-    primaryBlueText,
-    primaryErrorColor
-  } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor',
-    'primaryBlueText',
-    'primaryErrorColor'
-  ])
+  const { headingTextColor, primaryTextColor, primaryErrorColor } =
+    useThemeColor(['headingTextColor', 'primaryTextColor', 'primaryErrorColor'])
   const { colorMode } = useColorMode()
   const { prodVulnState, dispatch } = useGlobalState()
   const { selectedVulns } = prodVulnState
@@ -64,12 +54,7 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
               target={'_blank'}
             >
               <Flex direction='row' alignItems={'center'} gap={2}>
-                <Icon
-                  as={ExternalLinkIcon}
-                  h={'16px'}
-                  w={'16px'}
-                  color={primaryBlueText}
-                />
+                <ExternalNavIcon />
                 <Text fontSize='sm' color={primaryTextColor}>
                   {fromVuln?.vuln?.vulnId || ''}
                 </Text>
