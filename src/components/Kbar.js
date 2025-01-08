@@ -91,7 +91,7 @@ const Kbar = () => {
     settingActions,
     'users',
     'feeds',
-    'checks',
+    'compliance',
     'lists',
     'legal',
     'integrations-org',

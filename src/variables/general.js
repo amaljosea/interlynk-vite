@@ -142,10 +142,10 @@ export const settingActions = [
     path: '/vendor/settings?tab=feeds'
   },
   {
-    id: 'checks',
-    name: 'Checks',
+    id: 'compliance',
+    name: 'Compliance',
     section: 'Organization',
-    path: '/vendor/settings?tab=checks'
+    path: '/vendor/settings?tab=compliance'
   },
   {
     id: 'lists',
