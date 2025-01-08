@@ -4,6 +4,7 @@ import { ProductUrlContextWrapper } from 'context/ProductUrlContext.js'
 import Cookies from 'js-cookie'
 import Auth from 'layouts/Auth.js'
 import Callback from 'layouts/Callback.js'
+import PageNotFound from 'layouts/PageNotFound.js'
 import Reset from 'layouts/Reset'
 import Success from 'layouts/Success'
 import React from 'react'
@@ -134,6 +135,7 @@ export const MainRoutes = () => {
         <Route path={`register`} element={<Register />} />
         <Route path={`sentry-test`} element={<SentryTest />} />
         <Route path='request-sbom-upload' element={<RequestSbomUpload />} />
+        <Route path='*' element={<PageNotFound />} />
       </Route>
     </Routes>
   )
