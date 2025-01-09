@@ -1,43 +1,43 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-const GlobalVulnSearch = ({ filters, setFilters }) => {
-  const { search } = filters || ''
-  const [searchInput, setSearchInput] = useState(search || '')
+import { useGlobalState } from 'hooks/useGlobalState'
 
-  const setSearchFilter = (value) => {
-    setFilters((oldFilter) => ({
-      ...oldFilter,
-      search: value
-    }))
-  }
+const GlobalVulnSearch = () => {
+  const { globalVulnState, dispatch } = useGlobalState()
+  const { globalVulnDispatch } = dispatch
+
+  const [searchInput, setSearchInput] = useState('')
 
   const handleSearch = (event) => {
-    const {
-      key,
-      target: { value }
-    } = event
-    if (key === 'Enter' && value !== '') {
-      setSearchFilter(value)
+    if (event.key === 'Enter' && event.target.value !== '') {
+      globalVulnDispatch({
+        type: 'CHANGE_SEARCH_INPUT',
+        payload: event.target.value
+      })
     }
   }
 
   const onClear = () => {
     setSearchInput('')
-    setFilters((oldFilter) => ({
-      ...oldFilter,
-      search: undefined
-    }))
+    globalVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
   }
 
   const onChangeSearchInput = (e) => {
-    const { value } = e.target
-    if (value === '') {
+    if (e.target.value === '') {
       onClear()
     } else {
-      setSearchInput(value)
+      setSearchInput(e.target.value)
     }
   }
+
+  useEffect(() => {
+    if (globalVulnState?.search !== '') {
+      setSearchInput(globalVulnState?.search)
+    } else {
+      setSearchInput('')
+    }
+  }, [globalVulnState?.search])
 
   return (
     <SearchFilter

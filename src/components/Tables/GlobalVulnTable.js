@@ -14,15 +14,18 @@ import EpssTag from 'components/Misc/EpssTag'
 import SeverityTag from 'components/Misc/SeverityTag'
 import VulnBadge from 'components/Misc/VulnBadge'
 
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import Pagination from '../Pagination'
 
 const GlobalVulnTable = (props) => {
-  const { vulns, loading, paginationProps, filters, setFilters } = props
+  const { vulns, reset, filters, loading, paginationProps } = props
 
-  const { field } = filters
+  const { globalVulnState, dispatch } = useGlobalState()
+  const { globalVulnDispatch } = dispatch
+
   const { generateProductVulnerabilityDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
 
@@ -223,17 +226,17 @@ const GlobalVulnTable = (props) => {
   ]
 
   // HEADER
-  const subHeaderComponent = (
-    <SubHeader filters={filters} setFilters={setFilters} />
-  )
+  const subHeaderComponent = <SubHeader reset={reset} filters={filters} />
 
   // SORTING
   const handleSort = (column, sortDirection) => {
-    setFilters((oldFilters) => ({
-      ...oldFilters,
-      field: column?.id,
-      direction: sortDirection.toUpperCase()
-    }))
+    globalVulnDispatch({
+      type: 'SET_SORT_ORDER',
+      payload: {
+        field: column?.id,
+        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      }
+    })
   }
 
   const data = vulns?.map((row, index) => ({ ...row, key: index }))
@@ -241,19 +244,18 @@ const GlobalVulnTable = (props) => {
   return (
     <Flex flexDir={'column'} width={'100%'}>
       <DataTable
-        columns={columns}
+        subHeader
+        responsive
         data={data}
-        keyField='key'
+        persistTableHead
+        columns={columns}
         onSort={handleSort}
-        defaultSortFieldId={field}
-        defaultSortAsc={false}
-        customStyles={customStyles(headingTextColor)}
         progressPending={loading}
         progressComponent={<CustomLoader />}
-        subHeader
         subHeaderComponent={subHeaderComponent}
-        responsive
-        persistTableHead
+        defaultSortFieldId={globalVulnState?.field}
+        customStyles={customStyles(headingTextColor)}
+        defaultSortAsc={globalVulnState?.direction === 'ASC' ? true : false}
       />
       <Pagination {...paginationProps} />
     </Flex>

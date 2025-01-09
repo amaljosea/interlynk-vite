@@ -1,4 +1,5 @@
 import { sbomCheckReducer } from 'context/reducers'
+import { globalVulnReducer } from 'context/reducers'
 import {
   compVulnReducer,
   prodCompReducer,
@@ -148,6 +149,19 @@ const GlobalStateProvider = ({ children }) => {
     searchInput: '',
     filters: null
   })
+  // GLOBAL VULNERABILITIES
+  const [globalVulnState, globalVulnDispatch] = useReducer(globalVulnReducer, {
+    field: 'VULNS_PUBLISHED_AT',
+    direction: 'DESC',
+    search: '',
+    projectGroupIds: [],
+    projectNames: [],
+    severity: [],
+    kev: '',
+    epss: '',
+    minEpss: 0,
+    maxEpss: 0
+  })
 
   const onChangeEnv = (env) => {
     localStorage.setItem('environment', env)
@@ -191,6 +205,7 @@ const GlobalStateProvider = ({ children }) => {
         toolsState,
         onChangeEnv,
         sbomCheckState,
+        globalVulnState,
         dispatch: {
           compVulnDispatch,
           prodDispatch,
@@ -200,7 +215,8 @@ const GlobalStateProvider = ({ children }) => {
           sbomDispatch,
           versionDispatch,
           toolsDispatch,
-          sbomCheckDispatch
+          sbomCheckDispatch,
+          globalVulnDispatch
         }
       }}
     >

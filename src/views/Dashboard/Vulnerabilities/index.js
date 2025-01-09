@@ -1,5 +1,5 @@
-import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { getFilterValue, parseEpssRange, setKEV } from 'utils'
 
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 
@@ -7,6 +7,7 @@ import Card from 'components/Card/Card'
 import CustomVulnTable from 'components/Tables/CustomVulnTable'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
 
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
@@ -20,6 +21,7 @@ const tabs = ['productVulnerabilities', 'customVulnerabilities']
 const Vulnerabilities = () => {
   const params = useParams()
   const navigate = useNavigate()
+  const { globalVulnState } = useGlobalState()
   const vulnId = useQueryParam('vulnId') || params.vulnerabilityid
 
   const tab = useQueryParam('tab')
@@ -30,21 +32,27 @@ const Vulnerabilities = () => {
     navigate(link)
   }
 
-  const [filters, setFilters] = useState({
-    field: 'VULNS_PUBLISHED_AT',
-    direction: 'DESC'
-  })
-
   const vulnsPermissions = useHasPermission({ parentKey: 'view_feeds' })
+
+  const epssRange = parseEpssRange(globalVulnState?.epss)
+
+  const filters = {
+    epss: epssRange,
+    field: globalVulnState?.field,
+    kev: setKEV(globalVulnState?.kev),
+    direction: globalVulnState?.direction,
+    search: globalVulnState?.search || undefined,
+    severity: getFilterValue(globalVulnState?.severity),
+    projectNames: getFilterValue(globalVulnState?.projectNames),
+    projectGroupIds: getFilterValue(globalVulnState?.projectGroupIds)
+  }
 
   const { nodes, paginationProps, reset, loading } = usePaginatedQuery(
     GetGlobalVulns,
     {
       skip: tab === 'productVulnerabilities' && vulnsPermissions ? false : true,
       selector: 'organization.vulns',
-      variables: {
-        ...filters
-      }
+      variables: { ...filters }
     }
   )
 
@@ -73,14 +81,11 @@ const Vulnerabilities = () => {
         <TabPanels>
           <TabPanel>
             <GlobalVulnTable
-              loading={loading}
               vulns={nodes}
-              paginationProps={paginationProps}
+              reset={reset}
               filters={filters}
-              setFilters={(newFilters) => {
-                setFilters(newFilters)
-                reset()
-              }}
+              loading={loading}
+              paginationProps={paginationProps}
             />
           </TabPanel>
           <TabPanel>

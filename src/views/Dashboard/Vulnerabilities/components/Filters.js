@@ -1,11 +1,11 @@
 import GlobalVulnFilters from './GlobalVulnFilters'
 import GlobalVulnSearch from './GlobalVulnSearch'
 
-const Filters = ({ filters, setFilters }) => {
+const Filters = ({ reset }) => {
   return (
     <>
-      <GlobalVulnSearch filters={filters} setFilters={setFilters} />
-      <GlobalVulnFilters setFilters={setFilters} />
+      <GlobalVulnSearch />
+      <GlobalVulnFilters reset={reset} />
     </>
   )
 }

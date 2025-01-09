@@ -71,6 +71,9 @@ import {
 import { MdDelete, MdOutlineArchive, MdOutlineUnarchive } from 'react-icons/md'
 import { VscDebugRerun } from 'react-icons/vsc'
 
+export const getFilterValue = (value, allValue = 'all') =>
+  value.includes(allValue) || value.length === 0 ? undefined : value
+
 export const formatString = (input) => {
   return input
     ?.split('_')

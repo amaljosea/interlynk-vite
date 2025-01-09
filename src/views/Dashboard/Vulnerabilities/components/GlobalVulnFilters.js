@@ -1,31 +1,43 @@
 import { useQuery } from '@apollo/client'
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import { useParams } from 'react-router-dom'
 
+import { Box, Button, Flex, Stack, useDisclosure } from '@chakra-ui/react'
 import {
-  Box,
-  Button,
-  Flex,
-  Input,
-  InputGroup,
-  InputLeftAddon,
-  InputRightAddon,
   Menu,
   MenuDivider,
   MenuItemOption,
   MenuList,
-  MenuOptionGroup,
-  Stack,
-  useDisclosure
+  MenuOptionGroup
+} from '@chakra-ui/react'
+import {
+  Input,
+  InputGroup,
+  InputLeftAddon,
+  InputRightAddon
 } from '@chakra-ui/react'
 
 import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
 
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import { GetProductNames } from 'graphQL/Queries'
 
-const GlobalVulnsFilters = ({ setFilters }) => {
+const GlobalVulnsFilters = ({ reset }) => {
   const params = useParams()
+  const { globalVulnState, dispatch } = useGlobalState()
+  const {
+    projectGroupIds,
+    projectNames,
+    severity,
+    kev,
+    epss,
+    minEpss,
+    maxEpss
+  } = globalVulnState
+
+  const { globalVulnDispatch } = dispatch
   const productView = window.location.pathname.startsWith(`/vendor/products`)
 
   const { data } = useQuery(GetProductNames, {
@@ -57,107 +69,67 @@ const GlobalVulnsFilters = ({ setFilters }) => {
     }
   }
 
-  // FILTER BY ENVIRONMENT
-  const [envs, setEnvs] = useState([])
-  const onFilterEnv = (value) => {
-    const filterValue = value?.includes('all') ? undefined : value
-    const allUnselected = value.length === 0
-    setEnvs(value?.includes('all') ? [] : value)
-    setFilters((oldFilters) => ({
-      ...oldFilters,
-      projectNames: allUnselected ? undefined : filterValue
-    }))
+  // FILTER BY PRODUCT
+  const onFilterProduct = (value) => {
+    globalVulnDispatch({ type: 'FILTER_PRODUCT', payload: value })
+    reset()
   }
 
-  // FILTER BY PRODUCT
-  const [products, setProducts] = useState([])
-  const onFilterProduct = (value) => {
-    const filterValue = value?.includes('all') ? undefined : value
-    const allUnselected = value.length === 0
-    setProducts(value?.includes('all') ? [] : value)
-    setFilters((oldFilters) => ({
-      ...oldFilters,
-      projectGroupIds: allUnselected ? undefined : filterValue
-    }))
+  // FILTER BY ENVIRONMENT
+  const onFilterEnv = (value) => {
+    globalVulnDispatch({ type: 'FILTER_ENV', payload: value })
+    reset()
   }
+
   // FILTER BY SEVERITY
-  const [severities, setSeverities] = useState([])
   const onFilterSeverity = (value) => {
-    const filterValue = value?.includes('all') ? undefined : value
-    const allUnselected = value.length === 0
-    setSeverities(value?.includes('all') ? [] : value)
-    setFilters((oldFilters) => ({
-      ...oldFilters,
-      severity: allUnselected ? undefined : filterValue
-    }))
+    globalVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
+    reset()
   }
-  // FILTER BY STATUS
-  const [statues, setStatues] = useState([])
-  const onFilterStatus = (value) => {
-    const filterValue = value?.includes('all') ? undefined : value
-    setStatues(value?.includes('all') ? [] : value)
-    setFilters((oldFilters) => ({
-      ...oldFilters,
-      status: filterValue
-    }))
-  }
+
   // FILTER BY KEV
-  const [kev, setKev] = useState('')
   const onFilterKev = (value) => {
-    const filterValue =
-      value === 'yes' ? true : value === 'false' ? false : undefined
-    setKev(value === 'all' ? '' : value)
-    setFilters((oldFilters) => ({
-      ...oldFilters,
-      kev: filterValue
-    }))
+    globalVulnDispatch({ type: 'FILTER_KEV', payload: value })
+    reset()
   }
   // FILTER BY EPSS
-  const [epss, setEpss] = useState('')
   const onFilterEpss = (value) => {
-    const epssRange = value !== 'all' && value !== '' && value?.split('-')
-    const range = {
-      min: parseFloat(epssRange[0]) / 100,
-      max: parseFloat(epssRange[1]) / 100
-    }
-    const filterValue = value === 'all' || value === '' ? undefined : range
-    setEpss(value === 'all' ? '' : value)
-    setFilters((oldFilters) => ({
-      ...oldFilters,
-      epss: filterValue
-    }))
-    setMinEpss(0)
-    setMaxEpss(0)
+    globalVulnDispatch({ type: 'FILTER_EPSS', payload: value })
+    reset()
   }
+
   // FILTER BY CUSTOM EPSS RANGE
-  const [minEpss, setMinEpss] = useState(0)
-  const [maxEpss, setMaxEpss] = useState(0)
   const handleSubmit = () => {
-    setEpss('')
-    const value = `${minEpss}-${maxEpss}`
-    const epssRange = value !== 'all' && value !== '' && value?.split('-')
-    const range = {
-      min: parseFloat(epssRange[0]) / 100,
-      max: parseFloat(epssRange[1]) / 100
-    }
-    const filterValue = value === 'all' || value === '' ? undefined : range
-    setFilters((oldFilters) => ({
-      ...oldFilters,
-      epss: filterValue
-    }))
+    globalVulnDispatch({
+      type: 'SET_EPSS',
+      payload: `${globalVulnState?.minEpss}-${globalVulnState?.maxEpss}`
+    })
+    reset()
     onClose()
+  }
+
+  const onChangeMinEpss = (e) => {
+    globalVulnDispatch({
+      type: 'SET_MIN_EPSS',
+      payload: e.target.value
+    })
+  }
+
+  const onChangeMaxEpss = (e) => {
+    globalVulnDispatch({
+      type: 'SET_MAX_EPSS',
+      payload: e.target.value
+    })
   }
 
   const getStatus = (category) => {
     switch (category) {
       case 'products':
-        return products?.length !== 0 && !products.includes('all')
+        return projectGroupIds?.length !== 0 && !projectGroupIds.includes('all')
       case 'envs':
-        return envs.length !== 0 && !envs.includes('all')
+        return projectNames.length !== 0 && !projectNames.includes('all')
       case 'severities':
-        return severities?.length !== 0 && !severities.includes('all')
-      case 'statues':
-        return statues.length !== 0 && !statues.includes('all')
+        return severity?.length !== 0 && !severity.includes('all')
       case 'kev':
         return kev !== 'all' && kev !== ''
       case 'epss':
@@ -182,7 +154,7 @@ const GlobalVulnsFilters = ({ setFilters }) => {
           >
             <MenuOptionGroup
               type='checkbox'
-              value={products}
+              value={projectGroupIds}
               onChange={onFilterProduct}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>
@@ -206,7 +178,7 @@ const GlobalVulnsFilters = ({ setFilters }) => {
           <MenuHeading title={'Environment'} active={getStatus('envs')} />
           <CustomList
             options={['default', 'development', 'production']}
-            value={envs}
+            value={projectNames}
             onChange={onFilterEnv}
           />
         </Menu>
@@ -217,19 +189,8 @@ const GlobalVulnsFilters = ({ setFilters }) => {
           <MenuHeading title={'Severity'} active={getStatus('severities')} />
           <CustomList
             options={['critical', 'high', 'medium', 'low', 'unknown']}
-            value={severities}
+            value={severity}
             onChange={onFilterSeverity}
-          />
-        </Menu>
-      </Box>
-      {/* STATUSES */}
-      <Box width={'fit-content'} hidden>
-        <Menu closeOnSelect={false}>
-          <MenuHeading title={'Status'} active={getStatus('statues')} />
-          <CustomList
-            options={['Affected', 'Fixed', 'In Triage', 'Not Affected']}
-            value={statues}
-            onChange={onFilterStatus}
           />
         </Menu>
       </Box>
@@ -277,7 +238,7 @@ const GlobalVulnsFilters = ({ setFilters }) => {
                     value={minEpss}
                     ref={minRef}
                     onKeyDown={onMinKeyDown}
-                    onChange={(e) => setMinEpss(e.target.value)}
+                    onChange={onChangeMinEpss}
                   />
                   <InputRightAddon>%</InputRightAddon>
                 </InputGroup>
@@ -291,7 +252,7 @@ const GlobalVulnsFilters = ({ setFilters }) => {
                     value={maxEpss}
                     ref={maxRef}
                     onKeyDown={onMaxKeyDown}
-                    onChange={(e) => setMaxEpss(e.target.value)}
+                    onChange={onChangeMaxEpss}
                   />
                   <InputRightAddon>%</InputRightAddon>
                 </InputGroup>

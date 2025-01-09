@@ -6,13 +6,13 @@ import RefreshBtn from 'components/Icons/RefreshBtn'
 
 import Filters from './Filters'
 
-const SubHeader = ({ filters, setFilters }) => {
+const SubHeader = ({ reset, filters }) => {
   const isVuln = window.location.pathname === '/vendor/vulnerabilities'
 
   return (
     <Flex width={'100%'} alignItems={'center'} justifyContent={'space-between'}>
       <Flex gap={2} spacing={isVuln ? 3 : 1}>
-        <Filters filters={filters} setFilters={setFilters} />
+        <Filters reset={reset} />
       </Flex>
       <Flex gap={2}>
         <ExportCsv tableType='Vulnerability View' filters={{ ...filters }} />
