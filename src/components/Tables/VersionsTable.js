@@ -682,7 +682,7 @@ const VersionsTable = (props) => {
     customStyles: customStyles(headingTextColor),
     onSort: handleSort,
     defaultSortFieldId: filters?.field,
-    defaultSortAsc: false,
+    defaultSortAsc: filters?.direction === 'ASC' ? true : false,
     subHeader: true,
     subHeaderComponent: subHeaderComponent,
     progressPending: loading,

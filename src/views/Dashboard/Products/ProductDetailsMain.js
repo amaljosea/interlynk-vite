@@ -48,13 +48,13 @@ const ProductDetailsMain = () => {
   const productGroupId = params.productgroupid
   const sbomId = params.sbomid
 
-  const { dispatch, envName } = useGlobalState()
+  const { dispatch, envName, versionState } = useGlobalState()
   const { setIsOpen, setCurrentStep } = useTour()
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
   const activeTour = localStorage.getItem('activeTour')
 
-  const { prodVulnDispatch } = dispatch
+  const { prodVulnDispatch, versionDispatch } = dispatch
   const [activeEnv, setActiveEnv] = useState(productId || '')
 
   // GET PROJECT DATA
@@ -65,8 +65,9 @@ const ProductDetailsMain = () => {
   const { name, description, projects } = data?.projectGroup || ''
 
   const [versionFilters, setVersionFilters] = useState({
-    field: 'SBOMS_CREATED_AT',
-    direction: 'DESC'
+    field: versionState?.field,
+    direction: versionState?.direction,
+    search: versionFilters?.search
   })
 
   const ENV = useDisclosure()
@@ -105,6 +106,13 @@ const ProductDetailsMain = () => {
       field: column?.id,
       direction: sortDirection.toUpperCase()
     }))
+    versionDispatch({
+      type: 'SET_SORT_ORDER',
+      payload: {
+        field: column.id,
+        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      }
+    })
   }
 
   const { data: settings, loading: settingsLoading } = useQuery(
@@ -174,6 +182,7 @@ const ProductDetailsMain = () => {
           <CardBody>
             <ProductTabs
               activeEnv={activeEnv}
+              handleSort={handleSort}
               filters={versionFilters}
               data={data?.projectGroup}
               settings={projectSetting}
