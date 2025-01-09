@@ -82,7 +82,7 @@ const ExpandedComponent = (props) => {
           <GridItem colSpan={3}>
             <CustomText>Description :</CustomText>
             <Text sx={textStyle} width={'90%'}>
-              {data?.description !== '' ? data?.description : 'N/A'}
+              {data?.description ? data?.description : 'N/A'}
             </Text>
           </GridItem>
           <GridItem colSpan={3}>
