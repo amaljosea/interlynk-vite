@@ -109,7 +109,7 @@ const SystemLogs = ({ isOpen, onClose }) => {
   const setAction = (type, subject) => {
     switch (type) {
       case 'cpe':
-        return `CPE: ${subject?.cpe || 'N/A'}`
+        return `CPE: ${subject?.cpes || 'N/A'}`
       case 'purl':
         return `PURL: ${subject?.purl || 'N/A'}`
     }
