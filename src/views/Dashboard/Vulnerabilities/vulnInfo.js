@@ -2,7 +2,8 @@ import { useQuery } from '@apollo/client'
 import { useParams } from 'react-router-dom'
 import { getFullDate, linkURl } from 'utils'
 
-import { Grid, GridItem, Link, SimpleGrid } from '@chakra-ui/react'
+import { Link, SimpleGrid, SkeletonText } from '@chakra-ui/react'
+import { Grid, GridItem } from '@chakra-ui/react'
 import { Flex, Icon, Stack, Text, useDisclosure } from '@chakra-ui/react'
 import { Stat, StatLabel, StatNumber } from '@chakra-ui/react'
 
@@ -55,7 +56,7 @@ const VulnInfo = () => {
   const { primaryBlueText, secondaryBlueText, primaryTextColor } =
     useThemeColor(['primaryBlueText', 'secondaryBlueText', 'primaryTextColor'])
 
-  const { data } = useQuery(GetGlobalVulnData, {
+  const { data, loading } = useQuery(GetGlobalVulnData, {
     skip: id ? false : true,
     variables: { id }
   })
@@ -80,6 +81,15 @@ const VulnInfo = () => {
     cvssVector && !cvssVector?.startsWith('[')
       ? primaryBlueText
       : primaryTextColor
+
+  const isInvalid = cvssVector?.startsWith('[')
+
+  if (loading)
+    return (
+      <Card>
+        <SkeletonText mx='2' noOfLines={4} spacing='4' skeletonHeight='4' />
+      </Card>
+    )
 
   return (
     <>
@@ -135,7 +145,7 @@ const VulnInfo = () => {
                     <Text
                       color={cvssColor}
                       cursor={'pointer'}
-                      onClick={cvssVector ? onOpen : null}
+                      onClick={() => (isInvalid ? null : onOpen())}
                     >
                       {cvssVector || 'N/A'}
                     </Text>
