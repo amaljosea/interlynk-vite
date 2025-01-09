@@ -63,6 +63,17 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
   const [description, setDescription] = useState('')
   const [isCreateDisabled, setIsCreateDisabled] = useState(true)
 
+  const formatCustomVulnFields = (customFields) => {
+    if (customFields.length === 0) return ''
+
+    return customFields
+      .map(
+        (field) =>
+          `${field.componentVulnCustomFieldDefinition.displayName}: ${field.value}`
+      )
+      .join('\n')
+  }
+
   useEffect(() => {
     const vulnId = row.vuln?.vulnId || 'N/A'
     const desc = row.vuln?.desc || 'N/A'
@@ -79,6 +90,7 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
     const impact = row.impact || 'N/A'
     const justification = row.vexJustification?.name || 'N/A'
     const note = row?.note || 'N/A'
+    const customFields = formatCustomVulnFields(row?.componentVulnCustomFields)
 
     setDescription(
       `Subject: [${vulnId}]: ${desc}\n
@@ -103,6 +115,7 @@ Vulnerability Action Statement: ${actionStmt}\n
 Vulnerability Impact: ${impact}\n
 Vulnerability Justification: ${justification}\n
 Vulnerability Notes: ${note}\n
+${customFields}
       `
     )
     setSummary(`[Vulnerability]: ${vulnId}`)
