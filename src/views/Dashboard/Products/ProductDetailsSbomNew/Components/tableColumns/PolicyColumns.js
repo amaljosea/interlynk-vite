@@ -1,12 +1,15 @@
 import { useMemo } from 'react'
 import { getColor, getFullDate, timeSince } from 'utils'
 
-import { Spinner, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
+import { Spinner, Stack, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const PolicyColumns = (isInitialized) => {
-  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
+  const { primaryTextColor, secondaryTextInverse } = useThemeColor([
+    'primaryTextColor',
+    'secondaryTextInverse'
+  ])
 
   return useMemo(() => {
     const columns = [
@@ -15,8 +18,16 @@ const PolicyColumns = (isInitialized) => {
         name: 'POLICY',
         selector: (row) => {
           const { policy } = row
-          return <Text color={primaryTextColor}>{policy?.name || ''}</Text>
+          return (
+            <Stack my={4} spacing={1}>
+              <Text color={primaryTextColor}>{policy?.name || ''}</Text>
+              <Text size='sm' color={secondaryTextInverse}>
+                {policy?.description}
+              </Text>
+            </Stack>
+          )
         },
+        width: '40%',
         wrap: true
       },
       {
@@ -24,7 +35,6 @@ const PolicyColumns = (isInitialized) => {
         name: 'RESULT',
         selector: (row) => {
           const { resultType } = row
-
           return (
             <Tag minW={'100px'} colorScheme={getColor(resultType)}>
               <TagLabel mx={'auto'} pt={0.5} textTransform={'capitalize'}>
@@ -56,7 +66,6 @@ const PolicyColumns = (isInitialized) => {
           )
         },
         right: 'true',
-        width: '10%',
         wrap: true
       },
       // CREATED AT
@@ -68,14 +77,13 @@ const PolicyColumns = (isInitialized) => {
             <Text color={primaryTextColor}>{timeSince(row?.updatedAt)}</Text>
           </Tooltip>
         ),
-        width: '14%',
         right: 'true',
         wrap: true
       }
     ]
 
     return columns
-  }, [isInitialized, primaryTextColor])
+  }, [isInitialized, primaryTextColor, secondaryTextInverse])
 }
 
 export default PolicyColumns

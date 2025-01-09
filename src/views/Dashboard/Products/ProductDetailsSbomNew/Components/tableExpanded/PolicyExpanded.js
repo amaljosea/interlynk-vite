@@ -1,22 +1,9 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
+import { getIcon } from 'utils'
 
-import {
-  Box,
-  Flex,
-  Heading,
-  IconButton,
-  Table,
-  TableContainer,
-  Tag,
-  TagLabel,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tooltip,
-  Tr
-} from '@chakra-ui/react'
+import { Box, Flex, Stack, Text, Tooltip } from '@chakra-ui/react'
+import { Icon, IconButton } from '@chakra-ui/react'
+import { Input, InputGroup, InputLeftAddon } from '@chakra-ui/react'
 
 import { CustomText } from 'components/Misc/CustomText'
 
@@ -27,7 +14,12 @@ import { FaEye } from 'react-icons/fa'
 const ExpandedComponent = ({ data, onCheckViolations }) => {
   const { policy } = data
 
-  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
+  const { primaryBlueText, primaryTextColor, secondaryTextInverse } =
+    useThemeColor([
+      'primaryBlueText',
+      'primaryTextColor',
+      'secondaryTextInverse'
+    ])
 
   return useMemo(() => {
     return (
@@ -38,118 +30,105 @@ const ExpandedComponent = ({ data, onCheckViolations }) => {
         flexDir={'column'}
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
-        {/* Description */}
         <Box>
-          <CustomText>Description :</CustomText>
-          <Text
-            color={primaryTextColor}
-            width={'90%'}
-            mt={1}
-            fontSize={14}
-            wordBreak={'break-all'}
-          >
-            {policy?.description || ''}
-          </Text>
-        </Box>
-
-        {/* Results Table */}
-        <Box>
-          <Heading
-            mb={2}
-            fontFamily={'inherit'}
-            fontSize={'sm'}
-            color={primaryTextColor}
-            textTransform={'uppercase'}
-          >
-            Results
-          </Heading>
-          <TableContainer>
-            <Table variant='striped'>
-              <Thead>
-                <Tr>
-                  {['subject', 'operator', 'value', 'violations', 'action'].map(
-                    (item, index) => (
-                      <Th
-                        fontFamily={'inherit'}
-                        key={index}
-                        color={primaryTextColor}
-                        isNumeric={item === 'action' || item === 'violations'}
+          <CustomText>RESULTS :</CustomText>
+          {policy?.policyRules?.length > 0 ? (
+            <Stack mt={3} spacing={3}>
+              {policy?.policyRules?.map((item, index) => (
+                <Flex gap={3} w={'100%'} key={index} alignItems={'center'}>
+                  <Text w={'32'} fontSize={'sm'} color={primaryTextColor}>
+                    {index + 1}.
+                  </Text>
+                  <InputGroup
+                    size='sm'
+                    fontSize={'sm'}
+                    color={primaryTextColor}
+                  >
+                    <InputLeftAddon>
+                      <Tooltip
+                        label={item?.category}
+                        textTransform={'capitalize'}
                       >
-                        {item}
-                      </Th>
-                    )
-                  )}
-                </Tr>
-              </Thead>
-              <Tbody>
-                {policy?.policyRules?.length > 0 &&
-                  policy?.policyRules?.map((item, index) => (
-                    <Tr key={index}>
-                      {/* Subject */}
-                      <Td>
-                        <Text
-                          color={primaryTextColor}
-                          fontSize={'sm'}
-                          textTransform={'capitalize'}
-                        >
-                          {`${item?.category} ${item?.name}`}
-                        </Text>
-                      </Td>
-
-                      {/* Operator */}
-                      <Td>
-                        <Text
-                          color={primaryTextColor}
-                          fontSize={'sm'}
-                          textTransform={'lowercase'}
-                        >
-                          {item?.operatorWording}
-                        </Text>
-                      </Td>
-
-                      {/* Value */}
-                      <Td>
-                        <Text
-                          color={primaryTextColor}
-                          fontSize={'sm'}
-                          wordBreak={'break-all'}
-                        >
-                          {item?.value}
-                        </Text>
-                      </Td>
-
-                      {/* Violations */}
-                      <Td isNumeric>
-                        <Tag width={'80px'} colorScheme='blue'>
-                          <TagLabel mx={'auto'}>
-                            {item?.policyRuleViolations?.totalCount || 0}
-                          </TagLabel>
-                        </Tag>
-                      </Td>
-
-                      {/* Action */}
-                      <Td isNumeric>
-                        <Tooltip label={'View Violations'}>
-                          <IconButton
-                            size='sm'
-                            icon={<FaEye />}
-                            colorScheme='blue'
-                            fontWeight={'medium'}
-                            onClick={() =>
-                              onCheckViolations(policy?.name, item)
-                            }
+                        <Flex>
+                          <Icon
+                            color={primaryBlueText}
+                            as={getIcon(item?.subject)}
                           />
-                        </Tooltip>
-                      </Td>
-                    </Tr>
-                  ))}
-              </Tbody>
-            </Table>
-          </TableContainer>
+                        </Flex>
+                      </Tooltip>
+                    </InputLeftAddon>
+                    <Input
+                      readOnly
+                      textTransform={'capitalize'}
+                      defaultValue={item?.name}
+                      _focus={{ boxShadow: 'none' }}
+                    />
+                  </InputGroup>
+                  <InputGroup
+                    size='sm'
+                    fontSize={'sm'}
+                    color={primaryTextColor}
+                  >
+                    <InputLeftAddon>Operator</InputLeftAddon>
+                    <Input
+                      readOnly
+                      _focus={{ boxShadow: 'none' }}
+                      defaultValue={item?.operatorWording?.toLowerCase()}
+                    />
+                  </InputGroup>
+                  <InputGroup
+                    size='sm'
+                    fontSize={'sm'}
+                    color={primaryTextColor}
+                  >
+                    <InputLeftAddon>Value</InputLeftAddon>
+                    <Input
+                      readOnly
+                      _focus={{ boxShadow: 'none' }}
+                      defaultValue={item?.value || 'N/A'}
+                    />
+                  </InputGroup>
+                  <InputGroup
+                    size='sm'
+                    fontSize={'sm'}
+                    color={primaryTextColor}
+                  >
+                    <InputLeftAddon>Violation</InputLeftAddon>
+                    <Input
+                      readOnly
+                      _focus={{ boxShadow: 'none' }}
+                      defaultValue={item?.policyRuleViolations?.totalCount || 0}
+                    />
+                  </InputGroup>
+                  <Tooltip label={'View Violations'}>
+                    <IconButton
+                      size='sm'
+                      icon={<FaEye />}
+                      w={'fit-content'}
+                      colorScheme='blue'
+                      fontWeight={'medium'}
+                      onClick={() => onCheckViolations(policy?.name, item)}
+                    />
+                  </Tooltip>
+                </Flex>
+              ))}
+            </Stack>
+          ) : (
+            <Text mt={3} color={secondaryTextInverse}>
+              No record to display
+            </Text>
+          )}
         </Box>
       </Flex>
     )
-  }, [onCheckViolations, policy, primaryTextColor])
+  }, [
+    onCheckViolations,
+    policy?.name,
+    policy?.policyRules,
+    primaryBlueText,
+    primaryTextColor,
+    secondaryTextInverse
+  ])
 }
 
 export default ExpandedComponent

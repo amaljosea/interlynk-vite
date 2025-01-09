@@ -22,10 +22,12 @@ import { PolicyRuleViolations } from 'graphQL/Queries'
 
 const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
   const { subject, category, name, operatorWording, value } = activeRow || null
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
+  const { headingTextColor, primaryTextColor, secondaryTextColor } =
+    useThemeColor([
+      'headingTextColor',
+      'primaryTextColor',
+      'secondaryTextColor'
+    ])
 
   const { nodes, paginationProps, loading } = usePaginatedQuery(
     PolicyRuleViolations,
@@ -40,6 +42,7 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
     {
       id: 'COMPONENT',
       name: 'COMPONENT',
+      compact: true,
       selector: (row) => {
         const { violation, component } = row || ''
         const { primaryComponent } = violation || ''
@@ -67,6 +70,7 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
     {
       id: 'LICENSE',
       name: 'LICENSE',
+      style: { padding: 0, margin: 0 },
       selector: (row) => {
         const { component } = row
         return (
@@ -106,13 +110,13 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
         <DrawerBody py={4}>
           <Stack spacing={3} direction={'column'}>
             <Stack spacing={0}>
-              <Text fontWeight={'semibold'}>Policy:</Text>
+              <Text color={secondaryTextColor}>Policy:</Text>
               <Text textTransform={'capitalize'}>
                 {truncatedValue(policy, 30)}
               </Text>
             </Stack>
             <Stack spacing={0}>
-              <Text fontWeight={'semibold'}>Condition:</Text>
+              <Text color={secondaryTextColor}>Condition:</Text>
               <Text textTransform={'capitalize'}>
                 {category} {name} {operatorWording} {value}
               </Text>
@@ -120,24 +124,31 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
             {supplierExists &&
               nodes?.map((item, index) => (
                 <Stack key={index} spacing={0}>
-                  <Text fontWeight={'semibold'}>Value:</Text>
-                  {item?.violation?.suppliers?.map((item, idx) => (
-                    <Text key={idx}>
-                      {idx + 1}:{' '}
-                      {`${item?.contactName || ''} (${item?.contactEmail || ''}) - ${item?.name || ''}`}
-                    </Text>
-                  ))}
+                  <Text color={secondaryTextColor}>Value:</Text>
+                  {item?.violation?.suppliers?.length > 0 ? (
+                    item?.violation?.suppliers?.map((item, idx) => (
+                      <Text key={idx}>
+                        {`${item?.contactName || ''} (${item?.contactEmail || ''}) - ${item?.name || ''}`}
+                      </Text>
+                    ))
+                  ) : (
+                    <Text>Not Available</Text>
+                  )}
                 </Stack>
               ))}
             {authorExists &&
               nodes?.map((item, index) => (
                 <Stack key={index} spacing={0}>
-                  <Text fontWeight={'semibold'}>Value:</Text>
-                  {item?.violation?.authors?.map((item, idx) => (
-                    <Text key={idx}>
-                      {idx + 1}: {`${item?.name || ''} ${item?.email || ''}`}
-                    </Text>
-                  ))}
+                  <Text color={secondaryTextColor}>Value:</Text>
+                  {item?.violation?.authors?.length > 0 ? (
+                    item?.violation?.authors?.map((item, idx) => (
+                      <Text key={idx}>
+                        {idx + 1}: {`${item?.name || ''} ${item?.email || ''}`}
+                      </Text>
+                    ))
+                  ) : (
+                    <Text>Not Available</Text>
+                  )}
                 </Stack>
               ))}
             {(subject === 'VERSION_PRIMARY' ||
@@ -145,17 +156,18 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
               nodes?.length > 0 && (
                 <Stack spacing={0}>
                   <Text fontWeight={'semibold'}>Value:</Text>
-                  <Text style={{ textTransform: 'capitalize' }}>
-                    {nodes[0].violation?.primaryComponent?.name}-{' '}
-                    {nodes[0].violation?.primaryComponent?.version}
-                  </Text>
+                  {nodes[0].violation?.primaryComponent?.name ? (
+                    <Text style={{ textTransform: 'capitalize' }}>
+                      {nodes[0].violation?.primaryComponent?.name}-{' '}
+                      {nodes[0].violation?.primaryComponent?.version}
+                    </Text>
+                  ) : (
+                    <Text>Not Available</Text>
+                  )}
                 </Stack>
               )}
-            <Text
-              hidden={category === 'version'}
-              sx={{ fontSize: 'md', fontWeight: 'bold' }}
-            >
-              Violations List
+            <Text color={secondaryTextColor} hidden={category === 'version'}>
+              Violations List:
             </Text>
           </Stack>
           <Box overflowY={'scroll'} hidden={category === 'version'}>
@@ -169,7 +181,7 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
               persistTableHead
             />
           </Box>
-          <Box hidden={category === 'version'}>
+          <Box hidden={category === 'version' || nodes?.length === 0}>
             <Pagination {...paginationProps} />
           </Box>
         </DrawerBody>

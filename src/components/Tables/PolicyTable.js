@@ -1,18 +1,20 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { customStyles, getFullDate, timeSince, updatedValue } from 'utils'
+import { getIcon } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import DeleteModal from 'views/Dashboard/Policies/DeleteModal'
 import PolicyModal from 'views/Dashboard/Policies/PolicyModal'
 import RuleModal from 'views/Dashboard/Policies/RuleModal'
 import WarnModal from 'views/Dashboard/Policies/WarnModal'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import {
   Box,
   Flex,
-  Heading,
+  Icon,
   Portal,
   Select,
   Stack,
@@ -20,16 +22,8 @@ import {
   Tooltip,
   useDisclosure
 } from '@chakra-ui/react'
+import { Input, InputGroup, InputLeftAddon } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
-import {
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr
-} from '@chakra-ui/react'
 import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
@@ -48,7 +42,9 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { DeletePolicyExclusion, PolicyExclusionCreate } from 'graphQL/Mutation'
 import { PolicySubjectOperators } from 'graphQL/Queries'
 
-const PolicyTable = ({ data, loading, paginationProps }) => {
+const PolicyTable = (props) => {
+  const { data, filters, setFilters, loading, paginationProps } = props
+
   const { showToast } = useCustomToast()
   const location = useLocation()
   const params = useParams()
@@ -71,18 +67,22 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
   })
 
   const {
+    primaryBlueText,
     headingTextColor,
     primaryTextColor,
     secondaryTextInverse,
     primaryErrorColor
   } = useThemeColor([
+    'primaryBlueText',
     'headingTextColor',
     'primaryTextColor',
     'secondaryTextInverse',
     'primaryErrorColor'
   ])
 
+  const { search } = filters || ''
   const [activeRow, setActiveRow] = useState(null)
+  const [filterText, setFilterText] = useState(filters ? search : '')
 
   const { POLICIES } = ProductDetailsTabs
 
@@ -98,7 +98,7 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
       const result = subOperators.policySubjectOperatorMapping.find(
         (item) => item?.subject === value
       )
-      return `${result?.category} ${result?.name}`
+      return { name: result?.name, category: result?.category }
     }
   }
 
@@ -138,27 +138,91 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
     })
   }
 
+  const setSearchFilter = useCallback(
+    (value) => {
+      setFilters((oldFilter) => ({
+        ...oldFilter,
+        search: value
+      }))
+    },
+    [setFilters]
+  )
+
+  const handleClear = useCallback(async () => {
+    setFilterText('')
+    setFilters((oldFilter) => ({
+      ...oldFilter,
+      search: undefined
+    }))
+  }, [setFilters])
+
+  const onSearchInputChange = useCallback(
+    (event) => {
+      const { value } = event.target
+      if (value === '') {
+        handleClear()
+      } else {
+        setFilterText(value)
+      }
+    },
+    [handleClear]
+  )
+
+  const handleSearch = useCallback(
+    (event) => {
+      const {
+        key,
+        target: { value }
+      } = event
+      if (key === 'Enter' && value !== '') {
+        setSearchFilter(value)
+      }
+    },
+    [setSearchFilter]
+  )
+
   // SUB HEADER
   const subHeader = useMemo(() => {
+    const handleCreate = () => {
+      setActiveRow(null)
+      UPDATE.onOpen()
+    }
     return (
-      <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
-        {/* SEARCH COMPONENTS */}
+      <Flex
+        w={'100%'}
+        alignItems={'center'}
+        justifyContent={productId ? 'flex-end' : 'space-between'}
+      >
+        {!productId && (
+          <SearchFilter
+            id='policies'
+            onClear={handleClear}
+            filterText={filterText}
+            onFilter={handleSearch}
+            onChange={onSearchInputChange}
+          />
+        )}
         <Stack spacing={2} alignItems={'center'} direction={'row'}>
           <AddButton
-            label='Create Policy'
             hidden={productId}
+            label='Create Policy'
+            onClick={handleCreate}
             aria-label='add_policy'
             isDisabled={!updatePolicy}
-            onClick={() => {
-              setActiveRow(null)
-              UPDATE.onOpen()
-            }}
           />
           <RefreshBtn />
         </Stack>
       </Flex>
     )
-  }, [UPDATE, productId, updatePolicy])
+  }, [
+    UPDATE,
+    filterText,
+    handleClear,
+    handleSearch,
+    onSearchInputChange,
+    productId,
+    updatePolicy
+  ])
 
   // COLUMNS
   const columns = [
@@ -179,34 +243,62 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
           />
         )
       },
-      width: '8%',
+      width: '7%',
       omit: productId
     },
     {
       id: 'POLICY',
       name: 'POLICY',
       selector: (row, index) => (
-        <Text color={primaryTextColor} my={4} data-testid={`policy_${index}`}>
-          {row?.name}
-        </Text>
+        <Stack my={4} spacing={1}>
+          <Text color={primaryTextColor} data-testid={`policy_${index}`}>
+            {row?.name}
+          </Text>
+          <Text size='sm' color={secondaryTextInverse}>
+            {row?.description}
+          </Text>
+        </Stack>
       ),
+      width: '32%',
       wrap: true
+    },
+    {
+      id: 'EXCLUDED',
+      name: 'EXCLUDED',
+      selector: (row) => {
+        const { excludePrimaryComponent, excludeInternalComponent } = row || ''
+        return (
+          <Flex gap={2} alignItems={'center'}>
+            {excludePrimaryComponent && (
+              <Tag variant='solid' colorScheme='blue'>
+                Primary
+              </Tag>
+            )}
+            {excludeInternalComponent && (
+              <Tag variant='solid' colorScheme='cyan'>
+                Internal
+              </Tag>
+            )}
+          </Flex>
+        )
+      },
+      omit: productId
     },
     {
       id: 'CONDITIONS',
       name: 'CONDITIONS',
       selector: (row) => (
-        <Tag minW={'60px'} textTransform={'uppercase'} colorScheme='blue'>
-          <TagLabel
-            pt={0.5}
-            style={{ textTransform: 'capitalize' }}
-            mx={'auto'}
-          >
+        <Tag
+          minW={'60px'}
+          textTransform={'uppercase'}
+          colorScheme={row?.operator === 'any' ? 'red' : 'green'}
+        >
+          <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
             {row?.operator}
           </TagLabel>
         </Tag>
       ),
-      width: '12%',
+      width: '10%',
       wrap: true
     },
     {
@@ -225,17 +317,13 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
                   : 'red'
             }
           >
-            <TagLabel
-              pt={0.5}
-              style={{ textTransform: 'capitalize' }}
-              mx={'auto'}
-            >
+            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
               {resultType}
             </TagLabel>
           </Tag>
         )
       },
-      width: '12%',
+      width: '10%',
       wrap: true
     },
     // UPDATED AT
@@ -352,7 +440,16 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
 
   // EXPAND VIEW
   const ExpandedComponent = ({ data }) => {
-    const { description, policyRules } = data
+    const { policyRules } = data || {}
+
+    const getValue = (item) => {
+      const isEPSS =
+        item?.subject === 'VULNERABILITY_EPSS' &&
+        (item?.operator === 'LESS_THAN' || item?.operator === 'MORE_THAN')
+      if (item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS')
+        return ''
+      return `${item?.value}${isEPSS ? ' %' : ''}`
+    }
 
     return (
       <Flex
@@ -363,86 +460,68 @@ const PolicyTable = ({ data, loading, paginationProps }) => {
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
         <Box>
-          <CustomText>Description :</CustomText>
-          <Text
-            width={'90%'}
-            mt={1}
-            fontSize={14}
-            wordBreak={'break-all'}
-            color={primaryTextColor}
-          >
-            {description || ''}
-          </Text>
-        </Box>
-        <Box>
-          <Heading
-            mb={3}
-            fontFamily={'inherit'}
-            fontSize={'sm'}
-            color={primaryTextColor}
-          >
-            CONDITIONS
-          </Heading>
-          <TableContainer>
-            <Table variant='striped'>
-              <Thead>
-                <Tr>
-                  {['subject', 'operator', 'value'].map((item, index) => (
-                    <Th
-                      fontFamily={'inherit'}
-                      key={index}
-                      color={secondaryTextInverse}
-                      isNumeric={item === 'value'}
+          <CustomText>CONDITIONS :</CustomText>
+          <Stack mt={3} spacing={3}>
+            {policyRules?.map((item, index) => {
+              const { name, category } = formatSubject(item?.subject)
+              return (
+                <Flex gap={3} key={index} alignItems={'center'}>
+                  <Text w={'12'} fontSize={'sm'} color={primaryTextColor}>
+                    {index + 1}.
+                  </Text>
+                  <InputGroup
+                    size='sm'
+                    fontSize={'sm'}
+                    color={primaryTextColor}
+                  >
+                    <InputLeftAddon>
+                      <Tooltip label={category} textTransform={'capitalize'}>
+                        <Flex>
+                          <Icon
+                            color={primaryBlueText}
+                            as={getIcon(item.subject)}
+                          />
+                        </Flex>
+                      </Tooltip>
+                    </InputLeftAddon>
+                    <Input
+                      readOnly
+                      textTransform={'capitalize'}
+                      _focus={{ boxShadow: 'none' }}
+                      defaultValue={name}
+                    />
+                  </InputGroup>
+                  <InputGroup
+                    size='sm'
+                    fontSize={'sm'}
+                    color={primaryTextColor}
+                  >
+                    <InputLeftAddon>Operator</InputLeftAddon>
+                    <Input
+                      readOnly
+                      _focus={{ boxShadow: 'none' }}
+                      defaultValue={updatedValue(item?.operator?.toLowerCase())}
+                    />
+                  </InputGroup>
+                  {item?.value && (
+                    <InputGroup
+                      size='sm'
+                      fontSize={'sm'}
+                      color={primaryTextColor}
                     >
-                      {item}
-                    </Th>
-                  ))}
-                </Tr>
-              </Thead>
-              <Tbody>
-                {policyRules?.map((item, index) => (
-                  <Tr key={index}>
-                    <Td>
-                      <Text
-                        color={primaryTextColor}
-                        fontSize={'sm'}
+                      <InputLeftAddon>Value</InputLeftAddon>
+                      <Input
+                        readOnly
                         textTransform={'capitalize'}
-                      >
-                        {formatSubject(item?.subject)}
-                      </Text>
-                    </Td>
-                    <Td>
-                      <Text
-                        color={primaryTextColor}
-                        fontSize={'sm'}
-                        textTransform={'lowercase'}
-                      >
-                        {updatedValue(item?.operator)}
-                      </Text>
-                    </Td>
-                    <Td isNumeric>
-                      <Text
-                        color={primaryTextColor}
-                        fontSize={'sm'}
-                        wordBreak={'break-all'}
-                        hidden={
-                          item?.operator === 'EXISTS' ||
-                          item?.operator === 'NOT_EXISTS'
-                        }
-                      >
-                        {item?.value}{' '}
-                        {item?.subject === 'VULNERABILITY_EPSS' &&
-                        (item?.operator === 'LESS_THAN' ||
-                          item?.operator === 'MORE_THAN')
-                          ? ' %'
-                          : ''}
-                      </Text>
-                    </Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          </TableContainer>
+                        _focus={{ boxShadow: 'none' }}
+                        defaultValue={getValue(item)}
+                      />
+                    </InputGroup>
+                  )}
+                </Flex>
+              )
+            })}
+          </Stack>
         </Box>
       </Flex>
     )

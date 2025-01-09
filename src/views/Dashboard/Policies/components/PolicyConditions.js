@@ -150,12 +150,7 @@ const PolicyConditions = ({
             >
               <InputGroup>
                 <InputLeftElement pointerEvents='none'>
-                  <Tooltip
-                    label={item?.subject !== '' && getLabel(item?.subject)}
-                    placement='top'
-                  >
-                    <Icon color={primaryBlueText} as={getIcon(item.subject)} />
-                  </Tooltip>
+                  <Icon color={primaryBlueText} as={getIcon(item.subject)} />
                 </InputLeftElement>
                 {/* SUBJECT */}
                 <FormControl>

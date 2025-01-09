@@ -291,7 +291,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
         name: data?.name,
         desc: data?.description,
         operator: getOperator(data?.operator),
-        isPrimary: data?.excludeInternalComponent,
+        isPrimary: data?.excludePrimaryComponent,
         isInternal: data?.excludeInternalComponent,
         resultType: getResultType(data?.resultType)
       }))
