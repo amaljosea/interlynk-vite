@@ -467,6 +467,9 @@ const ProductTable = (props) => {
                     setActiveRow(row)
                     PRODUCT.onOpen()
                   }}
+                  onMouseEnter={() => {
+                    setOpenTagMenu(false)
+                  }}
                   isDisabled={!enabled || !canEditProduct}
                 >
                   Edit Product
@@ -480,8 +483,13 @@ const ProductTable = (props) => {
                     setActiveRow(row)
                   }}
                   aria-label={`add_label`}
-                  onMouseLeave={() => setOpenTagMenu(false)}
                   isDisabled={!enabled || !canEditProduct}
+                  sx={{
+                    bg:
+                      openTagMenu && activeRow === row
+                        ? semiTransparentBorder
+                        : 'inherit'
+                  }}
                 >
                   Edit Labels
                 </MenuItem>
@@ -497,7 +505,6 @@ const ProductTable = (props) => {
                       position='absolute'
                       border={`1px solid ${grayBorderColor}`}
                       onMouseEnter={() => setOpenTagMenu(true)}
-                      onMouseLeave={() => setOpenTagMenu(false)}
                     >
                       <LabelInput
                         data={row}
@@ -515,6 +522,9 @@ const ProductTable = (props) => {
                     setActiveRow(row)
                     UPLOAD.onOpen()
                   }}
+                  onMouseEnter={() => {
+                    setOpenTagMenu(false)
+                  }}
                   isDisabled={!enabled || !canCreateSBOM}
                 >
                   Upload SBOM
@@ -523,6 +533,9 @@ const ProductTable = (props) => {
                 <MenuItem
                   isDisabled={!enabled || !canEditShareynk}
                   onClick={() => onSharelynkOpen(row)}
+                  onMouseEnter={() => {
+                    setOpenTagMenu(false)
+                  }}
                 >
                   View ShareLynk
                 </MenuItem>
@@ -535,6 +548,9 @@ const ProductTable = (props) => {
                   onClick={() => {
                     setActiveRow(row)
                     DELETE.onOpen()
+                  }}
+                  onMouseEnter={() => {
+                    setOpenTagMenu(false)
                   }}
                   isDisabled={!canArchiveProduct}
                 >
