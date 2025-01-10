@@ -33,7 +33,7 @@ const ProductActions = ({ data }) => {
   const signedUrlParams = getSignedUrlParams()
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
-  const [projectDelete] = useMutation(DeleteProjectGroup)
+  const [projectDelete, { loading }] = useMutation(DeleteProjectGroup)
 
   const { id, name, description, enabled, defaultProject } = data || ''
 
@@ -168,11 +168,12 @@ const ProductActions = ({ data }) => {
       {/* DELETE */}
       {DELETE.isOpen && (
         <ConfirmationModal
+          name={name}
+          isLoading={loading}
+          title='Delete Product'
           isOpen={DELETE.isOpen}
           onClose={DELETE.onClose}
           onConfirm={onProductDelete}
-          name={name}
-          title='Delete Product'
           description='Deleting this product will:'
           items={[
             'Remove this product, its versions and SBOMs',

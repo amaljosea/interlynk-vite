@@ -1,6 +1,17 @@
+import { useState } from 'react'
+import { useParams } from 'react-router-dom'
 import { getConfirmatonModalIcon } from 'utils'
 
-import { Box, Flex, ListItem, Tag, Text, UnorderedList } from '@chakra-ui/react'
+import {
+  Box,
+  Flex,
+  Input,
+  ListItem,
+  Stack,
+  Tag,
+  Text,
+  UnorderedList
+} from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
 
@@ -15,7 +26,12 @@ const ConfirmationModal = ({
   isLoading = false,
   children
 }) => {
+  const params = useParams()
   const Icon = getConfirmatonModalIcon(title)
+
+  const [input, setInput] = useState('')
+  const warning =
+    title === 'Delete Product' && params?.productid && !params?.sbomid
 
   return (
     <LynkModal
@@ -25,6 +41,7 @@ const ConfirmationModal = ({
       title={title}
       isLoading={isLoading}
       Icon={Icon}
+      disabled={warning && input !== 'DELETE'}
       type='confirmation'
     >
       {name && (
@@ -48,7 +65,20 @@ const ConfirmationModal = ({
       )}
       {children && <Box>{children}</Box>}
       <br />
-      <Text fontWeight={500}>Are you sure you want to proceed?</Text>
+      {warning ? (
+        <Stack>
+          <Text>
+            Please type <strong>DELETE</strong> to confirm
+          </Text>
+          <Input
+            fontSize='sm'
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
+        </Stack>
+      ) : (
+        <Text fontWeight={500}>Are you sure you want to proceed?</Text>
+      )}
     </LynkModal>
   )
 }
