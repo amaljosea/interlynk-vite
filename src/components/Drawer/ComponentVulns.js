@@ -67,9 +67,7 @@ const ComponentVulns = ({ data, isOpen, onClose }) => {
         }
         return (
           <Flex alignItems={'center'} gap={2} my={3}>
-            <Tooltip label={vuln.source === 'osv' ? 'OSV View' : 'NVD View'}>
-              <ExternalNavIcon href={linkURl(vuln.source, vuln.vulnId)} />
-            </Tooltip>
+            <ExternalNavIcon href={linkURl(vuln.source, vuln.vulnId)} />
             <Text
               my={2}
               cursor={'pointer'}

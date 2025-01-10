@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { customStyles } from 'utils'
@@ -138,7 +138,7 @@ const Vulnerabilities = ({ sbomData }) => {
   })
 
   const [activeRow, setActiveRow] = useState(null)
-  const [vulnSearch, setVulnSearch] = useState(searchInput)
+  const [vulnSearch, setVulnSearch] = useState('')
   const [toggleClear, setToggleClear] = useState(false)
   const [selectedVulns, setSelectedVulns] = useState([])
   const [selectedGroup, setSelectedGroup] = useState('')
@@ -282,6 +282,14 @@ const Vulnerabilities = ({ sbomData }) => {
     JIRA,
     VULN
   )
+
+  useEffect(() => {
+    if (searchInput !== '') {
+      setVulnSearch(searchInput)
+    } else {
+      setVulnSearch('')
+    }
+  }, [searchInput])
 
   return (
     <>
