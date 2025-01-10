@@ -1,42 +1,43 @@
-import React from 'react'
-
+import { Flex, Heading, SimpleGrid, Stack, Tag } from '@chakra-ui/react'
+import { Grid, GridItem } from '@chakra-ui/react'
 import {
   Drawer,
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
   DrawerHeader,
-  DrawerOverlay,
-  Flex,
-  Grid,
-  GridItem,
-  Heading,
-  SimpleGrid,
-  Skeleton,
-  Stack,
-  Tag
+  DrawerOverlay
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
+import CustomLoader from 'components/CustomLoader'
 import SbomInfo from 'components/SbomInfo'
 import DiffTable from 'components/Tables/DiffTable'
 
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useSbomCompare } from 'hooks/useSbomCompare'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const Loader = () => {
   return (
-    <Stack width={'100%'} dir='column' spacing={6}>
-      <SimpleGrid columns={2} spacing={6}>
-        <Skeleton width={'100%'} height={64} />
-        <Skeleton width={'100%'} height={64} />
+    <Stack spacing={6}>
+      <SimpleGrid columns={2} gap={4}>
+        <Card>
+          <CustomLoader />
+        </Card>
+        <Card>
+          <CustomLoader />
+        </Card>
       </SimpleGrid>
-      <Skeleton width={'100%'} height={72} />
+      <Card>
+        <CustomLoader />
+      </Card>
     </Stack>
   )
 }
 
 const ToolsDrawer = ({ sbomIdOne, sbomIdTwo, onClose }) => {
+  const { clearSelect, setClearSelect, setSelectedSbom } = useGlobalState()
   const { sbomOne, sbomTwo, isLoading, diffs } = useSbomCompare({
     sbomIdOne,
     sbomIdTwo
@@ -49,11 +50,16 @@ const ToolsDrawer = ({ sbomIdOne, sbomIdTwo, onClose }) => {
       'secondaryGreenBorder'
     ])
 
+  const handleClear = () => {
+    setSelectedSbom([])
+    setClearSelect(!clearSelect)
+  }
+
   return (
     <Drawer size='full' isOpen={true} placement='bottom' onClose={onClose}>
       <DrawerOverlay />
       <DrawerContent>
-        <DrawerCloseButton mt={2} />
+        <DrawerCloseButton mt={2} onClick={handleClear} />
         <DrawerHeader>SBOM Comparison</DrawerHeader>
         <DrawerBody>
           {isLoading ? (

@@ -1,7 +1,7 @@
 import { gql, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { addDays, differenceInDays, parseISO } from 'date-fns'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { customStyles, getFormat, getFullDate } from 'utils'
@@ -76,8 +76,14 @@ const VersionsTable = (props) => {
   const params = useParams()
   const productId = params.productid
   const signedUrlParams = getSignedUrlParams()
-  const { clearSelect, setClearSelect } = useGlobalState()
-  const { versionState, dispatch } = useGlobalState()
+  const {
+    clearSelect,
+    setClearSelect,
+    versionState,
+    selectedSbom,
+    setSelectedSbom,
+    dispatch
+  } = useGlobalState()
   const { searchInput } = versionState
   const { prodVulnDispatch, prodCompDispatch } = dispatch
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
@@ -85,7 +91,6 @@ const VersionsTable = (props) => {
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const [filterText, setFilterText] = useState(searchInput)
   const [activeRow, setActiveRow] = useState(null)
-  const [selectedSbom, setSelectedSbom] = useState([])
   const currentDate = new Date()
 
   const {
@@ -116,11 +121,6 @@ const VersionsTable = (props) => {
 
   const { VERSIONS } = ProductDetailsTabs
 
-  useEffect(() => {
-    setSelectedSbom([])
-    setClearSelect(true)
-  }, [productId, setClearSelect])
-
   // GET PROJECT DATA
   const { data } = useQuery(
     signedUrlParams ? GetShareProjectGroup : GetProjectGroup,
@@ -144,9 +144,7 @@ const VersionsTable = (props) => {
         id: productId,
         ...filters
       },
-      onCompleted: () => {
-        setClearSelect(false)
-      }
+      onCompleted: () => setClearSelect(!clearSelect)
     })
 
   const shouldPoll = nodes?.some((item) => item?.vulnRunStatus !== 'FINISHED')
@@ -216,6 +214,11 @@ const VersionsTable = (props) => {
   const retention = retentionTime && Math.floor(retentionTime)
 
   const ignoreMsg = `An SBOM with the same version was recently imported. However, the system found no difference between the two versions, so the newer import has been ignored. On the right, you can still see its record under Action ... > View Alternates`
+
+  const onClear = useCallback(() => {
+    setSelectedSbom([])
+    setClearSelect(!clearSelect)
+  }, [clearSelect, setClearSelect, setSelectedSbom])
 
   // COLUMNS
   const columns = [
@@ -472,7 +475,10 @@ const VersionsTable = (props) => {
       selector: (row) => {
         return (
           <Menu>
-            <LynkAction aria-label={`sbom-${row?.projectVersion}-actions`} />
+            <LynkAction
+              onClick={onClear}
+              aria-label={`sbom-${row?.projectVersion}-actions`}
+            />
             <Portal>
               <MenuList fontSize={'sm'}>
                 <MenuItem
@@ -538,9 +544,10 @@ const VersionsTable = (props) => {
   ]
 
   const onBuildSbom = useCallback(() => {
+    onClear()
     prodCompDispatch({ type: 'CLEAR_LICENSES' })
     SBOM.onOpen()
-  }, [SBOM, prodCompDispatch])
+  }, [SBOM, onClear, prodCompDispatch])
 
   const handleChange = (state) => {
     setSelectedSbom(state?.selectedRows)
