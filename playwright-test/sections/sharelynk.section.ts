@@ -113,6 +113,7 @@ export default class SharelynkSection {
                   .isVisible()
 
                 if (deleteProductHeader) {
+                  await this.page.getByTestId(`delete-field`).fill('DELETE')
                   await this.page.locator(ss.yesBtn).click()
                   await waitForSelectorWithMinTime(this.page, ss.productSearch)
 

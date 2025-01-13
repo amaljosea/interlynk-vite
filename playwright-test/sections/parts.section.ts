@@ -106,7 +106,7 @@ export default class PartsSection {
         await this.page.waitForTimeout(2000)
 
         await this.page.locator("button[type='submit']").click()
-        await this.page.waitForTimeout(2000)
+        await this.page.waitForTimeout(3000)
       } else {
         errors.push('Version not found')
       }
@@ -211,6 +211,7 @@ export default class PartsSection {
           await this.page
             .locator(`//button[@aria-label='Delete product TestOne']`)
             .click()
+          await this.page.getByTestId(`delete-field`).fill('DELETE')
           await this.page.locator("button[type='submit']").click()
           await this.page.waitForTimeout(3000)
 
@@ -221,6 +222,7 @@ export default class PartsSection {
           await this.page
             .locator(`//button[@aria-label='Delete product TestTwo']`)
             .click()
+          await this.page.getByTestId(`delete-field`).fill('DELETE')
           await this.page.locator("button[type='submit']").click()
           await this.page.waitForTimeout(3000)
         } else {

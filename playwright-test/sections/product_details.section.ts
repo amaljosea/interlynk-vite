@@ -250,6 +250,7 @@ export default class ProductDetailsSection {
           .locator(`//button[@aria-label='delete_product']`)
           .click()
         await this.page.waitForTimeout(2000)
+        await this.page.getByTestId(`delete-field`).fill('DELETE')
 
         await this.page.locator("button[type='submit']").click()
         await this.page.waitForTimeout(3000)

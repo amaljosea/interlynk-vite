@@ -248,6 +248,7 @@ export default class SbomSection {
           await this.page.waitForTimeout(2000)
 
           await this.page.getByTestId('delete_product').first().click()
+          await this.page.getByTestId(`delete-field`).fill('DELETE')
           await this.page.locator("button[type='submit']").click()
           await this.page.waitForTimeout(2000)
         } else {

@@ -240,6 +240,7 @@ export default class VulnsSection {
                 await this.page
                   .locator(`//button[@aria-label='Delete product Test']`)
                   .click()
+                await this.page.getByTestId(`delete-field`).fill('DELETE')
                 await this.page.locator("button[type='submit']").click()
 
                 await this.page.waitForTimeout(2000)

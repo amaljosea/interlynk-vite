@@ -180,6 +180,9 @@ export default class LabelSection {
                             .isVisible()
 
                           if (deleteProductHeader) {
+                            await this.page
+                              .getByTestId(`delete-field`)
+                              .fill('DELETE')
                             await this.page.locator(ps.yesBtn).click()
                             await waitForSelectorWithMinTime(
                               this.page,

@@ -102,6 +102,7 @@ export default class ProductSection {
                       .isVisible()
 
                     if (deleteProductHeader) {
+                      await this.page.getByTestId(`delete-field`).fill('DELETE')
                       await this.page.locator(ps.yesBtn).click()
                       await waitForSelectorWithMinTime(
                         this.page,
@@ -137,7 +138,6 @@ export default class ProductSection {
       } else {
         errors.push('products header verification failed')
       }
-
       expect(errors.length).toBe(0)
     } catch (error) {
       throw error
@@ -403,6 +403,9 @@ export default class ProductSection {
                                   .isVisible()
 
                                 if (deleteProductHeader) {
+                                  await this.page
+                                    .getByTestId(`delete-field`)
+                                    .fill('DELETE')
                                   await this.page.locator(ps.yesBtn).click()
                                 }
                               }

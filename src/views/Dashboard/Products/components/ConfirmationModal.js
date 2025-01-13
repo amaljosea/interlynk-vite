@@ -70,6 +70,7 @@ const ConfirmationModal = ({
           <Input
             fontSize='sm'
             value={input}
+            data-testid='delete-field'
             onChange={(e) => setInput(e.target.value)}
           />
         </Stack>
