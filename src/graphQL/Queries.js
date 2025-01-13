@@ -1765,6 +1765,16 @@ export const GetComponentData = gql`
               }
             }
           }
+          enrichedContent {
+            packageVersion {
+              version
+            }
+            latestPackageVersion {
+              version
+              isOutdated
+              isDeprecated
+            }
+          }
           name
           version
           primary

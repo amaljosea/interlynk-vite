@@ -60,6 +60,7 @@ const ComponentsColumns = ({
   ])
 
   const customerView = isCustomerView()
+
   return useMemo(() => {
     const columns = [
       // COMPONENT
@@ -68,6 +69,10 @@ const ComponentsColumns = ({
         name: 'NAME',
         selector: (row) => {
           const { purl, name, primary, internal, sbomId: bomId, sbom } = row
+          const { latestPackageVersion, packageVersion } =
+            row?.enrichedContent || ''
+          const isOutdated =
+            latestPackageVersion?.version !== packageVersion?.version
           const { projectVersion, project } = sbom || ''
           const { projectGroup } = project || ''
           const isPart = sbomId !== bomId
@@ -116,13 +121,20 @@ const ComponentsColumns = ({
                     {projectVersion ? `: ${projectVersion}` : ''}
                   </Text>
                 )}
-                <Flex
-                  alignItems={'center'}
-                  gap={isVulnerable || internal ? 1 : 0}
-                >
+                <Flex gap={1} flexWrap={'wrap'} alignItems={'center'}>
                   {isVulnerable && (
                     <Tag {...tagStyle} colorScheme='red'>
                       <TagLabel>Vulnerable</TagLabel>
+                    </Tag>
+                  )}
+                  {isOutdated && (
+                    <Tag {...tagStyle} colorScheme='teal'>
+                      <TagLabel>Outdated</TagLabel>
+                    </Tag>
+                  )}
+                  {latestPackageVersion?.isDeprecated === true && (
+                    <Tag {...tagStyle} colorScheme='orange'>
+                      <TagLabel>Deprecated</TagLabel>
                     </Tag>
                   )}
                   {primary && (
