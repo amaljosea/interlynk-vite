@@ -71,7 +71,7 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
         (field) =>
           `${field.componentVulnCustomFieldDefinition.displayName}: ${field.value}`
       )
-      .join('\n')
+      .join('\n\n')
   }
 
   useEffect(() => {
