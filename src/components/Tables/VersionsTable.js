@@ -389,7 +389,7 @@ const VersionsTable = (props) => {
               color='green'
               label='Low'
               status={vulnRunStatus}
-              onClick={() => onFilterSev(['low'], id)}
+              onClick={() => onFilterSev(['low'], id, link)}
             >
               {notStarted ? '-' : stats?.vulnStats?.low || 0}
             </VulnBadge>
