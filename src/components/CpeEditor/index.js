@@ -66,25 +66,30 @@ const CpeEditor = ({ value, setValue, isOpen, onOpen, onClose }) => {
 
   useEffect(() => {
     if (value) {
-      const allowedValues = ['a', 'h', 'o', 'A', 'H', 'O']
-      const components = value?.split(':')
-      const isValid =
-        components[2] && allowedValues.includes(components[2].toLowerCase())
-      setCpeData(() => ({
-        part: isValid ? components[2].toLowerCase() : '',
-        vendor: components[3]?.replace(/\*/g, '') || '',
-        product: components[4]?.replace(/\*/g, '') || '',
-        version: components[5]?.replace(/\*/g, '') || '',
-        update: components[6]?.replace(/\*/g, '') || '',
-        edition: components[7]?.replace(/\*/g, '') || '',
-        language: components[8]?.replace(/\*/g, '') || '',
-        swEdition: components[9]?.replace(/\*/g, '') || '',
-        targetSoftware: components[10]?.replace(/\*/g, '') || '',
-        targetHardware: components[11]?.replace(/\*/g, '') || '',
-        other: components[12]?.replace(/\*/g, '') || ''
-      }))
+      const matches = validateCpe(value)
+      if (matches) {
+        const allowedValues = ['a', 'h', 'o', 'A', 'H', 'O']
+        const components = value?.split(':')
+        const isValid =
+          components[2] && allowedValues.includes(components[2].toLowerCase())
+        setCpeData(() => ({
+          part: isValid ? components[2].toLowerCase() : '',
+          vendor: components[3]?.replace(/\*/g, '') || '',
+          product: components[4]?.replace(/\*/g, '') || '',
+          version: components[5]?.replace(/\*/g, '') || '',
+          update: components[6]?.replace(/\*/g, '') || '',
+          edition: components[7]?.replace(/\*/g, '') || '',
+          language: components[8]?.replace(/\*/g, '') || '',
+          swEdition: components[9]?.replace(/\*/g, '') || '',
+          targetSoftware: components[10]?.replace(/\*/g, '') || '',
+          targetHardware: components[11]?.replace(/\*/g, '') || '',
+          other: components[12]?.replace(/\*/g, '') || ''
+        }))
+      } else {
+        setValue('cpe:2.3:*:*:*:*:*:*:*:*:*:*:*')
+      }
     }
-  }, [value])
+  }, [setValue, value])
 
   return (
     <Stack spacing={4}>
