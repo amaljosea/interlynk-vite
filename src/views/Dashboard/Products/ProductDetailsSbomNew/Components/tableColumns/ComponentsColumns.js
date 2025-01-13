@@ -403,20 +403,12 @@ const ComponentsColumns = ({
                         Edit Component
                       </MenuItem>
                       <MenuItem
-                        data-testid='view_insights'
-                        onClick={() => hanldeAnalysis(row)}
-                        isDisabled={status === 'signed'}
-                        hidden={isFreeTier}
-                      >
-                        Insights
-                      </MenuItem>
-                      <MenuItem
                         hidden={isFreeTier}
                         data-testid='view_notes'
                         onClick={() => handleNotes(row)}
                         isDisabled={status === 'signed' || !updateComponent}
                       >
-                        Notes
+                        Edit Notes
                       </MenuItem>
                       <MenuItem
                         data-testid='view_component_vulns'
@@ -424,7 +416,15 @@ const ComponentsColumns = ({
                         isDisabled={status === 'signed'}
                         hidden={isFreeTier}
                       >
-                        Vulnerabilities
+                        View Vulnerabilities
+                      </MenuItem>
+                      <MenuItem
+                        data-testid='view_insights'
+                        onClick={() => hanldeAnalysis(row)}
+                        isDisabled={status === 'signed'}
+                        hidden={isFreeTier}
+                      >
+                        View Insights
                       </MenuItem>
                       <MenuItem
                         data-testid='view_relation'

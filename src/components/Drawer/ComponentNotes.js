@@ -205,7 +205,7 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
         <DrawerCloseButton mt={3} />
         <DrawerHeader borderBottomWidth='1px'>
           <Text mb={1} fontWeight={'medium'}>
-            Notes
+            Edit Notes
           </Text>
           {data && <CompInfo data={data} />}
         </DrawerHeader>
