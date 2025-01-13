@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
 import { getConfirmatonModalIcon } from 'utils'
 
 import {
@@ -26,12 +25,10 @@ const ConfirmationModal = ({
   isLoading = false,
   children
 }) => {
-  const params = useParams()
   const Icon = getConfirmatonModalIcon(title)
 
   const [input, setInput] = useState('')
-  const warning =
-    title === 'Delete Product' && params?.productid && !params?.sbomid
+  const warning = title === 'Delete Product'
 
   return (
     <LynkModal
