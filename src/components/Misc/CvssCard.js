@@ -1,6 +1,14 @@
-import { useEffect, useState } from 'react'
+import { getCvssObject, getCvssVersion, getFormatedCvss } from 'utils/cvssUtils'
 
-import { Divider, Grid, Stack, Tag, TagLabel, Text } from '@chakra-ui/react'
+import {
+  Divider,
+  Input,
+  SimpleGrid,
+  Stack,
+  Text,
+  VStack
+} from '@chakra-ui/react'
+import { Tag, TagLabel } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
 
@@ -13,7 +21,6 @@ const CvssText = ({ children }) => {
 
   return (
     <Text
-      c
       fontSize='xs'
       textAlign={'left'}
       fontWeight={'medium'}
@@ -24,170 +31,70 @@ const CvssText = ({ children }) => {
   )
 }
 
-const CvssTag = ({ value, red, orange, children }) => (
+const CvssTag = ({ color, children }) => (
   <Tag
-    width={'100px'}
-    justifyContent={'center'}
-    ml={'auto'}
     size='sm'
+    ml={'auto'}
+    minW='120px'
     variant='subtle'
-    colorScheme={
-      red.includes(value) ? 'red' : orange.includes(value) ? 'orange' : 'gray'
-    }
+    maxW='fit-content'
+    colorScheme={color}
+    justifyContent={'center'}
   >
     <TagLabel>{children}</TagLabel>
   </Tag>
 )
 
 const CvssCard = ({ isOpen, onClose, value }) => {
-  const [cvssObject, setcvssObject] = useState(null)
+  const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
 
-  useEffect(() => {
-    if (value) {
-      const cvssParts = value.split('/')
-      const cvssObject = {}
-      cvssParts.forEach((part) => {
-        const [property, value] = part.split(':')
-        cvssObject[property] = value
-      })
-      setcvssObject(cvssObject)
-    }
-  }, [value])
+  const version = getCvssVersion(value)
+  const CVSS = getCvssObject(value)
+  const output = getFormatedCvss(version, CVSS)
 
-  const attackComplexity = (value) => {
-    switch (value) {
-      case 'H':
-        return 'High'
-      case 'L':
-        return 'Low'
-    }
-  }
-
-  const confidentiality = (value) => {
-    switch (value) {
-      case 'H':
-        return 'High'
-      case 'L':
-        return 'Low'
-      case 'N':
-        return 'None'
-    }
-  }
-
-  const attackVector = (value) => {
-    switch (value) {
-      case 'A':
-        return 'Adjacent'
-      case 'L':
-        return 'Local'
-      case 'N':
-        return 'Network'
-      case 'P':
-        return 'Physical'
-    }
-  }
-
-  const userInteraction = (value) => {
-    switch (value) {
-      case 'N':
-        return 'None'
-      case 'R':
-        return 'Required'
-    }
-  }
-
-  const scope = (value) => {
-    switch (value) {
-      case 'C':
-        return 'Changed'
-      case 'U':
-        return 'Unchanged'
-    }
+  const colorScheme = {
+    High: 'red',
+    Low: 'orange',
+    Medium: 'yellow',
+    Passive: 'purple',
+    Present: 'green',
+    Active: 'green',
+    None: 'gray',
+    Network: 'cyan',
+    Required: 'pink',
+    Local: 'cyan'
   }
 
   return (
     <LynkModal
+      noFooter
       isOpen={isOpen}
       onClose={onClose}
-      title={'CVSS Vector'}
       Icon={FaCircleInfo}
-      noFooter
+      title={'CVSS Vector'}
     >
-      <Stack spacing={1}>
-        <Tag
-          justifyContent={'center'}
+      <Stack spacing={2}>
+        <Input
+          isReadOnly
           fontSize={'sm'}
-          py={2}
-          wordBreak={'break-all'}
-        >
-          {value}
-        </Tag>
-        <Divider />
-        <Stack spacing={2} py={3}>
-          {/* Attack Vector */}
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-            <CvssText>Attack Vector</CvssText>
-            <CvssTag value={cvssObject?.AV} red={['N']} orange={['A', 'L']}>
-              {attackVector(cvssObject?.AV)}
-            </CvssTag>
-          </Grid>
-          <Divider />
-          {/* Attack Complexity */}
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-            <CvssText>Attack Complexity</CvssText>
-            <CvssTag value={cvssObject?.AC} red={['L']} orange={[]}>
-              {attackComplexity(cvssObject?.AC)}
-            </CvssTag>
-          </Grid>
-          <Divider />
-          {/* Privileges Required */}
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-            <CvssText>Privileges Required</CvssText>
-            <CvssTag value={cvssObject?.PR} red={['N']} orange={['L']}>
-              {confidentiality(cvssObject?.PR)}
-            </CvssTag>
-          </Grid>
-          <Divider />
-          {/* User Interaction */}
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-            <CvssText>User Interaction</CvssText>
-            <CvssTag value={cvssObject?.UI} red={['N']} orange={[]}>
-              {userInteraction(cvssObject?.UI)}
-            </CvssTag>
-          </Grid>
-          <Divider />
-          {/* Scope */}
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-            <CvssText>Scope</CvssText>
-            <CvssTag value={cvssObject?.S} red={'C'} orange={[]}>
-              {scope(cvssObject?.S)}
-            </CvssTag>
-          </Grid>
-          <Divider />
-          {/* Confidentiality */}
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-            <CvssText>Confidentiality Impact</CvssText>
-            <CvssTag value={cvssObject?.C} red={['H']} orange={['L']}>
-              {confidentiality(cvssObject?.C)}
-            </CvssTag>
-          </Grid>
-          <Divider />
-          {/* Integrity */}
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-            <CvssText>Integrity Impact</CvssText>
-            <CvssTag value={cvssObject?.I} red={['H']} orange={['L']}>
-              {confidentiality(cvssObject?.I)}
-            </CvssTag>
-          </Grid>
-          <Divider />
-          {/* Availability */}
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-            <CvssText>Availability Impact</CvssText>
-            <CvssTag value={cvssObject?.A} red={['H']} orange={['L']}>
-              {confidentiality(cvssObject?.A)}
-            </CvssTag>
-          </Grid>
-        </Stack>
+          defaultValue={value}
+          _focus={{ boxShadow: 'none' }}
+        />
+        <VStack align='stretch' spacing={2} py={2}>
+          {output ? (
+            Object.entries(output)?.map(([key, item]) => (
+              <Stack mt={0} key={key} spacing={1}>
+                <SimpleGrid mb={1} columns={2} flexWrap={'wrap'}>
+                  <CvssText>{key}</CvssText>
+                  <CvssTag color={colorScheme[item] || 'blue'}>{item}</CvssTag>
+                </SimpleGrid>
+                <Divider />
+              </Stack>
+            ))
+          ) : (
+            <Text color={secondaryTextColor}>No record to display</Text>
+          )}
+        </VStack>
       </Stack>
     </LynkModal>
   )

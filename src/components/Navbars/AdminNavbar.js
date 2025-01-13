@@ -1,18 +1,11 @@
 import { useQuery } from '@apollo/client'
 import PropTypes from 'prop-types'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { permissionList } from 'utils'
-import { truncatedValue } from 'utils'
-import { isCustomerView } from 'utils'
+import { isCustomerView, permissionList, truncatedValue } from 'utils'
 
 import { ChevronRightIcon } from '@chakra-ui/icons'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  Grid,
-  GridItem
-} from '@chakra-ui/react'
+import { Grid, GridItem } from '@chakra-ui/react'
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@chakra-ui/react'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -79,6 +72,11 @@ export default function AdminNavbar(props) {
     projectGroupId: params.productgroupid
   })
 
+  const isVuln = category === 'vulnerabilities'
+  const link = isVuln
+    ? `/${path}/${category}?tab=productVulnerabilities`
+    : `/${path}/${category}`
+
   return (
     <Grid
       bg={mainContrastBgColor}
@@ -106,7 +104,7 @@ export default function AdminNavbar(props) {
             </Link>
           </BreadcrumbItem>
           <BreadcrumbItem color={mainText} textTransform={'capitalize'}>
-            <Link to={`/${path}/${category}`}>{category}</Link>
+            <Link to={link}>{category}</Link>
           </BreadcrumbItem>
           {!loading &&
             partsContext.isParts &&

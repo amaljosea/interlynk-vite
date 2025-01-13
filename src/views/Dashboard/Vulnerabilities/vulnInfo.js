@@ -2,7 +2,7 @@ import { useQuery } from '@apollo/client'
 import { useParams } from 'react-router-dom'
 import { getFullDate, linkURl } from 'utils'
 
-import { Link, SimpleGrid, SkeletonText } from '@chakra-ui/react'
+import { Link, SkeletonText } from '@chakra-ui/react'
 import { Grid, GridItem } from '@chakra-ui/react'
 import { Flex, Icon, Stack, Text, useDisclosure } from '@chakra-ui/react'
 import { Stat, StatLabel, StatNumber } from '@chakra-ui/react'
@@ -82,7 +82,7 @@ const VulnInfo = () => {
       ? primaryBlueText
       : primaryTextColor
 
-  const isInvalid = cvssVector?.startsWith('[')
+  const isInvalid = !cvssVector || cvssVector?.startsWith('[')
 
   if (loading)
     return (
@@ -98,11 +98,10 @@ const VulnInfo = () => {
         <Card display={vuln ? 'block' : 'none'}>
           <CardBody>
             <Flex
-              direction={'row'}
-              alignItems={'flex-start'}
               gap={5}
+              direction={'row'}
               width={'100%'}
-              pb={2}
+              alignItems={'flex-start'}
             >
               <Icon
                 as={FaBug}
@@ -128,19 +127,24 @@ const VulnInfo = () => {
                 <Text fontSize={'sm'} my={0.5}>
                   {desc || ''}
                 </Text>
-                <SimpleGrid mt={6} columnGap={6} columns={3}>
+                <Flex
+                  mt={6}
+                  w={'100%'}
+                  columnGap={20}
+                  alignItems={'flex-start'}
+                >
                   {/* Published At  */}
-                  <Stack dir='column' fontSize={'sm'}>
+                  <Stack spacing={1} fontSize={'sm'}>
                     <Text fontWeight={'medium'}>Published:</Text>
                     <Text>{getFullDate(publishedAt)}</Text>
                   </Stack>
                   {/* Last Modified At */}
-                  <Stack dir='column' fontSize={'sm'}>
+                  <Stack spacing={1} fontSize={'sm'}>
                     <Text fontWeight={'medium'}>Last Modified:</Text>
                     <Text>{getFullDate(lastModifiedAt)}</Text>
                   </Stack>
                   {/* CVSS Vector */}
-                  <Stack dir={'column'} fontSize={'sm'}>
+                  <Stack spacing={1} fontSize={'sm'}>
                     <Text fontWeight={'medium'}>CVSS Vector</Text>
                     <Text
                       color={cvssColor}
@@ -150,7 +154,7 @@ const VulnInfo = () => {
                       {cvssVector || 'N/A'}
                     </Text>
                   </Stack>
-                </SimpleGrid>
+                </Flex>
               </Flex>
             </Flex>
           </CardBody>
