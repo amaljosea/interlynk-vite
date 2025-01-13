@@ -82,12 +82,10 @@ const Compliance = () => {
           <Text fontWeight={'medium'}>SBOM Quality Score :</Text>
           <Flex gap={2} alignItems={'center'}>
             {qualitySore?.map((item) => (
-              <Tag
-                key={item?.id}
-                colorScheme='orange'
-                textTransform={'uppercase'}
-              >
-                {item?.complianceType}
+              <Tag key={item?.id} colorScheme='orange'>
+                {item?.complianceType === 'unspecified'
+                  ? 'None'
+                  : item?.complianceType?.toUpperCase()}
               </Tag>
             ))}
           </Flex>

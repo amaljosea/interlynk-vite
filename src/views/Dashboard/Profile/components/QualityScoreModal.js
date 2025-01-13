@@ -46,12 +46,20 @@ const QualityScoreModal = ({ data, isOpen, onClose }) => {
 
   useEffect(() => {
     if (isOpen && data?.length > 0) {
+      const getLabel = (type) => {
+        switch (type) {
+          case 'unspecified':
+            return 'None'
+          default:
+            return type?.toUpperCase()
+        }
+      }
       const compliances = data
         ?.filter((item) => item?.complianceType !== 'bsi')
         ?.map((item) => ({
           value: item?.id,
           active: item?.isEnabled,
-          label: item?.complianceType?.toUpperCase()
+          label: getLabel(item?.complianceType)
         }))
       setOptions(compliances)
       const result = data?.find((item) => item?.scoreEnabled)
@@ -59,7 +67,7 @@ const QualityScoreModal = ({ data, isOpen, onClose }) => {
         setItem({
           value: result?.id,
           active: result?.isEnabled,
-          label: result?.complianceType?.toUpperCase()
+          label: getLabel(result?.complianceType)
         })
       } else {
         setItem(null)
