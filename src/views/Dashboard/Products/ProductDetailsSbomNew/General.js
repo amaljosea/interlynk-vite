@@ -18,10 +18,18 @@ import Supplier from './SbomDetails/Supplier'
 import Tools from './SbomDetails/Tools'
 
 const General = ({ data, loading, error }) => {
-  const { inverseSecondaryBgColor, sameSecondaryText } = useThemeColor([
-    'inverseSecondaryBgColor',
-    'sameSecondaryText'
-  ])
+  const { inverseSecondaryBgColor, sameSecondaryText, neutralBorder } =
+    useThemeColor([
+      'inverseSecondaryBgColor',
+      'sameSecondaryText',
+      'neutralBorder'
+    ])
+
+  const LynkTd = ({ children, ...props }) => (
+    <Td {...props} borderColor={neutralBorder}>
+      {children}
+    </Td>
+  )
 
   const isArchived = data?.lifecycle === 'archived'
 
@@ -70,75 +78,75 @@ const General = ({ data, loading, error }) => {
           <Tbody w={'100%'}>
             {/* CREATED AT */}
             <Tr minH={'64px'}>
-              <Td p={0} fontWeight={'medium'} width={'15%'}>
+              <LynkTd p={0} fontWeight={'medium'} width={'15%'}>
                 <InfoLabel
                   title={`Created At`}
                   onCheck={onCheck('Created At')}
                 />
-              </Td>
-              <Td fontSize={'sm'} color={sameSecondaryText} width={'85%'}>
+              </LynkTd>
+              <LynkTd fontSize={'sm'} color={sameSecondaryText} width={'85%'}>
                 {data?.creationAt ? getFullDate(data?.creationAt) : ''}
-              </Td>
+              </LynkTd>
             </Tr>
             {/* PHASES */}
             <Tr minH={'64px'}>
-              <Td p={0} fontWeight={'medium'} width={'15%'}>
+              <LynkTd p={0} fontWeight={'medium'} width={'15%'}>
                 <InfoLabel title={`Phases`} onCheck={onCheck('SBOM Phases')} />
-              </Td>
-              <Td width={'85%'}>
+              </LynkTd>
+              <LynkTd width={'85%'}>
                 <Phases data={data?.phases || []} permission={isArchived} />
-              </Td>
+              </LynkTd>
             </Tr>
             {/* CREATION TOOLS */}
             <Tr minH={'64px'}>
-              <Td pl={0} fontWeight={'medium'} width={'15%'}>
+              <LynkTd pl={0} fontWeight={'medium'} width={'15%'}>
                 <InfoLabel
                   title={`Creation Tool`}
                   onCheck={onCheck('Creation Tool')}
                 />
-              </Td>
-              <Td width={'85%'}>
+              </LynkTd>
+              <LynkTd width={'85%'}>
                 <Tools
                   data={data?.tools || []}
                   permission={isArchived || !editSboms}
                 />
-              </Td>
+              </LynkTd>
             </Tr>
             {/* AUTHORS */}
             <Tr minH={'64px'}>
-              <Td p={0} fontWeight={'medium'} width={'15%'}>
+              <LynkTd p={0} fontWeight={'medium'} width={'15%'}>
                 <InfoLabel title={`Authors`} onCheck={onCheck('Authors')} />
-              </Td>
-              <Td width={'85%'}>
+              </LynkTd>
+              <LynkTd width={'85%'}>
                 <Authors
                   data={data?.authors || []}
                   permission={isArchived || !editSboms}
                 />
-              </Td>
+              </LynkTd>
             </Tr>
             {/* SUPPLIERS */}
             <Tr minH={'64px'}>
-              <Td pl={0} fontWeight={'medium'} w={'15%'}>
+              <LynkTd pl={0} fontWeight={'medium'} w={'15%'}>
                 <InfoLabel title={`Supplier`} onCheck={onCheck('Supplier')} />
-              </Td>
-              <Td w={'85%'} py={0}>
+              </LynkTd>
+              <LynkTd w={'85%'} py={0}>
                 <Supplier
                   data={data?.suppliers || []}
                   permission={isArchived || !editSboms}
                 />
-              </Td>
+              </LynkTd>
             </Tr>
             {/* LICENSES */}
             <Tr minH={'64px'}>
-              <Td pl={0} fontSize={'sm'} fontWeight={'medium'} w={'15%'}>
+              <LynkTd pl={0} fontSize={'sm'} fontWeight={'medium'} w={'15%'}>
                 Data License
-              </Td>
-              <Td w={'85%'} py={0}>
+              </LynkTd>
+              <LynkTd w={'85%'} py={0}>
                 <License
                   data={licenseData}
                   permission={isArchived || !editSboms}
                 />
-              </Td>
+              </LynkTd>
             </Tr>
           </Tbody>
         </Table>
