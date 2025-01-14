@@ -138,15 +138,21 @@ const General = ({ data, loading, error }) => {
             </Tr>
             {/* LICENSES */}
             <Tr minH={'64px'}>
-              <LynkTd pl={0} fontSize={'sm'} fontWeight={'medium'} w={'15%'}>
+              <Td
+                pl={0}
+                w={'15%'}
+                fontSize={'sm'}
+                fontWeight={'medium'}
+                borderColor={neutralBorder}
+              >
                 Data License
-              </LynkTd>
-              <LynkTd w={'85%'} py={0}>
+              </Td>
+              <Td w={'85%'} py={0} borderColor={neutralBorder}>
                 <License
                   data={licenseData}
                   permission={isArchived || !editSboms}
                 />
-              </LynkTd>
+              </Td>
             </Tr>
           </Tbody>
         </Table>

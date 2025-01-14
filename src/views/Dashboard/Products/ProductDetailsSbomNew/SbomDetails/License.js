@@ -1,5 +1,4 @@
 import { useMutation } from '@apollo/client'
-import { useCallback, useEffect } from 'react'
 import { isCustomerView, parseLicenseString } from 'utils'
 import { transformLicenseString } from 'utils'
 
@@ -78,24 +77,6 @@ const License = ({ data, permission }) => {
         DELETE_LICENSE?.isOpen ? DELETE_LICENSE?.onClose() : LICENSE?.onClose()
       })
   }
-
-  // ADD KEYBOARD SHORTCUT FOR TOGGLE SBOM DRAWER
-  const handleSBMDown = useCallback(
-    (event) => {
-      if (event.altKey && event.key === '2') {
-        LICENSE?.onToggle()
-      }
-    },
-    [LICENSE]
-  )
-
-  // KEYBOARD EVENT LISTNER FOR SBOM DRAWER
-  useEffect(() => {
-    window.addEventListener('keydown', handleSBMDown)
-    return () => {
-      window.removeEventListener('keydown', handleSBMDown)
-    }
-  }, [handleSBMDown])
 
   return (
     <>
