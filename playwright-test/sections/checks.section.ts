@@ -34,10 +34,11 @@ export default class ChecksSection {
     await this.page.getByTestId(`product_Test`).click()
     await this.page.waitForTimeout(2000)
 
-    const version = await this.page.getByTestId('version').nth(0).isVisible()
+    await this.page.reload()
+    const version = this.page.getByTestId('version').nth(0)
 
-    if (version) {
-      await this.page.getByTestId('version').nth(0).click()
+    if (version.isVisible()) {
+      await version.click()
       await this.page.waitForTimeout(2000)
 
       await this.page.getByRole('tab', { name: 'checks' }).click()
@@ -87,6 +88,7 @@ export default class ChecksSection {
 
       await this.page.locator(menuBtn).click()
       await this.page.locator(deleteBtn).click()
+      await this.page.getByTestId(`delete-field`).fill('DELETE')
       await this.page.locator("button[type='submit']").click()
     }
   }
