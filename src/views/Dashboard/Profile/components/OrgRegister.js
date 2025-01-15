@@ -1,7 +1,11 @@
 import { useMutation } from '@apollo/client'
 import Cookies from 'js-cookie'
 import { useState } from 'react'
-import { hasWhiteSpace, validateEmail, validateUrl } from 'utils'
+import {
+  hasWhiteSpace,
+  validateEmail,
+  validateUrl
+} from 'utils/formValidationUtils'
 
 import {
   Button,

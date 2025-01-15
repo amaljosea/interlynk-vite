@@ -1,6 +1,6 @@
 import { useTour } from '@reactour/tour'
 import { useEffect, useState } from 'react'
-import { displayErrorMessage } from 'utils'
+import { displayErrorMessage } from 'utils/errorUtils'
 
 import LynkAlert from 'components/LynkAlert'
 import ProductTable from 'components/Tables/ProductTable'

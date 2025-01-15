@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client'
 import Cookies from 'js-cookie'
 import React, { useEffect, useState } from 'react'
-import { validPassword, validateEmail } from 'utils'
+import { validPassword, validateEmail } from 'utils/formValidationUtils'
 
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import {

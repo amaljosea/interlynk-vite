@@ -1,7 +1,8 @@
 import { useQuery } from '@apollo/client'
 import { useMemo } from 'react'
 import DataTable from 'react-data-table-component'
-import { customStyles, linkURl, statusColor } from 'utils'
+import { linkURl } from 'utils'
+import { customStyles, statusColor } from 'utils/styleUtils'
 
 import {
   Box,

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { hasWhiteSpace, truncatedValue, validateUrl } from 'utils'
+import { truncatedValue } from 'utils'
+import { hasWhiteSpace, validateUrl } from 'utils/formValidationUtils'
 
 import { DeleteIcon } from '@chakra-ui/icons'
 import {

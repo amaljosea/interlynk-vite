@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import MultiSelect from 'react-select'
-import { validateEmail } from 'utils'
+import { validateEmail } from 'utils/formValidationUtils'
 
 import {
   Box,

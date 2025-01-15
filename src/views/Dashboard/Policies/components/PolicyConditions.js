@@ -1,4 +1,5 @@
-import { getIcon, getLabel, updatedValue } from 'utils'
+import { updatedValue } from 'utils'
+import { getIcon } from 'utils/styleUtils'
 import { componentTypes } from 'variables/general'
 
 import {

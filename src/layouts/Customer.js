@@ -4,6 +4,7 @@ import NotFound from 'assets/svg/not-found.svg'
 import { useEffect } from 'react'
 import { Outlet, useNavigate, useParams } from 'react-router-dom'
 import { customerRoutes } from 'routes'
+import { tourStyles } from 'utils/tourUtils'
 
 import { Box, Center, Flex, Img, Text } from '@chakra-ui/react'
 
@@ -19,12 +20,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6'
 
 // Custom components
-import {
-  getActiveNavbar,
-  getActiveRoute,
-  isMobileOrTablet,
-  tourStyles
-} from '../utils'
+import { getActiveNavbar, getActiveRoute, isMobileOrTablet } from '../utils'
 
 export const getSharelynk = gql`
   query getSharelynk($id: Uuid!) {

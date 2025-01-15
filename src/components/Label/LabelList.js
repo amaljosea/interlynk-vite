@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { generateRandomColor, hexToRGBA } from 'utils'
+import { generateRandomColor, hexToRGBA } from 'utils/styleUtils'
 
 import {
   CheckIcon,

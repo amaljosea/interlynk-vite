@@ -1,4 +1,4 @@
-import { cvssColor } from 'utils'
+import { cvssColor } from 'utils/styleUtils'
 
 import { Tag, TagLabel, Text } from '@chakra-ui/react'
 

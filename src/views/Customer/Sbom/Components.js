@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
-import { customStyles } from 'utils'
+import { customStyles } from 'utils/styleUtils'
 import ComponentsColumns from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableColumns/ComponentsColumns'
 import ExpandedComponent from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableExpanded/ComponentsExpanded'
 import ComponentsSubHeader from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableSubHeaders/ComponentsSubHeader'

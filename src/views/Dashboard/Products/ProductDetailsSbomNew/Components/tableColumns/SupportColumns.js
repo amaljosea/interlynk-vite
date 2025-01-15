@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
-import { getEolStatusColor, getFullDate, timeSince } from 'utils'
+import { getFullDate, timeSince } from 'utils'
+import { getEolStatusColor } from 'utils/styleUtils'
 
 import { CheckIcon } from '@chakra-ui/icons'
 import { Portal, Stack, Tag, Text, Tooltip } from '@chakra-ui/react'

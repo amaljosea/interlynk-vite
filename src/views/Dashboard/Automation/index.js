@@ -2,8 +2,8 @@ import { useQuery } from '@apollo/client'
 import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
-import { customStyles } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
+import { customStyles } from 'utils/styleUtils'
 
 import { Flex, useDisclosure } from '@chakra-ui/react'
 

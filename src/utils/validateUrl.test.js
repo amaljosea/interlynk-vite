@@ -1,4 +1,4 @@
-import { validateUrl } from './index'
+import { validateUrl } from './formValidationUtils'
 
 describe('validateUrl', () => {
   it('should return true for valid URLs without encoding', () => {

@@ -1,4 +1,4 @@
-import { hexToRGBA } from 'utils'
+import { hexToRGBA } from 'utils/styleUtils'
 
 import { Tag } from '@chakra-ui/react'
 

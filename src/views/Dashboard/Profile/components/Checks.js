@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import DataTable from 'react-data-table-component'
-import { customStyles, sevColor } from 'utils'
+import { sevColor } from 'utils/styleUtils'
+import { customStyles } from 'utils/styleUtils'
 
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import {

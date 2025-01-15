@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import DataTable from 'react-data-table-component'
-import { customStyles, getFullDate, timeSince } from 'utils'
+import { getFullDate, timeSince } from 'utils'
+import { customStyles } from 'utils/styleUtils'
 
 import { Flex, Stack, Text, Tooltip, useDisclosure } from '@chakra-ui/react'
 import { IconButton } from '@chakra-ui/react'

@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client'
 import { PackageURL } from 'packageurl-js'
 import { useEffect, useState } from 'react'
-import { validateCpe } from 'utils'
+import { validateCpe } from 'utils/cpeUtils'
 
 import {
   Button,

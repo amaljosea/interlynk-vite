@@ -1,8 +1,8 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { validatePhoneNumber } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
+import { validatePhoneNumber } from 'utils/formValidationUtils'
 
 import { Button, Flex, FormControl, FormLabel, Input } from '@chakra-ui/react'
 

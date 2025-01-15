@@ -2,7 +2,11 @@ import { useMutation } from '@apollo/client'
 import DOMPurify from 'dompurify'
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { nameRegex, validPassword, validateEmail } from 'utils'
+import {
+  nameValidation,
+  validPassword,
+  validateEmail
+} from 'utils/formValidationUtils'
 
 import { CheckCircleIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import {
@@ -185,7 +189,7 @@ const RegistrationForm = () => {
       setNameError('Input must be between 2 and 256 characters')
     } else if (value.startsWith(' ')) {
       setNameError('A name must begin with a letter')
-    } else if (!nameRegex.test(value) && value.length > 0) {
+    } else if (!nameValidation.test(value) && value.length > 0) {
       setNameError(
         'Only letters, numbers, spaces, dashes, and underscores are allowed'
       )

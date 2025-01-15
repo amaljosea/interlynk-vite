@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { getIcon } from 'utils'
+import { getIcon } from 'utils/styleUtils'
 
 import { Box, Flex, Stack, Text, Tooltip } from '@chakra-ui/react'
 import { Icon, IconButton } from '@chakra-ui/react'

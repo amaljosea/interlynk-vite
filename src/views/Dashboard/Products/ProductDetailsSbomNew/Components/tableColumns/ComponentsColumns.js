@@ -1,7 +1,8 @@
 import { useMemo } from 'react'
-import { GetIcon, isValidPurl, truncatedValue } from 'utils'
+import { isValidPurl, truncatedValue } from 'utils'
 import { parseLicenseString, timeSince } from 'utils'
 import { getFullDate, isCustomerView } from 'utils'
+import { GetIcon } from 'utils/styleUtils'
 
 import { ViewIcon } from '@chakra-ui/icons'
 import {

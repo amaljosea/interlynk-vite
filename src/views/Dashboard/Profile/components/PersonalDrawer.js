@@ -2,7 +2,7 @@ import { useMutation } from '@apollo/client'
 import DOMPurify from 'dompurify'
 import Cookies from 'js-cookie'
 import { useEffect, useState } from 'react'
-import { nameRegex, validPassword } from 'utils'
+import { nameValidation, validPassword } from 'utils/formValidationUtils'
 
 import { EditIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import {
@@ -92,7 +92,7 @@ const PersonalDrawer = ({ isOpen, onClose, inputRef }) => {
     } else if (value.startsWith(' ')) {
       setNameError('A name must begin with a letter')
       setIsSaveDisabled(true)
-    } else if (!nameRegex.test(value)) {
+    } else if (!nameValidation.test(value)) {
       setNameError(
         'Only letters, numbers, spaces, dashes, and underscores are allowed'
       )

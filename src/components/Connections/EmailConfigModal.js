@@ -1,4 +1,4 @@
-import { validateEmail } from 'utils'
+import { validateEmail } from 'utils/formValidationUtils'
 
 import { IoSettingsOutline } from 'react-icons/io5'
 

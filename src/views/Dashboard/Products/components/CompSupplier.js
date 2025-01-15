@@ -1,12 +1,12 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useState } from 'react'
+import { disableButtonTemporarily } from 'utils'
 import {
-  disableButtonTemporarily,
   hasWhiteSpace,
   validateEmail,
   validateUrl
-} from 'utils'
+} from 'utils/formValidationUtils'
 
 import {
   Button,

@@ -1,7 +1,8 @@
 import { useMutation, useQuery } from '@apollo/client'
 import React, { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { customStyles, getFullDate, timeSince } from 'utils'
+import { getFullDate, timeSince } from 'utils'
+import { customStyles } from 'utils/styleUtils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import LegalModal from 'views/Dashboard/Profile/components/LegalModal'
 

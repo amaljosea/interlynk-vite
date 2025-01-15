@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client'
 import DOMPurify from 'dompurify'
 import { useEffect, useState } from 'react'
-import { nameRegex } from 'utils'
+import { nameValidation } from 'utils/formValidationUtils'
 
 import {
   Drawer,
@@ -52,7 +52,7 @@ const OrgDrawer = ({ isOpen, onClose }) => {
       setNameError('Organisation name must begin with a letter')
       setIsSaveDisabled(true)
       return
-    } else if (!nameRegex.test(value)) {
+    } else if (!nameValidation.test(value)) {
       setNameError(
         'Only letters, numbers, spaces, dashes, and underscores are allowed'
       )

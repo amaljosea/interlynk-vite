@@ -1,11 +1,6 @@
 import React from 'react'
-import {
-  capitalizeFirstLetter,
-  getFullDate,
-  valueToColor,
-  valueToIcon,
-  valueToText
-} from 'utils'
+import { capitalizeFirstLetter, getFullDate } from 'utils'
+import { valueToColor, valueToIcon, valueToText } from 'utils/styleUtils'
 
 import { Box, Flex, Icon, Stack, Text, Tooltip } from '@chakra-ui/react'
 

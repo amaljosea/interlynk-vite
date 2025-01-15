@@ -1,7 +1,8 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { customStyles, getChangelogColor, getFullDate, timeSince } from 'utils'
+import { getFullDate, timeSince } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
+import { customStyles, getChangelogColor } from 'utils/styleUtils'
 import ChangelogFilterMenu from 'views/Sbom/components/ChangelogFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 

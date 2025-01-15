@@ -1,7 +1,7 @@
 import DataTable from 'react-data-table-component'
 import { Link, useNavigate } from 'react-router-dom'
 import { getFullDate, normalizeSBOMVersion, timeSince } from 'utils'
-import { customStyles } from 'utils'
+import { customStyles } from 'utils/styleUtils'
 
 import { Flex, Heading, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 

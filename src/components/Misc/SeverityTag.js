@@ -1,4 +1,4 @@
-import { sevColor } from 'utils'
+import { sevColor } from 'utils/styleUtils'
 
 import { Tag, TagLabel, Text } from '@chakra-ui/react'
 

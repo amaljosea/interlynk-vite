@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Flex, Text } from '@chakra-ui/react'
 
 export const homeSteps = [
@@ -420,3 +421,42 @@ export const productSteps = [
     )
   }
 ]
+
+export const tourStyles = {
+  popover: (base) => ({
+    ...base,
+    width: '480px',
+    maxWidth: '100%',
+    background: '#2B6CB0',
+    fontSize: '14px',
+    color: 'white',
+    paddingTop: '56px'
+  }),
+  close: (base) => ({
+    ...base,
+    top: '26px',
+    right: '25px',
+    color: 'white'
+  }),
+  badge: (base) => ({
+    ...base,
+    fontWeight: 'bold',
+    width: 'fit-content',
+    backgroundColor: 'transparent',
+    boxShadow: 'none',
+    color: 'white',
+    top: '16px',
+    left: '20px'
+  }),
+  dot: (base, state) => ({
+    ...base,
+    backgroundColor: state.current ? '#EBF8FF' : 'none'
+  }),
+  controls: (base) => ({
+    ...base,
+    button: {
+      ...base.button,
+      color: 'white'
+    }
+  })
+}

@@ -13,3 +13,10 @@ export const validateCPEString = (cpeString) => {
 
   return { isValid: true }
 }
+
+export const validateCpe = (value) => {
+  const cpeRegex =
+    // eslint-disable-next-line no-useless-escape
+    /^cpe:2\.3:[aho\*\-]?(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])?){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-])?)(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])?){4}$/
+  return cpeRegex.test(value)
+}

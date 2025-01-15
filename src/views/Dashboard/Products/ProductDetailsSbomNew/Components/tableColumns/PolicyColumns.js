@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
-import { getColor, getFullDate, timeSince } from 'utils'
+import { getFullDate, timeSince } from 'utils'
+import { getColor } from 'utils/styleUtils'
 
 import { Spinner, Stack, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 

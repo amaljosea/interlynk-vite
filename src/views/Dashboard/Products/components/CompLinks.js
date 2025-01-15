@@ -1,7 +1,8 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useState } from 'react'
-import { hasWhiteSpace, truncatedValue, validateUrl } from 'utils'
+import { truncatedValue } from 'utils'
+import { hasWhiteSpace, validateUrl } from 'utils/formValidationUtils'
 
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
 import {

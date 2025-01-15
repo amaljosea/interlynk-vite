@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { generateRandomColor } from 'utils'
+import { generateRandomColor } from 'utils/styleUtils'
 import { tagColors } from 'variables/general'
 
 import { AddIcon, RepeatIcon } from '@chakra-ui/icons'

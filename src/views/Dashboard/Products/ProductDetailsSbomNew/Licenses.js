@@ -1,6 +1,6 @@
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
-import { customStyles } from 'utils'
+import { customStyles } from 'utils/styleUtils'
 
 import { Flex } from '@chakra-ui/react'
 

@@ -1,4 +1,4 @@
-import { getIcon, getLabel } from 'utils'
+import { getIcon, getLabel } from 'utils/styleUtils'
 
 import { Box, Icon, Tooltip } from '@chakra-ui/react'
 

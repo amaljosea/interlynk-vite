@@ -1,6 +1,6 @@
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
-import { customStyles } from 'utils'
+import { customStyles } from 'utils/styleUtils'
 import LicenseColumns from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableColumns/LicenseColumns'
 import ExpandedRow from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableExpanded/LicensesExpanded'
 import LicensesSubHeader from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableSubHeaders/LicensesSubHeader'

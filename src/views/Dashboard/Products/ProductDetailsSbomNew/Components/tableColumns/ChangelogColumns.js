@@ -1,10 +1,6 @@
 import { useMemo } from 'react'
-import {
-  getChangelogColor,
-  getFullDate,
-  timeSince,
-  truncatedValue
-} from 'utils'
+import { getFullDate, timeSince, truncatedValue } from 'utils'
+import { getChangelogColor } from 'utils/styleUtils'
 
 import {
   Box,

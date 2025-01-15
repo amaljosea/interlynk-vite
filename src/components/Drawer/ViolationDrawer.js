@@ -1,5 +1,6 @@
 import DataTable from 'react-data-table-component'
-import { customStyles, truncatedValue } from 'utils'
+import { truncatedValue } from 'utils'
+import { customStyles } from 'utils/styleUtils'
 
 import {
   Drawer,

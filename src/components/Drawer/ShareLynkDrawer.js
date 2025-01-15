@@ -1,7 +1,8 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { customStyles, getFullDate, timeSince, truncatedValue } from 'utils'
+import { getFullDate, timeSince, truncatedValue } from 'utils'
+import { customStyles } from 'utils/styleUtils'
 import { getShareLinklUrl } from 'utils/url'
 
 import { DeleteIcon } from '@chakra-ui/icons'

@@ -1,8 +1,8 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { hasWhiteSpace, validateUrl } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
+import { hasWhiteSpace, validateUrl } from 'utils/formValidationUtils'
 
 import { Box, Button, Flex, Input } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'

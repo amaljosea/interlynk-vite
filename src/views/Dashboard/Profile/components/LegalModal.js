@@ -5,7 +5,7 @@ import {
   validateEmail,
   validatePhoneNumber,
   validateUrl
-} from 'utils'
+} from 'utils/formValidationUtils'
 
 import { Icon, IconButton } from '@chakra-ui/react'
 import { Button, Flex, Heading, Input, Stack } from '@chakra-ui/react'

@@ -1,7 +1,8 @@
 import React from 'react'
 import DataTable from 'react-data-table-component'
 import { useNavigate } from 'react-router-dom'
-import { customStyles, linkURl, statusColor } from 'utils'
+import { linkURl } from 'utils'
+import { customStyles, statusColor } from 'utils/styleUtils'
 
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { Flex, Stack, Text, Tooltip } from '@chakra-ui/react'

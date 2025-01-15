@@ -1,7 +1,8 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { customStyles, getFullDate, timeSince } from 'utils'
+import { getFullDate, timeSince } from 'utils'
+import { customStyles } from 'utils/styleUtils'
 
 import { Flex, Text, Tooltip } from '@chakra-ui/react'
 

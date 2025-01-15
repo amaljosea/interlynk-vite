@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
-import { validateEmail } from 'utils'
+import { validateEmail } from 'utils/formValidationUtils'
 
 import { Input, Select, Stack } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'

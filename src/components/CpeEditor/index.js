@@ -1,6 +1,6 @@
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useState } from 'react'
-import { validateCpe } from 'utils'
+import { validateCpe } from 'utils/cpeUtils'
 import IdentifierLabel from 'views/Dashboard/Products/components/IdentifierLabel'
 
 import { FormControl, Stack, Textarea } from '@chakra-ui/react'

@@ -1,4 +1,4 @@
-import { validateEmail } from '.'
+import { validateEmail } from './formValidationUtils'
 
 describe('validateEmail', () => {
   test('should return true for valid email addresses', () => {

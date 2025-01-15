@@ -1,6 +1,7 @@
 import DataTable from 'react-data-table-component'
 import { Link, useParams } from 'react-router-dom'
-import { customStyles, getFullDate, linkURl, timeSince } from 'utils'
+import { getFullDate, linkURl, timeSince } from 'utils'
+import { customStyles } from 'utils/styleUtils'
 import SubHeader from 'views/Dashboard/Vulnerabilities/components/SubHeader'
 
 import { Badge, Flex, Stack, Text } from '@chakra-ui/react'

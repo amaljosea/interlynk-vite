@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { displayErrorMessage } from 'utils'
+import { displayErrorMessage } from 'utils/errorUtils'
 
 import { WarningTwoIcon } from '@chakra-ui/icons'
 import { Flex, Text } from '@chakra-ui/react'

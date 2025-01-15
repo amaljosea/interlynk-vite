@@ -1,4 +1,4 @@
-import { statusColor } from 'utils'
+import { statusColor } from 'utils/styleUtils'
 
 import {
   Drawer,

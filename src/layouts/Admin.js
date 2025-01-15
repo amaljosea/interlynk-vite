@@ -7,6 +7,8 @@ import { KBarProvider } from 'kbar'
 import React, { useEffect } from 'react'
 import { Outlet, useNavigate, useParams } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
+import { displayErrorMessage } from 'utils/errorUtils'
+import { tourStyles } from 'utils/tourUtils'
 import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 
 import { Box, Button, Center, Flex, Img, Stack, Text } from '@chakra-ui/react'
@@ -25,13 +27,7 @@ import { GetOrganization } from 'graphQL/Queries'
 
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6'
 
-import {
-  displayErrorMessage,
-  getActiveNavbar,
-  getActiveRoute,
-  isMobileOrTablet,
-  tourStyles
-} from '../utils'
+import { getActiveNavbar, getActiveRoute, isMobileOrTablet } from '../utils'
 import { logoutUser } from '../utils/authUtils'
 
 export default function Admin() {

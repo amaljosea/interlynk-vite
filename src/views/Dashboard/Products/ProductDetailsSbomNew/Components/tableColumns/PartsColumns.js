@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { GetIcon, isValidPurl } from 'utils'
+import { isValidPurl } from 'utils'
+import { GetIcon } from 'utils/styleUtils'
 
 import { Flex, Tag, TagLabel } from '@chakra-ui/react'
 import { IconButton, Link, Portal, Stack, Text } from '@chakra-ui/react'

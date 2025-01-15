@@ -1,8 +1,8 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { validateCpe } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
+import { validateCpe } from 'utils/cpeUtils'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import { Box, Button, Flex, Grid, Textarea } from '@chakra-ui/react'

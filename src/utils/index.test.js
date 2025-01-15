@@ -1,4 +1,4 @@
-import { validateCpe } from './index'
+import { validateCpe } from './cpeUtils'
 
 // Replace with the correct path to your util file
 

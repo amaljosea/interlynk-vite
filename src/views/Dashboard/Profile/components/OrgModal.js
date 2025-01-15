@@ -1,7 +1,11 @@
 import { useMutation } from '@apollo/client'
 import { useState } from 'react'
-import { validateEmail, validateUrl } from 'utils'
-import { disableButtonTemporarily, hasWhiteSpace } from 'utils'
+import { disableButtonTemporarily } from 'utils'
+import {
+  hasWhiteSpace,
+  validateEmail,
+  validateUrl
+} from 'utils/formValidationUtils'
 
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 import { Flex, Input } from '@chakra-ui/react'

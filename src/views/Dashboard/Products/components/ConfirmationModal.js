@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { getConfirmatonModalIcon } from 'utils'
+import { getConfirmatonModalIcon } from 'utils/styleUtils'
 
 import {
   Box,
