@@ -2,13 +2,20 @@ import { useMutation } from '@apollo/client'
 import React from 'react'
 
 import { CheckCircleIcon, CloseIcon } from '@chakra-ui/icons'
-import { Icon } from '@chakra-ui/react'
+import {
+  Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr
+} from '@chakra-ui/react'
 import {
   Box,
   Button,
   Flex,
-  Grid,
-  GridItem,
+  Icon,
   SimpleGrid,
   Text,
   useDisclosure
@@ -39,12 +46,16 @@ const PlanTable = () => {
 
   const [sendRequest, { loading }] = useMutation(EnterpriseUpgradeRequest)
   const {
+    headingTextColor,
+    neutralBorder,
     primaryBgColor,
     primaryErrorColor,
     primarySuccessColor,
     primaryBlueText,
     secondaryTextInverse
   } = useThemeColor([
+    'headingTextColor',
+    'neutralBorder',
     'primaryBgColor',
     'primaryErrorColor',
     'primarySuccessColor',
@@ -147,31 +158,48 @@ const PlanTable = () => {
     integrationsFeatures
   ]
 
+  const LynkTd = ({ children, ...props }) => (
+    <Td {...props} borderColor={neutralBorder}>
+      {children}
+    </Td>
+  )
+
+  const headStyle = {
+    fontWeight: 'bold',
+    fontFamily: 'inherit',
+    color: headingTextColor,
+    borderColor: neutralBorder
+  }
+
   return (
     <Box>
       {/* Plan Overview Section */}
-      <Grid templateColumns='repeat(4, 1fr)' gap={8} mb={6}>
-        <GridItem>
-          <Text fontWeight='bold'>Plan</Text>
-          <Text>{isFreeTier ? 'Free' : 'Enterprise'}</Text>
-        </GridItem>
-        <GridItem>
-          <Text fontWeight='bold'>Products</Text>
-          <Text>{isFreeTier ? '5' : 'Unlimited'}</Text>
-        </GridItem>
-        <GridItem>
-          <Text fontWeight='bold'>Users</Text>
-          <Text>{isFreeTier ? '2' : 'Unlimited'}</Text>
-        </GridItem>
-        <GridItem>
-          <Text fontWeight='bold'>Renewal Date</Text>
-          <Text>N/A</Text>
-        </GridItem>
-      </Grid>
+      <TableContainer>
+        <Table variant='simple'>
+          <Thead>
+            <Tr>
+              <Th sx={headStyle}>Plan</Th>
+              <Th sx={headStyle}>Products</Th>
+              <Th sx={headStyle}>Users</Th>
+              <Th sx={headStyle}>Renewal Date</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <LynkTd fontSize={'sm'}>
+                {isFreeTier ? 'Free' : 'Enterprise'}
+              </LynkTd>
+              <LynkTd fontSize={'sm'}>{isFreeTier ? '5' : 'Unlimited'}</LynkTd>
+              <LynkTd fontSize={'sm'}>{isFreeTier ? '2' : 'Unlimited'}</LynkTd>
+              <LynkTd fontSize={'sm'}>N/A</LynkTd>
+            </Tr>
+          </Tbody>
+        </Table>
+      </TableContainer>
 
       {/* Upgrade Modal Button */}
       {isFreeTier && (
-        <Flex justify='left' marginTop={'40px'}>
+        <Flex justify='left' mt={6}>
           <Button title='Upgrade plan' colorScheme='blue' onClick={onOpen}>
             Upgrade Plan
           </Button>
