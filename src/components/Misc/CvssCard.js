@@ -2,11 +2,14 @@ import { getCvssObject, getCvssVersion, getFormatedCvss } from 'utils/cvssUtils'
 
 import {
   Divider,
+  Flex,
+  IconButton,
   Input,
   SimpleGrid,
   Stack,
   Text,
-  VStack
+  VStack,
+  useClipboard
 } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 
@@ -14,7 +17,7 @@ import LynkModal from 'components/LynkModal'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaCircleInfo } from 'react-icons/fa6'
+import { FaCheck, FaCircleInfo, FaRegCopy } from 'react-icons/fa6'
 
 const CvssText = ({ children }) => {
   const { primaryTextColor } = useThemeColor(['primaryTextColor'])
@@ -47,6 +50,7 @@ const CvssTag = ({ color, children }) => (
 
 const CvssCard = ({ isOpen, onClose, value }) => {
   const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
+  const cvss = useClipboard(value)
 
   const version = getCvssVersion(value)
   const CVSS = getCvssObject(value)
@@ -74,12 +78,19 @@ const CvssCard = ({ isOpen, onClose, value }) => {
       title={'CVSS Vector'}
     >
       <Stack spacing={2}>
-        <Input
-          isReadOnly
-          fontSize={'sm'}
-          defaultValue={value}
-          _focus={{ boxShadow: 'none' }}
-        />
+        <Flex gap={2} mb={1} alignItems={'center'}>
+          <Input
+            isReadOnly
+            fontSize={'sm'}
+            defaultValue={value}
+            _focus={{ boxShadow: 'none' }}
+          />
+          <IconButton
+            onClick={() => cvss?.onCopy()}
+            colorScheme={cvss?.hasCopied ? 'green' : 'gray'}
+            icon={cvss?.hasCopied ? <FaCheck /> : <FaRegCopy />}
+          />
+        </Flex>
         <VStack align='stretch' spacing={2} py={2}>
           {output ? (
             Object.entries(output)?.map(([key, item]) => (

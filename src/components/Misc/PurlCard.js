@@ -1,8 +1,15 @@
 import { PackageURL } from 'packageurl-js'
 
 import { CheckCircleIcon, WarningIcon } from '@chakra-ui/icons'
-import { Divider, Flex, Grid, Stack, Text } from '@chakra-ui/react'
-import { Tag, TagLabel, TagRightIcon } from '@chakra-ui/react'
+import {
+  Divider,
+  Flex,
+  Grid,
+  IconButton,
+  Input,
+  Stack,
+  Text
+} from '@chakra-ui/react'
 import { useClipboard } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
@@ -40,17 +47,19 @@ const PurlCard = ({ value, isOpen, onClose }) => {
       noFooter
     >
       <Stack spacing={1}>
-        <Tag sx={{ py: 2, mb: 1, fontSize: 'sm', wordBreak: 'break-all' }}>
-          <TagLabel>{decodeURI(value)}</TagLabel>
-          <TagRightIcon
-            ml={'auto'}
-            cursor={'pointer'}
+        <Flex gap={2} mb={1} alignItems={'center'}>
+          <Input
+            isReadOnly
+            fontSize={'sm'}
+            defaultValue={decodeURI(value)}
+            _focus={{ boxShadow: 'none' }}
+          />
+          <IconButton
             onClick={() => purl.onCopy()}
-          >
-            {purl.hasCopied ? <FaCheck size={24} /> : <FaRegCopy size={24} />}
-          </TagRightIcon>
-        </Tag>
-        <Divider />
+            colorScheme={purl?.hasCopied ? 'green' : 'gray'}
+            icon={purl?.hasCopied ? <FaCheck /> : <FaRegCopy />}
+          />
+        </Flex>
         <Stack spacing={2} pt={1}>
           <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
             <Text fontSize={'sm'}>Type</Text>
