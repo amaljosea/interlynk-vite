@@ -12,6 +12,7 @@ import SeverityTag from 'components/Misc/SeverityTag'
 import CustomVuln from 'components/Modal/CustomVuln'
 import Pagination from 'components/Pagination'
 
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
@@ -23,6 +24,9 @@ import { FaPlus } from 'react-icons/fa6'
 
 const CustomVulnTable = () => {
   const tab = useQueryParam('tab')
+  const { organization } = useGlobalState()
+  const isFreeTier = organization?.tier === 'free'
+
   const editVulns = useHasPermission({
     parentKey: 'view_sbom',
     childKey: 'edit_vulnerabilities'
@@ -59,19 +63,21 @@ const CustomVulnTable = () => {
       >
         <Flex></Flex>
         <Flex gap={2}>
-          <Tooltip label={'Add Custom Vulnerability'}>
-            <IconButton
-              onClick={onOpen}
-              icon={<FaPlus />}
-              colorScheme='blue'
-              isDisabled={!editVulns}
-            />
-          </Tooltip>
+          {!isFreeTier && (
+            <Tooltip label={'Add Custom Vulnerability'}>
+              <IconButton
+                onClick={onOpen}
+                icon={<FaPlus />}
+                colorScheme='blue'
+                isDisabled={!editVulns}
+              />
+            </Tooltip>
+          )}
           <RefreshBtn />
         </Flex>
       </Flex>
     )
-  }, [editVulns, onOpen])
+  }, [editVulns, isFreeTier, onOpen])
 
   const columns = [
     // CVE ID
