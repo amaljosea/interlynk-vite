@@ -1,15 +1,7 @@
 import { PackageURL } from 'packageurl-js'
 
 import { CheckCircleIcon, WarningIcon } from '@chakra-ui/icons'
-import {
-  Divider,
-  Flex,
-  Grid,
-  IconButton,
-  Input,
-  Stack,
-  Text
-} from '@chakra-ui/react'
+import { Divider, Flex, IconButton, Input, Stack, Text } from '@chakra-ui/react'
 import { useClipboard } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
@@ -61,36 +53,36 @@ const PurlCard = ({ value, isOpen, onClose }) => {
           />
         </Flex>
         <Stack spacing={2} pt={1}>
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
+          <Flex gap={4} alignItems={'center'} justifyContent={'space-between'}>
             <Text fontSize={'sm'}>Type</Text>
             <InfoTag>{purlString(value)?.type || 'N/A'}</InfoTag>
-          </Grid>
+          </Flex>
           <Divider />
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
+          <Flex gap={4} alignItems={'center'} justifyContent={'space-between'}>
             <Text fontSize={'sm'}>Namespace</Text>
             <InfoTag>{purlString(value)?.namespace || 'N/A'}</InfoTag>
-          </Grid>
+          </Flex>
           <Divider />
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
+          <Flex gap={4} alignItems={'center'} justifyContent={'space-between'}>
             <Text fontSize={'sm'}>Package Name</Text>
             <InfoTag>{purlString()?.name || 'N/A'}</InfoTag>
-          </Grid>
+          </Flex>
           <Divider />
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
+          <Flex gap={4} alignItems={'center'} justifyContent={'space-between'}>
             <Text fontSize={'sm'}>Package Version</Text>
             <InfoTag>{purlString()?.version || 'N/A'}</InfoTag>
-          </Grid>
+          </Flex>
           <Divider />
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
+          <Flex gap={4} alignItems={'center'} justifyContent={'space-between'}>
             <Text fontSize={'sm'}>Qualifiers</Text>
             <InfoTag>
               {purlString()?.qualifiers
                 ? JSON.stringify(purlString()?.qualifiers)
                 : 'N/A'}
             </InfoTag>
-          </Grid>
+          </Flex>
           <Divider />
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
+          <Flex gap={4} alignItems={'center'} justifyContent={'space-between'}>
             <Text fontSize={'sm'}>Validity</Text>
             <Flex alignItems={'flex-end'} justifyContent={'flex-end'}>
               {purlString() ? (
@@ -99,7 +91,7 @@ const PurlCard = ({ value, isOpen, onClose }) => {
                 <WarningIcon color={primaryErrorColor} />
               )}
             </Flex>
-          </Grid>
+          </Flex>
         </Stack>
       </Stack>
     </LynkModal>
