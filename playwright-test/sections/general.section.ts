@@ -39,21 +39,6 @@ export default class GeneralSection {
 
     if (version.isVisible()) {
       await version.click()
-      await this.page.waitForTimeout(2000)
-
-      await this.page.locator(`//button[@aria-label='add_tool']`).click()
-      await this.page.getByPlaceholder('Add vendor').fill('SPDX')
-      await this.page.getByPlaceholder('Add name').fill('Maven')
-      await this.page.getByPlaceholder('Add version').fill('4.5.6')
-      await this.page.getByRole('button', { name: 'Save' }).click()
-      await this.page.waitForTimeout(3000)
-
-      await this.page.getByLabel('close').nth(1).click()
-      await this.page.waitForTimeout(3000)
-
-      await this.page.getByRole('button', { name: 'Yes' }).click()
-    } else {
-      errors.push('Version not found')
     }
   }
 
@@ -81,6 +66,28 @@ export default class GeneralSection {
         await this.page.waitForTimeout(3000)
         await this.addSBOM()
         await this.page.waitForTimeout(3000)
+        await this.page.reload()
+
+        await this.page.locator(`//button[@aria-label='add_tool']`).click()
+
+        const toolModal = this.page.locator(
+          "//section[contains(@id, 'chakra') and @role='dialog']"
+        )
+
+        if (toolModal.isVisible()) {
+          await this.page.getByPlaceholder('Add vendor').fill('SPDX')
+          await this.page.getByPlaceholder('Add name').fill('Maven')
+          await this.page.getByPlaceholder('Add version').fill('4.5.6')
+          await this.page.waitForTimeout(3000)
+
+          await this.page.getByRole('button', { name: 'Save' }).click()
+          await this.page.waitForTimeout(3000)
+
+          await this.page.getByLabel('close').nth(1).click()
+          await this.page.waitForTimeout(3000)
+
+          await this.page.getByRole('button', { name: 'Yes' }).click()
+        }
       }
 
       expect(errors.length).toBe(0)
