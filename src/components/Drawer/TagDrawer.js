@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
+import { isValidHexCode } from 'utils'
 
 import {
   Divider,
@@ -38,17 +39,25 @@ const TagDrawer = ({ isOpen, onClose }) => {
 
   const addLabel = (newLabel) => {
     const { name, color } = newLabel || ''
-    createTag({ variables: { name, color } }).then((res) => {
-      const { errors } = res?.data?.labelCreate || ''
-      if (errors?.length > 0) {
-        showToast({ description: errors[0], status: 'error' })
-      } else {
-        showToast({
-          description: 'Label added successfully',
-          status: 'success'
-        })
-      }
-    })
+    const isValidColor = isValidHexCode(color)
+    if (isValidColor) {
+      createTag({ variables: { name, color } }).then((res) => {
+        const { errors } = res?.data?.labelCreate || ''
+        if (errors?.length > 0) {
+          showToast({ description: errors[0], status: 'error' })
+        } else {
+          showToast({
+            description: 'Label added successfully',
+            status: 'success'
+          })
+        }
+      })
+    } else {
+      showToast({
+        description: 'Invalid color code',
+        status: 'error'
+      })
+    }
   }
 
   const deleteLabel = (id) => {
@@ -62,14 +71,22 @@ const TagDrawer = ({ isOpen, onClose }) => {
 
   const editLabel = (editedLabel) => {
     const { id, name, color } = editedLabel || ''
-    updateTag({
-      variables: { id, name, color }
-    }).then((res) => {
-      const { errors } = res?.data?.labelUpdate || ''
-      if (errors?.length > 0) {
-        showToast({ description: errors[0], status: 'error' })
-      }
-    })
+    const isValidColor = isValidHexCode(color)
+    if (isValidColor) {
+      updateTag({
+        variables: { id, name, color }
+      }).then((res) => {
+        const { errors } = res?.data?.labelUpdate || ''
+        if (errors?.length > 0) {
+          showToast({ description: errors[0], status: 'error' })
+        }
+      })
+    } else {
+      showToast({
+        description: 'Invalid color code',
+        status: 'error'
+      })
+    }
   }
 
   useEffect(() => {

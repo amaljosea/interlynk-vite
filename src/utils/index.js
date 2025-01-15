@@ -531,3 +531,106 @@ export const parseLicenseString = (licenseText) => {
 
   return licenseText
 }
+
+export const valueToColor = (action, event, orig, updated) => {
+  if (action == 'updated') {
+    if (updated == '[]') {
+      return 'red.500'
+    } else if (orig == '[]') {
+      return 'green.500'
+    } else {
+      return 'blue.500'
+    }
+  } else if (action == 'created') {
+    if (event == 'auto_check') {
+      return 'blue.500'
+    } else {
+      return 'green.500'
+    }
+  } else if (
+    action == 'tool' ||
+    action === 'retracted' ||
+    action === 'restored' ||
+    action === 'replaced'
+  ) {
+    return 'blue.500'
+  } else if (action == 'auto_check') {
+    return 'purple.500'
+  } else if (action == 'download') {
+    return 'blue.500'
+  } else if (action == 'uploaded') {
+    return 'green.500'
+  } else if (action == 'failed') {
+    return 'pink.500'
+  } else if (action == 'destroyed') {
+    return 'pink.500'
+  }
+}
+
+export const valueToIcon = (action, event, orig, updated) => {
+  if (action == 'updated') {
+    if (updated == '[]') {
+      return FaMinus
+    } else if (orig == '[]') {
+      return FaPlus
+    } else {
+      return FaEdit
+    }
+  } else if (action == 'created') {
+    return FaHammer
+  } else if (action == 'replaced') {
+    return FaArrowsRotate
+  } else if (action == 'retracted' || action == 'restored') {
+    return BsBack
+  } else if (action == 'tool') {
+    return FaHammer
+  } else if (action == 'auto_check') {
+    return FaRobot
+  } else if (action == 'download') {
+    return FaDownload
+  } else if (action == 'uploaded') {
+    return FaUpload
+  } else if (action == 'failed') {
+    return FaTimesCircle
+  } else if (action == 'destroyed') {
+    return FaMinus
+  }
+}
+
+export const valueToText = (action, event, orig, updated) => {
+  if (action == 'updated') {
+    if (updated == '[]') {
+      return `${orig}`
+    } else if (orig == '[]') {
+      return `${updated}`
+    } else if (event === 'primary') {
+      return `Modified: ${orig === 'f' ? 'False' : 'True'} to ${
+        updated === 't' ? 'True' : 'False'
+      }`
+    } else {
+      return `Modified: ${orig} to ${updated}`
+    }
+  } else if (action == 'created') {
+    return `${updated}`
+  } else if (action == 'retracted' || action == 'restored') {
+    return `${orig}`
+  } else if (action == 'tool') {
+    return `${updated}`
+  } else if (action == 'auto_check') {
+    return `${updated}`
+  } else if (action == 'downloaded') {
+    return `${updated}`
+  } else if (action == 'uploaded') {
+    return `${updated}`
+  } else if (action == 'failed') {
+    return `${updated?.substring(0, 100)}...`
+  }
+}
+
+//Validate name for registration and profile edit
+export const nameRegex = /^[a-zA-Z0-9 _-]+$/
+
+export const isValidHexCode = (hex) => {
+  const hexPattern = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/
+  return hexPattern.test(hex)
+}
