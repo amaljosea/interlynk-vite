@@ -1,15 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import {
-  Divider,
-  Stack,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs
-} from '@chakra-ui/react'
+import { Divider, Stack } from '@chakra-ui/react'
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import LegalTable from 'components/Tables/LegalTable'
@@ -171,8 +164,8 @@ function Profile() {
               {/* RULES */}
               <TabPanel px={0}>
                 <Stack spacing={5}>
-                  <Compliance />
-                  <Divider />
+                  {!isFreeTier && <Compliance />}
+                  <Divider hidden={isFreeTier} />
                   <Checks />
                 </Stack>
               </TabPanel>
