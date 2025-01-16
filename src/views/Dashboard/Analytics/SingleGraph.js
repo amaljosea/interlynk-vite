@@ -55,6 +55,19 @@ export const SingleGraph = ({
 }) => {
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
+  const relevantKeys = lines.map((line) => line.dataKey)
+  const maxDataValue = Math.max(
+    ...data.flatMap((item) =>
+      relevantKeys.map((key) =>
+        typeof item[key] === 'number' && !Number.isNaN(item[key])
+          ? item[key]
+          : 0
+      )
+    )
+  )
+  const getNextMultipleOf5 = (value) => Math.ceil(value / 5) * 5
+  const extendedMax = getNextMultipleOf5(maxDataValue)
+
   const conditionalFormatter = (value) => {
     const precision = averages ? 2 : 0
     const formattedValue = parseFloat(value).toFixed(precision)
@@ -64,7 +77,7 @@ export const SingleGraph = ({
   return (
     <ResponsiveContainer aspect={2.5} debounce={300}>
       <LineChart data={data} syncId={syncId}>
-        <CartesianGrid strokeDasharray='3 3' />
+        <CartesianGrid strokeDasharray='1 1' />
         <XAxis
           dataKey='date'
           tickFormatter={(date) => dateFormatter(date)}
@@ -77,6 +90,7 @@ export const SingleGraph = ({
           }
         />
         <YAxis
+          domain={percentage ? [0, 100] : [0, extendedMax]}
           tickFormatter={conditionalFormatter}
           tick={<CustomizedAxisTick x={5} y={5} />}
         />
