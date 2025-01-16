@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { getFullDate, timeSince } from 'utils'
-import { getColor } from 'utils/styleUtils'
+import { getResultColor } from 'utils/styleUtils'
 
 import { Spinner, Stack, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 
@@ -37,7 +37,7 @@ const PolicyColumns = (isInitialized) => {
         selector: (row) => {
           const { resultType } = row
           return (
-            <Tag minW={'100px'} colorScheme={getColor(resultType)}>
+            <Tag minW={'100px'} colorScheme={getResultColor(resultType)}>
               <TagLabel mx={'auto'} pt={0.5} textTransform={'capitalize'}>
                 {resultType}
               </TagLabel>
@@ -57,7 +57,8 @@ const PolicyColumns = (isInitialized) => {
           } = row
           if (isInitialized || policyRunStatus !== 'FINISHED')
             return <Spinner size='xs' mt={0.5} />
-          const vColor = violationsCount === 0 ? 'green' : getColor(resultType)
+          const vColor =
+            violationsCount === 0 ? 'green' : getResultColor(resultType)
           return (
             <Tag width={'60px'} colorScheme={vColor}>
               <TagLabel mx={'auto'} pt={0.5}>

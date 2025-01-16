@@ -2,7 +2,7 @@ import { useMutation } from '@apollo/client'
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
-import { customStyles } from 'utils/styleUtils'
+import { customStyles, getStatusColor } from 'utils/styleUtils'
 
 import { Flex, Menu, Portal, Stack, Text } from '@chakra-ui/react'
 import { Tooltip, useDisclosure } from '@chakra-ui/react'
@@ -193,23 +193,6 @@ const RequestTable = (props) => {
     setActiveRow(row)
   }
 
-  const getColor = (status) => {
-    switch (status) {
-      case 'Sent':
-        return 'green'
-      case 'Bounced':
-        return 'orange'
-      case 'Canceled':
-        return 'red'
-      case 'Uploaded':
-        return 'blue'
-      case 'Declined':
-        return 'red'
-      case 'Accepted':
-        return 'green'
-    }
-  }
-
   // COLUMNS
   const columns = [
     {
@@ -263,7 +246,7 @@ const RequestTable = (props) => {
       id: 'STATUS',
       name: 'STATUS',
       selector: (row) => (
-        <Tag colorScheme={getColor(row?.status)} width={'100px'}>
+        <Tag colorScheme={getStatusColor(row?.status)} width={'100px'}>
           <TagLabel mx={'auto'}>{row?.status}</TagLabel>
         </Tag>
       ),

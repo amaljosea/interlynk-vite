@@ -280,7 +280,8 @@ export const getEolStatusColor = (eolDate) => {
   }
 }
 
-export const getColor = (result) => {
+//Usage ex: PolicyColumns
+export const getResultColor = (result) => {
   switch (result) {
     case 'inform':
       return 'blue'
@@ -294,6 +295,24 @@ export const getColor = (result) => {
       return 'orange'
     case 'error':
       return 'gray'
+  }
+}
+
+//Usage ex: Request table
+export const getStatusColor = (status) => {
+  switch (status) {
+    case 'Sent':
+      return 'green'
+    case 'Bounced':
+      return 'orange'
+    case 'Canceled':
+      return 'red'
+    case 'Uploaded':
+      return 'blue'
+    case 'Declined':
+      return 'red'
+    case 'Accepted':
+      return 'green'
   }
 }
 
