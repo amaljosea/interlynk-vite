@@ -34,6 +34,7 @@ export default class GeneralSection {
 
     await this.page.getByTestId(`product_Test`).click()
     await this.page.waitForTimeout(2000)
+    await this.page.reload()
 
     const version = this.page.getByTestId('version').nth(0)
 
@@ -66,7 +67,6 @@ export default class GeneralSection {
         await this.page.waitForTimeout(3000)
         await this.addSBOM()
         await this.page.waitForTimeout(3000)
-        await this.page.reload()
 
         await this.page.locator(`//button[@aria-label='add_tool']`).click()
 
@@ -80,7 +80,7 @@ export default class GeneralSection {
           await this.page.getByPlaceholder('Add version').fill('4.5.6')
           await this.page.waitForTimeout(3000)
 
-          await this.page.getByRole('button', { name: 'Save' }).click()
+          await this.page.locator("button[type='submit']").click()
           await this.page.waitForTimeout(3000)
 
           await this.page.getByLabel('close').nth(1).click()
@@ -120,14 +120,15 @@ export default class GeneralSection {
           await this.page
             .getByPlaceholder('Add email address')
             .fill('abhisek@sofueled.com')
-          await this.page.getByRole('button', { name: 'Save' }).click()
+
+          await this.page.locator("button[type='submit']").click()
           await this.page.waitForTimeout(3000)
 
           await this.page
             .getByRole('row', { name: 'Authors Abhisek Paul -' })
             .getByLabel('close')
             .click()
-          await this.page.getByRole('button', { name: 'Yes' }).click()
+          await this.page.locator("button[type='submit']").click()
           await this.page.waitForTimeout(3000)
         } else {
           errors.push('Version not found')
