@@ -1,25 +1,4 @@
-import { parseISO } from 'date-fns'
-import { format as formatWithTZ, toZonedTime } from 'date-fns-tz'
-
-const currentDateTime = (dateFormat = 'MMMM dd, yyyy hh:mm a') => {
-  const now = new Date()
-  const utcDate = toZonedTime(now, 'UTC')
-  return formatWithTZ(utcDate, dateFormat) + ' UTC'
-}
-
-function formatDateWithTimeZone(
-  date,
-  dateFormat = 'MMMM dd, yyyy hh:mm a zzz'
-) {
-  if (!date) return ''
-  const timeZone = date.endsWith('Z')
-    ? 'UTC' // If 'Z', it's UTC
-    : undefined
-
-  const parsedDate = parseISO(date)
-  const zonedDate = timeZone ? toZonedTime(parsedDate, timeZone) : parsedDate
-  return formatWithTZ(zonedDate, dateFormat, { timeZone })
-}
+import { currentDateTime, formatDateWithTimeZone } from 'utils'
 
 //Format and return the manufacturuer contact list
 export const formatManufacturerContacts = (organizationContactsArray) => {
