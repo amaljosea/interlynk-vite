@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getFullDate, timeSince } from 'utils'
-import { customStyles } from 'utils/styleUtils'
+import { customStyles, getSupportStatusColor } from 'utils/styleUtils'
 import DeleteModal from 'views/Dashboard/Support/DeleteModal'
 import StatusModal from 'views/Dashboard/Support/StatusModal'
 import SupportModal from 'views/Dashboard/Support/SupportModal'
@@ -176,20 +176,6 @@ const SupportTable = ({
     onOpen
   ])
 
-  const getColor = (eolDate) => {
-    const currentDate = new Date()
-    const sixMonthsFromToday = new Date()
-    sixMonthsFromToday.setMonth(sixMonthsFromToday.getMonth() + 6)
-
-    if (new Date(eolDate) <= currentDate) {
-      return 'red'
-    } else if (new Date(eolDate) <= sixMonthsFromToday) {
-      return 'orange'
-    } else {
-      return 'green'
-    }
-  }
-
   // COLUMNS
   const columns = [
     {
@@ -281,7 +267,11 @@ const SupportTable = ({
       selector: (row) => {
         const { eol } = row
         return (
-          <Tag variant='solid' colorScheme={getColor(eol)} hidden={!eol}>
+          <Tag
+            variant='solid'
+            colorScheme={getSupportStatusColor(eol, 6)}
+            hidden={!eol}
+          >
             {eol}
           </Tag>
         )
@@ -295,7 +285,11 @@ const SupportTable = ({
       selector: (row) => {
         const { eos } = row
         return (
-          <Tag variant='solid' colorScheme={getColor(eos)} hidden={!eos}>
+          <Tag
+            variant='solid'
+            colorScheme={getSupportStatusColor(eos, 6)}
+            hidden={!eos}
+          >
             {eos}
           </Tag>
         )

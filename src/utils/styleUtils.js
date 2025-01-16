@@ -501,3 +501,19 @@ export const getType = (name) => {
     return <FaScrewdriverWrench />
   }
 }
+
+export const getSupportStatusColor = (eolDate, warningMonths = 6) => {
+  const currentDate = new Date()
+  const warningDate = new Date()
+  warningDate.setMonth(currentDate.getMonth() + warningMonths)
+
+  const targetDate = new Date(eolDate)
+
+  if (targetDate <= currentDate) {
+    return 'red'
+  } else if (targetDate <= warningDate) {
+    return 'orange'
+  } else {
+    return 'green'
+  }
+}
