@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation, useParams } from 'react-router-dom'
 import { getFullDate, timeSince, updatedValue } from 'utils'
+import { formatConditionValue } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import { getIcon } from 'utils/styleUtils'
 import { customStyles } from 'utils/styleUtils'
@@ -443,15 +444,6 @@ const PolicyTable = (props) => {
   const ExpandedComponent = ({ data }) => {
     const { policyRules } = data || {}
 
-    const getValue = (item) => {
-      const isEPSS =
-        item?.subject === 'VULNERABILITY_EPSS' &&
-        (item?.operator === 'LESS_THAN' || item?.operator === 'MORE_THAN')
-      if (item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS')
-        return ''
-      return `${item?.value}${isEPSS ? ' %' : ''}`
-    }
-
     return (
       <Flex
         p={5}
@@ -515,7 +507,7 @@ const PolicyTable = (props) => {
                         readOnly
                         textTransform={'capitalize'}
                         _focus={{ boxShadow: 'none' }}
-                        defaultValue={getValue(item)}
+                        defaultValue={formatConditionValue(item)}
                       />
                     </InputGroup>
                   )}

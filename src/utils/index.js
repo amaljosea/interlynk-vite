@@ -634,3 +634,12 @@ export const isValidHexCode = (hex) => {
   const hexPattern = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/
   return hexPattern.test(hex)
 }
+
+//Usage ex: PolicyTable
+export const formatConditionValue = (item) => {
+  const isEPSS =
+    item?.subject === 'VULNERABILITY_EPSS' &&
+    (item?.operator === 'LESS_THAN' || item?.operator === 'MORE_THAN')
+  if (item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS') return ''
+  return `${item?.value}${isEPSS ? ' %' : ''}`
+}
