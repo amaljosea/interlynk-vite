@@ -1,7 +1,5 @@
 import {
-  Divider,
   Flex,
-  Grid,
   IconButton,
   Input,
   Stack,
@@ -11,12 +9,15 @@ import {
 
 import LynkModal from 'components/LynkModal'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 import { FaCheck, FaCircleInfo, FaRegCopy } from 'react-icons/fa6'
 
 import InfoTag from './InfoTag'
 
 const CpeCard = ({ value, isOpen, onClose }) => {
   const cpe = useClipboard(value)
+  const { grayBorderColor } = useThemeColor(['grayBorderColor'])
 
   // eslint-disable-next-line no-useless-escape
   const filterString = value?.replace(/[\[\]"]/g, '') || ''
@@ -34,6 +35,20 @@ const CpeCard = ({ value, isOpen, onClose }) => {
         return ''
     }
   }
+
+  const data = [
+    { id: 1, label: 'part', value: setType(cpeString[2]) },
+    { id: 2, label: 'vendor', value: cpeString[3] },
+    { id: 3, label: 'product', value: cpeString[4] },
+    { id: 4, label: 'version', value: cpeString[5] },
+    { id: 5, label: 'update', value: cpeString[6] },
+    { id: 6, label: 'edition', value: cpeString[7] },
+    { id: 7, label: 'language', value: cpeString[8] },
+    { id: 8, label: 'SW edition', value: cpeString[9] },
+    { id: 9, label: 'target software', value: cpeString[10] },
+    { id: 10, label: 'Hardware', value: cpeString[11] },
+    { id: 11, label: 'other', value: cpeString[12] }
+  ]
 
   return (
     <LynkModal
@@ -59,60 +74,21 @@ const CpeCard = ({ value, isOpen, onClose }) => {
           />
         </Flex>
         <Stack spacing={2} pt={1}>
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-            <Text fontSize={'sm'}>Part</Text>
-            {cpeString[2] && <InfoTag>{setType(cpeString[2])}</InfoTag>}
-          </Grid>
-          <Divider />
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-            <Text fontSize={'sm'}>Vendor</Text>
-            {cpeString[3] && <InfoTag>{cpeString[3]}</InfoTag>}
-          </Grid>
-          <Divider />
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-            <Text fontSize={'sm'}>Product</Text>
-            {cpeString[4] && <InfoTag>{cpeString[4]}</InfoTag>}
-          </Grid>
-          <Divider />
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-            <Text fontSize={'sm'}>Version</Text>
-            {cpeString[5] && <InfoTag>{cpeString[5]}</InfoTag>}
-          </Grid>
-          <Divider />
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-            <Text fontSize={'sm'}>Update</Text>
-            {cpeString[6] && <InfoTag>{cpeString[6]}</InfoTag>}
-          </Grid>
-          <Divider />
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-            <Text fontSize={'sm'}>Edition</Text>
-            {cpeString[7] && <InfoTag>{cpeString[7]}</InfoTag>}
-          </Grid>
-          <Divider />
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-            <Text fontSize={'sm'}>Language</Text>
-            {cpeString[8] && <InfoTag>{cpeString[8]}</InfoTag>}
-          </Grid>
-          <Divider />
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-            <Text fontSize={'sm'}>SW Edition</Text>
-            {cpeString[9] && <InfoTag>{cpeString[9]}</InfoTag>}
-          </Grid>
-          <Divider />
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-            <Text fontSize={'sm'}>Target Software</Text>
-            {cpeString[10] && <InfoTag>{cpeString[10]}</InfoTag>}
-          </Grid>
-          <Divider />
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-            <Text fontSize={'sm'}>Hardware</Text>
-            {cpeString[11] && <InfoTag>{cpeString[11]}</InfoTag>}
-          </Grid>
-          <Divider />
-          <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-            <Text fontSize={'sm'}>Other</Text>
-            {cpeString[12] && <InfoTag>{cpeString[12]}</InfoTag>}
-          </Grid>
+          {data?.map((item) => (
+            <Flex
+              pb={2}
+              gap={5}
+              w='100%'
+              key={item?.id}
+              justifyContent={'space-between'}
+              borderBottom={`1px solid ${grayBorderColor}`}
+            >
+              <Text fontSize={'sm'} textTransform={'capitalize'}>
+                {item?.label}
+              </Text>
+              <InfoTag>{item?.value}</InfoTag>
+            </Flex>
+          ))}
         </Stack>
       </Stack>
     </LynkModal>

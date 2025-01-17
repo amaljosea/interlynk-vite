@@ -1,7 +1,7 @@
 import { PackageURL } from 'packageurl-js'
 
 import { CheckCircleIcon, WarningIcon } from '@chakra-ui/icons'
-import { Divider, Flex, IconButton, Input, Stack, Text } from '@chakra-ui/react'
+import { Flex, IconButton, Input, Stack, Text } from '@chakra-ui/react'
 import { useClipboard } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
@@ -24,10 +24,39 @@ const PurlCard = ({ value, isOpen, onClose }) => {
     }
   }
 
-  const { primaryErrorColor, primarySuccessColor } = useThemeColor([
-    'primaryErrorColor',
-    'primarySuccessColor'
-  ])
+  const { primaryErrorColor, primarySuccessColor, grayBorderColor } =
+    useThemeColor([
+      'primaryErrorColor',
+      'primarySuccessColor',
+      'grayBorderColor'
+    ])
+
+  const data = [
+    { id: 1, label: 'type', value: purlString(value)?.type || 'N/A' },
+    { id: 2, label: 'namespace', value: purlString(value)?.namespace || 'N/A' },
+    { id: 3, label: 'package name', value: purlString(value)?.name || 'N/A' },
+    {
+      id: 4,
+      label: 'package version',
+      value: purlString(value)?.verion || 'N/A'
+    },
+    {
+      id: 5,
+      label: 'qualifiers',
+      value: purlString()?.qualifiers
+        ? JSON.stringify(purlString()?.qualifiers)
+        : 'N/A'
+    },
+    {
+      id: 6,
+      label: 'validity',
+      value: purlString() ? (
+        <CheckCircleIcon color={primarySuccessColor} />
+      ) : (
+        <WarningIcon color={primaryErrorColor} />
+      )
+    }
+  ]
 
   return (
     <LynkModal
@@ -53,45 +82,25 @@ const PurlCard = ({ value, isOpen, onClose }) => {
           />
         </Flex>
         <Stack spacing={2} pt={1}>
-          <Flex gap={4} alignItems={'center'} justifyContent={'space-between'}>
-            <Text fontSize={'sm'}>Type</Text>
-            <InfoTag>{purlString(value)?.type || 'N/A'}</InfoTag>
-          </Flex>
-          <Divider />
-          <Flex gap={4} alignItems={'center'} justifyContent={'space-between'}>
-            <Text fontSize={'sm'}>Namespace</Text>
-            <InfoTag>{purlString(value)?.namespace || 'N/A'}</InfoTag>
-          </Flex>
-          <Divider />
-          <Flex gap={4} alignItems={'center'} justifyContent={'space-between'}>
-            <Text fontSize={'sm'}>Package Name</Text>
-            <InfoTag>{purlString()?.name || 'N/A'}</InfoTag>
-          </Flex>
-          <Divider />
-          <Flex gap={4} alignItems={'center'} justifyContent={'space-between'}>
-            <Text fontSize={'sm'}>Package Version</Text>
-            <InfoTag>{purlString()?.version || 'N/A'}</InfoTag>
-          </Flex>
-          <Divider />
-          <Flex gap={4} alignItems={'center'} justifyContent={'space-between'}>
-            <Text fontSize={'sm'}>Qualifiers</Text>
-            <InfoTag>
-              {purlString()?.qualifiers
-                ? JSON.stringify(purlString()?.qualifiers)
-                : 'N/A'}
-            </InfoTag>
-          </Flex>
-          <Divider />
-          <Flex gap={4} alignItems={'center'} justifyContent={'space-between'}>
-            <Text fontSize={'sm'}>Validity</Text>
-            <Flex alignItems={'flex-end'} justifyContent={'flex-end'}>
-              {purlString() ? (
-                <CheckCircleIcon color={primarySuccessColor} />
+          {data?.map((item) => (
+            <Flex
+              pb={2}
+              gap={5}
+              w='100%'
+              key={item?.id}
+              justifyContent={'space-between'}
+              borderBottom={`1px solid ${grayBorderColor}`}
+            >
+              <Text fontSize={'sm'} textTransform={'capitalize'}>
+                {item?.label}
+              </Text>
+              {item?.label === 'validity' ? (
+                item?.value
               ) : (
-                <WarningIcon color={primaryErrorColor} />
+                <InfoTag>{item?.value}</InfoTag>
               )}
             </Flex>
-          </Flex>
+          ))}
         </Stack>
       </Stack>
     </LynkModal>

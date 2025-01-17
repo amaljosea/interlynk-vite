@@ -1,17 +1,17 @@
-import { Tag, TagLabel } from '@chakra-ui/react'
+import { Tag } from '@chakra-ui/react'
 
 const InfoTag = ({ children }) => {
   return (
     <Tag
       size='sm'
-      minW='120px'
+      minW='150px'
+      maxW={'250px'}
       variant='subtle'
       colorScheme='blue'
-      maxW={'fit-content'}
       justifyContent={'center'}
-      sx={{ ml: 'auto', py: 1, textAlign: 'right', wordBreak: 'break-all' }}
+      sx={{ textAlign: 'right', py: 1, wordBreak: 'break-all' }}
     >
-      <TagLabel>{children}</TagLabel>
+      {children}
     </Tag>
   )
 }
