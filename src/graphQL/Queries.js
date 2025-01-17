@@ -5340,3 +5340,24 @@ export const GetDailyMetrics = gql`
     }
   }
 `
+
+export const GetScoreSetting = gql`
+  query GetScoreSetting {
+    organization {
+      scoreSetting {
+        id
+        ageWeight
+        updatedAt
+        createdAt
+        securityWeight
+        communityWeight
+        contributorThresholdMax
+        contributorThresholdMin
+        componentAbandonedThreshold
+        organization {
+          id
+        }
+      }
+    }
+  }
+`

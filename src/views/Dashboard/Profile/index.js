@@ -26,6 +26,7 @@ import Header from './components/Header'
 import { InternalComponents } from './components/InternalComponents'
 import RiskFields from './components/RiskFields'
 import TokenInfo from './components/TokenInfo'
+import WeightControl from './components/WeightControl'
 
 function Profile() {
   const { organization } = useGlobalState()
@@ -42,6 +43,7 @@ function Profile() {
     'legal',
     'integrations-org',
     'plan',
+    'health',
     'custom-fields',
     'risks'
   ]
@@ -99,6 +101,7 @@ function Profile() {
       Feeds: !manageFeeds,
       Users: !viewUsers,
       roles: isFreeTier,
+      health: isFreeTier,
       'custom-fields': isFreeTier,
       'security tokens': isFreeTier,
       risks: !shouldShowDemoFeatures
@@ -182,6 +185,9 @@ function Profile() {
               </TabPanel>
               <TabPanel px={0}>
                 <PlanTable />
+              </TabPanel>
+              <TabPanel px={0}>
+                <WeightControl />
               </TabPanel>
               <TabPanel px={0}>
                 <CustomFields />

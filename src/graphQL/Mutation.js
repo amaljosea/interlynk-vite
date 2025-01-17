@@ -3044,3 +3044,46 @@ export const RuleExecution = gql`
     }
   }
 `
+
+export const UpdateScoreSetting = gql`
+  mutation UpdateScoreSetting(
+    $ageWeight: Float!
+    $communityWeight: Float!
+    $securityWeight: Float!
+    $componentAbandonedThreshold: Int!
+    $contributorThresholdMin: Int!
+    $contributorThresholdMax: Int!
+  ) {
+    scoreSettingUpdate(
+      input: {
+        ageWeight: $ageWeight
+        communityWeight: $communityWeight
+        securityWeight: $securityWeight
+        componentAbandonedThreshold: $componentAbandonedThreshold
+        contributorThresholdMax: $contributorThresholdMax
+        contributorThresholdMin: $contributorThresholdMin
+      }
+    ) {
+      scoreSetting {
+        ageWeight
+        communityWeight
+        securityWeight
+        contributorThresholdMax
+        contributorThresholdMin
+        componentAbandonedThreshold
+      }
+      errors
+    }
+  }
+`
+
+export const DeleteScoreSetting = gql`
+  mutation DeleteScoreSetting {
+    scoreSettingDelete {
+      scoreSetting {
+        id
+      }
+      errors
+    }
+  }
+`
