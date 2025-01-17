@@ -38,7 +38,7 @@ const ProductDetails = () => {
     'change log'
   ]
 
-  const { activeCsProdTab, setActiveCsProdTab, dispatch } = useGlobalState()
+  const { dispatch } = useGlobalState()
 
   const { prodVulnDispatch } = dispatch
 
@@ -51,11 +51,6 @@ const ProductDetails = () => {
 
   const { projectGroup } = data?.shareLynkQuery || ''
   const { name, description } = projectGroup || ''
-
-  const handleTabChange = (value) => {
-    localStorage.setItem('activeCsProdTab', value)
-    setActiveCsProdTab(value)
-  }
 
   const [versionFilters, setVersionFilters] = useState({
     field: 'SBOMS_CREATED_AT',
@@ -150,12 +145,7 @@ const ProductDetails = () => {
       {/* TAB SECTION */}
       <Card display={data ? 'block' : 'none'}>
         <CardBody>
-          <Tabs
-            variant='enclosed'
-            w={'100%'}
-            index={activeCsProdTab}
-            onChange={(value) => handleTabChange(value)}
-          >
+          <Tabs variant='enclosed' w={'100%'}>
             <TabList>
               {tabs.map((item, index) => (
                 <Tab

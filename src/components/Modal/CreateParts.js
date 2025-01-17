@@ -62,7 +62,7 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
   const productGrpId = params.productgroupid
   const partsContext = usePartsContext()
 
-  const { totalRows, prodState, dispatch } = useGlobalState()
+  const { prodState, dispatch } = useGlobalState()
   const { enabled, field, direction } = prodState
   const { prodVulnDispatch } = dispatch
 
@@ -79,7 +79,7 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
   const { data: allProjects } = useQuery(GetProjectGroups, {
     skip: isOpen ? false : true,
     variables: {
-      first: totalRows,
+      first: 25,
       labelIds: label ? [label?.value] : undefined,
       enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
       field: field,

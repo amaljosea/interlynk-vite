@@ -41,7 +41,7 @@ const Parts = ({ data }) => {
 
   const isArchived = data?.lifecycle === 'archived'
 
-  const { totalRows, dispatch } = useGlobalState()
+  const { dispatch } = useGlobalState()
 
   const { headingTextColor } = useThemeColor(['headingTextColor'])
 
@@ -57,7 +57,7 @@ const Parts = ({ data }) => {
     stopPolling
   } = useQuery(GetSbomParts, {
     skip: activeTab === PARTS ? false : true,
-    variables: { projectId: prodId, sbomId, first: totalRows }
+    variables: { projectId: prodId, sbomId, first: 25 }
   })
 
   const { sbomParts } = sbomData?.sbom || ''

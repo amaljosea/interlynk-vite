@@ -44,7 +44,7 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
 
-  const { dispatch, setActiveCsSbomTab } = useGlobalState()
+  const { dispatch } = useGlobalState()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
 
   const setActiveTab = (value) => {
@@ -58,18 +58,14 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
 
   const onSelectComp = () => {
     prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
-    if (signedUrlParams) {
-      setActiveCsSbomTab(2)
-    } else {
+    if (!signedUrlParams) {
       setActiveTab('components')
     }
   }
 
   const onSelectVulns = () => {
     prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
-    if (signedUrlParams) {
-      setActiveCsSbomTab(3)
-    } else {
+    if (!signedUrlParams) {
       prodVulnDispatch({
         type: 'FILTER_INCLUDE',
         payload: sbomParts?.length > 0 ? ['parts'] : []
@@ -79,9 +75,7 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
   }
 
   const onSelectLicenses = () => {
-    if (signedUrlParams) {
-      setActiveCsSbomTab(4)
-    } else {
+    if (!signedUrlParams) {
       setActiveTab('licenses')
     }
   }
@@ -120,9 +114,7 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
       type: 'FILTER_INCLUDE',
       payload: sbomParts?.length > 0 ? ['parts'] : []
     })
-    if (signedUrlParams) {
-      setActiveCsSbomTab(3)
-    } else {
+    if (!signedUrlParams) {
       setActiveTab('vulnerabilities')
     }
   }

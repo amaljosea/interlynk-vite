@@ -64,7 +64,7 @@ const Vulnerabilities = ({ sbomData }) => {
   const sbomId = params.sbomid
   const activeTab = useQueryParam('tab')
 
-  const { totalRows, prodVulnState, dispatch } = useGlobalState()
+  const { prodVulnState, dispatch } = useGlobalState()
   const {
     field,
     searchInput,
@@ -103,7 +103,6 @@ const Vulnerabilities = ({ sbomData }) => {
       variables: {
         projectId: productId,
         sbomId: sbomId,
-        first: totalRows,
         search: searchInput !== '' ? searchInput.trim() : undefined,
         severity: severities.length > 0 ? severities : undefined,
         source: include.includes('parts') ? undefined : 'COMPONENT',

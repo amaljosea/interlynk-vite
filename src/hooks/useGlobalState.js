@@ -1,10 +1,8 @@
 import { sbomCheckReducer } from 'context/reducers'
 import { globalVulnReducer } from 'context/reducers'
 import {
-  compVulnReducer,
   prodCompReducer,
   prodReducer,
-  prodRulesReducer,
   prodVulnReducer,
   sbomReducer,
   toolsReducer,
@@ -16,16 +14,8 @@ const GlobalStateContext = createContext()
 
 const GlobalStateProvider = ({ children }) => {
   const env = localStorage.getItem('environment')
-  const [steps, setSteps] = useState([])
   const [organization, setOrganization] = useState(null)
   const [userPermissions, setUserPermissions] = useState([])
-  const [userName, setUserName] = useState('')
-  const [totalRows, setTotalRows] = useState(25)
-  const [activeCsProdTab, setActiveCsProdTab] = useState(0)
-  const [activeCsSbomTab, setActiveCsSbomTab] = useState(0)
-  const [activeDockerHub, setActiveDockerHub] = useState(true)
-  const [vulnerabilitiesData, setVulnerabilitiesData] = useState([])
-  const [scanEnabled, setScanEnabled] = useState(false)
   const [envName, setEnvName] = useState(env || 'default')
   const [clearSelect, setClearSelect] = useState(false)
   const [selectedSbom, setSelectedSbom] = useState([])
@@ -48,23 +38,7 @@ const GlobalStateProvider = ({ children }) => {
     searchInput: '',
     pageIndex: 1
   })
-  // SINGLE VULNERABILITIES
-  const [compVulnState, compVulnDispatch] = useReducer(compVulnReducer, {
-    after: '',
-    before: '',
-    searchInput: '',
-    vexComplete: undefined,
-    envs: [],
-    versions: [],
-    products: [],
-    statuses: [],
-    pageIndex: 1
-  })
-  const [prodRulesState, prodRulesDispatch] = useReducer(prodRulesReducer, {
-    field: 'AUTO_CHECKS_UPDATED_AT',
-    direction: 'DESC',
-    pageIndex: 1
-  })
+
   const [prodCompState, prodCompDispatch] = useReducer(prodCompReducer, {
     field: 'COMPONENTS_UPDATED_AT',
     direction: 'DESC',
@@ -172,35 +146,17 @@ const GlobalStateProvider = ({ children }) => {
   return (
     <GlobalStateContext.Provider
       value={{
-        steps,
-        setSteps,
-        totalRows,
         organization,
         setOrganization,
-        setTotalRows,
-        activeCsProdTab,
-        setActiveCsProdTab,
-        activeCsSbomTab,
-        setActiveCsSbomTab,
-        activeDockerHub,
-        setActiveDockerHub,
-        vulnerabilitiesData,
-        setVulnerabilitiesData,
         userPermissions,
         setUserPermissions,
-        scanEnabled,
-        setScanEnabled,
-        userName,
-        setUserName,
         envName,
         setEnvName,
         clearSelect,
         setClearSelect,
-        compVulnState,
         prodState,
         prodCompState,
         prodVulnState,
-        prodRulesState,
         sbomState,
         versionState,
         toolsState,
@@ -210,11 +166,9 @@ const GlobalStateProvider = ({ children }) => {
         selectedSbom,
         setSelectedSbom,
         dispatch: {
-          compVulnDispatch,
           prodDispatch,
           prodCompDispatch,
           prodVulnDispatch,
-          prodRulesDispatch,
           sbomDispatch,
           versionDispatch,
           toolsDispatch,

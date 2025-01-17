@@ -35,7 +35,7 @@ const StepOne = ({
   uniqVersions,
   setUniqVersions
 }) => {
-  const { totalRows, prodState } = useGlobalState()
+  const { prodState } = useGlobalState()
   const { enabled, field, direction } = prodState
 
   const { headingTextColor } = useThemeColor(['headingTextColor'])
@@ -44,7 +44,7 @@ const StepOne = ({
 
   const { data, loading: projectGrpLoading } = useQuery(GetProjectGroups, {
     variables: {
-      first: totalRows,
+      first: 25,
       labelIds: label ? [label?.value] : undefined,
       enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
       field: field,

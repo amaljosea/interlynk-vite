@@ -81,9 +81,9 @@ const VersionsTable = (props) => {
     clearSelect,
     setClearSelect,
     versionState,
+    dispatch,
     selectedSbom,
-    setSelectedSbom,
-    dispatch
+    setSelectedSbom
   } = useGlobalState()
   const { searchInput } = versionState
   const { prodVulnDispatch, prodCompDispatch } = dispatch
@@ -92,6 +92,7 @@ const VersionsTable = (props) => {
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const [filterText, setFilterText] = useState(searchInput)
   const [activeRow, setActiveRow] = useState(null)
+
   const currentDate = new Date()
 
   const {
