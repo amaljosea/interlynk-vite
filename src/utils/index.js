@@ -645,7 +645,8 @@ export const formatFieldValue = (item) => {
     default:
       return item?.value
   }
-  
+}
+
 //Usage ex: PolicyTable
 export const formatConditionValue = (item) => {
   const isEPSS =
