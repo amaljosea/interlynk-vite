@@ -635,6 +635,17 @@ export const isValidHexCode = (hex) => {
   return hexPattern.test(hex)
 }
 
+//Usage ex: automation columns
+export const formatFieldValue = (item) => {
+  switch (item?.field) {
+    case 'component_support_level':
+      return item?.value?.replaceAll('_', ' ')
+    case 'component_end_of_support':
+      return new Date(item?.value).toLocaleDateString()
+    default:
+      return item?.value
+  }
+  
 //Usage ex: PolicyTable
 export const formatConditionValue = (item) => {
   const isEPSS =
