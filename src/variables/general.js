@@ -166,6 +166,12 @@ export const settingActions = [
     path: '/vendor/settings?tab=integrations-org'
   },
   {
+    id: 'health',
+    name: 'Health',
+    section: 'Organization',
+    path: '/vendor/settings?tab=health'
+  },
+  {
     id: 'plan',
     name: 'Plan',
     section: 'Organization',
