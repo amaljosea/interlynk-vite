@@ -150,6 +150,8 @@ const Vulnerabilities = ({ sbomData }) => {
   const IMPORT = useDisclosure()
   const CUSTOM_VULNS = useDisclosure()
 
+  const onVexOpen = () => VEX.onOpen()
+
   // GET VULN FILTER HEADS
   useQuery(signedUrlParams ? ShareVulnFilters : GetVulnFilterData, {
     variables: {
@@ -242,12 +244,14 @@ const Vulnerabilities = ({ sbomData }) => {
     showToast
   ])
 
+  const onCreateCustomVuln = () => CUSTOM_VULNS.onOpen()
+
   const subHeader = VulnerabilitySubHeader({
     editVulns,
     handleClear,
     handleScan,
     handleSearch,
-    VEX,
+    onVexOpen,
     isArchived,
     onSearchInputChange,
     IMPORT,
@@ -256,7 +260,7 @@ const Vulnerabilities = ({ sbomData }) => {
     selectedVulns,
     signedUrlParams,
     vulnSearch,
-    CUSTOM_VULNS
+    onCreateCustomVuln
   })
 
   const handleSort = (column, sortDirection) => {
