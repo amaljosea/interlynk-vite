@@ -109,11 +109,11 @@ const WeightControl = () => {
   }
 
   const disabled =
-    !ageWeight ||
+    ageWeight < 1 ||
     ageWeight > 100 ||
-    !communityWeight ||
+    communityWeight < 1 ||
     communityWeight > 100 ||
-    !securityWeight ||
+    securityWeight < 1 ||
     securityWeight > 100 ||
     !threshold ||
     threshold > 365 ||
@@ -162,7 +162,7 @@ const WeightControl = () => {
               <FormControl
                 w={'400px'}
                 isRequired
-                isInvalid={!ageWeight || ageWeight > 100}
+                isInvalid={ageWeight < 1 || ageWeight > 100}
               >
                 <FormLabel>Component Age Weight {`(%)`}</FormLabel>
                 <Input
@@ -175,7 +175,7 @@ const WeightControl = () => {
               <FormControl
                 w={'400px'}
                 isRequired
-                isInvalid={!communityWeight || communityWeight > 100}
+                isInvalid={communityWeight < 1 || communityWeight > 100}
               >
                 <FormLabel>Component Community Weight {`(%)`}</FormLabel>
                 <Input
@@ -187,7 +187,7 @@ const WeightControl = () => {
               <FormControl
                 w={'400px'}
                 isRequired
-                isInvalid={!securityWeight || securityWeight > 100}
+                isInvalid={securityWeight < 1 || securityWeight > 100}
               >
                 <FormLabel>Component Security Weight {`(%)`}</FormLabel>
                 <Input

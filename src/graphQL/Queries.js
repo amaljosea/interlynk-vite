@@ -1791,6 +1791,12 @@ export const GetComponentData = gql`
           group
           scope
           healthScore
+          healthScoreReason
+          scoreBreakdown {
+            age
+            community
+            security
+          }
           endOfSupport
           supportLevel
           externalUrls {

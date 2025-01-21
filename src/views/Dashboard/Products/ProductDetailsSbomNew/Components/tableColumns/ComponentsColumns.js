@@ -171,8 +171,14 @@ const ComponentsColumns = ({
         id: 'COMPONENTS_HEALTH',
         name: 'HEALTH',
         selector: (row) => {
-          const { healthScore } = row
-          return <HealthScore isComponent value={healthScore} />
+          const { healthScore, scoreBreakdown } = row
+          return (
+            <HealthScore
+              isComponent
+              value={healthScore}
+              scores={scoreBreakdown}
+            />
+          )
         },
         width: '10%',
         omit: isFreeTier || customerView
