@@ -2974,7 +2974,6 @@ export const CustomVulnCreate = gql`
     $customVulnSbomsAttributes: [CustomVulnSbomsAttributesInput!]
     $purl: String
     $cpe: String
-    $componentId: Uuid
   ) {
     customVulnCreate(
       input: {
@@ -2985,7 +2984,6 @@ export const CustomVulnCreate = gql`
         publishedAt: $publishedAt
         lastModifiedAt: $lastModifiedAt
         cpe: $cpe
-        componentId: $componentId
         purl: $purl
         customVulnSbomsAttributes: $customVulnSbomsAttributes
       }

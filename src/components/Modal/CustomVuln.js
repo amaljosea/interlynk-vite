@@ -67,19 +67,16 @@ const CustomVuln = ({ isOpen, onClose }) => {
   // const [cveList, setCveList] = useState([])
   const [purlError, setPurlError] = useState('')
   const [cpeError, setCpeError] = useState('')
+  const [compId, setCompId] = useState('')
   const [formData, setFormData] = useState({
     vulnIdentifier: undefined,
     desc: undefined,
     sev: undefined,
     purl: undefined,
     cpe: undefined,
-    componentId: undefined,
     reportedAt: undefined,
     publishedAt: undefined,
-    lastModifiedAt: undefined,
-    customVulnSbomsAttributes: params?.sbomid
-      ? [{ sbomId: params?.sbomid }]
-      : undefined
+    lastModifiedAt: undefined
   })
 
   const handleChange = (e) => {
@@ -162,8 +159,25 @@ const CustomVuln = ({ isOpen, onClose }) => {
     }
   }
 
+  const onChangeComponent = (e) => {
+    setCompId(e.target.value)
+    setError('')
+  }
+
   const handleSubmit = async () => {
-    await createVuln({ variables: formData }).then((res) => {
+    await createVuln({
+      variables: {
+        ...formData,
+        customVulnSbomsAttributes: params?.sbomid
+          ? [
+              {
+                sbomId: params?.sbomid,
+                componentId: compId !== '' ? compId : undefined
+              }
+            ]
+          : undefined
+      }
+    }).then((res) => {
       if (res?.data?.customVulnCreate?.errors?.length > 0) {
         setError(res?.data?.customVulnCreate?.errors[0])
       } else {
@@ -179,14 +193,11 @@ const CustomVuln = ({ isOpen, onClose }) => {
   const isDisabled = error !== '' || purlError !== '' || cpeError !== ''
 
   useEffect(() => {
-    if (components) {
+    if (components?.nodes?.length > 0) {
       const component = components?.nodes?.find(
         (item) => item?.primary === true
       )
-      setFormData((prev) => ({
-        ...prev,
-        componentId: component?.id
-      }))
+      setCompId(component?.id)
     }
   }, [components])
 
@@ -315,9 +326,9 @@ const CustomVuln = ({ isOpen, onClose }) => {
             <FormLabel htmlFor='componentId'>Component</FormLabel>
             <Select
               fontSize={'sm'}
+              value={compId}
               name='componentId'
-              value={formData?.componentId}
-              onChange={handleChange}
+              onChange={onChangeComponent}
             >
               <option value=''>-- Select --</option>
               {[...nodes]
