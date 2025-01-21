@@ -53,6 +53,7 @@ export default class ChangelogSection {
 
         await product.click()
         await this.page.waitForTimeout(2000)
+        await this.page.reload()
 
         const version = this.page.getByTestId('version').nth(0)
 

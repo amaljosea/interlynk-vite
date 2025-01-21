@@ -41,6 +41,8 @@ export default class GeneralSection {
     if (version.isVisible()) {
       await version.click()
       await this.page.locator(`//button[@aria-label='add_tool']`).click()
+      await this.page.waitForTimeout(2000)
+
       await this.page.getByPlaceholder('Add vendor').fill('SPDX')
       await this.page.getByPlaceholder('Add name').fill('Maven')
       await this.page.getByPlaceholder('Add version').fill('4.5.6')
@@ -51,7 +53,8 @@ export default class GeneralSection {
       await this.page.getByLabel('close').nth(1).click()
       await this.page.waitForTimeout(3000)
 
-      await this.page.getByRole('button', { name: 'Yes' }).click()
+      await this.page.locator("button[type='submit']").click()
+      await this.page.waitForTimeout(3000)
     }
   }
 
@@ -103,8 +106,6 @@ export default class GeneralSection {
 
         if (version.isVisible()) {
           await version.click()
-          await this.page.waitForTimeout(2000)
-
           await this.page.locator(`//button[@aria-label='add_author']`).click()
           await this.page.getByPlaceholder('Add name').fill('Abhisek Paul')
           await this.page
