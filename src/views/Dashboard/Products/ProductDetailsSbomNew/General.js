@@ -18,18 +18,11 @@ import Supplier from './SbomDetails/Supplier'
 import Tools from './SbomDetails/Tools'
 
 const General = ({ data, loading, error }) => {
-  const { inverseSecondaryBgColor, sameSecondaryText, neutralBorder } =
-    useThemeColor([
-      'inverseSecondaryBgColor',
-      'sameSecondaryText',
-      'neutralBorder'
-    ])
-
-  const LynkTd = ({ children, ...props }) => (
-    <Td {...props} borderColor={neutralBorder}>
-      {children}
-    </Td>
-  )
+  const { inverseSecondaryBgColor, grayBorderColor } = useThemeColor([
+    'inverseSecondaryBgColor',
+    'sameSecondaryText',
+    'grayBorderColor'
+  ])
 
   const isArchived = data?.lifecycle === 'archived'
 
@@ -78,63 +71,98 @@ const General = ({ data, loading, error }) => {
           <Tbody w={'100%'}>
             {/* CREATED AT */}
             <Tr minH={'64px'}>
-              <LynkTd p={0} fontWeight={'medium'} width={'15%'}>
+              <Td
+                pl={0}
+                w={'15%'}
+                fontSize={'sm'}
+                fontWeight={'medium'}
+                borderColor={grayBorderColor}
+              >
                 <InfoLabel
                   title={`Created At`}
                   onCheck={onCheck('Created At')}
                 />
-              </LynkTd>
-              <LynkTd fontSize={'sm'} color={sameSecondaryText} width={'85%'}>
+              </Td>
+              <Td
+                py={0}
+                w={'85%'}
+                fontSize={'sm'}
+                borderColor={grayBorderColor}
+              >
                 {data?.creationAt ? getFullDate(data?.creationAt) : ''}
-              </LynkTd>
+              </Td>
             </Tr>
             {/* PHASES */}
             <Tr minH={'64px'}>
-              <LynkTd p={0} fontWeight={'medium'} width={'15%'}>
+              <Td
+                pl={0}
+                w={'15%'}
+                fontSize={'sm'}
+                fontWeight={'medium'}
+                borderColor={grayBorderColor}
+              >
                 <InfoLabel title={`Phases`} onCheck={onCheck('SBOM Phases')} />
-              </LynkTd>
-              <LynkTd width={'85%'}>
+              </Td>
+              <Td w={'85%'} py={0} borderColor={grayBorderColor}>
                 <Phases data={data?.phases || []} permission={isArchived} />
-              </LynkTd>
+              </Td>
             </Tr>
             {/* CREATION TOOLS */}
             <Tr minH={'64px'}>
-              <LynkTd pl={0} fontWeight={'medium'} width={'15%'}>
+              <Td
+                pl={0}
+                w={'15%'}
+                fontSize={'sm'}
+                fontWeight={'medium'}
+                borderColor={grayBorderColor}
+              >
                 <InfoLabel
                   title={`Creation Tool`}
                   onCheck={onCheck('Creation Tool')}
                 />
-              </LynkTd>
-              <LynkTd width={'85%'}>
+              </Td>
+              <Td w={'85%'} py={0} borderColor={grayBorderColor}>
                 <Tools
                   data={data?.tools || []}
                   permission={isArchived || !editSboms}
                 />
-              </LynkTd>
+              </Td>
             </Tr>
             {/* AUTHORS */}
             <Tr minH={'64px'}>
-              <LynkTd p={0} fontWeight={'medium'} width={'15%'}>
+              <Td
+                pl={0}
+                w={'15%'}
+                fontSize={'sm'}
+                fontWeight={'medium'}
+                borderColor={grayBorderColor}
+              >
                 <InfoLabel title={`Authors`} onCheck={onCheck('Authors')} />
-              </LynkTd>
-              <LynkTd width={'85%'}>
+              </Td>
+              <Td w={'85%'} py={0} borderColor={grayBorderColor}>
                 <Authors
                   data={data?.authors || []}
                   permission={isArchived || !editSboms}
                 />
-              </LynkTd>
+              </Td>
             </Tr>
             {/* SUPPLIERS */}
             <Tr minH={'64px'}>
-              <LynkTd pl={0} fontWeight={'medium'} w={'15%'}>
+              <Td
+                pl={0}
+                w={'15%'}
+                fontSize={'sm'}
+                fontWeight={'medium'}
+                borderColor={grayBorderColor}
+              >
                 <InfoLabel title={`Supplier`} onCheck={onCheck('Supplier')} />
-              </LynkTd>
-              <LynkTd w={'85%'} py={0}>
+              </Td>
+              <Td w={'85%'} py={0} borderColor={grayBorderColor}>
                 <Supplier
                   data={data?.suppliers || []}
                   permission={isArchived || !editSboms}
                 />
-              </LynkTd>
+              </Td>
             </Tr>
             {/* LICENSES */}
             <Tr minH={'64px'}>
@@ -143,11 +171,11 @@ const General = ({ data, loading, error }) => {
                 w={'15%'}
                 fontSize={'sm'}
                 fontWeight={'medium'}
-                borderColor={neutralBorder}
+                borderColor={grayBorderColor}
               >
                 Data License
               </Td>
-              <Td w={'85%'} py={0} borderColor={neutralBorder}>
+              <Td w={'85%'} py={0} borderColor={grayBorderColor}>
                 <License
                   data={licenseData}
                   permission={isArchived || !editSboms}
