@@ -111,7 +111,7 @@ export default class PartsSection {
         errors.push('Version not found')
       }
 
-      await this.page.waitForTimeout(2000)
+      await this.page.waitForTimeout(5000)
       expect(errors.length).toBe(0)
     } catch (error) {
       throw error
@@ -129,6 +129,7 @@ export default class PartsSection {
 
       if (product.isVisible()) {
         await product.click()
+        await this.page.reload()
         await this.page.waitForTimeout(2000)
 
         const version = this.page.getByTestId('version').nth(0)

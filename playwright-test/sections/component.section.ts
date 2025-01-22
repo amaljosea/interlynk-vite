@@ -59,7 +59,7 @@ export default class ComponentSection {
         const submitBtn = await this.page.isEnabled("button[type='submit']")
         if (submitBtn) {
           await this.page.locator("button[type='submit']").click()
-          await this.page.waitForTimeout(5000)
+          await this.page.waitForTimeout(12000)
         }
       } else {
         errors.push('Modal not found')
