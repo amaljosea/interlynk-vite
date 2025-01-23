@@ -276,6 +276,7 @@ const LegalModal = ({ data, isOpen, onClose }) => {
       Icon={BsGear}
       isOpen={isOpen}
       onClose={onClose}
+      isLoading={crLoading || upLoading}
       buttonText={data ? 'Update' : 'Save'}
       onSubmit={data ? handleUpdate : handleCreate}
       title={`${data ? 'Edit' : 'Add'} Manufacturer`}
@@ -350,7 +351,7 @@ const LegalModal = ({ data, isOpen, onClose }) => {
                   isInvalid={item?.phone !== '' && item?.phError !== ''}
                 >
                   <Input
-                    type='text'
+                    minLength={'10'}
                     placeholder='Phone number'
                     value={item?.phone}
                     onBlur={(e) => onPhoneBlur(e, item)}
