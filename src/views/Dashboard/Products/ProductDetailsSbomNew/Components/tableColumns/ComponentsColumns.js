@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
-import { isValidPurl, truncatedValue } from 'utils'
-import { parseLicenseString, timeSince } from 'utils'
-import { getFullDate, isCustomerView } from 'utils'
+import { isValidPurl, parseLicenseString, truncatedValue } from 'utils'
+import { getFullDate, isCustomerView, timeSince } from 'utils'
 import { GetIcon } from 'utils/styleUtils'
 
 import { ViewIcon } from '@chakra-ui/icons'
@@ -27,6 +26,21 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
 import { FaEllipsisV, FaGlobe, FaLightbulb, FaSitemap } from 'react-icons/fa'
 import { FaHouseUser, FaListCheck } from 'react-icons/fa6'
+import {
+  LuBug,
+  LuCheckCircle,
+  LuCloudOff,
+  LuFlaskConical,
+  LuGitFork
+} from 'react-icons/lu'
+
+const StatusIcon = ({ icon, label, color }) => {
+  return (
+    <Tooltip label={label}>
+      <IconButton size='xs' colorScheme={color} icon={icon} />
+    </Tooltip>
+  )
+}
 
 const ComponentsColumns = ({
   onOpen = () => {},
@@ -87,11 +101,6 @@ const ComponentsColumns = ({
               color={inverseSecondaryBgColor}
             />
           )
-          const tagStyle = {
-            size: 'sm',
-            variant: 'subtle',
-            width: 'fit-content'
-          }
           return (
             <Flex sx={{ alignItems: 'center', gap: 2, my: 3 }}>
               <Box width={'50px'}>
@@ -124,29 +133,39 @@ const ComponentsColumns = ({
                 )}
                 <Flex gap={1} flexWrap={'wrap'} alignItems={'center'}>
                   {isVulnerable && (
-                    <Tag {...tagStyle} colorScheme='red'>
-                      <TagLabel>Vulnerable</TagLabel>
-                    </Tag>
+                    <StatusIcon
+                      color='red'
+                      label={'Vulnerable'}
+                      icon={<LuBug size={18} />}
+                    />
                   )}
                   {isOutdated && (
-                    <Tag {...tagStyle} colorScheme='teal'>
-                      <TagLabel>Outdated</TagLabel>
-                    </Tag>
+                    <StatusIcon
+                      color='teal'
+                      label={'Outdated'}
+                      icon={<LuGitFork size={16} />}
+                    />
                   )}
                   {latestPackageVersion?.isDeprecated === true && (
-                    <Tag {...tagStyle} colorScheme='orange'>
-                      <TagLabel>Deprecated</TagLabel>
-                    </Tag>
+                    <StatusIcon
+                      color='orange'
+                      label={'Deprecated'}
+                      icon={<LuCloudOff size={16} />}
+                    />
                   )}
                   {primary && (
-                    <Tag {...tagStyle} colorScheme='blue'>
-                      <TagLabel>Primary</TagLabel>
-                    </Tag>
+                    <StatusIcon
+                      color='green'
+                      label={'Primary'}
+                      icon={<LuCheckCircle size={16} />}
+                    />
                   )}
                   {internal && (
-                    <Tag {...tagStyle} colorScheme='cyan'>
-                      <TagLabel>Internal</TagLabel>
-                    </Tag>
+                    <StatusIcon
+                      color='blue'
+                      label={'Internal'}
+                      icon={<LuFlaskConical size={16} />}
+                    />
                   )}
                 </Flex>
               </Flex>
