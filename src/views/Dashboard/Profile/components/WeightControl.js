@@ -1,9 +1,11 @@
 import { useMutation, useQuery } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
 
+import { InfoIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
+  Flex,
   Input,
   SimpleGrid,
   SkeletonText,
@@ -34,6 +36,13 @@ import { GetScoreSetting } from 'graphQL/Queries'
 import { MdGraphicEq } from 'react-icons/md'
 
 const WeightControl = () => {
+  const { primaryTextColor, primaryBlueText } = useThemeColor([
+    'primaryTextColor',
+    'primaryBlueText'
+  ])
+  const infoWeights = `Relative weights of factors contributing to the component health score (must add up to 100).`
+  const infoAge = `Factors contributing to the age score. For example, number of days of inactivity before component is declared abondoned.`
+  const infoCommunity = `Factors contrinbuting to the community score. For example, minimum number of contributors that is considered a community and maximum number of contributors beyond which component is considered widely supported`
   const tab = useQueryParam('tab')
   const { showToast } = useCustomToast()
   const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
@@ -145,17 +154,35 @@ const WeightControl = () => {
 
   return (
     <Stack spacing={6}>
+      <Flex flexDirection={'column'}>
+        <Stack direction={'row'} alignItems={'center'}>
+          <Text fontSize='lg' color={primaryTextColor} fontWeight='bold'>
+            Health Scoring
+          </Text>
+        </Stack>
+        <Text fontSize={'sm'}>
+          Platform scores components and versions using its age, community
+          engagement and active vulnerabilities.
+          <br />
+          Use following controls to customize health scoring.
+        </Text>
+      </Flex>
       <SimpleGrid columns={3}>
         {/* HEALTH WEIGHT AGE */}
         <Card p={0} boxShadow='none'>
           <CardHeader mb='12px'>
-            <Text
-              fontSize='lg'
-              color={inverseSecondaryBgColor}
-              fontWeight='bold'
-            >
-              Health Weightage
-            </Text>
+            <Stack direction={'row'} alignItems={'center'}>
+              <Text
+                fontSize='md'
+                color={inverseSecondaryBgColor}
+                fontWeight='bold'
+              >
+                Relative Weights
+              </Text>
+              <Tooltip label={infoWeights}>
+                <InfoIcon cursor={'pointer'} color={primaryBlueText} />
+              </Tooltip>
+            </Stack>
           </CardHeader>
           <CardBody mt={2}>
             <Stack spacing={5}>
@@ -164,7 +191,7 @@ const WeightControl = () => {
                 isRequired
                 isInvalid={ageWeight < 1 || ageWeight > 100}
               >
-                <FormLabel>Component Age Weight {`(%)`}</FormLabel>
+                <FormLabel>Age Weight {`(%)`}</FormLabel>
                 <Input
                   type='number'
                   value={ageWeight}
@@ -177,7 +204,7 @@ const WeightControl = () => {
                 isRequired
                 isInvalid={communityWeight < 1 || communityWeight > 100}
               >
-                <FormLabel>Component Community Weight {`(%)`}</FormLabel>
+                <FormLabel>Community Weight {`(%)`}</FormLabel>
                 <Input
                   value={communityWeight}
                   onChange={(e) => setCommunityWeight(e.target.value)}
@@ -189,7 +216,7 @@ const WeightControl = () => {
                 isRequired
                 isInvalid={securityWeight < 1 || securityWeight > 100}
               >
-                <FormLabel>Component Security Weight {`(%)`}</FormLabel>
+                <FormLabel>Security Weight {`(%)`}</FormLabel>
                 <Input
                   value={securityWeight}
                   onChange={(e) => setSecurityWeight(e.target.value)}
@@ -202,13 +229,18 @@ const WeightControl = () => {
         {/* AGE CONFIGURATIONS */}
         <Card p={0} boxShadow='none'>
           <CardHeader mb='12px'>
-            <Text
-              fontSize='lg'
-              color={inverseSecondaryBgColor}
-              fontWeight='bold'
-            >
-              Age Configurations
-            </Text>
+            <Stack direction={'row'} alignItems={'center'}>
+              <Text
+                fontSize='md'
+                color={inverseSecondaryBgColor}
+                fontWeight='bold'
+              >
+                Age Score
+              </Text>
+              <Tooltip label={infoAge}>
+                <InfoIcon cursor={'pointer'} color={primaryBlueText} />
+              </Tooltip>
+            </Stack>
           </CardHeader>
           <CardBody mt={2}>
             <FormControl
@@ -216,7 +248,7 @@ const WeightControl = () => {
               isRequired
               isInvalid={!threshold || threshold > 365}
             >
-              <FormLabel>Component Abandoned Threshold {`(Days)`}</FormLabel>
+              <FormLabel>Declare Abondoned After {`(Days)`}</FormLabel>
               <Input
                 type='number'
                 value={threshold}
@@ -229,13 +261,18 @@ const WeightControl = () => {
         {/* COMMUNITY CONFIGURATIONS */}
         <Card p={0} boxShadow='none'>
           <CardHeader mb='12px'>
-            <Text
-              fontSize='lg'
-              color={inverseSecondaryBgColor}
-              fontWeight='bold'
-            >
-              Community Configuration
-            </Text>
+            <Stack direction={'row'} alignItems={'center'}>
+              <Text
+                fontSize='md'
+                color={inverseSecondaryBgColor}
+                fontWeight='bold'
+              >
+                Community Score
+              </Text>
+              <Tooltip label={infoCommunity}>
+                <InfoIcon cursor={'pointer'} color={primaryBlueText} />
+              </Tooltip>
+            </Stack>
           </CardHeader>
           <CardBody mt={2}>
             <FormControl
@@ -243,7 +280,7 @@ const WeightControl = () => {
               isRequired
               isInvalid={isInvalidArray(communityScore)}
             >
-              <FormLabel>Community Score</FormLabel>
+              <FormLabel>Community Count Thresholds</FormLabel>
               <RangeSlider
                 min={0}
                 max={100}
