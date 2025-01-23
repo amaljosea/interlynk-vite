@@ -370,22 +370,23 @@ const ProductTable = (props) => {
             gap={shouldShowDemoFeatures ? 3 : 0}
             className={index === 0 ? 'product' : ''}
           >
-            <Tooltip label={getFormat(name)} placement='top'>
-              <Olink
-                href={name ? getLink(name) : '#'}
-                isExternal={getLink(name) === '#' ? false : true}
-              >
-                <IconBox
-                  h={'40px'}
-                  w={'40px'}
-                  bg={secondaryBgColor}
-                  color={primaryBlueText}
-                  hidden={!shouldShowDemoFeatures}
+            {shouldShowDemoFeatures && (
+              <Tooltip label={getFormat(name)} placement='top'>
+                <Olink
+                  href={name ? getLink(name) : ''}
+                  isExternal={getLink(name) === '' ? false : true}
                 >
-                  {getType(name)}
-                </IconBox>
-              </Olink>
-            </Tooltip>
+                  <IconBox
+                    h={'40px'}
+                    w={'40px'}
+                    bg={secondaryBgColor}
+                    color={primaryBlueText}
+                  >
+                    {getType(name)}
+                  </IconBox>
+                </Olink>
+              </Tooltip>
+            )}
             <Stack spacing={1}>
               <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
                 <Text

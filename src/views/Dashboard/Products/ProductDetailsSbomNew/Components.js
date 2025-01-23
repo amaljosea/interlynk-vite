@@ -73,7 +73,6 @@ const Components = ({ sbomData }) => {
   const getUndefinedIfEmptyOrAll = (value, allValue = 'all') =>
     value.includes(allValue) || value.length === 0 ? undefined : value
 
-  const compBtn = useRef(null)
   const [activeRow, setActiveRow] = useState(null)
   const [compSearch, setCompSearch] = useState(searchInput || '')
 
@@ -300,8 +299,7 @@ const Components = ({ sbomData }) => {
     searchInput,
     field,
     direction,
-    reset,
-    compBtn
+    reset
   })
 
   useEffect(() => {

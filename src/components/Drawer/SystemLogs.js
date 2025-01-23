@@ -79,17 +79,12 @@ const runType = {
 
 const SystemLogs = ({ isOpen, onClose }) => {
   const params = useParams()
-  const {
-    headingTextColor,
-    primarySuccessColor,
-    sameSecondaryText,
-    secondaryTextColor
-  } = useThemeColor([
-    'headingTextColor',
-    'primarySuccessColor',
-    'sameSecondaryText',
-    secondaryTextColor
-  ])
+  const { headingTextColor, primarySuccessColor, sameSecondaryText } =
+    useThemeColor([
+      'headingTextColor',
+      'primarySuccessColor',
+      'sameSecondaryText'
+    ])
 
   const { data, loading } = useQuery(GetActivities, {
     skip: isOpen ? false : true,
@@ -123,8 +118,8 @@ const SystemLogs = ({ isOpen, onClose }) => {
           <ListIcon as={MdSettings} color={sameSecondaryText} />
           Started at {data?.startTime ? getFullDateTime(data?.startTime) : ''}
         </ListItem>
-        {sbomActivityDetails?.map((item) => (
-          <ListItem key={item?.id}>
+        {sbomActivityDetails?.map((item, index) => (
+          <ListItem key={index}>
             <ListIcon as={MdSettings} color={sameSecondaryText} />
             {`[${item?.subject?.name}:${item?.subject?.version}]`} {'>'}{' '}
             {setAction(item?.action, item?.subject)} {'>'} {item?.result}

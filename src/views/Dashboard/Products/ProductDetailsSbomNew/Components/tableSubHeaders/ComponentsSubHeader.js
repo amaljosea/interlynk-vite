@@ -27,8 +27,7 @@ const ComponentsSubHeader = ({
   searchInput,
   field,
   direction,
-  reset,
-  compBtn
+  reset
 }) => {
   const customerView = isCustomerView()
   // Use useMemo to memoize the component's JSX
@@ -69,7 +68,6 @@ const ComponentsSubHeader = ({
           {!customerView && (
             <AddButton
               label='Add Component'
-              ref={compBtn}
               onClick={onCreateComponent}
               name='add_component'
               isDisabled={restricted}
@@ -110,7 +108,6 @@ const ComponentsSubHeader = ({
     field,
     direction,
     reset,
-    compBtn,
     customerView
   ])
 }

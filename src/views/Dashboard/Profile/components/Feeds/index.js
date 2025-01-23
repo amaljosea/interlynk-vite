@@ -36,7 +36,6 @@ const Feeds = () => {
   )
 
   if (loading) return <CustomLoader />
-  console.log(advisoryFeed)
 
   return (
     <Grid

@@ -3,6 +3,7 @@ import { getIcon } from 'utils/styleUtils'
 import { componentTypes } from 'variables/general'
 
 import {
+  Box,
   Flex,
   FormControl,
   Icon,
@@ -15,8 +16,7 @@ import {
   Select,
   Stack,
   Tag,
-  Text,
-  Tooltip
+  Text
 } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -44,10 +44,10 @@ const PolicyConditions = ({
   const optionsByCategory = categories.reduce((acc, category) => {
     const options = plSubjects
       .filter((item) => item.category === category)
-      .map((item) => (
+      .map((item, index) => (
         <option
+          key={index}
           value={item.subject}
-          key={item?.subject}
           style={{ textTransform: 'capitalize' }}
         >
           {/* {`${item?.category} ${item.name}`} */}
@@ -140,11 +140,10 @@ const PolicyConditions = ({
     <>
       {conditions?.length > 0 &&
         conditions?.map((item, index) => (
-          <>
+          <Box key={index}>
             <Flex
               gap={2}
               mt={1.5}
-              key={index}
               width={'100%'}
               alignItems={'flex-start'}
               justifyContent={'space-bewteen'}
@@ -526,7 +525,7 @@ const PolicyConditions = ({
                 </Text>
               </Tag>
             )}
-          </>
+          </Box>
         ))}
     </>
   )

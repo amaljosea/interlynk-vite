@@ -114,7 +114,6 @@ const CustomNode = ({ nodeDatum, compId, click, foreignObjectProps }) => {
             maxW={'300px'}
           >
             <Box
-              colorScheme='blue'
               position={'relative'}
               fontWeight={'medium'}
               wordBreak={'break-all'}
