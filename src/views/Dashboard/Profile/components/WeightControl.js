@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { validScore } from 'utils/formValidationUtils'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import {
@@ -118,12 +119,9 @@ const WeightControl = () => {
   }
 
   const disabled =
-    ageWeight < 1 ||
-    ageWeight > 100 ||
-    communityWeight < 1 ||
-    communityWeight > 100 ||
-    securityWeight < 1 ||
-    securityWeight > 100 ||
+    !validScore(ageWeight) ||
+    !validScore(communityWeight) ||
+    !validScore(securityWeight) ||
     !threshold ||
     threshold > 365 ||
     isInvalidArray(communityScore)
@@ -189,11 +187,10 @@ const WeightControl = () => {
               <FormControl
                 w={'400px'}
                 isRequired
-                isInvalid={ageWeight < 1 || ageWeight > 100}
+                isInvalid={!validScore(ageWeight)}
               >
                 <FormLabel>Age Weight {`(%)`}</FormLabel>
                 <Input
-                  type='number'
                   value={ageWeight}
                   onChange={(e) => setAgeWeight(e.target.value)}
                 />
@@ -202,7 +199,7 @@ const WeightControl = () => {
               <FormControl
                 w={'400px'}
                 isRequired
-                isInvalid={communityWeight < 1 || communityWeight > 100}
+                isInvalid={!validScore(communityWeight)}
               >
                 <FormLabel>Community Weight {`(%)`}</FormLabel>
                 <Input
@@ -214,7 +211,7 @@ const WeightControl = () => {
               <FormControl
                 w={'400px'}
                 isRequired
-                isInvalid={securityWeight < 1 || securityWeight > 100}
+                isInvalid={!validScore(securityWeight)}
               >
                 <FormLabel>Security Weight {`(%)`}</FormLabel>
                 <Input

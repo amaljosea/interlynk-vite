@@ -31,3 +31,8 @@ export const hasWhiteSpace = (url) => {
 
 //Validate name for registration and profile edit
 export const nameValidation = /^[a-zA-Z0-9 _-]+$/
+
+export const validScore = (value) => {
+  const scoreRegex = /^(?:0|[1-9][0-9]?|100)$/
+  return scoreRegex.test(value)
+}
