@@ -35,7 +35,7 @@ import { FaFolderTree } from 'react-icons/fa6'
 import VexModal from './VexModal'
 import VulnFilters from './VulnsFilter'
 
-const VulnProdTable = ({ vuln, sbomVersions }) => {
+const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
   const params = useParams()
   const productGroupId = params?.productgroupid
   const { headingTextColor, primaryTextColor } = useThemeColor([
@@ -51,7 +51,8 @@ const VulnProdTable = ({ vuln, sbomVersions }) => {
   })
 
   const [vulnState, setVulnState] = useState({
-    vexComplete: undefined
+    vexComplete: undefined,
+    projectGroupIds: productGroupId ? [productGroupId] : undefined
   })
 
   const { nodes, paginationProps, loading, reset } = usePaginatedQuery(
@@ -59,11 +60,7 @@ const VulnProdTable = ({ vuln, sbomVersions }) => {
     {
       skip: id ? false : true,
       selector: 'componentVulns',
-      variables: {
-        ...vulnState,
-        id: id,
-        projectGroupIds: productGroupId ? [productGroupId] : undefined
-      }
+      variables: { ...vulnState, id: id }
     }
   )
 
@@ -277,6 +274,7 @@ const VulnProdTable = ({ vuln, sbomVersions }) => {
             onChange={onSearchInputChange}
           />
           <VulnFilters
+            prodGroups={prodGroups}
             sbomVersions={sbomVersions}
             setFilter={(newFilters) => {
               setVulnState(newFilters)
@@ -312,6 +310,7 @@ const VulnProdTable = ({ vuln, sbomVersions }) => {
     handleSearch,
     handleClear,
     onSearchInputChange,
+    prodGroups,
     sbomVersions,
     vulnState,
     selectedVulns.length,

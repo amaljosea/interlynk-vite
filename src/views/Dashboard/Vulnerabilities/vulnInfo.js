@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client'
+import { gql, useQuery } from '@apollo/client'
 import { useParams } from 'react-router-dom'
 import { getFullDate, linkURl } from 'utils'
 
@@ -22,6 +22,36 @@ import { FaBug, FaCube, FaCubes } from 'react-icons/fa'
 import { FaCodeMerge } from 'react-icons/fa6'
 
 import VulnProdTable from './components/ProdTable'
+
+export const GetProjectVersions = gql`
+  query GetProjectVersions($id: Uuid!) {
+    project(id: $id) {
+      sbomVersions {
+        totalCount
+        nodes {
+          projectVersion
+        }
+      }
+    }
+  }
+`
+
+export const GetCompVulnData = gql`
+  query GetCompVulnData(
+    $id: Uuid!
+    $projectGroupIds: [Uuid!]
+    $projectIds: [Uuid!]
+  ) {
+    componentVulns(
+      vulnId: $id
+      first: 1000
+      projectGroupIds: $projectGroupIds
+      projectIds: $projectIds
+    ) {
+      totalCount
+    }
+  }
+`
 
 const StatsContainer = ({ icon, title, children }) => {
   const { primaryBlueText, secondaryBgColor, primaryTextColor } = useThemeColor(
@@ -61,6 +91,14 @@ const VulnInfo = () => {
     variables: { id }
   })
 
+  const { data: versions } = useQuery(GetProjectVersions, {
+    skip: params?.productid ? false : true,
+    variables: { id: params?.productid }
+  })
+  const { nodes } = versions?.project?.sbomVersions || ''
+
+  const productVersions = nodes?.map((item) => item?.projectVersion)
+
   const { vuln } = data || ''
   const {
     source,
@@ -72,10 +110,31 @@ const VulnInfo = () => {
     sbomVersions,
     lastModifiedAt,
     componentCount,
+    projectGroups,
     projectGroupsCount,
     sbomVersionsCount
   } = vuln || ''
   const { kev, epssScore } = vulnInfo || ''
+
+  const productList =
+    projectGroups?.nodes?.length > 0
+      ? projectGroups?.nodes?.map((item) => ({
+          id: item?.id,
+          name: item?.name
+        }))
+      : []
+
+  const versionList = params?.productid ? productVersions : sbomVersions
+
+  const { data: vulns } = useQuery(GetCompVulnData, {
+    skip: params?.productid ? false : true,
+    variables: {
+      id: id,
+      projectIds: [params?.productid],
+      projectGroupIds: [params?.productgroupid]
+    }
+  })
+  const { totalCount } = vulns?.componentVulns || ''
 
   const cvssColor =
     cvssVector && !cvssVector?.startsWith('[')
@@ -168,17 +227,17 @@ const VulnInfo = () => {
         >
           <GridItem colSpan={3}>
             <StatsContainer icon={<FaCubes size={22} />} title={'Products'}>
-              {projectGroupsCount || 0}
+              {params?.productid ? 1 : projectGroupsCount}
             </StatsContainer>
           </GridItem>
           <GridItem colSpan={3}>
             <StatsContainer icon={<FaCodeMerge size={18} />} title={'Versions'}>
-              {sbomVersionsCount || 0}
+              {params?.productid ? productVersions?.length : sbomVersionsCount}
             </StatsContainer>
           </GridItem>
           <GridItem colSpan={3}>
             <StatsContainer icon={<FaCube size={18} />} title={'Components'}>
-              {componentCount || 0}
+              {params?.productid ? totalCount : componentCount}
             </StatsContainer>
           </GridItem>
           <GridItem colSpan={3}>
@@ -204,7 +263,8 @@ const VulnInfo = () => {
         {/* Tab List */}
         <Card>
           <VulnProdTable
-            sbomVersions={sbomVersions}
+            prodGroups={productList}
+            sbomVersions={versionList}
             vuln={{ id: id, vulnId: vuln?.vulnId }}
           />
         </Card>

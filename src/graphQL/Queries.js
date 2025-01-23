@@ -761,11 +761,10 @@ export const GetGlobalVulnData = gql`
         kev
         epssScore
       }
-      organization {
-        projectGroups {
-          nodes {
-            name
-          }
+      projectGroups {
+        nodes {
+          id
+          name
         }
       }
       componentCount
