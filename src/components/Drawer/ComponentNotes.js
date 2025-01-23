@@ -281,8 +281,14 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
                       >
                         <Flex gap={2} alignItems={'flex-start'}>
                           <Text fontSize={'sm'}>{index + 1}.</Text>
-                          <Stack spacing={0}>
-                            <Text fontSize={'sm'}>{note.comment}</Text>
+                          <Stack spacing={0} maxW='345px'>
+                            <Text
+                              fontSize={'sm'}
+                              whiteSpace='pre-wrap'
+                              wordBreak='break-word'
+                            >
+                              {note.comment}
+                            </Text>
                             <Text fontSize={'xs'} color={sameSecondaryText}>
                               {timeSince(note?.updatedAt)}
                             </Text>
