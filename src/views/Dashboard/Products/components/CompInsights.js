@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import { getFullDate } from 'utils'
 import { pkgData, pkgVersionData, repositoryData } from 'variables/general'
 
-import { Flex, SimpleGrid, Skeleton, Spacer, Stack } from '@chakra-ui/react'
+import { Divider, SimpleGrid, Skeleton, Spacer, Stack } from '@chakra-ui/react'
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 import { Box, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 import {
@@ -16,7 +16,6 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
-import { HealthScore } from 'components/HealthScore'
 import CompInfo from 'components/Misc/CompInfo'
 
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -43,17 +42,23 @@ const LynkTag = ({ value }) => {
   )
 }
 
-const CompInsights = ({ isOpen, onClose, id }) => {
+const CompInsights = ({ isOpen, onClose, data }) => {
+  const { id, scores } = data || ''
   const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
   const params = useParams()
   const { secondaryBgColor } = useThemeColor(['secondaryBgColor'])
 
-  const { data, loading } = useQuery(GetEnrichedData, {
+  const { age, community, security } = scores || ''
+  const ageScore = Math.round(age)
+  const communityScore = Math.round(community)
+  const securityScore = Math.round(security)
+
+  const { data: insights, loading } = useQuery(GetEnrichedData, {
     skip: isOpen ? false : true,
     variables: { id: id, sbomId: params?.sbomid }
   })
 
-  const { enrichedContent, healthScore } = data?.component || ''
+  const { enrichedContent } = insights?.component || ''
   const { packageVersion, latestPackageVersion, repository } =
     enrichedContent || ''
 
@@ -79,9 +84,7 @@ const CompInsights = ({ isOpen, onClose, id }) => {
     }
   }
 
-  const tabs = ['Package', 'Version', 'Source Code']
-
-  const isOutdated = latestPackageVersion?.version !== packageVersion?.version
+  const tabs = ['Package', 'Version', 'Source Code', 'Health Score']
 
   return (
     <Drawer size='md' isOpen={isOpen} placement='right' onClose={onClose}>
@@ -93,10 +96,7 @@ const CompInsights = ({ isOpen, onClose, id }) => {
           {loading ? (
             <Skeleton mt={2} w={'50%'} h={3} />
           ) : (
-            <Flex alignItems={'center'} gap={2} justifyContent={'flex-start'}>
-              {data && <CompInfo data={data?.component || ''} />}
-              <HealthScore isComponent value={healthScore} />
-            </Flex>
+            insights && <CompInfo data={insights?.component || ''} />
           )}
         </DrawerHeader>
         <DrawerBody p={0}>
@@ -119,9 +119,22 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                 ))}
               </TabList>
               <TabPanels px={2}>
+                {/* PACKAGE */}
                 <TabPanel>
                   {enrichedContent?.package ? (
-                    <Stack spacing={3}>
+                    <Stack>
+                      <Container>
+                        <Tooltip
+                          label={onCheck(
+                            'packageVersion',
+                            'Most Recent Version'
+                          )}
+                        >
+                          <Text cursor={'pointer'}>Most Recent Version</Text>
+                        </Tooltip>
+                        <Text>{latestPackageVersion?.version}</Text>
+                      </Container>
+                      <Divider />
                       <Container>
                         <Tooltip label={onCheck('package', 'Deprecated')}>
                           <Text cursor={'pointer'}>Deprecated</Text>
@@ -130,6 +143,7 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                           value={enrichedContent?.package?.isDeprecated}
                         />
                       </Container>
+                      <Divider />
                       <Container>
                         <Tooltip label={onCheck('package', 'Last Updated')}>
                           <Text cursor={'pointer'}>Last Updated</Text>
@@ -143,96 +157,97 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                     <Text color={sameSecondaryText}>Not available</Text>
                   )}
                 </TabPanel>
+                {/* PACKAGE VERSION */}
                 <TabPanel>
-                  {latestPackageVersion ? (
-                    <Stack spacing={3}>
+                  {packageVersion ? (
+                    <Stack>
+                      <Container>
+                        <Text cursor={'pointer'}>Version</Text>
+                        <Text>{packageVersion?.version}</Text>
+                      </Container>
+                      <Divider />
                       <Container>
                         <Tooltip label={onCheck('packageVersion', 'License')}>
                           <Text cursor={'pointer'}>License</Text>
                         </Tooltip>
-                        <Text>{getLicense(latestPackageVersion?.license)}</Text>
+                        <Text>{getLicense(packageVersion?.license)}</Text>
                       </Container>
+                      <Divider />
                       <Container>
                         <Tooltip
                           label={onCheck('packageVersion', 'Deprecated')}
                         >
                           <Text cursor={'pointer'}>Deprecated</Text>
                         </Tooltip>
-                        <LynkTag value={latestPackageVersion?.isDeprecated} />
+                        <LynkTag value={packageVersion?.isDeprecated} />
                       </Container>
+                      <Divider />
                       <Container>
                         <Tooltip label={onCheck('packageVersion', 'Archived')}>
                           <Text cursor={'pointer'}>Archived</Text>
                         </Tooltip>
-                        <LynkTag value={latestPackageVersion?.isArchived} />
+                        <LynkTag value={packageVersion?.isArchived} />
                       </Container>
+                      <Divider />
                       <Container>
                         <Tooltip
                           label={onCheck('packageVersion', 'Pre-release')}
                         >
                           <Text cursor={'pointer'}>Pre-release</Text>
                         </Tooltip>
-                        <LynkTag value={latestPackageVersion?.isPreRelease} />
+                        <LynkTag value={packageVersion?.isPreRelease} />
                       </Container>
+                      <Divider />
                       <Container>
                         <Tooltip label={onCheck('packageVersion', 'Outdated')}>
                           <Text cursor={'pointer'}>Outdated</Text>
                         </Tooltip>
-                        <LynkTag
-                          value={
-                            isOutdated
-                              ? 'Yes'
-                              : latestPackageVersion?.isOutdated
-                          }
-                        />
+                        <LynkTag value={packageVersion?.isOutdated} />
                       </Container>
-                      <Container>
-                        <Tooltip
-                          label={onCheck(
-                            'packageVersion',
-                            'Most Recent Version'
-                          )}
-                        >
-                          <Text cursor={'pointer'}>Most Recent Version</Text>
-                        </Tooltip>
-                        <Text>{latestPackageVersion?.version}</Text>
-                      </Container>
+                      <Divider />
                       <Container>
                         <Tooltip
                           label={onCheck('packageVersion', 'Last Updated')}
                         >
                           <Text cursor={'pointer'}>Last Updated</Text>
                         </Tooltip>
-                        <Text>
-                          {getFullDate(latestPackageVersion?.updatedAt)}
-                        </Text>
+                        <Text>{getFullDate(packageVersion?.updatedAt)}</Text>
+                      </Container>
+                      <Divider />
+                      <Container>
+                        <Text cursor={'pointer'}>Published At</Text>
+                        <Text>{getFullDate(packageVersion?.publishedAt)}</Text>
                       </Container>
                     </Stack>
                   ) : (
                     <Text color={sameSecondaryText}>Not available</Text>
                   )}
                 </TabPanel>
+                {/* SOURCE CODE */}
                 <TabPanel>
                   {repository ? (
-                    <Stack spacing={3}>
+                    <Stack>
                       <Container>
                         <Tooltip label={onCheck('repository', 'Name')}>
                           <Text cursor={'pointer'}>Name</Text>
                         </Tooltip>
                         <Text>{repository?.name}</Text>
                       </Container>
+                      <Divider />
                       <Container>
                         <Tooltip label={onCheck('repository', 'Owner')}>
                           <Text cursor={'pointer'}>Owner</Text>
                         </Tooltip>
                         <Text>{repository?.owner}</Text>
                       </Container>
+                      <Divider />
                       <Container>
                         <Tooltip label={onCheck('repository', 'Description')}>
                           <Text cursor={'pointer'}>Description</Text>
                         </Tooltip>
                         <Text>{repository?.description}</Text>
                       </Container>
+                      <Divider />
                       <Container>
                         <Tooltip
                           label={onCheck('repository', 'Source Archived')}
@@ -241,42 +256,49 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                         </Tooltip>
                         <LynkTag value={repository?.isArchived} />
                       </Container>
+                      <Divider />
                       <Container>
                         <Tooltip label={onCheck('repository', 'Stars')}>
                           <Text cursor={'pointer'}>Stars</Text>
                         </Tooltip>
                         <Text>{repository?.starsCount}</Text>
                       </Container>
+                      <Divider />
                       <Container>
                         <Tooltip label={onCheck('repository', 'Forks')}>
                           <Text cursor={'pointer'}>Forks</Text>
                         </Tooltip>
                         <Text>{repository?.forksCount}</Text>
                       </Container>
+                      <Divider />
                       <Container>
                         <Tooltip label={onCheck('repository', 'Watchers')}>
                           <Text cursor={'pointer'}>Watchers</Text>
                         </Tooltip>
                         <Text>{repository?.watchersCount}</Text>
                       </Container>
+                      <Divider />
                       <Container>
                         <Tooltip label={onCheck('repository', 'Contibutors')}>
                           <Text cursor={'pointer'}>Contibutors</Text>
                         </Tooltip>
                         <Text>{repository?.contributorCount}</Text>
                       </Container>
+                      <Divider />
                       <Container>
                         <Tooltip label={onCheck('repository', 'Relases')}>
                           <Text cursor={'pointer'}>Relases</Text>
                         </Tooltip>
                         <Text>{JSON.stringify(repository?.releases)}</Text>
                       </Container>
+                      <Divider />
                       <Container>
                         <Tooltip label={onCheck('repository', 'Issues')}>
                           <Text cursor={'pointer'}>Issues</Text>
                         </Tooltip>
                         <Text>{JSON.stringify(repository?.issues)}</Text>
                       </Container>
+                      <Divider />
                       <Container>
                         <Tooltip
                           label={onCheck('repository', 'OpenSSF Scorecard')}
@@ -285,6 +307,7 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                         </Tooltip>
                         <Text>{repository?.scorecardScore}</Text>
                       </Container>
+                      <Divider />
                       <Container>
                         <Tooltip label={onCheck('repository', 'License')}>
                           <Text cursor={'pointer'}>License</Text>
@@ -295,11 +318,42 @@ const CompInsights = ({ isOpen, onClose, id }) => {
                           </TagLabel>
                         </Tag>
                       </Container>
+                      <Divider />
                       <Container>
                         <Tooltip label={onCheck('repository', 'Last Updated')}>
                           <Text cursor={'pointer'}>Last Updated</Text>
                         </Tooltip>
                         <Text>{getFullDate(repository?.updatedAt)}</Text>
+                      </Container>
+                    </Stack>
+                  ) : (
+                    <Text color={sameSecondaryText}>Not available</Text>
+                  )}
+                </TabPanel>
+                {/* HEALTH SCORE */}
+                <TabPanel>
+                  {scores?.age ? (
+                    <Stack>
+                      <Container>
+                        <Text cursor={'pointer'}>Age Score</Text>
+                        <Text>{ageScore}%</Text>
+                      </Container>
+                      <Divider />
+                      <Container>
+                        <Text cursor={'pointer'}>Community Score</Text>
+                        <Text>{communityScore}%</Text>
+                      </Container>
+                      <Divider />
+                      <Container>
+                        <Text cursor={'pointer'}>Security Score</Text>
+                        <Text>{securityScore}%</Text>
+                      </Container>
+                      <Divider />
+                      <Container>
+                        <Text cursor={'pointer'}>Total Score</Text>
+                        <Text>
+                          {ageScore + communityScore + securityScore}%
+                        </Text>
                       </Container>
                     </Stack>
                   ) : (

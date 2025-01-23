@@ -5014,9 +5014,6 @@ export const GetEnrichedData = gql`
           updatedAt
         }
         packageVersion {
-          version
-        }
-        latestPackageVersion {
           purl
           version
           isArchived
@@ -5031,6 +5028,9 @@ export const GetEnrichedData = gql`
           repositoryUrl
           publishedAt
           updatedAt
+        }
+        latestPackageVersion {
+          version
         }
         repository {
           url
