@@ -103,12 +103,18 @@ const Organizations = () => {
           leftIcon={<FaBuilding />}
           isLoading={!organization?.name}
           rightIcon={<ChevronDownIcon />}
+          data-testid='org_menu'
         >
           {truncatedValue(organization?.name, 20)}
         </MenuButton>
-        <MenuList maxHeight='400px' overflowY='auto' fontSize={'sm'}>
-          <MenuItem fontSize='sm' icon={<AddIcon />} onClick={onOpen}>
-            Add Organization
+        <MenuList maxHeight='300px' overflowY='auto'>
+          <MenuItem
+            fontSize='sm'
+            icon={<AddIcon />}
+            onClick={onOpen}
+            data-testid='add_org'
+          >
+            Add organization
           </MenuItem>
           <MenuDivider />
           {allOrgLoading || myOrgLoading ? (
