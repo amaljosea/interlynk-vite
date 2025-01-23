@@ -3,16 +3,15 @@ import { envOrderList, truncatedValue } from 'utils'
 import {
   Button,
   Flex,
-  FormControl,
-  FormLabel,
   GridItem,
   Heading,
   IconButton,
   Select,
-  Skeleton,
   Stack,
   Tag
 } from '@chakra-ui/react'
+import { FormControl, FormLabel } from '@chakra-ui/react'
+import { Skeleton, SkeletonCircle, SkeletonText } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import LynkAlert from 'components/LynkAlert'
@@ -78,7 +77,12 @@ const SbomCompare = ({
   )
 
   if (projectGrpLoading) {
-    return <Skeleton height='450px' width='100%' borderRadius='md'></Skeleton>
+    return (
+      <Card>
+        <SkeletonCircle size='10' />
+        <SkeletonText mt='4' noOfLines={4} spacing='4' skeletonHeight='4' />
+      </Card>
+    )
   }
 
   return (
