@@ -760,6 +760,7 @@ export const GetGlobalVulnData = gql`
         id
         kev
         epssScore
+        epssPercentile
       }
       projectGroups {
         nodes {

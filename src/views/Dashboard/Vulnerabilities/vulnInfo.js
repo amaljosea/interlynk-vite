@@ -10,8 +10,8 @@ import { Stat, StatLabel, StatNumber } from '@chakra-ui/react'
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import IconBox from 'components/Icons/IconBox'
+import { CustomText } from 'components/Misc/CustomText'
 import CvssCard from 'components/Misc/CvssCard'
-import VulnBadge from 'components/Misc/VulnBadge'
 
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -104,7 +104,6 @@ const VulnInfo = () => {
     source,
     desc,
     vulnInfo,
-    cvssScore,
     cvssVector,
     publishedAt,
     sbomVersions,
@@ -114,7 +113,8 @@ const VulnInfo = () => {
     projectGroupsCount,
     sbomVersionsCount
   } = vuln || ''
-  const { kev, epssScore } = vulnInfo || ''
+
+  const { kev, epssPercentile } = vulnInfo || ''
 
   const productList =
     projectGroups?.nodes?.length > 0
@@ -191,20 +191,22 @@ const VulnInfo = () => {
                   w={'100%'}
                   columnGap={20}
                   alignItems={'flex-start'}
+                  flexWrap='wrap'
+                  rowGap={4}
                 >
                   {/* Published At  */}
                   <Stack spacing={1} fontSize={'sm'}>
-                    <Text fontWeight={'medium'}>Published:</Text>
+                    <CustomText>Published :</CustomText>
                     <Text>{getFullDate(publishedAt)}</Text>
                   </Stack>
                   {/* Last Modified At */}
                   <Stack spacing={1} fontSize={'sm'}>
-                    <Text fontWeight={'medium'}>Last Modified:</Text>
+                    <CustomText>Last Modified :</CustomText>
                     <Text>{getFullDate(lastModifiedAt)}</Text>
                   </Stack>
                   {/* CVSS Vector */}
-                  <Stack spacing={1} fontSize={'sm'}>
-                    <Text fontWeight={'medium'}>CVSS Vector</Text>
+                  <Stack spacing={1} fontSize={'sm'} whiteSpace='break-words'>
+                    <CustomText>CVSS Vector :</CustomText>
                     <Text
                       color={cvssColor}
                       cursor={'pointer'}
@@ -212,6 +214,18 @@ const VulnInfo = () => {
                     >
                       {cvssVector || 'N/A'}
                     </Text>
+                  </Stack>
+                  {/*   EPSS Percentile */}
+                  <Stack spacing={1} fontSize={'sm'}>
+                    <CustomText>EPSS Percentile :</CustomText>
+                    <Text>
+                      {epssPercentile ? (epssPercentile * 100).toFixed() : 0}%
+                    </Text>
+                  </Stack>
+                  {/*  KEV */}
+                  <Stack spacing={1} fontSize={'sm'}>
+                    <CustomText>KEV :</CustomText>
+                    <Text>{kev ? 'Yes' : 'No'}</Text>
                   </Stack>
                 </Flex>
               </Flex>
@@ -225,37 +239,19 @@ const VulnInfo = () => {
           alignItems={'flex-start'}
           templateColumns='repeat(12, 1fr)'
         >
-          <GridItem colSpan={3}>
+          <GridItem colSpan={4}>
             <StatsContainer icon={<FaCubes size={22} />} title={'Products'}>
               {params?.productid ? 1 : projectGroupsCount}
             </StatsContainer>
           </GridItem>
-          <GridItem colSpan={3}>
+          <GridItem colSpan={4}>
             <StatsContainer icon={<FaCodeMerge size={18} />} title={'Versions'}>
               {params?.productid ? productVersions?.length : sbomVersionsCount}
             </StatsContainer>
           </GridItem>
-          <GridItem colSpan={3}>
+          <GridItem colSpan={4}>
             <StatsContainer icon={<FaCube size={18} />} title={'Components'}>
               {params?.productid ? totalCount : componentCount}
-            </StatsContainer>
-          </GridItem>
-          <GridItem colSpan={3}>
-            <StatsContainer
-              icon={<FaBug size={18} />}
-              title={'Vulnerabilities'}
-            >
-              <Stack direction={'row'}>
-                <VulnBadge color='red' label='CVSS'>
-                  {cvssScore || 0}
-                </VulnBadge>
-                <VulnBadge color='orange' label='EPSS'>
-                  {Math.ceil(epssScore * 10000 || 0)}
-                </VulnBadge>
-                <VulnBadge color='yellow' label='KEV'>
-                  {kev ? 'K' : '-'}
-                </VulnBadge>
-              </Stack>
             </StatsContainer>
           </GridItem>
         </Grid>
