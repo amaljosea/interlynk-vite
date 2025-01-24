@@ -46,10 +46,11 @@ const LoginForm = () => {
 
   const loginURL = process.env.REACT_APP_VENDOR_LOGIN_URL
 
-  const [email, setEmail] = useState(emailId ? emailId : '')
-  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState(emailId ? emailId : '')
 
   const [resendInvitation] = useMutation(UserResendConfirmationEmail)
 
@@ -58,19 +59,20 @@ const LoginForm = () => {
   }
 
   const handleSubmit = (e) => {
+    setLoading(true)
     e.preventDefault()
     axios
       .post(`${loginURL}`, { user: { email, password } })
       .then((response) => {
-        console.log('response', response)
         const { status } = response.data
         if (status.code === 200) {
+          setLoading(false)
           Cookies.set('authToken', response.headers.authorization)
           navigate('/vendor/dashboard')
         }
       })
       .catch((error) => {
-        console.log(`Error: ${error}`)
+        setLoading(false)
         if (error.response) {
           const { status, data } = error.response
           if (status === 401) {
@@ -110,7 +112,7 @@ const LoginForm = () => {
 
   const ErrorMsg = () => {
     return (
-      <>
+      <Stack spacing={1}>
         {error}
         {error ===
           'You have to confirm your email address before continuing.' && (
@@ -121,7 +123,7 @@ const LoginForm = () => {
             </strong>
           </p>
         )}
-      </>
+      </Stack>
     )
   }
 
@@ -202,6 +204,8 @@ const LoginForm = () => {
             type='submit'
             title='Login'
             colorScheme='blue'
+            isLoading={loading}
+            loadingText='Logging in'
             isDisabled={email === '' || password === ''}
           >
             Log in

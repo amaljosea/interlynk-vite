@@ -11,6 +11,7 @@ import { getItem, removeItem, setItem } from 'utils/localStorageUtils'
 import { Button, Flex, useColorMode } from '@chakra-ui/react'
 import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
+import Loading from 'components/Misc/Loading'
 import Organizations from 'components/Organizations'
 // Custom Components
 import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
@@ -33,7 +34,12 @@ export default function AdminNavbarLinks(props) {
 
   const signedUrlParams = getSignedUrlParams()
 
-  const handleLogout = async () => await logoutUser()
+  const [loading, setLoading] = useState(false)
+
+  const handleLogout = async () => {
+    setLoading(true)
+    await logoutUser().then(() => setLoading(false))
+  }
 
   const { setIsOpen, setCurrentStep } = useTour()
 
@@ -138,6 +144,9 @@ export default function AdminNavbarLinks(props) {
         routes={signedUrlParams ? customerRoutes : dashRoutes}
         {...props}
       />
+
+      {/* LOADING */}
+      {loading && <Loading type={'signout'} />}
     </Flex>
   )
 }

@@ -47,7 +47,7 @@ const PlanTable = () => {
   const [sendRequest, { loading }] = useMutation(EnterpriseUpgradeRequest)
   const {
     headingTextColor,
-    neutralBorder,
+    grayBorderColor,
     primaryBgColor,
     primaryErrorColor,
     primarySuccessColor,
@@ -55,7 +55,7 @@ const PlanTable = () => {
     secondaryTextInverse
   } = useThemeColor([
     'headingTextColor',
-    'neutralBorder',
+    'grayBorderColor',
     'primaryBgColor',
     'primaryErrorColor',
     'primarySuccessColor',
@@ -159,7 +159,7 @@ const PlanTable = () => {
   ]
 
   const LynkTd = ({ children, ...props }) => (
-    <Td {...props} borderColor={neutralBorder}>
+    <Td {...props} borderColor={grayBorderColor}>
       {children}
     </Td>
   )
@@ -168,7 +168,7 @@ const PlanTable = () => {
     fontWeight: 'bold',
     fontFamily: 'inherit',
     color: headingTextColor,
-    borderColor: neutralBorder
+    borderColor: grayBorderColor
   }
 
   return (

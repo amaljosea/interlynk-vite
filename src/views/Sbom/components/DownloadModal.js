@@ -10,6 +10,7 @@ import {
   Divider,
   Flex,
   HStack,
+  SimpleGrid,
   Stack,
   Tag,
   Text,
@@ -350,84 +351,88 @@ const DownloadModal = (props) => {
             </FormControl>
           )}
 
-          <FormControl>
-            <FormLabel>Content</FormLabel>
-            <VStack align='start'>
-              {downloadType === 'pdf' && (
+          <SimpleGrid columns={2}>
+            <FormControl>
+              <FormLabel>Content</FormLabel>
+              <VStack align='start'>
+                {downloadType === 'pdf' && (
+                  <Checkbox
+                    isChecked={includeComponents}
+                    onChange={() => setIncludeComponents(!includeComponents)}
+                  >
+                    Components
+                  </Checkbox>
+                )}
+
                 <Checkbox
-                  isChecked={includeComponents}
-                  onChange={() => setIncludeComponents(!includeComponents)}
+                  hidden={signedUrlParams}
+                  isChecked={includeParts}
+                  onChange={() => setIncludeParts(!includeParts)}
+                  isDisabled={isFreeTier || spec === 'SPDX'}
                 >
-                  Components
+                  Parts
                 </Checkbox>
-              )}
-
-              <Checkbox
-                hidden={signedUrlParams}
-                isChecked={includeParts}
-                onChange={() => setIncludeParts(!includeParts)}
-                isDisabled={isFreeTier || spec === 'SPDX'}
-              >
-                Parts
-              </Checkbox>
-              <Checkbox
-                isChecked={includeVulns}
-                onChange={() => setIncludeVulns(!includeVulns)}
-                isDisabled={spec === 'SPDX'}
-              >
-                Vulnerabilities
-              </Checkbox>
-
-              {downloadType === 'pdf' && (
                 <Checkbox
-                  isDisabled={!includeVulns}
-                  isChecked={includeVulnStatus}
-                  onChange={() => {
-                    setIncludeVulnStatus(!includeVulnStatus)
-                  }}
+                  isChecked={includeVulns}
+                  onChange={() => setIncludeVulns(!includeVulns)}
+                  isDisabled={spec === 'SPDX'}
                 >
-                  Vulnerability Status
+                  Vulnerabilities
                 </Checkbox>
-              )}
 
-              {downloadType === 'pdf' && (
-                <Checkbox
-                  isDisabled={!includeVulns || !includeVulnStatus}
-                  isChecked={includeStatusNotes}
-                  onChange={() => {
-                    setIncludeStatusNotes(!includeStatusNotes)
-                  }}
+                {downloadType === 'pdf' && (
+                  <Checkbox
+                    isDisabled={!includeVulns}
+                    isChecked={includeVulnStatus}
+                    onChange={() => {
+                      setIncludeVulnStatus(!includeVulnStatus)
+                    }}
+                  >
+                    Vulnerability Status
+                  </Checkbox>
+                )}
+
+                {downloadType === 'pdf' && (
+                  <Checkbox
+                    isDisabled={!includeVulns || !includeVulnStatus}
+                    isChecked={includeStatusNotes}
+                    onChange={() => {
+                      setIncludeStatusNotes(!includeStatusNotes)
+                    }}
+                  >
+                    Internal Notes
+                  </Checkbox>
+                )}
+                {/* <Checkbox>Redact Internal Components</Checkbox> */}
+              </VStack>
+            </FormControl>
+            <FormControl>
+              <FormLabel>Output</FormLabel>
+              <HStack justify='space-between'>
+                <RadioGroup
+                  value={format}
+                  onChange={(value) => setFormat(value)}
                 >
-                  Internal Notes
-                </Checkbox>
-              )}
-              {/* <Checkbox>Redact Internal Components</Checkbox> */}
-            </VStack>
-          </FormControl>
-
-          <FormControl>
-            <FormLabel>Output</FormLabel>
-            <HStack justify='space-between'>
-              <RadioGroup value={format} onChange={(value) => setFormat(value)}>
-                <Stack spacing={4} direction='row'>
-                  <Radio value={downloadType === 'pdf' ? 'pdf' : 'json'}>
-                    {downloadType === 'pdf' ? 'PDF' : 'JSON'}
-                  </Radio>
-                  {/*  <Radio isDisabled={isFreeTier} value='pdf'>
+                  <Stack spacing={4} direction='row'>
+                    <Radio value={downloadType === 'pdf' ? 'pdf' : 'json'}>
+                      {downloadType === 'pdf' ? 'PDF' : 'JSON'}
+                    </Radio>
+                    {/*  <Radio isDisabled={isFreeTier} value='pdf'>
                     XML
                   </Radio> */}
-                </Stack>
-              </RadioGroup>
-              <Checkbox
-                hidden={!superAdmin}
-                isChecked={encoded}
-                onChange={() => setEncoded(!encoded)}
-                isDisabled={spec === 'SPDX'}
-              >
-                Base64 Unencoded
-              </Checkbox>
-            </HStack>
-          </FormControl>
+                  </Stack>
+                </RadioGroup>
+                <Checkbox
+                  hidden={!superAdmin}
+                  isChecked={encoded}
+                  onChange={() => setEncoded(!encoded)}
+                  isDisabled={spec === 'SPDX'}
+                >
+                  Base64 Unencoded
+                </Checkbox>
+              </HStack>
+            </FormControl>
+          </SimpleGrid>
 
           <Divider hidden={isHidden} />
           {!isUnspecified && (
