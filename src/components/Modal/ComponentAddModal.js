@@ -258,8 +258,8 @@ function ComponentAddModal(props) {
           ) : (
             <>
               {/* Package Lookup */}
-              {!details?.kind && <PackageLookup />}
-              <Stack spacing={4} hidden={!details?.kind}>
+              <PackageLookup />
+              <Stack spacing={4}>
                 {/* Name */}
                 <FormControl isReadOnly={customerView}>
                   <FormLabel htmlFor='name'>

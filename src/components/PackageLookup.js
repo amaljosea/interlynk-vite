@@ -8,14 +8,12 @@ import { FormControl, FormLabel } from '@chakra-ui/react'
 
 import { GetPackageData } from 'graphQL/Queries'
 
-import { LuPenLine } from 'react-icons/lu'
-
 import LynkAlert from './LynkAlert'
 
 const PackageLookup = () => {
   const [lookup, { loading }] = useLazyQuery(GetPackageData)
 
-  const { handleChange, setTabData } = useContext(TabContext)
+  const { setTabData } = useContext(TabContext)
 
   const [pkgString, setPkgString] = useState('')
   const [error, setError] = useState('')
@@ -30,9 +28,8 @@ const PackageLookup = () => {
       const licenseList = JSON.parse(value)
       if (licenseList?.length > 0) {
         const result = licenseList?.map((item) => ({
-          value: item?.name,
-          label: item?.name,
-          type: item?.spdx_id
+          value: item?.spdx_id,
+          label: item?.spdx_id
         }))
         return result
       } else {
@@ -80,7 +77,7 @@ const PackageLookup = () => {
         }
       })
     } else {
-      setError('Please enter a valid string')
+      setError('Please enter valid package details')
     }
   }
 
@@ -102,13 +99,6 @@ const PackageLookup = () => {
           colorScheme='blue'
           icon={<SearchIcon />}
           onClick={handleSearch}
-        />
-        <IconButton
-          siz='sm'
-          hidden={loading}
-          colorScheme='blue'
-          icon={<LuPenLine />}
-          onClick={() => handleChange('details', 'kind', 'library')}
         />
       </Flex>
       {error !== '' && <LynkAlert msg={error} />}
