@@ -1183,6 +1183,10 @@ export const sbomUpdate = gql`
     $promoteToDirect: Boolean
     $generateUniqueId: Boolean
     $moveTo: Uuid
+    $stage: String
+    $releaseDate: ISO8601Date
+    $endOfLifeDate: ISO8601Date
+    $endOfSupportDate: ISO8601Date
   ) {
     sbomUpdate(
       input: {
@@ -1192,9 +1196,13 @@ export const sbomUpdate = gql`
         format: $format
         licenses: $licenses
         archived: $archived
+        productLifeCycleStage: $stage
         promoteToDirect: $promoteToDirect
         generateUniqueId: $generateUniqueId
         moveTo: $moveTo
+        releaseDate: $releaseDate
+        endOfLifeDate: $endOfLifeDate
+        endOfSupportDate: $endOfSupportDate
       }
     ) {
       errors

@@ -1549,6 +1549,10 @@ export const GetProductData = gql`
       healthScore
       vulnRunStatus
       projectVersion
+      productLifeCycleStage
+      releaseDate
+      endOfLifeDate
+      endOfSupportDate
       sbomParts {
         id
       }

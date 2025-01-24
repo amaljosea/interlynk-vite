@@ -13,6 +13,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import Authors from './SbomDetails/Authors'
 import License from './SbomDetails/License'
+import Lifecycle from './SbomDetails/Lifecycle'
 import Phases from './SbomDetails/Phases'
 import Supplier from './SbomDetails/Supplier'
 import Tools from './SbomDetails/Tools'
@@ -40,6 +41,13 @@ const General = ({ data, loading, error }) => {
     id: data?.id,
     spec: data?.spec,
     license: data?.licensesExp
+  }
+
+  const lifecycleData = {
+    stage: data?.productLifeCycleStage,
+    releaseDate: data?.releaseDate,
+    endOfLifeDate: data?.endOfLifeDate,
+    endOfSupportDate: data?.endOfSupportDate
   }
 
   if (loading) {
@@ -105,6 +113,27 @@ const General = ({ data, loading, error }) => {
               </Td>
               <Td w={'85%'} py={0} borderColor={grayBorderColor}>
                 <Phases data={data?.phases || []} permission={isArchived} />
+              </Td>
+            </Tr>
+            {/* LIFECYCLE STAGE */}
+            <Tr minH={'64px'}>
+              <Td
+                pl={0}
+                w={'15%'}
+                fontSize={'sm'}
+                fontWeight={'medium'}
+                borderColor={grayBorderColor}
+              >
+                <InfoLabel
+                  title={`Lifecycle Stage`}
+                  onCheck={onCheck('SBOM Phases')}
+                />
+              </Td>
+              <Td w={'85%'} py={0} borderColor={grayBorderColor}>
+                <Lifecycle
+                  data={lifecycleData || null}
+                  permission={isArchived}
+                />
               </Td>
             </Tr>
             {/* CREATION TOOLS */}
