@@ -4,6 +4,12 @@ import { format as formatWithTZ, toZonedTime } from 'date-fns-tz'
 import { PackageURL } from 'packageurl-js'
 import { sbomOrigin } from 'variables/general'
 
+export const formatToISO = (dateString) => {
+  const currentYear = new Date().getFullYear()
+  const fullDate = new Date(`${dateString} ${currentYear}`)
+  return fullDate.toISOString()
+}
+
 export const getFilterValue = (value, allValue = 'all') =>
   value.includes(allValue) || value.length === 0 ? undefined : value
 
@@ -654,4 +660,11 @@ export const formatConditionValue = (item) => {
     (item?.operator === 'LESS_THAN' || item?.operator === 'MORE_THAN')
   if (item?.operator === 'EXISTS' || item?.operator === 'NOT_EXISTS') return ''
   return `${item?.value}${isEPSS ? ' %' : ''}`
+}
+
+export const filterString = (input) => {
+  if (typeof input !== 'string') {
+    throw new Error('Invalid input: Only strings are allowed.')
+  }
+  return input.replace(/([a-z])([A-Z])/g, '$1 $2')
 }

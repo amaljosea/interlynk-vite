@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { Flex, Text, useDisclosure } from '@chakra-ui/react'
+import { Flex, Heading, useDisclosure } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
@@ -22,9 +22,9 @@ const ActivitiesOverview = ({ loading, title, data }) => {
     <>
       <Card maxH='100%'>
         <Flex direction='column'>
-          <Text fontSize='lg' color={primaryTextColor} fontWeight='bold'>
+          <Heading fontSize={'lg'} color={primaryTextColor}>
             {title}
-          </Text>
+          </Heading>
         </Flex>
         {loading ? (
           <CustomLoader />

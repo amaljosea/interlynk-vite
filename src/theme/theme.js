@@ -178,6 +178,12 @@ export default extendTheme(
     breakpoints,
     components: {
       Steps,
+      Heading: {
+        baseStyle: {
+          fontFamily: 'inherit',
+          fontWeight: 'semibold'
+        }
+      },
       FormLabel: {
         baseStyle: {
           fontSize: 12,

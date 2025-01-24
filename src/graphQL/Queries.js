@@ -5369,7 +5369,7 @@ export const GetScoreSetting = gql`
 
 export const GetPackageData = gql`
   query GetPackageData($name: String!, $version: String!, $ecosystem: String!) {
-  packageLookup(name: $name, version: $version, ecosystem: $ecosystem) {
+    packageLookup(name: $name, version: $version, ecosystem: $ecosystem) {
       package {
         createdAt
         description
@@ -5421,6 +5421,71 @@ export const GetPackageData = gql`
         version
         website
       }
+    }
+  }
+`
+
+// GET ALL PRODUCTS
+export const getAllProducts = gql`
+  query getAllProducts {
+    organization {
+      projectGroups {
+        totalCount
+      }
+    }
+  }
+`
+
+// GET PRODUCTS BY STAGES
+export const getProductsByStage = gql`
+  query getProductsByStage($stage: [ProductLifecycleStageEnum!]) {
+    organization {
+      projectGroups(sbomProductLifeCycleStage: $stage) {
+        totalCount
+      }
+    }
+  }
+`
+
+// GET ALL VULNERABILITIES BY SEVERITY
+export const getVulnsBySeverity = gql`
+  query getVulnsBySeverity(
+    $firstMatchDateAfter: ISO8601DateTime
+    $severity: [String!]
+  ) {
+    organization {
+      vulns(firstMatchDateAfter: $firstMatchDateAfter, severity: $severity) {
+        totalCount
+      }
+    }
+  }
+`
+
+// GET ALL VULNERABILITIES BY STATUS
+export const getVulnsByStatus = gql`
+  query getVulnsByStatus($status: [String!]) {
+    organization {
+      vulns(status: $status) {
+        totalCount
+      }
+    }
+  }
+`
+
+// GET ALL POLICIES RULES
+export const getAllPolicies = gql`
+  query GetAllPolicies($excludeUndetected: Boolean, $resultType: [String!]) {
+    policies(resultType: $resultType, excludeUndetected: $excludeUndetected) {
+      totalCount
+    }
+  }
+`
+
+// GET ALL POLICY RESULTS
+export const getPolicyViolations = gql`
+  query getPolicyViolations($resultType: [String!]) {
+    policyRuleViolations(resultTypes: $resultType) {
+      totalCount
     }
   }
 `

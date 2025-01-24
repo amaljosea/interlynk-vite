@@ -269,7 +269,7 @@ const ProductsOverview = ({ loading, title, data }) => {
   return (
     <Card maxH='100%'>
       {/* HEADING */}
-      <Heading minH={'auto'} fontSize={'lg'} fontFamily={'inherit'}>
+      <Heading minH={'auto'} fontSize={'lg'}>
         {title}
       </Heading>
       <CardBody mt={6}>
