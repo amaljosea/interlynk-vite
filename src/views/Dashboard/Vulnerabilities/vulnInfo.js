@@ -12,6 +12,7 @@ import CardBody from 'components/Card/CardBody.js'
 import IconBox from 'components/Icons/IconBox'
 import { CustomText } from 'components/Misc/CustomText'
 import CvssCard from 'components/Misc/CvssCard'
+import SeverityTag from 'components/Misc/SeverityTag'
 
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -111,7 +112,9 @@ const VulnInfo = () => {
     componentCount,
     projectGroups,
     projectGroupsCount,
-    sbomVersionsCount
+    sbomVersionsCount,
+    sev,
+    cvssScore
   } = vuln || ''
 
   const { kev, epssPercentile } = vulnInfo || ''
@@ -214,6 +217,16 @@ const VulnInfo = () => {
                     >
                       {cvssVector || 'N/A'}
                     </Text>
+                  </Stack>
+                  {/* Severity */}
+                  <Stack spacing={1} fontSize={'sm'} whiteSpace='break-words'>
+                    <CustomText>Severity :</CustomText>
+                    <SeverityTag value={sev} />
+                  </Stack>
+                  {/* cvssScore */}
+                  <Stack spacing={1} fontSize={'sm'} whiteSpace='break-words'>
+                    <CustomText>CVSS :</CustomText>
+                    <Text>{cvssScore}</Text>
                   </Stack>
                   {/*   EPSS Percentile */}
                   <Stack spacing={1} fontSize={'sm'}>

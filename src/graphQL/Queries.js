@@ -756,6 +756,7 @@ export const GetGlobalVulnData = gql`
       cvssVector
       publishedAt
       lastModifiedAt
+      sev
       vulnInfo {
         id
         kev
