@@ -5301,6 +5301,7 @@ export const GetProjectVulnMetrics = gql`
 
 export const GetDailyMetrics = gql`
   query GetDailyMetrics(
+    $first: Int
     $projectNames: [String!]
     $projectGroupIds: [Uuid!]
     $sbomIds: [Uuid!]
@@ -5310,6 +5311,7 @@ export const GetDailyMetrics = gql`
   ) {
     dailyMetrics {
       sbomMetrics(
+        first: $first
         level: $level
         projectNames: $projectNames
         projectGroupIds: $projectGroupIds

@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-syntax */
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   CartesianGrid,
   Line,
@@ -11,20 +11,34 @@ import {
 } from 'recharts'
 import { filterString } from 'utils'
 
-import { Flex, Heading, Select, Stack, Text } from '@chakra-ui/react'
+import {
+  Box,
+  Flex,
+  Heading,
+  Select,
+  SkeletonCircle,
+  SkeletonText,
+  Stack,
+  Text
+} from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-const LynkLineChart = ({ title, data, options, onChange, days }) => {
+const LynkLineChart = ({ title, data, options, onChange, days, loading }) => {
   const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
-  const keys =
-    data?.length > 0 ? Object.keys(data[0]).filter((key) => key !== 'date') : []
+  const keys = useMemo(
+    () =>
+      data?.length > 0
+        ? Object.keys(data[0]).filter((key) => key !== 'date')
+        : [],
+    [data]
+  )
 
-  const [activeKey, setActiveKey] = useState('all')
-  const [dataKeys, setDataKeys] = useState(keys)
+  const [activeKey, setActiveKey] = useState('')
+  const [dataKeys, setDataKeys] = useState([])
 
   const handleFilter = (e) => {
     setActiveKey(e.target.value)
@@ -33,6 +47,23 @@ const LynkLineChart = ({ title, data, options, onChange, days }) => {
   }
 
   const placeHolder = title?.split(' ')
+
+  useEffect(() => {
+    if (data?.length > 0) {
+      setActiveKey('all')
+      setDataKeys(keys)
+    }
+  }, [data?.length, keys])
+
+  if (loading)
+    return (
+      <Card>
+        <Box padding='2'>
+          <SkeletonCircle size='10' />
+          <SkeletonText mt='4' noOfLines={4} spacing='4' skeletonHeight='2' />
+        </Box>
+      </Card>
+    )
 
   return (
     <Card maxH='100%'>

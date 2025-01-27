@@ -1,9 +1,7 @@
 /* eslint-disable no-restricted-syntax */
-import { useLazyQuery, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
-import { format, subDays } from 'date-fns'
-import { useEffect, useState } from 'react'
-import { formatToISO } from 'utils'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import {
   Flex,
@@ -31,40 +29,12 @@ import {
   getVulnsByStatus,
   getVulnsWithConditions
 } from 'graphQL/Queries'
+import { GetDailyMetrics } from 'graphQL/Queries'
 
 import ActivitiesOverview from './components/ActivitiesOverview'
 import ProductLabels from './components/ProductLabels'
 import ProductLifestages from './components/ProductLifestages'
 import ProductsOverview from './components/ProductsOverview'
-
-const vulnSeverityGraphs = (days = 7) => {
-  return Array.from({ length: days }, (_, index) => {
-    const date = format(subDays(new Date(), days - index - 1), 'MMM d')
-    const firstMatchDateAfter = formatToISO(date)
-    return {
-      date,
-      critical: Math.floor(Math.random() * 20),
-      high: Math.floor(Math.random() * 10),
-      medium: Math.floor(Math.random() * 20),
-      low: Math.floor(Math.random() * 25),
-      unknown: Math.floor(Math.random() * 10)
-    }
-  })
-}
-
-const vulnStatusGraphs = (days = 7) => {
-  return Array.from({ length: days }, (_, index) => {
-    const date = format(subDays(new Date(), days - index - 1), 'MMM d')
-
-    return {
-      date,
-      inTriage: Math.floor(Math.random() * 20),
-      affected: Math.floor(Math.random() * 10),
-      fixed: Math.floor(Math.random() * 25),
-      notAffected: Math.floor(Math.random() * 15)
-    }
-  })
-}
 
 const severities = {
   critical: '#E53E3E',
@@ -78,7 +48,8 @@ const statues = {
   inTriage: '#00B5D8',
   affected: '#E53E3E',
   notAffected: '#38A169',
-  fixed: '#3182CE'
+  fixed: '#3182CE',
+  unspecified: '#718096'
 }
 
 export default function Dashboard() {
@@ -91,6 +62,74 @@ export default function Dashboard() {
     skip: organization ? false : true,
     variables: { env: envName }
   })
+
+  // --------------- DAILY MATRICS --------------------
+  const { data, loading: metricsLoading } = useQuery(GetDailyMetrics, {
+    skip: organization ? false : true,
+    variables: {
+      first: 500,
+      projectNames: [envName]
+    }
+  })
+
+  const { sbomMetrics } = data?.dailyMetrics || ''
+
+  const filterMetrics = useMemo(
+    () =>
+      sbomMetrics?.nodes?.length > 0
+        ? Object.values(
+            sbomMetrics?.nodes?.reduce((acc, item) => {
+              acc[item?.date] = item
+              return acc
+            }, {})
+          )
+        : [],
+    [sbomMetrics?.nodes]
+  )
+
+  const vulnSeverityGraphs = useCallback(
+    (day = 7) => {
+      if (filterMetrics?.length > 0) {
+        const data = filterMetrics?.slice(0, day)
+        return data?.map((item) => ({
+          date: new Date(item?.date).toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric'
+          }),
+          critical: item?.vulnerabilityCriticalCount || 0,
+          high: item?.vulnerabilityHighCount || 0,
+          medium: item?.vulnerabilityMediumCount || 0,
+          low: item?.vulnerabilityLowCount || 0,
+          unknown: item?.vulnerabilityUnknownSevCount || 0
+        }))
+      } else {
+        return []
+      }
+    },
+    [filterMetrics]
+  )
+
+  const vulnStatusGraphs = useCallback(
+    (day = 7) => {
+      if (filterMetrics?.length > 0) {
+        const data = filterMetrics?.slice(0, day)
+        return data?.map((item) => ({
+          date: new Date(item?.date).toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric'
+          }),
+          inTriage: item?.vulnerabilityInTriageCount,
+          affected: item?.vulnerabilityAffectedCount,
+          notAffected: item?.vulnerabilityNotAffectedCount,
+          fixed: item?.vulnerabilityFixedCount,
+          unspecified: item?.vulnerabilityUnspecifiedCount
+        }))
+      } else {
+        return []
+      }
+    },
+    [filterMetrics]
+  )
 
   // -------------- POLICY RESULTS ---------------------
   const { data: informPolicies, loading: policyLoading } = useQuery(
@@ -585,70 +624,32 @@ export default function Dashboard() {
   ]
 
   const [severityTimeline, setSeverityTimeline] = useState(7)
-  const [severityData, setSeverityData] = useState(() =>
-    vulnSeverityGraphs(severityTimeline)
-  )
+  const [severityData, setSeverityData] = useState([])
+
+  useEffect(() => {
+    if (filterMetrics?.length > 0) {
+      const output = vulnSeverityGraphs(severityTimeline)
+      setSeverityData(output)
+    }
+  }, [filterMetrics?.length, severityTimeline, vulnSeverityGraphs])
 
   const [statusTimeline, setStatusTimeline] = useState(7)
-  const [statusData, setStatusData] = useState(() =>
-    vulnStatusGraphs(statusTimeline)
-  )
+  const [statusData, setStatusData] = useState([])
+
+  useEffect(() => {
+    if (filterMetrics?.length > 0) {
+      const output = vulnStatusGraphs(severityTimeline)
+      setStatusData(output)
+    }
+  }, [filterMetrics?.length, severityTimeline, vulnStatusGraphs])
 
   const onFilterSeverity = (days) => {
     setSeverityTimeline(days || 7)
-    setSeverityData(vulnSeverityGraphs(days || 7))
   }
 
   const onFilterStatus = (days) => {
     setStatusTimeline(days || 7)
-    setStatusData(vulnStatusGraphs(days || 7))
   }
-
-  const [getSeverities] = useLazyQuery(getVulnsBySeverity)
-
-  useEffect(() => {
-    if (severityData?.length > 0) {
-      severityData?.map((item) => {
-        const date = formatToISO(item?.date)
-        let result = { date: item?.date }
-        getSeverities({
-          variables: { severity: ['critical'], firstMatchDateAfter: date }
-        }).then((res) => {
-          const { vulns } = res?.data?.organization || ''
-          const output = { ...result, critcal: vulns?.totalCount }
-          result = output
-        })
-        getSeverities({
-          variables: { severity: ['high'], firstMatchDateAfter: date }
-        }).then((res) => {
-          const { vulns } = res?.data?.organization || ''
-          const output = { ...result, high: vulns?.totalCount }
-          result = output
-        })
-        getSeverities({
-          variables: { severity: ['low'], firstMatchDateAfter: date }
-        }).then((res) => {
-          const { vulns } = res?.data?.organization || ''
-          const output = { ...result, low: vulns?.totalCount }
-          result = output
-        })
-        getSeverities({
-          variables: { severity: ['medium'], firstMatchDateAfter: date }
-        }).then((res) => {
-          const { vulns } = res?.data?.organization || ''
-          const output = { ...result, medium: vulns?.totalCount }
-          result = output
-        })
-        getSeverities({
-          variables: { severity: ['unknown'], firstMatchDateAfter: date }
-        }).then((res) => {
-          const { vulns } = res?.data?.organization || ''
-          const output = { ...result, unknown: vulns?.totalCount }
-          result = output
-        })
-      })
-    }
-  }, [getSeverities, severityData, severityData?.length])
 
   useEffect(() => {
     if (product === null) {
@@ -735,6 +736,7 @@ export default function Dashboard() {
           data={severityData}
           days={severityTimeline}
           options={severities}
+          loading={metricsLoading}
           onChange={onFilterSeverity}
           title='Vulnerabilities by Severity'
         />
@@ -742,6 +744,7 @@ export default function Dashboard() {
           data={statusData}
           options={statues}
           days={statusTimeline}
+          loading={metricsLoading}
           onChange={onFilterStatus}
           title='Vulnerabilities by Status'
         />

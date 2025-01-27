@@ -131,14 +131,14 @@ const ProductLifestages = () => {
     <Card maxH='100%' height='320px' overflowY='auto'>
       {/* HEADING */}
       <Heading fontSize={'lg'}>Products by Lifestages</Heading>
-      <CardBody mt={6}>
+      <CardBody mt={6} h='100%'>
         <Flex
           gap={4}
           w={'100%'}
           alignItems={'center'}
           justifyContent={'space-between'}
         >
-          <StatGroup w={'320px'}>
+          <StatGroup w={'200px'}>
             <Stat textAlign={'right'}>
               <StatNumber
                 fontWeight={'normal'}

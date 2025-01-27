@@ -55,7 +55,7 @@ const ProductLabels = () => {
     <Card maxH='100%' height='320px' overflowY='auto'>
       {/* HEADING */}
       <Heading fontSize={'lg'}>Products by Label</Heading>
-      <CardBody mt={6}>
+      <CardBody mt={6} h='100%'>
         <Flex
           gap={4}
           w={'100%'}
@@ -78,7 +78,7 @@ const ProductLabels = () => {
           </StatGroup>
           <Box
             w={0.5}
-            h={'100%'}
+            h={'full'}
             borderRight={`1px solid ${grayBorderColor}`}
           />
           <SimpleGrid w={'100%'} columns={1} spacing={2}>
