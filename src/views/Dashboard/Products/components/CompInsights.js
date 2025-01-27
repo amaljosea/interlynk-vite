@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client'
 import { useParams } from 'react-router-dom'
-import { getFullDate } from 'utils'
+import { getFullDateTime, timeSince } from 'utils'
 import { pkgData, pkgVersionData, repositoryData } from 'variables/general'
 
 import { Divider, SimpleGrid, Skeleton, Spacer, Stack } from '@chakra-ui/react'
@@ -145,12 +145,21 @@ const CompInsights = ({ isOpen, onClose, data }) => {
                       </Container>
                       <Divider />
                       <Container>
-                        <Tooltip label={onCheck('package', 'Last Updated')}>
-                          <Text cursor={'pointer'}>Last Updated</Text>
+                        <Tooltip
+                          label={onCheck('packageVersion', 'Last Checked')}
+                        >
+                          <Text cursor={'pointer'}>Last Checked</Text>
                         </Tooltip>
-                        <Text>
-                          {getFullDate(enrichedContent?.package?.updatedAt)}
-                        </Text>
+                        <Tooltip
+                          placement='top'
+                          label={getFullDateTime(
+                            enrichedContent?.package?.updatedAt
+                          )}
+                        >
+                          <Text width={'fit-content'} cursor={'pointer'}>
+                            {timeSince(enrichedContent?.package?.updatedAt)}
+                          </Text>
+                        </Tooltip>
                       </Container>
                     </Stack>
                   ) : (
@@ -206,17 +215,33 @@ const CompInsights = ({ isOpen, onClose, data }) => {
                       </Container>
                       <Divider />
                       <Container>
-                        <Tooltip
-                          label={onCheck('packageVersion', 'Last Updated')}
-                        >
-                          <Text cursor={'pointer'}>Last Updated</Text>
+                        <Tooltip label={onCheck('packageVersion', 'Published')}>
+                          <Text cursor={'pointer'}>Published</Text>
                         </Tooltip>
-                        <Text>{getFullDate(packageVersion?.updatedAt)}</Text>
+                        <Tooltip
+                          placement='top'
+                          label={getFullDateTime(packageVersion?.publishedAt)}
+                        >
+                          <Text width={'fit-content'} cursor={'pointer'}>
+                            {timeSince(packageVersion?.publishedAt)}
+                          </Text>
+                        </Tooltip>
                       </Container>
                       <Divider />
                       <Container>
-                        <Text cursor={'pointer'}>Published At</Text>
-                        <Text>{getFullDate(packageVersion?.publishedAt)}</Text>
+                        <Tooltip
+                          label={onCheck('packageVersion', 'Last Checked')}
+                        >
+                          <Text cursor={'pointer'}>Last Checked</Text>
+                        </Tooltip>
+                        <Tooltip
+                          placement='top'
+                          label={getFullDateTime(packageVersion?.updatedAt)}
+                        >
+                          <Text width={'fit-content'} cursor={'pointer'}>
+                            {timeSince(packageVersion?.updatedAt)}
+                          </Text>
+                        </Tooltip>
                       </Container>
                     </Stack>
                   ) : (
@@ -320,10 +345,17 @@ const CompInsights = ({ isOpen, onClose, data }) => {
                       </Container>
                       <Divider />
                       <Container>
-                        <Tooltip label={onCheck('repository', 'Last Updated')}>
-                          <Text cursor={'pointer'}>Last Updated</Text>
+                        <Tooltip label={onCheck('repository', 'Last Checked')}>
+                          <Text cursor={'pointer'}>Last Checked</Text>
                         </Tooltip>
-                        <Text>{getFullDate(repository?.updatedAt)}</Text>
+                        <Tooltip
+                          placement='top'
+                          label={getFullDateTime(repository?.updatedAt)}
+                        >
+                          <Text width={'fit-content'} cursor={'pointer'}>
+                            {timeSince(repository?.updatedAt)}
+                          </Text>
+                        </Tooltip>
                       </Container>
                     </Stack>
                   ) : (

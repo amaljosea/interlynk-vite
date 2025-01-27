@@ -24,15 +24,16 @@ import ExternalLink from 'components/Misc/ExternalLink'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
-import { FaEllipsisV, FaGlobe, FaLightbulb, FaSitemap } from 'react-icons/fa'
-import { FaHouseUser, FaListCheck } from 'react-icons/fa6'
 import {
-  LuBug,
-  LuCheckCircle,
-  LuCloudOff,
-  LuFlaskConical,
-  LuGitFork
-} from 'react-icons/lu'
+  FaBuilding,
+  FaEllipsisV,
+  FaGlobe,
+  FaLightbulb,
+  FaSitemap
+} from 'react-icons/fa'
+import { FaHouseUser, FaListCheck, FaStar, FaTextSlash } from 'react-icons/fa6'
+import { LuBug } from 'react-icons/lu'
+import { MdOutlineHourglassBottom } from 'react-icons/md'
 
 const StatusIcon = ({ icon, label, color }) => {
   return (
@@ -136,35 +137,35 @@ const ComponentsColumns = ({
                     <StatusIcon
                       color='red'
                       label={'Vulnerable'}
-                      icon={<LuBug size={18} />}
-                    />
-                  )}
-                  {isOutdated && (
-                    <StatusIcon
-                      color='teal'
-                      label={'Outdated'}
-                      icon={<LuGitFork size={16} />}
+                      icon={<LuBug size={14} />}
                     />
                   )}
                   {latestPackageVersion?.isDeprecated === true && (
                     <StatusIcon
                       color='orange'
                       label={'Deprecated'}
-                      icon={<LuCloudOff size={16} />}
+                      icon={<FaTextSlash size={14} />}
+                    />
+                  )}
+                  {isOutdated && (
+                    <StatusIcon
+                      color='yellow'
+                      label={'Outdated'}
+                      icon={<MdOutlineHourglassBottom size={14} />}
                     />
                   )}
                   {primary && (
                     <StatusIcon
                       color='green'
                       label={'Primary'}
-                      icon={<LuCheckCircle size={16} />}
+                      icon={<FaStar size={14} />}
                     />
                   )}
                   {internal && (
                     <StatusIcon
                       color='blue'
                       label={'Internal'}
-                      icon={<LuFlaskConical size={16} />}
+                      icon={<FaBuilding size={14} />}
                     />
                   )}
                 </Flex>

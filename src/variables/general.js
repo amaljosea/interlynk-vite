@@ -887,8 +887,8 @@ export const pkgData = [
     desc: `If the entire package has been marked deprecated by the package manager`
   },
   {
-    title: `Last Updated`,
-    desc: `The date and time of the last update made on this package in the package manager`
+    title: `Last Checked`,
+    desc: `The date and time when data was last checked against for this package`
   }
 ]
 
@@ -914,12 +914,16 @@ export const pkgVersionData = [
     desc: `If a newer version of the package exists`
   },
   {
+    title: `Published`,
+    desc: `The date and time when the current version was published`
+  },
+  {
     title: `Most Recent Version`,
     desc: `The most recent version of this package is available at the package manager`
   },
   {
-    title: `Last Updated`,
-    desc: `The date and time of the last update made on this version of the package`
+    title: `Last Checked`,
+    desc: `The date and time when data was last checked against for this package`
   }
 ]
 
@@ -973,8 +977,8 @@ export const repositoryData = [
     desc: `License declaration associated with the code repository`
   },
   {
-    title: `Last Updated`,
-    desc: `The date and time of the last update associated with the code repository`
+    title: `Last Checked`,
+    desc: `The date and time when data was last checked against for this code repository`
   }
 ]
 

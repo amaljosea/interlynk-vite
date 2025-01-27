@@ -41,7 +41,6 @@ import {
 } from 'graphQL/Queries'
 
 import { BiTrash } from 'react-icons/bi'
-import { FaCheck } from 'react-icons/fa6'
 import { FiCheckCircle } from 'react-icons/fi'
 
 import CheckModal from './CheckModal'
