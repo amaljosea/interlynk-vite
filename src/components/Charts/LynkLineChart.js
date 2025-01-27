@@ -73,6 +73,7 @@ const LynkLineChart = ({ title, data, options, onChange, days, loading }) => {
         </Stack>
         <Flex gap='2'>
           <Select
+            display={'none'}
             size='sm'
             w={'140px'}
             value={activeKey}
@@ -92,6 +93,7 @@ const LynkLineChart = ({ title, data, options, onChange, days, loading }) => {
             ))}
           </Select>
           <Select
+            display={'none'}
             size='sm'
             w={'160px'}
             value={days}
@@ -134,7 +136,12 @@ const LynkLineChart = ({ title, data, options, onChange, days, loading }) => {
               ))}
             </LineChart>
           </ResponsiveContainer>
-          <Text fontSize={'sm'} textAlign={'center'} color={secondaryTextColor}>
+          <Text
+            display={'none'}
+            fontSize={'sm'}
+            textAlign={'center'}
+            color={secondaryTextColor}
+          >
             The data displayed for demonstration purposes only. Actual data will
             be available soon. Stay tuned
           </Text>

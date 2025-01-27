@@ -79,7 +79,29 @@ export default function Dashboard() {
       sbomMetrics?.nodes?.length > 0
         ? Object.values(
             sbomMetrics?.nodes?.reduce((acc, item) => {
-              acc[item?.date] = item
+              if (!acc[item?.date]) {
+                acc[item?.date] = {
+                  date: item?.date,
+                  vulnerabilityCount: 0,
+                  vulnerabilityCriticalCount: 0,
+                  vulnerabilityHighCount: 0,
+                  vulnerabilityMediumCount: 0,
+                  vulnerabilityLowCount: 0,
+                  vulnerabilityUnknownSevCount: 0
+                }
+              }
+
+              acc[item?.date].vulnerabilityCount = item?.vulnerabilityCount || 0
+              acc[item?.date].vulnerabilityCriticalCount +=
+                item?.vulnerabilityCriticalCount || 0
+              acc[item?.date].vulnerabilityHighCount +=
+                item?.vulnerabilityHighCount || 0
+              acc[item?.date].vulnerabilityMediumCount +=
+                item?.vulnerabilityMediumCount || 0
+              acc[item?.date].vulnerabilityLowCount +=
+                item?.vulnerabilityLowCount || 0
+              acc[item?.date].vulnerabilityUnknownSevCount +=
+                item?.vulnerabilityUnknownSevCount || 0
               return acc
             }, {})
           )
@@ -109,10 +131,43 @@ export default function Dashboard() {
     [filterMetrics]
   )
 
+  const filterStatuses = useMemo(
+    () =>
+      sbomMetrics?.nodes?.length > 0
+        ? Object.values(
+            sbomMetrics?.nodes?.reduce((acc, item) => {
+              if (!acc[item?.date]) {
+                acc[item?.date] = {
+                  date: item?.date,
+                  vulnerabilityInTriageCount: 0,
+                  vulnerabilityAffectedCount: 0,
+                  vulnerabilityNotAffectedCount: 0,
+                  vulnerabilityFixedCount: 0,
+                  vulnerabilityUnspecifiedCount: 0
+                }
+              }
+
+              acc[item?.date].vulnerabilityInTriageCount =
+                item?.vulnerabilityInTriageCount || 0
+              acc[item?.date].vulnerabilityAffectedCount +=
+                item?.vulnerabilityAffectedCount || 0
+              acc[item?.date].vulnerabilityNotAffectedCount +=
+                item?.vulnerabilityNotAffectedCount || 0
+              acc[item?.date].vulnerabilityFixedCount +=
+                item?.vulnerabilityFixedCount || 0
+              acc[item?.date].vulnerabilityUnspecifiedCount +=
+                item?.vulnerabilityUnspecifiedCount || 0
+              return acc
+            }, {})
+          )
+        : [],
+    [sbomMetrics?.nodes]
+  )
+
   const vulnStatusGraphs = useCallback(
     (day = 7) => {
-      if (filterMetrics?.length > 0) {
-        const data = filterMetrics?.slice(0, day)
+      if (filterStatuses?.length > 0) {
+        const data = filterStatuses?.slice(0, day)
         return data?.map((item) => ({
           date: new Date(item?.date).toLocaleString('en-US', {
             month: 'short',
