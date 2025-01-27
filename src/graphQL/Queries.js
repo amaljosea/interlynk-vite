@@ -5457,9 +5457,16 @@ export const getVulnsBySeverity = gql`
   query getVulnsBySeverity(
     $firstMatchDateAfter: ISO8601DateTime
     $severity: [String!]
+    $status: [String!]
+    $envNames: [String!]
   ) {
     organization {
-      vulns(firstMatchDateAfter: $firstMatchDateAfter, severity: $severity) {
+      vulns(
+        firstMatchDateAfter: $firstMatchDateAfter
+        severity: $severity
+        status: $status
+        projectNames: $envNames
+      ) {
         totalCount
       }
     }
@@ -5468,9 +5475,30 @@ export const getVulnsBySeverity = gql`
 
 // GET ALL VULNERABILITIES BY STATUS
 export const getVulnsByStatus = gql`
-  query getVulnsByStatus($status: [String!]) {
+  query getVulnsByStatus($status: [String!], $envNames: [String!]) {
     organization {
-      vulns(status: $status) {
+      vulns(status: $status, projectNames: $envNames) {
+        totalCount
+      }
+    }
+  }
+`
+
+// GET ALL VULNERABILITIES BY SPECIFIC CONDITIONS
+export const getVulnsWithConditions = gql`
+  query getVulnsByStatus(
+    $severity: [String!]
+    $status: [String!]
+    $kev: Boolean
+    $envNames: [String!]
+  ) {
+    organization {
+      vulns(
+        status: $status
+        severity: $severity
+        kev: $kev
+        projectNames: $envNames
+      ) {
         totalCount
       }
     }
@@ -5488,9 +5516,29 @@ export const getAllPolicies = gql`
 
 // GET ALL POLICY RESULTS
 export const getPolicyViolations = gql`
-  query getPolicyViolations($resultType: [String!]) {
-    policyRuleViolations(resultTypes: $resultType) {
+  query getPolicyViolations($resultType: [String!], $envNames: [String!]) {
+    policyRuleViolations(
+      resultTypes: $resultType
+      environmentNames: $envNames
+    ) {
       totalCount
+    }
+  }
+`
+
+// GET PRODUCT COUNTS BY LABELS
+export const getProductsByLabels = gql`
+  query getProductsByLabels {
+    organization {
+      projectGroups {
+        totalCount
+        nodes {
+          labels {
+            name
+            color
+          }
+        }
+      }
     }
   }
 `

@@ -8,7 +8,6 @@ import {
   StatArrow,
   StatGroup,
   StatHelpText,
-  StatLabel,
   StatNumber
 } from '@chakra-ui/react'
 
@@ -33,7 +32,12 @@ const ProductLifestages = () => {
   const { organization } = useGlobalState()
   const { grayBorderColor } = useThemeColor(['grayBorderColor'])
 
-  const { data: design, loading } = useQuery(getProductsByStage, {
+  const { data: noStage, loading } = useQuery(getProductsByStage, {
+    skip: organization ? false : true,
+    variables: { stage: null }
+  })
+
+  const { data: design } = useQuery(getProductsByStage, {
     skip: organization ? false : true,
     variables: { stage: ['design'] }
   })
@@ -60,6 +64,13 @@ const ProductLifestages = () => {
   })
 
   const lifeStages = [
+    {
+      id: 0,
+      color: 'gray',
+      label: 'None',
+      count: noStage?.organization?.projectGroups?.totalCount || 0,
+      icon: <LuCalendarMinus size={20} />
+    },
     {
       id: 1,
       color: 'orange',
@@ -117,9 +128,9 @@ const ProductLifestages = () => {
     )
 
   return (
-    <Card maxH='100%'>
+    <Card maxH='100%' height='320px' overflowY='auto'>
       {/* HEADING */}
-      <Heading fontSize={'lg'}>Products by Lifestage</Heading>
+      <Heading fontSize={'lg'}>Products by Lifestages</Heading>
       <CardBody mt={6}>
         <Flex
           gap={4}
@@ -127,16 +138,15 @@ const ProductLifestages = () => {
           alignItems={'center'}
           justifyContent={'space-between'}
         >
-          <StatGroup w={'300px'}>
+          <StatGroup w={'320px'}>
             <Stat textAlign={'right'}>
-              <StatLabel>Total</StatLabel>
               <StatNumber
                 fontWeight={'normal'}
-                fontSize={['2xl', '3xl', '4xl']}
+                fontSize={['4xl', '5xl', '6xl']}
               >
                 {total || 0}
               </StatNumber>
-              <StatHelpText>
+              <StatHelpText display={'none'}>
                 <StatArrow type='increase' />
                 Up from 3 last week
               </StatHelpText>
@@ -155,7 +165,7 @@ const ProductLifestages = () => {
                 alignItems={'center'}
                 justifyContent={'space-between'}
               >
-                <Text>{item?.label}</Text>
+                <Text fontSize={'md'}>{item?.label}</Text>
                 <Tag w={'100px'} colorScheme={item?.color}>
                   <TagLabel mx={'auto'}>{item?.count}</TagLabel>
                 </Tag>

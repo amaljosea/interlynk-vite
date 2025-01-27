@@ -33,12 +33,12 @@ const LynkPieChart = ({ title, data, loading }) => {
     )
 
   return (
-    <Card maxH='100%'>
+    <Card maxH='100%' height='300px' overflowY='auto'>
       <Heading fontSize={'lg'}>{title}</Heading>
       <CardBody mt={6}>
         <SimpleGrid w={'100%'} columns={2} alignItems={'center'}>
           <Flex justify='center' align='center' position='relative'>
-            <PieChart width={160} height={160}>
+            <PieChart width={180} height={180}>
               <Pie
                 cx='50%'
                 cy='50%'
@@ -56,7 +56,7 @@ const LynkPieChart = ({ title, data, loading }) => {
               <Text fontSize='lg' fontWeight='bold'>
                 {total || 0}
               </Text>
-              <Text fontSize='xs' color='gray'>
+              <Text fontSize='sm' color='gray'>
                 Total
               </Text>
             </Box>
@@ -80,7 +80,7 @@ const LynkPieChart = ({ title, data, loading }) => {
                   />
                   <Text fontSize={'sm'}>{item.name}</Text>
                 </Flex>
-                <Text fontSize={'sm'} fontWeight='semibold'>
+                <Text fontSize={'md'} fontWeight='semibold'>
                   {item.value}
                 </Text>
               </Flex>
