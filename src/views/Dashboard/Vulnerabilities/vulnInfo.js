@@ -117,7 +117,7 @@ const VulnInfo = () => {
     cvssScore
   } = vuln || ''
 
-  const { kev, epssPercentile } = vulnInfo || ''
+  const { kev, epssScore, epssPercentile } = vulnInfo || ''
 
   const productList =
     projectGroups?.nodes?.length > 0
@@ -207,6 +207,33 @@ const VulnInfo = () => {
                     <CustomText>Last Modified :</CustomText>
                     <Text>{getFullDate(lastModifiedAt)}</Text>
                   </Stack>
+                  {/* Severity */}
+                  <Stack spacing={1} fontSize={'sm'} whiteSpace='break-words'>
+                    <CustomText>Severity :</CustomText>
+                    <SeverityTag value={sev} />
+                  </Stack>
+                  {/*   EPSS Percentile */}
+                  <Stack spacing={1} fontSize={'sm'}>
+                    <CustomText>EPSS :</CustomText>
+                    <Text>{epssScore}</Text>
+                  </Stack>
+                  {/*   EPSS Percentile */}
+                  <Stack spacing={1} fontSize={'sm'}>
+                    <CustomText>EPSS Percentile:</CustomText>
+                    <Text>
+                      {epssPercentile ? (epssPercentile * 100).toFixed() : 0}%
+                    </Text>
+                  </Stack>
+                  {/*  KEV */}
+                  <Stack spacing={1} fontSize={'sm'}>
+                    <CustomText>KEV :</CustomText>
+                    <Text>{kev ? 'Yes' : 'No'}</Text>
+                  </Stack>
+                  {/* cvssScore */}
+                  <Stack spacing={1} fontSize={'sm'} whiteSpace='break-words'>
+                    <CustomText>CVSS :</CustomText>
+                    <Text>{cvssScore}</Text>
+                  </Stack>
                   {/* CVSS Vector */}
                   <Stack spacing={1} fontSize={'sm'} whiteSpace='break-words'>
                     <CustomText>CVSS Vector :</CustomText>
@@ -217,28 +244,6 @@ const VulnInfo = () => {
                     >
                       {cvssVector || 'N/A'}
                     </Text>
-                  </Stack>
-                  {/* Severity */}
-                  <Stack spacing={1} fontSize={'sm'} whiteSpace='break-words'>
-                    <CustomText>Severity :</CustomText>
-                    <SeverityTag value={sev} />
-                  </Stack>
-                  {/* cvssScore */}
-                  <Stack spacing={1} fontSize={'sm'} whiteSpace='break-words'>
-                    <CustomText>CVSS :</CustomText>
-                    <Text>{cvssScore}</Text>
-                  </Stack>
-                  {/*   EPSS Percentile */}
-                  <Stack spacing={1} fontSize={'sm'}>
-                    <CustomText>EPSS Percentile :</CustomText>
-                    <Text>
-                      {epssPercentile ? (epssPercentile * 100).toFixed() : 0}%
-                    </Text>
-                  </Stack>
-                  {/*  KEV */}
-                  <Stack spacing={1} fontSize={'sm'}>
-                    <CustomText>KEV :</CustomText>
-                    <Text>{kev ? 'Yes' : 'No'}</Text>
                   </Stack>
                 </Flex>
               </Flex>
