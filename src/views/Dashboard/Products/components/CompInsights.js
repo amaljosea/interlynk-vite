@@ -32,11 +32,7 @@ const Container = ({ children }) => {
 
 const LynkTag = ({ value }) => {
   return (
-    <Tag
-      size='sm'
-      sx={{ w: 'fit-content', pt: 1 }}
-      colorScheme={value ? 'red' : 'green'}
-    >
+    <Tag size='sm' w={'fit-content'} colorScheme={value ? 'red' : 'green'}>
       {value ? 'Yes' : 'No'}
     </Tag>
   )
@@ -105,7 +101,7 @@ const CompInsights = ({ isOpen, onClose, data }) => {
               <CustomLoader />
             </Box>
           ) : (
-            <Tabs isFitted>
+            <Tabs isFitted defaultIndex={1}>
               <TabList bg={secondaryBgColor} zIndex={11}>
                 {tabs.map((item, index) => (
                   <Tab

@@ -35,10 +35,10 @@ import { FaHouseUser, FaListCheck, FaStar, FaTextSlash } from 'react-icons/fa6'
 import { LuBug } from 'react-icons/lu'
 import { MdOutlineHourglassBottom } from 'react-icons/md'
 
-const StatusIcon = ({ icon, label, color }) => {
+const StatusIcon = ({ icon, label, color, onClick }) => {
   return (
     <Tooltip label={label}>
-      <IconButton size='xs' colorScheme={color} icon={icon} />
+      <IconButton size='xs' colorScheme={color} icon={icon} onClick={onClick} />
     </Tooltip>
   )
 }
@@ -52,7 +52,7 @@ const ComponentsColumns = ({
   updateComponent,
   handleGraphView,
   totalComp,
-  hanldeAnalysis,
+  handleAnalysis,
   handleNotes,
   setActiveRow,
   onCheckCpe,
@@ -138,6 +138,7 @@ const ComponentsColumns = ({
                       color='red'
                       label={'Vulnerable'}
                       icon={<LuBug size={14} />}
+                      onClick={() => handleVuln(row)}
                     />
                   )}
                   {latestPackageVersion?.isDeprecated === true && (
@@ -145,12 +146,14 @@ const ComponentsColumns = ({
                       color='orange'
                       label={'Deprecated'}
                       icon={<FaTextSlash size={14} />}
+                      onClick={() => handleAnalysis(row)}
                     />
                   )}
                   {isOutdated && (
                     <StatusIcon
                       color='yellow'
                       label={'Outdated'}
+                      onClick={() => handleAnalysis(row)}
                       icon={<MdOutlineHourglassBottom size={14} />}
                     />
                   )}
@@ -158,6 +161,7 @@ const ComponentsColumns = ({
                     <StatusIcon
                       color='green'
                       label={'Primary'}
+                      onClick={() => onEditOpen(row)}
                       icon={<FaStar size={14} />}
                     />
                   )}
@@ -165,6 +169,7 @@ const ComponentsColumns = ({
                     <StatusIcon
                       color='blue'
                       label={'Internal'}
+                      onClick={() => onEditOpen(row)}
                       icon={<FaBuilding size={14} />}
                     />
                   )}
@@ -447,7 +452,7 @@ const ComponentsColumns = ({
                       </MenuItem>
                       <MenuItem
                         data-testid='view_insights'
-                        onClick={() => hanldeAnalysis(row)}
+                        onClick={() => handleAnalysis(row)}
                         isDisabled={status === 'signed'}
                         hidden={isFreeTier}
                       >
@@ -522,7 +527,7 @@ const ComponentsColumns = ({
     primaryErrorColor,
     primaryBlueText,
     onEditOpen,
-    hanldeAnalysis,
+    handleAnalysis,
     handleNotes,
     handleVuln,
     handleGraphView,

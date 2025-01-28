@@ -168,7 +168,7 @@ const Components = ({ sbomData }) => {
     CPE.onOpen()
   }
 
-  const hanldeAnalysis = (data) => {
+  const handleAnalysis = (data) => {
     setActiveRow(data)
     INSIGHTS.onOpen()
   }
@@ -217,7 +217,7 @@ const Components = ({ sbomData }) => {
     onRelOpen,
     handleGraphView,
     totalComp,
-    hanldeAnalysis,
+    handleAnalysis,
     handleNotes,
     setActiveRow,
     DELETE,
