@@ -24,7 +24,6 @@ import useQueryParam from 'hooks/useQueryParam'
 import {
   GetOrgMetrics,
   getAllPolicies,
-  getPolicyViolations,
   getVulnsBySeverity,
   getVulnsByStatus,
   getVulnsWithConditions
@@ -183,7 +182,7 @@ export default function Dashboard() {
         return []
       }
     },
-    [filterMetrics]
+    [filterStatuses]
   )
 
   // -------------- POLICY RESULTS ---------------------
@@ -209,6 +208,7 @@ export default function Dashboard() {
     }
   })
 
+  // -------------- POLICY VIOLATIONS ---------------------
   const policyResults = [
     {
       name: 'Inform',
@@ -227,81 +227,24 @@ export default function Dashboard() {
     }
   ]
 
-  // -------------- POLICY VIOLATIONS ---------------------
-  const { data: informViolations, loading: violationLoading } = useQuery(
-    getPolicyViolations,
-    {
-      skip: organization ? false : true,
-      variables: {
-        resultType: ['inform']
-      }
-    }
-  )
-  const { data: warnViolations } = useQuery(getPolicyViolations, {
-    skip: organization ? false : true,
-    variables: {
-      resultType: ['warn']
-    }
-  })
-  const { data: failViolations } = useQuery(getPolicyViolations, {
-    skip: organization ? false : true,
-    variables: {
-      resultType: ['fail']
-    }
-  })
-
   // -------------- VULN SEVERITIES ---------------------
-  const { data: uniqueCriticalVulns, loading: sevLoading } = useQuery(
+  const { data: criticalVulns, loading: sevLoading } = useQuery(
     getVulnsBySeverity,
     {
       skip: organization ? false : true,
       variables: {
         severity: ['critical'],
+        status: [
+          'Unspecified',
+          'In Triage',
+          'Affected',
+          'Not Affected',
+          'Fixed'
+        ],
         envNames: [envName]
       }
     }
   )
-
-  const { data: uniqueHighVulns } = useQuery(getVulnsBySeverity, {
-    skip: organization ? false : true,
-    variables: {
-      severity: ['high'],
-      envNames: [envName]
-    }
-  })
-
-  const { data: uniqueMediumVulns } = useQuery(getVulnsBySeverity, {
-    skip: organization ? false : true,
-    variables: {
-      severity: ['medium'],
-      envNames: [envName]
-    }
-  })
-
-  const { data: uniqueLowVulns } = useQuery(getVulnsBySeverity, {
-    skip: organization ? false : true,
-    variables: {
-      severity: ['low'],
-      envNames: [envName]
-    }
-  })
-
-  const { data: uniqueUnknownVulns } = useQuery(getVulnsBySeverity, {
-    skip: organization ? false : true,
-    variables: {
-      severity: ['unknown'],
-      envNames: [envName]
-    }
-  })
-
-  const { data: criticalVulns } = useQuery(getVulnsBySeverity, {
-    skip: organization ? false : true,
-    variables: {
-      severity: ['critical'],
-      status: ['Unspecified', 'In Triage', 'Affected', 'Not Affected', 'Fixed'],
-      envNames: [envName]
-    }
-  })
 
   const { data: highVulns } = useQuery(getVulnsBySeverity, {
     skip: organization ? false : true,
@@ -469,34 +412,6 @@ export default function Dashboard() {
       envNames: [envName]
     }
   })
-
-  const uniqueVulnSeverities = [
-    {
-      name: 'Critical',
-      value: uniqueCriticalVulns?.organization?.vulns?.totalCount,
-      color: '#E53E3E'
-    },
-    {
-      name: 'High',
-      value: uniqueHighVulns?.organization?.vulns?.totalCount,
-      color: '#DD6B20'
-    },
-    {
-      name: 'Medium',
-      value: uniqueMediumVulns?.organization?.vulns?.totalCount,
-      color: '#D69E2E'
-    },
-    {
-      name: 'Low',
-      value: uniqueLowVulns?.organization?.vulns?.totalCount,
-      color: '#38A169'
-    },
-    {
-      name: 'Unknown',
-      value: uniqueUnknownVulns?.organization?.vulns?.totalCount,
-      color: '#718096'
-    }
-  ]
 
   const vulnSeverities = [
     {
