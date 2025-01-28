@@ -75,12 +75,6 @@ const GlobalVulnsFilters = ({ reset }) => {
     reset()
   }
 
-  // FILTER BY ENVIRONMENT
-  const onFilterEnv = (value) => {
-    globalVulnDispatch({ type: 'FILTER_ENV', payload: value })
-    reset()
-  }
-
   // FILTER BY SEVERITY
   const onFilterSeverity = (value) => {
     globalVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
@@ -167,20 +161,6 @@ const GlobalVulnsFilters = ({ reset }) => {
               ))}
             </MenuOptionGroup>
           </MenuList>
-        </Menu>
-      </Box>
-      {/* ENVIRONMENT */}
-      <Box
-        width={'fit-content'}
-        display={params?.productgroupid ? 'none' : 'block'}
-      >
-        <Menu closeOnSelect={false}>
-          <MenuHeading title={'Environment'} active={getStatus('envs')} />
-          <CustomList
-            options={['default', 'development', 'production']}
-            value={projectNames}
-            onChange={onFilterEnv}
-          />
         </Menu>
       </Box>
       {/* SEVERITY */}
