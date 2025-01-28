@@ -68,7 +68,7 @@ const PackageLookup = () => {
             },
             identifiers: {
               ...prev.identifiers,
-              purl: pkg?.purl
+              purl: packageVersion?.purl
             }
           }))
           setError('')
