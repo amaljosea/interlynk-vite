@@ -1,4 +1,3 @@
-import { useQuery } from '@apollo/client'
 import { addDays, differenceInDays, parseISO } from 'date-fns'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
@@ -9,6 +8,7 @@ import { Flex, Icon, IconButton, Stack, Text, Tooltip } from '@chakra-ui/react'
 
 import { SettingsTag } from 'components/Misc/SettingsTag'
 
+import useFetchAllPages from 'hooks/useFetchAllPages'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetVersionsDate } from 'graphQL/Queries'
@@ -38,17 +38,12 @@ const ProductInfo = ({ settings, data, filters, handleSort }) => {
     automatedFixesEnabled
   } = settings || ''
 
-  const { data: versions } = useQuery(GetVersionsDate, {
-    skip: signedUrlParams,
-    fetchPolicy: 'network-only',
-    variables: {
-      first: 25,
-      ...filters,
-      id: params?.productid
-    }
-  })
-
-  const { nodes: versionDates } = versions?.project?.sbomVersions || ''
+  const { data: versionDates } = useFetchAllPages(
+    GetVersionsDate,
+    { id: params?.productid, ...filters },
+    'project.sbomVersions',
+    { skip: signedUrlParams }
+  )
 
   useEffect(() => {
     if (versionDates && dataRetentionDays) {

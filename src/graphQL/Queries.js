@@ -1236,15 +1236,23 @@ export const GetVersionsDate = gql`
     $first: Int
     $field: SbomOrderByFields!
     $direction: OrderByDirection!
+    $after: String
   ) {
     project(id: $id) {
       id
       sbomVersions(
         first: $first
+        after: $after
         orderBy: { direction: $direction, field: $field }
       ) {
         nodes {
           createdAt
+        }
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
         }
       }
     }
