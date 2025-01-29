@@ -11,19 +11,11 @@ import {
 } from 'recharts'
 import { filterString } from 'utils'
 
-import {
-  Box,
-  Flex,
-  Heading,
-  Select,
-  SkeletonCircle,
-  SkeletonText,
-  Stack,
-  Text
-} from '@chakra-ui/react'
+import { Flex, Heading, Select, Stack, Text } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
+import LynkLoader from 'components/Misc/LynkLoader'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -55,15 +47,7 @@ const LynkLineChart = ({ title, data, options, onChange, days, loading }) => {
     }
   }, [data?.length, keys])
 
-  if (loading)
-    return (
-      <Card>
-        <Box padding='2'>
-          <SkeletonCircle size='10' />
-          <SkeletonText mt='4' noOfLines={4} spacing='4' skeletonHeight='2' />
-        </Box>
-      </Card>
-    )
+  if (loading) return <LynkLoader />
 
   return (
     <Card maxH='100%'>

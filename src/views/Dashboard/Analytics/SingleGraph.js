@@ -9,6 +9,8 @@ import {
   YAxis
 } from 'recharts'
 
+import CustomLoader from 'components/CustomLoader'
+
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const CustomizedAxisTick = ({
@@ -51,7 +53,8 @@ export const SingleGraph = ({
   lines,
   syncId,
   averages = false,
-  percentage = false
+  percentage = false,
+  loading
 }) => {
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
@@ -73,6 +76,8 @@ export const SingleGraph = ({
     const formattedValue = parseFloat(value).toFixed(precision)
     return percentage ? `${formattedValue}%` : formattedValue
   }
+
+  if (loading) return <CustomLoader />
 
   return (
     <ResponsiveContainer aspect={2.5} debounce={300}>

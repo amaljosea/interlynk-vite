@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client'
 
-import { Center, Icon, SimpleGrid } from '@chakra-ui/react'
+import { Center, Icon } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 
@@ -132,13 +132,9 @@ export const Graphs = ({ filters }) => {
 
   if (!filters.product.length || !filters.version.length || !filters.duration) {
     return (
-      <SimpleGrid width={'100%'} columns={2} spacing={24}>
-        {[1, 2, 3, 4].map((_, index) => (
-          <Center key={index}>
-            <Icon as={TfiBarChart} boxSize={44} color={headingTextSecondary} />
-          </Center>
-        ))}
-      </SimpleGrid>
+      <Center w={'100%'} py={24}>
+        <Icon as={TfiBarChart} boxSize={44} color={headingTextSecondary} />
+      </Center>
     )
   }
 

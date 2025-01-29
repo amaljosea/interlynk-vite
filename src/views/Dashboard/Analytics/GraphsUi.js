@@ -1,8 +1,10 @@
-import { Box, Grid, Text, useTheme } from '@chakra-ui/react'
+import { Grid, Text, useTheme } from '@chakra-ui/react'
+
+import Card from 'components/Card/Card'
 
 import { SingleGraph } from './SingleGraph'
 
-export const GraphUi = ({ dataForGraph, projectMetrics, prodVulnMetrics }) => {
+export const GraphUi = ({ dataForGraph, prodVulnMetrics }) => {
   const theme = useTheme()
 
   const updatedDataForGraph = dataForGraph.map((item) => {
@@ -31,14 +33,14 @@ export const GraphUi = ({ dataForGraph, projectMetrics, prodVulnMetrics }) => {
 
   return (
     <Grid
-      gap={12}
+      gap={6}
       width={'100%'}
       alignItems={'center'}
       justifyContent='center'
       templateColumns={`repeat(2, 1fr)`}
     >
-      <Box textAlign='center'>
-        <Text fontSize='lg' fontWeight='bold' mb={2}>
+      <Card textAlign='center'>
+        <Text fontSize='lg' fontWeight='bold' mb={1}>
           Component Count
         </Text>
         <Text fontSize='sm' mb={4}>
@@ -53,10 +55,10 @@ export const GraphUi = ({ dataForGraph, projectMetrics, prodVulnMetrics }) => {
             }
           ]}
         />
-      </Box>
+      </Card>
 
-      <Box textAlign='center'>
-        <Text fontSize='lg' fontWeight='bold' mb={2}>
+      <Card textAlign='center'>
+        <Text fontSize='lg' fontWeight='bold' mb={1}>
           License Count
         </Text>
         <Text fontSize='sm' mb={4}>
@@ -71,10 +73,10 @@ export const GraphUi = ({ dataForGraph, projectMetrics, prodVulnMetrics }) => {
             }
           ]}
         />
-      </Box>
+      </Card>
 
-      <Box textAlign='center'>
-        <Text fontSize='lg' fontWeight='bold' mb={2}>
+      <Card textAlign='center'>
+        <Text fontSize='lg' fontWeight='bold' mb={1}>
           Vulnerabilities by Severity
         </Text>
         <Text fontSize='sm' mb={4}>
@@ -115,12 +117,11 @@ export const GraphUi = ({ dataForGraph, projectMetrics, prodVulnMetrics }) => {
               stroke: theme.colors.gray[500]
             }
           ]}
-          syncId={'vulns'}
         />
-      </Box>
+      </Card>
 
-      <Box textAlign='center'>
-        <Text fontSize='lg' fontWeight='bold' mb={2}>
+      <Card textAlign='center'>
+        <Text fontSize='lg' fontWeight='bold' mb={1}>
           Vulnerabilities by Status
         </Text>
         <Text fontSize='sm' mb={4}>
@@ -161,12 +162,11 @@ export const GraphUi = ({ dataForGraph, projectMetrics, prodVulnMetrics }) => {
               stroke: theme.colors.green[500]
             }
           ]}
-          syncId={'vulns'}
         />
-      </Box>
+      </Card>
 
-      <Box textAlign='center'>
-        <Text fontSize='lg' fontWeight='bold' mb={2}>
+      <Card textAlign='center'>
+        <Text fontSize='lg' fontWeight='bold' mb={1}>
           Patch Velocity
         </Text>
         <Text fontSize='sm' mb={4}>
@@ -189,10 +189,10 @@ export const GraphUi = ({ dataForGraph, projectMetrics, prodVulnMetrics }) => {
           ]}
           averages={true}
         />
-      </Box>
+      </Card>
 
-      <Box textAlign='center'>
-        <Text fontSize='lg' fontWeight='bold' mb={2}>
+      <Card textAlign='center'>
+        <Text fontSize='lg' fontWeight='bold' mb={1}>
           Defect Density
         </Text>
         <Text fontSize='sm' mb={4}>
@@ -208,10 +208,10 @@ export const GraphUi = ({ dataForGraph, projectMetrics, prodVulnMetrics }) => {
           ]}
           percentage={true}
         />
-      </Box>
+      </Card>
 
-      <Box textAlign='center'>
-        <Text fontSize='lg' fontWeight='bold' mb={2}>
+      <Card textAlign='center'>
+        <Text fontSize='lg' fontWeight='bold' mb={1}>
           Deploy Velocity
         </Text>
         <Text fontSize='sm' mb={4}>
@@ -248,7 +248,7 @@ export const GraphUi = ({ dataForGraph, projectMetrics, prodVulnMetrics }) => {
             }
           ]}
         />
-      </Box>
+      </Card>
     </Grid>
   )
 }

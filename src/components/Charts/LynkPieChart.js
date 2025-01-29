@@ -1,19 +1,11 @@
 /* eslint-disable no-restricted-syntax */
 import { Cell, Pie, PieChart } from 'recharts'
 
-import {
-  Box,
-  Flex,
-  Heading,
-  SimpleGrid,
-  SkeletonCircle,
-  SkeletonText,
-  Text,
-  VStack
-} from '@chakra-ui/react'
+import { Box, Flex, SimpleGrid, Text, VStack } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
+import LynkLoader from 'components/Misc/LynkLoader'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -22,19 +14,13 @@ const LynkPieChart = ({ title, data, loading }) => {
 
   const total = data?.reduce((acc, item) => acc + item.value, 0)
 
-  if (loading)
-    return (
-      <Card>
-        <Box padding='2'>
-          <SkeletonCircle size='10' />
-          <SkeletonText mt='4' noOfLines={4} spacing='4' skeletonHeight='2' />
-        </Box>
-      </Card>
-    )
+  if (loading) return <LynkLoader />
 
   return (
-    <Card maxH='100%' height='300px' overflowY='auto'>
-      <Heading fontSize={'lg'}>{title}</Heading>
+    <Card textAlign='center' maxH='100%' height='300px' overflowY='auto'>
+      <Text fontWeight='semibold'>
+        {title}
+      </Text>
       <CardBody mt={6}>
         <SimpleGrid w={'100%'} columns={2} alignItems={'center'}>
           <Flex justify='center' align='center' position='relative'>

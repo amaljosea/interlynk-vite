@@ -269,9 +269,7 @@ const ProductsOverview = ({ loading, title, data }) => {
   return (
     <Card maxH='100%'>
       {/* HEADING */}
-      <Heading minH={'auto'} fontSize={'lg'}>
-        {title}
-      </Heading>
+      <Text fontWeight={'semibold'}>{title}</Text>
       <CardBody mt={6}>
         <DataTable
           responsive

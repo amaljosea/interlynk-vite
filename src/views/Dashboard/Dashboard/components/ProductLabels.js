@@ -1,21 +1,20 @@
 import { useQuery } from '@apollo/client'
-import { generateRandomColor, hexToRGBA } from 'utils/styleUtils'
+import { hexToRGBA } from 'utils/styleUtils'
 
-import { Heading, SimpleGrid } from '@chakra-ui/react'
+import { SimpleGrid } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
+import { Box, Flex, Text } from '@chakra-ui/react'
 import {
-  Box,
-  Flex,
   Stat,
   StatArrow,
   StatGroup,
   StatHelpText,
-  StatNumber,
-  Text
+  StatNumber
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
+import LynkLoader from 'components/Misc/LynkLoader'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -45,16 +44,33 @@ const ProductLabels = () => {
       }
     })
   })
-  const sortedLabels = Object.entries(labelCounts)
-    .sort((a, b) => b[1].count - a[1].count)
-    .map(([label, data]) => ({ label, count: data.count, color: data.color }))
 
-  const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
-  const total = sortedLabels?.reduce((sum, stage) => sum + stage.count, 0)
+  const topLabels = Object.entries(labelCounts)
+    ?.slice(0, 6)
+    ?.sort((a, b) => b[1].count - a[1].count)
+    ?.map(([label, data]) => ({ label, count: data.count, color: data.color }))
+
+  const otherLabels = Object.entries(labelCounts)?.slice(6)
+  const result = []
+  if (otherLabels?.length > 0) {
+    const otherCount = otherLabels.reduce(
+      (acc, [, { count }]) => acc + count,
+      0
+    )
+    // eslint-disable-next-line no-restricted-syntax
+    result.push({ label: 'Others', count: otherCount, color: '#718096' })
+  }
+
+  const filterLabels = [...topLabels, ...result]
+
+  const total = filterLabels?.reduce((sum, stage) => sum + stage.count, 0)
+
+  if (loading) return <LynkLoader />
+
   return (
-    <Card maxH='100%' height='320px' overflowY='auto'>
+    <Card textAlign='center' maxH='100%' overflowY='auto'>
       {/* HEADING */}
-      <Heading fontSize={'lg'}>Products by Label</Heading>
+      <Text fontWeight={'semibold'}>Products by Label</Text>
       <CardBody mt={6} h='100%'>
         <Flex
           gap={4}
@@ -82,14 +98,14 @@ const ProductLabels = () => {
             borderRight={`1px solid ${grayBorderColor}`}
           />
           <SimpleGrid w={'100%'} columns={1} spacing={2}>
-            {sortedLabels?.map((item) => (
+            {filterLabels?.map((item) => (
               <Flex
                 gap={6}
                 key={item?.id}
                 alignItems={'center'}
                 justifyContent={'space-between'}
               >
-                <Text fontSize={'md'} color={item?.color}>
+                <Text fontSize={'sm'} color={item?.color}>
                   {item?.label}
                 </Text>
                 <Tag
@@ -99,6 +115,7 @@ const ProductLabels = () => {
                 >
                   <TagLabel
                     mx={'auto'}
+                    fontSize={'sm'}
                     color={item?.color}
                     borderColor={hexToRGBA(item?.color, 0.4)}
                   >

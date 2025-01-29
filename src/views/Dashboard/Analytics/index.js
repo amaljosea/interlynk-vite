@@ -38,11 +38,8 @@ const Analytics = () => {
           <Filters filters={filters} setFilters={setFilters} />
         </CardBody>
       </Card>
-      <Card>
-        <CardBody py={6} pr={12}>
-          <Graphs filters={filters} />
-        </CardBody>
-      </Card>
+      {/* GRAPHS */}
+      <Graphs filters={filters} />
     </Flex>
   )
 }

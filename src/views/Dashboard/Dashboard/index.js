@@ -1,73 +1,81 @@
 /* eslint-disable no-restricted-syntax */
 import { useQuery } from '@apollo/client'
+import { useTheme } from '@emotion/react'
 import { useTour } from '@reactour/tour'
+import { format } from 'date-fns'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import {
-  Flex,
-  Grid,
-  GridItem,
-  Heading,
-  SimpleGrid,
-  Skeleton
-} from '@chakra-ui/react'
+import { Button, Flex, Heading, Skeleton, Text } from '@chakra-ui/react'
+import { Grid, GridItem, SimpleGrid } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
-import LynkLineChart from 'components/Charts/LynkLineChart'
 import LynkPieChart from 'components/Charts/LynkPieChart'
 import CustomLoader from 'components/CustomLoader'
 import GlobalEnvFilter from 'components/Misc/GlobalEnvFilter'
+import GlobalLabelFilter from 'components/Misc/GlobalLabelFilter'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
 
 import {
+  GetDailyMetrics,
   GetOrgMetrics,
   getAllPolicies,
   getVulnsBySeverity,
   getVulnsByStatus,
   getVulnsWithConditions
 } from 'graphQL/Queries'
-import { GetDailyMetrics } from 'graphQL/Queries'
 
+import { SingleGraph } from '../Analytics/SingleGraph'
 import ActivitiesOverview from './components/ActivitiesOverview'
 import ProductLabels from './components/ProductLabels'
 import ProductLifestages from './components/ProductLifestages'
 import ProductsOverview from './components/ProductsOverview'
 
-const severities = {
-  critical: '#E53E3E',
-  high: '#DD6B20',
-  medium: '#D69E2E',
-  low: '#38A169',
-  unknown: '#718096'
-}
+// const severities = {
+//   critical: '#E53E3E',
+//   high: '#DD6B20',
+//   medium: '#D69E2E',
+//   low: '#38A169',
+//   unknown: '#718096'
+// }
 
-const statues = {
-  inTriage: '#00B5D8',
-  affected: '#E53E3E',
-  notAffected: '#38A169',
-  fixed: '#3182CE',
-  unspecified: '#718096'
-}
+// const statues = {
+//   inTriage: '#00B5D8',
+//   affected: '#E53E3E',
+//   notAffected: '#38A169',
+//   fixed: '#3182CE',
+//   unspecified: '#718096'
+// }
 
 export default function Dashboard() {
+  const theme = useTheme()
   const { setIsOpen } = useTour()
   const product = useQueryParam('id')
   const { dispatch, envName, organization } = useGlobalState()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
+
+  const [projectGroupIds, setProjectGroupIds] = useState([])
 
   const { data: metrics, loading } = useQuery(GetOrgMetrics, {
     skip: organization ? false : true,
     variables: { env: envName }
   })
 
+  const endDate = new Date()
+  const startDate = new Date()
+  startDate.setDate(endDate?.getDate() - 7)
+
   // --------------- DAILY MATRICS --------------------
   const { data, loading: metricsLoading } = useQuery(GetDailyMetrics, {
     skip: organization ? false : true,
     variables: {
       first: 500,
-      projectNames: [envName]
+      projectGroupIds:
+        projectGroupIds?.length > 0 ? projectGroupIds : undefined,
+      projectNames: [envName],
+      startDate: format(startDate, 'yyyy-MM-dd'),
+      endDate: format(endDate, 'yyyy-MM-dd')
     }
   })
 
@@ -241,6 +249,8 @@ export default function Dashboard() {
           'Not Affected',
           'Fixed'
         ],
+        projectGroupIds:
+          projectGroupIds?.length > 0 ? projectGroupIds : undefined,
         envNames: [envName]
       }
     }
@@ -249,6 +259,8 @@ export default function Dashboard() {
   const { data: highVulns } = useQuery(getVulnsBySeverity, {
     skip: organization ? false : true,
     variables: {
+      projectGroupIds:
+        projectGroupIds?.length > 0 ? projectGroupIds : undefined,
       severity: ['high'],
       status: ['Unspecified', 'In Triage', 'Affected', 'Not Affected', 'Fixed'],
       envNames: [envName]
@@ -258,6 +270,8 @@ export default function Dashboard() {
   const { data: mediumVulns } = useQuery(getVulnsBySeverity, {
     skip: organization ? false : true,
     variables: {
+      projectGroupIds:
+        projectGroupIds?.length > 0 ? projectGroupIds : undefined,
       severity: ['medium'],
       status: ['Unspecified', 'In Triage', 'Affected', 'Not Affected', 'Fixed'],
       envNames: [envName]
@@ -267,6 +281,8 @@ export default function Dashboard() {
   const { data: lowVulns } = useQuery(getVulnsBySeverity, {
     skip: organization ? false : true,
     variables: {
+      projectGroupIds:
+        projectGroupIds?.length > 0 ? projectGroupIds : undefined,
       severity: ['low'],
       status: ['Unspecified', 'In Triage', 'Affected', 'Not Affected', 'Fixed'],
       envNames: [envName]
@@ -276,6 +292,8 @@ export default function Dashboard() {
   const { data: unknownVulns } = useQuery(getVulnsBySeverity, {
     skip: organization ? false : true,
     variables: {
+      projectGroupIds:
+        projectGroupIds?.length > 0 ? projectGroupIds : undefined,
       severity: ['unknown'],
       status: ['Unspecified', 'In Triage', 'Affected', 'Not Affected', 'Fixed'],
       envNames: [envName]
@@ -285,6 +303,8 @@ export default function Dashboard() {
   const { data: criticalUnspecified } = useQuery(getVulnsWithConditions, {
     skip: organization ? false : true,
     variables: {
+      projectGroupIds:
+        projectGroupIds?.length > 0 ? projectGroupIds : undefined,
       status: ['Unspecified'],
       severity: ['critical'],
       envNames: [envName]
@@ -294,6 +314,8 @@ export default function Dashboard() {
   const { data: criticalInTriage } = useQuery(getVulnsWithConditions, {
     skip: organization ? false : true,
     variables: {
+      projectGroupIds:
+        projectGroupIds?.length > 0 ? projectGroupIds : undefined,
       status: ['In Triage'],
       severity: ['critical'],
       envNames: [envName]
@@ -302,6 +324,8 @@ export default function Dashboard() {
   const { data: criticalAffected } = useQuery(getVulnsWithConditions, {
     skip: organization ? false : true,
     variables: {
+      projectGroupIds:
+        projectGroupIds?.length > 0 ? projectGroupIds : undefined,
       status: ['Affected'],
       severity: ['critical'],
       envNames: [envName]
@@ -311,6 +335,8 @@ export default function Dashboard() {
   const { data: criticalNotAffected } = useQuery(getVulnsWithConditions, {
     skip: organization ? false : true,
     variables: {
+      projectGroupIds:
+        projectGroupIds?.length > 0 ? projectGroupIds : undefined,
       status: ['Not Affected'],
       severity: ['critical'],
       envNames: [envName]
@@ -320,6 +346,8 @@ export default function Dashboard() {
   const { data: criticalFixed } = useQuery(getVulnsWithConditions, {
     skip: organization ? false : true,
     variables: {
+      projectGroupIds:
+        projectGroupIds?.length > 0 ? projectGroupIds : undefined,
       status: ['Fixed'],
       severity: ['critical'],
       envNames: [envName]
@@ -329,6 +357,8 @@ export default function Dashboard() {
   const { data: kevUnspecified } = useQuery(getVulnsWithConditions, {
     skip: organization ? false : true,
     variables: {
+      projectGroupIds:
+        projectGroupIds?.length > 0 ? projectGroupIds : undefined,
       status: ['Unspecified'],
       kev: true,
       envNames: [envName]
@@ -338,6 +368,8 @@ export default function Dashboard() {
   const { data: kevInTriage } = useQuery(getVulnsWithConditions, {
     skip: organization ? false : true,
     variables: {
+      projectGroupIds:
+        projectGroupIds?.length > 0 ? projectGroupIds : undefined,
       status: ['In Triage'],
       kev: true
     }
@@ -345,6 +377,8 @@ export default function Dashboard() {
   const { data: kevAffected } = useQuery(getVulnsWithConditions, {
     skip: organization ? false : true,
     variables: {
+      projectGroupIds:
+        projectGroupIds?.length > 0 ? projectGroupIds : undefined,
       status: ['Affected'],
       kev: true,
       envNames: [envName]
@@ -354,6 +388,8 @@ export default function Dashboard() {
   const { data: kevNotAffected } = useQuery(getVulnsWithConditions, {
     skip: organization ? false : true,
     variables: {
+      projectGroupIds:
+        projectGroupIds?.length > 0 ? projectGroupIds : undefined,
       status: ['Not Affected'],
       kev: true,
       envNames: [envName]
@@ -363,6 +399,8 @@ export default function Dashboard() {
   const { data: kevFixed } = useQuery(getVulnsWithConditions, {
     skip: organization ? false : true,
     variables: {
+      projectGroupIds:
+        projectGroupIds?.length > 0 ? projectGroupIds : undefined,
       status: ['Fixed'],
       kev: true,
       envNames: [envName]
@@ -372,6 +410,8 @@ export default function Dashboard() {
   const { data: highUnspecified } = useQuery(getVulnsWithConditions, {
     skip: organization ? false : true,
     variables: {
+      projectGroupIds:
+        projectGroupIds?.length > 0 ? projectGroupIds : undefined,
       status: ['Unspecified'],
       severity: ['high'],
       envNames: [envName]
@@ -381,6 +421,8 @@ export default function Dashboard() {
   const { data: highInTriage } = useQuery(getVulnsWithConditions, {
     skip: organization ? false : true,
     variables: {
+      projectGroupIds:
+        projectGroupIds?.length > 0 ? projectGroupIds : undefined,
       status: ['In Triage'],
       severity: ['high'],
       envNames: [envName]
@@ -389,6 +431,8 @@ export default function Dashboard() {
   const { data: highAffected } = useQuery(getVulnsWithConditions, {
     skip: organization ? false : true,
     variables: {
+      projectGroupIds:
+        projectGroupIds?.length > 0 ? projectGroupIds : undefined,
       status: ['Affected'],
       severity: ['high'],
       envNames: [envName]
@@ -398,6 +442,8 @@ export default function Dashboard() {
   const { data: highNotAffected } = useQuery(getVulnsWithConditions, {
     skip: organization ? false : true,
     variables: {
+      projectGroupIds:
+        projectGroupIds?.length > 0 ? projectGroupIds : undefined,
       status: ['Not Affected'],
       severity: ['high'],
       envNames: [envName]
@@ -407,6 +453,8 @@ export default function Dashboard() {
   const { data: highFixed } = useQuery(getVulnsWithConditions, {
     skip: organization ? false : true,
     variables: {
+      projectGroupIds:
+        projectGroupIds?.length > 0 ? projectGroupIds : undefined,
       status: ['Fixed'],
       severity: ['high'],
       envNames: [envName]
@@ -447,6 +495,8 @@ export default function Dashboard() {
     {
       skip: organization ? false : true,
       variables: {
+        projectGroupIds:
+          projectGroupIds?.length > 0 ? projectGroupIds : undefined,
         status: ['Unspecified'],
         envNames: [envName]
       }
@@ -456,6 +506,8 @@ export default function Dashboard() {
   const { data: inTriage } = useQuery(getVulnsByStatus, {
     skip: organization ? false : true,
     variables: {
+      projectGroupIds:
+        projectGroupIds?.length > 0 ? projectGroupIds : undefined,
       status: ['In Triage'],
       envNames: [envName]
     }
@@ -463,6 +515,8 @@ export default function Dashboard() {
   const { data: affected } = useQuery(getVulnsByStatus, {
     skip: organization ? false : true,
     variables: {
+      projectGroupIds:
+        projectGroupIds?.length > 0 ? projectGroupIds : undefined,
       status: ['Affected'],
       envNames: [envName]
     }
@@ -470,6 +524,8 @@ export default function Dashboard() {
   const { data: fixed } = useQuery(getVulnsByStatus, {
     skip: organization ? false : true,
     variables: {
+      projectGroupIds:
+        projectGroupIds?.length > 0 ? projectGroupIds : undefined,
       status: ['Fixed'],
       envNames: [envName]
     }
@@ -477,6 +533,8 @@ export default function Dashboard() {
   const { data: notAffected } = useQuery(getVulnsByStatus, {
     skip: organization ? false : true,
     variables: {
+      projectGroupIds:
+        projectGroupIds?.length > 0 ? projectGroupIds : undefined,
       status: ['Not Affected'],
       envNames: [envName]
     }
@@ -593,33 +651,33 @@ export default function Dashboard() {
     }
   ]
 
-  const [severityTimeline, setSeverityTimeline] = useState(7)
+  // const [severityTimeline, setSeverityTimeline] = useState(7)
   const [severityData, setSeverityData] = useState([])
 
   useEffect(() => {
     if (filterMetrics?.length > 0) {
-      const output = vulnSeverityGraphs(severityTimeline)
+      const output = vulnSeverityGraphs(7)
       setSeverityData(output)
     }
-  }, [filterMetrics?.length, severityTimeline, vulnSeverityGraphs])
+  }, [filterMetrics?.length, vulnSeverityGraphs])
 
-  const [statusTimeline, setStatusTimeline] = useState(7)
+  // const [statusTimeline, setStatusTimeline] = useState(7)
   const [statusData, setStatusData] = useState([])
 
   useEffect(() => {
     if (filterMetrics?.length > 0) {
-      const output = vulnStatusGraphs(severityTimeline)
+      const output = vulnStatusGraphs(7)
       setStatusData(output)
     }
-  }, [filterMetrics?.length, severityTimeline, vulnStatusGraphs])
+  }, [filterMetrics?.length, vulnStatusGraphs])
 
-  const onFilterSeverity = (days) => {
-    setSeverityTimeline(days || 7)
-  }
+  // const onFilterSeverity = (days) => {
+  //   setSeverityTimeline(days || 7)
+  // }
 
-  const onFilterStatus = (days) => {
-    setStatusTimeline(days || 7)
-  }
+  // const onFilterStatus = (days) => {
+  //   setStatusTimeline(days || 7)
+  // }
 
   useEffect(() => {
     if (product === null) {
@@ -659,10 +717,31 @@ export default function Dashboard() {
 
   return (
     <Flex width={'100%'} flexDirection='column' gap={5}>
-      {/* ENVIRONMENT FILTER */}
-      {organization && <GlobalEnvFilter />}
+      <Flex
+        width={'100%'}
+        alignItems={'center'}
+        justifyContent={'space-between'}
+      >
+        <Button
+          colorScheme='blue'
+          textTransform={'capitalize'}
+          _hover={{ colorScheme: 'blue' }}
+          _active={{ colorScheme: 'blue' }}
+        >
+          {envName}
+        </Button>
+        <Flex gap={2} alignItems={'center'}>
+          {/* LABEL FILTER */}
+          <GlobalLabelFilter
+            value={projectGroupIds}
+            setValue={setProjectGroupIds}
+          />
+          {/* ENVIRONMENT FILTER */}
+          {organization && <GlobalEnvFilter />}
+        </Flex>
+      </Flex>
       {/* PRODUCT STATS */}
-      <Heading size={'lg'} mt={'30px'}>
+      <Heading size={'md'} mt={'30px'}>
         Products
       </Heading>
       <SimpleGrid columns={{ sm: 1, md: 3 }} spacing={5}>
@@ -670,7 +749,7 @@ export default function Dashboard() {
         <ProductLabels />
       </SimpleGrid>
       {/* VULN PIE CHARTS */}
-      <Heading size={'lg'} mt={'30px'}>
+      <Heading size={'md'} mt={'30px'}>
         Vulnerabilities
       </Heading>
       <SimpleGrid columns={{ sm: 1, md: 3 }} spacing={5}>
@@ -702,25 +781,77 @@ export default function Dashboard() {
       </SimpleGrid>
       {/* VULN LINE CHARTS */}
       <SimpleGrid columns={{ sm: 1, md: 2 }} spacing={5}>
-        <LynkLineChart
-          data={severityData}
-          days={severityTimeline}
-          options={severities}
-          loading={metricsLoading}
-          onChange={onFilterSeverity}
-          title='Vulnerabilities by Severity'
-        />
-        <LynkLineChart
-          data={statusData}
-          options={statues}
-          days={statusTimeline}
-          loading={metricsLoading}
-          onChange={onFilterStatus}
-          title='Vulnerabilities by Status'
-        />
+        <Card textAlign='center'>
+          <Text fontWeight='semibold' mb={4}>Vulnerabilities by Severity</Text>
+          <SingleGraph
+            data={severityData}
+            loading={metricsLoading}
+            lines={[
+              {
+                dataKey: 'critical',
+                name: 'Critical',
+                stroke: theme.colors.red[500]
+              },
+              {
+                dataKey: 'high',
+                name: 'High',
+                stroke: theme.colors.orange[500]
+              },
+              {
+                dataKey: 'medium',
+                name: 'Medium',
+                stroke: theme.colors.yellow[500]
+              },
+              {
+                dataKey: 'low',
+                name: 'Low',
+                stroke: theme.colors.green[500]
+              },
+              {
+                dataKey: 'unknown',
+                name: 'Unknown',
+                stroke: theme.colors.gray[500]
+              }
+            ]}
+          />
+        </Card>
+        <Card textAlign='center'>
+          <Text fontWeight='semibold' mb={4}>Vulnerabilities by Status</Text>
+          <SingleGraph
+            data={statusData}
+            loading={metricsLoading}
+            lines={[
+              {
+                dataKey: 'unspecified',
+                name: 'Unspecified',
+                stroke: theme.colors.gray[500]
+              },
+              {
+                dataKey: 'inTriage',
+                name: 'In Triage',
+                stroke: theme.colors.cyan[500]
+              },
+              {
+                dataKey: 'affected',
+                name: 'Affected',
+                stroke: theme.colors.red[500]
+              },
+              {
+                dataKey: 'fixed',
+                name: 'Fixed',
+                stroke: theme.colors.blue[500]
+              },
+              {
+                dataKey: 'notAffected',
+                name: 'Not Affected',
+                stroke: theme.colors.green[500]
+              }
+            ]}
+          />
+        </Card>
       </SimpleGrid>
 
-      <Heading size={'lg'} mt={'30px'}>
+      <Heading size={'md'} mt={'30px'}>
         Policies
       </Heading>
       <SimpleGrid columns={{ sm: 1, md: 3 }} spacing={5}>
@@ -731,8 +862,8 @@ export default function Dashboard() {
         />
       </SimpleGrid>
       {/* LIST */}
-      <Heading size={'lg'} mt={'30px'}>
-        Acitivities
+      <Heading size={'md'} mt={'30px'}>
+        Activities
       </Heading>
       <Grid templateColumns='repeat(12, 1fr)' gap={5} flexWrap={'wrap'}>
         {/* RECENT IMPORTS */}

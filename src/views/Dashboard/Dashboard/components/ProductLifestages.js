@@ -1,7 +1,6 @@
 import { useQuery } from '@apollo/client'
 
-import { Box, Flex, Heading, SimpleGrid, Text } from '@chakra-ui/react'
-import { SkeletonCircle, SkeletonText } from '@chakra-ui/react'
+import { Box, Flex, SimpleGrid, Text } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 import {
   Stat,
@@ -13,6 +12,7 @@ import {
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
+import LynkLoader from 'components/Misc/LynkLoader'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -117,20 +117,12 @@ const ProductLifestages = () => {
 
   const total = lifeStages?.reduce((sum, stage) => sum + stage.count, 0)
 
-  if (loading)
-    return (
-      <Card>
-        <Box padding='2'>
-          <SkeletonCircle size='10' />
-          <SkeletonText mt='4' noOfLines={4} spacing='4' skeletonHeight='2' />
-        </Box>
-      </Card>
-    )
+  if (loading) return <LynkLoader />
 
   return (
-    <Card maxH='100%' height='320px' overflowY='auto'>
+    <Card textAlign='center' maxH='100%' height='320px' overflowY='auto'>
       {/* HEADING */}
-      <Heading fontSize={'lg'}>Products by Lifestages</Heading>
+      <Text fontWeight='semibold'>Products by Lifestages</Text>
       <CardBody mt={6} h='100%'>
         <Flex
           gap={4}
@@ -165,9 +157,11 @@ const ProductLifestages = () => {
                 alignItems={'center'}
                 justifyContent={'space-between'}
               >
-                <Text fontSize={'md'}>{item?.label}</Text>
+                <Text fontSize={'sm'}>{item?.label}</Text>
                 <Tag w={'100px'} colorScheme={item?.color}>
-                  <TagLabel mx={'auto'}>{item?.count}</TagLabel>
+                  <TagLabel mx={'auto'} fontSize={'sm'}>
+                    {item?.count}
+                  </TagLabel>
                 </Tag>
               </Flex>
             ))}
