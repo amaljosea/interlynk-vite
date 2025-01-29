@@ -12,9 +12,11 @@ import { Tag, TagLabel } from '@chakra-ui/react'
 import { Icon } from '@chakra-ui/react'
 import { Grid, GridItem } from '@chakra-ui/react'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@chakra-ui/react'
+import { useDisclosure } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
+import ActiveBtn from 'components/Misc/ActiveBtn'
 import { SettingsTag } from 'components/Misc/SettingsTag'
 import { ProgressBar } from 'components/ProgressBar'
 
@@ -30,6 +32,8 @@ import { GetProjectSettings } from 'graphQL/Queries'
 
 import { FaBug, FaCubes, FaLongArrowAltRight, FaRobot } from 'react-icons/fa'
 import { FaCircleCheck, FaTag } from 'react-icons/fa6'
+
+import LifecycleModal from '../../components/LifecycleModal'
 
 const SbomDetails = ({ sbomData }) => {
   const params = useParams()
@@ -50,6 +54,16 @@ const SbomDetails = ({ sbomData }) => {
     healthScore
   } = sbomData || ''
   const { name, version, description } = primaryComponent || ''
+
+  const lifecycleData = {
+    stage: sbomData?.productLifeCycleStage,
+    releaseDate: sbomData?.releaseDate,
+    endOfLifeDate: sbomData?.endOfLifeDate,
+    endOfSupportDate: sbomData?.endOfSupportDate
+  }
+
+  const isArchived = sbomData?.lifecycle === 'archived'
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   const signedUrlParams = getSignedUrlParams()
 
@@ -175,16 +189,31 @@ const SbomDetails = ({ sbomData }) => {
                 </Text>
                 <Tooltip label='Lifecycle stage' fontSize='md'>
                   <Tag
+                    hidden={!lifecycleData?.stage}
                     size={'sm'}
                     variant='solid'
                     colorScheme='blue'
                     w={'fit-content'}
                   >
                     <TagLabel textTransform={'capitalize'}>
-                      {lifecycle}
+                      {lifecycleData?.stage
+                        ? String(lifecycleData?.stage).replace(/_/g, ' ')
+                        : ''}
                     </TagLabel>
                   </Tag>
                 </Tooltip>
+                <Flex paddingTop={1}>
+                  <ActiveBtn
+                    onClick={onOpen}
+                    hidden={isArchived}
+                    label={'add_lifecycle'}
+                    editable={lifecycleData?.stage ? true : false}
+                    title={lifecycleData?.stage ? 'Update' : 'Add Lifecycle'}
+                    color={
+                      lifecycleData?.stage ? sameSecondaryText : primaryBlueText
+                    }
+                  />
+                </Flex>
               </Flex>
               <Text
                 wordBreak={'break-all'}
@@ -287,6 +316,11 @@ const SbomDetails = ({ sbomData }) => {
               </GridItem>
             )}
           </Grid>
+          <LifecycleModal
+            data={lifecycleData}
+            isOpen={isOpen}
+            onClose={onClose}
+          />
         </Flex>
       </Flex>
     </>
