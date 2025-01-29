@@ -87,9 +87,9 @@ const PackageLookup = () => {
         <FormControl>
           <FormLabel>Package</FormLabel>
           <Input
+            fontSize={'sm'}
             value={pkgString}
             onChange={onInputChange}
-            _placeholder={{ fontWeight: 300 }}
             placeholder='Ecosystem Name Version (e.g. nuget Fody 6.8.2)'
           />
         </FormControl>

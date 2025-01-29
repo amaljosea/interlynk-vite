@@ -10,7 +10,13 @@ import {
 import { componentTypes, infoData } from 'variables/general'
 
 import { InfoIcon, WarningTwoIcon } from '@chakra-ui/icons'
-import { chakra, useDisclosure } from '@chakra-ui/react'
+import {
+  AbsoluteCenter,
+  Box,
+  Divider,
+  chakra,
+  useDisclosure
+} from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 import { Flex, Stack, Text, Tooltip } from '@chakra-ui/react'
 import { Checkbox, Input, Select, Textarea } from '@chakra-ui/react'
@@ -257,8 +263,13 @@ function ComponentAddModal(props) {
             />
           ) : (
             <>
+              <Text>Fill it up to search or add manually</Text>
               {/* Package Lookup */}
               <PackageLookup />
+              <Box position='relative' py='3'>
+                <Divider />
+                <AbsoluteCenter px='6'>OR</AbsoluteCenter>
+              </Box>
               <Stack spacing={4}>
                 {/* Name */}
                 <FormControl isReadOnly={customerView}>
