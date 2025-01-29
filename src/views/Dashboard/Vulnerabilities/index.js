@@ -1,12 +1,14 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { getFilterValue, parseEpssRange, setKEV } from 'utils'
 
-import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
+import { Flex, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
+import EnvGeneralFilter from 'components/Misc/EnvGeneralFilter'
 import CustomVulnTable from 'components/Tables/CustomVulnTable'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
 
+import { useEnvTotalCounts } from 'hooks/useEnvTotalCount'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
@@ -56,6 +58,14 @@ const Vulnerabilities = () => {
     }
   )
 
+  const totalCounts = useEnvTotalCounts({
+    filters,
+    queryOptions: {
+      skip: tab === 'vulnerabilities',
+      selector: 'organization.vulns'
+    }
+  })
+
   if (vulnId && location.pathname === '/vendor/vulnerabilities') {
     return <VulnInfo vulnId={vulnId} />
   }
@@ -77,6 +87,11 @@ const Vulnerabilities = () => {
             </Tab>
           ))}
         </TabList>
+        <Flex position='absolute' right={9} top={5}>
+          {tab !== 'vulnerabilities' && tab === 'productVulnerabilities' && (
+            <EnvGeneralFilter reset={reset} totalCounts={totalCounts} />
+          )}
+        </Flex>
 
         <TabPanels>
           <TabPanel>

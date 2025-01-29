@@ -1,21 +1,15 @@
 import { useEffect, useState } from 'react'
 
-import { Button, Stack, Tooltip } from '@chakra-ui/react'
 import { Spinner } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useThemeColor } from 'hooks/useThemeColors'
 
-import { LuInbox, LuPackage, LuShapes } from 'react-icons/lu'
+import EnvironmentButtons from './EnvironmentButtons'
 
 const EnvGeneralFilter = (props) => {
   const { reset, totalCounts } = props
   const [name, setName] = useState('')
 
-  const { semiTransparentBorder } = useThemeColor([
-    'semiTransparentBorder',
-    'semiTransparentBorder'
-  ])
   const { dispatch, globalVulnState } = useGlobalState()
 
   const variant = (env) => (name === env ? 'solid' : 'ghost')
@@ -57,59 +51,15 @@ const EnvGeneralFilter = (props) => {
   )
 
   return (
-    <Stack
-      direction={'row'}
-      spacing={0}
-      sx={{ borderRadius: '6px', alignItems: 'center' }}
-      border={`1px solid ${semiTransparentBorder}`}
-    >
-      <Tooltip label='Default'>
-        <Button
-          size='sm'
-          leftIcon={<LuInbox size={16} />}
-          borderColor={semiTransparentBorder}
-          title='Default environment'
-          variant={variant('default')}
-          colorScheme={colorScheme('default')}
-          sx={{
-            minWidth: '90px',
-            fontWeight: 400,
-            height: '100%'
-          }}
-          onClick={() => handleButtonClick('default')}
-        >
-          {defaultEnvs}
-        </Button>
-      </Tooltip>
-      <Tooltip label='Development'>
-        <Button
-          size='sm'
-          leftIcon={<LuShapes size={16} />}
-          borderColor={semiTransparentBorder}
-          title='Development environment'
-          variant={variant('development')}
-          colorScheme={colorScheme('development')}
-          sx={{ minWidth: '90px', fontWeight: 400, height: '100%' }}
-          onClick={() => handleButtonClick('development')}
-        >
-          {developmentEnvs}
-        </Button>
-      </Tooltip>
-      <Tooltip label='Production'>
-        <Button
-          size='sm'
-          leftIcon={<LuPackage size={16} />}
-          borderColor={semiTransparentBorder}
-          title='Production environment'
-          variant={variant('production')}
-          colorScheme={colorScheme('production')}
-          sx={{ minWidth: '90px', fontWeight: 400, height: '100%' }}
-          onClick={() => handleButtonClick('production')}
-        >
-          {productionEnvs}
-        </Button>
-      </Tooltip>
-    </Stack>
+    <EnvironmentButtons
+      isGeneralFilter={true}
+      getDefaultCount={defaultEnvs}
+      getDevelopmentCount={developmentEnvs}
+      getProductionCount={productionEnvs}
+      variant={variant}
+      colorScheme={colorScheme}
+      onClick={handleButtonClick}
+    />
   )
 }
 
