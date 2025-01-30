@@ -1,4 +1,4 @@
-import { gql, useLazyQuery } from '@apollo/client'
+import { useLazyQuery } from '@apollo/client'
 import { useState } from 'react'
 
 import {
@@ -10,45 +10,37 @@ import {
 } from '@chakra-ui/react'
 import { Box, Button, SkeletonText } from '@chakra-ui/react'
 
+import ProdLabel from 'components/Label/ProdLabel'
+
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaFilter } from 'react-icons/fa'
+import { GetLabels } from 'graphQL/Queries'
 
-export const getProjectGroups = gql`
-  query getProjectGroups($first: Int) {
-    organization {
-      projectGroups(first: $first) {
-        nodes {
-          id
-          name
-        }
-      }
-    }
-  }
-`
+import { FaFilter } from 'react-icons/fa'
 
 const GlobalLabelFilter = ({ value, setValue }) => {
   const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
 
-  const [prodGroups, setProdGroups] = useState([{ id: 'all', name: 'All' }])
+  const [labels, setLabels] = useState([{ id: 'all', name: 'All' }])
 
   const onFilterLabel = (value) => {
     setValue(value?.includes('all') ? [] : value)
   }
 
-  const [getProjects, { loading }] = useLazyQuery(getProjectGroups)
+  const [getLabels, { loading }] = useLazyQuery(GetLabels)
 
   const onCheckLabels = async () => {
-    await getProjects({ variables: { first: 25 } }).then((res) => {
-      if (res?.data?.organization?.projectGroups?.nodes?.length > 0) {
-        const results = [{ id: 'all', name: 'All', color: secondaryTextColor }]
-        res?.data?.organization?.projectGroups?.nodes?.map((item) =>
-          results?.push({
+    await getLabels({ variables: { first: 100 } }).then((res) => {
+      if (res?.data?.labels?.nodes?.length > 0) {
+        const labels = [{ id: 'all', name: 'All', color: secondaryTextColor }]
+        res?.data?.labels?.nodes?.map((item) =>
+          labels?.push({
             id: item?.id,
-            name: item?.name
+            name: item?.name,
+            color: item?.color
           })
         )
-        setProdGroups(results)
+        setLabels(labels)
       }
     })
   }
@@ -57,14 +49,16 @@ const GlobalLabelFilter = ({ value, setValue }) => {
     <Menu closeOnSelect={false}>
       <MenuButton
         as={Button}
-        colorScheme='blue'
-        fontWeight='semibold'
+        fontSize='sm'
+        fontWeight='medium'
+        colorScheme={'blue'}
         onClick={onCheckLabels}
         leftIcon={<FaFilter size={14} />}
+        variant={value?.length > 0 ? 'solid' : 'outline'}
       >
-        Products
+        Labels
       </MenuButton>
-      <MenuList minH='auto' maxH={'320px'} fontSize={'sm'} overflowY={'scroll'}>
+      <MenuList minH='auto' maxH={'300px'} fontSize={'sm'} overflowY={'scroll'}>
         {loading ? (
           <Box px={2}>
             <SkeletonText noOfLines={4} spacing='3' skeletonHeight='2' />
@@ -75,7 +69,7 @@ const GlobalLabelFilter = ({ value, setValue }) => {
             value={value}
             onChange={onFilterLabel}
           >
-            {prodGroups?.map((item, index) => (
+            {labels?.map((item, index) => (
               <MenuItemOption
                 key={index}
                 fontSize={'sm'}
@@ -83,7 +77,7 @@ const GlobalLabelFilter = ({ value, setValue }) => {
                 wordBreak={'break-all'}
                 aria-label={`label${index}`}
               >
-                {item?.name}
+                <ProdLabel item={item} />
               </MenuItemOption>
             ))}
           </MenuOptionGroup>

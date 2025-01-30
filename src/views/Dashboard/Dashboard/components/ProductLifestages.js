@@ -1,14 +1,8 @@
 import { useQuery } from '@apollo/client'
 
-import { Box, Flex, SimpleGrid, Text } from '@chakra-ui/react'
+import { Grid, GridItem, SimpleGrid, Stack, Text } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
-import {
-  Stat,
-  StatArrow,
-  StatGroup,
-  StatHelpText,
-  StatNumber
-} from '@chakra-ui/react'
+import { Stat, StatGroup, StatNumber } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -120,53 +114,43 @@ const ProductLifestages = () => {
   if (loading) return <LynkLoader />
 
   return (
-    <Card textAlign='center' maxH='100%' height='320px' overflowY='auto'>
+    <Card maxH='100%' height='320px' overflowY='auto'>
       {/* HEADING */}
       <Text fontWeight='semibold'>Products by Lifestages</Text>
       <CardBody mt={6} h='100%'>
-        <Flex
-          gap={4}
-          w={'100%'}
-          alignItems={'center'}
-          justifyContent={'space-between'}
-        >
-          <StatGroup w={'200px'}>
-            <Stat textAlign={'right'}>
-              <StatNumber
-                fontWeight={'normal'}
-                fontSize={['4xl', '5xl', '6xl']}
-              >
-                {total || 0}
-              </StatNumber>
-              <StatHelpText display={'none'}>
-                <StatArrow type='increase' />
-                Up from 3 last week
-              </StatHelpText>
-            </Stat>
-          </StatGroup>
-          <Box
-            w={0.5}
-            h={'100%'}
-            borderRight={`1px solid ${grayBorderColor}`}
-          />
-          <SimpleGrid w={'100%'} columns={1} spacing={2}>
-            {lifeStages?.map((item) => (
-              <Flex
-                gap={6}
-                key={item?.id}
-                alignItems={'center'}
-                justifyContent={'space-between'}
-              >
-                <Text fontSize={'sm'}>{item?.label}</Text>
-                <Tag w={'100px'} colorScheme={item?.color}>
-                  <TagLabel mx={'auto'} fontSize={'sm'}>
-                    {item?.count}
-                  </TagLabel>
-                </Tag>
-              </Flex>
-            ))}
-          </SimpleGrid>
-        </Flex>
+        <Grid w={'100%'} templateColumns='repeat(12, 1fr)' gap={6}>
+          <GridItem colSpan={4}>
+            <StatGroup
+              pr={4}
+              h={'100%'}
+              alignItems={'center'}
+              borderRight={`1px solid ${grayBorderColor}`}
+            >
+              <Stat textAlign={'right'}>
+                <StatNumber
+                  fontWeight={'normal'}
+                  fontSize={['4xl', '5xl', '6xl']}
+                >
+                  {total || 0}
+                </StatNumber>
+              </Stat>
+            </StatGroup>
+          </GridItem>
+          <GridItem colSpan={8}>
+            <Stack>
+              {lifeStages?.map((item, index) => (
+                <SimpleGrid w={'100%'} key={index} columns={2} spacing={2}>
+                  <Text fontSize={'sm'}>{item?.label}</Text>
+                  <Tag colorScheme={item?.color}>
+                    <TagLabel mx={'auto'} fontSize={'sm'}>
+                      {item?.count}
+                    </TagLabel>
+                  </Tag>
+                </SimpleGrid>
+              ))}
+            </Stack>
+          </GridItem>
+        </Grid>
       </CardBody>
     </Card>
   )

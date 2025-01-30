@@ -1,136 +1,25 @@
-import { useQuery } from '@apollo/client'
+import { Center, Icon, SimpleGrid, Text } from '@chakra-ui/react'
 
-import { Center, Icon } from '@chakra-ui/react'
-
-import CustomLoader from 'components/CustomLoader'
+import ComponentCount from 'components/Graphs/ComponentCount'
+import DefectDensity from 'components/Graphs/DefectDensity'
+import DeployVelocity from 'components/Graphs/DeployVelocity'
+import LicenseCount from 'components/Graphs/LicenseCount'
+import PatchVelocity from 'components/Graphs/PatchVelocity'
+import VulnBySeverity from 'components/Graphs/VulnBySeverity'
+import VulnByStatus from 'components/Graphs/VulnByStatus'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import {
-  GetDailyMetrics,
-  GetProjectMetrics,
-  GetProjectVulnMetrics
-} from 'graphQL/Queries'
-
 import { TfiBarChart } from 'react-icons/tfi'
-
-import { GraphUi } from './GraphsUi'
-import { formatForGraph, getDays } from './utils'
 
 export const Graphs = ({ filters }) => {
   const { orgView } = useGlobalQueryContext()
-  const { startDate, endDate } = filters?.duration || {}
   const { headingTextSecondary } = useThemeColor(['headingTextSecondary'])
 
-  const { dates } = getDays({
-    startDate,
-    endDate
-  })
+  const { product, version, duration } = filters || ''
 
-  const { data, loading, error } = useQuery(GetDailyMetrics, {
-    variables: {
-      sbomIds: filters.version?.map((p) => p.value),
-      projectNames: filters?.env?.value ? [filters?.env?.value] : [],
-      projectGroupIds: filters.product?.map((p) => p.value),
-      startDate,
-      endDate: endDate
-    },
-    skip: !filters.version || !startDate || !endDate || !orgView
-  })
-
-  const { data: metrics, loading: prodLoading } = useQuery(GetProjectMetrics, {
-    skip: filters?.product?.length > 0 ? false : true,
-    variables: {
-      projectGroupIds: filters.product?.map((p) => p.value)
-    }
-  })
-  const { nodes: prodMetrics } = metrics?.dailyMetrics?.projectMetrics || ''
-
-  const { data: vulnMetrics, loading: vulnloading } = useQuery(
-    GetProjectVulnMetrics,
-    {
-      skip: filters?.product?.length > 0 ? false : true,
-      variables: {
-        projectGroupIds: filters.product?.map((p) => p.value),
-        startDate,
-        endDate: endDate
-      }
-    }
-  )
-
-  const processVulnMetricsByDate = (data) => {
-    if (!data || !Array.isArray(data.nodes)) {
-      return []
-    }
-
-    const result = {}
-
-    dates.forEach((date) => {
-      result[date] = {
-        date,
-        statusCount: 0,
-        statusAgePresent: 0,
-        statusAgeResolved: 0,
-        statusAgePresentAverage: 0.0,
-        statusAgeResolvedAverage: 0.0
-      }
-    })
-
-    data.nodes.forEach((node) => {
-      const {
-        date,
-        statusAgeAffected = 0,
-        statusAgeFixed = 0,
-        statusAgeNotAffected = 0,
-        statusAgeResolved = 0,
-        statusAgeUnspecified = 0,
-        statusAgeInTriage = 0
-      } = node
-
-      if (!result[date]) {
-        result[date] = {
-          date,
-          statusCount: 0,
-          statusAgePresent: 0,
-          statusAgeResolved: 0,
-          statusAgePresentAverage: 0.0,
-          statusAgeResolvedAverage: 0.0
-        }
-      }
-      result[date].statusCount += 1
-      if (
-        statusAgeUnspecified > 0 ||
-        statusAgeAffected > 0 ||
-        statusAgeInTriage > 0
-      ) {
-        result[date].statusAgePresent +=
-          statusAgeUnspecified + statusAgeAffected + statusAgeInTriage
-      } else {
-        result[date].statusAgeResolved += statusAgeResolved
-      }
-    })
-
-    return Object.values(result).map((entry) => ({
-      date: entry.date,
-      statusAgePresent: entry.statusAgePresent,
-      statusAgeResolved: entry.statusAgeResolved,
-      statusCount: entry.statusCount,
-      statusAgePresentAverage:
-        entry.statusCount === 0
-          ? 0
-          : entry.statusAgePresent / entry.statusCount,
-      statusAgeResolvedAverage:
-        entry.statusCount === 0
-          ? 0
-          : entry.statusAgeResolved / entry.statusCount
-    }))
-  }
-  const prodVulnMetricProcessed = processVulnMetricsByDate(
-    vulnMetrics?.dailyMetrics?.projectVulnMetrics
-  )
-
-  if (!filters.product.length || !filters.version.length || !filters.duration) {
+  if (!product?.length || !version?.length || !duration) {
     return (
       <Center w={'100%'} py={24}>
         <Icon as={TfiBarChart} boxSize={44} color={headingTextSecondary} />
@@ -138,26 +27,22 @@ export const Graphs = ({ filters }) => {
     )
   }
 
-  const nodes = data?.dailyMetrics?.sbomMetrics?.nodes || []
-
-  const { dataForGraph } = formatForGraph({
-    nodes,
-    dates
-  })
-
-  if (loading || prodLoading || vulnloading) {
-    return <CustomLoader />
-  }
-
-  if (error) {
-    return 'Error!'
-  }
+  if (!orgView)
+    return (
+      <Center w={'100%'} py={24}>
+        <Text>You do not have permission to check analytics</Text>
+      </Center>
+    )
 
   return (
-    <GraphUi
-      dataForGraph={dataForGraph}
-      projectMetrics={prodMetrics}
-      prodVulnMetrics={prodVulnMetricProcessed}
-    />
+    <SimpleGrid gap={6} width={'100%'} columns={3}>
+      <ComponentCount filters={filters} />
+      <LicenseCount filters={filters} />
+      <VulnBySeverity filters={filters} />
+      <VulnByStatus filters={filters} />
+      <PatchVelocity filters={filters} />
+      <DefectDensity filters={filters} />
+      <DeployVelocity filters={filters} />
+    </SimpleGrid>
   )
 }

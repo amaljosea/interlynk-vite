@@ -5498,7 +5498,7 @@ export const getVulnsBySeverity = gql`
     $severity: [String!]
     $status: [String!]
     $envNames: [String!]
-    $projectGroupIds: [Uuid!]
+    $labelIds: [Uuid!]
   ) {
     organization {
       vulns(
@@ -5506,7 +5506,7 @@ export const getVulnsBySeverity = gql`
         severity: $severity
         status: $status
         projectNames: $envNames
-        projectGroupIds: $projectGroupIds
+        projectGroupLabelIds: $labelIds
       ) {
         totalCount
       }
@@ -5519,13 +5519,13 @@ export const getVulnsByStatus = gql`
   query getVulnsByStatus(
     $status: [String!]
     $envNames: [String!]
-    $projectGroupIds: [Uuid!]
+    $labelIds: [Uuid!]
   ) {
     organization {
       vulns(
         status: $status
         projectNames: $envNames
-        projectGroupIds: $projectGroupIds
+        projectGroupLabelIds: $labelIds
       ) {
         totalCount
       }
@@ -5540,7 +5540,7 @@ export const getVulnsWithConditions = gql`
     $status: [String!]
     $kev: Boolean
     $envNames: [String!]
-    $projectGroupIds: [Uuid!]
+    $labelIds: [Uuid!]
   ) {
     organization {
       vulns(
@@ -5548,7 +5548,7 @@ export const getVulnsWithConditions = gql`
         severity: $severity
         kev: $kev
         projectNames: $envNames
-        projectGroupIds: $projectGroupIds
+        projectGroupLabelIds: $labelIds
       ) {
         totalCount
       }

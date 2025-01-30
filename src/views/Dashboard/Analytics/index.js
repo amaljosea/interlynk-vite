@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { Flex } from '@chakra-ui/react'
+import { Button, Flex } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -32,7 +32,19 @@ const Analytics = () => {
   return (
     <Flex gap={6} width={'100%'} flexDir={'column'} alignItems={'flex-start'}>
       {/* ENVIRONMENT FILTER */}
-      {organization && <GlobalEnvFilter />}
+      <Flex w={'100%'} alignItems={'center'} justifyContent={'space-between'}>
+        <Button
+          fontSize='sm'
+          fontWeight={'medium'}
+          colorScheme='blue'
+          textTransform={'capitalize'}
+          _hover={{ colorScheme: 'blue' }}
+          _active={{ colorScheme: 'blue' }}
+        >
+          {envName}
+        </Button>
+        {organization && <GlobalEnvFilter />}
+      </Flex>
       <Card>
         <CardBody>
           <Filters filters={filters} setFilters={setFilters} />

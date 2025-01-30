@@ -9,8 +9,6 @@ import {
   YAxis
 } from 'recharts'
 
-import CustomLoader from 'components/CustomLoader'
-
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const CustomizedAxisTick = ({
@@ -53,8 +51,7 @@ export const SingleGraph = ({
   lines,
   syncId,
   averages = false,
-  percentage = false,
-  loading
+  percentage = false
 }) => {
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
@@ -77,8 +74,6 @@ export const SingleGraph = ({
     return percentage ? `${formattedValue}%` : formattedValue
   }
 
-  if (loading) return <CustomLoader />
-
   return (
     <ResponsiveContainer aspect={2.5} debounce={300}>
       <LineChart data={data} syncId={syncId}>
@@ -100,16 +95,22 @@ export const SingleGraph = ({
           tick={<CustomizedAxisTick x={5} y={5} />}
         />
         <Tooltip
-          formatter={conditionalFormatter}
-          labelStyle={{ color: primaryBlueText }}
-          labelFormatter={(label) => dateFormatter(label)}
+          contentStyle={{
+            fontSize: '14px',
+            borderRadius: '8px',
+            border: 'none',
+            color: 'black',
+            textAlign: 'left',
+            textTransform: 'capitalize',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)'
+          }}
         />
         <Legend wrapperStyle={{ fontSize: 15, paddingTop: '12px' }} />
         {lines.map((item) => (
           <Line
             key={item.name}
             type='monotone'
-            stroke={primaryBlueText}
+            stroke={item?.color || primaryBlueText}
             activeDot={{ r: 5 }}
             {...item}
           />

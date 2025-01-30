@@ -1,16 +1,9 @@
 import { useQuery } from '@apollo/client'
 import { hexToRGBA } from 'utils/styleUtils'
 
-import { SimpleGrid } from '@chakra-ui/react'
-import { Tag, TagLabel } from '@chakra-ui/react'
-import { Box, Flex, Text } from '@chakra-ui/react'
-import {
-  Stat,
-  StatArrow,
-  StatGroup,
-  StatHelpText,
-  StatNumber
-} from '@chakra-ui/react'
+import { Grid, GridItem, SimpleGrid, Stack } from '@chakra-ui/react'
+import { Tag, TagLabel, Text } from '@chakra-ui/react'
+import { Stat, StatGroup, StatNumber } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -68,64 +61,53 @@ const ProductLabels = () => {
   if (loading) return <LynkLoader />
 
   return (
-    <Card textAlign='center' maxH='100%' overflowY='auto'>
+    <Card maxH='100%' overflowY='auto'>
       {/* HEADING */}
       <Text fontWeight={'semibold'}>Products by Label</Text>
       <CardBody mt={6} h='100%'>
-        <Flex
-          gap={4}
-          w={'100%'}
-          alignItems={'center'}
-          justifyContent={'space-between'}
-        >
-          <StatGroup w={'200px'}>
-            <Stat textAlign={'right'}>
-              <StatNumber
-                fontWeight={'normal'}
-                fontSize={['4xl', '5xl', '6xl']}
-              >
-                {total || 0}
-              </StatNumber>
-              <StatHelpText display={'none'}>
-                <StatArrow type='increase' />
-                Up from 3 last week
-              </StatHelpText>
-            </Stat>
-          </StatGroup>
-          <Box
-            w={0.5}
-            h={'full'}
-            borderRight={`1px solid ${grayBorderColor}`}
-          />
-          <SimpleGrid w={'100%'} columns={1} spacing={2}>
-            {filterLabels?.map((item) => (
-              <Flex
-                gap={6}
-                key={item?.id}
-                alignItems={'center'}
-                justifyContent={'space-between'}
-              >
-                <Text fontSize={'sm'} color={item?.color}>
-                  {item?.label}
-                </Text>
-                <Tag
-                  w={'80px'}
-                  bg={hexToRGBA(item?.color, 0.1)}
-                  borderColor={hexToRGBA(item?.color, 0.4)}
+        <Grid w={'100%'} templateColumns='repeat(12, 1fr)' gap={6}>
+          <GridItem colSpan={4}>
+            <StatGroup
+              pr={4}
+              h={'100%'}
+              alignItems={'center'}
+              borderRight={`1px solid ${grayBorderColor}`}
+            >
+              <Stat textAlign={'right'}>
+                <StatNumber
+                  fontWeight={'normal'}
+                  fontSize={['4xl', '5xl', '6xl']}
                 >
-                  <TagLabel
-                    mx={'auto'}
-                    fontSize={'sm'}
-                    color={item?.color}
+                  {total || 0}
+                </StatNumber>
+              </Stat>
+            </StatGroup>
+          </GridItem>
+          <GridItem colSpan={8}>
+            <Stack>
+              {filterLabels?.map((item, index) => (
+                <SimpleGrid key={index} w={'100%'} columns={2} spacing={2}>
+                  <Text fontSize={'sm'} color={item?.color}>
+                    {item?.label}
+                  </Text>
+                  <Tag
+                    bg={hexToRGBA(item?.color, 0.1)}
                     borderColor={hexToRGBA(item?.color, 0.4)}
                   >
-                    {item?.count}
-                  </TagLabel>
-                </Tag>
-              </Flex>
-            ))}
-          </SimpleGrid>
-        </Flex>
+                    <TagLabel
+                      mx={'auto'}
+                      fontSize={'sm'}
+                      color={item?.color}
+                      borderColor={hexToRGBA(item?.color, 0.4)}
+                    >
+                      {item?.count}
+                    </TagLabel>
+                  </Tag>
+                </SimpleGrid>
+              ))}
+            </Stack>
+          </GridItem>
+        </Grid>
       </CardBody>
     </Card>
   )

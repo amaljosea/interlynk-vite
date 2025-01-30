@@ -10,12 +10,20 @@ export const getDays = ({ startDate, endDate }) => {
   return { dates }
 }
 
-export const formatForGraph = ({ nodes, dates }) => {
-  const dataForGraph = dates.map((date) => {
-    // Filter nodes matching the current date
-    const nodesForDate = nodes.filter((node) => node.date === date)
+export const formatDate = (date, timeZone = 'UTC') => {
+  return new Date(date).toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    timeZone
+  })
+}
 
-    if (nodesForDate.length > 0) {
+export const formatForGraph = ({ nodes, dates }) => {
+  const dataForGraph = dates?.map((date) => {
+    // Filter nodes matching the current date
+    const nodesForDate = nodes?.filter((node) => node.date === date)
+
+    if (nodesForDate?.length > 0) {
       // Aggregate data from all matching nodes
       const aggregatedData = nodesForDate.reduce(
         (acc, node) => {
