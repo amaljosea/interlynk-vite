@@ -22,7 +22,12 @@ const ActiveBtn = ({ title, label, color, onClick, isArchived, editable }) => {
       onClick={onClick}
       variant='unstyled'
       aria-label={label}
-      sx={{ color: color, ml: editable ? 1 : 0 }}
+      sx={{
+        color: color,
+        ml: editable ? 1 : 0,
+        display: 'flex',
+        alignItems: 'center'
+      }}
       leftIcon={editable ? <FaPen /> : <AddIcon />}
       hidden={isArchived || customerView || !editSboms}
     >
