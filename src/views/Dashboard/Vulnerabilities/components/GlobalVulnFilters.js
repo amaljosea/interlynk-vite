@@ -31,6 +31,7 @@ const GlobalVulnsFilters = ({ reset }) => {
     projectGroupIds,
     projectNames,
     severity,
+    status,
     kev,
     epss,
     minEpss,
@@ -81,6 +82,12 @@ const GlobalVulnsFilters = ({ reset }) => {
     reset()
   }
 
+  // FILTER BY STATUS
+  const onFilterStatus = (value) => {
+    globalVulnDispatch({ type: 'FILTER_STATUS', payload: value })
+    reset()
+  }
+
   // FILTER BY KEV
   const onFilterKev = (value) => {
     globalVulnDispatch({ type: 'FILTER_KEV', payload: value })
@@ -124,6 +131,8 @@ const GlobalVulnsFilters = ({ reset }) => {
         return projectNames.length !== 0 && !projectNames.includes('all')
       case 'severities':
         return severity?.length !== 0 && !severity.includes('all')
+      case 'statuses':
+        return status?.length !== 0 && !status.includes('all')
       case 'kev':
         return kev !== 'all' && kev !== ''
       case 'epss':
@@ -249,6 +258,26 @@ const GlobalVulnsFilters = ({ reset }) => {
               </Button>
             </Flex>
           </MenuList>
+        </Menu>
+      </Box>
+      {/* STATUS */}
+      <Box
+        width={'fit-content'}
+        display={params?.productgroupid ? 'none' : 'block'}
+      >
+        <Menu closeOnSelect={false}>
+          <MenuHeading title={'Status'} active={getStatus('statuses')} />
+          <CustomList
+            options={[
+              'In Triage',
+              'Not Affected',
+              'Affected',
+              'Fixed',
+              'Unspecified'
+            ]}
+            value={status}
+            onChange={onFilterStatus}
+          />
         </Menu>
       </Box>
     </Stack>

@@ -132,6 +132,7 @@ const GlobalStateProvider = ({ children }) => {
     projectGroupIds: [],
     projectNames: [],
     severity: [],
+    status: [],
     kev: '',
     epss: '',
     minEpss: 0,

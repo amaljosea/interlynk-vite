@@ -44,6 +44,7 @@ const Vulnerabilities = () => {
     kev: setKEV(globalVulnState?.kev),
     direction: globalVulnState?.direction,
     search: globalVulnState?.search || undefined,
+    status: getFilterValue(globalVulnState?.status),
     severity: getFilterValue(globalVulnState?.severity),
     projectNames: getFilterValue(globalVulnState?.projectNames),
     projectGroupIds: getFilterValue(globalVulnState?.projectGroupIds)
