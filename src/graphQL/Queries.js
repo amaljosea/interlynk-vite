@@ -1849,6 +1849,11 @@ export const GetComponentData = gql`
           }
           vulns {
             totalCount
+            nodes {
+              vexStatus {
+                name
+              }
+            }
           }
         }
       }

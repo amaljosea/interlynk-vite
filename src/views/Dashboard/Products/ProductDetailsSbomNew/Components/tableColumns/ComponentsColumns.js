@@ -93,6 +93,12 @@ const ComponentsColumns = ({
           const { projectGroup } = project || ''
           const isPart = sbomId !== bomId
           const isVulnerable = row?.vulns?.totalCount > 0
+
+          const isAllVulnsNotAffected =
+            row?.vulns?.nodes?.every(
+              (node) => node.vexStatus?.name === 'Not Affected'
+            ) ?? false
+
           const validPurl = isValidPurl(purl)
           const icon = validPurl ? (
             GetIcon(purl?.split('/')[0], colorMode)
@@ -133,7 +139,7 @@ const ComponentsColumns = ({
                   </Text>
                 )}
                 <Flex gap={1} flexWrap={'wrap'} alignItems={'center'}>
-                  {isVulnerable && (
+                  {isVulnerable && !isAllVulnsNotAffected && (
                     <StatusIcon
                       color='red'
                       label={'Vulnerable'}
