@@ -1,29 +1,45 @@
-import { useMemo } from 'react'
+import { useMutation } from '@apollo/client'
+import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
 import { customStyles } from 'utils/styleUtils'
+import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 
-import { Flex, Stack, Text, Tooltip, useDisclosure } from '@chakra-ui/react'
+import {
+  Flex,
+  Menu,
+  MenuItem,
+  MenuList,
+  Portal,
+  Stack,
+  Text,
+  Tooltip,
+  useDisclosure
+} from '@chakra-ui/react'
 import { IconButton } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import RefreshBtn from 'components/Icons/RefreshBtn'
+import LynkAction from 'components/Misc/LynkAction'
 import SeverityTag from 'components/Misc/SeverityTag'
 import CustomVuln from 'components/Modal/CustomVuln'
 import Pagination from 'components/Pagination'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
+import { CustomVulnDelete } from 'graphQL/Mutation'
 import { GetCustomVulns } from 'graphQL/Queries'
 
 import { FaPlus } from 'react-icons/fa6'
 
 const CustomVulnTable = () => {
   const tab = useQueryParam('tab')
+  const { showToast } = useCustomToast()
   const { organization } = useGlobalState()
   const isFreeTier = organization?.tier === 'free'
 
@@ -32,20 +48,25 @@ const CustomVulnTable = () => {
     childKey: 'edit_vulnerabilities'
   })
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const EDIT = useDisclosure()
+  const DELETE = useDisclosure()
+  const [activeRow, setActiveRow] = useState(null)
 
   const {
     headingTextColor,
     primaryTextColor,
     primaryBlueText,
-    secondaryTextColor
+    secondaryTextColor,
+    primaryErrorColor
   } = useThemeColor([
     'headingTextColor',
     'primaryTextColor',
     'primaryBlueText',
-    'secondaryTextColor'
+    'secondaryTextColor',
+    'primaryErrorColor'
   ])
 
+  const [deleteVuln, { loading: deleteLoading }] = useMutation(CustomVulnDelete)
   const { nodes, paginationProps, loading } = usePaginatedQuery(
     GetCustomVulns,
     {
@@ -54,30 +75,46 @@ const CustomVulnTable = () => {
     }
   )
 
+  const handleWarning = (row) => {
+    console.log('row', row)
+    setActiveRow(row)
+    DELETE.onOpen()
+  }
+
+  const handleRemove = (id) => {
+    deleteVuln({ variables: { id: id } }).then((res) => {
+      if (res?.data?.customVulnDelete?.errors?.length > 0) {
+        showToast({
+          description: res?.data?.customVulnDelete?.errors[0],
+          status: 'error'
+        })
+      } else {
+        showToast({
+          description: 'Vulnerability removed successfully',
+          status: 'success'
+        })
+        DELETE.onClose()
+      }
+    })
+  }
+
   const SubHeader = useMemo(() => {
     return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
-        <Flex></Flex>
-        <Flex gap={2}>
-          {!isFreeTier && (
-            <Tooltip label={'Add Custom Vulnerability'}>
-              <IconButton
-                onClick={onOpen}
-                icon={<FaPlus />}
-                colorScheme='blue'
-                isDisabled={!editVulns}
-              />
-            </Tooltip>
-          )}
-          <RefreshBtn />
-        </Flex>
+      <Flex gap={2} alignItems={'center'} justifyContent={'flex-end'}>
+        {!isFreeTier && (
+          <Tooltip label={'Add Custom Vulnerability'}>
+            <IconButton
+              onClick={EDIT.onOpen}
+              icon={<FaPlus />}
+              colorScheme='blue'
+              isDisabled={!editVulns}
+            />
+          </Tooltip>
+        )}
+        <RefreshBtn />
       </Flex>
     )
-  }, [editVulns, isFreeTier, onOpen])
+  }, [editVulns, isFreeTier, EDIT.onOpen])
 
   const columns = [
     // CVE ID
@@ -190,6 +227,32 @@ const CustomVulnTable = () => {
       },
       wrap: true,
       right: 'true'
+    },
+    // ACTION
+    {
+      id: 'ACTION',
+      name: 'ACTION',
+      selector: (row) => {
+        return (
+          <Menu>
+            <LynkAction aria-label='Options' data-testid='customVuln-actions' />
+            <Portal>
+              <MenuList fontSize='sm'>
+                <MenuItem
+                  hidden={isFreeTier}
+                  isDisabled={!editVulns}
+                  color={primaryErrorColor}
+                  onClick={() => handleWarning(row)}
+                >
+                  Delete
+                </MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
+        )
+      },
+      right: 'true',
+      omit: true // isFreeTier
     }
   ]
 
@@ -212,8 +275,23 @@ const CustomVulnTable = () => {
         <Pagination {...paginationProps} />
       </Flex>
 
-      {/* CUSTOM VULNS */}
-      {isOpen && <CustomVuln isOpen={isOpen} onClose={onClose} />}
+      {/* EDIT CUSTOM VULNS */}
+      {EDIT.isOpen && (
+        <CustomVuln isOpen={EDIT.isOpen} onClose={EDIT.onClose} />
+      )}
+
+      {/* DELETE CUSTOM VULN */}
+      {DELETE.isOpen && (
+        <ConfirmationModal
+          name={activeRow?.name}
+          isOpen={DELETE?.isOpen}
+          onClose={DELETE?.onClose}
+          isLoading={deleteLoading}
+          title={'Remove Vulnerability'}
+          onConfirm={() => handleRemove(activeRow?.id)}
+          description={`You are about to delete the custom vulnerability`}
+        />
+      )}
     </>
   )
 }

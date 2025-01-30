@@ -5106,9 +5106,9 @@ export const ActiveCompliances = gql`
 `
 
 export const CveLookup = gql`
-  query CveLookup($cveId: String!) {
-    cveLookup(cveId: $cveId) {
-      cveId
+  query CveLookup($vulnId: String!) {
+    cveLookup(vulnId: $vulnId) {
+      vulnId
       description
       lastModified
       published
@@ -5442,6 +5442,29 @@ export const GetPackageData = gql`
         version
         website
       }
+    }
+  }
+`
+
+export const verfifyCustomVuln = gql`
+  query verfifyCustomVuln($vulnIdentifier: String!) {
+    customVuln(vulnIdentifier: $vulnIdentifier) {
+      id
+      vulnIdentifier
+      desc
+      sev
+      reportedAt
+      publishedAt
+      lastModifiedAt
+      purl
+      cpe
+      customVulnSboms {
+        id
+        sbomId
+        componentId
+      }
+      createdAt
+      updatedAt
     }
   }
 `

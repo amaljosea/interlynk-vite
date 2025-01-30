@@ -1,12 +1,20 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { PackageURL } from 'packageurl-js'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-// import ReactSelect from 'react-select'
 import { getSignedUrlParams } from 'utils'
 import { validateCPEString } from 'utils/cpeUtils'
 
-import { Input, Select, Stack, Textarea } from '@chakra-ui/react'
+import { SearchIcon } from '@chakra-ui/icons'
+import {
+  Divider,
+  Flex,
+  IconButton,
+  Input,
+  Select,
+  Stack,
+  Textarea
+} from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
@@ -16,18 +24,19 @@ import LynkModal from 'components/LynkModal'
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 
-// import { useSelect } from 'hooks/useSelect'
 import { CustomVulnCreate } from 'graphQL/Mutation'
-import { GetAllComponents, GetTotalComponents } from 'graphQL/Queries'
+import {
+  CveLookup,
+  GetAllComponents,
+  GetTotalComponents
+} from 'graphQL/Queries'
 
-// import { CveLookup } from 'graphQL/Queries'
 import { FaBug } from 'react-icons/fa6'
 
 const severities = ['Critical', 'High', 'Medium', 'Low', 'Unknown']
 
 const CustomVuln = ({ isOpen, onClose }) => {
   const params = useParams()
-  // const { style } = useSelect('field')
   const { showToast } = useCustomToast()
   const { prodCompState } = useGlobalState()
   const signedUrlParams = getSignedUrlParams()
@@ -41,7 +50,7 @@ const CustomVuln = ({ isOpen, onClose }) => {
   }
 
   const [createVuln, { loading }] = useMutation(CustomVulnCreate)
-  // const [lookup] = useLazyQuery(CveLookup)
+  const [lookup, { loading: cveLoading }] = useLazyQuery(CveLookup)
   const { data: compData } = useQuery(GetTotalComponents, {
     skip: isOpen && params?.sbomid ? false : true,
     variables: { ...compState }
@@ -62,9 +71,7 @@ const CustomVuln = ({ isOpen, onClose }) => {
   const { nodes } = components || ''
 
   const [error, setError] = useState('')
-  // const [cve, setCve] = useState(null)
-  // const [searchText, setSearchText] = useState('')
-  // const [cveList, setCveList] = useState([])
+  const [cve, setCve] = useState('')
   const [purlError, setPurlError] = useState('')
   const [cpeError, setCpeError] = useState('')
   const [compId, setCompId] = useState('')
@@ -90,6 +97,11 @@ const CustomVuln = ({ isOpen, onClose }) => {
     setError('')
   }
 
+  const handleCveChange = (e) => {
+    setCve(e.target.value)
+    setError('')
+  }
+
   const onBlurPurl = (e) => {
     if (e.target.value !== '') {
       try {
@@ -109,45 +121,27 @@ const CustomVuln = ({ isOpen, onClose }) => {
     }
   }
 
-  // const onChangeLookup = (item) => {
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     vulnIdentifier: item?.value || undefined,
-  //     desc: item?.desc || undefined,
-  //     sev: item?.severity || undefined,
-  //     publishedAt: item?.published || undefined,
-  //     lastModifiedAt: item?.lastModified || undefined
-  //   }))
-  // }
-
-  // const onInputChange = (value) => {
-  //   setSearchText(value)
-  //   if (value !== '') {
-  //     lookup({
-  //       variables: {
-  //         cveId: value
-  //       }
-  //     }).then((res) => {
-  //       const { cveLookup } = res?.data || ''
-  //       if (cveLookup && cveLookup?.length > 0) {
-  //         setCveList(() =>
-  //           cveLookup?.map((item) => ({
-  //             label: item?.cveId,
-  //             value: item?.cveId,
-  //             desc: item?.description,
-  //             severity: item?.severity,
-  //             published: item?.published,
-  //             lastModified: item?.lastModified
-  //           }))
-  //         )
-  //       } else {
-  //         setCveList([{ label: value, value: value }])
-  //       }
-  //     })
-  //   } else {
-  //     setCveList([])
-  //   }
-  // }
+  const handleSearch = () => {
+    if (cve !== '') {
+      lookup({ variables: { vulnId: cve } }).then((res) => {
+        const { cveLookup } = res?.data || ''
+        if (cveLookup) {
+          setFormData((prev) => ({
+            ...prev,
+            sev: cveLookup?.severity,
+            desc: cveLookup?.description,
+            vulnIdentifier: cveLookup?.vulnId,
+            publishedAt: new Date(cveLookup?.published),
+            lastModifiedAt: new Date(cveLookup?.lastModified)
+          }))
+        } else {
+          setError('Data not found')
+        }
+      })
+    } else {
+      setError('Please enter a valid CVE ID')
+    }
+  }
 
   const handleDateChange = (type, newDate) => {
     const isValidDate = newDate && !isNaN(newDate)
@@ -165,17 +159,14 @@ const CustomVuln = ({ isOpen, onClose }) => {
   }
 
   const handleSubmit = async () => {
+    const attribute = {
+      sbomId: params?.sbomid,
+      componentId: compId !== '' ? compId : undefined
+    }
     await createVuln({
       variables: {
         ...formData,
-        customVulnSbomsAttributes: params?.sbomid
-          ? [
-              {
-                sbomId: params?.sbomid,
-                componentId: compId !== '' ? compId : undefined
-              }
-            ]
-          : undefined
+        customVulnSbomsAttributes: compId ? [attribute] : undefined
       }
     }).then((res) => {
       if (res?.data?.customVulnCreate?.errors?.length > 0) {
@@ -214,32 +205,27 @@ const CustomVuln = ({ isOpen, onClose }) => {
       title='Add Custom Vulerability'
     >
       <Stack spacing={4}>
-        <FormControl>
-          <FormLabel htmlFor='cveLookup'>
-            CVE Lookup {`( Coming soon )`}
-          </FormLabel>
-          {/* <ReactSelect
-            name='license'
-            styles={style}
-            className='react-select'
-            isClearable={true}
-            isSearchable={true}
-            isDisabled={signedUrlParams}
-            isLoading={loading}
-            noOptionsMessage={() => `Please search...`}
-            components={{
-              DropdownIndicator: () => null,
-              IndicatorSeparator: () => null
-            }}
-            value={cve}
-            options={cveList}
-            inputValue={searchText}
-            onChange={onChangeLookup}
-            onInputChange={onInputChange}
-            placeholder={'Search for CVE'}
-            filterOption={null}
-          /> */}
-        </FormControl>
+        {error !== '' && <LynkAlert msg={error} />}
+        <Flex gap={2} alignItems={'end'}>
+          <FormControl>
+            <FormLabel htmlFor='cveLookup'>CVE Lookup</FormLabel>
+            <Input
+              value={cve}
+              fontSize={'sm'}
+              onChange={handleCveChange}
+              _placeholder={{ fontWeight: 300 }}
+              placeholder='e.g. GHSA-qppj-fm5r-hxr3'
+            />
+          </FormControl>
+          <IconButton
+            siz='sm'
+            colorScheme='blue'
+            icon={<SearchIcon />}
+            isLoading={cveLoading}
+            onClick={handleSearch}
+          />
+        </Flex>
+        <Divider />
         <FormControl isRequired>
           <FormLabel htmlFor='vulnIdentifier'>Identifier</FormLabel>
           <Input
@@ -342,7 +328,6 @@ const CustomVuln = ({ isOpen, onClose }) => {
             </Select>
           </FormControl>
         )}
-        {error !== '' && <LynkAlert msg={error} />}
       </Stack>
     </LynkModal>
   )

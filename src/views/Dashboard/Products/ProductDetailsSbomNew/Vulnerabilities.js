@@ -149,6 +149,7 @@ const Vulnerabilities = ({ sbomData }) => {
   const VULN = useDisclosure()
   const IMPORT = useDisclosure()
   const CUSTOM_VULNS = useDisclosure()
+  const DELETE = useDisclosure()
 
   const onVexOpen = () => VEX.onOpen()
 
@@ -244,6 +245,11 @@ const Vulnerabilities = ({ sbomData }) => {
     showToast
   ])
 
+  const handleWarning = (row) => {
+    setActiveRow(row)
+    DELETE.onOpen()
+  }
+
   const onCreateCustomVuln = () => CUSTOM_VULNS.onOpen()
 
   const subHeader = VulnerabilitySubHeader({
@@ -275,6 +281,7 @@ const Vulnerabilities = ({ sbomData }) => {
   }
 
   const onCvssOpen = () => CVSS.onOpen()
+
   // COLUMNS
   const columns = VulnerabilityColumns(
     editVulns,
@@ -283,7 +290,8 @@ const Vulnerabilities = ({ sbomData }) => {
     jiraConnection,
     LINK,
     JIRA,
-    VULN
+    VULN,
+    handleWarning
   )
 
   useEffect(() => {

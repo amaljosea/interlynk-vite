@@ -3017,7 +3017,6 @@ export const CustomVulnUpdate = gql`
     $customVulnSbomsAttributes: [CustomVulnSbomsAttributesInput!]
     $purl: String
     $cpe: String
-    $componentId: Uuid
   ) {
     customVulnUpdate(
       input: {
@@ -3029,11 +3028,27 @@ export const CustomVulnUpdate = gql`
         publishedAt: $publishedAt
         lastModifiedAt: $lastModifiedAt
         cpe: $cpe
-        componentId: $componentId
         purl: $purl
         customVulnSbomsAttributes: $customVulnSbomsAttributes
       }
     ) {
+      errors
+      customVuln {
+        id
+        vulnIdentifier
+        customVulnSboms {
+          id
+          sbomId
+          componentId
+        }
+      }
+    }
+  }
+`
+
+export const CustomVulnDelete = gql`
+  mutation CustomVulnDelete($id: ID!) {
+    customVulnDelete(input: { id: $id }) {
       errors
       customVuln {
         id
