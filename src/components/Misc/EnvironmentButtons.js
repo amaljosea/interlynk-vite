@@ -60,13 +60,14 @@ const EnvironmentButtons = ({
       {environments.map(({ name, label, icon, count, project }) => {
         const button = (
           <Button
+            flex='1'
             size='sm'
             leftIcon={icon}
             borderColor={secondaryBlueBorder}
             title={`${label} environment`}
             variant={variant(name)}
             colorScheme={colorScheme(name)}
-            sx={{ w: '60px', fontWeight: 400 }}
+            sx={{ minWidth: '60px', fontWeight: 400 }}
             onClick={onClick ? () => onClick(name) : ''}
           >
             {count}
