@@ -1,5 +1,7 @@
 import { Center, Icon, SimpleGrid, Text } from '@chakra-ui/react'
 
+import Card from 'components/Card/Card'
+import CardBody from 'components/Card/CardBody'
 import ComponentCount from 'components/Graphs/ComponentCount'
 import DefectDensity from 'components/Graphs/DefectDensity'
 import DeployVelocity from 'components/Graphs/DeployVelocity'
@@ -11,7 +13,7 @@ import VulnByStatus from 'components/Graphs/VulnByStatus'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { TfiBarChart } from 'react-icons/tfi'
+import { FaChartArea } from 'react-icons/fa6'
 
 export const Graphs = ({ filters }) => {
   const { orgView } = useGlobalQueryContext()
@@ -21,9 +23,19 @@ export const Graphs = ({ filters }) => {
 
   if (!product?.length || !version?.length || !duration) {
     return (
-      <Center w={'100%'} py={24}>
-        <Icon as={TfiBarChart} boxSize={44} color={headingTextSecondary} />
-      </Center>
+      <SimpleGrid w={'100%'} columns={3} gap={6}>
+        {[1, 2, 3, 4, 5, 6].map((item) => (
+          <Card key={item}>
+            <CardBody py={16} alignItem='center' justifyContent='center'>
+              <Icon
+                boxSize={32}
+                as={FaChartArea}
+                color={headingTextSecondary}
+              />
+            </CardBody>
+          </Card>
+        ))}
+      </SimpleGrid>
     )
   }
 
