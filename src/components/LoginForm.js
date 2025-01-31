@@ -15,6 +15,7 @@ import {
   Stack,
   Text
 } from '@chakra-ui/react'
+import { Alert, AlertDescription, AlertIcon } from '@chakra-ui/react'
 import { FormControl, FormHelperText, FormLabel } from '@chakra-ui/react'
 import { Input, InputGroup, InputRightElement } from '@chakra-ui/react'
 
@@ -24,7 +25,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UserResendConfirmationEmail } from 'graphQL/Mutation'
 
-import LynkAlert from './LynkAlert'
 import PolicyTerms from './PolicyTerms'
 import SocialLogin from './SocialLogin'
 
@@ -110,22 +110,8 @@ const LoginForm = () => {
     color: primaryBlueText
   }
 
-  const ErrorMsg = () => {
-    return (
-      <Stack spacing={1}>
-        {error}
-        {error ===
-          'You have to confirm your email address before continuing.' && (
-          <p>
-            Lost invitation link ?{' '}
-            <strong style={alertStyle} onClick={onResendEmail}>
-              Resend
-            </strong>
-          </p>
-        )}
-      </Stack>
-    )
-  }
+  const notConfirmed =
+    'You have to confirm your email address before continuing.'
 
   return (
     <Flex
@@ -146,9 +132,21 @@ const LoginForm = () => {
         Log in to continue to the dashboard
       </Text>
       {error !== '' && (
-        <Box mt={4} width={'100%'}>
-          <LynkAlert msg={<ErrorMsg />} />
-        </Box>
+        <Alert mt={4} status={'error'} borderRadius={4}>
+          <AlertIcon />
+          <AlertDescription fontSize={'sm'} pr={2}>
+            {error === notConfirmed ? (
+              <p>
+                Lost invitation link ?{' '}
+                <strong style={alertStyle} onClick={onResendEmail}>
+                  Resend
+                </strong>
+              </p>
+            ) : (
+              error
+            )}
+          </AlertDescription>
+        </Alert>
       )}
       <form style={{ width: '100%' }} onSubmit={handleSubmit}>
         <Stack py={'1rem'} direction={'column'} gap={3} width={'100%'} mt={2}>
