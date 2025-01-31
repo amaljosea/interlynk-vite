@@ -68,6 +68,11 @@ const LifecycleModal = ({ data, isOpen, onClose }) => {
     }
   }
 
+  const closeModal = () => {
+    onClose()
+    setError('')
+  }
+
   const stages = [
     { value: 'design', label: 'Design' },
     { value: 'development', label: 'Development' },
@@ -97,7 +102,7 @@ const LifecycleModal = ({ data, isOpen, onClose }) => {
           description: 'Lifecycle updated successfully',
           status: 'success'
         })
-        onClose()
+        closeModal()
       }
     })
   }
@@ -122,7 +127,7 @@ const LifecycleModal = ({ data, isOpen, onClose }) => {
     <LynkModal
       isOpen={isOpen}
       Icon={FaLifeRing}
-      onClose={onClose}
+      onClose={closeModal}
       isLoading={loading}
       buttonText={'Save'}
       onSubmit={handleSubmit}
