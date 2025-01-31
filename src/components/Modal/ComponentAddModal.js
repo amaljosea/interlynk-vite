@@ -67,8 +67,17 @@ function ComponentAddModal(props) {
     }
   })
 
-  const { primaryErrorColor, primaryBlueText, headingTextColor } =
-    useThemeColor(['primaryErrorColor', 'primaryBlueText', 'headingTextColor'])
+  const {
+    primaryErrorColor,
+    primaryBlueText,
+    headingTextColor,
+    primaryBgColor
+  } = useThemeColor([
+    'primaryErrorColor',
+    'primaryBlueText',
+    'headingTextColor',
+    'primaryBgColor'
+  ])
 
   const { isOpen, onClose, data, primaryComp, shortDesc } = props
   const { prodCompState, dispatch } = useGlobalState()
@@ -268,7 +277,9 @@ function ComponentAddModal(props) {
               <PackageLookup />
               <Box position='relative' py='3'>
                 <Divider />
-                <AbsoluteCenter px='6'>OR</AbsoluteCenter>
+                <AbsoluteCenter px='6' bg={primaryBgColor}>
+                  OR
+                </AbsoluteCenter>
               </Box>
               <Stack spacing={4}>
                 {/* Name */}

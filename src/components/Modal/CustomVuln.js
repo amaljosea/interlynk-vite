@@ -1,18 +1,21 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { PackageURL } from 'packageurl-js'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getSignedUrlParams } from 'utils'
 import { validateCPEString } from 'utils/cpeUtils'
 
 import { SearchIcon } from '@chakra-ui/icons'
 import {
+  AbsoluteCenter,
+  Box,
   Divider,
   Flex,
   IconButton,
   Input,
   Select,
   Stack,
+  Text,
   Textarea
 } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
@@ -23,6 +26,7 @@ import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CustomVulnCreate } from 'graphQL/Mutation'
 import {
@@ -40,6 +44,7 @@ const CustomVuln = ({ isOpen, onClose }) => {
   const { showToast } = useCustomToast()
   const { prodCompState } = useGlobalState()
   const signedUrlParams = getSignedUrlParams()
+  const { primaryBgColor } = useThemeColor(['primaryBgColor'])
 
   const { field, direction } = prodCompState
   const compState = {
@@ -206,6 +211,7 @@ const CustomVuln = ({ isOpen, onClose }) => {
     >
       <Stack spacing={4}>
         {error !== '' && <LynkAlert msg={error} />}
+        <Text>Fill it up to search or add manually</Text>
         <Flex gap={2} alignItems={'end'}>
           <FormControl>
             <FormLabel htmlFor='cveLookup'>CVE Lookup</FormLabel>
@@ -225,7 +231,12 @@ const CustomVuln = ({ isOpen, onClose }) => {
             onClick={handleSearch}
           />
         </Flex>
-        <Divider />
+        <Box position='relative' py='3'>
+          <Divider />
+          <AbsoluteCenter px='2' bg={primaryBgColor}>
+            OR
+          </AbsoluteCenter>
+        </Box>
         <FormControl isRequired>
           <FormLabel htmlFor='vulnIdentifier'>Identifier</FormLabel>
           <Input
