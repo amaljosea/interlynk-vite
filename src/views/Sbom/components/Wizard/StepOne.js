@@ -1,23 +1,19 @@
-import { useLazyQuery, useQuery } from '@apollo/client'
+import { useLazyQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { envOrderList } from 'utils'
+import AsyncSelect from 'react-select/async'
+import { capitalizeFirstLetter, envOrderList } from 'utils'
 import LabelSelect from 'views/Dashboard/Analytics/Selects/LabelSelect'
 
-import {
-  Box,
-  Flex,
-  Heading,
-  Select,
-  Skeleton,
-  Spinner,
-  Stack,
-  Text
-} from '@chakra-ui/react'
+import { Box, Heading, Skeleton, Stack, Text } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
+import LynkSelect from 'components/LynkSelect'
+import CustomDropdownIndicator from 'components/Misc/CustomDropdownIndicator'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useLazyDropDown } from 'hooks/useLazyDropDown'
+import { useSelect } from 'hooks/useSelect'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetProject, GetProjectGroups } from 'graphQL/Queries'
@@ -26,14 +22,13 @@ const StepOne = ({
   setSbomId,
   currentSbomId,
   currentProductId,
-  selectedGroup,
-  setSelectedGroup,
   selectedProd,
   setSelectedProd,
   selectedVersion,
   setSelectedVersion,
   uniqVersions,
-  setUniqVersions
+  setUniqVersions,
+  setSelectedGroupId
 }) => {
   const { prodState } = useGlobalState()
   const { enabled, field, direction } = prodState
@@ -41,42 +36,49 @@ const StepOne = ({
   const { headingTextColor } = useThemeColor(['headingTextColor'])
 
   const [label, setLabel] = useState(null)
+  const { style } = useSelect('lynkSelect')
+  const [selectedGroup, setSelectedGroup] = useState({})
 
-  const { data, loading: projectGrpLoading } = useQuery(GetProjectGroups, {
-    variables: {
-      first: 25,
-      labelIds: label ? [label?.value] : undefined,
-      enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
-      field: field,
-      direction: direction
-    }
-  })
+  const handleSelectGroup = (item) => {
+    setSelectedGroupId(item.id)
+    setSelectedGroup(item)
+    setSelectedVersion('')
+    setSelectedProd('')
+    setUniqVersions([])
+  }
 
   const handleChange = (value) => {
     setLabel(value)
-    setSelectedGroup('')
     setSelectedProd('')
     setSelectedVersion('')
+    setSelectedGroup({})
   }
 
-  const activeGroup =
-    data &&
-    data?.organization?.projectGroups?.nodes.find(
-      (item) => item.id === selectedGroup
-    )
+  const { lazyDropDownProps } = useLazyDropDown(GetProjectGroups, {
+    selector: 'organization.projectGroups',
+    variables: {
+      labelIds: label ? [label?.value] : undefined,
+      enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
+      field: field,
+      direction: direction,
+      first: 5
+    },
+    selectorForActualCount: 'organization.projectGroups',
+    styles: style,
+    selectedItem: selectedGroup.name ? selectedGroup.name : '--Select--',
+    onChange: handleSelectGroup,
+    components: {
+      IndicatorSeparator: () => null,
+      DropdownIndicator: CustomDropdownIndicator
+    },
+    optionLabel: 'name'
+  })
 
-  const productList =
-    activeGroup &&
-    activeGroup.projects
-      .filter((item) => item.enabled === true)
-      .map((option) => ({
-        value: option.id,
-        label: option.name
-      }))
+  const { isLoading, nodes } = lazyDropDownProps
 
   useEffect(() => {
-    if (activeGroup) {
-      const currentProd = activeGroup.projects.find(
+    if (selectedGroup?.id) {
+      const currentProd = selectedGroup.projects.find(
         (item) => item.id === currentProductId
       )
       setSelectedProd(currentProd?.id)
@@ -86,15 +88,8 @@ const StepOne = ({
 
   const [getProduct, { loading }] = useLazyQuery(GetProject)
 
-  const handleSelectGroup = (e) => {
-    setUniqVersions([])
-    setSelectedVersion('')
-    setSelectedProd('')
-    setSelectedGroup(e.target.value)
-  }
-
   const handleSelectProduct = (e) => {
-    const { value } = e.target
+    const value = e.value
     setSelectedVersion('')
     setSelectedProd(value)
   }
@@ -125,39 +120,66 @@ const StepOne = ({
 
   const NoVersionAlert = <LynkAlert status='info' msg='No version available' />
 
-  const NoEnvironmentAlert = (
-    <LynkAlert status='info' msg='No Environment selected' />
+  const noProjectsAlert = (
+    <LynkAlert status='info' msg='No projects available' />
   )
+
+  //Checks if any product is available after applying the labels
+  const isProductAvailable = !(label !== null && nodes.length === 0)
+
+  const productList =
+    selectedGroup?.id &&
+    selectedGroup.projects
+      .filter((item) => item.enabled === true)
+      .map((option) => ({
+        value: option.id,
+        label: option.name
+      }))
+
+  const envOptions =
+    productList?.length > 0 &&
+    envOrderList(productList).map((item) => {
+      return {
+        value: item.value,
+        label: item.label ? capitalizeFirstLetter(item.label) : item.label
+      }
+    })
+
+  const versionsOptions =
+    uniqVersions &&
+    uniqVersions.map((version) => {
+      return {
+        value: version.id,
+        label: version.projectVersion
+      }
+    })
+
+  const envLabel =
+    selectedProd && envOptions
+      ? envOptions.find((option) => option.value === selectedProd)?.label
+      : '--Select--'
+
+  const versionLabel =
+    selectedVersion && versionsOptions
+      ? versionsOptions.find((version) => version.value === selectedVersion)
+          ?.label
+      : '--Select--'
 
   const VersionSelect = (
-    <Select
+    <LynkSelect
       name='versions'
-      id='versions'
-      fontSize='sm'
-      value={selectedVersion}
+      placeholder={versionLabel || '--Select--'}
+      value={versionLabel}
+      options={versionsOptions}
       onChange={(e) => {
-        setSelectedVersion(e.target.value)
-        setSbomId(e.target.value)
+        setSelectedVersion(e.value)
+        setSbomId(e.value)
       }}
-    >
-      <option value=''>-- Select --</option>
-      {uniqVersions?.map((item, index) => (
-        <option key={index} value={item.id}>
-          {item?.projectVersion}
-        </option>
-      ))}
-    </Select>
+      isSearchable={false}
+      isDisabled={!selectedGroup?.id}
+      dropDown={true}
+    />
   )
-
-  if (projectGrpLoading) {
-    return (
-      <Flex alignItems={'center'} gap={2}>
-        <Spinner />
-        <Text>LOADING....</Text>
-      </Flex>
-    )
-  }
-
   return (
     <>
       <Box width={'50%'} mx={'auto'}>
@@ -191,68 +213,56 @@ const StepOne = ({
             onChange={(value) => handleChange(value)}
           />
           {/* PROJECT GROUPS */}
-          {data?.organization?.projectGroups?.nodes?.length > 0 && (
+          {
             <FormControl fontSize={'sm'}>
               <FormLabel htmlFor='product' color={headingTextColor}>
                 Product
               </FormLabel>
-              <Select
-                name='groups'
-                id='groups'
-                fontSize='sm'
-                value={selectedGroup}
-                onChange={handleSelectGroup}
-              >
-                <option value={''}>-- Select --</option>
-                {data?.organization?.projectGroups?.nodes?.map(
-                  (item, index) => (
-                    <option key={index} value={item.id}>
-                      {item.name}
-                    </option>
-                  )
-                )}
-              </Select>
+              {isProductAvailable ? (
+                <AsyncSelect
+                  {...{
+                    ...lazyDropDownProps,
+                    isDisabled: isLoading,
+                    value: null
+                  }}
+                />
+              ) : (
+                noProjectsAlert
+              )}
+            </FormControl>
+          }
+          {/* ENVIRONMENT */}
+          {isProductAvailable && (
+            <FormControl fontSize={'sm'}>
+              <FormLabel htmlFor='product' color={headingTextColor}>
+                Environment
+              </FormLabel>
+              <LynkSelect
+                name='product'
+                placeholder={envLabel || '--Select--'}
+                value={'envLabel'}
+                options={envOptions}
+                onChange={handleSelectProduct}
+                isSearchable={false}
+                isDisabled={!selectedGroup?.id}
+                dropDown={true}
+              />
             </FormControl>
           )}
-          {/* ENVIRONMENT */}
-          <FormControl fontSize={'sm'}>
-            <FormLabel htmlFor='product' color={headingTextColor}>
-              Environment
-            </FormLabel>
-            <Select
-              name='product'
-              id='product'
-              fontSize='sm'
-              value={selectedProd}
-              onChange={handleSelectProduct}
-              textTransform={'capitalize'}
-            >
-              <option value={''}>-- Select --</option>
-              {productList?.length > 0 &&
-                envOrderList(productList).map((item, index) => (
-                  <option
-                    key={index}
-                    value={item.value}
-                    style={{ textTransform: 'capitalize' }}
-                  >
-                    {item.label}
-                  </option>
-                ))}
-            </Select>
-          </FormControl>
+
           {/* Version */}
-          <FormControl fontSize={'sm'}>
-            <FormLabel htmlFor='versions' color={headingTextColor}>
-              Version
-            </FormLabel>
-            {loading
-              ? LoadingSkeleton
-              : uniqVersions?.length === 0 && selectedProd !== ''
-                ? NoVersionAlert
-                : selectedProd === ''
-                  ? NoEnvironmentAlert
+          {isProductAvailable && (
+            <FormControl fontSize={'sm'}>
+              <FormLabel htmlFor='versions' color={headingTextColor}>
+                Version
+              </FormLabel>
+              {loading
+                ? LoadingSkeleton
+                : uniqVersions.length === 0 && selectedProd && selectedGroup?.id
+                  ? NoVersionAlert
                   : VersionSelect}
-          </FormControl>
+            </FormControl>
+          )}
         </Stack>
       </Box>
     </>

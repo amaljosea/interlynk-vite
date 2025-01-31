@@ -61,8 +61,8 @@ const ImportWizard = ({
           setSbomId={setSbomId}
           currentSbomId={currentSbomId}
           currentProductId={currentProductId}
-          selectedGroup={selectedGroup}
-          setSelectedGroup={setSelectedGroup}
+          selectedGroupId={selectedGroup}
+          setSelectedGroupId={setSelectedGroup}
           selectedProd={selectedProd}
           setSelectedProd={setSelectedProd}
           selectedVersion={selectedVersion}
@@ -143,6 +143,7 @@ const ImportWizard = ({
                   prodVulnDispatch({ type: 'RESET_SELECTED_VULN' })
                   prodVulnDispatch({ type: 'RESET_IMPORT_SBOMS' })
                   prevStep()
+                  setSelectedVersion('')
                 }}
               >
                 Back
