@@ -1,6 +1,8 @@
 import ReactSelect, { components } from 'react-select'
 import CreatableSelect from 'react-select/creatable'
 
+import CustomDropdownIndicator from 'components/Misc/CustomDropdownIndicator'
+
 import useQueryParam from 'hooks/useQueryParam'
 import { useSelect } from 'hooks/useSelect'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -30,7 +32,9 @@ const LynkSelect = (props) => {
       className='react-select'
       components={{
         ClearIndicator,
-        DropdownIndicator: () => null,
+        DropdownIndicator: props.dropDown
+          ? CustomDropdownIndicator
+          : () => null,
         IndicatorSeparator: () => null
       }}
     />
@@ -41,7 +45,9 @@ const LynkSelect = (props) => {
       className='react-select'
       components={{
         ClearIndicator,
-        DropdownIndicator: () => null,
+        DropdownIndicator: props.dropDown
+          ? CustomDropdownIndicator
+          : () => null,
         IndicatorSeparator: () => null
       }}
     />

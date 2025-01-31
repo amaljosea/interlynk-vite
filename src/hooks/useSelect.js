@@ -4,6 +4,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 export const useSelect = (type) => {
   const isBreadcrumb = type === 'breadcrumb'
   const isVersion = type === 'version'
+  const isLynkSelect = type === 'lynkSelect'
 
   const {
     primaryBlueText,
@@ -27,7 +28,7 @@ export const useSelect = (type) => {
       color: primaryTextColor,
       overflow: 'hidden',
       opacity: state.isDisabled ? 0.5 : 1,
-      maxWidth: isBreadcrumb ? '200px' : 'inherit',
+      maxWidth: isBreadcrumb ? '200px' : isLynkSelect ? '100%' : 'inherit',
       minWidth: isBreadcrumb ? '120px' : 'inherit',
       minHeight: isBreadcrumb ? '6px' : 'inherit',
       border: isBreadcrumb ? 'none' : 'auto',

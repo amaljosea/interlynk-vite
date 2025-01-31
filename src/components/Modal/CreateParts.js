@@ -1,6 +1,7 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
+import AsyncSelect from 'react-select/async'
 import {
   capitalizeFirstLetter,
   envOrderList,
@@ -9,13 +10,17 @@ import {
 } from 'utils'
 import LabelSelect from 'views/Dashboard/Analytics/Selects/LabelSelect'
 
-import { FormControl, FormLabel, Select, Stack } from '@chakra-ui/react'
+import { FormControl, FormLabel, Stack } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
+import LynkSelect from 'components/LynkSelect'
+import CustomDropdownIndicator from 'components/Misc/CustomDropdownIndicator'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useLazyDropDown } from 'hooks/useLazyDropDown'
 import { usePartsContext } from 'hooks/usePartsContext'
+import { useSelect } from 'hooks/useSelect'
 
 import { SbomPartCreate } from 'graphQL/Mutation'
 import {
@@ -40,27 +45,13 @@ function getActualVersion(versions = [], parts = []) {
   return actualVersions
 }
 
-const LynkSelect = ({ name, value, onChange, children }) => {
-  return (
-    <Select
-      name={name}
-      value={value}
-      fontSize={'sm'}
-      onChange={onChange}
-      data-testid={`part_${name}`}
-    >
-      <option value={''}>-- Select --</option>
-      {children}
-    </Select>
-  )
-}
-
 const CreateParts = ({ parts, isOpen, onClose }) => {
   const params = useParams()
   const sbomId = params.sbomid
   const prodId = params.productid
   const productGrpId = params.productgroupid
   const partsContext = usePartsContext()
+  const { style } = useSelect('lynkSelect')
 
   const { prodState, dispatch } = useGlobalState()
   const { enabled, field, direction } = prodState
@@ -68,24 +59,63 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
 
   const [selectedProd, setSelectedProd] = useState('')
   const [selectedVersion, setSelectedVersion] = useState('')
-  const [selectedGroup, setSelectedGroup] = useState('')
   const [envList, setEnvList] = useState([])
   const [label, setLabel] = useState(null)
+  const [selectedGrpName, setSelectedGrpName] = useState('')
+  const [selectedGroup, setSelectedGroup] = useState({})
 
   const [createSbomPart, { loading }] = useMutation(SbomPartCreate)
 
   const [getProduct] = useLazyQuery(GetProject)
 
-  const { data: allProjects } = useQuery(GetProjectGroups, {
+  const handleSelectGroup = (item) => {
+    const value = item.id
+    setSelectedGrpName(item.name)
+    setSelectedGroup(item)
+    if (value !== '') {
+      setSelectedProd('')
+      setSelectedVersion('')
+      const activeGroup = item
+      const productList =
+        activeGroup &&
+        activeGroup.projects
+          .filter((item) => item.enabled === true)
+          .map((option) => ({
+            value: option.id,
+            label: option.name
+          }))
+      setEnvList(productList)
+    } else {
+      setSelectedGroup({})
+      setSelectedProd('')
+      setSelectedVersion('')
+      setSelectedGrpName('')
+      setEnvList([])
+    }
+  }
+
+  const { lazyDropDownProps } = useLazyDropDown(GetProjectGroups, {
     skip: isOpen ? false : true,
+    selector: 'organization.projectGroups',
     variables: {
-      first: 25,
       labelIds: label ? [label?.value] : undefined,
       enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
       field: field,
-      direction: direction
-    }
+      direction: direction,
+      first: 5
+    },
+    selectorForActualCount: 'organization.projectGroups',
+    styles: style,
+    selectedItem: selectedGroup?.id ? selectedGrpName : '--Select--',
+    onChange: handleSelectGroup,
+    components: {
+      IndicatorSeparator: () => null,
+      DropdownIndicator: CustomDropdownIndicator
+    },
+    optionLabel: 'name'
   })
+
+  const { defaultOptions, nodes, isLoading } = lazyDropDownProps
 
   const { data: partsData } = useQuery(GetSbomParts, {
     skip: selectedProd && selectedVersion ? false : true,
@@ -109,9 +139,11 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
 
   const handleChange = (value) => {
     setLabel(value)
-    setSelectedGroup('')
+    setSelectedGroup({})
     setSelectedProd('')
     setSelectedVersion('')
+    setSelectedGrpName('')
+    setEnvList([])
   }
 
   const getSbomVersions = () => {
@@ -123,11 +155,7 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
       return []
     }
 
-    const activeGroup = allProjects?.organization?.projectGroups?.nodes.find(
-      (item) => item.id === selectedGroup
-    )
-
-    const activeEnv = activeGroup?.projects?.find(
+    const activeEnv = selectedGroup?.projects?.find(
       (item) => item.id === selectedProd
     )
 
@@ -140,7 +168,7 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
       return !urlHasId
     })
 
-    return allowedSboms.map((sbom) => ({
+    return allowedSboms?.map((sbom) => ({
       label: sbom?.projectVersion,
       value: sbom?.id,
       creationAt: sbom?.createdAt
@@ -150,44 +178,21 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
   const sbomVersions = getSbomVersions()
   const versionsActual = getActualVersion(sbomVersions, parts)
   //Filters out currently selected project so that sbom from same project is not added as parts
-  const projectsActual = allProjects?.organization?.projectGroups?.nodes.filter(
+  const projectsActual = defaultOptions?.filter(
     (project) => project.id !== productGrpId
   )
 
   //Checks if any product is available after applying the labels
-  const isProductAvailable = !(label !== null && projectsActual?.length === 0)
-
-  const handleSelectGroup = (e) => {
-    const { value } = e.target
-    if (value !== '') {
-      setSelectedGroup(value)
-      setSelectedProd('')
-      setSelectedVersion('')
-      const activeGroup =
-        allProjects &&
-        allProjects?.organization?.projectGroups?.nodes.find(
-          (item) => item.id === value
-        )
-      const productList =
-        activeGroup &&
-        activeGroup.projects
-          .filter((item) => item.enabled === true)
-          .map((option) => ({
-            value: option.id,
-            label: option.name
-          }))
-      setEnvList(productList)
-    } else {
-      setSelectedGroup('')
-      setSelectedProd('')
-      setSelectedVersion('')
-      setEnvList('')
-    }
-  }
+  const isProductAvailable = !(
+    label !== null &&
+    (nodes?.length === 0 ||
+      (nodes?.length === 1 && nodes[0]?.id === productGrpId))
+  )
 
   const handleSelectProduct = (e) => {
-    const { value } = e.target
+    const value = e.value
     setSelectedProd(value)
+    setSelectedVersion('')
     if (value === '') {
       setSelectedVersion('')
     } else {
@@ -208,12 +213,43 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
         }
       })
       .finally(() => {
-        setSelectedGroup('')
+        setSelectedGroup({})
         setSelectedProd('')
         setSelectedVersion('')
         onClose()
       })
   }
+
+  const envOptions =
+    envList?.length > 0 &&
+    envOrderList(envList).map((item) => {
+      return {
+        value: item.value,
+        label: isDefaultEnv(item.label)
+          ? capitalizeFirstLetter(item.label)
+          : item.label
+      }
+    })
+
+  const versionsOptions =
+    versionsActual &&
+    versionsActual?.map((version) => {
+      return {
+        value: version.value,
+        label: truncatedValue(version?.label, 30)
+      }
+    })
+
+  const envLabel =
+    selectedProd && envOptions
+      ? envOptions.find((option) => option.value === selectedProd)?.label
+      : '--Select--'
+
+  const versionLabel =
+    selectedVersion && versionsActual
+      ? versionsActual.find((version) => version.value === selectedVersion)
+          ?.label
+      : '--Select--'
 
   return (
     <LynkModal
@@ -227,28 +263,30 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
       disabled={
         isExists === true ||
         existingNodes === true ||
-        versionsActual?.length === 0 ||
+        versionLabel === '--Select--' ||
         sbomVersions?.length === 0
       }
     >
       <Stack spacing={4} direction={'column'} gap={2}>
         {/* LABEL */}
-        <LabelSelect value={label} onChange={(value) => handleChange(value)} />
+        <LabelSelect
+          value={label}
+          onChange={(value) => {
+            handleChange(value)
+          }}
+        />
         {/* PROJECTS */}
         <FormControl fontSize={'sm'} isRequired>
           <FormLabel htmlFor='groups'>Product</FormLabel>
           {isProductAvailable ? (
-            <LynkSelect
-              name='groups'
-              value={selectedGroup}
-              onChange={handleSelectGroup}
-            >
-              {projectsActual?.map((item, index) => (
-                <option key={index} value={item.id}>
-                  {truncatedValue(item.name, 30)}
-                </option>
-              ))}
-            </LynkSelect>
+            <AsyncSelect
+              {...{
+                ...lazyDropDownProps,
+                defaultOptions: projectsActual, // Override defaultOptions
+                isDisabled: isLoading,
+                value: null
+              }}
+            />
           ) : (
             <LynkAlert
               status='info'
@@ -262,31 +300,21 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
             <FormLabel htmlFor='products'>Environment</FormLabel>
             <LynkSelect
               name='products'
-              value={selectedProd}
+              placeholder={envLabel || '--Select--'}
+              value={envLabel}
+              options={envOptions}
               onChange={handleSelectProduct}
-            >
-              {envList?.length > 0 &&
-                envOrderList(envList).map((item, index) => (
-                  <option
-                    key={index}
-                    value={item.value}
-                    label={
-                      isDefaultEnv(item.label)
-                        ? capitalizeFirstLetter(item.label)
-                        : item.label
-                    }
-                  >
-                    {item.label}
-                  </option>
-                ))}
-            </LynkSelect>
+              isSearchable={false}
+              isDisabled={!selectedGroup?.id}
+              dropDown={true}
+            />
           </FormControl>
         )}
         {/* Version */}
         {isProductAvailable && (
           <FormControl fontSize={'sm'} isRequired>
             <FormLabel htmlFor='versions'>Version</FormLabel>
-            {versionsActual?.length === 0 && sbomVersions.length > 0 ? (
+            {versionsActual?.length === 0 && sbomVersions?.length > 0 ? (
               <LynkAlert
                 status='info'
                 msg='All available versions from this project have already been added.'
@@ -295,16 +323,16 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
               <LynkAlert status='info' msg='No versions available.' />
             ) : (
               <LynkSelect
-                name='versions'
-                value={selectedVersion}
-                onChange={(e) => setSelectedVersion(e.target.value)}
-              >
-                {versionsActual.map((item, index) => (
-                  <option key={index} value={item.value}>
-                    {truncatedValue(item?.label, 30)}
-                  </option>
-                ))}
-              </LynkSelect>
+                name='version'
+                value={versionLabel}
+                placeholder={versionLabel || '--Select--'}
+                options={versionsOptions}
+                onChange={(e) => setSelectedVersion(e.value)}
+                isSearchable={false}
+                isDisabled={!selectedGroup?.id}
+                styles={style}
+                dropDown={true}
+              />
             )}
           </FormControl>
         )}
