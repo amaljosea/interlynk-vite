@@ -1,5 +1,3 @@
-import { useEffect, useState } from 'react'
-
 import { Spinner } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -8,28 +6,19 @@ import EnvironmentButtons from './EnvironmentButtons'
 
 const EnvGeneralFilter = (props) => {
   const { reset, totalCounts } = props
-  const [name, setName] = useState('')
 
-  const { dispatch, globalVulnState } = useGlobalState()
+  const { dispatch, envName, setEnvName } = useGlobalState()
 
-  const variant = (env) => (name === env ? 'solid' : 'ghost')
-  const colorScheme = (env) => (name === env ? 'blue' : 'gray')
+  const variant = (env) => (envName === env ? 'solid' : 'ghost')
+  const colorScheme = (env) => (envName === env ? 'blue' : 'gray')
 
   const { globalVulnDispatch } = dispatch
 
   const handleButtonClick = (value) => {
-    setName(value)
+    setEnvName(value)
     globalVulnDispatch({ type: 'FILTER_ENV', payload: value })
     reset()
   }
-
-  useEffect(() => {
-    if (globalVulnState?.projectNames.length === 0) {
-      setName('default')
-    } else {
-      setName(globalVulnState?.projectNames)
-    }
-  }, [globalVulnState?.projectNames, name])
 
   const {
     defaultTotalCount = 0,
