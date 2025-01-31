@@ -103,12 +103,18 @@ const Components = ({ sbomData }) => {
     CPE.onOpen()
   }
 
+  const onEditOpen = (row) => {
+    setActiveRow(row)
+    onOpen()
+  }
+
   // COLUMNS
   const columns = ComponentsColumns({
     onOpen,
     colorMode,
     onCheckCpe,
     sbomId,
+    onEditOpen,
     onCheckPurl,
     setActiveRow,
     PURL,
