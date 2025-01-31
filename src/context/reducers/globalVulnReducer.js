@@ -47,6 +47,66 @@ const globalVulnReducer = (state, action) => {
         ...state,
         severity: [...payload]?.includes('all') ? [] : payload
       }
+    case 'ALL_VULN_BY_SEVERITY':
+      return {
+        ...state,
+        kev: '',
+        epss: '',
+        minEpss: 0,
+        maxEpss: 0,
+        status: [],
+        projectNames: [],
+        projectGroupIds: [],
+        severity: [...payload]?.includes('all') ? [] : payload
+      }
+    case 'ALL_VULN_BY_STATUS':
+      return {
+        ...state,
+        kev: '',
+        epss: '',
+        minEpss: 0,
+        maxEpss: 0,
+        severity: [],
+        projectNames: [],
+        projectGroupIds: [],
+        status: [...payload]?.includes('all') ? [] : payload
+      }
+    case 'CRITICAL_VULN_BY_STATUS':
+      return {
+        ...state,
+        kev: '',
+        epss: '',
+        minEpss: 0,
+        maxEpss: 0,
+        severity: ['critical'],
+        projectNames: [],
+        projectGroupIds: [],
+        status: [...payload]?.includes('all') ? [] : payload
+      }
+    case 'HIGH_VULN_BY_STATUS':
+      return {
+        ...state,
+        kev: '',
+        epss: '',
+        minEpss: 0,
+        maxEpss: 0,
+        severity: ['high'],
+        projectNames: [],
+        projectGroupIds: [],
+        status: [...payload]?.includes('all') ? [] : payload
+      }
+    case 'KEV_VULN_BY_STATUS':
+      return {
+        ...state,
+        kev: 'yes',
+        epss: '',
+        minEpss: 0,
+        maxEpss: 0,
+        severity: [],
+        projectNames: [],
+        projectGroupIds: [],
+        status: [...payload]?.includes('all') ? [] : payload
+      }
     case 'FILTER_STATUS':
       return {
         ...state,

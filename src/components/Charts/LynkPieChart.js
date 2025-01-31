@@ -23,11 +23,20 @@ const LynkPieChart = ({ title, data, loading }) => {
   const total = data?.reduce((acc, item) => acc + item.value, 0)
 
   const handleReview = (value) => {
-    if (title?.includes('Severity')) {
-      globalVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
+    if (title === 'All Vulnerabilities by Severity') {
+      globalVulnDispatch({ type: 'ALL_VULN_BY_SEVERITY', payload: [value] })
       navigate('/vendor/vulnerabilities?tab=productVulnerabilities')
-    } else if (title?.includes('Status')) {
-      globalVulnDispatch({ type: 'FILTER_STATUS', payload: value })
+    } else if (title === 'All Vulnerabilities by Status') {
+      globalVulnDispatch({ type: 'ALL_VULN_BY_STATUS', payload: [value] })
+      navigate('/vendor/vulnerabilities?tab=productVulnerabilities')
+    } else if (title === 'Critical Vulnerabilities by Status') {
+      globalVulnDispatch({ type: 'CRITICAL_VULN_BY_STATUS', payload: [value] })
+      navigate('/vendor/vulnerabilities?tab=productVulnerabilities')
+    } else if (title === 'High Vulnerabilities by Status') {
+      globalVulnDispatch({ type: 'HIGH_VULN_BY_STATUS', payload: [value] })
+      navigate('/vendor/vulnerabilities?tab=productVulnerabilities')
+    } else if (title === 'KEV Vulnerabilties by Status') {
+      globalVulnDispatch({ type: 'KEV_VULN_BY_STATUS', payload: [value] })
       navigate('/vendor/vulnerabilities?tab=productVulnerabilities')
     } else {
       return null
@@ -87,8 +96,8 @@ const LynkPieChart = ({ title, data, loading }) => {
                     fontSize={'sm'}
                     cursor={'pointer'}
                     textTransform={'capitalize'}
-                    // _hover={{ color: primaryBlueText }}
-                    // onClick={() => handleReview(item?.name)}
+                    _hover={{ color: primaryBlueText }}
+                    onClick={() => handleReview(item?.name)}
                   >
                     {item.name}
                   </Text>
