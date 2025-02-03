@@ -77,8 +77,7 @@ const RegistrationForm = () => {
     password === '' ||
     confirmPassword === '' ||
     emailError !== '' ||
-    password !== confirmPassword ||
-    name.length < 2
+    password !== confirmPassword
 
   const handleCheckEmail = () => {
     if (!validateEmail(email)) {
