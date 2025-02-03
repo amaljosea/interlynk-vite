@@ -110,13 +110,7 @@ const SbomDetails = () => {
   return (
     <>
       <Flex direction={'row'} alignItems={'flex-start'} gap={5} width={'100%'}>
-        <Icon
-          as={FaCubes}
-          h={'64px'}
-          w={'64px'}
-          color={secondaryBlueText}
-          cursor={'pointer'}
-        />
+        <Icon as={FaCubes} h={'64px'} w={'64px'} color={secondaryBlueText} />
         <Flex direction={'column'} gap={0.5}>
           {/* PRODUCT TITLE */}
           <Stack spacing={1} direction={'column'} alignItems={'left'}>

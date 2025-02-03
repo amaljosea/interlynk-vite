@@ -46,7 +46,6 @@ export const ProgressBar = ({ value, loading, text }) => {
           <StatLabel
             mb={1}
             fontSize='sm'
-            cursor={'pointer'}
             fontWeight={'normal'}
             onClick={onSelectCheck}
           >

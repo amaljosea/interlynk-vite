@@ -167,7 +167,7 @@ const CompInsights = ({ isOpen, onClose, data }) => {
                   {packageVersion ? (
                     <Stack>
                       <Container>
-                        <Text cursor={'pointer'}>Version</Text>
+                        <Text>Version</Text>
                         <Text>{packageVersion?.version}</Text>
                       </Container>
                       <Divider />
@@ -363,22 +363,22 @@ const CompInsights = ({ isOpen, onClose, data }) => {
                   {scores?.age ? (
                     <Stack>
                       <Container>
-                        <Text cursor={'pointer'}>Age Score</Text>
+                        <Text>Age Score</Text>
                         <Text>{ageScore}%</Text>
                       </Container>
                       <Divider />
                       <Container>
-                        <Text cursor={'pointer'}>Community Score</Text>
+                        <Text>Community Score</Text>
                         <Text>{communityScore}%</Text>
                       </Container>
                       <Divider />
                       <Container>
-                        <Text cursor={'pointer'}>Security Score</Text>
+                        <Text>Security Score</Text>
                         <Text>{securityScore}%</Text>
                       </Container>
                       <Divider />
                       <Container>
-                        <Text cursor={'pointer'}>Total Score</Text>
+                        <Text>Total Score</Text>
                         <Text>
                           {ageScore + communityScore + securityScore}%
                         </Text>

@@ -127,7 +127,6 @@ const SbomDetails = ({ sbomData }) => {
       <Flex direction={'row'} alignItems={'flex-start'} gap={5} width={'100%'}>
         <Icon
           as={FaCubes}
-          cursor={'pointer'}
           sx={{ w: '64px', h: '64px', color: secondaryBlueText }}
         />
         <Flex width={'100%'} flexDir={'column'} gap={5}>
@@ -194,6 +193,7 @@ const SbomDetails = ({ sbomData }) => {
                     variant='solid'
                     colorScheme='blue'
                     w={'fit-content'}
+                    cursor={'pointer'}
                   >
                     <TagLabel textTransform={'capitalize'}>
                       {lifecycleData?.stage

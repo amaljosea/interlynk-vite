@@ -72,6 +72,7 @@ const PartsColumns = (
                   variant='solid'
                   colorScheme='gray'
                   icon={icon}
+                  cursor={'default'}
                 />
               </GridItem>
               <GridItem colSpan={6}>

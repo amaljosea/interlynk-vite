@@ -40,6 +40,7 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
                 variant='solid'
                 colorScheme={getChangelogColor(action)}
                 textTransform={'capitalize'}
+                cursor={'pointer'}
               >
                 {action.slice(0, 1)}
               </Tag>
@@ -290,7 +291,11 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
         selector: (row) => (
           <Box width={'fit-content'}>
             <Tooltip label={getFullDate(row.updatedAt)} placement={'top'}>
-              <Text color={primaryTextColor} width={'fit-content'}>
+              <Text
+                cursor={'pointer'}
+                color={primaryTextColor}
+                width={'fit-content'}
+              >
                 {timeSince(row.updatedAt)}
               </Text>
             </Tooltip>
