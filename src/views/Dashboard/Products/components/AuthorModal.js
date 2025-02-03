@@ -308,7 +308,7 @@ const AuthorModal = ({ isOpen, onClose, ruleExists }) => {
         <FormControl isInvalid={isValidPhoneNumber} isDisabled={resolved}>
           <FormLabel htmlFor='phone'>Phone</FormLabel>
           <Input
-            type='text'
+            type='tel'
             name='phone'
             onBlur={onPhoneBlur}
             onChange={handleChange}
