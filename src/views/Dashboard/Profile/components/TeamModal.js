@@ -23,7 +23,7 @@ const TeamModal = ({ isOpen, onClose, data, changeRole }) => {
 
   const { data: roles } = useQuery(GetRoles, { skip: isOpen ? false : true })
 
-  const [inviteUsers] = useMutation(InviteUser)
+  const [inviteUsers, { loading }] = useMutation(InviteUser)
 
   const onChaneEmail = (e) => {
     const value = e.target.value?.trim()
@@ -61,6 +61,7 @@ const TeamModal = ({ isOpen, onClose, data, changeRole }) => {
       onSubmit={handleAdd}
       title={'Invite User'}
       Icon={BiUserPlus}
+      isLoading={loading}
       disabled={!validateEmail(email) || role === ''}
       buttonText='Add'
     >
