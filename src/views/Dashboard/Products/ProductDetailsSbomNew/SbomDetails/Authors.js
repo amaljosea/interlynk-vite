@@ -78,7 +78,11 @@ const Authors = ({ data, permission }) => {
       </Flex>
 
       {/* AUTHOR MODAL */}
-      <AuthorModal isOpen={AUTHOR?.isOpen} onClose={AUTHOR?.onClose} />
+      <AuthorModal
+        isOpen={AUTHOR?.isOpen}
+        onClose={AUTHOR?.onClose}
+        ruleExists
+      />
 
       {/* AUTHOR DELETE MODAL */}
       <ConfirmationModal
