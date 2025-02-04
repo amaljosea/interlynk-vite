@@ -1,17 +1,11 @@
-import {
-  Flex,
-  IconButton,
-  Input,
-  Stack,
-  Text,
-  useClipboard
-} from '@chakra-ui/react'
+import { Flex, Input, Stack, Text, useClipboard } from '@chakra-ui/react'
 
+import CopyButton from 'components/Icons/CopyButton'
 import LynkModal from 'components/LynkModal'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaCheck, FaCircleInfo, FaRegCopy } from 'react-icons/fa6'
+import { FaCircleInfo } from 'react-icons/fa6'
 
 import InfoTag from './InfoTag'
 
@@ -67,10 +61,10 @@ const CpeCard = ({ value, isOpen, onClose }) => {
             defaultValue={value}
             _focus={{ boxShadow: 'none' }}
           />
-          <IconButton
-            onClick={() => cpe.onCopy()}
-            colorScheme={cpe?.hasCopied ? 'green' : 'gray'}
-            icon={cpe?.hasCopied ? <FaCheck /> : <FaRegCopy />}
+          <CopyButton
+            onCopy={() => cpe.onCopy()}
+            hasCopied={cpe?.hasCopied}
+            size='md'
           />
         </Flex>
         <Stack spacing={2} pt={1}>

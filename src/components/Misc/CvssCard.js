@@ -3,7 +3,6 @@ import { getCvssObject, getCvssVersion, getFormatedCvss } from 'utils/cvssUtils'
 import {
   Divider,
   Flex,
-  IconButton,
   Input,
   SimpleGrid,
   Stack,
@@ -13,11 +12,12 @@ import {
 } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 
+import CopyButton from 'components/Icons/CopyButton'
 import LynkModal from 'components/LynkModal'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaCheck, FaCircleInfo, FaRegCopy } from 'react-icons/fa6'
+import { FaCircleInfo } from 'react-icons/fa6'
 
 const CvssText = ({ children }) => {
   const { primaryTextColor } = useThemeColor(['primaryTextColor'])
@@ -85,10 +85,10 @@ const CvssCard = ({ isOpen, onClose, value }) => {
             defaultValue={value}
             _focus={{ boxShadow: 'none' }}
           />
-          <IconButton
-            onClick={() => cvss?.onCopy()}
-            colorScheme={cvss?.hasCopied ? 'green' : 'gray'}
-            icon={cvss?.hasCopied ? <FaCheck /> : <FaRegCopy />}
+          <CopyButton
+            onCopy={() => cvss?.onCopy()}
+            hasCopied={cvss?.hasCopied}
+            size='md'
           />
         </Flex>
         <VStack align='stretch' spacing={2} py={2}>

@@ -21,6 +21,7 @@ import {
 
 import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
+import CopyButton from 'components/Icons/CopyButton'
 import LynkDate from 'components/LynkDate'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -29,7 +30,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { CreateShareLynk, DeleteSharelynk } from 'graphQL/Mutation'
 import { GetSharelynks } from 'graphQL/Queries'
 
-import { FaCheck, FaRegCopy } from 'react-icons/fa6'
 import { PiFileSvgDuotone } from 'react-icons/pi'
 
 const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
@@ -137,11 +137,6 @@ const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
 
   // HEADER SECTION
   const subHeader = useMemo(() => {
-    const icon = svgLink.hasCopied ? (
-      <FaCheck />
-    ) : (
-      <PiFileSvgDuotone size={26} />
-    )
     const onCopySvg = () => {
       svgLink.onCopy()
       showToast({ description: 'SVG link copied' })
@@ -151,12 +146,15 @@ const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
       <Flex gap={2} alignItems={'center'} justifyContent={'flex-end'}>
         {nodes?.length > 0 && (
           <Tooltip label='SVG Link' placement='left'>
-            <IconButton
-              icon={icon}
-              onClick={onCopySvg}
-              aria-label='copy_sharelynk'
-              colorScheme={svgLink.hasCopied ? 'whatsapp' : 'blue'}
-            />
+            <>
+              <CopyButton
+                icon={<PiFileSvgDuotone size={26} />}
+                hasCopied={svgLink?.hasCopied}
+                onCopy={onCopySvg}
+                size={'md'}
+                colorScheme={{ copied: 'green', default: 'blue' }}
+              />
+            </>
           </Tooltip>
         )}
         <AddButton
@@ -188,12 +186,12 @@ const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
         )
         return (
           <Flex my={4} gap={2} alignItems={'center'}>
-            <IconButton
-              size={'sm'}
+            <CopyButton
               isDisabled={!enabled}
-              onClick={() => sbomLink.onCopy()}
-              colorScheme={sbomLink?.hasCopied ? 'whatsapp' : 'blue'}
-              icon={sbomLink?.hasCopied ? <FaCheck /> : <FaRegCopy />}
+              hasCopied={sbomLink?.hasCopied}
+              onCopy={() => sbomLink.onCopy()}
+              size={'md'}
+              colorScheme={{ copied: 'green', default: 'blue' }}
             />
             <Input
               isReadOnly

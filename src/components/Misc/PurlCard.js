@@ -1,14 +1,15 @@
 import { PackageURL } from 'packageurl-js'
 
 import { CheckCircleIcon, WarningIcon } from '@chakra-ui/icons'
-import { Flex, IconButton, Input, Stack, Text } from '@chakra-ui/react'
+import { Flex, Input, Stack, Text } from '@chakra-ui/react'
 import { useClipboard } from '@chakra-ui/react'
 
+import CopyButton from 'components/Icons/CopyButton'
 import LynkModal from 'components/LynkModal'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaCheck, FaCircleInfo, FaRegCopy } from 'react-icons/fa6'
+import { FaCircleInfo } from 'react-icons/fa6'
 
 import InfoTag from './InfoTag'
 
@@ -75,10 +76,10 @@ const PurlCard = ({ value, isOpen, onClose }) => {
             defaultValue={decodeURI(value)}
             _focus={{ boxShadow: 'none' }}
           />
-          <IconButton
-            onClick={() => purl.onCopy()}
-            colorScheme={purl?.hasCopied ? 'green' : 'gray'}
-            icon={purl?.hasCopied ? <FaCheck /> : <FaRegCopy />}
+          <CopyButton
+            onCopy={() => purl.onCopy()}
+            hasCopied={purl?.hasCopied}
+            size='md'
           />
         </Flex>
         <Stack spacing={2} pt={1}>

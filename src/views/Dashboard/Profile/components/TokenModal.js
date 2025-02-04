@@ -3,31 +3,20 @@ import { isValid } from 'date-fns'
 import { useEffect, useState } from 'react'
 import { truncatedValue } from 'utils'
 
-import { CopyIcon } from '@chakra-ui/icons'
-import {
-  IconButton,
-  Progress,
-  Stack,
-  Text,
-  Tooltip,
-  useClipboard
-} from '@chakra-ui/react'
+import { Progress, Stack, Text, Tooltip, useClipboard } from '@chakra-ui/react'
 import { Checkbox, Input } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
+import CopyButton from 'components/Icons/CopyButton'
 import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
-
-import { useThemeColor } from 'hooks/useThemeColors'
 
 import { createApiToken } from 'graphQL/Mutation'
 import { updateApiToken } from 'graphQL/Mutation'
 
-import { BiCheck, BiShieldQuarter } from 'react-icons/bi'
+import { BiShieldQuarter } from 'react-icons/bi'
 
 const TokenModal = ({ data, isOpen, onClose }) => {
-  const { grayBorderColor } = useThemeColor(['headingTextColor'])
-
   const defaultDate = new Date()
   defaultDate.setDate(defaultDate.getDate() + 90)
 
@@ -217,12 +206,13 @@ const TokenModal = ({ data, isOpen, onClose }) => {
             hasArrow
             placement='top'
           >
-            <IconButton
-              border='1px solid'
-              borderColor={grayBorderColor}
-              onClick={() => key.onCopy()}
-              icon={key.hasCopied ? <BiCheck /> : <CopyIcon />}
-            />
+            <>
+              <CopyButton
+                size='md'
+                onCopy={() => key.onCopy()}
+                hasCopied={key.hasCopied}
+              />
+            </>
           </Tooltip>
         </Stack>
       )}
