@@ -245,22 +245,12 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
           />
         </Tooltip>
         <MenuList width='220px'>
-          <MenuItem onClick={downloadOriginal} hidden={signedUrlParams}>
-            <Stack spacing={1}>
-              <Box {...title}>Original SBOM</Box>
-              <Box {...subTitle}>
-                Download the original SBOM file that created this version
-              </Box>
-            </Stack>
-          </MenuItem>
-          <Divider hidden={signedUrlParams} />
           {/* Updated SBOM */}
           <MenuItem onClick={downloadUpdated}>
             <Stack spacing={1}>
-              <Box {...title}>Updated SBOM</Box>
+              <Box {...title}>SBOM</Box>
               <Box {...subTitle}>
-                Download the current state of the version as a CycloneDX / SPDX
-                or SPDX-Lite file
+                Download version details as a CycloneDX / SPDX
               </Box>
             </Stack>
           </MenuItem>
@@ -273,19 +263,7 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
           >
             <Stack spacing={1}>
               <Box {...title}>PDF</Box>
-              <Box {...subTitle}>
-                Download the current state of the version as PDF
-              </Box>
-            </Stack>
-          </MenuItem>
-          <Divider hidden={signedUrlParams} />
-          {/* Support Level CSV */}
-          <MenuItem onClick={downloadSupport} hidden={signedUrlParams}>
-            <Stack spacing={1}>
-              <Box {...title}>Support Level</Box>
-              <Box {...subTitle}>
-                Download CSV of current Support Level for all components
-              </Box>
+              <Box {...subTitle}>Download version details as PDF</Box>
             </Stack>
           </MenuItem>
           <Divider hidden={signedUrlParams} />
@@ -293,9 +271,26 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
           <MenuItem onClick={downloadExcel} hidden={signedUrlParams}>
             <Stack spacing={1}>
               <Box {...title} spacing={1} mb='4px'>
-                SBOM Spreadsheet
+                Excel
               </Box>
-              <Box {...subTitle}>Download Spreadsheet of SBOM</Box>
+              <Box {...subTitle}>Download version details as Excel</Box>
+            </Stack>
+          </MenuItem>
+          <Divider hidden={signedUrlParams} />
+          {/* Support Level CSV */}
+          <MenuItem onClick={downloadSupport} hidden={signedUrlParams}>
+            <Stack spacing={1}>
+              <Box {...title}>CSV (Support Levels)</Box>
+              <Box {...subTitle}>Download component support levels as CSV</Box>
+            </Stack>
+          </MenuItem>
+          <Divider hidden={signedUrlParams} />
+          <MenuItem onClick={downloadOriginal} hidden={signedUrlParams}>
+            <Stack spacing={1}>
+              <Box {...title}>Original</Box>
+              <Box {...subTitle}>
+                Download the original SBOM (if applicable)
+              </Box>
             </Stack>
           </MenuItem>
         </MenuList>
