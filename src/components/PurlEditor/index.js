@@ -1,6 +1,7 @@
 import { TabContext } from 'context/TabContext'
 import { PackageURL } from 'packageurl-js'
 import { useContext, useEffect, useState } from 'react'
+import { examplePURLs } from 'variables/general'
 import IdentifierLabel from 'views/Dashboard/Products/components/IdentifierLabel'
 
 import { FormControl, Stack, Textarea } from '@chakra-ui/react'
@@ -28,21 +29,24 @@ const PurlEditor = ({ value, setValue, isOpen, onOpen, onClose }) => {
       ...prev,
       [name]: value
     }))
+    if (name === 'type') {
+      setValue(examplePURLs[value])
+    }
   }
 
-  const onBlur = (field, val) => {
+  const onBlur = (field, item) => {
     try {
       const pkg = PackageURL.fromString(value)
       if (field === 'qualifiers') {
         const convertedObject = {}
-        const params = new URLSearchParams(val)
+        const params = new URLSearchParams(item?.value)
         for (const [key, value] of params) {
           convertedObject[key] = value
         }
         pkg[field] = convertedObject
         setValue(pkg.toString())
       } else {
-        pkg[field] = val !== '' ? val : field
+        pkg[field] = item?.value || field
         setValue(pkg.toString())
       }
     } catch (error) {
@@ -66,7 +70,8 @@ const PurlEditor = ({ value, setValue, isOpen, onOpen, onClose }) => {
 
   const isInvalid =
     ['name', 'type'].some((key) => !purlData?.[key]) ||
-    (purlData?.type === 'swift' && !purlData?.namespace)
+    ((purlData?.type === 'swift' || purlData?.type === 'maven') &&
+      !purlData?.namespace)
 
   useEffect(() => {
     if (value) {

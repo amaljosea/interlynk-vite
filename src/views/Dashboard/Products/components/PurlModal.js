@@ -25,6 +25,7 @@ import { useProjectGroup } from 'hooks/useProjectGroup'
 import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
 
 import { FaCircleInfo } from 'react-icons/fa6'
+import { examplePURLs } from 'variables/general'
 
 const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
   const { status, component } = activeRow || ''
@@ -105,24 +106,27 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
   }, [envLoading])
 
   const onChange = (field, value) => {
-    const filterValue = value?.replace(/\s/g, '')
     setError('')
+    const filterValue = value?.replace(/\s/g, '')
     setPurlData((prev) => ({ ...prev, [field]: filterValue }))
+    if (field === 'type') {
+      setValue(examplePURLs[value])
+    }
   }
 
-  const onBlur = (field, val) => {
+  const onBlur = (field, item) => {
     try {
       const pkg = PackageURL.fromString(value)
       if (field === 'qualifiers') {
         const convertedObject = {}
-        const params = new URLSearchParams(val)
+        const params = new URLSearchParams(item?.value)
         for (const [key, value] of params) {
           convertedObject[key] = value
         }
         pkg[field] = convertedObject
         setValue(pkg.toString())
       } else {
-        pkg[field] = val !== '' ? val : field
+        pkg[field] = item?.value || field
         setValue(pkg.toString())
       }
     } catch (error) {

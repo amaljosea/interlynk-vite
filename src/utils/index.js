@@ -342,40 +342,6 @@ export const updatedValue = (operator) => {
   return operator?.replace(/_/g, ' ')?.replace(/\b\w/g, (c) => c)
 }
 
-export const typeOptions = [
-  { value: '', label: '-- Select --' },
-  { value: 'alpm', label: 'alpm' },
-  { value: 'apk', label: 'apk' },
-  { value: 'bitbucket', label: 'bitbucket' },
-  { value: 'bitnami', label: 'bitnami' },
-  { value: 'cocoapods', label: 'cocoapods' },
-  { value: 'cargo', label: 'cargo' },
-  { value: 'composer', label: 'composer' },
-  { value: 'conan', label: 'conan' },
-  { value: 'conda', label: 'conda' },
-  { value: 'cran', label: 'cran' },
-  { value: 'deb', label: 'deb' },
-  { value: 'docker', label: 'docker' },
-  { value: 'gem', label: 'gem' },
-  { value: 'generic', label: 'generic' },
-  { value: 'github', label: 'github' },
-  { value: 'golang', label: 'golang' },
-  { value: 'hex', label: 'hex' },
-  { value: 'hackage', label: 'hackage' },
-  { value: 'huggingface', label: 'huggingface' },
-  { value: 'maven', label: 'maven' },
-  { value: 'mlflow', label: 'mlflow' },
-  { value: 'npm', label: 'npm' },
-  { value: 'nuget', label: 'nuget' },
-  { value: 'qpkg', label: 'qpkg' },
-  { value: 'oci', label: 'oci' },
-  { value: 'pub', label: 'pub' },
-  { value: 'pypi', label: 'pypi' },
-  { value: 'rpm', label: 'rpm' },
-  { value: 'swid', label: 'swid' },
-  { value: 'swift', label: 'swift' }
-]
-
 export const isValidPurl = (purl) => {
   if (purl) {
     try {

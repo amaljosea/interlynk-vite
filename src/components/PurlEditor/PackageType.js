@@ -1,6 +1,6 @@
-import { typeOptions } from 'utils'
 
 import { FormControl, FormLabel, Select } from '@chakra-ui/react'
+import { packageTypes } from 'variables/general'
 
 const PackageType = ({ disabled, type, onChange, onBlur }) => {
   return (
@@ -12,10 +12,10 @@ const PackageType = ({ disabled, type, onChange, onBlur }) => {
         value={type}
         fontSize={'sm'}
         data-testid='purl_type'
-        onBlur={(e) => onBlur('type', e.target.value)}
+        onBlur={(e) => onBlur('type', e.target)}
         onChange={(e) => onChange('type', e.target.value)}
       >
-        {typeOptions.map((option) => (
+        {packageTypes?.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
           </option>

@@ -16,10 +16,11 @@ const Namespace = ({ disabled, namespace, type, onChange, onBlur }) => {
   const [options, setOptions] = useState([])
 
   const handleChange = (item) => {
-    setValue(item)
-    onChange('namespace', item?.value)
-    onBlur('namespace', item?.value)
+    setValue(item || null)
+    item?.value && onChange('namespace', item?.value)
   }
+
+  const handleBlur = () => value && onBlur('namespace', value)
 
   const searchTypes = ['npm', 'maven', 'gem']
   const isSearchable = searchTypes?.includes(type)
@@ -82,6 +83,7 @@ const Namespace = ({ disabled, namespace, type, onChange, onBlur }) => {
           isDisabled={disabled}
           noOptionsMessage={() => null}
           onInputChange={onInputChange}
+          onBlur={handleBlur}
         />
       ) : isSelectable ? (
         <Select
