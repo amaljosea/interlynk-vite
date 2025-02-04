@@ -147,22 +147,8 @@ export default function Admin() {
   }
 
   useEffect(() => {
-    if (authToken) {
-      try {
-        const expired = isTokenExpired(authToken)
-        if (expired === true) {
-          logoutUser().then(() => navigate('/auth'))
-        }
-      } catch (err) {
-        console.error('Invalid Token')
-        logoutUser().then(() => navigate('/auth'))
-      }
-    }
-  }, [authToken, navigate])
-
-  useEffect(() => {
     if (!authToken) {
-      navigate('/auth')
+      logoutUser().then(() => navigate('/auth'))
     }
   }, [authToken, navigate])
 

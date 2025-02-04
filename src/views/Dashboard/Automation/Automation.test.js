@@ -4,6 +4,19 @@ import { render, screen } from '@testing-library/react'
 
 import Automation from '.'
 
+jest.mock('axios', () => ({
+  delete: jest.fn(() => Promise.resolve())
+}))
+
+jest.mock('context/ApolloWrapper', () => ({
+  client: { clearStore: jest.fn() }
+}))
+
+jest.mock('js-cookie', () => ({
+  get: jest.fn(),
+  remove: jest.fn()
+}))
+
 jest.mock('hooks/useGlobalState', () => ({
   useGlobalState: () => ({
     totalRows: 0,

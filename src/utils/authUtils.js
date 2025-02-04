@@ -12,6 +12,7 @@ export const clearData = () => {
   client.clearStore()
   sessionStorage.clear()
   Cookies.remove('authToken')
+  Cookies.remove('refreshToken')
   Cookies.remove('signedParamId')
   Cookies.remove('userToken')
 }

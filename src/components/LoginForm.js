@@ -68,6 +68,7 @@ const LoginForm = () => {
         if (status.code === 200) {
           setLoading(false)
           Cookies.set('authToken', response.headers.authorization)
+          Cookies.set('refreshToken', status?.data?.refresh_token)
           navigate('/vendor/dashboard')
         }
       })

@@ -11,6 +11,8 @@ import Cookies from 'js-cookie'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getSignedUrlParams } from 'utils'
+import { logoutUser } from 'utils/authUtils'
+import promiseToObservable from 'utils/promiseToObservable'
 
 import useCustomToast from 'hooks/useCustomToast'
 
@@ -23,7 +25,60 @@ const uploadLink = createUploadLink({
 })
 const env = process.env.NODE_ENV
 
-const authLink = setContext((_, { headers }) => {
+// Function to refresh token
+const refreshToken = async () => {
+  try {
+    const refreshToken = Cookies.get('refreshToken')
+    if (!refreshToken) {
+      throw new Error('No refresh token found')
+    }
+
+    const response = await fetch(
+      `${process.env.REACT_APP_REFRESH_TOKEN_URL}?refresh_token=${refreshToken}`,
+      {
+        method: 'POST',
+        credentials: 'include' // To include cookies
+      }
+    )
+
+    if (!response.ok) {
+      const errorResponse = await response.json()
+      console.error('Server error:', errorResponse)
+      throw new Error('Failed to refresh token')
+    }
+
+    const { access_token, refresh_token } = await response.json()
+
+    if (!access_token || !refresh_token) {
+      throw new Error('Failed to refresh token')
+    }
+
+    // Update cookies with the new tokens
+    Cookies.set('authToken', `Bearer ${access_token}`, {
+      sameSite: 'Strict',
+      secure: true,
+      path: '/'
+    })
+    Cookies.set('refreshToken', refresh_token)
+
+    return access_token
+  } catch (error) {
+    logoutUser().then(() => (window.location.href = '/auth'))
+    console.error('Token refresh failed:', error)
+    toastCache({
+      title: 'Session Expired',
+      description: 'Please log in again.',
+      status: 'error',
+      duration: 5000,
+      isClosable: true,
+      position: 'top'
+    })
+    return null
+  }
+}
+
+// Authentication link to attach tokens
+const authLink = setContext(async (_, { headers }) => {
   const authToken = Cookies.get('authToken')
   const queryParams = new URLSearchParams(location.search)
 
@@ -53,17 +108,28 @@ const authLink = setContext((_, { headers }) => {
   }
 })
 
-export const refetchActiveQueries = async () => {
-  await client.refetchQueries({
-    include: 'active'
-  })
-}
+let isRefreshing = false
 
-const errorLink = onError(({ graphQLErrors, networkError }) => {
-  if (networkError?.statusCode === 401) {
-    console.log('Unauthorized Access. Please log in.')
-    // logoutUser().then(() => navigateCache('/auth'))
+const errorLink = onError(({ graphQLErrors, operation, forward }) => {
+  if (graphQLErrors) {
+    for (const err of graphQLErrors) {
+      if (err.message === 'Authorization token is invalid or expired') {
+        if (!isRefreshing) {
+          isRefreshing = true
+          return promiseToObservable(
+            refreshToken().finally(() => {
+              isRefreshing = false
+            })
+          ).flatMap(() => forward(operation))
+        }
+
+        return promiseToObservable(
+          new Promise((resolve) => setTimeout(resolve, 100))
+        ).flatMap(() => forward(operation))
+      }
+    }
   }
+
   if (graphQLErrors && env !== 'production') {
     graphQLErrors.forEach(({ message }) => {
       toastCache({
@@ -78,6 +144,13 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   }
 })
 
+export const refetchActiveQueries = async () => {
+  await client.refetchQueries({
+    include: 'active'
+  })
+}
+
+// Apollo Client setup
 export const client = new ApolloClient({
   link: ApolloLink.from([errorLink, authLink, uploadLink]),
   cache: new InMemoryCache(),
