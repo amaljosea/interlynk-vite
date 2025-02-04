@@ -67,8 +67,8 @@ export const UserMenu = ({ handleLogout }) => {
             <Link to={`/vendor/settings?tab=security tokens`}>
               <Flex flexDirection='row' alignItems='flex-start' gap={3}>
                 <Icon as={FaUser} width={2.5} mt={1} />
-                <Stack direction='column' spacing={-1}>
-                  <Text>{currentUser?.name}</Text>
+                <Stack spacing={0}>
+                  {currentUser?.name && <Text>{currentUser?.name}</Text>}
                   <Text fontSize='sm' color={sameSecondaryText}>
                     {currentUser?.email}
                   </Text>
