@@ -1781,6 +1781,7 @@ export const GetComponentData = gql`
           enrichedContent {
             packageVersion {
               version
+              isDeprecated
             }
             latestPackageVersion {
               version

@@ -147,7 +147,7 @@ const ComponentsColumns = ({
                       onClick={() => handleVuln(row)}
                     />
                   )}
-                  {latestPackageVersion?.isDeprecated === true && (
+                  {packageVersion?.isDeprecated === true && (
                     <StatusIcon
                       color='orange'
                       label={'Deprecated'}
