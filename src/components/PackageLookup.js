@@ -3,23 +3,30 @@ import { TabContext } from 'context/TabContext'
 import { useContext, useState } from 'react'
 
 import { SearchIcon } from '@chakra-ui/icons'
-import { Flex, IconButton, Input, Stack } from '@chakra-ui/react'
+import { Button, Input, Select, Stack } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
 
 import { GetPackageData } from 'graphQL/Queries'
 
 import LynkAlert from './LynkAlert'
 
+const ecosystems = ['cargo', 'go', 'pypi', 'maven', 'npm', 'nuget']
+
 const PackageLookup = () => {
   const [lookup, { loading }] = useLazyQuery(GetPackageData)
 
   const { setTabData } = useContext(TabContext)
 
-  const [pkgString, setPkgString] = useState('')
   const [error, setError] = useState('')
+  const [formData, setFormData] = useState({
+    ecosystem: '',
+    name: '',
+    version: ''
+  })
 
-  const onInputChange = (e) => {
-    setPkgString(e.target.value)
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
     setError('')
   }
 
@@ -41,67 +48,101 @@ const PackageLookup = () => {
     }
   }
 
+  const isInvalid =
+    formData?.ecosystem === '' ||
+    formData?.name === '' ||
+    formData?.version === ''
+
   const handleSearch = () => {
-    const result = pkgString?.split(' ')
-    if (result?.length === 3) {
-      lookup({
-        variables: {
-          name: result[1] || '',
-          version: result[2] || '',
-          ecosystem: result[0] || ''
-        }
-      }).then((res) => {
-        const { packageLookup } = res?.data || ''
-        if (packageLookup?.package) {
-          const { package: pkg, packageVersion } = packageLookup || ''
-          const license = getLicense(packageVersion.license)
-          setTabData((prev) => ({
-            ...prev,
-            details: {
-              ...prev.details,
-              name: pkg?.name,
-              kind: 'library',
-              licenses: license,
-              copyright: packageVersion?.copyright,
-              version: packageVersion?.version,
-              description: pkg?.description
-            },
-            identifiers: {
-              ...prev.identifiers,
-              purl: packageVersion?.purl
-            }
-          }))
-          setError('')
-        } else {
-          setError('Package not found')
-        }
-      })
-    } else {
-      setError('Please enter valid package details')
-    }
+    lookup({
+      variables: {
+        name: formData?.name,
+        version: formData?.version,
+        ecosystem: formData?.ecosystem
+      }
+    }).then((res) => {
+      const { packageLookup } = res?.data || ''
+      if (packageLookup?.package) {
+        const { package: pkg, packageVersion } = packageLookup || ''
+        const license = getLicense(packageVersion.license)
+        setTabData((prev) => ({
+          ...prev,
+          details: {
+            ...prev.details,
+            name: pkg?.name,
+            kind: 'library',
+            licenses: license,
+            copyright: packageVersion?.copyright,
+            version: packageVersion?.version,
+            description: pkg?.description
+          },
+          identifiers: {
+            ...prev.identifiers,
+            purl: packageVersion?.purl
+          }
+        }))
+        setError('')
+      } else {
+        setError('Package not found')
+      }
+    })
   }
 
   return (
-    <Stack>
-      <Flex gap={2} alignItems={'end'}>
-        <FormControl>
-          <FormLabel>Package</FormLabel>
-          <Input
-            fontSize={'sm'}
-            value={pkgString}
-            onChange={onInputChange}
-            placeholder='Ecosystem Name Version (e.g. nuget Fody 6.8.2)'
-          />
-        </FormControl>
-        <IconButton
-          siz='sm'
-          isLoading={loading}
-          colorScheme='blue'
-          icon={<SearchIcon />}
-          onClick={handleSearch}
-        />
-      </Flex>
+    <Stack spacing={3}>
       {error !== '' && <LynkAlert msg={error} />}
+      <FormControl>
+        <FormLabel htmlFor='ecosystem'>Ecosystem</FormLabel>
+        <Select
+          name='ecosystem'
+          fontSize={'sm'}
+          onChange={handleChange}
+          textTransform={'uppercase'}
+          value={formData?.ecosystem}
+        >
+          <option value=''>-- Select --</option>
+          {ecosystems?.map((item, index) => (
+            <option
+              key={index}
+              value={item}
+              style={{ textTransform: 'uppercase' }}
+            >
+              {item}
+            </option>
+          ))}
+        </Select>
+      </FormControl>
+      <FormControl>
+        <FormLabel htmlFor='name'>Name</FormLabel>
+        <Input
+          name='name'
+          fontSize={'sm'}
+          value={formData?.name}
+          onChange={handleChange}
+          placeholder='Enter package name (e.g. Fody)'
+        />
+      </FormControl>
+      <FormControl>
+        <FormLabel htmlFor='version'>Version</FormLabel>
+        <Input
+          name='version'
+          fontSize={'sm'}
+          onChange={handleChange}
+          value={formData?.version}
+          placeholder='Enter package version (e.g 6.8.2)'
+        />
+      </FormControl>
+      <Button
+        siz='sm'
+        colorScheme='blue'
+        isLoading={loading}
+        isDisabled={isInvalid}
+        onClick={handleSearch}
+        loadingText='Loading...'
+        leftIcon={<SearchIcon />}
+      >
+        Search
+      </Button>
     </Stack>
   )
 }

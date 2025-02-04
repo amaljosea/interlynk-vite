@@ -275,7 +275,7 @@ function ComponentAddModal(props) {
               <Text>Fill it up to search or add manually</Text>
               {/* Package Lookup */}
               <PackageLookup />
-              <Box position='relative' py='3'>
+              <Box position='relative' py='4'>
                 <Divider />
                 <AbsoluteCenter px='6' bg={primaryBgColor}>
                   OR
