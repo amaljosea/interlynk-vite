@@ -169,14 +169,8 @@ const ExpandedComponent = (props) => {
           </GridItem>
           <GridItem>
             <CustomText>Licenses :</CustomText>
-            {data?.licenses?.length > 0 ? (
-              <Flex alignItems={'center'} gap={2} flexWrap={'wrap'} my={2}>
-                {data?.licenses.map((item, index) => (
-                  <Text key={index} sx={textStyle}>
-                    {item}
-                  </Text>
-                ))}
-              </Flex>
+            {data?.licensesExp ? (
+              <Text sx={textStyle}>{data?.licensesExp}</Text>
             ) : (
               <Text sx={textStyle}>N/A</Text>
             )}
