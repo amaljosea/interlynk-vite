@@ -66,7 +66,7 @@
     "sentry:sourcemaps": "sentry-cli sourcemaps inject --org interlync --project javascript-react ./build && sentry-cli sourcemaps upload --org interlync --project javascript-react ./build"
   },
   "optionalDependencies": {
-    "@babel/core": "7.25.2"
+    "@babel/core": "7.26.7"
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
