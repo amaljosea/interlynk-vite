@@ -39,7 +39,7 @@
     "react-router-dom": "^6.24.1",
     "react-scripts": "^5.0.0",
     "react-select": "^5.8.0",
-    "react-syntax-highlighter": "^15.5.0",
+    "react-syntax-highlighter": "^15.6.1",
     "react-window": "^1.8.10",
     "recharts": "^2.12.7",
     "use-persisted-state": "^0.3.3",
