@@ -684,6 +684,7 @@ export const GetGlobalVulns = gql`
     $epss: RangeInput
     $field: VulnOrderByFields!
     $direction: OrderByDirection!
+    $projectGroupLabelIds: [Uuid!]
   ) {
     organization {
       vulns(
@@ -694,6 +695,7 @@ export const GetGlobalVulns = gql`
         search: $search
         projectNames: $projectNames
         projectGroupIds: $projectGroupIds
+        projectGroupLabelIds: $projectGroupLabelIds
         status: $status
         severity: $severity
         kev: $kev

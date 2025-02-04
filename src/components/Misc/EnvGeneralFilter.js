@@ -16,7 +16,7 @@ const EnvGeneralFilter = (props) => {
 
   const handleButtonClick = (value) => {
     setEnvName(value)
-    globalVulnDispatch({ type: 'FILTER_ENV', payload: value })
+    globalVulnDispatch({ type: 'FILTER_ENV', payload: [value] })
     reset()
   }
 

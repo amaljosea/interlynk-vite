@@ -15,7 +15,7 @@ export const globalStyles = {
         fontFamily: "'Sora', sans-serif"
       },
       html: {
-        fontFamily: "'Roboto', sans-serif"
+        fontFamily: "'Sora', sans-serif"
       }
     })
   }

@@ -23,7 +23,7 @@ const tabs = ['productVulnerabilities', 'customVulnerabilities']
 const Vulnerabilities = () => {
   const params = useParams()
   const navigate = useNavigate()
-  const { globalVulnState } = useGlobalState()
+  const { globalVulnState, envName } = useGlobalState()
   const vulnId = useQueryParam('vulnId') || params.vulnerabilityid
 
   const tab = useQueryParam('tab')
@@ -40,14 +40,15 @@ const Vulnerabilities = () => {
 
   const filters = {
     epss: epssRange,
+    projectNames: [envName],
     field: globalVulnState?.field,
     kev: setKEV(globalVulnState?.kev),
     direction: globalVulnState?.direction,
     search: globalVulnState?.search || undefined,
     status: getFilterValue(globalVulnState?.status),
     severity: getFilterValue(globalVulnState?.severity),
-    projectNames: getFilterValue(globalVulnState?.projectNames),
-    projectGroupIds: getFilterValue(globalVulnState?.projectGroupIds)
+    projectGroupIds: getFilterValue(globalVulnState?.projectGroupIds),
+    projectGroupLabelIds: getFilterValue(globalVulnState?.projectGroupLabelIds)
   }
 
   const { nodes, paginationProps, reset, loading } = usePaginatedQuery(

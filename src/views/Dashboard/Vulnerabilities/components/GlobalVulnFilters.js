@@ -18,6 +18,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomList from 'components/Misc/CustomList'
+import GlobalLabelFilter from 'components/Misc/GlobalLabelFilter'
 import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -28,6 +29,7 @@ const GlobalVulnsFilters = ({ reset }) => {
   const params = useParams()
   const { globalVulnState, dispatch } = useGlobalState()
   const {
+    projectGroupLabelIds,
     projectGroupIds,
     projectNames,
     severity,
@@ -68,6 +70,12 @@ const GlobalVulnsFilters = ({ reset }) => {
       e.preventDefault()
       minRef.current.focus()
     }
+  }
+
+  // FILTER BY PRODUCT
+  const onFilterLabel = (value) => {
+    globalVulnDispatch({ type: 'FILTER_LABEL', payload: value })
+    reset()
   }
 
   // FILTER BY PRODUCT
@@ -142,6 +150,8 @@ const GlobalVulnsFilters = ({ reset }) => {
 
   return (
     <Stack direction={'row'} alignItems={'center'} spacing={2}>
+      {/* LABELS */}
+      <GlobalLabelFilter value={projectGroupLabelIds} setValue={onFilterLabel} />
       {/* PRODUCTS */}
       <Box
         width={'fit-content'}

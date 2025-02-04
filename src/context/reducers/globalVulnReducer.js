@@ -9,6 +9,7 @@ const globalVulnReducer = (state, action) => {
         search: '',
         projectGroupIds: [],
         projectNames: [],
+        projectGroupLabelIds: [],
         status: [],
         severity: [],
         kev: '',
@@ -31,6 +32,11 @@ const globalVulnReducer = (state, action) => {
       return {
         ...state,
         search: ''
+      }
+    case 'FILTER_LABEL':
+      return {
+        ...state,
+        projectGroupLabelIds: [...payload]?.includes('all') ? [] : payload
       }
     case 'FILTER_PRODUCT':
       return {

@@ -3,28 +3,32 @@ import { useState } from 'react'
 
 import {
   Menu,
-  MenuButton,
   MenuItemOption,
   MenuList,
   MenuOptionGroup
 } from '@chakra-ui/react'
-import { Box, Button, SkeletonText } from '@chakra-ui/react'
+import { Box, SkeletonText } from '@chakra-ui/react'
 
 import ProdLabel from 'components/Label/ProdLabel'
 
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetLabels } from 'graphQL/Queries'
 
-import { FaFilter } from 'react-icons/fa'
+import MenuHeading from './MenuHeading'
 
 const GlobalLabelFilter = ({ value, setValue }) => {
+  const { dispatch } = useGlobalState()
   const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
+
+  const { globalVulnDispatch } = dispatch
 
   const [labels, setLabels] = useState([{ id: 'all', name: 'All' }])
 
   const onFilterLabel = (value) => {
     setValue(value?.includes('all') ? [] : value)
+    globalVulnDispatch({ type: 'FILTER_LABEL', payload: value })
   }
 
   const [getLabels, { loading }] = useLazyQuery(GetLabels)
@@ -47,17 +51,11 @@ const GlobalLabelFilter = ({ value, setValue }) => {
 
   return (
     <Menu closeOnSelect={false}>
-      <MenuButton
-        as={Button}
-        fontSize='sm'
-        fontWeight='medium'
-        colorScheme={'blue'}
+      <MenuHeading
+        title={'Labels'}
+        active={value?.length !== 0}
         onClick={onCheckLabels}
-        leftIcon={<FaFilter size={14} />}
-        variant={value?.length > 0 ? 'solid' : 'outline'}
-      >
-        Labels
-      </MenuButton>
+      />
       <MenuList minH='auto' maxH={'300px'} fontSize={'sm'} overflowY={'scroll'}>
         {loading ? (
           <Box px={2}>

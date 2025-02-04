@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import { useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 import { Button, Flex, Heading, Skeleton, Stack } from '@chakra-ui/react'
 import { Grid, GridItem, SimpleGrid } from '@chakra-ui/react'
@@ -25,10 +25,9 @@ import VulnGraphs from './components/category/VulnGraphs'
 export default function Dashboard() {
   const { setIsOpen } = useTour()
   const product = useQueryParam('id')
-  const { dispatch, envName, organization } = useGlobalState()
+  const { dispatch, envName, organization, labelIds, setLabelIds } =
+    useGlobalState()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
-
-  const [labelIds, setLabelIds] = useState([])
 
   const { data: metrics, loading } = useQuery(GetOrgMetrics, {
     skip: organization ? false : true,

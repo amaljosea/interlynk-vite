@@ -19,6 +19,7 @@ const GlobalStateProvider = ({ children }) => {
   const [envName, setEnvName] = useState(env || 'default')
   const [clearSelect, setClearSelect] = useState(false)
   const [selectedSbom, setSelectedSbom] = useState([])
+  const [labelIds, setLabelIds] = useState([])
 
   // PRODUCTS
   const [prodState, prodDispatch] = useReducer(prodReducer, {
@@ -131,6 +132,7 @@ const GlobalStateProvider = ({ children }) => {
     search: '',
     projectGroupIds: [],
     projectNames: [],
+    projectGroupLabelIds: [],
     severity: [],
     status: [],
     kev: '',
@@ -166,6 +168,8 @@ const GlobalStateProvider = ({ children }) => {
         globalVulnState,
         selectedSbom,
         setSelectedSbom,
+        labelIds,
+        setLabelIds,
         dispatch: {
           prodDispatch,
           prodCompDispatch,
