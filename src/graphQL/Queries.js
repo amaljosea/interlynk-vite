@@ -769,6 +769,16 @@ export const GetGlobalVulnData = gql`
         nodes {
           id
           name
+          projects {
+            id
+            name
+            sbomVersions {
+              nodes {
+                id
+                projectVersion
+              }
+            }
+          }
         }
       }
       componentCount

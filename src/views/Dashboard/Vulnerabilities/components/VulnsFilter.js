@@ -57,9 +57,44 @@ const VulnFilters = ({ setFilter, sbomVersions, prodGroups }) => {
     }))
   }
 
+  const filteredByProducts =
+    products?.length > 0
+      ? prodGroups?.filter((item) => products?.includes(item?.id))
+      : prodGroups
+
+  const filteredByEnvs =
+    envs?.length > 0
+      ? filteredByProducts
+          ?.map((group) => ({
+            ...group,
+            projects: group.projects.filter((project) =>
+              envs.includes(project.name)
+            )
+          }))
+          ?.filter((group) => group.projects.length > 0)
+      : filteredByProducts
+
+  const filteredVersions =
+    filteredByEnvs?.length > 0
+      ? filteredByEnvs.reduce((acc, group) => {
+          group.projects.forEach((project) => {
+            project.sbomVersions.nodes.forEach((sbom) => {
+              acc.push(sbom.projectVersion)
+            })
+          })
+          return acc
+        }, [])
+      : []
+
+  const uniqueList =
+  filteredVersions?.length > 0 ? [...new Set(filteredVersions)] : []
+
   const productOptions = prodGroups?.map((item) => item?.id)
-  const versionOptions = sbomVersions?.map((item) => item)
   const envOptions = ['default', 'development', 'production', 'others']
+  const versionOptions =
+    uniqueList?.length > 0
+      ? uniqueList?.filter((item) => sbomVersions?.includes(item))
+      : []
 
   const getStatus = (category) => {
     switch (category) {

@@ -120,12 +120,7 @@ const VulnInfo = () => {
   const { kev, epssScore, epssPercentile } = vulnInfo || ''
 
   const productList =
-    projectGroups?.nodes?.length > 0
-      ? projectGroups?.nodes?.map((item) => ({
-          id: item?.id,
-          name: item?.name
-        }))
-      : []
+    projectGroups?.nodes?.length > 0 ? projectGroups?.nodes : []
 
   const versionList = params?.productid ? productVersions : sbomVersions
 
