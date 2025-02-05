@@ -20,6 +20,7 @@ const GetGlobalVulns = gql`
     $epss: RangeInput
     $field: VulnOrderByFields!
     $direction: OrderByDirection!
+    $projectGroupLabelIds: [Uuid!]
   ) {
     organization {
       vulns(
@@ -34,6 +35,7 @@ const GetGlobalVulns = gql`
         severity: $severity
         kev: $kev
         epss: $epss
+        projectGroupLabelIds: $projectGroupLabelIds
         orderBy: { field: $field, direction: $direction }
         projectIds: $projectIds
       ) {
