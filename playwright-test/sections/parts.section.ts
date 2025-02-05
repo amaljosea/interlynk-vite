@@ -96,17 +96,20 @@ export default class PartsSection {
         await this.page.locator(`//button[@aria-label='add_part']`).click()
         await this.page.waitForTimeout(2000)
 
-        await this.page.getByTestId(`part_groups`).selectOption('TestOne')
+        await this.page.locator('#part_groups').click()
+        await this.page.keyboard.press('Enter')
         await this.page.waitForTimeout(2000)
 
-        await this.page.getByTestId(`part_products`).selectOption({ index: 1 })
+        await this.page.locator('#part_products').click()
+        await this.page.keyboard.press('Enter')
         await this.page.waitForTimeout(2000)
 
-        await this.page.getByTestId(`part_versions`).selectOption({ index: 1 })
+        await this.page.locator('#part_versions').click()
+        await this.page.keyboard.press('Enter')
         await this.page.waitForTimeout(2000)
 
         await this.page.locator("button[type='submit']").click()
-        await this.page.waitForTimeout(3000)
+        await this.page.waitForTimeout(2000)
       } else {
         errors.push('Version not found')
       }

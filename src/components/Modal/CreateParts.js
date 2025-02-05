@@ -284,7 +284,8 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
                 ...lazyDropDownProps,
                 defaultOptions: projectsActual, // Override defaultOptions
                 isDisabled: isLoading,
-                value: null
+                value: null,
+                id: 'part_groups'
               }}
             />
           ) : (
@@ -299,6 +300,7 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
           <FormControl fontSize={'sm'} isRequired>
             <FormLabel htmlFor='products'>Environment</FormLabel>
             <LynkSelect
+              id='part_products'
               name='products'
               placeholder={envLabel || '--Select--'}
               value={envLabel}
@@ -323,6 +325,7 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
               <LynkAlert status='info' msg='No versions available.' />
             ) : (
               <LynkSelect
+                id='part_versions'
                 name='version'
                 value={versionLabel}
                 placeholder={versionLabel || '--Select--'}
