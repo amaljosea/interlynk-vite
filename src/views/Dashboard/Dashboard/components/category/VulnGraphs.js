@@ -6,7 +6,9 @@ import { Heading, SimpleGrid, Stack } from '@chakra-ui/react'
 import LynkPieChart from 'components/Charts/LynkPieChart'
 import DefectDensity from 'components/Graphs/DefectDensity'
 import DeployVelocity from 'components/Graphs/DeployVelocity'
+import IdentityVelocity from 'components/Graphs/IdentificationVelocity'
 import PatchVelocity from 'components/Graphs/PatchVelocity'
+import VulnAge from 'components/Graphs/VulnAge'
 import VulnBySeverity from 'components/Graphs/VulnBySeverity'
 import VulnByStatus from 'components/Graphs/VulnByStatus'
 
@@ -456,6 +458,8 @@ const VulnGraphs = ({ labelIds }) => {
         <PatchVelocity filters={filters} />
         <DefectDensity filters={filters} />
         <DeployVelocity filters={filters} />
+        <VulnAge filters={filters} />
+        <IdentityVelocity filters={filters} />
       </SimpleGrid>
     </Stack>
   )
