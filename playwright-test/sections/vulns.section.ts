@@ -303,11 +303,16 @@ export default class VulnsSection {
                 .click()
               await this.page.waitForTimeout(2000)
 
-              await this.page
-                .getByLabel('Environment')
-                .selectOption({ index: 1 })
-              await this.page.getByLabel('Version').selectOption({ index: 1 })
+              await this.page.locator('#vex_groups').click()
+              await this.page.keyboard.press('Enter')
               await this.page.waitForTimeout(2000)
+
+              await this.page.locator('#vex_products').click()
+              await this.page.keyboard.press('Enter')
+              await this.page.waitForTimeout(2000)
+
+              await this.page.locator('#vex_versions').click()
+              await this.page.keyboard.press('Enter')
 
               await this.page
                 .locator(`//button[@aria-label='vulnStepOne']`)

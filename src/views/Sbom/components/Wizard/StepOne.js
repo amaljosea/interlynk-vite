@@ -167,6 +167,7 @@ const StepOne = ({
 
   const VersionSelect = (
     <LynkSelect
+      id='vex_versions'
       name='versions'
       placeholder={versionLabel || '--Select--'}
       value={versionLabel}
@@ -223,7 +224,8 @@ const StepOne = ({
                   {...{
                     ...lazyDropDownProps,
                     isDisabled: isLoading,
-                    value: null
+                    value: null,
+                    id: 'vex_groups'
                   }}
                 />
               ) : (
@@ -238,6 +240,7 @@ const StepOne = ({
                 Environment
               </FormLabel>
               <LynkSelect
+                id='vex_products'
                 name='product'
                 placeholder={envLabel || '--Select--'}
                 value={'envLabel'}
