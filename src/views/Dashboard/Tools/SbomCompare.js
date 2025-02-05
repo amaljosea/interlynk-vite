@@ -95,7 +95,7 @@ const SbomCompare = ({
         >
           {sbomInfo ? (
             <Stack>
-              <Heading fontWeight={'semibold'} fontFamily={'inherit'} size='md'>
+              <Heading fontWeight={'semibold'} size='md'>
                 {truncatedValue(sbomInfo?.project?.projectGroup?.name, 20)} :{' '}
                 {truncatedValue(sbomInfo?.projectVersion, 20)}
               </Heading>
@@ -109,7 +109,7 @@ const SbomCompare = ({
               </Tag>
             </Stack>
           ) : (
-            <Heading fontWeight={'semibold'} fontFamily={'inherit'} size='md'>
+            <Heading fontWeight={'semibold'} size='md'>
               {isSbomOne ? ' Select First SBOM' : 'Select Second SBOM'}
             </Heading>
           )}

@@ -191,7 +191,7 @@ const StepOne = ({
           justifyContent={'center'}
           textAlign={'center'}
         >
-          <Heading fontWeight={'medium'} fontSize={24} fontFamily={'inherit'}>
+          <Heading fontWeight={'medium'} fontSize={24}>
             Select the source of Vulnerability Status.
           </Heading>
           <Text>

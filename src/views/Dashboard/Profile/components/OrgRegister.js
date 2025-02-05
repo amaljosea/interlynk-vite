@@ -109,12 +109,7 @@ const OrgRegister = ({ loading }) => {
   return (
     <>
       <Card p={20} alignItems={'center'} justifyContent={'center'} height={64}>
-        <Heading
-          textAlign={'center'}
-          size='md'
-          fontFamily={'inherit'}
-          fontWeight={'semibold'}
-        >
+        <Heading textAlign={'center'} size='md' fontWeight={'semibold'}>
           Register or join an organization to get started
         </Heading>
         <Button

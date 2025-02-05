@@ -85,7 +85,6 @@ const ToolsDrawer = ({ sbomIdOne, sbomIdTwo, onClose }) => {
                             <Heading
                               fontWeight={'semibold'}
                               color={primaryTextColor}
-                              fontFamily={'inherit'}
                               size='md'
                             >
                               {sbomOne?.project?.projectGroup?.name} :{' '}
@@ -126,7 +125,6 @@ const ToolsDrawer = ({ sbomIdOne, sbomIdTwo, onClose }) => {
                           <Heading
                             fontWeight={'semibold'}
                             color={primaryTextColor}
-                            fontFamily={'inherit'}
                             size='md'
                           >
                             {sbomTwo?.project?.projectGroup?.name} :{' '}

@@ -101,7 +101,7 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
               <Thead>
                 <Tr>
                   {columns.map((item, index) => (
-                    <Th px={0} key={index} fontFamily={'inherit'}>
+                    <Th px={0} key={index}>
                       {item}
                     </Th>
                   ))}

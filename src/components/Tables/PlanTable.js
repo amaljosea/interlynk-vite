@@ -166,7 +166,6 @@ const PlanTable = () => {
 
   const headStyle = {
     fontWeight: 'bold',
-    fontFamily: 'inherit',
     color: headingTextColor,
     borderColor: grayBorderColor
   }

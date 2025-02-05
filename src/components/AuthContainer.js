@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import InterlynkLogo from 'assets/img/logo.png'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -49,13 +50,7 @@ const AuthContainer = ({ children }) => {
             </Text>
           </Flex>
         </Link>
-        <Heading
-          opacity={0.8}
-          fontSize={'5xl'}
-          // eslint-disable-next-line
-          color={'blue.200'}
-          fontFamily={'inherit'}
-        >
+        <Heading opacity={0.8} fontSize={'5xl'} color={'blue.200'}>
           {selectedHeader}
         </Heading>
       </GridItem>

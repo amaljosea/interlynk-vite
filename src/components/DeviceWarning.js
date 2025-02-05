@@ -30,7 +30,7 @@ const DeviceWarning = () => {
       >
         <Heading
           textAlign='center'
-          sx={{ fontSize: '3xl', fontFamily: 'inherit', opacity: 0.9 }}
+          sx={{ fontSize: '3xl', opacity: 0.9 }}
           color={isDark ? headingTextColor : grayBorderColor}
         >
           This page is best viewed on Desktop

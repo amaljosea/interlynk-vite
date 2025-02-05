@@ -310,7 +310,7 @@ const LegalModal = ({ data, isOpen, onClose }) => {
           <FormErrorMessage>{isValidUrl}</FormErrorMessage>
         </FormControl>
         <Stack spacing={2}>
-          <Heading fontWeight={500} fontFamily={'inherit'} fontSize={12}>
+          <Heading fontWeight={500} fontSize={12}>
             Contacts
           </Heading>
           {contacts?.length > 0 &&

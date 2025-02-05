@@ -189,7 +189,7 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
 
   return (
     <Box width={'100%'} mx={'auto'} mb={10}>
-      <Heading fontWeight={'medium'} fontSize={'lg'} fontFamily={'inherit'}>
+      <Heading fontWeight={'medium'} fontSize={'lg'}>
         Select common vulnerabilities for status update
       </Heading>
       <Flex mt={5} flexDir={'column'} width={'100%'}>

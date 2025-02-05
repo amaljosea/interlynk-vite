@@ -33,7 +33,6 @@ const ConnectedSbomDrawer = ({ data, isOpen, onClose }) => {
                     <Th
                       px={0}
                       key={index}
-                      fontFamily={'inherit'}
                       textAlign={item === 'STATUS' ? 'right' : 'left'}
                     >
                       {item}

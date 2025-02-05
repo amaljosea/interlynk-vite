@@ -17,7 +17,7 @@ const StepThree = () => {
         mt={32}
       >
         <FaCheckCircle color={primarySuccessColor} size={96} />
-        <Heading fontWeight={'medium'} fontSize={20} fontFamily={'inherit'}>
+        <Heading fontWeight={'medium'} fontSize={20}>
           {/* {selectedVulns.length} out of {mergeData.length}  */}
           Vulnerability status updated successfully.
         </Heading>

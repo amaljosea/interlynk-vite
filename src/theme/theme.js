@@ -189,6 +189,13 @@ export default extendTheme(
           fontSize: 12,
           marginBottom: '4px'
         }
+      },
+      Table: {
+        baseStyle: {
+          th: {
+            fontFamily: 'inherit'
+          }
+        }
       }
     },
     colors,
