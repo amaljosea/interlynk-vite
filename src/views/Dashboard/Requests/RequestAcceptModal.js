@@ -16,7 +16,7 @@ import { FaCheckToSlot } from 'react-icons/fa6'
 const RequestAcceptModal = ({ data, isOpen, onClose }) => {
   const { showToast } = useCustomToast()
 
-  const [acceptRequest] = useMutation(RequestAccept)
+  const [acceptRequest, { loading }] = useMutation(RequestAccept)
 
   const { data: productNames } = useQuery(GetProductNamesForRequest)
 
@@ -72,14 +72,15 @@ const RequestAcceptModal = ({ data, isOpen, onClose }) => {
       onClose={onClose}
       title={'Accept SBOM'}
       buttonText='Accept'
+      isLoading={loading}
       onSubmit={handleAccept}
       Icon={FaCheckToSlot}
     >
       <Flex width={'100%'} direction={'column'} gap={4}>
         <FormControl isRequired>
           <FormLabel>Product</FormLabel>
-          <Select onChange={handleProductChange}>
-            <option value=''>Select Product</option>
+          <Select fontSize={'sm'} onChange={handleProductChange}>
+            <option value=''>-- Select --</option>
             {productNames?.organization?.projectGroups?.nodes?.map(
               (item, index) => (
                 <option key={index} value={item.id}>
@@ -92,6 +93,7 @@ const RequestAcceptModal = ({ data, isOpen, onClose }) => {
         <FormControl isRequired>
           <FormLabel>Environment</FormLabel>
           <Select
+            fontSize={'sm'}
             onChange={(e) => {
               setProjectId(e.target.value)
             }}

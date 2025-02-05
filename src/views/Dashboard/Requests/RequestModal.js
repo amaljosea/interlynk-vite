@@ -21,7 +21,7 @@ const RequestModal = ({ isOpen, onClose }) => {
 
   const [isSaveDisabled, setIsSaveDisabled] = useState(false)
 
-  const [createRequest] = useMutation(RequestCreate)
+  const [createRequest, { loading }] = useMutation(RequestCreate)
 
   useEffect(() => {
     if (email === '') {
@@ -61,6 +61,7 @@ const RequestModal = ({ isOpen, onClose }) => {
       onSubmit={handleCreate}
       title={'Request SBOM'}
       Icon={GoVersions}
+      isLoading={loading}
       disabled={isSaveDisabled}
       buttonText={'Save'}
     >
