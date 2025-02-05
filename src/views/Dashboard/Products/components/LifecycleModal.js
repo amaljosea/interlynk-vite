@@ -107,8 +107,6 @@ const LifecycleModal = ({ data, isOpen, onClose }) => {
     })
   }
 
-  console.log('data', data)
-
   useEffect(() => {
     if (data) {
       const { stage, releaseDate, endOfLifeDate, endOfSupportDate } = data || ''

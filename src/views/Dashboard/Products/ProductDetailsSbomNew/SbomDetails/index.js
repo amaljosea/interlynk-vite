@@ -316,11 +316,13 @@ const SbomDetails = ({ sbomData }) => {
               </GridItem>
             )}
           </Grid>
-          <LifecycleModal
-            data={lifecycleData}
-            isOpen={isOpen}
-            onClose={onClose}
-          />
+          {isOpen && (
+            <LifecycleModal
+              data={lifecycleData}
+              isOpen={isOpen}
+              onClose={onClose}
+            />
+          )}
         </Flex>
       </Flex>
     </>
