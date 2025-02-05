@@ -60,7 +60,7 @@ test('Component edit functionality', async ({ page }) => {
   }
 })
 
-test('Link CURD functionality', async ({ page }) => {
+test('Link CRUD functionality', async ({ page }) => {
   test.setTimeout(120000)
   const pp = new ComponentPage(page)
   try {
@@ -71,13 +71,13 @@ test('Link CURD functionality', async ({ page }) => {
   }
 })
 
-test('Relationship CURD functionality', async ({ page }) => {
+test('Relationship CRUD functionality', async ({ page }) => {
   test.setTimeout(120000)
   const pp = new ComponentPage(page)
   try {
     await pp.componentRelations()
   } catch (error) {
-    console.error('Relationship CURD test failed:', error)
+    console.error('Relationship CRUD test failed:', error)
     throw error
   }
 })

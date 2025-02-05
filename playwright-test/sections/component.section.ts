@@ -237,7 +237,7 @@ export default class ComponentSection {
     }
   }
 
-  // COMPONENT LINKS CURD
+  // COMPONENT LINKS CRUD
   public async updateLinks() {
     try {
       await this.page.locator("//a[@aria-label='products']").click()
@@ -335,8 +335,7 @@ export default class ComponentSection {
           await this.page.waitForTimeout(2000)
           await this.page.keyboard.press('Enter')
 
-          const relationSave = this.page.getByRole('button', { name: 'Add' })
-          await relationSave.click()
+          await this.page.getByTestId('Add').click()
           await this.page.waitForTimeout(2000)
 
           await this.page.getByTestId('delete_depends_on').first().click()
