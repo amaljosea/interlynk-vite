@@ -100,8 +100,11 @@ const PolicyTable = (props) => {
       const result = subOperators.policySubjectOperatorMapping.find(
         (item) => item?.subject === value
       )
-      return { name: result?.name, category: result?.category }
+      return result
+        ? { name: result.name, category: result.category }
+        : { name: '', category: '' }
     }
+    return { name: '', category: '' }
   }
 
   const [createExclusion] = useMutation(PolicyExclusionCreate)
