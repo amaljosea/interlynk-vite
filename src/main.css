@@ -199,3 +199,46 @@ td.rdtYear:hover {
   fill: white;
   stroke: transparent;
 }
+
+.data-table-container input[type='checkbox'] {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #4299e1;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease-in-out;
+}
+
+.data-table-container input[type='checkbox']:checked {
+  background-color: #3182ce;
+  border-color: #3182ce;
+}
+
+.data-table-container input[type='checkbox']:checked::before {
+  content: '✓';
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.data-table-container input[type='checkbox']:indeterminate {
+  background-color: #3182ce;
+  border-color: #3182ce;
+}
+
+.data-table-container input[type='checkbox']:indeterminate::before {
+  content: '—';
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

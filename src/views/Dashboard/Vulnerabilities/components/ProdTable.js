@@ -366,6 +366,7 @@ const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
           clearSelectedRows={toggleClear}
           onSelectedRowsChange={handleChange}
           progressComponent={<CustomLoader />}
+          className='data-table-container'
           customStyles={customStyles(headingTextColor)}
           subHeaderComponent={subHeaderComponent}
         />

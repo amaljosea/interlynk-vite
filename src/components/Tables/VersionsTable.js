@@ -709,7 +709,7 @@ const VersionsTable = (props) => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable {...dataTableProps} />
+        <DataTable {...dataTableProps} className='data-table-container' />
         <Pagination {...paginationProps} />
       </Flex>
       {/* DELETE VERSION */}

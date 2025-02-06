@@ -196,7 +196,7 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
         <DataTable
           subHeader
           columns={columns}
-          className={tableClassName}
+          className={tableClassName + 'data-table-container'}
           data={data?.intersectingVulns || []}
           customStyles={customStyles(headingTextColor)}
           progressPending={data ? false : true}
