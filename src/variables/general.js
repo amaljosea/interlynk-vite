@@ -1,3 +1,6 @@
+import BSI from 'assets/img/bsi.jpg'
+import FDA from 'assets/img/fda.jpg'
+import NTIA from 'assets/img/ntia.jpg'
 import { getFullDate } from 'utils'
 
 import { Stack, Text } from '@chakra-ui/react'
@@ -1776,7 +1779,6 @@ export const CVSS3_METRICS = {
   }
 }
 
-
 export const packageTypes = [
   { value: '', label: '-- Select --' },
   { value: 'alpm', label: 'alpm' },
@@ -1812,34 +1814,61 @@ export const packageTypes = [
 ]
 
 export const examplePURLs = {
-  alpm: "pkg:alpm/pacman@1.0.0",
-  apk: "pkg:apk/alpine@3.16.0",
-  bitbucket: "pkg:bitbucket/repo-name@latest",
-  bitnami: "pkg:bitnami/redis@6.2.5",
-  cocoapods: "pkg:cocoapods/Alamofire@5.4.4",
-  cargo: "pkg:cargo/crate-name@1.2.3",
-  composer: "pkg:composer/laravel/laravel@8.5.0",
-  conan: "pkg:conan/openssl@1.1.1k",
-  conda: "pkg:conda/numpy@1.21.0",
-  cran: "pkg:cran/ggplot2@3.3.5",
-  deb: "pkg:deb/debian/curl@7.74.0",
-  docker: "pkg:docker/library/nginx@1.21.0",
-  gem: "pkg:gem/rails@6.1.4",
-  generic: "pkg:generic/my-package@2.0.0",
-  github: "pkg:github/user/repo@v1.0.0",
-  golang: "pkg:golang/github.com/gin-gonic/gin@v1.7.3",
-  hex: "pkg:hex/phoenix@1.5.9",
-  hackage: "pkg:hackage/lens@4.19.2",
-  huggingface: "pkg:huggingface/transformers@4.9.1",
-  maven: "pkg:maven/org.apache.commons/commons-lang3@3.12.0",
-  mlflow: "pkg:mlflow/scikit-learn@0.24.2",
-  npm: "pkg:npm/react@17.0.2",
-  nuget: "pkg:nuget/Newtonsoft.Json@13.0.1",
-  qpkg: "pkg:qpkg/my-qnap-package@1.0.0",
-  oci: "pkg:oci/nginx@1.21.0",
-  pub: "pkg:pub/flutter@2.2.3",
-  pypi: "pkg:pypi/numpy@1.21.0",
-  rpm: "pkg:rpm/redhat/curl@7.74.0",
-  swid: "pkg:swid/example@1.0.0",
-  swift: "pkg:swift/alamofire@5.4.4"
-};
+  alpm: 'pkg:alpm/pacman@1.0.0',
+  apk: 'pkg:apk/alpine@3.16.0',
+  bitbucket: 'pkg:bitbucket/repo-name@latest',
+  bitnami: 'pkg:bitnami/redis@6.2.5',
+  cocoapods: 'pkg:cocoapods/Alamofire@5.4.4',
+  cargo: 'pkg:cargo/crate-name@1.2.3',
+  composer: 'pkg:composer/laravel/laravel@8.5.0',
+  conan: 'pkg:conan/openssl@1.1.1k',
+  conda: 'pkg:conda/numpy@1.21.0',
+  cran: 'pkg:cran/ggplot2@3.3.5',
+  deb: 'pkg:deb/debian/curl@7.74.0',
+  docker: 'pkg:docker/library/nginx@1.21.0',
+  gem: 'pkg:gem/rails@6.1.4',
+  generic: 'pkg:generic/my-package@2.0.0',
+  github: 'pkg:github/user/repo@v1.0.0',
+  golang: 'pkg:golang/github.com/gin-gonic/gin@v1.7.3',
+  hex: 'pkg:hex/phoenix@1.5.9',
+  hackage: 'pkg:hackage/lens@4.19.2',
+  huggingface: 'pkg:huggingface/transformers@4.9.1',
+  maven: 'pkg:maven/org.apache.commons/commons-lang3@3.12.0',
+  mlflow: 'pkg:mlflow/scikit-learn@0.24.2',
+  npm: 'pkg:npm/react@17.0.2',
+  nuget: 'pkg:nuget/Newtonsoft.Json@13.0.1',
+  qpkg: 'pkg:qpkg/my-qnap-package@1.0.0',
+  oci: 'pkg:oci/nginx@1.21.0',
+  pub: 'pkg:pub/flutter@2.2.3',
+  pypi: 'pkg:pypi/numpy@1.21.0',
+  rpm: 'pkg:rpm/redhat/curl@7.74.0',
+  swid: 'pkg:swid/example@1.0.0',
+  swift: 'pkg:swift/alamofire@5.4.4'
+}
+
+export const complianceList = [
+  {
+    id: 1,
+    img: FDA,
+    slug: 'fda',
+    title: 'FDA Cybersecurity Compliance',
+    url: 'https://www.fda.gov/media/119933/download',
+    desc: 'SBOM requirements from FDA issued the final guidance Cybersecurity in Medical Devices: Quality System Considerations and Content of Premarket Submissions.'
+  },
+  {
+    id: 2,
+    img: NTIA,
+    slug: 'ntia',
+    title: 'NTIA Minimum Elements',
+    url: 'https://www.ntia.doc.gov/files/ntia/publications/sbom_minimum_elements_report.pdf',
+    desc: 'The NTIA (National Telecommunications and Information Administration) Minimum Elements for a Software Bill of Materials (SBOM) are a set of guidelines and recommendations that define the essential information an SBOM should contain.'
+  },
+  {
+    id: 3,
+    img: BSI,
+    slug: 'bsi',
+    title: 'BSI TR-03183',
+    url: 'https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/TechGuidelines/TR03183/BSI-TR-03183-2.pdf?__blob=publicationFile&v=5',
+    desc: 'The Technical Guideline TR-03183: Cyber Resilience Requirements for Manufacturers and Products aims to provide manufacturers with advance access to the type of requirements that will be imposed on them by the future Cyber Resilience Act (CRA) of the EU.'
+  }
+]

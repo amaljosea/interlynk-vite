@@ -1,9 +1,7 @@
 import { useQuery } from '@apollo/client'
-import BSI from 'assets/img/bsi.jpg'
-import FDA from 'assets/img/fda.jpg'
-import NTIA from 'assets/img/ntia.jpg'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { complianceList } from 'variables/general'
 import ComplianceChecks from 'views/Sbom/components/ComplianceChecks'
 
 import {
@@ -13,7 +11,6 @@ import {
   Img,
   Link,
   SimpleGrid,
-  Skeleton,
   Spinner,
   Text,
   chakra,
@@ -21,6 +18,7 @@ import {
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
+import LynkLoader from 'components/Misc/LynkLoader'
 
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -97,57 +95,25 @@ const Compliance = ({ sbomData }) => {
     }
   }
 
-  const getTitle = (type) => {
-    switch (type) {
-      case 'fda':
-        return 'FDA Cybersecurity Compliance'
-      case 'ntia':
-        return 'NTIA Minimum Elements'
-      case 'bsi':
-        return 'BSI TR-03183'
-    }
-  }
+  const getTitle = (type) =>
+    complianceList?.find((item) => item?.slug === type)?.title
 
-  const getDesc = (type) => {
-    switch (type) {
-      case 'fda':
-        return 'SBOM requirements from FDA issued the final guidance Cybersecurity in Medical Devices: Quality System Considerations and Content of Premarket Submissions.'
-      case 'ntia':
-        return 'The NTIA (National Telecommunications and Information Administration) Minimum Elements for a Software Bill of Materials (SBOM) are a set of guidelines and recommendations that define the essential information an SBOM should contain.'
-      case 'bsi':
-        return 'The Technical Guideline TR-03183: Cyber Resilience Requirements for Manufacturers and Products aims to provide manufacturers with advance access to the type of requirements that will be imposed on them by the future Cyber Resilience Act (CRA) of the EU.'
-    }
-  }
+  const getDesc = (type) =>
+    complianceList?.find((item) => item?.slug === type)?.desc
 
-  const getIcon = (type) => {
-    switch (type) {
-      case 'fda':
-        return FDA
-      case 'ntia':
-        return NTIA
-      case 'bsi':
-        return BSI
-    }
-  }
+  const getIcon = (type) =>
+    complianceList?.find((item) => item?.slug === type)?.img
 
-  const getLink = (type) => {
-    switch (type) {
-      case 'fda':
-        return 'https://www.fda.gov/media/119933/download'
-      case 'ntia':
-        return 'https://www.ntia.doc.gov/files/ntia/publications/sbom_minimum_elements_report.pdf'
-      case 'bsi':
-        return 'https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/TechGuidelines/TR03183/BSI-TR-03183-2.pdf?__blob=publicationFile&v=5'
-      default:
-        return '#'
-    }
-  }
+  const getLink = (type) =>
+    complianceList?.find((item) => item?.slug === type)?.url
 
   if (loading) {
     return (
       <SimpleGrid columns={3} spacing={5} mt={2}>
         {[1, 2, 3].map((item) => (
-          <Skeleton key={item} w={'full'} h={64} />
+          <Card p={0} key={item} border={`1px solid ${grayBorderColor}`}>
+            <LynkLoader />
+          </Card>
         ))}
       </SimpleGrid>
     )
