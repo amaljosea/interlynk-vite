@@ -1,5 +1,7 @@
-import { Flex, Heading, SimpleGrid, Stack, Tag } from '@chakra-ui/react'
-import { Grid, GridItem } from '@chakra-ui/react'
+import React, { useEffect } from 'react'
+import SbomCompare from 'views/Dashboard/Tools/SbomCompare'
+
+import { Grid, SimpleGrid, Stack } from '@chakra-ui/react'
 import {
   Drawer,
   DrawerBody,
@@ -11,12 +13,11 @@ import {
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
-import SbomInfo from 'components/SbomInfo'
 import DiffTable from 'components/Tables/DiffTable'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useSbomCompare } from 'hooks/useSbomCompare'
-import { useThemeColor } from 'hooks/useThemeColors'
 
 const Loader = () => {
   return (
@@ -43,12 +44,18 @@ const ToolsDrawer = ({ sbomIdOne, sbomIdTwo, onClose }) => {
     sbomIdTwo
   })
 
-  const { primaryTextColor, secondaryRedBorder, secondaryGreenBorder } =
-    useThemeColor([
-      'primaryTextColor',
-      'secondaryRedBorder',
-      'secondaryGreenBorder'
-    ])
+  const showToast = useCustomToast()
+
+  //Close the drawer if the sbomOne or sbomTwo is not retrieved from useSbomCompare
+  useEffect(() => {
+    if (sbomOne === null || sbomTwo === null) {
+      onClose()
+      showToast({
+        description: 'An error occured. Please try later',
+        status: 'error'
+      })
+    }
+  }, [sbomOne, sbomTwo, onClose, showToast])
 
   const handleClear = () => {
     setSelectedSbom([])
@@ -69,82 +76,17 @@ const ToolsDrawer = ({ sbomIdOne, sbomIdTwo, onClose }) => {
               {/* SBOM INFO */}
               <Grid templateColumns='repeat(2, 1fr)' gap={6} mb={12}>
                 {/* SBOM ONE */}
-                <GridItem w='100%'>
-                  <Card
-                    width='100%'
-                    bg={secondaryGreenBorder}
-                    px={6}
-                    h='450px'
-                    overflowY='scroll'
-                  >
-                    {sbomOne && (
-                      <Flex width={'100%'} flexDirection={'column'}>
-                        {/* HEADIING */}
-                        <Stack>
-                          <Flex alignItems={'flex-end'} gap={1}>
-                            <Heading
-                              fontWeight={'semibold'}
-                              color={primaryTextColor}
-                              size='md'
-                            >
-                              {sbomOne?.project?.projectGroup?.name} :{' '}
-                              {sbomOne?.projectVersion}
-                            </Heading>
-                          </Flex>
-                          <Tag
-                            variant='solid'
-                            colorScheme='green'
-                            width={'fit-content'}
-                            textTransform={'capitalize'}
-                          >
-                            {sbomOne?.project?.name}
-                          </Tag>
-                        </Stack>
-                        {/* DETAILS */}
-                        <SbomInfo data={sbomOne} />
-                      </Flex>
-                    )}
-                  </Card>
-                </GridItem>
+                <SbomCompare
+                  isSbomOne={true}
+                  sbomInfo={sbomOne}
+                  isToolsDrawer={true}
+                />
                 {/* SBOM TWO */}
-                <GridItem w='100%'>
-                  <Card
-                    bg={secondaryRedBorder}
-                    px={6}
-                    h='450px'
-                    overflowY='scroll'
-                  >
-                    {sbomTwo && (
-                      <Flex
-                        width='100%'
-                        flexWrap={'wrap'}
-                        flexDirection={'column'}
-                      >
-                        {/* HEADIING */}
-                        <Stack>
-                          <Heading
-                            fontWeight={'semibold'}
-                            color={primaryTextColor}
-                            size='md'
-                          >
-                            {sbomTwo?.project?.projectGroup?.name} :{' '}
-                            {sbomTwo?.projectVersion}
-                          </Heading>
-                          <Tag
-                            variant='solid'
-                            colorScheme='red'
-                            width={'fit-content'}
-                            textTransform={'capitalize'}
-                          >
-                            {sbomTwo?.project?.name}
-                          </Tag>
-                        </Stack>
-                        {/* DETAILS */}
-                        <SbomInfo data={sbomTwo} />
-                      </Flex>
-                    )}
-                  </Card>
-                </GridItem>
+                <SbomCompare
+                  isSbomOne={false}
+                  sbomInfo={sbomTwo}
+                  isToolsDrawer={true}
+                />
               </Grid>
               {/* SBOM DIFFERENCE */}
               <DiffTable

@@ -1,3 +1,4 @@
+//User in Compare under tools and also compare in toolsDrawer from versionsTable
 import { envOrderList, truncatedValue } from 'utils'
 
 import {
@@ -38,7 +39,8 @@ const SbomCompare = ({
   loading,
   onSelectProduct,
   productList,
-  compareButtonProps = {}
+  compareButtonProps = {},
+  isToolsDrawer
 }) => {
   const {
     firstSbomInfo,
@@ -48,7 +50,19 @@ const SbomCompare = ({
     selectedVersionTwo,
     disabled
   } = compareButtonProps
-  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
+
+  const {
+    primaryTextColor,
+    secondaryGreenBorder,
+    secondaryRedBorder,
+    lightAndDarkBgColor
+  } = useThemeColor([
+    'primaryTextColor',
+    'secondaryGreenBorder',
+    'secondaryRedBorder',
+    'lightAndDarkBgColor'
+  ])
+
   const VersionSelect = (
     <LynkSelect
       components={{
@@ -85,9 +99,15 @@ const SbomCompare = ({
     )
   }
 
+  const cardBgColor = isToolsDrawer
+    ? isSbomOne
+      ? secondaryGreenBorder
+      : secondaryRedBorder
+    : lightAndDarkBgColor
+
   return (
     <GridItem w='100%'>
-      <Card p={8} h='450px' overflowY='scroll'>
+      <Card width='100%' p={8} h='450px' overflowY='scroll' bg={cardBgColor}>
         <Flex
           alignItems={'flex-start'}
           flexWrap={'wrap'}
@@ -113,7 +133,7 @@ const SbomCompare = ({
               {isSbomOne ? ' Select First SBOM' : 'Select Second SBOM'}
             </Heading>
           )}
-          {sbomInfo && !selectedSboms && (
+          {sbomInfo && !selectedSboms && !isToolsDrawer && (
             <IconButton
               icon={<FaX color={primaryTextColor} />}
               size='sm'
@@ -204,21 +224,23 @@ const SbomCompare = ({
           </Stack>
         )}
         {/*  COMPARE BUTTON */}
-        {(!firstSbomInfo || !secondSbomInfo) && !isSbomOne && (
-          <Flex justifyContent={'flex-end'}>
-            <Button
-              colorScheme='blue'
-              width={'fit-content'}
-              leftIcon={<FaCodeCompare />}
-              onClick={handleCompare}
-              isDisabled={
-                !selectedVersionOne || !selectedVersionTwo || disabled
-              }
-            >
-              Compare
-            </Button>
-          </Flex>
-        )}
+        {(!firstSbomInfo || !secondSbomInfo) &&
+          !isSbomOne &&
+          !isToolsDrawer && (
+            <Flex justifyContent={'flex-end'}>
+              <Button
+                colorScheme='blue'
+                width={'fit-content'}
+                leftIcon={<FaCodeCompare />}
+                onClick={handleCompare}
+                isDisabled={
+                  !selectedVersionOne || !selectedVersionTwo || disabled
+                }
+              >
+                Compare
+              </Button>
+            </Flex>
+          )}
       </Card>
     </GridItem>
   )
