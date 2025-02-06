@@ -10,10 +10,8 @@ import {
 
 import { CheckCircleIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import {
-  AbsoluteCenter,
   Box,
   Button,
-  Divider,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -35,6 +33,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { RegisterUser } from 'graphQL/Mutation'
 
+import DividerWithText from './DividerWithText'
 import LynkAlert from './LynkAlert'
 import PolicyTerms from './PolicyTerms'
 import SocialLogin from './SocialLogin'
@@ -48,14 +47,12 @@ const RegistrationForm = () => {
     primaryBlueText,
     primaryErrorColor,
     primarySuccessColor,
-    headingTextColor,
-    secondaryTextColor
+    headingTextColor
   } = useThemeColor([
     'primaryBlueText',
     'primaryErrorColor',
     'primarySuccessColor',
-    'headingTextColor',
-    'secondaryTextColor'
+    'headingTextColor'
   ])
   const [name, setName] = useState('')
   const [email, setEmail] = useState(emailId?.replace(/\s+/g, '+') || '')
@@ -358,12 +355,7 @@ const RegistrationForm = () => {
             </Text>
           </Link>
         </Stack>
-        <Box position='relative' py={1}>
-          <Divider />
-          <AbsoluteCenter px='2' fontSize={'xs'} color={secondaryTextColor}>
-            Or Register With
-          </AbsoluteCenter>
-        </Box>
+        <DividerWithText text='Or Register With' />
         <SocialLogin />
         <PolicyTerms />
       </Stack>

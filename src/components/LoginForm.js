@@ -5,16 +5,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import {
-  AbsoluteCenter,
-  Box,
-  Button,
-  Divider,
-  Flex,
-  IconButton,
-  Stack,
-  Text
-} from '@chakra-ui/react'
+import { Button, Flex, IconButton, Stack, Text } from '@chakra-ui/react'
 import { Alert, AlertDescription, AlertIcon } from '@chakra-ui/react'
 import { FormControl, FormHelperText, FormLabel } from '@chakra-ui/react'
 import { Input, InputGroup, InputRightElement } from '@chakra-ui/react'
@@ -25,6 +16,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UserResendConfirmationEmail } from 'graphQL/Mutation'
 
+import DividerWithText from './DividerWithText'
 import PolicyTerms from './PolicyTerms'
 import SocialLogin from './SocialLogin'
 
@@ -32,17 +24,9 @@ const LoginForm = () => {
   const navigate = useNavigate()
   const { showToast } = useCustomToast()
   const emailId = useQueryParam('id')
-  const {
-    primaryBlueText,
-    headingTextColor,
-    primaryTextColor,
-    secondaryTextColor
-  } = useThemeColor([
-    'primaryBlueText',
-    'headingTextColor',
-    'primaryTextColor',
-    'secondaryTextColor'
-  ])
+  const { primaryBlueText, headingTextColor, primaryTextColor } = useThemeColor(
+    ['primaryBlueText', 'headingTextColor', 'primaryTextColor']
+  )
 
   const loginURL = process.env.REACT_APP_VENDOR_LOGIN_URL
 
@@ -222,12 +206,7 @@ const LoginForm = () => {
               </Text>
             </Link>
           </Stack>
-          <Box position='relative' py={1}>
-            <Divider />
-            <AbsoluteCenter px='2' fontSize={'xs'} color={secondaryTextColor}>
-              Or Login With
-            </AbsoluteCenter>
-          </Box>
+          <DividerWithText text='Or Login With' />
           <SocialLogin />
           <PolicyTerms />
         </Stack>

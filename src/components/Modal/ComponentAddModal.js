@@ -10,19 +10,14 @@ import {
 import { componentTypes, infoData } from 'variables/general'
 
 import { InfoIcon, WarningTwoIcon } from '@chakra-ui/icons'
-import {
-  AbsoluteCenter,
-  Box,
-  Divider,
-  chakra,
-  useDisclosure
-} from '@chakra-ui/react'
+import { chakra, useDisclosure } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 import { Flex, Stack, Text, Tooltip } from '@chakra-ui/react'
 import { Checkbox, Input, Select, Textarea } from '@chakra-ui/react'
 
 import CpeEditor from 'components/CpeEditor'
 import CpeField from 'components/CpeField'
+import DividerWithText from 'components/DividerWithText'
 import LicenseField from 'components/Licenses/LicenseField'
 import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
@@ -67,17 +62,8 @@ function ComponentAddModal(props) {
     }
   })
 
-  const {
-    primaryErrorColor,
-    primaryBlueText,
-    headingTextColor,
-    primaryBgColor
-  } = useThemeColor([
-    'primaryErrorColor',
-    'primaryBlueText',
-    'headingTextColor',
-    'primaryBgColor'
-  ])
+  const { primaryErrorColor, primaryBlueText, headingTextColor } =
+    useThemeColor(['primaryErrorColor', 'primaryBlueText', 'headingTextColor'])
 
   const { isOpen, onClose, data, primaryComp, shortDesc } = props
   const { prodCompState, dispatch } = useGlobalState()
@@ -275,12 +261,7 @@ function ComponentAddModal(props) {
               <Text>Fill it up to search or add manually</Text>
               {/* Package Lookup */}
               <PackageLookup />
-              <Box position='relative' py='4'>
-                <Divider />
-                <AbsoluteCenter px='6' bg={primaryBgColor}>
-                  OR
-                </AbsoluteCenter>
-              </Box>
+              <DividerWithText text='OR' />
               <Stack spacing={4}>
                 {/* Name */}
                 <FormControl isReadOnly={customerView}>

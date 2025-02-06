@@ -7,9 +7,6 @@ import { validateCPEString } from 'utils/cpeUtils'
 
 import { SearchIcon } from '@chakra-ui/icons'
 import {
-  AbsoluteCenter,
-  Box,
-  Divider,
   Flex,
   IconButton,
   Input,
@@ -20,13 +17,13 @@ import {
 } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
+import DividerWithText from 'components/DividerWithText'
 import LynkAlert from 'components/LynkAlert'
 import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CustomVulnCreate } from 'graphQL/Mutation'
 import {
@@ -44,7 +41,6 @@ const CustomVuln = ({ isOpen, onClose }) => {
   const { showToast } = useCustomToast()
   const { prodCompState } = useGlobalState()
   const signedUrlParams = getSignedUrlParams()
-  const { primaryBgColor } = useThemeColor(['primaryBgColor'])
 
   const { field, direction } = prodCompState
   const compState = {
@@ -231,12 +227,7 @@ const CustomVuln = ({ isOpen, onClose }) => {
             onClick={handleSearch}
           />
         </Flex>
-        <Box position='relative' py='3'>
-          <Divider />
-          <AbsoluteCenter px='2' bg={primaryBgColor}>
-            OR
-          </AbsoluteCenter>
-        </Box>
+        <DividerWithText text='OR' />
         <FormControl isRequired>
           <FormLabel htmlFor='vulnIdentifier'>Identifier</FormLabel>
           <Input
