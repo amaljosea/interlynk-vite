@@ -97,7 +97,7 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
                 }}
                 sx={{ my: 3, cursor: 'pointer', color: primaryTextColor }}
               >
-                {orig}
+                {orig || 'N/A'}
               </Text>
             )
           }
@@ -137,7 +137,7 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
                       </Flex>
                     ))
                   ) : license?.length === 0 ? (
-                    ''
+                    'N/A'
                   ) : urls && urls.length > 0 ? (
                     urls.map((item, index) => (
                       <Flex
@@ -164,7 +164,7 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
                     ))
                   ) : (
                     <Text color={primaryTextColor} whiteSpace={'wrap'}>
-                      {orig}
+                      {orig || 'N/A'}
                     </Text>
                   )}
                 </Box>
@@ -194,7 +194,7 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
                 }}
                 sx={{ my: 3, color: primaryTextColor, cursor: 'pointer' }}
               >
-                {updated}
+                {updated || 'N/A'}
               </Text>
             )
           }
@@ -227,7 +227,7 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
                       ))}
                     </Flex>
                   ) : updatedValue?.length === 0 ? (
-                    ''
+                    'N/A'
                   ) : urls && urls.length > 0 ? (
                     <Flex my={2} gap={2} flexDir={'column'} flexWrap={'wrap'}>
                       {urls.map((item, index) => (
@@ -251,7 +251,7 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
                       cursor={'pointer'}
                       onClick={() => onSelect(row)}
                     >
-                      {updated}
+                      {updated || 'N/A'}
                     </Text>
                   )}
                 </Box>

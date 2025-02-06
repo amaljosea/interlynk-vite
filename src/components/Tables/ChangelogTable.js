@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
@@ -96,7 +96,7 @@ const ChangelogTable = ({ activeEnv }) => {
         const content = orig ? `${event} / ${orig}` : ''
         return (
           <Text color={primaryTextColor} my={2}>
-            {content}
+            {content || 'N/A'}
           </Text>
         )
       }
@@ -111,7 +111,7 @@ const ChangelogTable = ({ activeEnv }) => {
         const content = updated ? `${event} / ${updated}` : ''
         return (
           <Text color={primaryTextColor} overflow={'auto'} my={2}>
-            {content}
+            {content || 'N/A'}
           </Text>
         )
       }
@@ -123,8 +123,9 @@ const ChangelogTable = ({ activeEnv }) => {
       selector: (row) => (
         <Tooltip placement='top' label={row.changedBy}>
           <Text
-            color={primaryTextColor}
             cursor={'pointer'}
+            color={primaryTextColor}
+            textTransform={'capitalize'}
             onClick={() => {
               setActiveRow(row)
               onUserOpen()
