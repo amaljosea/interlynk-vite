@@ -337,7 +337,9 @@ const RegistrationForm = () => {
           isLoading={loading}
           onClick={handleSubmit}
           loadingText='Submitting'
-          disabled={isInvalid || loading || error || nameError}
+          disabled={
+            isInvalid || loading || error || nameError || name.length === 1
+          }
         >
           Register
         </Button>
