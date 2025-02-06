@@ -1,5 +1,4 @@
 import { useMutation } from '@apollo/client'
-import { useState } from 'react'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -10,23 +9,22 @@ const ReprocessSbom = ({ isOpen, onClose, data, projectGroup }) => {
   const { showToast } = useCustomToast()
   const { id, projectVersion } = data || ''
 
-  const [reprocessSbom] = useMutation(SbomReprocess)
-
-  const [isLoading, setIsLoading] = useState(false)
+  const [reprocessSbom, { loading }] = useMutation(SbomReprocess)
 
   const onReprocess = () => {
-    setIsLoading(true)
-    reprocessSbom({ variables: { sbomId: id } }).then((res) => {
-      const { errors } = res?.data?.sbomReprocess || ''
-      if (errors?.length > 0) {
-        showToast({ description: errors[0], status: 'error' })
-        setIsLoading(false)
-        onClose()
-      } else {
-        setIsLoading(false)
-        onClose()
-      }
-    })
+    reprocessSbom({ variables: { sbomId: id } })
+      .then((res) => {
+        const { errors } = res?.data?.sbomReprocess || {}
+        if (errors?.length > 0) {
+          showToast({ description: errors[0], status: 'error' })
+        } else {
+          showToast({
+            description: 'SBOM reprocess successfully',
+            status: 'success'
+          })
+        }
+      })
+      .finally(() => onClose())
   }
 
   const modalProps = {
@@ -43,7 +41,7 @@ const ReprocessSbom = ({ isOpen, onClose, data, projectGroup }) => {
     ]
   }
 
-  return <ConfirmationModal {...modalProps} isLoading={isLoading} />
+  return <ConfirmationModal {...modalProps} isLoading={loading} />
 }
 
 export default ReprocessSbom
