@@ -84,11 +84,15 @@ const DefectDensity = ({ filters }) => {
               updatedVulnerabilityRate:
                 totalVulnerabilityCount === 0
                   ? 0
-                  : ((vulnerabilityNotAffectedCount +
-                      vulnerabilityAffectedCount +
-                      vulnerabilityFixedCount) *
-                      100) /
-                    totalVulnerabilityCount
+                  : parseFloat(
+                      (
+                        ((vulnerabilityNotAffectedCount +
+                          vulnerabilityAffectedCount +
+                          vulnerabilityFixedCount) *
+                          100) /
+                        totalVulnerabilityCount
+                      ).toFixed(2)
+                    )
             }
           }
 

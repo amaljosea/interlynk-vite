@@ -121,11 +121,15 @@ const PatchVelocity = ({ filters }) => {
       statusAgePresentAverage:
         entry?.statusCount === 0
           ? 0
-          : entry?.statusAgePresent / entry?.statusCount,
+          : parseFloat(
+              (entry?.statusAgePresent / entry?.statusCount).toFixed(2)
+            ),
       statusAgeResolvedAverage:
         entry?.statusCount === 0
           ? 0
-          : entry?.statusAgeResolved / entry?.statusCount
+          : parseFloat(
+              (entry?.statusAgeResolved / entry?.statusCount).toFixed(2)
+            )
     }))
   }
 
