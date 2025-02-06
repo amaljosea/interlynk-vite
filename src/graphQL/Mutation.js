@@ -262,21 +262,6 @@ export const orgRuleUpdate = gql`
   }
 `
 
-// CREATE USER
-export const createOrgUser = gql`
-  mutation createOrgUser($name: String!, $email: String!) {
-    userCreate(input: { name: $name, email: $email }) {
-      errors
-      user {
-        id
-        name
-        email
-        role
-      }
-    }
-  }
-`
-
 // DELETE USER
 export const deleteOrgUser = gql`
   mutation deleteOrgUser($userId: Uuid) {
@@ -408,272 +393,6 @@ export const ProjectSettingUpdate = gql`
         internalCompMatchingEnabled
         vulnScanningEnabled
         jiraProject
-      }
-      errors
-    }
-  }
-`
-
-export const OrgConnectorRefresh = gql`
-  mutation OrgConnectorRefresh {
-    organizationConnectorRefresh(input: {}) {
-      errors
-    }
-  }
-`
-
-export const OrgConnectorCreate = gql`
-  mutation OrgConnectorCreate(
-    $connId: Uuid!
-    $name: String!
-    $user: String!
-    $token: String!
-    $enabled: Boolean
-    $region: String
-  ) {
-    organizationConnectorCreate(
-      input: {
-        connectorId: $connId
-        name: $name
-        username: $user
-        token: $token
-        enabled: $enabled
-        awsRegion: $region
-      }
-    ) {
-      organizationConnector {
-        id
-        organizationId
-        connectorId
-        connector {
-          name
-        }
-        name
-        username
-        enabled
-      }
-    }
-  }
-`
-
-export const OrgConnectorUpdate = gql`
-  mutation OrgConnectorUpdate($id: ID!, $name: String, $enabled: Boolean) {
-    organizationConnectorUpdate(
-      input: { id: $id, name: $name, enabled: $enabled }
-    ) {
-      organizationConnector {
-        id
-        organizationId
-        connectorId
-        connector {
-          name
-        }
-        name
-        username
-        enabled
-      }
-    }
-  }
-`
-
-export const OrgConnectorDelete = gql`
-  mutation OrgConnectorDelete($id: ID!) {
-    organizationConnectorDelete(input: { id: $id }) {
-      organizationConnector {
-        id
-      }
-    }
-  }
-`
-
-export const scannerUpdate = gql`
-  mutation scannerUpdate(
-    $id: ID!
-    $company: String!
-    $name: String!
-    $version: String!
-    $description: String!
-    $releasedAt: ISO8601Date!
-  ) {
-    scannerUpdate(
-      input: {
-        id: $id
-        company: $company
-        name: $name
-        version: $version
-        description: $description
-        releasedAt: $releasedAt
-      }
-    ) {
-      scanner {
-        id
-        company
-        name
-        description
-        version
-      }
-    }
-  }
-`
-
-export const imageCreate = gql`
-  mutation orgImageCreate($id: Uuid!, $name: String!) {
-    imageCreate(input: { organizationConnectorId: $id, name: $name }) {
-      image {
-        id
-        name
-        organizationConnector {
-          id
-          organizationId
-          connectorId
-          name
-          username
-          enabled
-        }
-        organizationConnectorId
-        updatedAt
-      }
-    }
-  }
-`
-
-export const ImageUpdate = gql`
-  mutation ImageUpdate($id: ID!, $scanEnabled: Boolean, $scanRefresh: Boolean) {
-    imageUpdate(
-      input: { id: $id, scanEnabled: $scanEnabled, scanRefresh: $scanRefresh }
-    ) {
-      image {
-        id
-        name
-        updatedAt
-      }
-      errors
-    }
-  }
-`
-
-export const AddScannerImage = gql`
-  mutation AddScannerImage($imageID: Uuid!, $scannerID: Uuid!) {
-    imageScannerAdd(input: { imageId: $imageID, scannerId: $scannerID }) {
-      imageScanner {
-        id
-        scanner {
-          id
-          name
-        }
-        imageVersion {
-          id
-          name
-          image {
-            id
-            name
-          }
-        }
-      }
-      errors
-    }
-  }
-`
-
-export const RemoveScannerImage = gql`
-  mutation RemoveScannerImage($imageID: Uuid!, $scannerID: Uuid!) {
-    imageScannerRemove(input: { imageId: $imageID, scannerId: $scannerID }) {
-      errors
-    }
-  }
-`
-
-export const imageVersionCreate = gql`
-  mutation imageVersionCreate(
-    $imageId: Uuid!
-    $name: String!
-    $size: Int!
-    $imageShaId: String!
-  ) {
-    imageVersionCreate(
-      input: {
-        imageId: $imageId
-        name: $name
-        sizeInBytes: $size
-        imageShaId: $imageShaId
-      }
-    ) {
-      imageVersion {
-        id
-        image {
-          id
-          name
-          organizationConnectorId
-        }
-        imageShaId
-        name
-        sizeInBytes
-        updatedAt
-      }
-    }
-  }
-`
-
-export const VexVulnCreate = gql`
-  mutation VexVulnCreate(
-    $imageVersionID: Uuid!
-    $cveID: String!
-    $compName: String!
-    $compVersion: String!
-    $notes: String
-    $vexStatusID: Uuid!
-    $vexJustificationID: Uuid
-    $fixedVersionID: Uuid
-  ) {
-    vexVulnCreate(
-      input: {
-        imageVersionId: $imageVersionID
-        cveId: $cveID
-        compName: $compName
-        compVersion: $compVersion
-        notes: $notes
-        vexJustificationId: $vexJustificationID
-        vexStatusId: $vexStatusID
-        fixedByImageVersionId: $fixedVersionID
-      }
-    ) {
-      vexVuln {
-        id
-        cveId
-        compName
-        compVersion
-        fixedByImageVersionId
-        fixedByImageVersion {
-          name
-        }
-        vexJustification {
-          id
-          name
-        }
-        vexStatus {
-          id
-          name
-        }
-      }
-      errors
-    }
-  }
-`
-
-export const OrgConnectorValidate = gql`
-  mutation OrgConnectorValidate($id: ID!) {
-    organizationConnectorValidate(input: { id: $id }) {
-      errors
-    }
-  }
-`
-
-export const UpdateImageVersion = gql`
-  mutation UpdateImageVersion($id: ID!, $scanRefresh: Boolean) {
-    imageVersionUpdate(input: { id: $id, scanRefresh: $scanRefresh }) {
-      imageVersion {
-        id
-        name
       }
       errors
     }
@@ -892,36 +611,6 @@ export const toolCreate = gql`
     toolCreate(
       input: {
         sbomId: $sbomId
-        name: $name
-        version: $version
-        vendor: $vendor
-      }
-    ) {
-      tool {
-        id
-        name
-        version
-        vendor
-        updatedAt
-      }
-      errors
-    }
-  }
-`
-
-// UPDATE SBOM TOOL
-export const toolUpdate = gql`
-  mutation UpdateTools(
-    $toolID: Uuid!
-    $sbomID: Uuid!
-    $name: String
-    $version: String
-    $vendor: String
-  ) {
-    toolUpdate(
-      input: {
-        toolId: $toolID
-        sbomId: $sbomID
         name: $name
         version: $version
         vendor: $vendor
@@ -1439,58 +1128,6 @@ export const updateBulkCompVex = gql`
   }
 `
 
-// UPDATE GLOBAL VULN STATUS
-export const updateBulkVulnVex = gql`
-  mutation updateBulkVulnVex(
-    $vulnIds: [Uuid!]!
-    $vexStatusId: Uuid!
-    $vexJustificationId: Uuid
-    $cdxResponseId: Uuid
-    $note: String
-    $impact: String
-    $detail: String
-    $action: String
-    $fixedIn: String
-    $sbomId: Uuid
-    $projectGroupId: Uuid
-    $projectId: Uuid
-  ) {
-    vulnVexBulkUpdate(
-      input: {
-        vulnIds: $vulnIds
-        vexStatusId: $vexStatusId
-        vexJustificationId: $vexJustificationId
-        cdxResponseId: $cdxResponseId
-        note: $note
-        impact: $impact
-        detail: $detail
-        action: $action
-        fixedIn: $fixedIn
-        sbomId: $sbomId
-        projectGroupId: $projectGroupId
-        projectId: $projectId
-      }
-    ) {
-      errors
-      componentVulns {
-        actionStmt
-        cdxResponseId
-        componentId
-        detail
-        fixedIn
-        id
-        impact
-        note
-        vexJustificationId
-        vexStatusId
-      }
-      vuln {
-        vulnId
-      }
-    }
-  }
-`
-
 // CREATE COMPONENT RELATION
 export const CreateCompRelation = gql`
   mutation CreateCompRelation($from: Uuid!, $to: Uuid!, $relType: String!) {
@@ -1517,83 +1154,12 @@ export const CreateCompRelation = gql`
   }
 `
 
-// UPDATE COMPONENT RELATION
-export const UpdateCompRelation = gql`
-  mutation UpdateCompRelation(
-    $relId: Uuid!
-    $from: Uuid
-    $to: Uuid
-    $relType: String
-  ) {
-    componentRelationUpdate(
-      input: {
-        compRelationId: $relId
-        fromCompId: $from
-        toCompId: $to
-        relationType: $relType
-      }
-    ) {
-      compRelation {
-        id
-        fromComp {
-          id
-          name
-        }
-        toComp {
-          id
-          name
-        }
-        relType
-      }
-      errors
-    }
-  }
-`
-
 // DELETE COMPONENT RELATION
 export const DeleteCompRelation = gql`
   mutation DeleteCompRelation($relId: Uuid!) {
     componentRelationDelete(input: { compRelationId: $relId }) {
       compRelation {
         id
-      }
-      errors
-    }
-  }
-`
-
-// CREATE AUTOMATION
-export const CreateAutomation = gql`
-  mutation CreateAutomation(
-    $projectId: Uuid!
-    $applicable: AutoCheckApplicability!
-    $condition: AutoCheckCondition!
-    $attr: AutoCheckAttrNames!
-    $enabled: Boolean!
-    $compName: String
-    $compVersion: String
-    $set: JSON
-  ) {
-    autoCheckCreate(
-      input: {
-        projectId: $projectId
-        applicability: $applicable
-        condition: $condition
-        attrName: $attr
-        enabled: $enabled
-        compName: $compName
-        compVersion: $compVersion
-        setTo: $set
-      }
-    ) {
-      autoCheck {
-        id
-        applicability
-        condition
-        attrName
-        enabled
-        lookup
-        setTo
       }
       errors
     }
@@ -2925,16 +2491,6 @@ export const SbomReprocess = gql`
   }
 `
 
-export const OrganizationAssignAwsToken = gql`
-  mutation OrganizationAssignAwsToken($awsRegistrationToken: String!) {
-    organizationAssignAwsToken(
-      input: { awsRegistrationToken: $awsRegistrationToken }
-    ) {
-      errors
-    }
-  }
-`
-
 export const EnterpriseUpgradeRequest = gql`
   mutation EnterpriseUpgradeRequest {
     enterpriseUpgradeRequest(input: {}) {
@@ -3092,17 +2648,6 @@ export const UpdateScoreSetting = gql`
         contributorThresholdMax
         contributorThresholdMin
         componentAbandonedThreshold
-      }
-      errors
-    }
-  }
-`
-
-export const DeleteScoreSetting = gql`
-  mutation DeleteScoreSetting {
-    scoreSettingDelete {
-      scoreSetting {
-        id
       }
       errors
     }
