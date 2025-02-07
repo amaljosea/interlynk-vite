@@ -361,14 +361,16 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
       </Card>
 
       {/* Personal Drawer */}
-      <PersonalDrawer
-        inputRef={inputRef}
-        isOpen={PERSONAL.isOpen}
-        onClose={PERSONAL.onClose}
-      />
+      {PERSONAL.isOpen && (
+        <PersonalDrawer
+          inputRef={inputRef}
+          isOpen={PERSONAL.isOpen}
+          onClose={PERSONAL.onClose}
+        />
+      )}
 
       {/* Edit organisation Drawer */}
-      <OrgDrawer isOpen={ORG.isOpen} onClose={ORG.onClose} />
+      {ORG.isOpen && <OrgDrawer isOpen={ORG.isOpen} onClose={ORG.onClose} />}
     </>
   )
 }

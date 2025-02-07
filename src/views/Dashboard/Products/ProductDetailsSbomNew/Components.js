@@ -405,15 +405,17 @@ const Components = ({ sbomData }) => {
       )}
 
       {/* SUPPLIER DELETE MODAL */}
-      <ConfirmationModal
-        isLoading={supLoading}
-        name={activeRow?.name}
-        title={'Remove Supplier'}
-        isOpen={DELETE_SUPPLIER?.isOpen}
-        onClose={DELETE_SUPPLIER?.onClose}
-        onConfirm={() => handleSupRemove(activeRow?.id)}
-        description={`You are about to delete the Supplier : ${activeRow?.name} from this component.`}
-      />
+      {DELETE_SUPPLIER?.isOpen && (
+        <ConfirmationModal
+          isLoading={supLoading}
+          name={activeRow?.name}
+          title={'Remove Supplier'}
+          isOpen={DELETE_SUPPLIER?.isOpen}
+          onClose={DELETE_SUPPLIER?.onClose}
+          onConfirm={() => handleSupRemove(activeRow?.id)}
+          description={`You are about to delete the Supplier : ${activeRow?.name} from this component.`}
+        />
+      )}
 
       {MAP.isOpen && <HealthMap isOpen={MAP.isOpen} onClose={MAP.onClose} />}
 
