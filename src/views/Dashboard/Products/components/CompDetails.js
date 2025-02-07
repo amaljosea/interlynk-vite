@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { isCustomerView, transformLicenseString } from 'utils'
 import { infoData } from 'variables/general'
 import { componentTypes } from 'variables/general'
@@ -9,23 +9,19 @@ import { InfoIcon } from '@chakra-ui/icons'
 import {
   Checkbox,
   Divider,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
   Input,
   Select,
   Stack,
-  Text,
   Textarea,
   Tooltip,
-  chakra,
   useDisclosure
 } from '@chakra-ui/react'
+import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import LicenseField from 'components/Licenses/LicenseField'
 import LynkAlert from 'components/LynkAlert'
 import LynkDate from 'components/LynkDate'
+import LynkFormLabel from 'components/Misc/LynkLabel'
 import PrimaryWarning from 'components/Modal/PrimaryWarning'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -43,10 +39,7 @@ const CompDetails = ({ data, primaryComp }) => {
 
   const { dispatch } = useGlobalState()
   const { prodCompDispatch } = dispatch
-  const { primaryErrorColor, primaryBlueText } = useThemeColor([
-    'primaryErrorColor',
-    'primaryBlueText'
-  ])
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   const {
     tab,
     unsavedChanges,
@@ -204,20 +197,12 @@ const CompDetails = ({ data, primaryComp }) => {
     <>
       <Stack direction={'column'} spacing={4} px={6}>
         {/* Name */}
-        <FormControl isDisabled={customerView}>
-          <FormLabel htmlFor='name'>
-            <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-              <Text>
-                Name
-                <chakra.span color={primaryErrorColor} ml={1}>
-                  *
-                </chakra.span>
-              </Text>
-              <Tooltip label={onCheck(`Component Name`)}>
-                <InfoIcon color={primaryBlueText} />
-              </Tooltip>
-            </Flex>
-          </FormLabel>
+        <FormControl isDisabled={customerView} isRequired>
+          <LynkFormLabel
+            label='Name'
+            htmlFor='name'
+            info={onCheck(`Component Name`)}
+          />
           <Input
             name='name'
             sx={inputStyle}
@@ -228,14 +213,11 @@ const CompDetails = ({ data, primaryComp }) => {
         </FormControl>
         {/* Description */}
         <FormControl isDisabled={customerView}>
-          <FormLabel htmlFor='compDescription'>
-            <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-              <Text>Description</Text>
-              <Tooltip label={onCheck(`Component Description`)}>
-                <InfoIcon color={primaryBlueText} />
-              </Tooltip>
-            </Flex>
-          </FormLabel>
+          <LynkFormLabel
+            label='Description'
+            htmlFor='compDescription'
+            info={onCheck(`Component Description`)}
+          />
           <Textarea
             sx={inputStyle}
             name='description'
@@ -248,14 +230,11 @@ const CompDetails = ({ data, primaryComp }) => {
         </FormControl>
         {/* Copyright */}
         <FormControl isDisabled={customerView}>
-          <FormLabel htmlFor='copyright'>
-            <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-              <Text>Copyright</Text>
-              <Tooltip label={onCheck(`Component Copyright`)}>
-                <InfoIcon color={primaryBlueText} />
-              </Tooltip>
-            </Flex>
-          </FormLabel>
+          <LynkFormLabel
+            label='Copyright'
+            htmlFor='copyright'
+            info={onCheck(`Component Copyright`)}
+          />
           <Textarea
             sx={inputStyle}
             name='copyright'
@@ -267,20 +246,16 @@ const CompDetails = ({ data, primaryComp }) => {
           />
         </FormControl>
         {/* Version */}
-        <FormControl isDisabled={customerView} isInvalid={invalidVersion}>
-          <FormLabel htmlFor='version'>
-            <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-              <Text>
-                Version{' '}
-                <chakra.span color={primaryErrorColor} ml={1}>
-                  *
-                </chakra.span>
-              </Text>
-              <Tooltip label={onCheck(`Component Version`)}>
-                <InfoIcon color={primaryBlueText} />
-              </Tooltip>
-            </Flex>
-          </FormLabel>
+        <FormControl
+          isRequired
+          isDisabled={customerView}
+          isInvalid={invalidVersion}
+        >
+          <LynkFormLabel
+            label='Version'
+            htmlFor='version'
+            info={onCheck(`Component Version`)}
+          />
           <Input
             name='version'
             sx={inputStyle}
@@ -295,14 +270,11 @@ const CompDetails = ({ data, primaryComp }) => {
         </FormControl>
         {/* GROUP */}
         <FormControl isDisabled={customerView}>
-          <FormLabel htmlFor='groupInfo'>
-            <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
-              <Text>Group</Text>
-              <Tooltip label={onCheck(`Component Group`)}>
-                <InfoIcon color={primaryBlueText} />
-              </Tooltip>
-            </Flex>
-          </FormLabel>
+          <LynkFormLabel
+            label='Group'
+            htmlFor='groupInfo'
+            info={onCheck(`Component Group`)}
+          />
           <Input
             name='group'
             value={details?.group}
@@ -312,20 +284,12 @@ const CompDetails = ({ data, primaryComp }) => {
           />
         </FormControl>
         {/* KIND */}
-        <FormControl isDisabled={customerView}>
-          <FormLabel htmlFor='componentType'>
-            <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-              <Text>
-                Type{' '}
-                <chakra.span color={primaryErrorColor} ml={1}>
-                  *
-                </chakra.span>
-              </Text>
-              <Tooltip label={onCheck(`Component Type`)}>
-                <InfoIcon color={primaryBlueText} />
-              </Tooltip>
-            </Flex>
-          </FormLabel>
+        <FormControl isRequired isDisabled={customerView}>
+          <LynkFormLabel
+            label='Type'
+            htmlFor='componentType'
+            info={onCheck(`Component Type`)}
+          />
           <Select
             name='kind'
             value={details?.kind}
@@ -353,14 +317,11 @@ const CompDetails = ({ data, primaryComp }) => {
         />
         {/* SCOPE */}
         <FormControl isDisabled={customerView}>
-          <FormLabel htmlFor='compScope'>
-            <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
-              <Text>Scope</Text>
-              <Tooltip label={onCheck(`Component Scope`)}>
-                <InfoIcon color={primaryBlueText} />
-              </Tooltip>
-            </Flex>
-          </FormLabel>
+          <LynkFormLabel
+            label='Scope'
+            htmlFor='compScope'
+            info={onCheck(`Component Scope`)}
+          />
           <Select
             name='scope'
             sx={inputStyle}
@@ -377,14 +338,11 @@ const CompDetails = ({ data, primaryComp }) => {
         </FormControl>
         {/* SUPPRT LEVEL */}
         <FormControl hidden={customerView}>
-          <FormLabel htmlFor='supportLevel'>
-            <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
-              <Text>Support Level</Text>
-              <Tooltip label={onCheck(`Support Level`)}>
-                <InfoIcon color={primaryBlueText} />
-              </Tooltip>
-            </Flex>
-          </FormLabel>
+          <LynkFormLabel
+            label='Support Level'
+            htmlFor='supportLevel'
+            info={onCheck(`Support Level`)}
+          />
           <Select
             sx={inputStyle}
             name='supportLevel'
@@ -405,14 +363,11 @@ const CompDetails = ({ data, primaryComp }) => {
         </FormControl>
         {/* END-OF-SUPPORT DATE */}
         <FormControl mb={5} isInvalid={!isValidDate} hidden={customerView}>
-          <FormLabel htmlFor='endOfSupport'>
-            <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
-              <Text>End-Of-Support Date</Text>
-              <Tooltip label={onCheck(`End-of-Support Date`)}>
-                <InfoIcon color={primaryBlueText} />
-              </Tooltip>
-            </Flex>
-          </FormLabel>
+          <LynkFormLabel
+            label='End-Of-Support Date'
+            htmlFor='endOfSupport'
+            info={onCheck(`End-of-Support Date`)}
+          />
           <LynkDate
             name='endOfSupport'
             value={details?.endOfSupport}

@@ -22,6 +22,7 @@ import LicenseField from 'components/Licenses/LicenseField'
 import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
 import CompInfo from 'components/Misc/CompInfo'
+import LynkFormLabel from 'components/Misc/LynkLabel'
 import PrimaryWarning from 'components/Modal/PrimaryWarning'
 import PackageLookup from 'components/PackageLookup'
 import PurlEditor from 'components/PurlEditor'
@@ -264,20 +265,12 @@ function ComponentAddModal(props) {
               <DividerWithText text='OR' />
               <Stack spacing={4}>
                 {/* Name */}
-                <FormControl isReadOnly={customerView}>
-                  <FormLabel htmlFor='name'>
-                    <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                      <Text>
-                        Name
-                        <chakra.span color={primaryErrorColor} ml={1}>
-                          *
-                        </chakra.span>
-                      </Text>
-                      <Tooltip label={onCheck(`Component Name`)}>
-                        <InfoIcon color={primaryBlueText} />
-                      </Tooltip>
-                    </Flex>
-                  </FormLabel>
+                <FormControl isRequired isReadOnly={customerView}>
+                  <LynkFormLabel
+                    label='Name'
+                    htmlFor='name'
+                    info={onCheck(`Component Name`)}
+                  />
                   <Input
                     name='name'
                     sx={inputStyle}
@@ -290,14 +283,11 @@ function ComponentAddModal(props) {
                 </FormControl>
                 {/* Description */}
                 <FormControl isReadOnly={customerView}>
-                  <FormLabel htmlFor='compDescription'>
-                    <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                      <Text>Description</Text>
-                      <Tooltip label={onCheck(`Component Description`)}>
-                        <InfoIcon color={primaryBlueText} />
-                      </Tooltip>
-                    </Flex>
-                  </FormLabel>
+                  <LynkFormLabel
+                    label='Description'
+                    htmlFor='compDescription'
+                    info={onCheck(`Component Description`)}
+                  />
                   <Textarea
                     sx={inputStyle}
                     name='description'
@@ -310,14 +300,11 @@ function ComponentAddModal(props) {
                 </FormControl>
                 {/* Copyright */}
                 <FormControl isReadOnly={customerView}>
-                  <FormLabel htmlFor='copyright'>
-                    <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                      <Text>Copyright</Text>
-                      <Tooltip label={onCheck(`Component Copyright`)}>
-                        <InfoIcon color={primaryBlueText} />
-                      </Tooltip>
-                    </Flex>
-                  </FormLabel>
+                  <LynkFormLabel
+                    label='Copyright'
+                    htmlFor='copyright'
+                    info={onCheck(`Component Copyright`)}
+                  />
                   <Textarea
                     sx={inputStyle}
                     name='copyright'
@@ -330,22 +317,15 @@ function ComponentAddModal(props) {
                 </FormControl>
                 {/* Version */}
                 <FormControl
+                  isRequired
                   isReadOnly={customerView}
                   isInvalid={invalidVersion}
                 >
-                  <FormLabel htmlFor='version'>
-                    <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                      <Text>
-                        Version{' '}
-                        <chakra.span color={primaryErrorColor} ml={1}>
-                          *
-                        </chakra.span>
-                      </Text>
-                      <Tooltip label={onCheck(`Component Version`)}>
-                        <InfoIcon color={primaryBlueText} />
-                      </Tooltip>
-                    </Flex>
-                  </FormLabel>
+                  <LynkFormLabel
+                    label='Version'
+                    htmlFor='version'
+                    info={onCheck(`Component Version`)}
+                  />
                   <Input
                     name='version'
                     sx={inputStyle}
@@ -362,14 +342,11 @@ function ComponentAddModal(props) {
                 </FormControl>
                 {/* GROUP */}
                 <FormControl isReadOnly={customerView}>
-                  <FormLabel htmlFor='groupInfo'>
-                    <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
-                      <Text>Group</Text>
-                      <Tooltip label={onCheck(`Component Group`)}>
-                        <InfoIcon color={primaryBlueText} />
-                      </Tooltip>
-                    </Flex>
-                  </FormLabel>
+                  <LynkFormLabel
+                    label='Group'
+                    htmlFor='groupInfo'
+                    info={onCheck(`Component Group`)}
+                  />
                   <Input
                     name='group'
                     value={details?.group}
@@ -381,20 +358,12 @@ function ComponentAddModal(props) {
                   />
                 </FormControl>
                 {/* KIND */}
-                <FormControl>
-                  <FormLabel htmlFor='componentType'>
-                    <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                      <Text>
-                        Type{' '}
-                        <chakra.span color={primaryErrorColor} ml={1}>
-                          *
-                        </chakra.span>
-                      </Text>
-                      <Tooltip label={onCheck(`Component Type`)}>
-                        <InfoIcon color={primaryBlueText} />
-                      </Tooltip>
-                    </Flex>
-                  </FormLabel>
+                <FormControl isRequired>
+                  <LynkFormLabel
+                    label='Type'
+                    htmlFor='componentType'
+                    info={onCheck(`Component Type`)}
+                  />
                   <Select
                     name='kind'
                     aria-label='kind'
@@ -450,14 +419,11 @@ function ComponentAddModal(props) {
                 />
                 {/* SCOPE */}
                 <FormControl>
-                  <FormLabel htmlFor='compScope'>
-                    <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
-                      <Text>Scope</Text>
-                      <Tooltip label={onCheck(`Component Scope`)}>
-                        <InfoIcon color={primaryBlueText} />
-                      </Tooltip>
-                    </Flex>
-                  </FormLabel>
+                  <LynkFormLabel
+                    label='Scope'
+                    htmlFor='compScope'
+                    info={onCheck(`Component Scope`)}
+                  />
                   <Select
                     name='scope'
                     value={details?.scope}
@@ -477,14 +443,11 @@ function ComponentAddModal(props) {
                 </FormControl>
                 {/* SUPPRT LEVEL */}
                 <FormControl hidden={signedUrlParams}>
-                  <FormLabel htmlFor='compScope'>
-                    <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
-                      <Text>Support Level</Text>
-                      <Tooltip label={onCheck(`Support Level`)}>
-                        <InfoIcon color={primaryBlueText} />
-                      </Tooltip>
-                    </Flex>
-                  </FormLabel>
+                  <LynkFormLabel
+                    label='Support Level'
+                    htmlFor='supportLevel'
+                    info={onCheck(`Support Level`)}
+                  />
                   <Select
                     sx={inputStyle}
                     name='supportLevel'
@@ -513,14 +476,11 @@ function ComponentAddModal(props) {
                   isInvalid={!isValidDate}
                   hidden={signedUrlParams}
                 >
-                  <FormLabel htmlFor='endOfSupport'>
-                    <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
-                      <Text>End-Of-Support Date</Text>
-                      <Tooltip label={onCheck(`End-of-Support Date`)}>
-                        <InfoIcon color={primaryBlueText} />
-                      </Tooltip>
-                    </Flex>
-                  </FormLabel>
+                  <LynkFormLabel
+                    label='End-Of-Support Date'
+                    htmlFor='endOfSupport'
+                    info={onCheck(`End-of-Support Date`)}
+                  />
                   <LynkDate
                     value={details?.endOfSupport}
                     onChange={handleDateChange}

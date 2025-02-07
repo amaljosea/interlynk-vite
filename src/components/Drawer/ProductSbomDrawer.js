@@ -21,6 +21,7 @@ import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import LicenseField from 'components/Licenses/LicenseField'
 import LynkSelect from 'components/LynkSelect'
+import LynkFormLabel from 'components/Misc/LynkLabel'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -260,20 +261,12 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
           <DrawerBody overflowX={'hidden'}>
             <Stack direction={'column'} spacing={4} pt={2} pb={4}>
               {/* Name */}
-              <FormControl isReadOnly={customerView}>
-                <FormLabel htmlFor='compName'>
-                  <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                    <Text>
-                      Name
-                      <chakra.span color={primaryErrorColor} ml={1}>
-                        *
-                      </chakra.span>
-                    </Text>
-                    <Tooltip label={onCheck(`Component Name`)}>
-                      <InfoIcon color={primaryBlueText} />
-                    </Tooltip>
-                  </Flex>
-                </FormLabel>
+              <FormControl isRequired isReadOnly={customerView}>
+                <LynkFormLabel
+                  label='Name'
+                  htmlFor='compName'
+                  info={onCheck(`Component Name`)}
+                />
                 <Input
                   size='md'
                   fontSize={'sm'}
@@ -284,14 +277,11 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
               </FormControl>
               {/* Description */}
               <FormControl isReadOnly={customerView}>
-                <FormLabel htmlFor='compDescription'>
-                  <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                    <Text>Description</Text>
-                    <Tooltip label={onCheck(`Component Description`)}>
-                      <InfoIcon color={primaryBlueText} />
-                    </Tooltip>
-                  </Flex>
-                </FormLabel>
+                <LynkFormLabel
+                  label='Description'
+                  htmlFor='compDescription'
+                  info={onCheck(`Component Description`)}
+                />
                 <Textarea
                   size='md'
                   fontSize={'sm'}
@@ -301,20 +291,16 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
                 />
               </FormControl>
               {/* Version */}
-              <FormControl isReadOnly={customerView} isInvalid={invalidVersion}>
-                <FormLabel htmlFor='compVersion'>
-                  <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                    <Text>
-                      Version{' '}
-                      <chakra.span color={primaryErrorColor} ml={1}>
-                        *
-                      </chakra.span>
-                    </Text>
-                    <Tooltip label={onCheck(`Component Version`)}>
-                      <InfoIcon color={primaryBlueText} />
-                    </Tooltip>
-                  </Flex>
-                </FormLabel>
+              <FormControl
+                isRequired
+                isReadOnly={customerView}
+                isInvalid={invalidVersion}
+              >
+                <LynkFormLabel
+                  label='Version'
+                  htmlFor='compVersion'
+                  info={onCheck(`Component Version`)}
+                />
                 <Input
                   size='md'
                   fontSize={'sm'}
@@ -329,14 +315,11 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
               </FormControl>
               {/* GROUP */}
               <FormControl isReadOnly={customerView}>
-                <FormLabel htmlFor='groupInfo'>
-                  <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
-                    <Text>Group</Text>
-                    <Tooltip label={onCheck(`Component Group`)}>
-                      <InfoIcon color={primaryBlueText} />
-                    </Tooltip>
-                  </Flex>
-                </FormLabel>
+                <LynkFormLabel
+                  label='Group'
+                  htmlFor='groupInfo'
+                  info={onCheck(`Component Group`)}
+                />
                 <Input
                   size='md'
                   fontSize={'sm'}
@@ -346,20 +329,12 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
                 />
               </FormControl>
               {/* KIND */}
-              <FormControl>
-                <FormLabel htmlFor='componentType'>
-                  <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                    <Text>
-                      Type{' '}
-                      <chakra.span color={primaryErrorColor} ml={1}>
-                        *
-                      </chakra.span>
-                    </Text>
-                    <Tooltip label={onCheck(`Component Type`)}>
-                      <InfoIcon color={primaryBlueText} />
-                    </Tooltip>
-                  </Flex>
-                </FormLabel>
+              <FormControl isRequired>
+                <LynkFormLabel
+                  label='Type'
+                  htmlFor='componentType'
+                  info={onCheck(`Component Type`)}
+                />
                 <Select
                   fontSize={'sm'}
                   value={compKind}
@@ -383,14 +358,11 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
               </FormControl>
               {/* PHASES */}
               <FormControl hidden={customerView}>
-                <FormLabel htmlFor='compPhases'>
-                  <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                    <Text>Phases</Text>
-                    <Tooltip label={onCheck(`SBOM Phases`)}>
-                      <InfoIcon color={primaryBlueText} />
-                    </Tooltip>
-                  </Flex>
-                </FormLabel>
+                <LynkFormLabel
+                  label='Phases'
+                  htmlFor='compPhases'
+                  info={onCheck(`SBOM Phases`)}
+                />
                 <LynkSelect
                   isMulti={true}
                   value={phases}
@@ -410,14 +382,11 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
               />
               {/* SCOPE */}
               <FormControl>
-                <FormLabel htmlFor='compScope'>
-                  <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
-                    <Text>Scope</Text>
-                    <Tooltip label={onCheck(`Component Scope`)}>
-                      <InfoIcon color={primaryBlueText} />
-                    </Tooltip>
-                  </Flex>
-                </FormLabel>
+                <LynkFormLabel
+                  label='Scope'
+                  htmlFor='compScope'
+                  info={onCheck(`Component Scope`)}
+                />
                 <Select
                   id='compScope'
                   name='compScope'

@@ -5,10 +5,11 @@ import ReactSelect, { components } from 'react-select'
 import { getSignedUrlParams, parseLicenseString } from 'utils'
 import { infoData } from 'variables/general'
 
-import { InfoIcon } from '@chakra-ui/icons'
-import { Flex, Stack, Text, Tooltip, VStack } from '@chakra-ui/react'
+import { Flex, Stack, Text, VStack } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
-import { FormControl, FormLabel } from '@chakra-ui/react'
+import { FormControl } from '@chakra-ui/react'
+
+import LynkFormLabel from 'components/Misc/LynkLabel'
 
 import { useDebounce } from 'hooks/useDebounce'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -37,10 +38,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
 
   const [searchText, setSearchText] = useState('')
   const debouncedSearchTerm = useDebounce(searchText, 300)
-  const { primaryBlueText, primaryTextColor } = useThemeColor([
-    'primaryBlueText',
-    'primaryTextColor'
-  ])
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const formatLicenseString = (str = '') => {
     const matchingWords = ['or', 'and', 'with']
@@ -198,16 +196,11 @@ const LicenseField = ({ resolved, sbomView, license }) => {
     <>
       <VStack spacing={4} alignItems={'flex-start'}>
         <FormControl isDisabled={signedUrlParams}>
-          <FormLabel htmlFor={licenseType}>
-            <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-              <Text>License</Text>
-              {!sbomView && (
-                <Tooltip label={onCheck(`Component License`)}>
-                  <InfoIcon color={primaryBlueText} />
-                </Tooltip>
-              )}
-            </Flex>
-          </FormLabel>
+          <LynkFormLabel
+            label='License'
+            htmlFor={licenseType}
+            info={!sbomView ? onCheck(`Component License`) : null}
+          />
           {/* LICENSE */}
           <ReactSelect
             name='license'
