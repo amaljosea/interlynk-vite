@@ -137,7 +137,7 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
                       </Flex>
                     ))
                   ) : license?.length === 0 ? (
-                    'N/A'
+                    <Text color={primaryTextColor}>N/A</Text>
                   ) : urls && urls.length > 0 ? (
                     urls.map((item, index) => (
                       <Flex
@@ -227,7 +227,7 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
                       ))}
                     </Flex>
                   ) : updatedValue?.length === 0 ? (
-                    'N/A'
+                    <Text color={primaryTextColor}>N/A</Text>
                   ) : urls && urls.length > 0 ? (
                     <Flex my={2} gap={2} flexDir={'column'} flexWrap={'wrap'}>
                       {urls.map((item, index) => (
