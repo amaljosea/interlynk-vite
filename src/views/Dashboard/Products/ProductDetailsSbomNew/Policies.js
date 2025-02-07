@@ -52,8 +52,8 @@ const Policies = ({ sbomData }) => {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const [activeRow, setActiveRow] = useState(null)
-  const [activePolicy, setActivePolicy] = useState('')
+  const [activeRule, setActiveRule] = useState(null)
+  const [activePolicy, setActivePolicy] = useState(null)
 
   const [policyScan] = useMutation(SbomPolicyScan)
 
@@ -79,9 +79,9 @@ const Policies = ({ sbomData }) => {
   }
 
   const onCheckViolations = useCallback(
-    (name, item) => {
-      setActiveRow(item)
-      setActivePolicy(name)
+    (data, rule) => {
+      setActivePolicy(data)
+      setActiveRule(rule)
       onOpen()
     },
     [onOpen]
@@ -109,7 +109,9 @@ const Policies = ({ sbomData }) => {
           expandableRows
           expandOnRowClicked
           expandableRowsComponent={ExpandedComponent}
-          expandableRowsComponentProps={{ onCheckViolations }}
+          expandableRowsComponentProps={{
+            onCheckViolations
+          }}
         />
 
         <Pagination {...paginationProps} />
@@ -120,8 +122,8 @@ const Policies = ({ sbomData }) => {
           isOpen={isOpen}
           sbomId={sbomId}
           onClose={onClose}
-          activeRow={activeRow}
-          policy={activePolicy}
+          activeRow={activeRule}
+          policy={activePolicy?.policy?.name || ''}
         />
       )}
     </>

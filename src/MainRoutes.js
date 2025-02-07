@@ -16,6 +16,7 @@ import PubSbomDetails from 'views/Customer/Sbom/index.js'
 import Analytics from 'views/Dashboard/Analytics/index.js'
 import Dashboard from 'views/Dashboard/Dashboard'
 import Policies from 'views/Dashboard/Policies'
+import PolicyDetails from 'views/Dashboard/Policies/PolicyDetails.js'
 import Products from 'views/Dashboard/Products'
 import ProductDetailsMain from 'views/Dashboard/Products/ProductDetailsMain.js'
 import ProductDetailsSbomNew from 'views/Dashboard/Products/ProductDetailsSbomNew/index.js'
@@ -31,6 +32,7 @@ import ColorDisplay from 'views/Dashboard/colors/index.js'
 import ConditionalRoute from 'components/ConditionalRoute.js'
 import Licenses from 'components/Licenses'
 import { SentryTest } from 'components/SentryTest.js'
+import PolicyTable from 'components/Tables/PolicyTable.js'
 
 import AdminLayout from './layouts/Admin.js'
 import CustomerLayout from './layouts/Customer.js'
@@ -108,7 +110,10 @@ export const MainRoutes = () => {
             path='support'
             element={<ConditionalRoute element={Support} />}
           />
-          <Route path={`policies`} element={<Policies />} />
+          <Route path={`policies`} element={<Policies />}>
+            <Route index element={<PolicyTable />} />
+            <Route exact path=':policyid' element={<PolicyDetails />} />
+          </Route>
           <Route
             path='requests'
             element={<ConditionalRoute element={Requests} />}

@@ -1,3 +1,4 @@
+import { useQuery } from '@apollo/client'
 import { useMemo } from 'react'
 import { getIcon } from 'utils/styleUtils'
 
@@ -5,14 +6,17 @@ import { Box, Flex, Stack, Text, Tooltip } from '@chakra-ui/react'
 import { Icon, IconButton } from '@chakra-ui/react'
 import { Input, InputGroup, InputLeftAddon } from '@chakra-ui/react'
 
+import CustomLoader from 'components/CustomLoader'
 import { CustomText } from 'components/Misc/CustomText'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
+import { GetPolicyRules } from 'graphQL/Queries'
+
 import { FaEye } from 'react-icons/fa'
 
 const ExpandedComponent = ({ data, onCheckViolations }) => {
-  const { policy } = data
+  const { policy, sbom } = data || {}
 
   const { primaryBlueText, primaryTextColor, secondaryTextInverse } =
     useThemeColor([
@@ -21,7 +25,21 @@ const ExpandedComponent = ({ data, onCheckViolations }) => {
       'secondaryTextInverse'
     ])
 
+  const { data: ruleData, loading } = useQuery(GetPolicyRules, {
+    skip: policy?.id ? false : true,
+    variables: { id: policy?.id, sbomId: sbom?.id }
+  })
+
+  const { policyRules } = ruleData?.policy || {}
+
   return useMemo(() => {
+    if (loading)
+      return (
+        <Box pb={6}>
+          <CustomLoader />
+        </Box>
+      )
+
     return (
       <Flex
         p={5}
@@ -32,9 +50,9 @@ const ExpandedComponent = ({ data, onCheckViolations }) => {
       >
         <Box>
           <CustomText>RESULTS :</CustomText>
-          {policy?.policyRules?.length > 0 ? (
+          {policyRules?.length > 0 ? (
             <Stack mt={3} spacing={3}>
-              {policy?.policyRules?.map((item, index) => (
+              {policyRules?.map((item, index) => (
                 <Flex gap={3} w={'100%'} key={index} alignItems={'center'}>
                   <Text w={'32'} fontSize={'sm'} color={primaryTextColor}>
                     {index + 1}.
@@ -107,7 +125,7 @@ const ExpandedComponent = ({ data, onCheckViolations }) => {
                       w={'fit-content'}
                       colorScheme='blue'
                       fontWeight={'medium'}
-                      onClick={() => onCheckViolations(policy?.name, item)}
+                      onClick={() => onCheckViolations(data, item)}
                     />
                   </Tooltip>
                 </Flex>
@@ -122,9 +140,10 @@ const ExpandedComponent = ({ data, onCheckViolations }) => {
       </Flex>
     )
   }, [
+    data,
+    loading,
     onCheckViolations,
-    policy?.name,
-    policy?.policyRules,
+    policyRules,
     primaryBlueText,
     primaryTextColor,
     secondaryTextInverse

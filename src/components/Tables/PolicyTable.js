@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { useLocation, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import { getFullDate, timeSince, updatedValue } from 'utils'
 import { formatConditionValue } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
@@ -28,6 +28,7 @@ import { Input, InputGroup, InputLeftAddon } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 
+import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
@@ -38,15 +39,14 @@ import Pagination from 'components/Pagination'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { DeletePolicyExclusion, PolicyExclusionCreate } from 'graphQL/Mutation'
-import { PolicySubjectOperators } from 'graphQL/Queries'
+import { GetPolicies, PolicySubjectOperators } from 'graphQL/Queries'
 
-const PolicyTable = (props) => {
-  const { data, filters, setFilters, loading, paginationProps } = props
-
+const PolicyTable = () => {
   const { showToast } = useCustomToast()
   const location = useLocation()
   const params = useParams()
@@ -81,6 +81,18 @@ const PolicyTable = (props) => {
     'secondaryTextInverse',
     'primaryErrorColor'
   ])
+
+  const [filters, setFilters] = useState({
+    search: ''
+  })
+
+  const { nodes, paginationProps, loading, reset } = usePaginatedQuery(
+    GetPolicies,
+    {
+      selector: 'policies',
+      variables: { ...filters }
+    }
+  )
 
   const { search } = filters || ''
   const [activeRow, setActiveRow] = useState(null)
@@ -149,8 +161,9 @@ const PolicyTable = (props) => {
         ...oldFilter,
         search: value
       }))
+      reset()
     },
-    [setFilters]
+    [reset]
   )
 
   const handleClear = useCallback(async () => {
@@ -159,7 +172,8 @@ const PolicyTable = (props) => {
       ...oldFilter,
       search: undefined
     }))
-  }, [setFilters])
+    reset()
+  }, [reset])
 
   const onSearchInputChange = useCallback(
     (event) => {
@@ -256,9 +270,11 @@ const PolicyTable = (props) => {
       name: 'POLICY',
       selector: (row, index) => (
         <Stack my={4} spacing={1}>
-          <Text color={primaryTextColor} data-testid={`policy_${index}`}>
-            {row?.name}
-          </Text>
+          <Link to={`/vendor/policies/${row?.id}`}>
+            <Text color={primaryBlueText} data-testid={`policy_${index}`}>
+              {row?.name}
+            </Text>
+          </Link>
           <Text size='sm' color={secondaryTextInverse}>
             {row?.description}
           </Text>
@@ -274,6 +290,9 @@ const PolicyTable = (props) => {
         const { excludePrimaryComponent, excludeInternalComponent } = row || ''
         return (
           <Flex gap={2} alignItems={'center'}>
+            {!excludePrimaryComponent && !excludeInternalComponent && (
+              <Text color={primaryTextColor}>N/A</Text>
+            )}
             {excludePrimaryComponent && (
               <Tag variant='solid' colorScheme='blue'>
                 Primary
@@ -525,26 +544,28 @@ const PolicyTable = (props) => {
 
   return (
     <>
-      <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
-          columns={columns}
-          data={data || []}
-          customStyles={customStyles(headingTextColor)}
-          progressPending={loading}
-          progressComponent={<CustomLoader />}
-          subHeader
-          subHeaderComponent={subHeader}
-          expandableRows
-          expandOnRowClicked
-          expandableRowsComponent={ExpandedComponent}
-          persistTableHead
-          responsive={true}
-          conditionalRowStyles={conditionalRowStyles}
-        />
+      <Card>
+        <Flex flexDir={'column'} width={'100%'}>
+          <DataTable
+            columns={columns}
+            data={nodes || []}
+            customStyles={customStyles(headingTextColor)}
+            progressPending={loading}
+            progressComponent={<CustomLoader />}
+            subHeader
+            subHeaderComponent={subHeader}
+            expandableRows
+            expandOnRowClicked
+            expandableRowsComponent={ExpandedComponent}
+            persistTableHead
+            responsive={true}
+            conditionalRowStyles={conditionalRowStyles}
+          />
 
-        {/* PAGINATION */}
-        {<Pagination {...paginationProps} />}
-      </Flex>
+          {/* PAGINATION */}
+          {<Pagination {...paginationProps} />}
+        </Flex>
+      </Card>
 
       {UPDATE.isOpen && (
         <PolicyModal

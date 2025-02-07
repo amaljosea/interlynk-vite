@@ -1,4 +1,5 @@
 import DataTable from 'react-data-table-component'
+import { useParams } from 'react-router-dom'
 import { truncatedValue } from 'utils'
 import { customStyles } from 'utils/styleUtils'
 
@@ -10,7 +11,7 @@ import {
   DrawerHeader,
   DrawerOverlay
 } from '@chakra-ui/react'
-import { Box, Stack, Text } from '@chakra-ui/react'
+import { Box, Stack, Text, Tooltip } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import Pagination from 'components/Pagination'
@@ -22,7 +23,8 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { PolicyRuleViolations } from 'graphQL/Queries'
 
 const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
-  const { subject, category, name, operatorWording, value } = activeRow || null
+  const params = useParams()
+  const { subject, category, name, operatorWording, value } = activeRow || {}
   const { headingTextColor, primaryTextColor, secondaryTextColor } =
     useThemeColor([
       'headingTextColor',
@@ -47,10 +49,21 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
       selector: (row) => {
         const { violation, component } = row || ''
         const { primaryComponent } = violation || ''
+
+        if (params?.productgroupid) {
+          return (
+            <Box my={2}>
+              <RowComponent content={component || primaryComponent || ''} />
+            </Box>
+          )
+        }
+
         return (
-          <Box my={2}>
-            <RowComponent content={component || primaryComponent || ''} />
-          </Box>
+          <Tooltip label={component?.name}>
+            <Text fontSize={14} color={primaryTextColor}>
+              {truncatedValue(component?.name, 30)}
+            </Text>
+          </Tooltip>
         )
       },
       wrap: true

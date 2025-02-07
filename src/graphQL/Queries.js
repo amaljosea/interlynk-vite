@@ -4126,9 +4126,11 @@ export const PolicyResults = gql`
         resultType
         resultWording
         sbom {
+          id
           policyRunStatus
         }
         policy {
+          id
           name
           description
           policyRules {
@@ -4143,6 +4145,29 @@ export const PolicyResults = gql`
               totalCount
             }
           }
+        }
+      }
+    }
+  }
+`
+
+export const GetPolicyRules = gql`
+  query GetPolicyRules($id: Uuid!, $sbomId: Uuid!) {
+    policy(id: $id) {
+      name
+      policyRules {
+        category
+        createdAt
+        id
+        name
+        operator
+        operatorWording
+        policyId
+        subject
+        updatedAt
+        value
+        policyRuleViolations(sbomId: $sbomId) {
+          totalCount
         }
       }
     }
@@ -5603,6 +5628,73 @@ export const getProductsByLabels = gql`
           }
         }
       }
+    }
+  }
+`
+
+export const GetPolicyResults = gql`
+  query GetPolicyResults(
+    $policyId: [Uuid!]
+    $result: [String!]
+    $after: String
+    $before: String
+    $first: Int
+    $last: Int
+  ) {
+    policyResults(
+      policyId: $policyId
+      after: $after
+      before: $before
+      first: $first
+      last: $last
+      result: $result
+    ) {
+      totalCount
+      pageInfo {
+        endCursor
+        hasNextPage
+        hasPreviousPage
+        startCursor
+      }
+      nodes {
+        id
+        policyId
+        updatedAt
+        resultWording
+        violationsCount
+        policy {
+          id
+          name
+        }
+        sbom {
+          id
+          projectVersion
+          project {
+            name
+            projectGroup {
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+export const GetPolicy = gql`
+  query Policy($id: Uuid!) {
+    policy(id: $id) {
+      createdAt
+      description
+      excludeInternalComponent
+      excludePrimaryComponent
+      id
+      isEnabled
+      name
+      operator
+      organizationId
+      resultType
+      updatedAt
     }
   }
 `

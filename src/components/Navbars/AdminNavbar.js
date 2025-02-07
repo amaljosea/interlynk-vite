@@ -31,6 +31,7 @@ export default function AdminNavbar(props) {
   const params = useParams()
   const prodID = params.productid
   const sbomId = params.sbomid
+  const policyId = params.policyid
   const parts = useQueryParam('parts')
   const vulnId = useQueryParam('vulnId') || params.vulnerabilityid
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
@@ -162,6 +163,11 @@ export default function AdminNavbar(props) {
                 <BreadcrumbLink>{activeVuln || ''}</BreadcrumbLink>
               </BreadcrumbItem>
             )}
+          {policyId && (
+            <BreadcrumbItem color={mainText} isCurrentPage>
+              <BreadcrumbLink>Violations</BreadcrumbLink>
+            </BreadcrumbItem>
+          )}
         </Breadcrumb>
       </GridItem>
       <GridItem colSpan={5} ml={'auto'}>
