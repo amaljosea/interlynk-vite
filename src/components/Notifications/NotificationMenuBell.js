@@ -2,7 +2,7 @@ import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { Box, Icon, IconButton } from '@chakra-ui/react'
+import { Box, Icon, IconButton, Tooltip } from '@chakra-ui/react'
 import {
   Menu,
   MenuButton,
@@ -110,9 +110,11 @@ const NotificationMenuBell = () => {
     <Box width={'fit-content'} position={'relative'}>
       <Menu closeOnSelect={false}>
         {preference[0] !== 'none' && <CheckMark zIndex={1} />}
-        <MenuButton as={IconButton} colorScheme='blue'>
-          <Icon as={FaRegBell} mt={1} />
-        </MenuButton>
+        <Tooltip label='Edit Notifications'>
+          <MenuButton as={IconButton} colorScheme='blue'>
+            <Icon as={FaRegBell} mt={1} />
+          </MenuButton>
+        </Tooltip>
         <MenuList fontSize={'sm'}>
           <MenuOptionGroup
             type='checkbox'
