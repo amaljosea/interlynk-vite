@@ -293,6 +293,8 @@ const PriSupplierModal = (props) => {
     }
   }, [data, initialData])
 
+  const hasSuppliers = data?.length > 0
+
   return (
     <>
       <LynkModal
@@ -301,9 +303,9 @@ const PriSupplierModal = (props) => {
         hidden={resolved}
         Icon={BiShieldPlus}
         disabled={isInvalid || crLoading || upLoading}
-        title={`Add ${friendlyId ? 'SBOM' : ''} Supplier`}
-        buttonText={data?.length > 0 > 0 ? 'Update' : 'Save'}
-        onSubmit={data?.length > 0 ? handleUpdate : handleSave}
+        title={`${hasSuppliers ? 'Update' : 'Add'} ${friendlyId ? 'SBOM' : ''} Supplier`}
+        buttonText={hasSuppliers ? 'Update' : 'Save'}
+        onSubmit={hasSuppliers ? handleUpdate : handleSave}
         leftFooterContent={
           !isFreeTier && (
             <Button
