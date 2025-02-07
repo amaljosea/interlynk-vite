@@ -4,7 +4,7 @@ import { useContext } from 'react'
 import { useParams } from 'react-router-dom'
 import { getSignedUrlParams, isCustomerView } from 'utils'
 
-import { Text } from '@chakra-ui/react'
+import { Box, Flex, Text, Tooltip } from '@chakra-ui/react'
 import {
   Drawer,
   DrawerBody,
@@ -21,11 +21,24 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetComponentPath } from 'graphQL/Queries'
 
+import { MdWarning } from 'react-icons/md'
+
 import CompDetails from './CompDetails'
 import CompIdentifiers from './CompIdentifiers'
 import CompLinks from './CompLinks'
 import CompRelations from './CompRelations'
 import CompSupplier from './CompSupplier'
+
+const Warning = ({ type }) => {
+  const label = `The component version does not match the ${type === 'purl' ? 'PURL' : 'CPE'} version under Identifiers`
+  return (
+    <Tooltip label={label}>
+      <Box>
+        <MdWarning color={'orange'} />
+      </Box>
+    </Tooltip>
+  )
+}
 
 const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
   const params = useParams()
@@ -38,7 +51,8 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
     ? ['details', 'identifiers']
     : ['details', 'identifiers', 'suppliers', 'links', 'relationships']
 
-  const { resetData, tab, onTabChange } = useContext(TabContext)
+  const { resetData, tab, tabData, onTabChange } = useContext(TabContext)
+  const { purl, cpe } = tabData?.identifiers || {}
 
   const { sbomId: bomId } = data || ''
   const isPart = sbomId !== bomId
@@ -47,6 +61,15 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
     skip: isOpen && !customerView ? false : true,
     variables: { compId: data?.id, sbomId: isPart ? bomId : sbomId }
   })
+
+  const purlString = purl !== '' ? purl : null
+  const purlMatch = purlString ? purlString.match(/@([\d.]+)$/) : null
+  const purlVersion = purlMatch ? purlMatch[1] : null
+  const purlWarning = purlVersion && data?.version !== purlVersion
+
+  const cpeString = cpe !== '' ? cpe?.split(':') : null
+  const cpeVersion = cpeString ? cpeString[5]?.replace(/\*/g, '') : null
+  const cpeWarning = cpeVersion && data?.version !== cpeVersion
 
   return (
     <Drawer
@@ -60,9 +83,13 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
       <DrawerContent>
         <DrawerCloseButton mt={3} onClick={resetData} aria-label='comp_close' />
         <DrawerHeader borderBottomWidth='1px'>
-          <Text mb={1} fontWeight={'medium'}>
-            {signedUrlParams ? 'Component' : 'Edit Component'}
-          </Text>
+          <Flex gap={2} mb={1} alignItems={'center'}>
+            <Text fontWeight={'medium'}>
+              {signedUrlParams ? 'Component' : 'Edit Component'}
+            </Text>
+            {purlWarning && <Warning type={'purl'} />}
+            {cpeWarning && <Warning type={'cpe'} />}
+          </Flex>
           {data && <CompInfo data={data} />}
         </DrawerHeader>
         <DrawerBody p={0}>
