@@ -4,20 +4,14 @@ import { useEffect, useState } from 'react'
 import { nameValidation } from 'utils/formValidationUtils'
 
 import {
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay
-} from '@chakra-ui/react'
-import {
   Button,
   FormControl,
   FormErrorMessage,
   FormLabel,
   Input
 } from '@chakra-ui/react'
+
+import LynkDrawer from 'components/LynkDrawer'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -91,45 +85,34 @@ const OrgDrawer = ({ isOpen, onClose }) => {
   }, [orgData])
 
   return (
-    <Drawer
-      size='md'
+    <LynkDrawer
+      title={'Edit Organization'}
       isOpen={isOpen}
-      placement='right'
       onClose={onClose}
-      closeOnOverlayClick={false}
+      noFooter={true}
     >
-      <DrawerOverlay />
-      <DrawerContent>
-        <DrawerCloseButton mt={1} />
-        <DrawerHeader fontWeight='500' borderBottomWidth='1px'>
-          Edit Organization
-        </DrawerHeader>
-
-        <DrawerBody>
-          <FormControl id='name' mb={4} isInvalid={nameError !== ''}>
-            <FormLabel mb='8px' textColor={secondaryTextInverse}>
-              Name
-            </FormLabel>
-            <Input
-              value={orgName}
-              placeholder='Enter organization name'
-              onChange={handleOrgNameChange}
-              borderColor={nameError ? primaryErrorColor : 'inherit'}
-            />
-            <FormErrorMessage>{nameError}</FormErrorMessage>
-          </FormControl>
-          <Button
-            colorScheme='blue'
-            isLoading={updateLoading}
-            isDisabled={orgName === '' || isSaveDisabled}
-            onClick={handleUpdateOrgName}
-            title='Update organization name'
-          >
-            Update
-          </Button>
-        </DrawerBody>
-      </DrawerContent>
-    </Drawer>
+      <FormControl id='name' mb={4} isInvalid={nameError !== ''}>
+        <FormLabel mb='8px' textColor={secondaryTextInverse}>
+          Name
+        </FormLabel>
+        <Input
+          value={orgName}
+          placeholder='Enter organization name'
+          onChange={handleOrgNameChange}
+          borderColor={nameError ? primaryErrorColor : 'inherit'}
+        />
+        <FormErrorMessage>{nameError}</FormErrorMessage>
+      </FormControl>
+      <Button
+        colorScheme='blue'
+        isLoading={updateLoading}
+        isDisabled={orgName === '' || isSaveDisabled}
+        onClick={handleUpdateOrgName}
+        title='Update organization name'
+      >
+        Update
+      </Button>
+    </LynkDrawer>
   )
 }
 
