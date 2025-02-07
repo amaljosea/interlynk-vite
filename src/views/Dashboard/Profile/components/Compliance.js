@@ -101,18 +101,22 @@ const Compliance = () => {
       </Stack>
 
       {/* COMPLIANCE UPDATE MODAL */}
-      <ComplianceModal
-        data={activeCompliances}
-        isOpen={COMPLIANCE.isOpen}
-        onClose={COMPLIANCE.onClose}
-      />
+      {COMPLIANCE.isOpen && (
+        <ComplianceModal
+          data={activeCompliances}
+          isOpen={COMPLIANCE.isOpen}
+          onClose={COMPLIANCE.onClose}
+        />
+      )}
 
       {/* SBOM QUALITY SCORE MODAL */}
-      <QualityScoreModal
-        data={activeCompliances}
-        isOpen={SCORE.isOpen}
-        onClose={SCORE.onClose}
-      />
+      {SCORE.isOpen && (
+        <QualityScoreModal
+          data={activeCompliances}
+          isOpen={SCORE.isOpen}
+          onClose={SCORE.onClose}
+        />
+      )}
     </>
   )
 }

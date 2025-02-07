@@ -110,33 +110,37 @@ const License = ({ data, permission }) => {
       )}
 
       {/* SBOM LICENSE MODAL */}
-      <LynkModal
-        isLoading={loading}
-        Icon={FaScaleBalanced}
-        isOpen={LICENSE?.isOpen}
-        onClose={LICENSE?.onClose}
-        onSubmit={onUpdateLicense}
-        disabled={!sbomState?.licenseString}
-        buttonText={license !== '' ? 'Update' : 'Save'}
-        title={`${license !== '' ? 'Update' : 'Add'} License`}
-      >
-        <LicenseField
-          sbomView={true}
-          license={license}
-          isDisabled={customerView}
-        />
-      </LynkModal>
+      {LICENSE?.isOpen && (
+        <LynkModal
+          isLoading={loading}
+          Icon={FaScaleBalanced}
+          isOpen={LICENSE?.isOpen}
+          onClose={LICENSE?.onClose}
+          onSubmit={onUpdateLicense}
+          disabled={!sbomState?.licenseString}
+          buttonText={license !== '' ? 'Update' : 'Save'}
+          title={`${license !== '' ? 'Update' : 'Add'} License`}
+        >
+          <LicenseField
+            sbomView={true}
+            license={license}
+            isDisabled={customerView}
+          />
+        </LynkModal>
+      )}
 
       {/* LICENSE DELETE MODAL */}
-      <ConfirmationModal
-        name={license}
-        isLoading={loading}
-        title={'Remove License'}
-        onConfirm={onUpdateLicense}
-        isOpen={DELETE_LICENSE?.isOpen}
-        onClose={DELETE_LICENSE?.onClose}
-        description={`You are about to delete the License : ${license} from this version.`}
-      />
+      {DELETE_LICENSE?.isOpen && (
+        <ConfirmationModal
+          name={license}
+          isLoading={loading}
+          title={'Remove License'}
+          onConfirm={onUpdateLicense}
+          isOpen={DELETE_LICENSE?.isOpen}
+          onClose={DELETE_LICENSE?.onClose}
+          description={`You are about to delete the License : ${license} from this version.`}
+        />
+      )}
     </>
   )
 }

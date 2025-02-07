@@ -78,18 +78,22 @@ const Tools = ({ data, permission }) => {
       </Flex>
 
       {/* TOOL MODAL */}
-      <ToolModal isOpen={TOOL?.isOpen} onClose={TOOL?.onClose} />
+      {TOOL?.isOpen && (
+        <ToolModal isOpen={TOOL?.isOpen} onClose={TOOL?.onClose} />
+      )}
 
       {/* TOOL DELETE MODAL */}
-      <ConfirmationModal
-        isLoading={loading}
-        title={'Remove Tool'}
-        isOpen={DELETE_TOOL?.isOpen}
-        onClose={DELETE_TOOL?.onClose}
-        onConfirm={() => handleDelete(activeTool?.id)}
-        name={`${activeTool?.name}-${activeTool?.version} `}
-        description={`You are about to delete the creator Tool : ${activeTool?.name}-${activeTool?.version} from this version.`}
-      />
+      {DELETE_TOOL?.isOpen && (
+        <ConfirmationModal
+          isLoading={loading}
+          title={'Remove Tool'}
+          isOpen={DELETE_TOOL?.isOpen}
+          onClose={DELETE_TOOL?.onClose}
+          onConfirm={() => handleDelete(activeTool?.id)}
+          name={`${activeTool?.name}-${activeTool?.version} `}
+          description={`You are about to delete the creator Tool : ${activeTool?.name}-${activeTool?.version} from this version.`}
+        />
+      )}
     </>
   )
 }

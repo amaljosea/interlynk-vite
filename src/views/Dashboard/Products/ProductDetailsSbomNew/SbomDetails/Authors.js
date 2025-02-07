@@ -78,22 +78,26 @@ const Authors = ({ data, permission }) => {
       </Flex>
 
       {/* AUTHOR MODAL */}
-      <AuthorModal
-        isOpen={AUTHOR?.isOpen}
-        onClose={AUTHOR?.onClose}
-        ruleExists
-      />
+      {AUTHOR?.isOpen && (
+        <AuthorModal
+          isOpen={AUTHOR?.isOpen}
+          onClose={AUTHOR?.onClose}
+          ruleExists
+        />
+      )}
 
       {/* AUTHOR DELETE MODAL */}
-      <ConfirmationModal
-        isLoading={loading}
-        title={'Remove Author'}
-        isOpen={DELETE_AUTHOR?.isOpen}
-        onClose={DELETE_AUTHOR?.onClose}
-        onConfirm={() => handleRemove(activeTool?.id)}
-        name={`${activeTool?.name}-${activeTool?.email} `}
-        description={`You are about to delete the Author : ${activeTool?.name}-${activeTool?.email} from this version.`}
-      />
+      {DELETE_AUTHOR?.isOpen && (
+        <ConfirmationModal
+          isLoading={loading}
+          title={'Remove Author'}
+          isOpen={DELETE_AUTHOR?.isOpen}
+          onClose={DELETE_AUTHOR?.onClose}
+          onConfirm={() => handleRemove(activeTool?.id)}
+          name={`${activeTool?.name}-${activeTool?.email} `}
+          description={`You are about to delete the Author : ${activeTool?.name}-${activeTool?.email} from this version.`}
+        />
+      )}
     </>
   )
 }

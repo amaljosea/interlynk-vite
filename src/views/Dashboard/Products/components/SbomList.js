@@ -191,15 +191,17 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
         </DrawerContent>
       </Drawer>
 
-      <ConfirmationModal
-        isLoading={updateLoading}
-        title={'Promote to version'}
-        isOpen={PROMOTE_WARNING?.isOpen}
-        onClose={PROMOTE_WARNING?.onClose}
-        onConfirm={() => handlePromote(activeSbom)}
-        name={getFullDate(activeSbom?.createdAt)}
-        description={`This will promote the existing one with the new one`}
-      />
+      {PROMOTE_WARNING?.isOpen && (
+        <ConfirmationModal
+          isLoading={updateLoading}
+          title={'Promote to version'}
+          isOpen={PROMOTE_WARNING?.isOpen}
+          onClose={PROMOTE_WARNING?.onClose}
+          onConfirm={() => handlePromote(activeSbom)}
+          name={getFullDate(activeSbom?.createdAt)}
+          description={`This will promote the existing one with the new one`}
+        />
+      )}
     </>
   )
 }

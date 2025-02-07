@@ -39,7 +39,7 @@ const Phases = ({ data, permission }) => {
         />
       </Flex>
 
-      <PhaseModal data={data} isOpen={isOpen} onClose={onClose} />
+      {isOpen && <PhaseModal data={data} isOpen={isOpen} onClose={onClose} />}
     </>
   )
 }

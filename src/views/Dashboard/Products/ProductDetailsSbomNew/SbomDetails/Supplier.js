@@ -58,24 +58,28 @@ const Supplier = ({ data, permission }) => {
       )}
 
       {/* SUPPLIER MODAL */}
-      <PriSupplierModal
-        activeRow={data}
-        isFreeTier={isFreeTier}
-        isOpen={SUPPLIER?.isOpen}
-        onClose={SUPPLIER?.onClose}
-        ruleExists={true}
-      />
+      {SUPPLIER?.isOpen && (
+        <PriSupplierModal
+          activeRow={data}
+          isFreeTier={isFreeTier}
+          isOpen={SUPPLIER?.isOpen}
+          onClose={SUPPLIER?.onClose}
+          ruleExists={true}
+        />
+      )}
 
       {/* SUPPLIER DELETE MODAL */}
-      <ConfirmationModal
-        isLoading={loading}
-        name={activeTool?.name}
-        title={'Remove Supplier'}
-        isOpen={DELETE_SUPPLIER?.isOpen}
-        onClose={DELETE_SUPPLIER?.onClose}
-        onConfirm={() => handleSupRemove(activeTool?.id)}
-        description={`You are about to delete the Supplier : ${activeTool?.name} from this version.`}
-      />
+      {DELETE_SUPPLIER?.isOpen && (
+        <ConfirmationModal
+          isLoading={loading}
+          name={activeTool?.name}
+          title={'Remove Supplier'}
+          isOpen={DELETE_SUPPLIER?.isOpen}
+          onClose={DELETE_SUPPLIER?.onClose}
+          onConfirm={() => handleSupRemove(activeTool?.id)}
+          description={`You are about to delete the Supplier : ${activeTool?.name} from this version.`}
+        />
+      )}
     </>
   )
 }

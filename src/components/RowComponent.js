@@ -42,7 +42,9 @@ const RowComponent = ({ content }) => {
         {getValue()}
       </Text>
 
-      <ComponentCard value={content} isOpen={isOpen} onClose={onClose} />
+      {isOpen && (
+        <ComponentCard value={content} isOpen={isOpen} onClose={onClose} />
+      )}
     </>
   )
 }
