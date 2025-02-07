@@ -54,10 +54,10 @@ export const TextRegex = ({ regex, ignoreCase }) => {
 
   const checkIsMatch = ({ ignoreCase, regex, item }) => {
     let isMatch = false
+    let test = ignoreCase ? item.value.toLowerCase() : item.value
+    let re = ignoreCase ? regex.toLowerCase() : regex
     try {
-      isMatch = new RegExp(regex).test(
-        ignoreCase ? item.value.toLowerCase() : item.value
-      )
+      isMatch = new RegExp(re).test(test)
     } catch (error) {
       showToast({
         description: `Something went wrong, please try again.`,
@@ -70,7 +70,7 @@ export const TextRegex = ({ regex, ignoreCase }) => {
 
   return (
     <div>
-      <FormLabel>Test Regular Expression</FormLabel>
+      <FormLabel>Test Expressions</FormLabel>
       {items.map((item) => {
         const { isMatch } = checkIsMatch({ regex, ignoreCase, item })
         const color = isMatch ? 'green' : 'red'
