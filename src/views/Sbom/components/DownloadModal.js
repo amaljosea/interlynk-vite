@@ -365,10 +365,10 @@ const DownloadModal = (props) => {
                 )}
 
                 <Checkbox
-                  hidden={signedUrlParams}
+                  hidden={signedUrlParams || isFreeTier}
                   isChecked={includeParts}
                   onChange={() => setIncludeParts(!includeParts)}
-                  isDisabled={isFreeTier || spec === 'SPDX'}
+                  isDisabled={spec === 'SPDX'}
                 >
                   Parts
                 </Checkbox>
@@ -434,8 +434,8 @@ const DownloadModal = (props) => {
             </FormControl>
           </SimpleGrid>
 
-          <Divider hidden={isHidden} />
-          {!isUnspecified && (
+          <Divider hidden={isHidden || isFreeTier} />
+          {!isUnspecified && !isFreeTier && (
             <Flex
               sx={{ flexDir: 'column', gap: 4 }}
               display={!signedUrlParams ? 'flex' : 'none'}
