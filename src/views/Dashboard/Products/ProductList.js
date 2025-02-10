@@ -17,7 +17,8 @@ function ProductList() {
   const { setIsOpen } = useTour()
   const { dispatch, prodState } = useGlobalState()
   const { prodDispatch, prodCompDispatch, prodVulnDispatch } = dispatch
-  const { field, direction, enabled, searchInput, labelIds, lifestage } = prodState
+  const { field, direction, enabled, searchInput, labelIds, lifestage } =
+    prodState
 
   const product = useQueryParam('id')
 
@@ -30,8 +31,10 @@ function ProductList() {
     direction,
     enabled: enabled === 'yes' ? true : false,
     labelIds: getUndefinedIfEmptyOrAll(labelIds),
-    lifestage: getUndefinedIfEmptyOrAll(lifestage),
-    search: searchInput !== '' ? searchInput : undefined
+    search: searchInput !== '' ? searchInput : undefined,
+    lifestage: !lifestage?.includes('none')
+      ? getUndefinedIfEmptyOrAll(lifestage)
+      : null
   }
 
   const { nodes, paginationProps, reset, loading, error } = usePaginatedQuery(

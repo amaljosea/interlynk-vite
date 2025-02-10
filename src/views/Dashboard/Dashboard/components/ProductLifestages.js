@@ -33,7 +33,11 @@ const ProductLifestages = () => {
 
   const { prodDispatch } = dispatch
 
-  const { data: design, loading } = useQuery(getProductsByStage, {
+  const { data: none, loading } = useQuery(getProductsByStage, {
+    skip: organization ? false : true,
+    variables: { stage: null }
+  })
+  const { data: design } = useQuery(getProductsByStage, {
     skip: organization ? false : true,
     variables: { stage: ['design'] }
   })
@@ -61,6 +65,13 @@ const ProductLifestages = () => {
 
   const lifeStages = [
     {
+      id: 0,
+      color: 'gray',
+      label: 'none',
+      count: none?.organization?.projectGroups?.totalCount || 0,
+      icon: <LuPencilRuler size={20} />
+    },
+    {
       id: 1,
       color: 'orange',
       label: 'design',
@@ -83,7 +94,7 @@ const ProductLifestages = () => {
     },
     {
       id: 4,
-      color: 'red',
+      color: 'purple',
       label: 'maintenance',
       count: maintenance?.organization?.projectGroups?.totalCount || 0,
       icon: <LuCog size={20} />
@@ -97,7 +108,7 @@ const ProductLifestages = () => {
     },
     {
       id: 6,
-      color: 'gray',
+      color: 'pink',
       label: 'end_of_life',
       count: endOfLife?.organization?.projectGroups?.totalCount || 0,
       icon: <LuCalendarMinus size={20} />

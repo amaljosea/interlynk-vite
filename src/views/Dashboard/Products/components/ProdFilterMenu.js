@@ -25,6 +25,7 @@ import { RxDotFilled } from 'react-icons/rx'
 
 const stages = [
   'all',
+  'none',
   'design',
   'development',
   'maintenance',
