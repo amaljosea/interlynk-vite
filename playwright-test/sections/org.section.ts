@@ -31,6 +31,12 @@ export default class OrgSection {
       await this.page.getByRole('menuitemradio', { name: orgName }).click()
       await this.page.waitForTimeout(5000)
 
+      await this.page.getByTestId('org_menu').click()
+      await this.page
+        .getByRole('menuitemradio', { name: 'Test Interlynk' })
+        .click()
+      await this.page.waitForTimeout(5000)
+
       expect(errors.length).toBe(0)
     } catch (error) {
       throw error
