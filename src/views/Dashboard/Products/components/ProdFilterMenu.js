@@ -14,6 +14,7 @@ import ProdLabel from 'components/Label/ProdLabel'
 import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
 
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetLabels } from 'graphQL/Queries'
@@ -21,10 +22,22 @@ import { GetLabels } from 'graphQL/Queries'
 import { FaCheck } from 'react-icons/fa6'
 import { RxDotFilled } from 'react-icons/rx'
 
+const stages = [
+  'all',
+  'design',
+  'development',
+  'maintenance',
+  'released',
+  'end_of_support',
+  'end_of_life'
+]
+
 const ProdFilterMenu = (props) => {
-  const { filters, setFilters, filterMode, setFilterMode, setSelectedTags } =
-    props
-  const { enabled, labelIds } = filters || ''
+  const { reset, filterMode, setFilterMode, setSelectedTags } = props
+
+  const { prodState, dispatch } = useGlobalState()
+  const { enabled, labelIds, lifestage } = prodState || ''
+  const { prodDispatch } = dispatch
 
   const {
     primaryBgColor,
@@ -43,17 +56,27 @@ const ProdFilterMenu = (props) => {
   ])
 
   const onFilterActive = (value) => {
-    setFilters((oldFilter) => ({
-      ...oldFilter,
-      enabled: value === 'yes' ? true : value === 'no' ? false : undefined
-    }))
+    prodDispatch({
+      type: 'FILTER_ACTIVE',
+      payload: value
+    })
+    reset()
   }
 
   const onFilterLabel = (value) => {
-    setFilters((oldFilter) => ({
-      ...oldFilter,
-      labelIds: value?.includes('all') ? [] : value
-    }))
+    prodDispatch({
+      type: 'FILTER_LABEL',
+      payload: value
+    })
+    reset()
+  }
+
+  const onFilterLifestage = (value) => {
+    prodDispatch({
+      type: 'FILTER_LIFESTAGE',
+      payload: value
+    })
+    reset()
   }
 
   const [getLabels, { loading }] = useLazyQuery(GetLabels)
@@ -177,6 +200,37 @@ const ProdFilterMenu = (props) => {
                 Use <Kbd>⇧</Kbd> + <Kbd>click/return</Kbd> for logical AND
               </Text>
             </Stack>
+          </MenuList>
+        </Menu>
+      </Box>
+      {/* LIFE STAGE */}
+      <Box width={'fit-content'} position={'relative'}>
+        <Menu closeOnSelect={false}>
+          <MenuHeading title={'Lifestage'} active={lifestage?.length !== 0} />
+          <MenuList
+            minW={'280px'}
+            maxW={'400px'}
+            minH='auto'
+            maxH={'320px'}
+            fontSize={'sm'}
+            overflowY={'scroll'}
+          >
+            <MenuOptionGroup
+              type={'checkbox'}
+              value={lifestage}
+              onChange={onFilterLifestage}
+            >
+              {stages?.map((item, index) => (
+                <MenuItemOption
+                  key={index}
+                  fontSize={'sm'}
+                  value={item}
+                  textTransform={'capitalize'}
+                >
+                  {item?.replaceAll('_', ' ')}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
           </MenuList>
         </Menu>
       </Box>

@@ -38,6 +38,7 @@ import HealthMap from '../components/HealthMap'
 import ComponentsColumns from './Components/tableColumns/ComponentsColumns'
 import ExpandedComponent from './Components/tableExpanded/ComponentsExpanded'
 import ComponentsSubHeader from './Components/tableSubHeaders/ComponentsSubHeader'
+import { getUndefinedIfEmptyOrAll } from 'utils'
 
 const Components = ({ sbomData }) => {
   const params = useParams()
@@ -70,8 +71,7 @@ const Components = ({ sbomData }) => {
   } = prodCompState
   const { prodCompDispatch } = dispatch
 
-  const getUndefinedIfEmptyOrAll = (value, allValue = 'all') =>
-    value.includes(allValue) || value.length === 0 ? undefined : value
+ 
 
   const [activeRow, setActiveRow] = useState(null)
   const [compSearch, setCompSearch] = useState(searchInput || '')

@@ -385,6 +385,7 @@ export const GetProductTable = gql`
     $before: String
     $field: ProjectGroupOrderByFields!
     $direction: OrderByDirection!
+    $lifestage: [ProductLifecycleStageEnum!]
   ) {
     organization {
       id
@@ -397,6 +398,7 @@ export const GetProductTable = gql`
         after: $after
         before: $before
         orderBy: { field: $field, direction: $direction }
+        sbomProductLifeCycleStage: $lifestage
       ) {
         totalCount
         pageInfo {
@@ -5623,6 +5625,7 @@ export const getProductsByLabels = gql`
         totalCount
         nodes {
           labels {
+            id
             name
             color
           }

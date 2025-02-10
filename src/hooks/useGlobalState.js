@@ -28,6 +28,8 @@ const GlobalStateProvider = ({ children }) => {
     direction: 'DESC',
     totalProduct: 0,
     searchInput: '',
+    labelIds: [],
+    lifestage: [],
     pageIndex: 1,
     enabled: 'yes',
     currentProduct: null

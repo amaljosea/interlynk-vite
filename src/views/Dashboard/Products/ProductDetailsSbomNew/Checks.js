@@ -29,9 +29,7 @@ import AuthorModal from '../components/AuthorModal'
 import FixedModal from '../components/FixedModal'
 import ChecksColumns from './Components/tableColumns/ChecksColumns'
 import ChecksSubHeader from './Components/tableSubHeaders/ChecksSubHeader'
-
-const getUndefinedIfEmptyOrAll = (value, allValue = 'all') =>
-  value.includes(allValue) || value.length === 0 ? undefined : value
+import { getUndefinedIfEmptyOrAll } from 'utils'
 
 const Checks = ({ sbomData }) => {
   const params = useParams()

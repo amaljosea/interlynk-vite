@@ -1,5 +1,6 @@
 import { useTour } from '@reactour/tour'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
+import { getUndefinedIfEmptyOrAll } from 'utils'
 import { displayErrorMessage } from 'utils/errorUtils'
 
 import LynkAlert from 'components/LynkAlert'
@@ -16,6 +17,7 @@ function ProductList() {
   const { setIsOpen } = useTour()
   const { dispatch, prodState } = useGlobalState()
   const { prodDispatch, prodCompDispatch, prodVulnDispatch } = dispatch
+  const { field, direction, enabled, searchInput, labelIds, lifestage } = prodState
 
   const product = useQueryParam('id')
 
@@ -23,12 +25,14 @@ function ProductList() {
     parentKey: 'view_product_group'
   })
 
-  const [filters, setFilters] = useState({
-    field: prodState?.field,
-    direction: prodState?.direction,
-    enabled: true,
-    labelIds: []
-  })
+  const filters = {
+    field,
+    direction,
+    enabled: enabled === 'yes' ? true : false,
+    labelIds: getUndefinedIfEmptyOrAll(labelIds),
+    lifestage: getUndefinedIfEmptyOrAll(lifestage),
+    search: searchInput !== '' ? searchInput : undefined
+  }
 
   const { nodes, paginationProps, reset, loading, error } = usePaginatedQuery(
     GetProductTable,
@@ -76,12 +80,7 @@ function ProductList() {
       data={nodes}
       reset={reset}
       loading={loading}
-      filters={filters}
       paginationProps={paginationProps}
-      setFilters={(newFilters) => {
-        setFilters(newFilters)
-        reset()
-      }}
     />
   )
 }

@@ -21,6 +21,7 @@ import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ShareComponentData } from 'graphQL/Queries'
+import { getUndefinedIfEmptyOrAll } from 'utils'
 
 const Components = ({ sbomData }) => {
   const params = useParams()
@@ -48,9 +49,6 @@ const Components = ({ sbomData }) => {
     include
   } = prodCompState
   const { prodCompDispatch } = dispatch
-
-  const getUndefinedIfEmptyOrAll = (value, allValue = 'all') =>
-    value.includes(allValue) || value.length === 0 ? undefined : value
 
   const compData = useMemo(() => {
     return {

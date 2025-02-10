@@ -50,10 +50,40 @@ const prodReducer = (state, action) => {
         direction: payload.direction,
         pageIndex: 1
       }
-    case 'ON_FILTER_ACTIVE':
+    case 'FILTER_ACTIVE':
       return {
         ...state,
         enabled: payload,
+        pageIndex: 1
+      }
+    case 'FILTER_LABEL':
+      return {
+        ...state,
+        labelIds: [...payload]?.includes('all') ? [] : payload,
+        pageIndex: 1
+      }
+    case 'FILTER_LIFESTAGE':
+      return {
+        ...state,
+        lifestage: [...payload]?.includes('all') ? [] : payload,
+        pageIndex: 1
+      }
+    case 'PRODUCT_BY_LABEL':
+      return {
+        ...state,
+        lifestage: [],
+        enabled: 'yes',
+        searchInput: '',
+        labelIds: [...payload]?.includes('all') ? [] : payload,
+        pageIndex: 1
+      }
+    case 'PRODUCT_BY_LIFESTAGE':
+      return {
+        ...state,
+        labelIds: [],
+        enabled: 'yes',
+        searchInput: '',
+        lifestage: [...payload]?.includes('all') ? [] : payload,
         pageIndex: 1
       }
     case 'SET_TOTAL_PRODUCT':
@@ -65,7 +95,9 @@ const prodReducer = (state, action) => {
     case 'CLEAR_FILTER':
       return {
         ...state,
-        enabled: 'all',
+        labelIds: [],
+        lifestage: [],
+        enabled: 'yes',
         pageIndex: 1
       }
     default:

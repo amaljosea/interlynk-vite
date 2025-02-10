@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/client'
+import { useNavigate } from 'react-router-dom'
 
 import { Grid, GridItem, SimpleGrid, Stack, Text } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
@@ -23,15 +24,16 @@ import {
 } from 'react-icons/lu'
 
 const ProductLifestages = () => {
-  const { organization } = useGlobalState()
-  const { grayBorderColor } = useThemeColor(['grayBorderColor'])
+  const navigate = useNavigate()
+  const { organization, dispatch } = useGlobalState()
+  const { primaryBlueText, grayBorderColor } = useThemeColor([
+    'primaryBlueText',
+    'grayBorderColor'
+  ])
 
-  const { data: noStage, loading } = useQuery(getProductsByStage, {
-    skip: organization ? false : true,
-    variables: { stage: null }
-  })
+  const { prodDispatch } = dispatch
 
-  const { data: design } = useQuery(getProductsByStage, {
+  const { data: design, loading } = useQuery(getProductsByStage, {
     skip: organization ? false : true,
     variables: { stage: ['design'] }
   })
@@ -59,57 +61,58 @@ const ProductLifestages = () => {
 
   const lifeStages = [
     {
-      id: 0,
-      color: 'gray',
-      label: 'None',
-      count: noStage?.organization?.projectGroups?.totalCount || 0,
-      icon: <LuCalendarMinus size={20} />
-    },
-    {
       id: 1,
       color: 'orange',
-      label: 'Design',
+      label: 'design',
       count: design?.organization?.projectGroups?.totalCount || 0,
       icon: <LuPencilRuler size={20} />
     },
     {
       id: 2,
       color: 'blue',
-      label: 'Development',
+      label: 'development',
       count: development?.organization?.projectGroups?.totalCount || 0,
       icon: <LuInbox size={20} />
     },
     {
       id: 3,
       color: 'green',
-      label: 'Release',
+      label: 'released',
       count: released?.organization?.projectGroups?.totalCount || 0,
       icon: <LuRocket size={20} />
     },
     {
       id: 4,
       color: 'red',
-      label: 'Maintenance',
+      label: 'maintenance',
       count: maintenance?.organization?.projectGroups?.totalCount || 0,
       icon: <LuCog size={20} />
     },
     {
       id: 5,
       color: 'cyan',
-      label: 'End of support',
+      label: 'end_of_support',
       count: endOfSupport?.organization?.projectGroups?.totalCount || 0,
       icon: <LuCalendarHeart size={20} />
     },
     {
       id: 6,
       color: 'gray',
-      label: 'End of life',
+      label: 'end_of_life',
       count: endOfLife?.organization?.projectGroups?.totalCount || 0,
       icon: <LuCalendarMinus size={20} />
     }
   ]
 
   const total = lifeStages?.reduce((sum, stage) => sum + stage.count, 0)
+
+  const handleFilter = (value) => {
+    prodDispatch({
+      type: 'PRODUCT_BY_LIFESTAGE',
+      payload: [value]
+    })
+    navigate('/vendor/products')
+  }
 
   if (loading) return <LynkLoader />
 
@@ -140,8 +143,20 @@ const ProductLifestages = () => {
             <Stack>
               {lifeStages?.map((item, index) => (
                 <SimpleGrid w={'100%'} key={index} columns={2} spacing={2}>
-                  <Text fontSize={'sm'}>{item?.label}</Text>
-                  <Tag colorScheme={item?.color}>
+                  <Text
+                    fontSize={'sm'}
+                    cursor={'pointer'}
+                    textTransform={'capitalize'}
+                    _hover={{ color: primaryBlueText }}
+                    onClick={() => handleFilter(item?.label)}
+                  >
+                    {item?.label?.replaceAll('_', ' ')}
+                  </Text>
+                  <Tag
+                    cursor={'pointer'}
+                    colorScheme={item?.color}
+                    onClick={() => handleFilter(item?.label)}
+                  >
                     <TagLabel mx={'auto'} fontSize={'sm'}>
                       {item?.count}
                     </TagLabel>

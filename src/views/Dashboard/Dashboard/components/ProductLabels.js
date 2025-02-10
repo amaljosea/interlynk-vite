@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/client'
+import { useNavigate } from 'react-router-dom'
 import { hexToRGBA } from 'utils/styleUtils'
 
 import { Grid, GridItem, SimpleGrid, Stack } from '@chakra-ui/react'
@@ -15,8 +16,14 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { getProductsByLabels } from 'graphQL/Queries'
 
 const ProductLabels = () => {
-  const { organization } = useGlobalState()
-  const { grayBorderColor } = useThemeColor(['grayBorderColor'])
+  const navigate = useNavigate()
+  const { organization, dispatch } = useGlobalState()
+  const { grayBorderColor, primaryBlueText } = useThemeColor([
+    'grayBorderColor',
+    'primaryBlueText'
+  ])
+
+  const { prodDispatch } = dispatch
 
   const { data: prodByLabels, loading } = useQuery(getProductsByLabels, {
     skip: organization ? false : true,
@@ -27,13 +34,14 @@ const ProductLabels = () => {
   const labelCounts = {}
   projectGroups?.forEach((group) => {
     group.labels.forEach((label) => {
+      const labelId = label.id
       const labelName = label.name
       const labelColor = label.color
 
       if (labelCounts[labelName]) {
         labelCounts[labelName].count++
       } else {
-        labelCounts[labelName] = { count: 1, color: labelColor }
+        labelCounts[labelName] = { id: labelId, count: 1, color: labelColor }
       }
     })
   })
@@ -41,7 +49,12 @@ const ProductLabels = () => {
   const topLabels = Object.entries(labelCounts)
     ?.slice(0, 6)
     ?.sort((a, b) => b[1].count - a[1].count)
-    ?.map(([label, data]) => ({ label, count: data.count, color: data.color }))
+    ?.map(([label, data]) => ({
+      label,
+      id: data.id,
+      count: data.count,
+      color: data.color
+    }))
 
   const otherLabels = Object.entries(labelCounts)?.slice(6)
   const result = []
@@ -57,6 +70,14 @@ const ProductLabels = () => {
   const filterLabels = [...topLabels, ...result]
 
   const total = filterLabels?.reduce((sum, stage) => sum + stage.count, 0)
+
+  const handleFilter = (value) => {
+    prodDispatch({
+      type: 'PRODUCT_BY_LABEL',
+      payload: [value]
+    })
+    navigate('/vendor/products')
+  }
 
   if (loading) return <LynkLoader />
 
@@ -87,11 +108,19 @@ const ProductLabels = () => {
             <Stack>
               {filterLabels?.map((item, index) => (
                 <SimpleGrid key={index} w={'100%'} columns={2} spacing={2}>
-                  <Text fontSize={'sm'} color={item?.color}>
+                  <Text
+                    fontSize={'sm'}
+                    cursor={'pointer'}
+                    // color={item?.color}
+                    _hover={{ color: primaryBlueText }}
+                    onClick={() => handleFilter(item.id)}
+                  >
                     {item?.label}
                   </Text>
                   <Tag
+                    cursor={'pointer'}
                     bg={hexToRGBA(item?.color, 0.1)}
+                    onClick={() => handleFilter(item.id)}
                     borderColor={hexToRGBA(item?.color, 0.4)}
                   >
                     <TagLabel

@@ -67,7 +67,7 @@ const ProductTable = (props) => {
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
-  const { data, reset, loading, filters, setFilters, paginationProps } = props
+  const { data, reset, loading, paginationProps } = props
 
   const { data: prodData } = useQuery(GetTotalProduct, {
     skip: orgView && isFreeTier ? false : true,
@@ -95,9 +95,9 @@ const ProductTable = (props) => {
     'primaryErrorColor'
   ])
 
-  const { search, field, direction } = filters
-
-  const { setEnvName, setClearSelect, dispatch, envName } = useGlobalState()
+  const { prodState, setEnvName, setClearSelect, dispatch, envName } =
+    useGlobalState()
+  const { field, direction, searchInput } = prodState
 
   const environment = envName
   const { prodDispatch } = dispatch
@@ -105,7 +105,7 @@ const ProductTable = (props) => {
   const [activeRow, setActiveRow] = useState(null)
   const isGithubConfigSaved = useGithubConfigSaved()
   const [openTagMenu, setOpenTagMenu] = useState(false)
-  const [filterText, setFilterText] = useState(search || '')
+  const [filterText, setFilterText] = useState(searchInput || '')
   const [selectedTags, setSelectedTags] = useState([])
   const [filterMode, setFilterMode] = useState('OR')
 
@@ -159,21 +159,17 @@ const ProductTable = (props) => {
 
   const setSearchFilter = useCallback(
     (value) => {
-      setFilters((oldFilter) => ({
-        ...oldFilter,
-        search: value
-      }))
+      prodDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+      reset()
     },
-    [setFilters]
+    [prodDispatch, reset]
   )
 
   const handleClear = useCallback(async () => {
     setFilterText('')
-    setFilters((oldFilter) => ({
-      ...oldFilter,
-      search: undefined
-    }))
-  }, [setFilters])
+    prodDispatch({ type: 'CLEAR_SEARCH_INPUT', payload: '' })
+    reset()
+  }, [prodDispatch, reset])
 
   const onSearchInputChange = useCallback(
     (event) => {
@@ -235,8 +231,7 @@ const ProductTable = (props) => {
           {/* FILTER PRODUCTS */}
           {!signedUrlParams && (
             <ProdFilterMenu
-              filters={filters}
-              setFilters={setFilters}
+              reset={reset}
               filterMode={filterMode}
               setFilterMode={setFilterMode}
               setSelectedTags={setSelectedTags}
@@ -301,8 +296,7 @@ const ProductTable = (props) => {
     handleClear,
     handleSearch,
     signedUrlParams,
-    filters,
-    setFilters,
+    reset,
     filterMode,
     shouldShowDemoFeatures,
     isGithubConfigSaved,
@@ -570,11 +564,6 @@ const ProductTable = (props) => {
   ]
 
   const handleSort = (column, sortDirection) => {
-    setFilters((oldFilters) => ({
-      ...oldFilters,
-      field: column?.id,
-      direction: sortDirection.toUpperCase()
-    }))
     prodDispatch({
       type: 'SET_SORT_ORDER',
       payload: {
@@ -582,6 +571,7 @@ const ProductTable = (props) => {
         direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
       }
     })
+    reset()
   }
 
   const dataTableProps = {
