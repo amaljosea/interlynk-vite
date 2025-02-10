@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useState } from 'react'
 import { isCustomerView, transformLicenseString } from 'utils'
@@ -30,6 +30,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UpdateComponent } from 'graphQL/Mutation'
 import { GetAllSboms } from 'graphQL/Queries'
+import { LicenseAutoComplete } from 'graphQL/Queries'
 
 import ActionButton from './ActionButton'
 
@@ -161,37 +162,86 @@ const CompDetails = ({ data, primaryComp }) => {
     }
   }
 
+  const [getLicense, { loading: licenseLoading }] = useLazyQuery(
+    LicenseAutoComplete,
+    {
+      skip: data?.licensesExp ? false : true,
+      fetchPolicy: 'network-only'
+    }
+  )
+
   const isInvalid =
     details?.kind === '' ||
     details?.name === '' ||
     details?.version === '' ||
-    loading
+    loading ||
+    licenseLoading
 
   useEffect(() => {
     if (data) {
       const { supportLevel, licensesExp } = data || {}
-      setTabData((prev) => ({
-        ...prev,
-        details: {
-          ...prev.details,
-          name: data?.name || '',
-          kind: data?.kind || '',
-          scope: data?.scope || '',
-          group: data?.group || '',
-          primary: data?.primary,
-          version: data?.version || '',
-          internal: data?.internal,
-          description: data?.description || '',
-          copyright: data?.copyright || '',
-          supportLevel: supportLevel?.replaceAll(' ', '_').toUpperCase() || '',
-          licenses: licensesExp
-            ? [{ value: licensesExp, label: licensesExp }]
-            : [],
-          endOfSupport: data?.endOfSupport ? new Date(data?.endOfSupport) : ''
-        }
-      }))
+
+      if (licensesExp) {
+        getLicense({ variables: { search: licensesExp } }).then((res) => {
+          const filteredResults =
+            res.data?.licenseAutoComplete?.result?.slice(0, -1) || []
+          const matchedLicense = filteredResults.find(
+            (license) => license.value === licensesExp
+          )
+
+          setTabData((prev) => ({
+            ...prev,
+            details: {
+              ...prev.details,
+              name: data?.name || '',
+              kind: data?.kind || '',
+              scope: data?.scope || '',
+              group: data?.group || '',
+              primary: data?.primary,
+              version: data?.version || '',
+              internal: data?.internal,
+              description: data?.description || '',
+              copyright: data?.copyright || '',
+              supportLevel:
+                supportLevel?.replaceAll(' ', '_').toUpperCase() || '',
+              licenses: licensesExp
+                ? [
+                    {
+                      value: licensesExp,
+                      label: licensesExp,
+                      type: matchedLicense?.type
+                    }
+                  ]
+                : [],
+              endOfSupport: data?.endOfSupport
+                ? new Date(data?.endOfSupport)
+                : ''
+            }
+          }))
+        })
+      } else {
+        setTabData((prev) => ({
+          ...prev,
+          details: {
+            ...prev.details,
+            name: data?.name || '',
+            kind: data?.kind || '',
+            scope: data?.scope || '',
+            group: data?.group || '',
+            primary: data?.primary,
+            version: data?.version || '',
+            internal: data?.internal,
+            description: data?.description || '',
+            copyright: data?.copyright || '',
+            supportLevel:
+              supportLevel?.replaceAll(' ', '_').toUpperCase() || '',
+            licenses: [],
+            endOfSupport: data?.endOfSupport ? new Date(data?.endOfSupport) : ''
+          }
+        }))
+      }
     }
-  }, [data, setTabData])
+  }, [data, setTabData, getLicense])
 
   return (
     <>
