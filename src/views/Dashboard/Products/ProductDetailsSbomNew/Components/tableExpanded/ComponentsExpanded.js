@@ -3,12 +3,10 @@ import { getSignedUrlParams, isCustomerView } from 'utils'
 import { openSsf } from 'variables/general'
 
 import { Box, Flex, Tag, Text, VStack } from '@chakra-ui/react'
-import { Grid, GridItem } from '@chakra-ui/react'
+import { Grid } from '@chakra-ui/react'
 
-import { CustomText } from 'components/Misc/CustomText'
+import DetailItem from 'components/Misc/DetailItem'
 import SupplierTag from 'components/SupplierTag'
-
-import { useThemeColor } from 'hooks/useThemeColors'
 
 const ExpandedComponent = (props) => {
   const {
@@ -20,76 +18,91 @@ const ExpandedComponent = (props) => {
     handleGraphView
   } = props
   const openSSF = openSsf?.find((item) => item?.name === data?.purl)
-  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
+
   const customerView = isCustomerView()
   const signedUrlParams = getSignedUrlParams()
 
   return useMemo(() => {
-    const textStyle = {
-      color: primaryTextColor,
-      mt: 1,
-      fontSize: 14,
-      workBreak: 'break-all'
-    }
+    const name = data?.name
+    const type = data?.kind
+    const suppliers = data?.suppliers
+    const description = data?.description
+    const dependsOn = data?.dependsOn
+    const dependencyOf = data?.dependencyOf
+    const purl = data?.purl
+    const purlForDisplay = decodeURI(purl)
+    const cpes = data?.cpes
+    const scope = data?.scope
+    const licensesExp = data?.licensesExp
+    const openSsfScore = openSSF?.score
+    const supportLevel = data?.supportLevel
+    const endOfSupportDate = data?.endOfSupport
+
     const getDate = (value) =>
       value ? `${new Date(value).toLocaleDateString()}` : `N/A`
+
+    const showSupplierForEnterprise =
+      !customerView && !signedUrlParams && suppliers?.length === 0
+
+    const showCustomerSupplier = customerView && suppliers?.length === 0
+
     return (
       <Box
         sx={{ w: '100%', p: 5 }}
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
         <Grid templateColumns='repeat(3, 1fr)' py={2} gap={6}>
-          <GridItem>
-            <CustomText>Name :</CustomText>
-            <Text sx={textStyle} width={'90%'}>
-              {data?.name || 'N/A'}
-            </Text>
-          </GridItem>
-          <GridItem>
-            <CustomText>Type :</CustomText>
-            <Text sx={textStyle}>{data?.kind || 'N/A'}</Text>
-          </GridItem>
-          <GridItem>
-            <CustomText>Supplier :</CustomText>
-            <VStack spacing={4} mt={1} alignItems={'left'}>
-              {!customerView ? (
-                !signedUrlParams && data?.suppliers?.length > 0 ? (
-                  <>
-                    {data?.suppliers.map((item, index) => (
-                      <SupplierTag
-                        key={index}
-                        item={item}
-                        editable={false}
-                        premission={isArchived}
-                        onDelete={() => onDeleteSup(item)}
-                      />
-                    ))}
-                  </>
-                ) : (
-                  <Text sx={textStyle}>N/A</Text>
-                )
-              ) : data?.suppliers?.length > 0 ? (
+          {/* NAME */}
+          <DetailItem label='Name' value={name || 'N/A'} />
+          {/* TYPE */}
+          <DetailItem label='Type' value={type || 'N/A'} />
+          {/* Supplier */}
+          <DetailItem
+            label='Supplier'
+            value={
+              showSupplierForEnterprise || showCustomerSupplier
+                ? 'N/A'
+                : undefined
+            }
+          >
+            <VStack spacing={4} alignItems={'left'}>
+              {!showSupplierForEnterprise && (
                 <>
-                  {data?.suppliers.map((item, index) => (
+                  {suppliers?.map((item, index) => (
+                    <SupplierTag
+                      key={index}
+                      item={item}
+                      editable={false}
+                      premission={isArchived}
+                      onDelete={() => onDeleteSup(item)}
+                    />
+                  ))}
+                </>
+              )}
+              {!showCustomerSupplier && showSupplierForEnterprise && (
+                <>
+                  {suppliers?.map((item, index) => (
                     <SupplierTag key={index} item={item} editable={false} />
                   ))}
                 </>
-              ) : (
-                <Text sx={textStyle}>N/A</Text>
               )}
             </VStack>
-          </GridItem>
-          <GridItem colSpan={3}>
-            <CustomText>Description :</CustomText>
-            <Text sx={textStyle} width={'90%'}>
-              {data?.description ? data?.description : 'N/A'}
-            </Text>
-          </GridItem>
-          <GridItem colSpan={3}>
-            <CustomText>Depends On :</CustomText>
-            <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
-              {data?.dependsOn?.length > 0 ? (
-                [...data.dependsOn]
+          </DetailItem>
+          {/* Description */}
+          <DetailItem
+            colSpan={3}
+            label='Description'
+            value={description || 'N/A'}
+          />
+          {/*  Depends On */}
+          <DetailItem
+            value={dependsOn?.length === 0 && 'N/A'}
+            colSpan={3}
+            label='Depends On'
+          >
+            <Flex alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
+              {dependsOn?.length > 0 &&
+                [...dependsOn]
                   .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
                   .map((comp, index) => (
                     <Tag
@@ -106,17 +119,18 @@ const ExpandedComponent = (props) => {
                         {comp.toComp.name}-{comp.toComp.version}
                       </Text>
                     </Tag>
-                  ))
-              ) : (
-                <Text sx={textStyle}>N/A</Text>
-              )}
+                  ))}
             </Flex>
-          </GridItem>
-          <GridItem colSpan={3}>
-            <CustomText>Dependency Of :</CustomText>
-            <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
-              {data?.dependencyOf?.length > 0 ? (
-                data.dependencyOf?.map((comp, index) => (
+          </DetailItem>
+          {/* Dependency Of */}
+          <DetailItem
+            colSpan={3}
+            label='Dependency Of'
+            value={dependencyOf?.length === 0 && 'N/A'}
+          >
+            <Flex alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
+              {dependencyOf?.length > 0 &&
+                dependencyOf?.map((comp, index) => (
                   <Tag
                     padding={1}
                     key={index}
@@ -131,67 +145,45 @@ const ExpandedComponent = (props) => {
                       {comp.fromComp.name}-{comp.fromComp.version}
                     </Text>
                   </Tag>
-                ))
-              ) : (
-                <Text sx={textStyle}>N/A</Text>
-              )}
+                ))}
             </Flex>
-          </GridItem>
-          <GridItem>
-            <CustomText>PURL :</CustomText>
-            <Text
-              sx={textStyle}
-              cursor={'pointer'}
-              onClick={() => (customerView ? null : onCheckPurl(data))}
-            >
-              {data?.purl ? decodeURI(data?.purl) : 'N/A'}
-            </Text>
-          </GridItem>
-          <GridItem>
-            <CustomText>CPES :</CustomText>
-            {data?.cpes?.length > 0 ? (
-              <Text
-                sx={textStyle}
-                cursor={'pointer'}
-                onClick={() => (customerView ? null : onCheckCpe(data))}
-              >
-                {data?.cpes[0]}
-              </Text>
-            ) : (
-              <Text sx={textStyle}>N/A</Text>
-            )}
-          </GridItem>
-          <GridItem>
-            <CustomText>Scope :</CustomText>
-            <Text sx={textStyle} textTransform={'capitalize'}>
-              {data?.scope || 'N/A'}
-            </Text>
-          </GridItem>
-          <GridItem>
-            <CustomText>Licenses :</CustomText>
-            {data?.licensesExp ? (
-              <Text sx={textStyle}>{data?.licensesExp}</Text>
-            ) : (
-              <Text sx={textStyle}>N/A</Text>
-            )}
-          </GridItem>
-          <GridItem>
-            <CustomText>OpenSSF Scorecard :</CustomText>
-            <Text sx={textStyle}>{openSSF?.score || 'N/A'}</Text>
-          </GridItem>
-          <GridItem hidden={customerView}>
-            <CustomText>Support Level :</CustomText>
-            <Text sx={textStyle}>{data?.supportLevel || 'N/A'}</Text>
-          </GridItem>
-          <GridItem hidden={customerView}>
-            <CustomText>End-of-Support Date :</CustomText>
-            <Text sx={textStyle}>{getDate(data?.endOfSupport)}</Text>
-          </GridItem>
+          </DetailItem>
+          {/* PURL */}
+          <DetailItem
+            cursor='pointer'
+            onClick={() => (customerView ? null : onCheckPurl(data))}
+            value={purl ? purlForDisplay : 'N/A'}
+            label='PURL'
+          />
+          {/* CPES */}
+          <DetailItem
+            cursor={cpes?.length > 0 ? 'pointer' : 'default'}
+            label='CPES'
+            value={cpes?.length > 0 ? cpes[0] : 'N/A'}
+            onClick={() => (customerView ? null : onCheckCpe(data))}
+          />
+          {/* Scope */}
+          <DetailItem label='Scope' value={scope || 'N/A'} />
+          {/* Licenses */}
+          <DetailItem label='Licenses' value={licensesExp || 'N/A'} />
+          {/*  OpenSSF Scorecard */}
+          <DetailItem label='OpenSSF Scorecard' value={openSsfScore || 'N/A'} />
+          {/* Support Level */}
+          <DetailItem
+            hidden={customerView}
+            label='Support Level'
+            value={supportLevel || 'N/A'}
+          />
+          {/*  End-of-Support Date */}
+          <DetailItem
+            hidden={customerView}
+            label='End-of-Support Date'
+            value={getDate(endOfSupportDate) || 'N/A'}
+          />
         </Grid>
       </Box>
     )
   }, [
-    primaryTextColor,
     data,
     customerView,
     signedUrlParams,
