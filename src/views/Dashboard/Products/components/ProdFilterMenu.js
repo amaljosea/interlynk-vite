@@ -14,6 +14,7 @@ import ProdLabel from 'components/Label/ProdLabel'
 import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -33,6 +34,8 @@ const stages = [
 ]
 
 const ProdFilterMenu = (props) => {
+  const { isFreeTier } = useGlobalQueryContext()
+
   const { reset, filterMode, setFilterMode, setSelectedTags } = props
 
   const { prodState, dispatch } = useGlobalState()
@@ -136,7 +139,7 @@ const ProdFilterMenu = (props) => {
         </Menu>
       </Box>
       {/* LABELS */}
-      <Box width={'fit-content'} position={'relative'}>
+      <Box width={'fit-content'} position={'relative'} hidden={isFreeTier}>
         <Menu closeOnSelect={false}>
           <MenuHeading
             title={'Labels'}

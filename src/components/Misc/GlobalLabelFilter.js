@@ -11,6 +11,7 @@ import { Box, SkeletonText } from '@chakra-ui/react'
 
 import ProdLabel from 'components/Label/ProdLabel'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -21,7 +22,7 @@ import MenuHeading from './MenuHeading'
 const GlobalLabelFilter = ({ value, setValue }) => {
   const { dispatch } = useGlobalState()
   const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
-
+  const { isFreeTier } = useGlobalQueryContext()
   const { globalVulnDispatch } = dispatch
 
   const [labels, setLabels] = useState([{ id: 'all', name: 'All' }])
@@ -50,38 +51,47 @@ const GlobalLabelFilter = ({ value, setValue }) => {
   }
 
   return (
-    <Menu closeOnSelect={false}>
-      <MenuHeading
-        title={'Labels'}
-        active={value?.length !== 0}
-        onClick={onCheckLabels}
-      />
-      <MenuList minH='auto' maxH={'300px'} fontSize={'sm'} overflowY={'scroll'}>
-        {loading ? (
-          <Box px={2}>
-            <SkeletonText noOfLines={4} spacing='3' skeletonHeight='2' />
-          </Box>
-        ) : (
-          <MenuOptionGroup
-            type={'checkbox'}
-            value={value}
-            onChange={onFilterLabel}
+    <>
+      {!isFreeTier && (
+        <Menu closeOnSelect={false}>
+          <MenuHeading
+            title={'Labels'}
+            active={value?.length !== 0}
+            onClick={onCheckLabels}
+          />
+          <MenuList
+            minH='auto'
+            maxH={'300px'}
+            fontSize={'sm'}
+            overflowY={'scroll'}
           >
-            {labels?.map((item, index) => (
-              <MenuItemOption
-                key={index}
-                fontSize={'sm'}
-                value={item?.id}
-                wordBreak={'break-all'}
-                aria-label={`label${index}`}
+            {loading ? (
+              <Box px={2}>
+                <SkeletonText noOfLines={4} spacing='3' skeletonHeight='2' />
+              </Box>
+            ) : (
+              <MenuOptionGroup
+                type={'checkbox'}
+                value={value}
+                onChange={onFilterLabel}
               >
-                <ProdLabel item={item} />
-              </MenuItemOption>
-            ))}
-          </MenuOptionGroup>
-        )}
-      </MenuList>
-    </Menu>
+                {labels?.map((item, index) => (
+                  <MenuItemOption
+                    key={index}
+                    fontSize={'sm'}
+                    value={item?.id}
+                    wordBreak={'break-all'}
+                    aria-label={`label${index}`}
+                  >
+                    <ProdLabel item={item} />
+                  </MenuItemOption>
+                ))}
+              </MenuOptionGroup>
+            )}
+          </MenuList>
+        </Menu>
+      )}
+    </>
   )
 }
 
