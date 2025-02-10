@@ -1,4 +1,6 @@
 /* eslint-disable */
+import { useColorModeValue } from '@chakra-ui/system'
+
 import { useThemeColor } from 'hooks/useThemeColors'
 
 export const useSelect = (type) => {
@@ -120,7 +122,12 @@ export const useSelect = (type) => {
         height: isBreadcrumb ? '32px' : '39px',
         paddingLeft: isVersion ? '36px' : 'auto'
       }
-    }
+    },
+    placeholder: (provided) => ({
+      ...provided,
+      fontWeight: 300,
+      color: '#A0AEC0'
+    })
   }
 
   return { style: selectStyles }

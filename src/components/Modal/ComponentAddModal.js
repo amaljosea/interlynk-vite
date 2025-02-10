@@ -10,7 +10,7 @@ import {
 import { componentTypes, infoData } from 'variables/general'
 
 import { InfoIcon, WarningTwoIcon } from '@chakra-ui/icons'
-import { chakra, useDisclosure } from '@chakra-ui/react'
+import { useDisclosure } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 import { Flex, Stack, Text, Tooltip } from '@chakra-ui/react'
 import { Checkbox, Input, Select, Textarea } from '@chakra-ui/react'
