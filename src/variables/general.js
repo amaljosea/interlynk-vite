@@ -85,7 +85,7 @@ export const allDefaultActions = [
     id: 'vulnerabilities',
     name: 'Vulnerabilities',
     section: 'navigation',
-    path: '/vendor/vulnerabilities'
+    path: '/vendor/vulnerabilities?tab=productVulnerabilities'
   },
   {
     id: 'licenses',
