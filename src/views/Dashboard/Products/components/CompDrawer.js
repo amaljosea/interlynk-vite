@@ -1,5 +1,6 @@
 import { useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
+import { PackageURL } from 'packageurl-js'
 import { useContext } from 'react'
 import { useParams } from 'react-router-dom'
 import { getSignedUrlParams, isCustomerView } from 'utils'
@@ -62,9 +63,16 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
     variables: { compId: data?.id, sbomId: isPart ? bomId : sbomId }
   })
 
-  const purlString = purl !== '' ? purl : null
-  const purlMatch = purlString ? purlString.match(/@([\d.]+)$/) : null
-  const purlVersion = purlMatch ? purlMatch[1] : null
+  const getPurlVersion = (value) => {
+    try {
+      const pkg = PackageURL.fromString(value)
+      return pkg?.version || null
+    } catch (error) {
+      console.log('Something went wrong', error)
+    }
+  }
+
+  const purlVersion = purl !== '' ? getPurlVersion(purl) : null
   const purlWarning = purlVersion && data?.version !== purlVersion
 
   const cpeString = cpe !== '' ? cpe?.split(':') : null
