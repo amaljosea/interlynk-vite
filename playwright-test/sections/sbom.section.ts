@@ -44,7 +44,8 @@ export default class SbomSection {
 
         await this.page.getByPlaceholder('Enter name').fill(sbomName)
         await this.page.getByPlaceholder('Enter version').fill(sbomVersion)
-        await this.page.getByLabel('Type *').selectOption(sbomType)
+        await this.page.waitForSelector('#componentType', { timeout: 5000 })
+        await this.page.locator('#componentType').selectOption(sbomType)
         await this.page
           .getByPlaceholder('Enter organization name')
           .fill(orgName)
@@ -87,7 +88,8 @@ export default class SbomSection {
 
         await this.page.getByPlaceholder('Enter name').fill(sbomName)
         await this.page.getByPlaceholder('Enter version').fill(sbomVersion)
-        await this.page.getByLabel('Type *').selectOption(sbomType)
+        await this.page.waitForSelector('#componentType', { timeout: 5000 })
+        await this.page.locator('#componentType').selectOption(sbomType)
         await this.page
           .getByPlaceholder('Enter organization name')
           .fill(orgName)
