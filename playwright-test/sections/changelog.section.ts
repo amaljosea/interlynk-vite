@@ -86,7 +86,9 @@ export default class ChangelogSection {
           await this.page.keyboard.press('Enter')
           await this.page.waitForTimeout(1000)
 
-          await this.page.getByText('SBOM', { exact: true }).click()
+          await this.page
+            .locator("//p[contains(@class, 'chakra-text') and text()='SBOM']")
+            .click()
           await this.page.waitForTimeout(3000)
 
           await this.page.getByLabel('Close').click()
