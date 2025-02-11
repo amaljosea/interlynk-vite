@@ -382,6 +382,13 @@ export default class ProductSection {
                               await this.page.press(ps.productSearch, 'Enter')
                               await this.page.waitForTimeout(2000)
 
+                              await this.page.locator(ps.activeFilter).click()
+                              await this.page.waitForTimeout(1000)
+                              await this.page
+                                .locator(`button[name='yes']`)
+                                .click()
+                              await this.page.waitForTimeout(1000)
+
                               await this.page
                                 .locator(ps.productName(productName))
                                 .isVisible()
