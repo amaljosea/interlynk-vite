@@ -7,17 +7,10 @@ import { Divider, IconButton, Textarea } from '@chakra-ui/react'
 import { Button, ButtonGroup } from '@chakra-ui/react'
 import { Flex, Stack, Text } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
-import {
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay
-} from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import LynkAlert from 'components/LynkAlert'
+import LynkDrawer from 'components/LynkDrawer'
 import CompInfo from 'components/Misc/CompInfo'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -199,157 +192,153 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
   }, [edit, noteId])
 
   return (
-    <Drawer size='md' isOpen={isOpen} placement='right' onClose={onClose}>
-      <DrawerOverlay />
-      <DrawerContent>
-        <DrawerCloseButton mt={3} />
-        <DrawerHeader borderBottomWidth='1px'>
-          <Text mb={1} fontWeight={'medium'}>
-            Edit Notes
-          </Text>
-          {data && <CompInfo data={data} />}
-        </DrawerHeader>
-        <DrawerBody>
-          <Stack spacing={4}>
-            {edit ? (
-              <Stack spacing={4} ref={noteForm}>
-                {/* NOTE COMMENT */}
-                <FormControl>
-                  <FormLabel>Comment</FormLabel>
-                  <Textarea
-                    fontSize={'sm'}
-                    value={comment}
-                    maxLength={512}
-                    placeholder={'Add some comment'}
-                    onChange={(e) => setComment(e.target.value)}
-                  />
-                </FormControl>
-                {error !== '' && <LynkAlert msg={error} />}
-                {/* NOTE ACTIONS */}
-                <ButtonGroup>
-                  <Button
-                    w={'24'}
-                    fontSize={'sm'}
-                    variant='outline'
-                    colorScheme='blue'
-                    onClick={() => setEdit(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    w={'24'}
-                    fontSize={'sm'}
-                    variant='solid'
-                    colorScheme='blue'
-                    isDisabled={comment === ''}
-                    onClick={handleSubmit}
-                    isLoading={createLoading || updateLoading}
-                  >
-                    Save
-                  </Button>
-                </ButtonGroup>
-              </Stack>
-            ) : (
-              <Button
-                mt={2}
-                w={'full'}
-                fontSize={'sm'}
-                leftIcon={<AddIcon />}
-                onClick={() => {
-                  setNoteId('')
-                  setComment('')
-                  setEdit(true)
-                  setWarning('')
-                }}
-              >
-                Add Note
-              </Button>
-            )}
-            <Divider />
-            {noteLoading ? (
-              <CustomLoader />
-            ) : (
-              <Stack>
-                {filterData?.length > 0 ? (
-                  <Stack spacing={6} mb={4}>
-                    {filterData?.map((note, index) => (
-                      <Flex
-                        gap={8}
-                        key={index}
-                        alignItems={'flex-start'}
-                        justify='space-between'
-                      >
-                        <Flex gap={2} alignItems={'flex-start'}>
-                          <Text fontSize={'sm'}>{index + 1}.</Text>
-                          <Stack spacing={0} maxW='345px'>
-                            <Text
-                              fontSize={'sm'}
-                              whiteSpace='pre-wrap'
-                              wordBreak='break-word'
-                            >
-                              {note.comment}
-                            </Text>
-                            <Text fontSize={'xs'} color={sameSecondaryText}>
-                              {timeSince(note?.updatedAt)}
-                            </Text>
-                          </Stack>
-                        </Flex>
-                        {warning === note?.id ? (
-                          <Flex gap={2} alignItems={'center'}>
-                            <Button
-                              size='sm'
-                              fontSize={12}
-                              hidden={deleteLoading}
-                              onClick={() => setWarning('')}
-                            >
-                              No
-                            </Button>
-                            <Button
-                              size='sm'
-                              fontSize={12}
-                              colorScheme='red'
-                              isLoading={deleteLoading}
-                              onClick={() => handleDeleteNote(note?.id)}
-                            >
-                              Yes
-                            </Button>
-                          </Flex>
-                        ) : (
-                          <Flex gap={2} alignItems={'center'}>
-                            <IconButton
-                              size='sm'
-                              cursor='pointer'
-                              icon={<EditIcon />}
-                              onClick={() => {
-                                setEdit(true)
-                                setWarning('')
-                                setNoteId(note?.id)
-                                setComment(note.comment)
-                              }}
-                            />
-                            <IconButton
-                              size='sm'
-                              cursor='pointer'
-                              colorScheme='red'
-                              icon={<DeleteIcon />}
-                              onClick={() => setWarning(note?.id)}
-                            />
-                          </Flex>
-                        )}
+    <>
+      <LynkDrawer
+        title={'Edit Notes'}
+        subtitle={data ? <CompInfo data={data} /> : null}
+        isOpen={isOpen}
+        onClose={onClose}
+        noFooter
+      >
+        <Stack spacing={4}>
+          {edit ? (
+            <Stack spacing={4} ref={noteForm}>
+              {/* NOTE COMMENT */}
+              <FormControl>
+                <FormLabel>Comment</FormLabel>
+                <Textarea
+                  fontSize={'sm'}
+                  value={comment}
+                  maxLength={512}
+                  placeholder={'Add some comment'}
+                  onChange={(e) => setComment(e.target.value)}
+                />
+              </FormControl>
+              {error !== '' && <LynkAlert msg={error} />}
+              {/* NOTE ACTIONS */}
+              <ButtonGroup>
+                <Button
+                  w={'24'}
+                  fontSize={'sm'}
+                  variant='outline'
+                  colorScheme='blue'
+                  onClick={() => setEdit(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  w={'24'}
+                  fontSize={'sm'}
+                  variant='solid'
+                  colorScheme='blue'
+                  isDisabled={comment === ''}
+                  onClick={handleSubmit}
+                  isLoading={createLoading || updateLoading}
+                >
+                  Save
+                </Button>
+              </ButtonGroup>
+            </Stack>
+          ) : (
+            <Button
+              mt={2}
+              w={'full'}
+              fontSize={'sm'}
+              leftIcon={<AddIcon />}
+              onClick={() => {
+                setNoteId('')
+                setComment('')
+                setEdit(true)
+                setWarning('')
+              }}
+            >
+              Add Note
+            </Button>
+          )}
+          <Divider />
+          {noteLoading ? (
+            <CustomLoader />
+          ) : (
+            <Stack>
+              {filterData?.length > 0 ? (
+                <Stack spacing={6} mb={4}>
+                  {filterData?.map((note, index) => (
+                    <Flex
+                      gap={8}
+                      key={index}
+                      alignItems={'flex-start'}
+                      justify='space-between'
+                    >
+                      <Flex gap={2} alignItems={'flex-start'}>
+                        <Text fontSize={'sm'}>{index + 1}.</Text>
+                        <Stack spacing={0} maxW='345px'>
+                          <Text
+                            fontSize={'sm'}
+                            whiteSpace='pre-wrap'
+                            wordBreak='break-word'
+                          >
+                            {note.comment}
+                          </Text>
+                          <Text fontSize={'xs'} color={sameSecondaryText}>
+                            {timeSince(note?.updatedAt)}
+                          </Text>
+                        </Stack>
                       </Flex>
-                    ))}
-                  </Stack>
-                ) : (
-                  <Text textAlign={'center'} color={sameSecondaryText}>
-                    No record to display
-                  </Text>
-                )}
-              </Stack>
-            )}
-          </Stack>
-        </DrawerBody>
-      </DrawerContent>
-    </Drawer>
+                      {warning === note?.id ? (
+                        <Flex gap={2} alignItems={'center'}>
+                          <Button
+                            size='sm'
+                            fontSize={12}
+                            hidden={deleteLoading}
+                            onClick={() => setWarning('')}
+                          >
+                            No
+                          </Button>
+                          <Button
+                            size='sm'
+                            fontSize={12}
+                            colorScheme='red'
+                            isLoading={deleteLoading}
+                            onClick={() => handleDeleteNote(note?.id)}
+                          >
+                            Yes
+                          </Button>
+                        </Flex>
+                      ) : (
+                        <Flex gap={2} alignItems={'center'}>
+                          <IconButton
+                            size='sm'
+                            cursor='pointer'
+                            icon={<EditIcon />}
+                            onClick={() => {
+                              setEdit(true)
+                              setWarning('')
+                              setNoteId(note?.id)
+                              setComment(note.comment)
+                            }}
+                          />
+                          <IconButton
+                            size='sm'
+                            cursor='pointer'
+                            colorScheme='red'
+                            icon={<DeleteIcon />}
+                            onClick={() => setWarning(note?.id)}
+                          />
+                        </Flex>
+                      )}
+                    </Flex>
+                  ))}
+                </Stack>
+              ) : (
+                <Text textAlign={'center'} color={sameSecondaryText}>
+                  No record to display
+                </Text>
+              )}
+            </Stack>
+          )}
+        </Stack>
+      </LynkDrawer>
+    </>
   )
 }
 

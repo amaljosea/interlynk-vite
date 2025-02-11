@@ -1,4 +1,5 @@
 import {
+  Box,
   Divider,
   Drawer,
   DrawerBody,
@@ -15,11 +16,13 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 const LynkDrawer = ({
   title,
+  subtitle,
   isOpen,
   onClose,
   isDisabled,
   onSubmit,
   isLoading,
+  size = 'md',
   buttonLabel = 'Save',
   buttonTitle = 'Save',
   cancelButtonTitle = 'Cancel',
@@ -30,22 +33,21 @@ const LynkDrawer = ({
   const { secondaryTextInverse } = useThemeColor(['secondaryTextInverse'])
   return (
     <Drawer
-      size='md'
+      size={size}
       isOpen={isOpen}
-      placement='right'
       onClose={onClose}
       closeOnOverlayClick={false}
+      placement='right'
     >
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton mt={1} />
         <DrawerHeader fontWeight='500' borderBottomWidth='1px'>
           {title}
+          {subtitle && <Box mt={1}>{subtitle}</Box>}
         </DrawerHeader>
 
-        <DrawerBody overflowX={'hidden'} padding={'20px'}>
-          {children}
-        </DrawerBody>
+        <DrawerBody overflowX={'hidden'}>{children}</DrawerBody>
         <Divider hidden={noFooter} />
         <DrawerFooter hidden={noFooter}>
           <HStack spacing={3}>
