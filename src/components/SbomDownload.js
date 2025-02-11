@@ -270,7 +270,7 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
           {/*  SBOM EXCEL DOWNLOAD */}
           <MenuItem onClick={downloadExcel} hidden={signedUrlParams}>
             <Stack spacing={1}>
-              <Box {...title} spacing={1} mb='4px'>
+              <Box {...title} spacing={1}>
                 Excel
               </Box>
               <Box {...subTitle}>Download version details as Excel</Box>
