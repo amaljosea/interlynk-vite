@@ -13,6 +13,7 @@ import VulnBySeverity from 'components/Graphs/VulnBySeverity'
 import VulnByStatus from 'components/Graphs/VulnByStatus'
 
 import useDateRange from 'hooks/useDateRange'
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import {
@@ -25,6 +26,8 @@ const VulnGraphs = ({ labelIds }) => {
   const { organization, envName } = useGlobalState()
 
   const { startDate, endDate } = useDateRange()
+
+  const { isFreeTier } = useGlobalQueryContext()
 
   const filters = {
     label: labelIds,
@@ -455,11 +458,15 @@ const VulnGraphs = ({ labelIds }) => {
       <SimpleGrid columns={{ sm: 1, md: 3 }} spacing={5}>
         <VulnBySeverity filters={filters} />
         <VulnByStatus filters={filters} />
-        <PatchVelocity filters={filters} />
-        <DefectDensity filters={filters} />
-        <DeployVelocity filters={filters} />
-        <VulnAge filters={filters} />
-        <IdentityVelocity filters={filters} />
+        {!isFreeTier && (
+          <>
+            <PatchVelocity filters={filters} />
+            <DefectDensity filters={filters} />
+            <DeployVelocity filters={filters} />
+            <VulnAge filters={filters} />
+            <IdentityVelocity filters={filters} />
+          </>
+        )}
       </SimpleGrid>
     </Stack>
   )
