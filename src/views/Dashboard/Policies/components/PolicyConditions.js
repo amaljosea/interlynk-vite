@@ -22,6 +22,7 @@ import {
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { MdDeleteOutline } from 'react-icons/md'
+import { vulnStatusTypes } from 'variables/general'
 
 const PolicyConditions = ({
   conditions,
@@ -282,13 +283,7 @@ const PolicyConditions = ({
                       }
                     >
                       <option value=''>-- select --</option>
-                      {[
-                        'In Triage',
-                        'Not Affected',
-                        'Affected',
-                        'Fixed',
-                        'Unspecified'
-                      ].map((item, index) => (
+                      {vulnStatusTypes.map((item, index) => (
                         <option
                           key={index}
                           value={item}

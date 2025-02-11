@@ -1,6 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { useRef } from 'react'
 import { useParams } from 'react-router-dom'
+import { vulnStatusTypes } from 'variables/general'
 
 import { Box, Button, Flex, Stack, useDisclosure } from '@chakra-ui/react'
 import {
@@ -151,7 +152,10 @@ const GlobalVulnsFilters = ({ reset }) => {
   return (
     <Stack direction={'row'} alignItems={'center'} spacing={2}>
       {/* LABELS */}
-      <GlobalLabelFilter value={projectGroupLabelIds} setValue={onFilterLabel} />
+      <GlobalLabelFilter
+        value={projectGroupLabelIds}
+        setValue={onFilterLabel}
+      />
       {/* PRODUCTS */}
       <Box
         width={'fit-content'}
@@ -278,14 +282,8 @@ const GlobalVulnsFilters = ({ reset }) => {
         <Menu closeOnSelect={false}>
           <MenuHeading title={'Status'} active={getStatus('statuses')} />
           <CustomList
-            options={[
-              'In Triage',
-              'Not Affected',
-              'Affected',
-              'Fixed',
-              'Unspecified'
-            ]}
             value={status}
+            options={vulnStatusTypes}
             onChange={onFilterStatus}
           />
         </Menu>

@@ -14,6 +14,14 @@ export const sbomPhases = [
   { label: 'Runtime', value: 'runtime' }
 ]
 
+export const vulnStatusTypes = [
+  'Unspecified',
+  'In Triage',
+  'Not Affected',
+  'Affected',
+  'Fixed'
+]
+
 export const componentTypes = [
   'application',
   'container',

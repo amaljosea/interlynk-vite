@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { vulnStatusTypes } from 'variables/general'
 
 import { Button, Flex, Stack, useDisclosure } from '@chakra-ui/react'
 import {
@@ -197,13 +198,7 @@ const VulnFilters = ({ reset }) => {
             onChange={onFilterStatus}
             fontSize={'sm'}
           >
-            {[
-              'Unspecified',
-              'In Triage',
-              'Not Affected',
-              'Affected',
-              'Fixed'
-            ].map((item, index) => (
+            {vulnStatusTypes.map((item, index) => (
               <MenuItemOption
                 key={index}
                 value={item}

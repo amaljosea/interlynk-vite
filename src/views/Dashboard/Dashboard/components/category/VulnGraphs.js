@@ -21,6 +21,7 @@ import {
   getVulnsByStatus,
   getVulnsWithConditions
 } from 'graphQL/Queries'
+import { vulnStatusTypes } from 'variables/general'
 
 const VulnGraphs = ({ labelIds }) => {
   const { organization, envName } = useGlobalState()
@@ -41,13 +42,7 @@ const VulnGraphs = ({ labelIds }) => {
       skip: organization ? false : true,
       variables: {
         severity: ['critical'],
-        status: [
-          'Unspecified',
-          'In Triage',
-          'Affected',
-          'Not Affected',
-          'Fixed'
-        ],
+        status: vulnStatusTypes,
         labelIds: labelIds?.length > 0 ? labelIds : undefined,
         envNames: [envName]
       }
