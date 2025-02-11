@@ -11,6 +11,7 @@ import LynkAlert from 'components/LynkAlert'
 import LynkSelect from 'components/LynkSelect'
 import CustomDropdownIndicator from 'components/Misc/CustomDropdownIndicator'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useLazyDropDown } from 'hooks/useLazyDropDown'
 import { useSelect } from 'hooks/useSelect'
@@ -34,6 +35,7 @@ const StepOne = ({
   const { enabled, field, direction } = prodState
 
   const { headingTextColor } = useThemeColor(['headingTextColor'])
+  const { isFreeTier } = useGlobalQueryContext()
 
   const [label, setLabel] = useState(null)
   const { style } = useSelect('lynkSelect')
@@ -209,10 +211,12 @@ const StepOne = ({
           mt={12}
         >
           {/* LABEL */}
-          <LabelSelect
-            value={label}
-            onChange={(value) => handleChange(value)}
-          />
+          {!isFreeTier && (
+            <LabelSelect
+              value={label}
+              onChange={(value) => handleChange(value)}
+            />
+          )}
           {/* PROJECT GROUPS */}
           {
             <FormControl fontSize={'sm'}>

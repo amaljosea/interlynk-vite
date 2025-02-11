@@ -10,15 +10,12 @@ import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import LynkLoader from 'components/Misc/LynkLoader'
 
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { getProductsByLabels } from 'graphQL/Queries'
 
 const ProductLabels = () => {
-  const { isFreeTier } = useGlobalQueryContext()
-
   const navigate = useNavigate()
   const { organization, dispatch } = useGlobalState()
   const { grayBorderColor, primaryBlueText } = useThemeColor([
@@ -74,7 +71,7 @@ const ProductLabels = () => {
 
   const total = filterLabels?.reduce((sum, stage) => sum + stage.count, 0)
 
-  if (loading && !isFreeTier) return <LynkLoader />
+  if (loading) return <LynkLoader />
 
   const handleFilter = (value) => {
     prodDispatch({
@@ -85,7 +82,7 @@ const ProductLabels = () => {
   }
 
   return (
-    <Card hidden={isFreeTier} maxH='100%' overflowY='auto'>
+    <Card maxH='100%' overflowY='auto'>
       {/* HEADING */}
       <Text fontWeight={'semibold'}>Products by Label</Text>
       <CardBody mt={6} h='100%'>
