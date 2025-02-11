@@ -1,5 +1,9 @@
 import { useMutation } from '@apollo/client'
 import React from 'react'
+import {
+  FREE_TIER_PRODUCT_LIMIT,
+  FREE_TIER_USER_LIMIT
+} from 'variables/general'
 
 import { CheckCircleIcon, CloseIcon } from '@chakra-ui/icons'
 import {
@@ -188,8 +192,12 @@ const PlanTable = () => {
               <LynkTd fontSize={'sm'}>
                 {isFreeTier ? 'Free' : 'Enterprise'}
               </LynkTd>
-              <LynkTd fontSize={'sm'}>{isFreeTier ? '5' : 'Unlimited'}</LynkTd>
-              <LynkTd fontSize={'sm'}>{isFreeTier ? '2' : 'Unlimited'}</LynkTd>
+              <LynkTd fontSize={'sm'}>
+                {isFreeTier ? FREE_TIER_PRODUCT_LIMIT : 'Unlimited'}
+              </LynkTd>
+              <LynkTd fontSize={'sm'}>
+                {isFreeTier ? FREE_TIER_USER_LIMIT : 'Unlimited'}
+              </LynkTd>
               <LynkTd fontSize={'sm'}>N/A</LynkTd>
             </Tr>
           </Tbody>

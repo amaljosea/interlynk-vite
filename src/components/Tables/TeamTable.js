@@ -3,6 +3,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
 import { customStyles } from 'utils/styleUtils'
+import { FREE_TIER_USER_LIMIT } from 'variables/general'
 import RoleModal from 'views/Dashboard/Profile/components/RoleModal'
 import TeamModal from 'views/Dashboard/Profile/components/TeamModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -319,7 +320,7 @@ const TeamTable = () => {
           <Box position='relative'>
             <Tooltip
               label={
-                isFreeTier && numberOfUsers === 2
+                isFreeTier && numberOfUsers >= FREE_TIER_USER_LIMIT
                   ? 'Limit reached for free tier'
                   : 'Invite User'
               }
@@ -330,7 +331,8 @@ const TeamTable = () => {
                 <AddButton
                   onClick={TEAM.onOpen}
                   isDisabled={
-                    !inviteUser || (isFreeTier && numberOfUsers === 2)
+                    !inviteUser ||
+                    (isFreeTier && numberOfUsers >= FREE_TIER_USER_LIMIT)
                   }
                 />
               </Box>

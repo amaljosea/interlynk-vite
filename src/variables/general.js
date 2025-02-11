@@ -1872,3 +1872,6 @@ export const complianceList = [
     desc: 'The Technical Guideline TR-03183: Cyber Resilience Requirements for Manufacturers and Products aims to provide manufacturers with advance access to the type of requirements that will be imposed on them by the future Cyber Resilience Act (CRA) of the EU.'
   }
 ]
+
+export const FREE_TIER_PRODUCT_LIMIT = 10
+export const FREE_TIER_USER_LIMIT = 5

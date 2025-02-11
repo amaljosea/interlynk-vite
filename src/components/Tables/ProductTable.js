@@ -7,6 +7,7 @@ import { getFullDate, timeSince } from 'utils'
 import { getFormat, getLink } from 'utils'
 import { getSignedUrlParams, truncatedValue } from 'utils'
 import { customStyles, getType } from 'utils/styleUtils'
+import { FREE_TIER_PRODUCT_LIMIT } from 'variables/general'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import GithubAddModal from 'views/Dashboard/Products/components/GithubAddModal'
 import LabelInput from 'views/Dashboard/Products/components/LabelInput'
@@ -266,7 +267,7 @@ const ProductTable = (props) => {
           <Box position='relative'>
             <Tooltip
               label={
-                isFreeTier && totalCount === 5
+                isFreeTier && totalCount >= FREE_TIER_PRODUCT_LIMIT
                   ? 'Limit reached for free tier'
                   : 'Add product'
               }
@@ -280,7 +281,8 @@ const ProductTable = (props) => {
                     PRODUCT.onOpen()
                   }}
                   isDisabled={
-                    !canAddProduct || (isFreeTier && totalCount === 5)
+                    !canAddProduct ||
+                    (isFreeTier && totalCount >= FREE_TIER_PRODUCT_LIMIT)
                   }
                   hidden={signedUrlParams}
                 />
