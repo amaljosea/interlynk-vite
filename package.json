@@ -86,7 +86,7 @@
     "gulp": "^5.0.0",
     "gulp-append-prepend": "1.0.9",
     "husky": "^9.1.1",
-    "prettier": "^3.3.3",
+    "prettier": "^3.5.0",
     "pretty-quick": "^4.0.0",
     "react-error-overlay": "^6.0.9"
   },
