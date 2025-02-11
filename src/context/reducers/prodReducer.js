@@ -53,7 +53,7 @@ const prodReducer = (state, action) => {
     case 'FILTER_ACTIVE':
       return {
         ...state,
-        enabled: payload,
+        enabled: payload === 'all' ? '' : payload,
         pageIndex: 1
       }
     case 'FILTER_LABEL':

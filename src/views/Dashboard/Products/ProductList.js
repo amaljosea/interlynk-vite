@@ -29,7 +29,7 @@ function ProductList() {
   const filters = {
     field,
     direction,
-    enabled: enabled === 'yes' ? true : false,
+    enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
     labelIds: getUndefinedIfEmptyOrAll(labelIds),
     search: searchInput !== '' ? searchInput : undefined,
     lifestage: !lifestage?.includes('none')

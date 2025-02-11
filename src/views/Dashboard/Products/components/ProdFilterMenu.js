@@ -128,14 +128,14 @@ const ProdFilterMenu = (props) => {
         <Menu closeOnSelect={false}>
           <MenuHeading
             title={'Active'}
-            active={enabled !== undefined}
+            active={enabled !== ''}
             name='active_filter'
           />
           <CustomList
             type='radio'
             onChange={onFilterActive}
             options={['yes', 'no']}
-            value={enabled === true ? 'yes' : enabled === false ? 'no' : 'all'}
+            value={enabled}
           />
         </Menu>
       </Box>
