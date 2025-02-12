@@ -1,5 +1,5 @@
 import { gql, useQuery } from '@apollo/client'
-import { checkIfCustomer } from 'utils/url'
+import { isCustomerView } from 'utils'
 
 export const GetProjectsVendor = gql`
   query GetProjectsVendor($projectGroupId: Uuid!) {
@@ -36,7 +36,7 @@ export const GetProjectsCustomer = gql`
 `
 
 export const useProjectGroup = ({ projectGroupId }) => {
-  const isCustomer = checkIfCustomer()
+  const isCustomer = isCustomerView()
   const { data, loading } = useQuery(
     isCustomer ? GetProjectsCustomer : GetProjectsVendor,
     {

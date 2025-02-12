@@ -26,8 +26,6 @@ export const appendParams = ({ url, paramsObj = {}, replaceParams }) => {
   return url
 }
 
-export const checkIfCustomer = () => getUserType() === 'customer'
-
 export const getShareLinklUrl = ({
   productgroupid,
   signedUrlParams,
