@@ -1883,3 +1883,81 @@ export const complianceList = [
 
 export const FREE_TIER_PRODUCT_LIMIT = 10
 export const FREE_TIER_USER_LIMIT = 5
+
+const usageData = {
+  title: 'Usage',
+  features: [
+    { feature: 'Users', val1: FREE_TIER_USER_LIMIT, val2: 'Custom' },
+    { feature: 'Products', val1: FREE_TIER_PRODUCT_LIMIT, val2: 'Unlimited' }
+  ]
+}
+
+const sbomFeatures = {
+  title: 'SBOM Features',
+  features: [
+    { feature: 'SBOM Management', val1: true, val2: true },
+    { feature: 'SBOM Manual Build', val1: true, val2: true },
+    { feature: 'SBOM Editor', val1: true, val2: true },
+    { feature: 'SBOM Quality Scoring', val1: true, val2: true },
+    { feature: 'SBOM Compliance Assessment', val1: true, val2: true },
+    { feature: 'SBOM ShareLynk', val1: true, val2: true },
+    { feature: 'SBOM Automation Rules', val1: false, val2: true },
+    { feature: 'SBOM Parts Composition', val1: false, val2: true },
+    { feature: 'SBOM In-Place Signing', val1: false, val2: true },
+    { feature: 'SBOM Component Privacy', val1: false, val2: true }
+  ]
+}
+
+const riskManagementFeatures = {
+  title: 'Risk Management Features',
+  features: [
+    { feature: 'Vulnerability Management', val1: true, val2: true },
+    { feature: 'Exploitability Editor (VEX)', val1: true, val2: true },
+    {
+      feature: 'End-of-life / End-of-service Detection',
+      val1: false,
+      val2: true
+    },
+    { feature: 'Open Source Risk Scoring', val1: false, val2: true },
+    { feature: 'OpenSSF Scorecard Risk Scoring', val1: false, val2: true }
+  ]
+}
+
+const managementAndReportingFeatures = {
+  title: 'Management & Reporting Features',
+  features: [
+    { feature: 'Policy Management', val1: true, val2: true },
+    { feature: 'Role Based Access Control (RBAC)', val1: false, val2: true },
+    { feature: 'Custom Roles', val1: false, val2: true },
+    { feature: 'Integrated License Manager', val1: false, val2: true },
+    { feature: 'Analytics', val1: false, val2: true }
+  ]
+}
+
+const supportFeatures = {
+  title: 'Support Features',
+  features: [
+    { feature: 'Product Support', val1: 'Email', val2: 'Chat, Slack, Email' }
+  ]
+}
+
+const integrationsFeatures = {
+  title: 'Integrations Features',
+  features: [
+    {
+      feature: 'Workflow Integrations',
+      val1: false,
+      val2: 'JIRA, Teams, Slack, GitHub'
+    }
+  ]
+}
+
+// Combine all feature objects into one array
+export const upgradePlanAllFeatures = [
+  usageData,
+  sbomFeatures,
+  riskManagementFeatures,
+  managementAndReportingFeatures,
+  supportFeatures,
+  integrationsFeatures
+]
