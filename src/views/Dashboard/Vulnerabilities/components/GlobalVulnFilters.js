@@ -25,6 +25,7 @@ import MenuHeading from 'components/Misc/MenuHeading'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { GetProductNames } from 'graphQL/Queries'
+import { severityList } from 'variables/general'
 
 const GlobalVulnsFilters = ({ reset }) => {
   const params = useParams()
@@ -191,7 +192,7 @@ const GlobalVulnsFilters = ({ reset }) => {
         <Menu closeOnSelect={false}>
           <MenuHeading title={'Severity'} active={getStatus('severities')} />
           <CustomList
-            options={['critical', 'high', 'medium', 'low', 'unknown']}
+            options={severityList}
             value={severity}
             onChange={onFilterSeverity}
           />

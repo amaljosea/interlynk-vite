@@ -15,6 +15,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
 
 import { GetOrgRules } from 'graphQL/Queries'
+import { severityList } from 'variables/general'
 
 const CheckFilters = ({ filters, reset }) => {
   const activeTab = useQueryParam('tab')
@@ -121,7 +122,7 @@ const CheckFilters = ({ filters, reset }) => {
             <CustomList
               value={severity}
               onChange={onFilterSeverity}
-              options={['critical', 'high', 'medium', 'low']}
+              options={severityList}
             />
           </Menu>
         </Box>

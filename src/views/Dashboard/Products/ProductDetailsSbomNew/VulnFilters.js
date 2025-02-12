@@ -22,6 +22,7 @@ import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { severityList } from 'variables/general'
 
 const VulnFilters = ({ reset }) => {
   const { prodVulnState, dispatch } = useGlobalState()
@@ -219,7 +220,7 @@ const VulnFilters = ({ reset }) => {
         <Menu closeOnSelect={false}>
           <MenuHeading title={'Severity'} active={severities.length !== 0} />
           <CustomList
-            options={['critical', 'high', 'medium', 'low', 'unknown']}
+            options={severityList}
             value={severities}
             onChange={onFilterSeverity}
           />

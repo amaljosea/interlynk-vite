@@ -19,6 +19,7 @@ import {
 import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { severityList } from 'variables/general'
 
 const VulnFilters = ({ reset }) => {
   const { prodVulnState, dispatch } = useGlobalState()
@@ -223,7 +224,7 @@ const VulnFilters = ({ reset }) => {
             <MenuItemOption value={'all'} fontSize={'sm'}>
               All
             </MenuItemOption>
-            {['critical', 'high', 'medium', 'low', 'unknown']?.map(
+            {severityList?.map(
               (item, index) => (
                 <MenuItemOption
                   key={index}

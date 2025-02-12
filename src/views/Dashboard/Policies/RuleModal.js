@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { updatedValue } from 'utils'
+import { severityList } from 'variables/general'
 
 import { EditIcon } from '@chakra-ui/icons'
 import {
@@ -202,7 +203,7 @@ const RuleModal = ({ activeRow, data, isOpen, onClose }) => {
               fontSize='sm'
             >
               <option value=''>-- Select --</option>
-              {['Critical', 'High', 'Medium', 'Low'].map((item, index) => (
+              {severityList.map((item, index) => (
                 <option
                   key={index}
                   value={item}

@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { severityList } from 'variables/general'
 
 import {
   Button,
@@ -36,8 +37,6 @@ import {
   GetTotalComponents,
   verfifyCustomVuln
 } from 'graphQL/Queries'
-
-const severities = ['Critical', 'High', 'Medium', 'Low', 'Unknown']
 
 const VulnDrawer = ({ data, isOpen, onClose }) => {
   const params = useParams()
@@ -216,8 +215,12 @@ const VulnDrawer = ({ data, isOpen, onClose }) => {
                   textTransform={'capitalize'}
                 >
                   <option value=''>-- Select --</option>
-                  {severities?.map((item, index) => (
-                    <option key={index} value={item}>
+                  {severityList?.map((item, index) => (
+                    <option
+                      key={index}
+                      value={item}
+                      style={{ textTransform: 'capitalize' }}
+                    >
                       {item}
                     </option>
                   ))}

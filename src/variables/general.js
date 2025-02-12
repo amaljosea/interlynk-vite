@@ -14,6 +14,8 @@ export const sbomPhases = [
   { label: 'Runtime', value: 'runtime' }
 ]
 
+export const severityList = ['critical', 'high', 'low', 'medium', 'unknown']
+
 export const vulnStatusTypes = [
   'Unspecified',
   'In Triage',

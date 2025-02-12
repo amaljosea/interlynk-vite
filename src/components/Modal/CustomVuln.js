@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getSignedUrlParams } from 'utils'
 import { validateCPEString } from 'utils/cpeUtils'
+import { severityList } from 'variables/general'
 
 import { SearchIcon } from '@chakra-ui/icons'
 import {
@@ -33,8 +34,6 @@ import {
 } from 'graphQL/Queries'
 
 import { FaBug } from 'react-icons/fa6'
-
-const severities = ['Critical', 'High', 'Medium', 'Low', 'Unknown']
 
 const CustomVuln = ({ isOpen, onClose }) => {
   const params = useParams()
@@ -257,8 +256,12 @@ const CustomVuln = ({ isOpen, onClose }) => {
             onChange={handleChange}
           >
             <option value=''>-- Select --</option>
-            {severities?.map((item, index) => (
-              <option key={index} value={item}>
+            {severityList?.map((item, index) => (
+              <option
+                key={index}
+                value={item}
+                style={{ textTransform: 'capitalize' }}
+              >
                 {item}
               </option>
             ))}

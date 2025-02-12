@@ -1,6 +1,7 @@
 import { useLazyQuery } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
 import { getDateFormat } from 'utils'
+import { severityList } from 'variables/general'
 
 import { RepeatIcon } from '@chakra-ui/icons'
 import {
@@ -30,7 +31,7 @@ import Timeline from './components/Timeline'
 
 function Advisories() {
   const source = ['all', 'nvd', 'ghsa', 'usn', 'pyadvisory', 'goadvisory']
-  const severity = ['all', 'critical', 'high', 'low', 'medium', 'unknown']
+  const severity = ['all', ...severityList]
 
   const [formattedDate, setFormattedDate] = useState(getDateFormat(new Date()))
 

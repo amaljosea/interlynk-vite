@@ -1,6 +1,8 @@
 import { updatedValue } from 'utils'
 import { getIcon } from 'utils/styleUtils'
 import { componentTypes } from 'variables/general'
+import { vulnStatusTypes } from 'variables/general'
+import { severityList } from 'variables/general'
 
 import {
   Box,
@@ -22,7 +24,6 @@ import {
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { MdDeleteOutline } from 'react-icons/md'
-import { vulnStatusTypes } from 'variables/general'
 
 const PolicyConditions = ({
   conditions,
@@ -227,17 +228,15 @@ const PolicyConditions = ({
                       }
                     >
                       <option value=''>-- select --</option>
-                      {['critical', 'high', 'medium', 'low', 'unknown'].map(
-                        (item, index) => (
-                          <option
-                            key={index}
-                            value={item}
-                            style={{ textTransform: 'capitalize' }}
-                          >
-                            {item}
-                          </option>
-                        )
-                      )}
+                      {severityList.map((item, index) => (
+                        <option
+                          key={index}
+                          value={item}
+                          style={{ textTransform: 'capitalize' }}
+                        >
+                          {item}
+                        </option>
+                      ))}
                     </Select>
                   </FormControl>
                 )}
