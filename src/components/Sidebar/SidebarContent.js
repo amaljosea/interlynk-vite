@@ -10,11 +10,12 @@ import IconBox from 'components/Icons/IconBox'
 import { SidebarHelp } from 'components/Sidebar/SidebarHelp'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const SidebarContent = ({ routes }) => {
   const location = useLocation()
-  const dashboardView = location.pathname === '/vendor/dashboard'
+  const { isDashboardView } = useRouteFlags()
   const signedUrlParams = getSignedUrlParams()
   const category = location.pathname.split('/')[2]
   const { organization } = useGlobalState()
@@ -67,7 +68,7 @@ const SidebarContent = ({ routes }) => {
           to={toPath}
           aria-label={name.toLowerCase()}
           onClick={() => handleClick(route)}
-          className={dashboardView ? name.toLowerCase() : ''}
+          className={isDashboardView ? name.toLowerCase() : ''}
           target={name === 'Documentation' ? '_blank' : '_self'}
         >
           <IconBox

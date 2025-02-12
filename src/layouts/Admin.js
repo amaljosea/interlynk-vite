@@ -21,6 +21,7 @@ import Sidebar from 'components/Sidebar'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetOrganization } from 'graphQL/Queries'
@@ -42,7 +43,7 @@ export default function Admin() {
   const sbomId = params.sbomid
   const authToken = Cookies.get('authToken')
   const tabRes = window.matchMedia('(max-width: 1199px)')
-  const productView = location.pathname === '/vendor/products'
+  const { isProductsPage, isVendorPage, isVendorRootPage } = useRouteFlags()
 
   const {
     generateProductDetailPageUrlFromCurrentUrl: genProdUrl,
@@ -56,7 +57,7 @@ export default function Admin() {
   document.documentElement.dir = 'ltr'
 
   const { data, error, loading } = useQuery(GetOrganization, {
-    skip: location.pathname.startsWith('/vendor') && authToken ? false : true
+    skip: isVendorPage && authToken ? false : true
   })
 
   const isTokenExpired = (token) => {
@@ -153,7 +154,7 @@ export default function Admin() {
   }, [authToken, navigate])
 
   useEffect(() => {
-    if (location.pathname === '/vendor') {
+    if (isVendorRootPage) {
       navigate('/vendor/dashboard')
       sessionStorage.removeItem('awsToken')
       sessionStorage.removeItem('signedUrlParams')
@@ -233,7 +234,7 @@ export default function Admin() {
               />
             )
           }
-          showPrevNextButtons={!productView}
+          showPrevNextButtons={!isProductsPage}
           onClickClose={(value) => onTourUpdate(value)}
           onClickMask={(value) => onTourUpdate(value)}
           badgeContent={(props) =>

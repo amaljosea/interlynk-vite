@@ -13,6 +13,7 @@ import {
 } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -30,8 +31,7 @@ export const UserMenu = ({ handleLogout }) => {
   const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
 
   const productId = params.productid
-  const dashboardView = location.pathname === '/vendor/dashboard'
-  const productView = location.pathname === '/vendor/products'
+  const { isDashboardView, isProductsPage } = useRouteFlags()
 
   const currentUser = organization?.currentUser
 
@@ -42,10 +42,10 @@ export const UserMenu = ({ handleLogout }) => {
 
   const onStartDashTour = () => {
     document?.body?.classList.add('no-scroll')
-    if (dashboardView) {
+    if (isDashboardView) {
       updateTour(homeSteps, 'dashboard')
     }
-    if (productView) {
+    if (isProductsPage) {
       updateTour(productSteps, 'products')
     }
     setCurrentStep(0)
@@ -77,13 +77,13 @@ export const UserMenu = ({ handleLogout }) => {
             </Link>
           </MenuItem>
           <MenuDivider hidden={!currentUser} />
-          {(dashboardView || productView) && (
+          {(isDashboardView || isProductsPage) && (
             <MenuItem
               onClick={onStartDashTour}
               icon={<FaLocationArrow />}
               hidden={!shouldShowDemoFeatures || productId}
             >
-              Start {productView ? 'Product' : ''} Tour
+              Start {isProductsPage ? 'Product' : ''} Tour
             </MenuItem>
           )}
           <Link to={`/vendor/settings?tab=users`}>

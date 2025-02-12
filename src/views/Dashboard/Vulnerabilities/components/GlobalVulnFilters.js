@@ -23,6 +23,7 @@ import GlobalLabelFilter from 'components/Misc/GlobalLabelFilter'
 import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 
 import { GetProductNames } from 'graphQL/Queries'
 import { severityList } from 'variables/general'
@@ -43,10 +44,10 @@ const GlobalVulnsFilters = ({ reset }) => {
   } = globalVulnState
 
   const { globalVulnDispatch } = dispatch
-  const productView = window.location.pathname.startsWith(`/vendor/products`)
+  const { isProductsPage } = useRouteFlags()
 
   const { data } = useQuery(GetProductNames, {
-    skip: productView ? true : false,
+    skip: isProductsPage ? true : false,
     variables: {
       first: 500,
       enabled: true,

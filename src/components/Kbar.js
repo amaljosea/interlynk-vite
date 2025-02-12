@@ -9,7 +9,7 @@ import {
   useRegisterActions
 } from 'kbar'
 import { Fragment, useMemo } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { truncatedValue } from 'utils'
 import { removeItem } from 'utils/localStorageUtils'
 import { allDefaultActions, settingActions } from 'variables/general'
@@ -20,6 +20,7 @@ import { useColorMode } from '@chakra-ui/system'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetProjectGroupAndVersionDetails } from 'graphQL/Queries'
@@ -35,7 +36,15 @@ const Kbar = () => {
   const resultsCount = results?.length
   const navigate = useNavigate()
   const params = useParams()
-  const location = useLocation()
+
+  const {
+    isVulnerabilityDetailsPage,
+    isProductVersionPage,
+    isProductDetailsPage,
+    isProductsPage,
+    isVulnerabilityRelatedPage,
+    isProductsRelatedPage
+  } = useRouteFlags()
 
   const {
     generateProductVersionDetailPageUrlFromCurrentUrl,
@@ -183,19 +192,6 @@ const Kbar = () => {
     section: 'shortcuts',
     icon: <FaRegFile color={sameSecondaryText} />,
     perform: () => {
-      const isVulnerabilityDetailsPage =
-        location.pathname.includes('products') &&
-        location.pathname.includes('env') &&
-        location.pathname.includes('vulnerability')
-
-      const isProductVersionPage = location.pathname.includes('version')
-
-      const isProductDetailsPage =
-        location.pathname.includes('products') &&
-        location.pathname.includes('env')
-
-      const isProductsPage = location.pathname === '/vendor/products'
-
       if (isVulnerabilityDetailsPage) {
         const link = generateProductDetailPageUrlFromCurrentUrl({
           productgroupid: params.productgroupid,
@@ -229,11 +225,6 @@ const Kbar = () => {
     keywords: ['/'],
     icon: <FaRegFile color={sameSecondaryText} />,
     perform: () => {
-      const isVulnerabilityRelatedPage =
-        location.pathname.includes('vulnerabilities')
-
-      const isProductsRelatedPage = location.pathname.includes('products')
-
       if (isVulnerabilityRelatedPage) {
         const link = '/vendor/vulnerabilities'
         navigate(link)

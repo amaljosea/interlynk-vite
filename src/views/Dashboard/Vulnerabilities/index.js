@@ -13,6 +13,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 
 import { GetGlobalVulns } from 'graphQL/Queries'
 
@@ -24,6 +25,7 @@ const Vulnerabilities = () => {
   const params = useParams()
   const navigate = useNavigate()
   const { globalVulnState, envName } = useGlobalState()
+  const { isVulnerabilitiesPage } = useRouteFlags()
   const vulnId = useQueryParam('vulnId') || params.vulnerabilityid
 
   const tab = useQueryParam('tab')
@@ -68,7 +70,7 @@ const Vulnerabilities = () => {
     }
   })
 
-  if (vulnId && location.pathname === '/vendor/vulnerabilities') {
+  if (vulnId && isVulnerabilitiesPage) {
     return <VulnInfo vulnId={vulnId} />
   }
 
