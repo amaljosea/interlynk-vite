@@ -34,7 +34,7 @@ function ProductList() {
     search: searchInput !== '' ? searchInput : undefined,
     lifestage: !lifestage?.includes('none')
       ? getUndefinedIfEmptyOrAll(lifestage)
-      : null
+      : 'none'
   }
 
   const { nodes, paginationProps, reset, loading, error } = usePaginatedQuery(

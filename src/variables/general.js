@@ -5,6 +5,16 @@ import { getFullDate } from 'utils'
 
 import { Stack, Text } from '@chakra-ui/react'
 
+export const stages = [
+  { value: 'none', label: 'None' },
+  { value: 'design', label: 'Design' },
+  { value: 'development', label: 'Development' },
+  { value: 'released', label: 'Released' },
+  { value: 'maintenance', label: 'Maintenance' },
+  { value: 'end_of_support', label: 'End of Support' },
+  { value: 'end_of_life', label: 'End of Life' }
+]
+
 export const sbomPhases = [
   { label: 'Design', value: 'design' },
   { label: 'Source', value: 'source' },

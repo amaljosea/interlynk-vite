@@ -35,7 +35,7 @@ const ProductLifestages = () => {
 
   const { data: none, loading } = useQuery(getProductsByStage, {
     skip: organization ? false : true,
-    variables: { stage: null }
+    variables: { stage: "none" }
   })
   const { data: design } = useQuery(getProductsByStage, {
     skip: organization ? false : true,

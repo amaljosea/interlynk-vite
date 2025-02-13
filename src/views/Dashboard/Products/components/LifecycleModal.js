@@ -1,6 +1,7 @@
 import { gql, useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { stages } from 'variables/general'
 
 import { FormControl, FormLabel, Select, Stack } from '@chakra-ui/react'
 
@@ -72,15 +73,6 @@ const LifecycleModal = ({ data, isOpen, onClose }) => {
     onClose()
     setError('')
   }
-
-  const stages = [
-    { value: 'design', label: 'Design' },
-    { value: 'development', label: 'Development' },
-    { value: 'released', label: 'Released' },
-    { value: 'maintenance', label: 'Maintenance' },
-    { value: 'end_of_support', label: 'End of Support' },
-    { value: 'end_of_life', label: 'End of Life' }
-  ]
 
   const handleSubmit = () => {
     const { stage, releaseDate, endOfLifeDate, endOfSupportDate } =
