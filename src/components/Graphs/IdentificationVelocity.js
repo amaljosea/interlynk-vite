@@ -1,4 +1,4 @@
-import { gql, useQuery } from '@apollo/client'
+import { gql } from '@apollo/client'
 import { SingleGraph } from 'views/Dashboard/Analytics/SingleGraph'
 import { getDays } from 'views/Dashboard/Analytics/utils'
 import { formatDate } from 'views/Dashboard/Analytics/utils'
@@ -7,6 +7,8 @@ import { Stack, Text, useTheme } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import LynkLoader from 'components/Misc/LynkLoader'
+
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 const IdentityVelocityMetrics = gql`
   query IdentityVelocityMetrics(
@@ -51,8 +53,9 @@ const IdentityVelocity = ({ filters }) => {
 
   const { dates } = getDays({ startDate, endDate })
 
-  const { data, loading } = useQuery(IdentityVelocityMetrics, {
+  const { nodes, loading } = usePaginatedQuery(IdentityVelocityMetrics, {
     skip: startDate && endDate ? false : true,
+    selector: 'dailyMetrics.projectVulnMetrics',
     variables: {
       endDate,
       startDate,
@@ -61,7 +64,6 @@ const IdentityVelocity = ({ filters }) => {
       projectGroupIds: product?.length > 0 ? product?.map((p) => p.value) : []
     }
   })
-  const { projectVulnMetrics } = data?.dailyMetrics || ''
 
   const processVulnMetricsByDate = (data) => {
     const result = {}
@@ -77,7 +79,7 @@ const IdentityVelocity = ({ filters }) => {
       }
     })
 
-    data?.nodes?.forEach((node) => {
+    data?.forEach((node) => {
       const {
         date,
         statusAgeAffected = 0,
@@ -125,7 +127,7 @@ const IdentityVelocity = ({ filters }) => {
     }))
   }
 
-  const vulnMetrics = processVulnMetricsByDate(projectVulnMetrics)
+  const vulnMetrics = processVulnMetricsByDate(nodes)
 
   const lines = [
     {

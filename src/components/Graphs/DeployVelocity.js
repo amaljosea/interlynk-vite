@@ -1,4 +1,4 @@
-import { gql, useQuery } from '@apollo/client'
+import { gql } from '@apollo/client'
 import { SingleGraph } from 'views/Dashboard/Analytics/SingleGraph'
 import { getDays } from 'views/Dashboard/Analytics/utils'
 import { formatDate } from 'views/Dashboard/Analytics/utils'
@@ -9,6 +9,7 @@ import Card from 'components/Card/Card'
 import LynkLoader from 'components/Misc/LynkLoader'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 const DeployVelocityMetrics = gql`
   query DeployVelocityMetrics(
@@ -53,8 +54,9 @@ const DeployVelocity = ({ filters }) => {
 
   const { dates } = getDays({ startDate, endDate })
 
-  const { data, loading } = useQuery(DeployVelocityMetrics, {
+  const { nodes, loading } = usePaginatedQuery(DeployVelocityMetrics, {
     skip: startDate && endDate ? false : true,
+    selector: 'dailyMetrics.projectVulnMetrics',
     variables: {
       endDate,
       startDate,
@@ -65,8 +67,6 @@ const DeployVelocity = ({ filters }) => {
       projectGroupIds: product?.length > 0 ? product?.map((p) => p.value) : []
     }
   })
-
-  const { nodes } = data?.dailyMetrics?.projectVulnMetrics || ''
 
   const deployMetrics = nodes?.length
     ? Object.values(

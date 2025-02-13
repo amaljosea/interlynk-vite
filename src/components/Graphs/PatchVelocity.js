@@ -1,12 +1,12 @@
-import { gql, useQuery } from '@apollo/client'
+import { gql } from '@apollo/client'
 import { SingleGraph } from 'views/Dashboard/Analytics/SingleGraph'
-import { getDays } from 'views/Dashboard/Analytics/utils'
-import { formatDate } from 'views/Dashboard/Analytics/utils'
 
 import { Stack, Text, useTheme } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import LynkLoader from 'components/Misc/LynkLoader'
+
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 const PatchVelocityMetrics = gql`
   query PatchVelocityMetrics(
@@ -49,8 +49,9 @@ const PatchVelocity = ({ filters }) => {
   const { product, label } = filters || {}
   const { startDate, endDate } = filters?.duration || {}
 
-  const { data, loading } = useQuery(PatchVelocityMetrics, {
+  const { nodes, loading } = usePaginatedQuery(PatchVelocityMetrics, {
     skip: startDate && endDate ? false : true,
+    selector: 'dailyMetrics.projectVulnMetrics',
     variables: {
       endDate,
       startDate,
@@ -59,10 +60,9 @@ const PatchVelocity = ({ filters }) => {
       projectGroupIds: product?.length > 0 ? product?.map((p) => p.value) : []
     }
   })
-  const { projectVulnMetrics } = data?.dailyMetrics || {}
 
   const processVulnMetricsByDate = (data) => {
-    const nodes = data?.nodes || []
+    const nodes = data || []
 
     // Aggregate metrics by date
     const aggregatedMetrics = nodes?.reduce((acc, entry) => {
@@ -101,7 +101,7 @@ const PatchVelocity = ({ filters }) => {
     return patchVelocity
   }
 
-  const vulnMetrics = processVulnMetricsByDate(projectVulnMetrics)
+  const vulnMetrics = processVulnMetricsByDate(nodes)
 
   const lines = [
     {

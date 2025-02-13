@@ -1,4 +1,4 @@
-import { gql, useQuery } from '@apollo/client'
+import { gql } from '@apollo/client'
 import { SingleGraph } from 'views/Dashboard/Analytics/SingleGraph'
 import { getDays } from 'views/Dashboard/Analytics/utils'
 import { formatDate } from 'views/Dashboard/Analytics/utils'
@@ -9,6 +9,7 @@ import Card from 'components/Card/Card'
 import LynkLoader from 'components/Misc/LynkLoader'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 const DefectDensityMetrics = gql`
   query DefectDensityMetrics(
@@ -51,8 +52,9 @@ const DefectDensity = ({ filters }) => {
 
   const { dates } = getDays({ startDate, endDate })
 
-  const { data, loading } = useQuery(DefectDensityMetrics, {
+  const { nodes, loading } = usePaginatedQuery(DefectDensityMetrics, {
     skip: startDate && endDate ? false : true,
+    selector: 'dailyMetrics.sbomMetrics',
     variables: {
       endDate,
       startDate,
@@ -63,8 +65,6 @@ const DefectDensity = ({ filters }) => {
       projectGroupIds: product?.length > 0 ? product?.map((p) => p.value) : []
     }
   })
-
-  const { nodes } = data?.dailyMetrics?.sbomMetrics || ''
 
   const defectMetrics = nodes?.length
     ? Object.values(
