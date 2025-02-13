@@ -34,19 +34,20 @@ const PurlEditor = ({ value, setValue, isOpen, onOpen, onClose }) => {
     }
   }
 
-  const onBlur = (field, item) => {
+  const onBlur = (field, inputValue) => {
     try {
+      onChange(field, inputValue)
       const pkg = PackageURL.fromString(value)
       if (field === 'qualifiers') {
         const convertedObject = {}
-        const params = new URLSearchParams(item?.value)
+        const params = new URLSearchParams(value)
         for (const [key, value] of params) {
           convertedObject[key] = value
         }
         pkg[field] = convertedObject
         setValue(pkg.toString())
       } else {
-        pkg[field] = item?.value || field
+        pkg[field] = inputValue || field
         setValue(pkg.toString())
       }
     } catch (error) {

@@ -15,11 +15,11 @@ const Version = ({ disabled, version, type, onChange, onBlur }) => {
   const [options, setOptions] = useState([])
 
   const handleChange = (item) => {
-    setValue(item || null)
-    item?.value && onChange('version', item?.value)
+    setValue(item)
+    onChange('version', item?.value)
   }
 
-  const handleBlur = () => value && onBlur('version', value)
+  const handleBlur = () => searchInput !== '' && onBlur('version', searchInput)
 
   const searchTypes = ['npm', 'maven', 'gem']
   const isSearchable = searchTypes?.includes(type)

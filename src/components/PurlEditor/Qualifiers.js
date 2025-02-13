@@ -10,7 +10,7 @@ const Qualifiers = ({ disabled, qualifiers, onChange, onBlur }) => {
         {...inputProps}
         value={qualifiers}
         data-testid={`purl_qualifiers`}
-        onBlur={(e) => onBlur('qualifiers', e.target)}
+        onBlur={(e) => onBlur('qualifiers', e.target.value)}
         onChange={(e) => onChange('qualifiers', e.target.value)}
       />
     </FormControl>
