@@ -245,14 +245,14 @@ const CompLinks = ({ data }) => {
               msg='Saving will apply changes to this tab only. save other tabs separately to retain their data.'
             />
             <ActionButton
-              title={'Save Link'}
+              title={'Save'}
               isDisabled={isInvalid}
               onClick={handleLinkAdd}
             />
           </Stack>
         ) : (
           <ActionButton
-            title={'Add Link'}
+            title={'Save'}
             leftIcon={<AddIcon />}
             isDisabled={isInvalid}
             onClick={handleSubmit}

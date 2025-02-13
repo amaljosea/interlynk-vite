@@ -177,17 +177,17 @@ const CompIdentifiers = ({ data }) => {
               msg='Saving will apply changes to this tab only. save other tabs separately to retain their data.'
             />
             <ActionButton
-              title={'Save Identifiers'}
+              title={'Save'}
               onClick={handleUpdateCom}
               hidden={purlOpen || cpeOpen}
-              isDisabled={loading}
+              isLoading={loading}
             />
           </Stack>
         ) : (
           <ActionButton
-            title={'Save Identifiers'}
+            title={'Save'}
             onClick={handleSubmit}
-            isDisabled={loading}
+            isLoading={loading}
             hidden={purlOpen || cpeOpen || customerView}
           />
         )}

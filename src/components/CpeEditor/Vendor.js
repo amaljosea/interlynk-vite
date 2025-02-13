@@ -17,8 +17,9 @@ const Vendor = ({ disabled, vendor, onChange, onBlur }) => {
   const handleChange = (item) => {
     setValue(item)
     onChange('vendor', item?.value)
-    onBlur(3, item?.value)
   }
+
+  const handleBlur = () => searchInput !== '' && onBlur(3, searchInput)
 
   const onInputChange = (value) => {
     setSearchInput(value)
@@ -65,6 +66,7 @@ const Vendor = ({ disabled, vendor, onChange, onBlur }) => {
         isSearchable={true}
         isLoading={loading}
         value={value}
+        onBlur={handleBlur}
         onChange={handleChange}
         inputValue={searchInput}
         options={options}

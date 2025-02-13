@@ -3,7 +3,7 @@ import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useState } from 'react'
 import { truncatedValue } from 'utils'
 
-import { AddIcon, ArrowDownIcon } from '@chakra-ui/icons'
+import { ArrowDownIcon } from '@chakra-ui/icons'
 import {
   Box,
   Flex,
@@ -233,13 +233,12 @@ const CompRelations = ({ data, compPath }) => {
               <ActionButton
                 onClick={handleAdd}
                 isDisabled={isInvalid}
-                title={'Save Relation'}
+                title={'Save'}
               />
             </Stack>
           ) : (
             <ActionButton
-              title={'Add'}
-              leftIcon={<AddIcon />}
+              title={'Save'}
               isDisabled={isInvalid}
               onClick={handleSubmit}
             />

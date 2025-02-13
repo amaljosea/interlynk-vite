@@ -271,8 +271,8 @@ const CompSupplier = ({ data }) => {
             msg='Saving will apply changes to this tab only. save other tabs separately to retain their data.'
           />
           <ActionButton
-            title={'Save Supplier'}
             isDisabled={isInvalid}
+            title={suppliers?.length > 0 ? 'Update' : 'Save'}
             onClick={suppliers?.length > 0 ? handleUpdate : handleSave}
           />
         </Stack>
@@ -281,7 +281,7 @@ const CompSupplier = ({ data }) => {
           <ActionButton
             isDisabled={isInvalid}
             onClick={handleSubmit}
-            title={suppliers?.length > 0 ? 'Update' : 'Add  Supplier'}
+            title={suppliers?.length > 0 ? 'Update' : 'Save'}
           />
           {suppliers?.length > 0 && (
             <Button

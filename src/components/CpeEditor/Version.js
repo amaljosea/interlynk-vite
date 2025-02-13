@@ -17,8 +17,9 @@ const Version = ({ disabled, version, onChange, onBlur }) => {
   const handleChange = (item) => {
     setValue(item)
     onChange('version', item?.value)
-    onBlur(5, item?.value)
   }
+
+  const handleBlur = () => searchInput !== '' && onBlur(5, searchInput)
 
   const onInputChange = (value) => {
     setSearchInput(value)
@@ -65,6 +66,7 @@ const Version = ({ disabled, version, onChange, onBlur }) => {
         isSearchable={true}
         isLoading={loading}
         value={value}
+        onBlur={handleBlur}
         onChange={handleChange}
         inputValue={searchInput}
         options={options}

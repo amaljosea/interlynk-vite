@@ -17,8 +17,9 @@ const Product = ({ disabled, product, onChange, onBlur }) => {
   const handleChange = (item) => {
     setValue(item)
     onChange('product', item?.value)
-    onBlur(4, item?.value)
   }
+
+  const handleBlur = () => searchInput !== '' && onBlur(4, searchInput)
 
   const onInputChange = (value) => {
     setSearchInput(value)
@@ -65,6 +66,7 @@ const Product = ({ disabled, product, onChange, onBlur }) => {
         isSearchable={true}
         isLoading={loading}
         value={value}
+        onBlur={handleBlur}
         onChange={handleChange}
         inputValue={searchInput}
         options={options}

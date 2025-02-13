@@ -1,16 +1,18 @@
 import { Button } from '@chakra-ui/react'
 
-const ActionButton = ({ title, onClick, isDisabled, hidden, props }) => {
+const ActionButton = (props) => {
+  const { title, onClick, isLoading = false, isDisabled, hidden } = props
   return (
     <Button
       hidden={hidden}
       onClick={onClick}
       variant='outline'
       colorScheme='blue'
-      width={'fit-content'}
-      isDisabled={isDisabled}
       data-testid={title}
-      {...props}
+      width={'fit-content'}
+      isLoading={isLoading}
+      loadingText='Saving...'
+      isDisabled={isDisabled}
     >
       {title}
     </Button>
