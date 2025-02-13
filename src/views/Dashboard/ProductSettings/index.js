@@ -20,7 +20,7 @@ import LynkSelect from 'components/LynkSelect'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
 import useCustomToast from 'hooks/useCustomToast'
-import { useGlobalState } from 'hooks/useGlobalState'
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -32,7 +32,7 @@ import ConfirmationModal from '../Products/components/ConfirmationModal'
 
 const Settings = ({ enabled, data, mfc }) => {
   const activeTab = useQueryParam('tab')
-  const { organization } = useGlobalState()
+  const { isFreeTier } = useGlobalQueryContext()
 
   const {
     id,
@@ -269,11 +269,7 @@ const Settings = ({ enabled, data, mfc }) => {
                 ))}
               </Select>
             </FormControl>
-            <FormControl
-              mt={4}
-              width={'400px'}
-              hidden={organization?.tier === 'free'}
-            >
+            <FormControl mt={4} width={'400px'} hidden={isFreeTier}>
               <FormLabel>
                 Jira Default Project
                 <Tooltip label={onCheck(`Jira Default Project`)}>

@@ -26,7 +26,7 @@ import CustomVuln from 'components/Modal/CustomVuln'
 import Pagination from 'components/Pagination'
 
 import useCustomToast from 'hooks/useCustomToast'
-import { useGlobalState } from 'hooks/useGlobalState'
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
@@ -40,8 +40,7 @@ import { FaPlus } from 'react-icons/fa6'
 const CustomVulnTable = () => {
   const tab = useQueryParam('tab')
   const { showToast } = useCustomToast()
-  const { organization } = useGlobalState()
-  const isFreeTier = organization?.tier === 'free'
+  const { isFreeTier } = useGlobalQueryContext()
 
   const editVulns = useHasPermission({
     parentKey: 'view_sbom',
