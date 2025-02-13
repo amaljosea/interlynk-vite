@@ -3,7 +3,7 @@ import { SingleGraph } from 'views/Dashboard/Analytics/SingleGraph'
 import { getDays } from 'views/Dashboard/Analytics/utils'
 import { formatDate } from 'views/Dashboard/Analytics/utils'
 
-import { Stack, Text } from '@chakra-ui/react'
+import { Stack, Text, theme } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import LynkLoader from 'components/Misc/LynkLoader'
@@ -70,27 +70,19 @@ const DefectDensity = ({ filters }) => {
     ? Object.values(
         nodes.reduce((acc, item) => {
           const dateKey = item.date
-          const {
-            vulnerabilityCount,
-            vulnerabilityNotAffectedCount,
-            vulnerabilityAffectedCount,
-            vulnerabilityFixedCount
-          } = item
-          const totalVulnerabilityCount =
-            vulnerabilityCount + vulnerabilityNotAffectedCount
+          const { vulnerabilityAffectedCount, vulnerabilityFixedCount } = item
+          const activeVulnerabilityCount =
+            vulnerabilityFixedCount + vulnerabilityAffectedCount
           if (!acc[dateKey]) {
             acc[dateKey] = {
               date: dateKey ? formatDate(dateKey) : 'N/A',
-              updatedVulnerabilityRate:
-                totalVulnerabilityCount === 0
+              fixedVulnerabiltyRatio:
+                activeVulnerabilityCount === 0
                   ? 0
                   : parseFloat(
                       (
-                        ((vulnerabilityNotAffectedCount +
-                          vulnerabilityAffectedCount +
-                          vulnerabilityFixedCount) *
-                          100) /
-                        totalVulnerabilityCount
+                        (vulnerabilityFixedCount * 100) /
+                        activeVulnerabilityCount
                       ).toFixed(2)
                     )
             }
@@ -101,13 +93,14 @@ const DefectDensity = ({ filters }) => {
       )
     : dates?.map((date) => ({
         date: date ? formatDate(date) : 'N/A',
-        updatedVulnerabilityRate: 0
+        defectDensityRate: 0
       })) || []
 
   const lines = [
     {
-      dataKey: 'updatedVulnerabilityRate',
-      name: 'Defect Density'
+      dataKey: 'fixedVulnerabiltyRatio',
+      name: 'Defect Density',
+      stroke: theme.colors.blue[500]
     }
   ]
 

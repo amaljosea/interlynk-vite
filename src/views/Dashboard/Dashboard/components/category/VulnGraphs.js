@@ -1,7 +1,8 @@
 /* eslint-disable no-restricted-syntax */
 import { useQuery } from '@apollo/client'
+import { vulnStatusTypes } from 'variables/general'
 
-import { Heading, SimpleGrid, Stack } from '@chakra-ui/react'
+import { Box, Heading, SimpleGrid, Stack } from '@chakra-ui/react'
 
 import LynkPieChart from 'components/Charts/LynkPieChart'
 import DefectDensity from 'components/Graphs/DefectDensity'
@@ -21,7 +22,6 @@ import {
   getVulnsByStatus,
   getVulnsWithConditions
 } from 'graphQL/Queries'
-import { vulnStatusTypes } from 'variables/general'
 
 const VulnGraphs = ({ labelIds }) => {
   const { organization, envName } = useGlobalState()
@@ -423,7 +423,7 @@ const VulnGraphs = ({ labelIds }) => {
   return (
     <Stack spacing={4} mt={6}>
       <Heading size={'md'}>Vulnerabilities</Heading>
-      <SimpleGrid columns={{ sm: 1, md: 3 }} spacing={5}>
+      <SimpleGrid columns={{ sm: 1, md: 3 }} spacing={5} pb={6}>
         <LynkPieChart
           loading={sevLoading}
           title='All Vulnerabilities by Severity'
@@ -434,6 +434,7 @@ const VulnGraphs = ({ labelIds }) => {
           title='All Vulnerabilities by Status'
           data={vulnStatues}
         />
+        <Box />
         <LynkPieChart
           loading={sevLoading}
           title='Critical Vulnerabilities by Status'
@@ -450,16 +451,20 @@ const VulnGraphs = ({ labelIds }) => {
           data={vulnKEVStatuses}
         />
       </SimpleGrid>
+      <Heading size={'md'} mt={6}>
+        Vulnerability Trends
+      </Heading>
       <SimpleGrid columns={{ sm: 1, md: 3 }} spacing={5}>
         <VulnBySeverity filters={filters} />
         <VulnByStatus filters={filters} />
         {!isFreeTier && (
           <>
-            <PatchVelocity filters={filters} />
             <DefectDensity filters={filters} />
-            <DeployVelocity filters={filters} />
             <VulnAge filters={filters} />
             <IdentityVelocity filters={filters} />
+            <PatchVelocity filters={filters} />
+            {/*             <DeployVelocity filters={filters} />
+             */}
           </>
         )}
       </SimpleGrid>

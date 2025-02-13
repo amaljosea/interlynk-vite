@@ -64,10 +64,6 @@ const IdentityVelocity = ({ filters }) => {
   const { projectVulnMetrics } = data?.dailyMetrics || ''
 
   const processVulnMetricsByDate = (data) => {
-    if (!data || !Array.isArray(data?.nodes)) {
-      return []
-    }
-
     const result = {}
 
     dates.forEach((date) => {
@@ -134,8 +130,8 @@ const IdentityVelocity = ({ filters }) => {
   const lines = [
     {
       dataKey: 'statusAgePresentAverage',
-      name: 'Identified (Average Days)',
-      stroke: theme?.colors?.red[400]
+      name: 'Average number of days until resolution',
+      stroke: theme.colors.red[500]
     }
   ]
 
@@ -145,11 +141,10 @@ const IdentityVelocity = ({ filters }) => {
     <Card>
       <Stack h='90px' spacing={1} mb={4}>
         <Text fontSize='lg' fontWeight='bold'>
-          Identification Velocity
+          Resolution Velocity
         </Text>
         <Text fontSize='sm'>
-          Average number of days a vulnerability should be present in an SBOM
-          before it got resolved.
+          Average number of days a vulnerability is present before resolution
         </Text>
       </Stack>
       <SingleGraph data={vulnMetrics} lines={lines} averages={true} />

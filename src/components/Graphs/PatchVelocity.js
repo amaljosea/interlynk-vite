@@ -46,10 +46,8 @@ const PatchVelocityMetrics = gql`
 const PatchVelocity = ({ filters }) => {
   const theme = useTheme()
 
-  const { product, label } = filters || ''
+  const { product, label } = filters || {}
   const { startDate, endDate } = filters?.duration || {}
-
-  const { dates } = getDays({ startDate, endDate })
 
   const { data, loading } = useQuery(PatchVelocityMetrics, {
     skip: startDate && endDate ? false : true,
@@ -61,89 +59,54 @@ const PatchVelocity = ({ filters }) => {
       projectGroupIds: product?.length > 0 ? product?.map((p) => p.value) : []
     }
   })
-  const { projectVulnMetrics } = data?.dailyMetrics || ''
+  const { projectVulnMetrics } = data?.dailyMetrics || {}
 
   const processVulnMetricsByDate = (data) => {
-    if (!data || !Array.isArray(data?.nodes)) {
-      return []
-    }
+    const nodes = data?.nodes || []
 
-    const result = {}
-
-    dates.forEach((date) => {
-      result[date] = {
-        date,
-        statusCount: 0,
-        statusAgePresent: 0,
-        statusAgeResolved: 0,
-        statusAgePresentAverage: 0.0,
-        statusAgeResolvedAverage: 0.0
+    // Aggregate metrics by date
+    const aggregatedMetrics = nodes?.reduce((acc, entry) => {
+      const { date, statusAgeAffected, statusAgeFixed } = entry
+      if (!acc[date]) {
+        acc[date] = { affected: 0, fixed: 0 }
       }
-    })
+      acc[date].affected += statusAgeAffected || 0
+      acc[date].fixed += statusAgeFixed || 0
+      return acc
+    }, {})
 
-    data?.nodes?.forEach((node) => {
-      const {
-        date,
-        statusAgeAffected = 0,
-        statusAgeResolved = 0,
-        statusAgeUnspecified = 0,
-        statusAgeInTriage = 0
-      } = node
+    let cumulativeAffected = 0
+    let cumulativeFixed = 0
+    const patchVelocity = []
 
-      if (!result[date]) {
-        result[date] = {
+    Object.keys(aggregatedMetrics)
+      .sort()
+      .forEach((date) => {
+        cumulativeAffected += aggregatedMetrics[date].affected
+        cumulativeFixed += aggregatedMetrics[date].fixed
+
+        const velocity =
+          cumulativeFixed > 0
+            ? parseFloat(cumulativeAffected / cumulativeFixed).toFixed(2)
+            : null
+
+        patchVelocity.push({
           date,
-          statusCount: 0,
-          statusAgePresent: 0,
-          statusAgeResolved: 0,
-          statusAgePresentAverage: 0.0,
-          statusAgeResolvedAverage: 0.0
-        }
-      }
-      result[date].statusCount += 1
-      if (
-        statusAgeUnspecified > 0 ||
-        statusAgeAffected > 0 ||
-        statusAgeInTriage > 0
-      ) {
-        result[date].statusAgePresent +=
-          statusAgeUnspecified + statusAgeAffected + statusAgeInTriage
-      } else {
-        result[date].statusAgeResolved += statusAgeResolved
-      }
-    })
+          cumulativeAffected,
+          cumulativeFixed,
+          velocity
+        })
+      })
 
-    return Object.values(result).map((entry) => ({
-      date: entry?.date ? formatDate(entry?.date) : 'N/A',
-      statusAgePresent: entry?.statusAgePresent,
-      statusAgeResolved: entry?.statusAgeResolved,
-      statusCount: entry?.statusCount,
-      statusAgePresentAverage:
-        entry?.statusCount === 0
-          ? 0
-          : parseFloat(
-              (entry?.statusAgePresent / entry?.statusCount).toFixed(2)
-            ),
-      statusAgeResolvedAverage:
-        entry?.statusCount === 0
-          ? 0
-          : parseFloat(
-              (entry?.statusAgeResolved / entry?.statusCount).toFixed(2)
-            )
-    }))
+    return patchVelocity
   }
 
   const vulnMetrics = processVulnMetricsByDate(projectVulnMetrics)
 
   const lines = [
     {
-      dataKey: 'statusAgePresentAverage',
-      name: 'Identified (Average Days)',
-      stroke: theme?.colors?.red[400]
-    },
-    {
-      dataKey: 'statusAgeResolvedAverage',
-      name: 'Patch Velocity (Average Days)',
+      dataKey: 'velocity',
+      name: 'Patch Velocity',
       stroke: theme?.colors?.green[500]
     }
   ]

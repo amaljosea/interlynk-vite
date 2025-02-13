@@ -64,10 +64,6 @@ const VulnAge = ({ filters }) => {
   const { projectVulnMetrics } = data?.dailyMetrics || {}
 
   const processVulnMetricsByDate = (data) => {
-    if (!data || !Array.isArray(data?.nodes)) {
-      return []
-    }
-
     const result = {}
 
     dates.forEach((date) => {
@@ -102,7 +98,8 @@ const VulnAge = ({ filters }) => {
         result[date].statusAgePresent +=
           statusAgeUnspecified + statusAgeAffected + statusAgeInTriage
       } else {
-        result[date].statusAgeResolved += statusAgeResolved
+        result[date].statusAgeResolved =
+          (result[date].statusAgeResolved || 0) + statusAgeResolved
       }
     })
 
@@ -117,8 +114,8 @@ const VulnAge = ({ filters }) => {
   const lines = [
     {
       dataKey: 'statusAgePresent',
-      name: 'Present',
-      stroke: theme.colors.green[500]
+      name: 'Total number of days until resolution',
+      stroke: theme.colors.red[500]
     }
   ]
 
@@ -128,10 +125,10 @@ const VulnAge = ({ filters }) => {
     <Card>
       <Stack h='90px' spacing={1} mb={4}>
         <Text fontSize='lg' fontWeight='bold'>
-          Vulnerabilities Age
+          Resolution Age
         </Text>
         <Text fontSize='sm'>
-          Total number of days all vulnerabilities have been present
+          Total number of days all vulnerabilities are present before resolution
         </Text>
       </Stack>
       <SingleGraph data={ageMetrics} lines={lines} averages={true} />
