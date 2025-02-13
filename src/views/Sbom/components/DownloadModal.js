@@ -246,7 +246,7 @@ const DownloadModal = (props) => {
           package: encoded,
           lite: spec === 'SPDX-Lite' ? true : false,
           projectId: signedUrlParams ? undefined : productId,
-          excludeParts: signedUrlParams ? undefined : includeParts,
+          excludeParts: signedUrlParams ? undefined : !includeParts,
           spec: spec === 'SPDX-Lite' ? 'SPDX' : spec
         }
       }).then((res) => {
