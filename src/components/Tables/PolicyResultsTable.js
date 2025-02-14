@@ -22,6 +22,7 @@ import Pagination from 'components/Pagination'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useThemeColor } from 'hooks/useThemeColors'
+
 import { GetPolicyResults } from 'graphQL/Queries'
 
 const PolicyResultsTable = () => {
@@ -33,7 +34,12 @@ const PolicyResultsTable = () => {
     'primaryTextColor'
   ])
 
-  const [filters, setFilters] = useState({ result: [] })
+  const [filters, setFilters] = useState({
+    result: [],
+    projectGroupIds: [],
+    projectName: [],
+    projectVersion: []
+  })
   const [activeRule, setActiveRule] = useState(null)
   const [activePolicy, setActivePolicy] = useState(null)
 

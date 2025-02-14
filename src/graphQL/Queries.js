@@ -5641,6 +5641,9 @@ export const GetPolicyResults = gql`
   query GetPolicyResults(
     $policyId: [Uuid!]
     $result: [String!]
+    $projectGroupIds: [Uuid!]
+    $projectVersion: [String!]
+    $projectName: [String!]
     $after: String
     $before: String
     $first: Int
@@ -5653,6 +5656,9 @@ export const GetPolicyResults = gql`
       first: $first
       last: $last
       result: $result
+      projectGroupIds: $projectGroupIds
+      projectVersion: $projectVersion
+      projectName: $projectName
     ) {
       totalCount
       pageInfo {
