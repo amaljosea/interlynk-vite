@@ -102,7 +102,7 @@ export default function Dashboard() {
       {/* PRODUCTS GRAPHS */}
       <ProductGraphs />
       {/* VULNERABILITIRS GRAPHS */}
-      <VulnGraphs labelIds={labelIds} />
+      <VulnGraphs />
       {/* POLICY GRAPHS */}
       <PolicyGraphs />
       {/* ACTIVITIES AND CHANGELOGS */}

@@ -1,13 +1,13 @@
-/* eslint-disable no-restricted-syntax */
-import { useQuery } from '@apollo/client'
-import { vulnStatusTypes } from 'variables/general'
-
 import { Box, Heading, SimpleGrid, Stack } from '@chakra-ui/react'
 
-import LynkPieChart from 'components/Charts/LynkPieChart'
+import AllVulnerabilitiesBySeverity from 'components/Graphs/AllVulnerabilitiesBySeverity'
+import AllVulnerabilitiesByStatus from 'components/Graphs/AllVulnerabilitiesByStatus'
+import CriticalVulnerabilitiesByStatus from 'components/Graphs/CriticalVulnerabilitiesByStatus'
 import DefectDensity from 'components/Graphs/DefectDensity'
-import DeployVelocity from 'components/Graphs/DeployVelocity'
+import HighVulnerabilitiesByStatus from 'components/Graphs/HighVulnerabilitiesByStatus'
+// import DeployVelocity from 'components/Graphs/DeployVelocity'
 import IdentityVelocity from 'components/Graphs/IdentificationVelocity'
+import KevVulnerabilitiesByStatus from 'components/Graphs/KevVulnerabilitiesByStatus'
 import PatchVelocity from 'components/Graphs/PatchVelocity'
 import VulnAge from 'components/Graphs/VulnAge'
 import VulnBySeverity from 'components/Graphs/VulnBySeverity'
@@ -17,17 +17,9 @@ import useDateRange from 'hooks/useDateRange'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import {
-  getVulnsBySeverity,
-  getVulnsByStatus,
-  getVulnsWithConditions
-} from 'graphQL/Queries'
-
-const VulnGraphs = ({ labelIds }) => {
-  const { organization, envName } = useGlobalState()
-
+const VulnGraphs = () => {
+  const { labelIds } = useGlobalState()
   const { startDate, endDate } = useDateRange()
-
   const { isFreeTier } = useGlobalQueryContext()
 
   const filters = {
@@ -35,343 +27,16 @@ const VulnGraphs = ({ labelIds }) => {
     duration: { startDate: startDate, endDate: endDate }
   }
 
-  // -------------- VULN SEVERITIES ---------------------
-  const { data, loading: sevLoading } = useQuery(getVulnsBySeverity, {
-    skip: !organization,
-    variables: {
-      status: vulnStatusTypes,
-      labelIds: labelIds?.length > 0 ? labelIds : undefined,
-      envNames: [envName]
-    }
-  })
-
-  const { data: criticalUnspecified } = useQuery(getVulnsWithConditions, {
-    skip: organization ? false : true,
-    variables: {
-      labelIds: labelIds?.length > 0 ? labelIds : undefined,
-      status: ['Unspecified'],
-      severity: ['critical'],
-      envNames: [envName]
-    }
-  })
-
-  const { data: criticalInTriage } = useQuery(getVulnsWithConditions, {
-    skip: organization ? false : true,
-    variables: {
-      labelIds: labelIds?.length > 0 ? labelIds : undefined,
-      status: ['In Triage'],
-      severity: ['critical'],
-      envNames: [envName]
-    }
-  })
-  const { data: criticalAffected } = useQuery(getVulnsWithConditions, {
-    skip: organization ? false : true,
-    variables: {
-      labelIds: labelIds?.length > 0 ? labelIds : undefined,
-      status: ['Affected'],
-      severity: ['critical'],
-      envNames: [envName]
-    }
-  })
-
-  const { data: criticalNotAffected } = useQuery(getVulnsWithConditions, {
-    skip: organization ? false : true,
-    variables: {
-      labelIds: labelIds?.length > 0 ? labelIds : undefined,
-      status: ['Not Affected'],
-      severity: ['critical'],
-      envNames: [envName]
-    }
-  })
-
-  const { data: criticalFixed } = useQuery(getVulnsWithConditions, {
-    skip: organization ? false : true,
-    variables: {
-      labelIds: labelIds?.length > 0 ? labelIds : undefined,
-      status: ['Fixed'],
-      severity: ['critical'],
-      envNames: [envName]
-    }
-  })
-
-  const { data: kevUnspecified } = useQuery(getVulnsWithConditions, {
-    skip: organization ? false : true,
-    variables: {
-      labelIds: labelIds?.length > 0 ? labelIds : undefined,
-      status: ['Unspecified'],
-      kev: true,
-      envNames: [envName]
-    }
-  })
-
-  const { data: kevInTriage } = useQuery(getVulnsWithConditions, {
-    skip: organization ? false : true,
-    variables: {
-      labelIds: labelIds?.length > 0 ? labelIds : undefined,
-      status: ['In Triage'],
-      kev: true
-    }
-  })
-  const { data: kevAffected } = useQuery(getVulnsWithConditions, {
-    skip: organization ? false : true,
-    variables: {
-      labelIds: labelIds?.length > 0 ? labelIds : undefined,
-      status: ['Affected'],
-      kev: true,
-      envNames: [envName]
-    }
-  })
-
-  const { data: kevNotAffected } = useQuery(getVulnsWithConditions, {
-    skip: organization ? false : true,
-    variables: {
-      labelIds: labelIds?.length > 0 ? labelIds : undefined,
-      status: ['Not Affected'],
-      kev: true,
-      envNames: [envName]
-    }
-  })
-
-  const { data: kevFixed } = useQuery(getVulnsWithConditions, {
-    skip: organization ? false : true,
-    variables: {
-      labelIds: labelIds?.length > 0 ? labelIds : undefined,
-      status: ['Fixed'],
-      kev: true,
-      envNames: [envName]
-    }
-  })
-
-  const { data: highUnspecified } = useQuery(getVulnsWithConditions, {
-    skip: organization ? false : true,
-    variables: {
-      labelIds: labelIds?.length > 0 ? labelIds : undefined,
-      status: ['Unspecified'],
-      severity: ['high'],
-      envNames: [envName]
-    }
-  })
-
-  const { data: highInTriage } = useQuery(getVulnsWithConditions, {
-    skip: organization ? false : true,
-    variables: {
-      labelIds: labelIds?.length > 0 ? labelIds : undefined,
-      status: ['In Triage'],
-      severity: ['high'],
-      envNames: [envName]
-    }
-  })
-  const { data: highAffected } = useQuery(getVulnsWithConditions, {
-    skip: organization ? false : true,
-    variables: {
-      labelIds: labelIds?.length > 0 ? labelIds : undefined,
-      status: ['Affected'],
-      severity: ['high'],
-      envNames: [envName]
-    }
-  })
-
-  const { data: highNotAffected } = useQuery(getVulnsWithConditions, {
-    skip: organization ? false : true,
-    variables: {
-      labelIds: labelIds?.length > 0 ? labelIds : undefined,
-      status: ['Not Affected'],
-      severity: ['high'],
-      envNames: [envName]
-    }
-  })
-
-  const { data: highFixed } = useQuery(getVulnsWithConditions, {
-    skip: organization ? false : true,
-    variables: {
-      labelIds: labelIds?.length > 0 ? labelIds : undefined,
-      status: ['Fixed'],
-      severity: ['high'],
-      envNames: [envName]
-    }
-  })
-
-  const vulnSeverities = [
-    {
-      name: 'critical',
-      value: data?.organization?.critical?.totalCount,
-      color: '#E53E3E'
-    },
-    {
-      name: 'high',
-      value: data?.organization?.high?.totalCount,
-      color: '#DD6B20'
-    },
-    {
-      name: 'medium',
-      value: data?.organization?.medium?.totalCount,
-      color: '#D69E2E'
-    },
-    {
-      name: 'low',
-      value: data?.organization?.low?.totalCount,
-      color: '#38A169'
-    },
-    {
-      name: 'unknown',
-      value: data?.organization?.unknown?.totalCount,
-      color: '#718096'
-    }
-  ]
-
-  // -------------- VULN STATUS ---------------------
-  const { data: statusData, loading: statusLoading } = useQuery(
-    getVulnsByStatus,
-    {
-      skip: !organization,
-      variables: {
-        labelIds: labelIds?.length > 0 ? labelIds : undefined,
-        envNames: envName ? [envName] : undefined
-      }
-    }
-  )
-
-  const vulnCriticalStatuses = [
-    {
-      name: 'Unspecified',
-      value: criticalUnspecified?.organization?.vulns?.totalCount,
-      color: '#718096'
-    },
-    {
-      name: 'In Triage',
-      value: criticalInTriage?.organization?.vulns?.totalCount,
-      color: '#003558'
-    },
-    {
-      name: 'Affected',
-      value: criticalAffected?.organization?.vulns?.totalCount,
-      color: '#E53E3E'
-    },
-    {
-      name: 'Fixed',
-      value: criticalFixed?.organization?.vulns?.totalCount,
-      color: '#3182ce'
-    },
-    {
-      name: 'Not Affected',
-      value: criticalNotAffected?.organization?.vulns?.totalCount,
-      color: '#38A169'
-    }
-  ]
-
-  const vulnHighStatuses = [
-    {
-      name: 'Unspecified',
-      value: highUnspecified?.organization?.vulns?.totalCount,
-      color: '#718096'
-    },
-    {
-      name: 'In Triage',
-      value: highInTriage?.organization?.vulns?.totalCount,
-      color: '#003558'
-    },
-    {
-      name: 'Affected',
-      value: highAffected?.organization?.vulns?.totalCount,
-      color: '#E53E3E'
-    },
-    {
-      name: 'Fixed',
-      value: highFixed?.organization?.vulns?.totalCount,
-      color: '#3182ce'
-    },
-    {
-      name: 'Not Affected',
-      value: highNotAffected?.organization?.vulns?.totalCount,
-      color: '#38A169'
-    }
-  ]
-  const vulnKEVStatuses = [
-    {
-      name: 'Unspecified',
-      value: kevUnspecified?.organization?.vulns?.totalCount,
-      color: '#718096'
-    },
-    {
-      name: 'In Triage',
-      value: kevInTriage?.organization?.vulns?.totalCount,
-      color: '#003558'
-    },
-    {
-      name: 'Affected',
-      value: kevAffected?.organization?.vulns?.totalCount,
-      color: '#E53E3E'
-    },
-    {
-      name: 'Fixed',
-      value: kevFixed?.organization?.vulns?.totalCount,
-      color: '#3182ce'
-    },
-    {
-      name: 'Not Affected',
-      value: kevNotAffected?.organization?.vulns?.totalCount,
-      color: '#38A169'
-    }
-  ]
-
-  const vulnStatues = [
-    {
-      name: 'Unspecified',
-      value: statusData?.organization?.unspecified?.totalCount,
-      color: '#718096'
-    },
-    {
-      name: 'In Triage',
-      value: statusData?.organization?.inTriage?.totalCount,
-      color: '#003558'
-    },
-    {
-      name: 'Affected',
-      value: statusData?.organization?.affected?.totalCount,
-      color: '#E53E3E'
-    },
-    {
-      name: 'Fixed',
-      value: statusData?.organization?.fixed?.totalCount,
-      color: '#3182ce'
-    },
-    {
-      name: 'Not Affected',
-      value: statusData?.organization?.notAffected?.totalCount,
-      color: '#38A169'
-    }
-  ]
-
   return (
     <Stack spacing={4} mt={6}>
       <Heading size={'md'}>Vulnerabilities</Heading>
       <SimpleGrid columns={{ sm: 1, md: 3 }} spacing={5} pb={6}>
-        <LynkPieChart
-          loading={sevLoading}
-          title='All Vulnerabilities by Severity'
-          data={vulnSeverities}
-        />
-        <LynkPieChart
-          loading={statusLoading}
-          title='All Vulnerabilities by Status'
-          data={vulnStatues}
-        />
+        <AllVulnerabilitiesBySeverity />
+        <AllVulnerabilitiesByStatus />
         <Box />
-        <LynkPieChart
-          loading={sevLoading}
-          title='Critical Vulnerabilities by Status'
-          data={vulnCriticalStatuses}
-        />
-        <LynkPieChart
-          loading={sevLoading}
-          title='High Vulnerabilities by Status'
-          data={vulnHighStatuses}
-        />
-        <LynkPieChart
-          loading={sevLoading}
-          title='KEV Vulnerabilties by Status'
-          data={vulnKEVStatuses}
-        />
+        <CriticalVulnerabilitiesByStatus />
+        <HighVulnerabilitiesByStatus />
+        <KevVulnerabilitiesByStatus />
       </SimpleGrid>
       <Heading size={'md'} mt={6}>
         Vulnerability Trends
@@ -385,8 +50,7 @@ const VulnGraphs = ({ labelIds }) => {
             <VulnAge filters={filters} />
             <IdentityVelocity filters={filters} />
             <PatchVelocity filters={filters} />
-            {/*             <DeployVelocity filters={filters} />
-             */}
+            {/* <DeployVelocity filters={filters} /> */}
           </>
         )}
       </SimpleGrid>
