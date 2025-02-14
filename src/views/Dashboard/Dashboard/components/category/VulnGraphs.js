@@ -220,50 +220,16 @@ const VulnGraphs = ({ labelIds }) => {
   ]
 
   // -------------- VULN STATUS ---------------------
-  const { data: unspecified, loading: statusLoading } = useQuery(
+  const { data: statusData, loading: statusLoading } = useQuery(
     getVulnsByStatus,
     {
-      skip: organization ? false : true,
+      skip: !organization,
       variables: {
         labelIds: labelIds?.length > 0 ? labelIds : undefined,
-        status: ['Unspecified'],
-        envNames: [envName]
+        envNames: envName ? [envName] : undefined
       }
     }
   )
-
-  const { data: inTriage } = useQuery(getVulnsByStatus, {
-    skip: organization ? false : true,
-    variables: {
-      labelIds: labelIds?.length > 0 ? labelIds : undefined,
-      status: ['In Triage'],
-      envNames: [envName]
-    }
-  })
-  const { data: affected } = useQuery(getVulnsByStatus, {
-    skip: organization ? false : true,
-    variables: {
-      labelIds: labelIds?.length > 0 ? labelIds : undefined,
-      status: ['Affected'],
-      envNames: [envName]
-    }
-  })
-  const { data: fixed } = useQuery(getVulnsByStatus, {
-    skip: organization ? false : true,
-    variables: {
-      labelIds: labelIds?.length > 0 ? labelIds : undefined,
-      status: ['Fixed'],
-      envNames: [envName]
-    }
-  })
-  const { data: notAffected } = useQuery(getVulnsByStatus, {
-    skip: organization ? false : true,
-    variables: {
-      labelIds: labelIds?.length > 0 ? labelIds : undefined,
-      status: ['Not Affected'],
-      envNames: [envName]
-    }
-  })
 
   const vulnCriticalStatuses = [
     {
@@ -351,27 +317,27 @@ const VulnGraphs = ({ labelIds }) => {
   const vulnStatues = [
     {
       name: 'Unspecified',
-      value: unspecified?.organization?.vulns?.totalCount,
+      value: statusData?.organization?.unspecified?.totalCount,
       color: '#718096'
     },
     {
       name: 'In Triage',
-      value: inTriage?.organization?.vulns?.totalCount,
+      value: statusData?.organization?.inTriage?.totalCount,
       color: '#003558'
     },
     {
       name: 'Affected',
-      value: affected?.organization?.vulns?.totalCount,
+      value: statusData?.organization?.affected?.totalCount,
       color: '#E53E3E'
     },
     {
       name: 'Fixed',
-      value: fixed?.organization?.vulns?.totalCount,
+      value: statusData?.organization?.fixed?.totalCount,
       color: '#3182ce'
     },
     {
       name: 'Not Affected',
-      value: notAffected?.organization?.vulns?.totalCount,
+      value: statusData?.organization?.notAffected?.totalCount,
       color: '#38A169'
     }
   ]

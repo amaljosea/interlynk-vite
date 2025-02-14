@@ -5611,14 +5611,42 @@ export const getVulnsBySeverity = gql`
 
 // GET ALL VULNERABILITIES BY STATUS
 export const getVulnsByStatus = gql`
-  query getVulnsByStatus(
-    $status: [String!]
-    $envNames: [String!]
-    $labelIds: [Uuid!]
-  ) {
+  query getVulnsByAllStatuses($envNames: [String!], $labelIds: [Uuid!]) {
     organization {
-      vulns(
-        status: $status
+      unspecified: vulns(
+        status: ["Unspecified"]
+        projectNames: $envNames
+        projectGroupLabelIds: $labelIds
+      ) {
+        totalCount
+      }
+
+      inTriage: vulns(
+        status: ["In Triage"]
+        projectNames: $envNames
+        projectGroupLabelIds: $labelIds
+      ) {
+        totalCount
+      }
+
+      affected: vulns(
+        status: ["Affected"]
+        projectNames: $envNames
+        projectGroupLabelIds: $labelIds
+      ) {
+        totalCount
+      }
+
+      fixed: vulns(
+        status: ["Fixed"]
+        projectNames: $envNames
+        projectGroupLabelIds: $labelIds
+      ) {
+        totalCount
+      }
+
+      notAffected: vulns(
+        status: ["Not Affected"]
         projectNames: $envNames
         projectGroupLabelIds: $labelIds
       ) {
