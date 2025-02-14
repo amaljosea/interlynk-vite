@@ -82,6 +82,7 @@ export default class ProductDetailsSection {
                   await waitForSelectorWithMinTime(this.page, ds.uploadBtn)
                   const productNameHeader = await this.page
                     .locator(ds.pNameHeader(productName))
+                    .nth(0)
                     .isVisible()
                   if (!productNameHeader) {
                     errors.push('product name header verified failed!')
