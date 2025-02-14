@@ -5826,8 +5826,14 @@ export const getKevVulnsByStatus = gql`
 
 // GET ALL POLICIES RULES
 export const getAllPolicies = gql`
-  query GetAllPolicies($excludeUndetected: Boolean, $resultType: [String!]) {
-    policies(resultType: $resultType, excludeUndetected: $excludeUndetected) {
+  query GetAllPolicies {
+    informPolicies: policies(resultType: ["inform"]) {
+      totalCount
+    }
+    warnPolicies: policies(resultType: ["warn"]) {
+      totalCount
+    }
+    failPolicies: policies(resultType: ["fail"]) {
       totalCount
     }
   }

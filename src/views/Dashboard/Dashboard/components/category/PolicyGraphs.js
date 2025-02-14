@@ -12,44 +12,24 @@ import { getAllPolicies } from 'graphQL/Queries'
 const PolicyGraphs = () => {
   const { organization } = useGlobalState()
 
-  // -------------- POLICY RESULTS ---------------------
-  const { data: informPolicies, loading: policyLoading } = useQuery(
-    getAllPolicies,
-    {
-      skip: organization ? false : true,
-      variables: {
-        resultType: ['inform']
-      }
-    }
-  )
-  const { data: warnPolicies } = useQuery(getAllPolicies, {
-    skip: organization ? false : true,
-    variables: {
-      resultType: ['warn']
-    }
-  })
-  const { data: failPolicies } = useQuery(getAllPolicies, {
-    skip: organization ? false : true,
-    variables: {
-      resultType: ['fail']
-    }
+  const { data, loading } = useQuery(getAllPolicies, {
+    skip: !organization
   })
 
-  // -------------- POLICY VIOLATIONS ---------------------
   const policyResults = [
     {
       name: 'Inform',
-      value: informPolicies?.policies?.totalCount,
+      value: data?.informPolicies?.totalCount,
       color: '#3182ce'
     },
     {
       name: 'Warn',
-      value: warnPolicies?.policies?.totalCount,
+      value: data?.warnPolicies?.totalCount,
       color: '#D69E2E'
     },
     {
       name: 'Fail',
-      value: failPolicies?.policies?.totalCount,
+      value: data?.failPolicies?.totalCount,
       color: '#E53E3E'
     }
   ]
@@ -59,7 +39,7 @@ const PolicyGraphs = () => {
       <Heading size={'md'}>Policies</Heading>
       <SimpleGrid columns={{ sm: 1, md: 3 }} spacing={5}>
         <LynkPieChart
-          loading={policyLoading}
+          loading={loading}
           title='Policy Results'
           data={policyResults}
         />
