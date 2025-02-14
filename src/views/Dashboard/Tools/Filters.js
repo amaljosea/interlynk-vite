@@ -7,7 +7,6 @@ import {
   Stack
 } from '@chakra-ui/react'
 
-import CheckMark from 'components/Misc/CheckMark'
 import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -39,8 +38,10 @@ const ToolsFilterMenu = () => {
       {/* STATUS */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu placement='top' closeOnSelect={false}>
-          {difference !== 'all' && difference !== '' && <CheckMark />}
-          <MenuHeading title={'Difference'} />
+          <MenuHeading
+            active={difference !== 'all' && difference !== ''}
+            title={'Difference'}
+          />
           <MenuList fontSize={'sm'}>
             <MenuOptionGroup
               type='radio'
@@ -64,8 +65,10 @@ const ToolsFilterMenu = () => {
       {/* COMPONENTS */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu placement='top' closeOnSelect={false}>
-          {component !== 'all' && component !== '' && <CheckMark />}
-          <MenuHeading title={'Components'} />
+          <MenuHeading
+            active={component !== 'all' && component !== ''}
+            title={'Components'}
+          />
           <MenuList
             minW='auto'
             fontSize={'sm'}
