@@ -5555,15 +5555,50 @@ export const getProductsByStage = gql`
 export const getVulnsBySeverity = gql`
   query getVulnsBySeverity(
     $firstMatchDateAfter: ISO8601DateTime
-    $severity: [String!]
     $status: [String!]
     $envNames: [String!]
     $labelIds: [Uuid!]
   ) {
     organization {
-      vulns(
+      critical: vulns(
         firstMatchDateAfter: $firstMatchDateAfter
-        severity: $severity
+        severity: ["critical"]
+        status: $status
+        projectNames: $envNames
+        projectGroupLabelIds: $labelIds
+      ) {
+        totalCount
+      }
+      high: vulns(
+        firstMatchDateAfter: $firstMatchDateAfter
+        severity: ["high"]
+        status: $status
+        projectNames: $envNames
+        projectGroupLabelIds: $labelIds
+      ) {
+        totalCount
+      }
+      medium: vulns(
+        firstMatchDateAfter: $firstMatchDateAfter
+        severity: ["medium"]
+        status: $status
+        projectNames: $envNames
+        projectGroupLabelIds: $labelIds
+      ) {
+        totalCount
+      }
+      low: vulns(
+        firstMatchDateAfter: $firstMatchDateAfter
+        severity: ["low"]
+        status: $status
+        projectNames: $envNames
+        projectGroupLabelIds: $labelIds
+      ) {
+        totalCount
+      }
+      unknown: vulns(
+        firstMatchDateAfter: $firstMatchDateAfter
+        severity: ["unknown"]
         status: $status
         projectNames: $envNames
         projectGroupLabelIds: $labelIds

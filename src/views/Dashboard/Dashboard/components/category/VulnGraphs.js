@@ -36,55 +36,11 @@ const VulnGraphs = ({ labelIds }) => {
   }
 
   // -------------- VULN SEVERITIES ---------------------
-  const { data: criticalVulns, loading: sevLoading } = useQuery(
-    getVulnsBySeverity,
-    {
-      skip: organization ? false : true,
-      variables: {
-        severity: ['critical'],
-        status: vulnStatusTypes,
-        labelIds: labelIds?.length > 0 ? labelIds : undefined,
-        envNames: [envName]
-      }
-    }
-  )
-
-  const { data: highVulns } = useQuery(getVulnsBySeverity, {
-    skip: organization ? false : true,
+  const { data, loading: sevLoading } = useQuery(getVulnsBySeverity, {
+    skip: !organization,
     variables: {
+      status: vulnStatusTypes,
       labelIds: labelIds?.length > 0 ? labelIds : undefined,
-      severity: ['high'],
-      status: ['Unspecified', 'In Triage', 'Affected', 'Not Affected', 'Fixed'],
-      envNames: [envName]
-    }
-  })
-
-  const { data: mediumVulns } = useQuery(getVulnsBySeverity, {
-    skip: organization ? false : true,
-    variables: {
-      labelIds: labelIds?.length > 0 ? labelIds : undefined,
-      severity: ['medium'],
-      status: ['Unspecified', 'In Triage', 'Affected', 'Not Affected', 'Fixed'],
-      envNames: [envName]
-    }
-  })
-
-  const { data: lowVulns } = useQuery(getVulnsBySeverity, {
-    skip: organization ? false : true,
-    variables: {
-      labelIds: labelIds?.length > 0 ? labelIds : undefined,
-      severity: ['low'],
-      status: ['Unspecified', 'In Triage', 'Affected', 'Not Affected', 'Fixed'],
-      envNames: [envName]
-    }
-  })
-
-  const { data: unknownVulns } = useQuery(getVulnsBySeverity, {
-    skip: organization ? false : true,
-    variables: {
-      labelIds: labelIds?.length > 0 ? labelIds : undefined,
-      severity: ['unknown'],
-      status: ['Unspecified', 'In Triage', 'Affected', 'Not Affected', 'Fixed'],
       envNames: [envName]
     }
   })
@@ -238,27 +194,27 @@ const VulnGraphs = ({ labelIds }) => {
   const vulnSeverities = [
     {
       name: 'critical',
-      value: criticalVulns?.organization?.vulns?.totalCount,
+      value: data?.organization?.critical?.totalCount,
       color: '#E53E3E'
     },
     {
       name: 'high',
-      value: highVulns?.organization?.vulns?.totalCount,
+      value: data?.organization?.high?.totalCount,
       color: '#DD6B20'
     },
     {
       name: 'medium',
-      value: mediumVulns?.organization?.vulns?.totalCount,
+      value: data?.organization?.medium?.totalCount,
       color: '#D69E2E'
     },
     {
       name: 'low',
-      value: lowVulns?.organization?.vulns?.totalCount,
+      value: data?.organization?.low?.totalCount,
       color: '#38A169'
     },
     {
       name: 'unknown',
-      value: unknownVulns?.organization?.vulns?.totalCount,
+      value: data?.organization?.unknown?.totalCount,
       color: '#718096'
     }
   ]
