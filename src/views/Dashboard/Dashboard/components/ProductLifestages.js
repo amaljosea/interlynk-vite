@@ -33,84 +33,66 @@ const ProductLifestages = () => {
 
   const { prodDispatch } = dispatch
 
-  const { data: none, loading } = useQuery(getProductsByStage, {
-    skip: organization ? false : true,
-    variables: { stage: "none" }
-  })
-  const { data: design } = useQuery(getProductsByStage, {
-    skip: organization ? false : true,
-    variables: { stage: ['design'] }
-  })
-  const { data: development } = useQuery(getProductsByStage, {
-    skip: organization ? false : true,
-    variables: { stage: ['development'] }
-  })
-  const { data: maintenance } = useQuery(getProductsByStage, {
-    skip: organization ? false : true,
-    variables: { stage: ['maintenance'] }
-  })
-  const { data: released } = useQuery(getProductsByStage, {
-    skip: organization ? false : true,
-    variables: { stage: ['released'] }
-  })
-  const { data: endOfSupport } = useQuery(getProductsByStage, {
-    skip: organization ? false : true,
-    variables: { stage: ['end_of_support'] }
+  const { data, loading } = useQuery(getProductsByStage, {
+    skip: !organization
   })
 
-  const { data: endOfLife } = useQuery(getProductsByStage, {
-    skip: organization ? false : true,
-    variables: { stage: ['end_of_life'] }
-  })
+  const noneCount = data?.organization?.none?.totalCount || 0
+  const designCount = data?.organization?.design?.totalCount || 0
+  const developmentCount = data?.organization?.development?.totalCount || 0
+  const releasedCount = data?.organization?.released?.totalCount || 0
+  const maintenanceCount = data?.organization?.maintenance?.totalCount || 0
+  const endOfSupportCount = data?.organization?.endOfSupport?.totalCount || 0
+  const endOfLifeCount = data?.organization?.endOfLife?.totalCount || 0
 
   const lifeStages = [
     {
       id: 0,
       color: 'gray',
       label: 'none',
-      count: none?.organization?.projectGroups?.totalCount || 0,
+      count: noneCount || 0,
       icon: <LuPencilRuler size={20} />
     },
     {
       id: 1,
       color: 'orange',
       label: 'design',
-      count: design?.organization?.projectGroups?.totalCount || 0,
+      count: designCount || 0,
       icon: <LuPencilRuler size={20} />
     },
     {
       id: 2,
       color: 'blue',
       label: 'development',
-      count: development?.organization?.projectGroups?.totalCount || 0,
+      count: developmentCount || 0,
       icon: <LuInbox size={20} />
     },
     {
       id: 3,
       color: 'green',
       label: 'released',
-      count: released?.organization?.projectGroups?.totalCount || 0,
+      count: releasedCount || 0,
       icon: <LuRocket size={20} />
     },
     {
       id: 4,
       color: 'purple',
       label: 'maintenance',
-      count: maintenance?.organization?.projectGroups?.totalCount || 0,
+      count: maintenanceCount || 0,
       icon: <LuCog size={20} />
     },
     {
       id: 5,
       color: 'cyan',
       label: 'end_of_support',
-      count: endOfSupport?.organization?.projectGroups?.totalCount || 0,
+      count: endOfSupportCount || 0,
       icon: <LuCalendarHeart size={20} />
     },
     {
       id: 6,
       color: 'pink',
       label: 'end_of_life',
-      count: endOfLife?.organization?.projectGroups?.totalCount || 0,
+      count: endOfLifeCount || 0,
       icon: <LuCalendarMinus size={20} />
     }
   ]

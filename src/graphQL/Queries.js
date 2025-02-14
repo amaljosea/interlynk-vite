@@ -5524,9 +5524,27 @@ export const getAllProducts = gql`
 
 // GET PRODUCTS BY STAGES
 export const getProductsByStage = gql`
-  query getProductsByStage($stage: [ProductLifecycleStageEnum!]) {
+  query getProductsByStage {
     organization {
-      projectGroups(sbomProductLifeCycleStage: $stage) {
+      none: projectGroups(sbomProductLifeCycleStage: none) {
+        totalCount
+      }
+      design: projectGroups(sbomProductLifeCycleStage: design) {
+        totalCount
+      }
+      development: projectGroups(sbomProductLifeCycleStage: development) {
+        totalCount
+      }
+      maintenance: projectGroups(sbomProductLifeCycleStage: maintenance) {
+        totalCount
+      }
+      released: projectGroups(sbomProductLifeCycleStage: released) {
+        totalCount
+      }
+      endOfSupport: projectGroups(sbomProductLifeCycleStage: end_of_support) {
+        totalCount
+      }
+      endOfLife: projectGroups(sbomProductLifeCycleStage: end_of_life) {
         totalCount
       }
     }
