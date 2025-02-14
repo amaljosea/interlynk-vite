@@ -15,7 +15,7 @@ import {
   DrawerHeader,
   DrawerOverlay
 } from '@chakra-ui/react'
-import { Button, Flex, Stack, Text, Tooltip, chakra } from '@chakra-ui/react'
+import { Button, Flex, Stack, Text, Tooltip } from '@chakra-ui/react'
 import { Checkbox, Divider, Input, Select, Textarea } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
@@ -36,10 +36,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
   const { showToast } = useCustomToast()
   const customerView = isCustomerView()
 
-  const { primaryErrorColor, primaryBlueText } = useThemeColor([
-    'primaryErrorColor',
-    'primaryBlueText'
-  ])
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   // GET PRIMARY COMPONENT
   const { data } = useQuery(GetPrimaryComponent, {

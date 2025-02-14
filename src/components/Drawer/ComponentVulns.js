@@ -5,7 +5,7 @@ import { linkURl } from 'utils'
 import { customStyles, statusColor } from 'utils/styleUtils'
 
 import { Tag, TagLabel } from '@chakra-ui/react'
-import { Flex, Stack, Text, Tooltip } from '@chakra-ui/react'
+import { Flex, Stack, Text } from '@chakra-ui/react'
 import {
   Drawer,
   DrawerBody,

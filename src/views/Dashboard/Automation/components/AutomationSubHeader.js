@@ -9,7 +9,6 @@ import RefreshBtn from 'components/Icons/RefreshBtn'
 
 import { useHasPermission } from 'hooks/useHasPermission'
 
-import { FaFileExport, FaFileImport } from 'react-icons/fa'
 import { TbFileExport, TbFileImport } from 'react-icons/tb'
 
 const RuleExport = gql`
