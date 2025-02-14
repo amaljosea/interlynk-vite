@@ -1816,6 +1816,8 @@ export const GetComponentData = gql`
           publisher
           description
           licensesExp
+          licenseStatus
+          licenseNotes
           group
           scope
           healthScore
@@ -5698,6 +5700,17 @@ export const GetPolicy = gql`
       organizationId
       resultType
       updatedAt
+    }
+  }
+`
+
+export const GetLicenseStatusHistory = gql`
+  query GetLicenseStatusHistory($compId: Uuid!) {
+    componentLicenseStatusHistories(componentId: $compId) {
+      id
+      changedBy
+      values
+      createdAt
     }
   }
 `

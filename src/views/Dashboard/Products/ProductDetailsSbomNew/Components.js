@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getSignedUrlParams } from 'utils'
+import { getUndefinedIfEmptyOrAll } from 'utils'
 import { customStyles } from 'utils/styleUtils'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
 
@@ -14,6 +15,7 @@ import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
 import ComponentNotes from 'components/Drawer/ComponentNotes'
 import ComponentVulns from 'components/Drawer/ComponentVulns'
+import LicenseStatus from 'components/Drawer/LicenseStatus'
 import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
@@ -38,7 +40,6 @@ import HealthMap from '../components/HealthMap'
 import ComponentsColumns from './Components/tableColumns/ComponentsColumns'
 import ExpandedComponent from './Components/tableExpanded/ComponentsExpanded'
 import ComponentsSubHeader from './Components/tableSubHeaders/ComponentsSubHeader'
-import { getUndefinedIfEmptyOrAll } from 'utils'
 
 const Components = ({ sbomData }) => {
   const params = useParams()
@@ -70,8 +71,6 @@ const Components = ({ sbomData }) => {
     selectedComp
   } = prodCompState
   const { prodCompDispatch } = dispatch
-
- 
 
   const [activeRow, setActiveRow] = useState(null)
   const [compSearch, setCompSearch] = useState(searchInput || '')
@@ -136,6 +135,7 @@ const Components = ({ sbomData }) => {
   const INSIGHTS = useDisclosure()
   const VULNS = useDisclosure()
   const DELETE_SUPPLIER = useDisclosure()
+  const LICENSE_STATUS = useDisclosure()
 
   const onCreateComponent = useCallback(() => {
     setActiveRow(null)
@@ -171,6 +171,11 @@ const Components = ({ sbomData }) => {
   const handleAnalysis = (data) => {
     setActiveRow(data)
     INSIGHTS.onOpen()
+  }
+
+  const handleLicenseStatus = (data) => {
+    setActiveRow(data)
+    LICENSE_STATUS.onOpen()
   }
 
   const handleNotes = (data) => {
@@ -218,6 +223,7 @@ const Components = ({ sbomData }) => {
     handleGraphView,
     totalComp,
     handleAnalysis,
+    handleLicenseStatus,
     handleNotes,
     setActiveRow,
     DELETE,
@@ -449,6 +455,14 @@ const Components = ({ sbomData }) => {
           data={activeRow}
           isOpen={NOTES.isOpen}
           onClose={NOTES.onClose}
+        />
+      )}
+
+      {LICENSE_STATUS.isOpen && (
+        <LicenseStatus
+          data={activeRow}
+          isOpen={LICENSE_STATUS.isOpen}
+          onClose={LICENSE_STATUS.onClose}
         />
       )}
     </>

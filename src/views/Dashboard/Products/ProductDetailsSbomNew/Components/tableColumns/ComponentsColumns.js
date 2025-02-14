@@ -53,6 +53,7 @@ const ComponentsColumns = ({
   handleGraphView,
   totalComp,
   handleAnalysis,
+  handleLicenseStatus,
   handleNotes,
   setActiveRow,
   onCheckCpe,
@@ -442,6 +443,14 @@ const ComponentsColumns = ({
                       </MenuItem>
                       <MenuItem
                         hidden={isFreeTier}
+                        data-testid='view_license_status'
+                        onClick={() => handleLicenseStatus(row)}
+                        isDisabled={status === 'signed' || !updateComponent}
+                      >
+                        Edit License Status
+                      </MenuItem>
+                      <MenuItem
+                        hidden={isFreeTier}
                         data-testid='view_notes'
                         onClick={() => handleNotes(row)}
                         isDisabled={status === 'signed' || !updateComponent}
@@ -525,6 +534,9 @@ const ComponentsColumns = ({
     colorMode,
     inverseSecondaryBgColor,
     primaryTextColor,
+    handleVuln,
+    handleAnalysis,
+    onEditOpen,
     onCheckCpe,
     onCheckPurl,
     secondaryTextColor,
@@ -532,10 +544,8 @@ const ComponentsColumns = ({
     totalComp?.length,
     primaryErrorColor,
     primaryBlueText,
-    onEditOpen,
-    handleAnalysis,
+    handleLicenseStatus,
     handleNotes,
-    handleVuln,
     handleGraphView,
     setActiveRow,
     DELETE,

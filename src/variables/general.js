@@ -24,6 +24,14 @@ export const sbomPhases = [
   { label: 'Runtime', value: 'runtime' }
 ]
 
+export const licenseStatusTypes = [
+  'Approved',
+  'Rejected',
+  'Replace',
+  'Procured',
+  'Acceptable Risk'
+]
+
 export const severityList = ['critical', 'high', 'low', 'medium', 'unknown']
 
 export const vulnStatusTypes = [

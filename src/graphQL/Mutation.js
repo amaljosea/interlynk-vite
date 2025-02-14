@@ -2653,3 +2653,29 @@ export const UpdateScoreSetting = gql`
     }
   }
 `
+
+export const ComponentLicenseStatusUpdate = gql`
+  mutation ComponentLicenseStatusUpdate(
+    $id: Uuid!
+    $sbomId: Uuid!
+    $licenseStatus: String!
+    $licenseNotes: String!
+  ) {
+    componentLicenseStatusUpdate(
+      input: {
+        id: $id
+        sbomId: $sbomId
+        licenseStatus: $licenseStatus
+        licenseNotes: $licenseNotes
+      }
+    ) {
+      component {
+        id
+        licenseStatus
+        licensesExp
+        licenseNotes
+      }
+      errors
+    }
+  }
+`

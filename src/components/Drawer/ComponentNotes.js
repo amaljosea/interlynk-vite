@@ -16,7 +16,7 @@ import CompInfo from 'components/Misc/CompInfo'
 import useCustomToast from 'hooks/useCustomToast'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-const GetNotes = gql`
+export const GetNotes = gql`
   query GetNotes($id: Uuid!, $sbomId: Uuid!) {
     component(id: $id, sbomId: $sbomId) {
       annotations {

@@ -1,8 +1,11 @@
 import { updatedValue } from 'utils'
 import { getIcon } from 'utils/styleUtils'
-import { componentTypes } from 'variables/general'
-import { vulnStatusTypes } from 'variables/general'
-import { severityList } from 'variables/general'
+import {
+  componentTypes,
+  licenseStatusTypes,
+  severityList,
+  vulnStatusTypes
+} from 'variables/general'
 
 import {
   Box,
@@ -322,6 +325,29 @@ const PolicyConditions = ({
                       </Select>
                     </FormControl>
                   )}
+                {item?.subject === 'COMPONENT_LICENSE_STATUS' &&
+                  (item?.operator === 'IS' || item?.operator === 'IS_NOT') && (
+                    <FormControl isRequired>
+                      <Select
+                        id='compLicenseStatus'
+                        name='compLicenseStatus'
+                        value={item?.value}
+                        onChange={(e) =>
+                          onChangeRule(e.target.value, item.id, 'value')
+                        }
+                        textTransform={'capitalize'}
+                        fontSize='sm'
+                        minWidth={140}
+                      >
+                        <option value=''>-- select --</option>
+                        {licenseStatusTypes.map((item, index) => (
+                          <option key={index} value={item}>
+                            {item}
+                          </option>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )}
                 {item?.subject === 'COMPONENT_TYPE' &&
                   (item?.operator === 'IS' ||
                     item?.operator === 'IS_NOT' ||
@@ -480,6 +506,7 @@ const PolicyConditions = ({
                   item?.subject !== 'VULNERABILITY_STATUS' &&
                   item?.subject !== 'VULNERABILITY_KEV' &&
                   item?.subject !== 'VULNERABILITY_STATUS_AGE' &&
+                  item?.subject !== 'COMPONENT_LICENSE_STATUS' &&
                   item?.operator !== 'EXISTS' &&
                   item?.operator !== 'NOT_EXISTS' && (
                     <Input
