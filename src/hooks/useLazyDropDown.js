@@ -16,7 +16,8 @@ export const useLazyDropDown = (
     components,
     optionLabel,
     optionValue,
-    defaultFirstOption
+    defaultFirstOption,
+    isBreadcrumb
   }
 ) => {
   /* eslint-disable */
@@ -97,7 +98,7 @@ export const useLazyDropDown = (
     ? (item) => item[optionLabel]
     : (item) => item?.name
 
-  const placeholder = truncatedValue(selectedItem, 18)
+  const placeholder = truncatedValue(selectedItem, isBreadcrumb ? 18 : 40)
 
   const defaultOptions = defaultFirstOption
     ? [defaultFirstOption, ...(filteredNodes || [])]

@@ -80,7 +80,8 @@ const VersionBreadcrumb = ({ selectStyles }) => {
         IndicatorSeparator: () => null,
         DropdownIndicator: CustomDropdownIndicator
       },
-      optionLabel: 'projectVersion'
+      optionLabel: 'projectVersion',
+      isBreadcrumb: true
     }
   )
 

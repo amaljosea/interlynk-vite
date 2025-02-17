@@ -71,7 +71,8 @@ const ProjectGroupBreadcrumb = ({
         IndicatorSeparator: () => null,
         DropdownIndicator: CustomDropdownIndicator
       },
-      defaultFirstOption
+      defaultFirstOption,
+      isBreadcrumb: true
     }
   )
 
