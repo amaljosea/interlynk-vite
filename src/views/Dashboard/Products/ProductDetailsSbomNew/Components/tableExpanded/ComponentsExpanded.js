@@ -11,6 +11,8 @@ import { Box, Flex, Grid, Tag, Text, VStack } from '@chakra-ui/react'
 import DetailItem from 'components/Misc/DetailItem'
 import SupplierTag from 'components/SupplierTag'
 
+import { useThemeColor } from 'hooks/useThemeColors'
+
 const ExpandedComponent = (props) => {
   const {
     data,
@@ -24,6 +26,8 @@ const ExpandedComponent = (props) => {
 
   const customerView = isCustomerView()
   const signedUrlParams = getSignedUrlParams()
+
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   return useMemo(() => {
     const name = data?.name
@@ -44,6 +48,9 @@ const ExpandedComponent = (props) => {
         )
       : ''
     const endOfSupportDate = data?.componentSupportLevel?.endDate
+
+    const purlColor = purl && primaryBlueText
+    const cpesColor = cpes?.length > 0 && primaryBlueText
 
     const getDate = (value) =>
       value ? `${new Date(value).toLocaleDateString()}` : `N/A`
@@ -161,6 +168,7 @@ const ExpandedComponent = (props) => {
             onClick={() => (customerView ? null : onCheckPurl(data))}
             value={purl ? purlForDisplay : 'N/A'}
             label='PURL'
+            valueStyle={purl && { color: purlColor }}
           />
           {/* CPES */}
           <DetailItem
@@ -168,6 +176,7 @@ const ExpandedComponent = (props) => {
             label='CPES'
             value={cpes?.length > 0 ? cpes[0] : 'N/A'}
             onClick={() => (customerView ? null : onCheckCpe(data))}
+            valueStyle={cpes?.length > 0 && { color: cpesColor }}
           />
           {/* Scope */}
           <DetailItem label='Scope' value={scope || 'N/A'} />
@@ -190,6 +199,7 @@ const ExpandedComponent = (props) => {
         </Grid>
       </Box>
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     data,
     customerView,
