@@ -1,8 +1,7 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { client } from 'context/ApolloWrapper'
 import { useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { convertToCSV, downloadCSV, getSignedUrlParams } from 'utils'
+import { formatSupportLevel, getSignedUrlParams } from 'utils'
 import { exportExcel } from 'views/Sbom/DownloadUtils/excelUtils'
 import DownloadModal from 'views/Sbom/components/DownloadModal'
 
@@ -18,9 +17,9 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { recheckHealth } from 'graphQL/Mutation'
 import {
   DownloadSBOM,
-  GetComponentSupportData,
   GetProductManufacturer,
-  SignedSbomDownload
+  SignedSbomDownload,
+  SupportLevelCSV
 } from 'graphQL/Queries'
 
 import { FiDownload } from 'react-icons/fi'
@@ -43,6 +42,8 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
   const [getData] = useLazyQuery(
     signedUrlParams ? SignedSbomDownload : DownloadSBOM
   )
+
+  const [getCSVData] = useLazyQuery(SupportLevelCSV)
 
   const { data: manufacturerData } = useQuery(GetProductManufacturer, {
     skip: !signedUrlParams ? false : true,
@@ -126,55 +127,80 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
     }
   }
 
-  //Download CSV for support status
-  const handleExport = async () => {
-    const selectedColumns = ['name', 'version', 'supportLevel', 'endOfSupport']
-    const fileName = `${productName}-${version}-Support-Level.csv`
+  //Download CSV
+
+  const supportLevelCSVDownload = async () => {
     setIsLoading(true)
+
     try {
-      let allFetchedData = []
-      let componentsHasNextPage = true
-      let componentsEndCursor = null
+      const response = await getCSVData({
+        variables: {
+          sbomId: params?.sbomid,
+          projectId: params?.productid,
+          supportLevelOnly: true
+        }
+      })
 
-      while (componentsHasNextPage) {
-        const componentsRes = await client.query({
-          query: GetComponentSupportData,
-          variables: {
-            first: 200,
-            sbomId: params?.sbomid,
-            projectId: params?.productid,
-            after: componentsEndCursor || undefined,
-            includeParts: true
-          },
-          fetchPolicy: 'no-cache'
-        })
+      const downloadData = response?.data?.sbom?.download
 
-        const fetchedComponents =
-          componentsRes?.data?.sbom?.components?.nodes || []
-        const pageInfo = componentsRes?.data?.sbom?.components?.pageInfo
-
-        allFetchedData.push(...fetchedComponents)
-        componentsEndCursor = pageInfo?.endCursor // Only assign once
-        componentsHasNextPage = pageInfo?.hasNextPage // Only assign once
-      }
-
-      if (allFetchedData.length > 0) {
-        const csvContent = convertToCSV(allFetchedData, selectedColumns)
-        downloadCSV(csvContent, fileName)
-      } else {
+      if (!response.data || downloadData === null) {
         showToast({
-          description: 'No data available for export.',
+          description: 'No Data available',
           status: 'warning'
         })
+        setIsLoading(false)
+        return
       }
+
+      if (response.called) {
+        let { content, filename, contentType } = downloadData
+
+        // Checking if the content only has headers
+        const splitContent = content.trim().split('\n')
+        if (
+          splitContent.length <= 1 ||
+          splitContent.slice(1).every((line) => !line.trim())
+        ) {
+          showToast({
+            description:
+              'No components with enabled support levels found for this version.',
+            status: 'warning'
+          })
+          setIsLoading(false)
+          return
+        }
+
+        // Process the content and format the level column values
+        const formattedContent = splitContent
+          .map((line, index) => {
+            if (index === 0) return line // Keep header row as is
+
+            const row = line.split(',') // Split CSV line into columns
+            row[4] = formatSupportLevel(row[4]) // Format the 'level' column
+
+            return row.join(',')
+          })
+          .join('\n')
+
+        const blob = new Blob([formattedContent], {
+          type: contentType || 'text/csv'
+        })
+        const url = URL.createObjectURL(blob)
+
+        const a = document.createElement('a')
+        a.href = url
+        a.download = filename || `${productName}-${version}-Support-Level.csv`
+        a.click()
+        URL.revokeObjectURL(url)
+      }
+
+      setIsLoading(false)
     } catch (error) {
-      console.error('Export Error:', error)
+      console.error('Error downloading support level CSV:', error)
       showToast({
-        description:
-          'Internal error during data download. Please try again in a few minutes.',
+        description: 'Error processing the SBOM CSV download.',
         status: 'error'
       })
-    } finally {
       setIsLoading(false)
     }
   }
@@ -217,7 +243,7 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
   }
   const downloadSupport = () => {
     setDownloadType('support')
-    handleExport()
+    supportLevelCSVDownload()
   }
   const downloadExcel = () => {
     setDownloadType('excel')

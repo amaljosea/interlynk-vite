@@ -637,3 +637,21 @@ export const filterString = (input) => {
   }
   return input.replace(/([a-z])([A-Z])/g, '$1 $2')
 }
+
+//Format the support level csv fields
+export const formatSupportLevel = (level) => {
+  const parts = level.split('_') // Split by underscore
+  if (parts.length > 1) {
+    // Capitalize only the first word and lowercase the rest
+    return parts
+      .map((part, index) => {
+        if (index === 0) {
+          return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase() // First word capitalized
+        }
+        return part.toLowerCase() // Rest of the words in lowercase
+      })
+      .join(' ')
+  }
+  // Capitalize if there is only one word
+  return level.charAt(0).toUpperCase() + level.slice(1).toLowerCase()
+}

@@ -2967,6 +2967,22 @@ export const DownloadSBOM = gql`
     }
   }
 `
+//CSV SUPPORT LEVELS
+export const SupportLevelCSV = gql`
+  query SupportLevelCSV(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $supportLevelOnly: Boolean
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      download(sbomId: $sbomId, supportLevelOnly: $supportLevelOnly) {
+        contentType
+        filename
+        content
+      }
+    }
+  }
+`
 
 // DOWNLOAD SBOM FROM PUBLIC SITE
 export const SignedSbomDownload = gql`
