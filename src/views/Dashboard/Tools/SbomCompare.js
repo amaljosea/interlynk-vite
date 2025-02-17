@@ -170,7 +170,7 @@ const SbomCompare = ({
                   {data?.organization?.projectGroups?.nodes?.map(
                     (item, index) => (
                       <option key={index} value={item.id}>
-                        {truncatedValue(item.name, 20)}
+                        {truncatedValue(item.name, 50)}
                       </option>
                     )
                   )}
