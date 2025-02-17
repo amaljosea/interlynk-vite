@@ -285,6 +285,7 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
                 defaultOptions: projectsActual, // Override defaultOptions
                 isDisabled: isLoading,
                 value: null,
+                styles: style,
                 id: 'part_groups'
               }}
             />
@@ -333,7 +334,6 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
                 onChange={(e) => setSelectedVersion(e.value)}
                 isSearchable={false}
                 isDisabled={!selectedGroup?.id}
-                styles={style}
                 dropDown={true}
               />
             )}

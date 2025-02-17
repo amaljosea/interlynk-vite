@@ -125,8 +125,7 @@ export const useSelect = (type) => {
     },
     placeholder: (provided) => ({
       ...provided,
-      fontWeight: 300,
-      color: '#A0AEC0'
+      color: primaryTextColor
     })
   }
 
