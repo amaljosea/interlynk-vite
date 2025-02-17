@@ -146,13 +146,7 @@ const PolicyConditions = ({
       {conditions?.length > 0 &&
         conditions?.map((item, index) => (
           <Box key={index}>
-            <Flex
-              gap={2}
-              mt={1.5}
-              width={'100%'}
-              alignItems={'flex-start'}
-              justifyContent={'space-bewteen'}
-            >
+            <Flex gap={2} mt={1.5} width={'100%'} alignItems={'flex-start'}>
               <InputGroup>
                 <InputLeftElement pointerEvents='none'>
                   <Icon color={primaryBlueText} as={getIcon(item.subject)} />
