@@ -72,7 +72,8 @@ const CompSupport = ({ data, isOpen, onClose }) => {
 }
 
 const SupportCard = ({ setEdit, data }) => {
-  const { level, endDate, notes, retainManualOverrideFor } = data || {}
+  const { level, endDate, notes, retainManualOverrideFor, updatedAt, user } =
+    data || {}
 
   const { sameSecondaryText, grayBorderColor } = useThemeColor([
     'sameSecondaryText',
@@ -96,7 +97,7 @@ const SupportCard = ({ setEdit, data }) => {
       <Stack spacing={3}>
         <SimpleGrid {...container}>
           <Text {...label}>Assessment</Text>
-          <Text {...infoStyle}>Manual</Text>
+          <Text {...infoStyle}>{user?.id ? 'Manual' : 'Automatic'}</Text>
         </SimpleGrid>
         <SimpleGrid {...container}>
           <Text {...label}>Support Level</Text>
@@ -116,6 +117,12 @@ const SupportCard = ({ setEdit, data }) => {
             {retainManualOverrideFor
               ? `${retainManualOverrideFor} Days`
               : 'N/A'}{' '}
+          </Text>
+        </SimpleGrid>
+        <SimpleGrid {...container}>
+          <Text {...label}>Last Assessed</Text>
+          <Text {...infoStyle}>
+            {updatedAt ? getFullDateTime(updatedAt) : 'N/A'}
           </Text>
         </SimpleGrid>
         <SimpleGrid {...container}>
@@ -363,15 +370,6 @@ const SupportForm = ({ id, data, setEdit }) => {
           value={formData?.explanation}
           placeholder='Enter explanation'
           onChange={handleChange}
-        />
-      </FormControl>
-      {/* LAST ASSESSED */}
-      <FormControl>
-        <FormLabel htmlFor='lastAssessed'>Last Assessed</FormLabel>
-        <LynkDate
-          name='lastAssessed'
-          value={formData?.lastAssessed}
-          onChange={(value) => handleDateChange(value, 'lastAssessed')}
         />
       </FormControl>
       {/* ASSESSED BY */}
