@@ -98,7 +98,8 @@ const CustomVuln = ({ isOpen, onClose }) => {
   }
 
   const handleCveChange = (e) => {
-    setCve(e.target.value)
+    const { value } = e.target
+    setCve(value?.trim())
     setError('')
   }
 
@@ -128,9 +129,9 @@ const CustomVuln = ({ isOpen, onClose }) => {
         if (cveLookup) {
           setFormData((prev) => ({
             ...prev,
-            sev: cveLookup?.severity,
             desc: cveLookup?.description,
             vulnIdentifier: cveLookup?.vulnId,
+            sev: cveLookup?.severity?.toLowerCase(),
             publishedAt: new Date(cveLookup?.published),
             lastModifiedAt: new Date(cveLookup?.lastModified)
           }))
@@ -254,6 +255,7 @@ const CustomVuln = ({ isOpen, onClose }) => {
             fontSize={'sm'}
             value={formData?.sev}
             onChange={handleChange}
+            textTransform={'capitalize'}
           >
             <option value=''>-- Select --</option>
             {severityList?.map((item, index) => (
