@@ -5068,50 +5068,58 @@ export const GetEnrichedData = gql`
       healthScore
       enrichedContent {
         package {
-          purl
-          name
-          ecosystem
+          createdAt
           description
-          website
+          ecosystem
+          id
           isDeprecated
+          name
+          purl
           updatedAt
+          website
         }
         packageVersion {
-          purl
-          version
+          copyright
+          createdAt
+          id
           isArchived
+          isDeprecated
+          isLatest
           isOutdated
           isPreRelease
-          isDeprecated
-          license
-          copyright
-          maintainers
-          website
           issueTrackerUrl
-          repositoryUrl
+          license
+          maintainers
+          packageId
           publishedAt
+          purl
+          repositoryUrl
           updatedAt
+          version
+          website
         }
         latestPackageVersion {
           version
         }
         repository {
-          url
-          name
-          owner
+          contributorCount
+          createdAt
           description
           ecosystem
           forksCount
-          starsCount
-          watchersCount
+          id
           isArchived
-          isForked
-          contributorCount
-          releases
-          issues
+          lastCommitDate
+          lastMergedPrDate
+          lastReleaseDate
+          lastRepoUpdateDate
           license
+          name
+          owner
           scorecardScore
+          starsCount
           updatedAt
+          url
         }
       }
     }

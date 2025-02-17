@@ -38,6 +38,17 @@ const LynkTag = ({ value }) => {
   )
 }
 
+const DateField = ({ value }) => {
+  if (!value) return 'N/A'
+  return (
+    <Tooltip placement='top' label={getFullDateTime(value)}>
+      <Text width={'fit-content'} cursor={'pointer'}>
+        {timeSince(value)}
+      </Text>
+    </Tooltip>
+  )
+}
+
 const CompInsights = ({ isOpen, onClose, data }) => {
   const { id, scores } = data || ''
   const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
@@ -146,16 +157,9 @@ const CompInsights = ({ isOpen, onClose, data }) => {
                         >
                           <Text cursor={'pointer'}>Last Checked</Text>
                         </Tooltip>
-                        <Tooltip
-                          placement='top'
-                          label={getFullDateTime(
-                            enrichedContent?.package?.updatedAt
-                          )}
-                        >
-                          <Text width={'fit-content'} cursor={'pointer'}>
-                            {timeSince(enrichedContent?.package?.updatedAt)}
-                          </Text>
-                        </Tooltip>
+                        <DateField
+                          value={enrichedContent?.package?.updatedAt}
+                        />
                       </Container>
                     </Stack>
                   ) : (
@@ -214,14 +218,7 @@ const CompInsights = ({ isOpen, onClose, data }) => {
                         <Tooltip label={onCheck('packageVersion', 'Published')}>
                           <Text cursor={'pointer'}>Published</Text>
                         </Tooltip>
-                        <Tooltip
-                          placement='top'
-                          label={getFullDateTime(packageVersion?.publishedAt)}
-                        >
-                          <Text width={'fit-content'} cursor={'pointer'}>
-                            {timeSince(packageVersion?.publishedAt)}
-                          </Text>
-                        </Tooltip>
+                        <DateField value={packageVersion?.publishedAt} />
                       </Container>
                       <Divider />
                       <Container>
@@ -230,14 +227,7 @@ const CompInsights = ({ isOpen, onClose, data }) => {
                         >
                           <Text cursor={'pointer'}>Last Checked</Text>
                         </Tooltip>
-                        <Tooltip
-                          placement='top'
-                          label={getFullDateTime(packageVersion?.updatedAt)}
-                        >
-                          <Text width={'fit-content'} cursor={'pointer'}>
-                            {timeSince(packageVersion?.updatedAt)}
-                          </Text>
-                        </Tooltip>
+                        <DateField value={packageVersion?.updatedAt} />
                       </Container>
                     </Stack>
                   ) : (
@@ -293,10 +283,10 @@ const CompInsights = ({ isOpen, onClose, data }) => {
                       </Container>
                       <Divider />
                       <Container>
-                        <Tooltip label={onCheck('repository', 'Watchers')}>
-                          <Text cursor={'pointer'}>Watchers</Text>
+                        <Tooltip label={onCheck('repository', 'Last Commit')}>
+                          <Text cursor={'pointer'}>Last Commit</Text>
                         </Tooltip>
-                        <Text>{repository?.watchersCount}</Text>
+                        <DateField value={repository?.lastCommitDate} />
                       </Container>
                       <Divider />
                       <Container>
@@ -307,17 +297,26 @@ const CompInsights = ({ isOpen, onClose, data }) => {
                       </Container>
                       <Divider />
                       <Container>
-                        <Tooltip label={onCheck('repository', 'Relases')}>
-                          <Text cursor={'pointer'}>Relases</Text>
+                        <Tooltip label={onCheck('repository', 'Last Merged')}>
+                          <Text cursor={'pointer'}>Last Merged</Text>
                         </Tooltip>
-                        <Text>{JSON.stringify(repository?.releases)}</Text>
+                        <DateField value={repository?.lastMergedPrDate} />
                       </Container>
                       <Divider />
                       <Container>
-                        <Tooltip label={onCheck('repository', 'Issues')}>
-                          <Text cursor={'pointer'}>Issues</Text>
+                        <Tooltip label={onCheck('repository', 'Relases')}>
+                          <Text cursor={'pointer'}>Last Relasesd</Text>
                         </Tooltip>
-                        <Text>{JSON.stringify(repository?.issues)}</Text>
+                        <DateField value={repository?.lastReleaseDate} />
+                      </Container>
+                      <Divider />
+                      <Container>
+                        <Tooltip
+                          label={onCheck('repository', 'Last Repo Update')}
+                        >
+                          <Text cursor={'pointer'}>Last Repo Update</Text>
+                        </Tooltip>
+                        <DateField value={repository?.lastRepoUpdateDate} />
                       </Container>
                       <Divider />
                       <Container>
@@ -344,14 +343,7 @@ const CompInsights = ({ isOpen, onClose, data }) => {
                         <Tooltip label={onCheck('repository', 'Last Checked')}>
                           <Text cursor={'pointer'}>Last Checked</Text>
                         </Tooltip>
-                        <Tooltip
-                          placement='top'
-                          label={getFullDateTime(repository?.updatedAt)}
-                        >
-                          <Text width={'fit-content'} cursor={'pointer'}>
-                            {timeSince(repository?.updatedAt)}
-                          </Text>
-                        </Tooltip>
+                        <DateField value={repository?.updatedAt} />
                       </Container>
                     </Stack>
                   ) : (
