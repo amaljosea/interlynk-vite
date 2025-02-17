@@ -105,7 +105,11 @@ export const SingleGraph = ({
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)'
           }}
         />
-        <Legend wrapperStyle={{ fontSize: 15, paddingTop: '12px' }} />
+        <Legend
+          height={36}
+          verticalAlign='bottom'
+          wrapperStyle={{ fontSize: 15, paddingTop: '12px' }}
+        />
         {lines.map((item) => (
           <Line
             key={item.name}
