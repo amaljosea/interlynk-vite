@@ -1,18 +1,9 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
-import {
-  Box,
-  Button,
-  FormControl,
-  FormErrorMessage,
-  HStack,
-  Icon,
-  IconButton,
-  Input,
-  Select,
-  VStack
-} from '@chakra-ui/react'
+import { Box, Button, HStack, Input, Select, Stack } from '@chakra-ui/react'
+import { Icon, IconButton } from '@chakra-ui/react'
+import { FormControl, FormErrorMessage } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
@@ -34,7 +25,6 @@ const ConfigModal = ({
   createConnection,
   updateConnection,
   deleteConnection,
-  validateAddress,
   title,
   addressPlaceholder,
   icon,
@@ -45,9 +35,9 @@ const ConfigModal = ({
   const [error, setError] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
 
-  const [updateConn] = useMutation(updateConnection)
-  const [createConn] = useMutation(createConnection)
-  const [deleteConn] = useMutation(deleteConnection)
+  const [updateConn, { loading: updateLoading }] = useMutation(updateConnection)
+  const [createConn, { loading: createLoading }] = useMutation(createConnection)
+  const [deleteConn, { loading: deleteLoading }] = useMutation(deleteConnection)
 
   const [configs, setConfigs] = useState([
     {
@@ -233,15 +223,6 @@ const ConfigModal = ({
     setErrorMessage('')
     const newConfigs = [...configs]
     newConfigs[index][field] = value
-    if (field === 'address') {
-      if (validateAddress(value)) {
-        newConfigs[index].error = ''
-        newConfigs[index].isValid = true
-      } else {
-        newConfigs[index].error = 'Invalid address'
-        newConfigs[index].isValid = false
-      }
-    }
     setConfigs(newConfigs)
   }
 
@@ -302,16 +283,16 @@ const ConfigModal = ({
       isOpen={isOpen}
       onClose={onClose}
       buttonText='Save'
-      isLoading={false}
       Icon={icon}
       title={title}
       disabled={!updateCon}
+      isLoading={createLoading || updateLoading}
       onSubmit={data ? handleUpdate : handleSave}
     >
-      <VStack>
+      <Stack spacing={4}>
         {configs.map((config, index) => (
-          <HStack key={index} width='100%' pb={2} alignItems='start'>
-            <FormControl isInvalid={config.address !== '' && config.error}>
+          <HStack key={index} width='100%' alignItems='start'>
+            <FormControl>
               <Box position='relative'>
                 <Input
                   w='270px'
@@ -320,9 +301,9 @@ const ConfigModal = ({
                   onChange={(e) =>
                     handleChange(index, 'address', e.target.value)
                   }
-                  borderColor={
-                    !config.isValid ? primaryErrorColor : grayBorderColor
-                  }
+                  // borderColor={
+                  //   !config.isValid ? primaryErrorColor : grayBorderColor
+                  // }
                   isDisabled={!updateCon}
                 />
                 <FormErrorMessage
@@ -362,6 +343,7 @@ const ConfigModal = ({
                 border='1px solid'
                 borderColor={grayBorderColor}
                 variant='ghost'
+                isLoading={deleteLoading}
                 aria-label='Delete configuration'
                 onClick={() => handleRemoveConfig(index)}
                 icon={
@@ -392,7 +374,7 @@ const ConfigModal = ({
           </Button>
         )}
         {errorMessage !== '' && <LynkAlert msg={errorMessage} />}
-      </VStack>
+      </Stack>
     </LynkModal>
   )
 }
