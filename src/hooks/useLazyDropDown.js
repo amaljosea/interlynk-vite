@@ -97,7 +97,7 @@ export const useLazyDropDown = (
     ? (item) => item[optionLabel]
     : (item) => item?.name
 
-  const placeholder = truncatedValue(selectedItem)
+  const placeholder = truncatedValue(selectedItem, 18)
 
   const defaultOptions = defaultFirstOption
     ? [defaultFirstOption, ...(filteredNodes || [])]
