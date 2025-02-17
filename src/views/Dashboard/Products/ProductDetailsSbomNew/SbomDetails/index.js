@@ -31,7 +31,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { GetProjectSettings } from 'graphQL/Queries'
 
 import { FaBug, FaCubes, FaLongArrowAltRight, FaRobot } from 'react-icons/fa'
-import { FaCircleCheck, FaTag } from 'react-icons/fa6'
+import { FaCircleCheck, FaLayerGroup, FaTag } from 'react-icons/fa6'
 
 import LifecycleModal from '../../components/LifecycleModal'
 
@@ -283,6 +283,13 @@ const SbomDetails = ({ sbomData }) => {
                     <SettingsTag
                       label={'Vulnerability Scan'}
                       icon={<FaBug />}
+                      isDisabled={!hasFinished || !vulnScan}
+                      rounded
+                    />
+                    <Divider width={3} borderColor={sameSecondaryText} />
+                    <SettingsTag
+                      label={'Component Support Analysis'}
+                      icon={<FaLayerGroup />}
                       isDisabled={!hasFinished || !vulnScan}
                       rounded
                     />

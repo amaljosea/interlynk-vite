@@ -371,6 +371,7 @@ export const ProjectSettingUpdate = gql`
     $copyVexFromPrevious: Boolean
     $mfcId: Uuid
     $jiraProject: String
+    $enableSupportLevel: Boolean
   ) {
     projectSettingUpdate(
       input: {
@@ -383,6 +384,7 @@ export const ProjectSettingUpdate = gql`
         copyVexFromPrevious: $copyVexFromPrevious
         organizationManufacturerId: $mfcId
         jiraProject: $jiraProject
+        enableSupportLevel: $enableSupportLevel
       }
     ) {
       projectSetting {
@@ -2650,6 +2652,94 @@ export const UpdateScoreSetting = gql`
         componentAbandonedThreshold
       }
       errors
+    }
+  }
+`
+
+export const componentSupportLevelCreate = gql`
+  mutation componentSupportLevelCreate(
+    $id: Uuid!
+    $level: ComponentSupportLevelValues
+    $endDate: ISO8601DateTime
+    $notes: String
+    $retainManualOverrideFor: Int
+  ) {
+    componentSupportLevelCreate(
+      input: {
+        componentId: $id
+        level: $level
+        endDate: $endDate
+        notes: $notes
+        retainManualOverrideFor: $retainManualOverrideFor
+      }
+    ) {
+      errors
+      componentSupportLevel {
+        id
+        component {
+          id
+          name
+          version
+        }
+        level
+        endDate
+        notes
+        retainManualOverrideFor
+      }
+    }
+  }
+`
+
+export const componentSupportLevelUpdate = gql`
+  mutation componentSupportLevelUpdate(
+    $id: Uuid!
+    $level: ComponentSupportLevelValues
+    $endDate: ISO8601DateTime
+    $notes: String
+    $retainManualOverrideFor: Int
+  ) {
+    componentSupportLevelUpdate(
+      input: {
+        id: $id
+        level: $level
+        endDate: $endDate
+        notes: $notes
+        retainManualOverrideFor: $retainManualOverrideFor
+      }
+    ) {
+      errors
+      componentSupportLevel {
+        id
+        component {
+          id
+          name
+          version
+        }
+        level
+        endDate
+        notes
+        retainManualOverrideFor
+      }
+    }
+  }
+`
+
+export const componentSupportLevelDelete = gql`
+  mutation componentSupportLevelDelete($id: Uuid!) {
+    componentSupportLevelDelete(input: { id: $id }) {
+      errors
+      componentSupportLevel {
+        id
+        component {
+          id
+          name
+          version
+        }
+        level
+        endDate
+        notes
+        retainManualOverrideFor
+      }
     }
   }
 `

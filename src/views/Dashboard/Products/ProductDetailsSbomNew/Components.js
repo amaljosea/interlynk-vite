@@ -35,6 +35,7 @@ import { GetComponentData, GetComponentPath } from 'graphQL/Queries'
 
 import CompDrawer from '../components/CompDrawer'
 import CompInsights from '../components/CompInsights'
+import CompSupport from '../components/CompSupport'
 import ConfirmationModal from '../components/ConfirmationModal'
 import HealthMap from '../components/HealthMap'
 import ComponentsColumns from './Components/tableColumns/ComponentsColumns'
@@ -134,6 +135,7 @@ const Components = ({ sbomData }) => {
   const COMPONENT = useDisclosure()
   const INSIGHTS = useDisclosure()
   const VULNS = useDisclosure()
+  const SUPPORT = useDisclosure()
   const DELETE_SUPPLIER = useDisclosure()
   const LICENSE_STATUS = useDisclosure()
 
@@ -188,6 +190,11 @@ const Components = ({ sbomData }) => {
     VULNS.onOpen()
   }
 
+  const handleSupport = (row) => {
+    setActiveRow(row)
+    SUPPORT.onOpen()
+  }
+
   const handleSort = async (column, sortDirection) => {
     prodCompDispatch({
       type: 'SET_SORT_ORDER',
@@ -225,6 +232,7 @@ const Components = ({ sbomData }) => {
     handleAnalysis,
     handleLicenseStatus,
     handleNotes,
+    handleSupport,
     setActiveRow,
     DELETE,
     COMPONENT,
@@ -455,6 +463,14 @@ const Components = ({ sbomData }) => {
           data={activeRow}
           isOpen={NOTES.isOpen}
           onClose={NOTES.onClose}
+        />
+      )}
+
+      {SUPPORT.isOpen && (
+        <CompSupport
+          data={activeRow}
+          isOpen={SUPPORT.isOpen}
+          onClose={SUPPORT.onClose}
         />
       )}
 

@@ -8,6 +8,7 @@ import {
   Box,
   Flex,
   Select,
+  SimpleGrid,
   Stack,
   Text,
   Tooltip,
@@ -81,7 +82,7 @@ const CompRelations = ({ data, compPath }) => {
   const [addRelation] = useMutation(CreateCompRelation)
   const [removeRelation] = useMutation(DeleteCompRelation)
   const { data: compDependency } = useQuery(GetCompDependency, {
-    skip: tab === 4 ? false : true,
+    skip: tab === 5 ? false : true,
     variables: { compId: id, sbomId: sbomId }
   })
 
@@ -175,7 +176,14 @@ const CompRelations = ({ data, compPath }) => {
 
   return (
     <>
-      <Flex flexDir={'column'} alignItems={'flex-start'} gap={4} px={6} pb={20}>
+      <Flex
+        px={6}
+        pb={20}
+        gap={4}
+        h={'80vh'}
+        flexDir={'column'}
+        alignItems={'flex-start'}
+      >
         {/* CREATE RELATIONSHIP */}
         <Stack
           gap={2}
@@ -183,46 +191,48 @@ const CompRelations = ({ data, compPath }) => {
           direction={'column'}
           alignItems={'flex-start'}
         >
-          {/* RELATION TYPE */}
-          <FormControl>
-            <FormLabel htmlFor='relType' color={headingTextColor}>
-              Type
-            </FormLabel>
-            <Select
-              fontSize='sm'
-              name='relationType'
-              value={relations?.relType}
-              onChange={(e) =>
-                handleChange('relations', 'relType', e.target.value)
-              }
-            >
-              <option value=''>-- Select --</option>
-              {[
-                { value: 'depends_on', label: 'Depends On' },
-                { value: 'dependency_of', label: 'Dependency Of' }
-              ].map((item, idx) => (
-                <option key={idx} value={item.value}>
-                  {item.label}
-                </option>
-              ))}
-            </Select>
-          </FormControl>
-          {/* RELATION TO */}
-          <FormControl isInvalid={list?.length > 0}>
-            <FormLabel htmlFor='relationTo' color={headingTextColor}>
-              Component
-            </FormLabel>
-            <ComponentList
-              name={name}
-              id='relationTo'
-              value={component}
-              setValue={setComponent}
-            />
-            <FormErrorMessage>
-              <FormErrorIcon />
-              Component dependency already exists
-            </FormErrorMessage>
-          </FormControl>
+          <SimpleGrid w={'100%'} columns={2} gap={4}>
+            {/* RELATION TYPE */}
+            <FormControl>
+              <FormLabel htmlFor='relType' color={headingTextColor}>
+                Type
+              </FormLabel>
+              <Select
+                fontSize='sm'
+                name='relationType'
+                value={relations?.relType}
+                onChange={(e) =>
+                  handleChange('relations', 'relType', e.target.value)
+                }
+              >
+                <option value=''>-- Select --</option>
+                {[
+                  { value: 'depends_on', label: 'Depends On' },
+                  { value: 'dependency_of', label: 'Dependency Of' }
+                ].map((item, idx) => (
+                  <option key={idx} value={item.value}>
+                    {item.label}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+            {/* RELATION TO */}
+            <FormControl isInvalid={list?.length > 0}>
+              <FormLabel htmlFor='relationTo' color={headingTextColor}>
+                Component
+              </FormLabel>
+              <ComponentList
+                name={name}
+                id='relationTo'
+                value={component}
+                setValue={setComponent}
+              />
+              <FormErrorMessage>
+                <FormErrorIcon />
+                Component dependency already exists
+              </FormErrorMessage>
+            </FormControl>
+          </SimpleGrid>
           {/* ACTION */}
           {alert ? (
             <Stack spacing={4}>

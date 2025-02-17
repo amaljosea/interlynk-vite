@@ -17,6 +17,7 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
+  SimpleGrid,
   Stack
 } from '@chakra-ui/react'
 

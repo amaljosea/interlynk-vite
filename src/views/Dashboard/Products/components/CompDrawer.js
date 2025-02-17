@@ -118,7 +118,7 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
                   textTransform={'capitalize'}
                   _focus={{ outline: 'none', bg: 'none' }}
                 >
-                  {item}
+                  {item?.replace('_', ' ')}
                 </Tab>
               ))}
             </TabList>

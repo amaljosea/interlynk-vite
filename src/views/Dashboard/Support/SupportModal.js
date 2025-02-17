@@ -310,6 +310,7 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
           <FormControl>
             <FormLabel htmlFor='eol'>End of life</FormLabel>
             <LynkDate
+              name='eol'
               value={formData?.eol}
               onChange={(newDate) => handleDateChange('eol', newDate)}
             />
@@ -317,6 +318,7 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
           <FormControl>
             <FormLabel htmlFor='eos'>End of service</FormLabel>
             <LynkDate
+              name='eos'
               value={formData?.eos}
               onChange={(newDate) => handleDateChange('eos', newDate)}
             />

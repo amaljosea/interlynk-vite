@@ -6,24 +6,20 @@ import { hasWhiteSpace, validateUrl } from 'utils/formValidationUtils'
 
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
 import {
-  Button,
-  ButtonGroup,
   Divider,
   Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
   IconButton,
   Input,
   Select,
   Stack,
-  Table,
-  Tbody,
-  Td,
   Text,
-  Tooltip,
-  Tr
+  Th,
+  Thead,
+  Tooltip
 } from '@chakra-ui/react'
+import { Table, Tbody, Td, Tr } from '@chakra-ui/react'
+import { Button, ButtonGroup } from '@chakra-ui/react'
+import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 
@@ -62,7 +58,7 @@ const CompLinks = ({ data }) => {
   const { links } = tabData
 
   const { data: compUrls } = useQuery(GetCompUrls, {
-    skip: tab === 3 ? false : true,
+    skip: tab === 4 ? false : true,
     variables: { id, sbomId }
   })
   const { externalUrls } = compUrls?.component || ''
@@ -179,11 +175,13 @@ const CompLinks = ({ data }) => {
 
   return (
     <>
-      <Flex px={6} gap={4} direction={'column'} alignItems={'flex-start'}>
-        {/* HEADING */}
-        <Text color={secondaryTextInverse} fontWeight={'medium'}>
-          Add Link
-        </Text>
+      <Flex
+        w={'100%'}
+        px={6}
+        gap={4}
+        direction={'column'}
+        alignItems={'flex-start'}
+      >
         {/* NAME */}
         <FormControl isRequired isInvalid={error}>
           <FormLabel>Type</FormLabel>
@@ -266,6 +264,15 @@ const CompLinks = ({ data }) => {
           </Text>
           {externalUrls?.length > 0 ? (
             <Table variant='simple' size='sm' mt={4}>
+              <Thead>
+                <Tr>
+                  <Th pl={0}>Link</Th>
+                  <Th pl={0}>Type</Th>
+                  <Th pr={0} isNumeric>
+                    Action
+                  </Th>
+                </Tr>
+              </Thead>
               <Tbody>
                 {externalUrls?.map((item, index) => (
                   <Tr key={index}>
@@ -277,6 +284,8 @@ const CompLinks = ({ data }) => {
                           </Tooltip>
                         ) : null}
                       </Text>
+                    </Td>
+                    <Td pl={0}>
                       <Text mt={2} color={sameSecondaryText}>
                         {item?.name}
                       </Text>

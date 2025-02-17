@@ -240,19 +240,28 @@ const WeightControl = () => {
             </Stack>
           </CardHeader>
           <CardBody mt={2}>
-            <FormControl
-              w={'400px'}
-              isRequired
-              isInvalid={!threshold || threshold > 365}
-            >
-              <FormLabel>Declare Abondoned After {`(Days)`}</FormLabel>
-              <Input
-                type='number'
-                value={threshold}
-                onChange={(e) => setThreshold(e.target.value)}
-              />
-              <FormErrorMessage>Value must be 1 to 365</FormErrorMessage>
-            </FormControl>
+            <Stack spacing={5}>
+              <FormControl
+                w={'400px'}
+                isRequired
+                isInvalid={!threshold || threshold > 365}
+              >
+                <FormLabel>Declare Abondoned After {`(Days)`}</FormLabel>
+                <Input
+                  type='number'
+                  value={threshold}
+                  onChange={(e) => setThreshold(e.target.value)}
+                />
+                <FormErrorMessage>Value must be 1 to 365</FormErrorMessage>
+              </FormControl>
+              <FormControl w={'400px'}>
+                <FormLabel>
+                  Declare Package Abondoned After {`(Days)`}
+                </FormLabel>
+                <Input defaultValue={'365'} />
+                <FormErrorMessage>Value must be 1 to 365</FormErrorMessage>
+              </FormControl>
+            </Stack>
           </CardBody>
         </Card>
         {/* COMMUNITY CONFIGURATIONS */}

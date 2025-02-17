@@ -55,6 +55,7 @@ const ComponentsColumns = ({
   handleAnalysis,
   handleLicenseStatus,
   handleNotes,
+  handleSupport,
   setActiveRow,
   onCheckCpe,
   onCheckPurl,
@@ -458,6 +459,13 @@ const ComponentsColumns = ({
                         Edit Notes
                       </MenuItem>
                       <MenuItem
+                        data-testid='edit_component_support'
+                        onClick={() => handleSupport(row)}
+                        isDisabled={status === 'signed' || !updateComponent}
+                      >
+                        Edit Component Support
+                      </MenuItem>
+                      <MenuItem
                         data-testid='view_component_vulns'
                         onClick={() => handleVuln(row)}
                         isDisabled={status === 'signed'}
@@ -544,6 +552,7 @@ const ComponentsColumns = ({
     totalComp?.length,
     primaryErrorColor,
     primaryBlueText,
+    handleSupport,
     handleLicenseStatus,
     handleNotes,
     handleGraphView,

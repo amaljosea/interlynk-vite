@@ -1,9 +1,12 @@
 import { useMemo } from 'react'
-import { getSignedUrlParams, isCustomerView } from 'utils'
+import {
+  capitalizeFirstLetter,
+  getSignedUrlParams,
+  isCustomerView
+} from 'utils'
 import { openSsf } from 'variables/general'
 
-import { Box, Flex, Tag, Text, VStack } from '@chakra-ui/react'
-import { Grid } from '@chakra-ui/react'
+import { Box, Flex, Grid, Tag, Text, VStack } from '@chakra-ui/react'
 
 import DetailItem from 'components/Misc/DetailItem'
 import SupplierTag from 'components/SupplierTag'
@@ -35,8 +38,12 @@ const ExpandedComponent = (props) => {
     const scope = data?.scope
     const licensesExp = data?.licensesExp
     const openSsfScore = openSSF?.score
-    const supportLevel = data?.supportLevel
-    const endOfSupportDate = data?.endOfSupport
+    const supportLevel = data?.componentSupportLevel?.level
+      ? capitalizeFirstLetter(
+          data?.componentSupportLevel?.level?.replaceAll('_', ' ')
+        )
+      : ''
+    const endOfSupportDate = data?.componentSupportLevel?.endDate
 
     const getDate = (value) =>
       value ? `${new Date(value).toLocaleDateString()}` : `N/A`

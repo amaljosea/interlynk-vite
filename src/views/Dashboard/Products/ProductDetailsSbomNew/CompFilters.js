@@ -2,17 +2,16 @@ import { gql, useLazyQuery } from '@apollo/client'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 
+import { Box, Button, Flex, Stack, Text } from '@chakra-ui/react'
 import {
-  Box,
-  Flex,
   Menu,
+  MenuDivider,
   MenuItemOption,
   MenuList,
-  MenuOptionGroup,
-  Stack,
-  Text
+  MenuOptionGroup
 } from '@chakra-ui/react'
 
+import LynkDate from 'components/LynkDate'
 import CustomList from 'components/Misc/CustomList'
 import LynkMenuList from 'components/Misc/LynkMenuList'
 import LynkSwitch from 'components/Misc/LynkSwitch'
@@ -25,16 +24,6 @@ const GetEcosystems = gql`
     sbom(projectId: $productId, sbomId: $sbomId) {
       filters {
         ecosystems
-      }
-    }
-  }
-`
-
-const GetSupplierNames = gql`
-  query GetSupplierNames($productId: Uuid!, $sbomId: Uuid!) {
-    sbom(projectId: $productId, sbomId: $sbomId) {
-      filters {
-        supplierNames
       }
     }
   }
@@ -60,23 +49,29 @@ const GetLicenses = gql`
   }
 `
 
+const supportLevels = [
+  { id: 1, label: 'All', value: 'all' },
+  { id: 2, label: 'Unspecified', value: 'UNSPECIFIED' },
+  { id: 3, label: 'Actively Maintained', value: 'ACTIVELY_MAINTAINED' },
+  { id: 4, label: 'No Longer Maintained', value: 'NO_LONGER_MAINTAINED' },
+  { id: 5, label: 'Abandoned', value: 'ABANDONED' }
+]
+
 const CompFilters = ({ reset }) => {
   const params = useParams()
   const productId = params?.productid
   const sbomId = params?.sbomid
   const { prodCompState, dispatch } = useGlobalState()
-  const { ecosystems, kinds, licenses, suppliers, scope, direct, include } =
-    prodCompState
+  const { ecosystems, kinds, licenses, scope, direct, include } = prodCompState
   const { prodCompDispatch } = dispatch
 
   const [compEcosystems, setCompEcosystems] = useState(['All'])
-  const [compSuppliers, setCompSuppliers] = useState(['All'])
+  // const [compSupport, setCompSupport] = useState(['All'])
   const [compLicenses, setCompLicenses] = useState(['All'])
   const [compKinds, setCompKinds] = useState(['All'])
 
   // GET COMPONENT FILTER HEADS
   const [getEcosystems, { loading: ecoLoading }] = useLazyQuery(GetEcosystems)
-  const [getSuppliers, { loading: supLoading }] = useLazyQuery(GetSupplierNames)
   const [getKinds, { loading: kindLoading }] = useLazyQuery(GetKinds)
   const [getLicenses, { loading: licLoading }] = useLazyQuery(GetLicenses)
 
@@ -113,13 +108,6 @@ const CompFilters = ({ reset }) => {
         getKinds({ variables }).then((res) => {
           if (res?.data?.sbom?.filters?.kinds?.length > 0) {
             setCompKinds(['All', ...res.data.sbom.filters.kinds])
-          }
-        })
-        break
-      case 'Supplier':
-        getSuppliers({ variables }).then((res) => {
-          if (res?.data?.sbom?.filters?.supplierNames?.length > 0) {
-            setCompSuppliers(['All', ...res.data.sbom.filters.supplierNames])
           }
         })
         break
@@ -216,21 +204,41 @@ const CompFilters = ({ reset }) => {
           />
         </Menu>
       </Box>
-      {/* SUPPLIER */}
-      <Box width={'fit-content'}>
+      {/* SUPPORT LEVEL */}
+      <Box width={'fit-content'} hidden>
         <Menu closeOnSelect={false} isLazy>
-          <MenuHeading
-            title={'Suppliers'}
-            active={suppliers?.length !== 0}
-            onClick={() => onCheckFilters('Supplier')}
-          />
-          <LynkMenuList
-            type='Suppliers'
-            value={suppliers}
-            onFilter={onFilter}
-            loading={supLoading}
-            options={compSuppliers}
-          />
+          <MenuHeading title={'Support Level'} />
+          <MenuList
+            minH='auto'
+            maxH={'350px'}
+            minW={'300px'}
+            fontSize={'sm'}
+            overflowY={'scroll'}
+          >
+            <MenuOptionGroup type={'checkbox'}>
+              {supportLevels?.map((item) => (
+                <MenuItemOption
+                  key={item?.id}
+                  fontSize={'sm'}
+                  value={item?.value}
+                >
+                  {item?.label}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+            <MenuDivider />
+            <Flex flexDirection={'column'} alignItems={'flex-start'}>
+              <Stack pl={8}>
+                <Text>Start Date</Text>
+                <LynkDate />
+                <Text>End Date</Text>
+                <LynkDate />
+              </Stack>
+              <Button ml={8} my={3} size='sm'>
+                Submit
+              </Button>
+            </Flex>
+          </MenuList>
         </Menu>
       </Box>
       {/* TYPE */}

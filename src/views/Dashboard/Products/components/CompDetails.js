@@ -1,6 +1,6 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect } from 'react'
 import { isCustomerView, transformLicenseString } from 'utils'
 import { infoData } from 'variables/general'
 import { componentTypes } from 'variables/general'
@@ -20,7 +20,6 @@ import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import LicenseField from 'components/Licenses/LicenseField'
 import LynkAlert from 'components/LynkAlert'
-import LynkDate from 'components/LynkDate'
 import LynkFormLabel from 'components/Misc/LynkLabel'
 import PrimaryWarning from 'components/Modal/PrimaryWarning'
 
@@ -64,22 +63,6 @@ const CompDetails = ({ data, primaryComp }) => {
 
   const defaultDate = new Date()
   defaultDate.setDate(defaultDate.getDate() + 90)
-  const [isValidDate, setIsValidDate] = useState(true)
-
-  const handleDateChange = (newDate) => {
-    const isValidDate = newDate && !isNaN(newDate)
-    setTabData((prev) => ({
-      ...prev,
-      details: { ...prev?.details, endOfSupport: newDate._d }
-    }))
-    if (newDate) {
-      if (isValidDate) {
-        setIsValidDate(true)
-      } else {
-        setIsValidDate(false)
-      }
-    }
-  }
 
   let SBOMs = []
   const { data: allSboms } = useQuery(GetAllSboms, {
@@ -261,6 +244,29 @@ const CompDetails = ({ data, primaryComp }) => {
             onChange={(e) => handleChange('details', 'name', e.target.value)}
           />
         </FormControl>
+        {/* Version */}
+        <FormControl
+          isRequired
+          isDisabled={customerView}
+          isInvalid={invalidVersion}
+        >
+          <LynkFormLabel
+            label='Version'
+            htmlFor='version'
+            info={onCheck(`Component Version`)}
+          />
+          <Input
+            name='version'
+            sx={inputStyle}
+            value={details?.version}
+            placeholder='Enter version'
+            onChange={(e) => handleChange('details', 'version', e.target.value)}
+          />
+          <FormErrorMessage>
+            This version of the product already exists. Continuing will override
+            one of these versions.
+          </FormErrorMessage>
+        </FormControl>
         {/* Description */}
         <FormControl isDisabled={customerView}>
           <LynkFormLabel
@@ -294,29 +300,6 @@ const CompDetails = ({ data, primaryComp }) => {
               handleChange('details', 'copyright', e.target.value)
             }
           />
-        </FormControl>
-        {/* Version */}
-        <FormControl
-          isRequired
-          isDisabled={customerView}
-          isInvalid={invalidVersion}
-        >
-          <LynkFormLabel
-            label='Version'
-            htmlFor='version'
-            info={onCheck(`Component Version`)}
-          />
-          <Input
-            name='version'
-            sx={inputStyle}
-            value={details?.version}
-            placeholder='Enter version'
-            onChange={(e) => handleChange('details', 'version', e.target.value)}
-          />
-          <FormErrorMessage>
-            This version of the product already exists. Continuing will override
-            one of these versions.
-          </FormErrorMessage>
         </FormControl>
         {/* GROUP */}
         <FormControl isDisabled={customerView}>
@@ -385,47 +368,6 @@ const CompDetails = ({ data, primaryComp }) => {
             <option value='optional'>Optional</option>
             <option value='required'>Required</option>
           </Select>
-        </FormControl>
-        {/* SUPPRT LEVEL */}
-        <FormControl hidden={customerView}>
-          <LynkFormLabel
-            label='Support Level'
-            htmlFor='supportLevel'
-            info={onCheck(`Support Level`)}
-          />
-          <Select
-            sx={inputStyle}
-            name='supportLevel'
-            value={details?.supportLevel}
-            isDisabled={customerView}
-            onChange={(e) =>
-              handleChange('details', 'supportLevel', e.target.value)
-            }
-          >
-            <option value='' style={{ background: 'lightgray' }}>
-              -- Select --
-            </option>
-            <option value='UNSPECIFIED'>Unspecified</option>
-            <option value='ACTIVELY_MAINTAINED'>Actively Maintained</option>
-            <option value='NO_LONGER_MAINTAINED'>No Longer Maintained</option>
-            <option value='ABANDONED'>Abandoned</option>
-          </Select>
-        </FormControl>
-        {/* END-OF-SUPPORT DATE */}
-        <FormControl mb={5} isInvalid={!isValidDate} hidden={customerView}>
-          <LynkFormLabel
-            label='End-Of-Support Date'
-            htmlFor='endOfSupport'
-            info={onCheck(`End-of-Support Date`)}
-          />
-          <LynkDate
-            name='endOfSupport'
-            value={details?.endOfSupport}
-            onChange={handleDateChange}
-          />
-          {!isValidDate && (
-            <FormErrorMessage>Please enter a valid datetime</FormErrorMessage>
-          )}
         </FormControl>
         {/* PRIMARY COMPONENT */}
         <FormControl isDisabled={customerView}>

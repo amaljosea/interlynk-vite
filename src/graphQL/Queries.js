@@ -545,6 +545,7 @@ export const GetProjectSettings = gql`
         vulnScanningEnabled
         copyVexFromPrevious
         jiraProject
+        enableSupportLevel
         organizationManufacturer {
           id
           organizationName
@@ -1827,8 +1828,10 @@ export const GetComponentData = gql`
             community
             security
           }
-          endOfSupport
-          supportLevel
+          componentSupportLevel {
+            level
+            endDate
+          }
           externalUrls {
             name
             url
@@ -5938,6 +5941,26 @@ export const GetPolicy = gql`
       organizationId
       resultType
       updatedAt
+    }
+  }
+`
+
+export const GetComponentSupportLevels = gql`
+  query GetComponentSupportLevels($id: Uuid!, $sbomId: Uuid!) {
+    component(id: $id, sbomId: $sbomId) {
+      componentSupportLevel {
+        id
+        level
+        endDate
+        notes
+        retainManualOverrideFor
+        user {
+          id
+          name
+        }
+        updatedAt
+        createdAt
+      }
     }
   }
 `

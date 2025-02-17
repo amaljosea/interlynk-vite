@@ -45,7 +45,9 @@ const LynkMenuList = ({ type, options, value, loading, onFilter }) => {
                   <Box width={4}>
                     {isSelected && <CheckIcon fontSize={11} />}
                   </Box>
-                  <Text fontSize={'sm'}>{truncatedValue(option, 24)}</Text>
+                  <Text fontSize={'sm'} textTransform={'capitalize'}>
+                    {truncatedValue(option?.replaceAll('_', ' '), 24)}
+                  </Text>
                 </Flex>
               </MenuItem>
             )
