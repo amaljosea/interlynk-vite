@@ -62,9 +62,11 @@ const CheckModal = (props) => {
   const resolved = status === 'resolved'
 
   const level =
-    component?.supportLevel?.replaceAll(' ', '_').toUpperCase() || ''
-  const endData = component?.endOfSupport
-    ? new Date(component?.endOfSupport)
+    component?.componentSupportLevel?.level
+      ?.replaceAll(' ', '_')
+      .toUpperCase() || ''
+  const endData = component?.componentSupportLevel?.endDate
+    ? new Date(component?.componentSupportLevel?.endDate)
     : ''
 
   const compRef = useRef()

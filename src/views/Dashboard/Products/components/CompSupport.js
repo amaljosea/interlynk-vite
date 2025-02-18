@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getFullDateTime, isCustomerView } from 'utils'
+import { getFullDate, isCustomerView, timeSince } from 'utils'
 
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import {
@@ -11,7 +11,8 @@ import {
   SimpleGrid,
   Stack,
   Text,
-  Tooltip
+  Tooltip,
+  useDisclosure
 } from '@chakra-ui/react'
 import { Input, InputGroup, InputRightAddon } from '@chakra-ui/react'
 import { Button, ButtonGroup } from '@chakra-ui/react'
@@ -59,9 +60,9 @@ const CompSupport = ({ data, isOpen, onClose }) => {
         <Stack>
           {edit ? (
             <SupportForm
-              id={data?.id}
               setEdit={setEdit}
               data={componentSupportLevel}
+              component={{ id: data?.id, name: data?.name }}
             />
           ) : (
             <SupportCard setEdit={setEdit} data={componentSupportLevel} />
@@ -119,9 +120,7 @@ const SupportCard = ({ setEdit, data }) => {
         </SimpleGrid>
         <SimpleGrid {...container}>
           <Text {...label}>End-of-Support Date</Text>
-          <Text {...infoStyle}>
-            {endDate ? getFullDateTime(endDate) : 'N/A'}
-          </Text>
+          <Text {...infoStyle}>{endDate ? getFullDate(endDate) : 'N/A'}</Text>
         </SimpleGrid>
         <SimpleGrid {...container}>
           <Text {...label}>Assessment Expries On</Text>
@@ -132,40 +131,61 @@ const SupportCard = ({ setEdit, data }) => {
           </Text>
         </SimpleGrid>
         <SimpleGrid {...container}>
-          <Text {...label}>Last Assessed</Text>
-          <Text {...infoStyle}>
-            {updatedAt ? getFullDateTime(updatedAt) : 'N/A'}
-          </Text>
-        </SimpleGrid>
-        <SimpleGrid {...container}>
           <Text {...label}>Explation</Text>
           <Text {...infoStyle}>{notes || 'N/A'}</Text>
+        </SimpleGrid>
+        <SimpleGrid {...container}>
+          <Text {...label}>Last Assessed</Text>
+          {updatedAt ? (
+            <Tooltip label={getFullDate(updatedAt)}>
+              <Text {...infoStyle}>{timeSince(updatedAt)}</Text>
+            </Tooltip>
+          ) : (
+            <Text {...infoStyle}>{'N/A'}</Text>
+          )}
+        </SimpleGrid>
+        <SimpleGrid {...container}>
+          <Text {...label}>Last Assessed By</Text>
+          <Text {...infoStyle}>{user?.name || 'N/A'}</Text>
         </SimpleGrid>
       </Stack>
     </Stack>
   )
 }
 
-const SupportForm = ({ id, data, setEdit }) => {
+const SupportForm = ({ component, data, setEdit }) => {
   const customerView = isCustomerView()
   const { showToast } = useCustomToast()
 
+  const { isOpen, onOpen, onClose } = useDisclosure()
+
   const [formData, setFormData] = useState({
-    assessment: '',
     supportLevel: '',
     endOfSupport: '',
     explanation: '',
-    assessmentExpiresOn: 0,
-    lastAssessed: '',
-    assessedBy: ''
+    assessmentExpiresOn: 0
   })
 
   const isDisabled =
-    formData?.supportLevel === '' || formData?.endOfSupport === ''
+    formData?.supportLevel === '' && formData?.endOfSupport === ''
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    const isUnspecified = name === 'supportLevel' && value === 'unspecified'
+    if (isUnspecified) {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+        endOfSupport: '',
+        explanation: '',
+        assessmentExpiresOn: 0
+      }))
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value
+      }))
+    }
   }
 
   const [createSupport, { loading: createLoading }] = useMutation(
@@ -181,7 +201,7 @@ const SupportForm = ({ id, data, setEdit }) => {
   const handleDateChange = (newDate, field) => {
     setFormData((prev) => ({
       ...prev,
-      [field]: newDate._d
+      [field]: newDate ? newDate._d : ''
     }))
   }
 
@@ -218,7 +238,7 @@ const SupportForm = ({ id, data, setEdit }) => {
   const handleSubmit = () => {
     createSupport({
       variables: {
-        id,
+        id: component?.id,
         level: formData?.supportLevel || undefined,
         notes: formData?.explanation || undefined,
         retainManualOverrideFor:
@@ -247,9 +267,7 @@ const SupportForm = ({ id, data, setEdit }) => {
 
   const handleRemove = () => {
     deleteSupport({
-      variables: {
-        id: data?.id
-      }
+      variables: { id: data?.id }
     })
       .then((res) => {
         const { errors } = res?.data?.componentSupportLevelDelete || {}
@@ -280,13 +298,11 @@ const SupportForm = ({ id, data, setEdit }) => {
 
   useEffect(() => {
     if (data) {
-      const { level, endDate, notes, retainManualOverrideFor, user } =
-        data || {}
+      const { level, endDate, notes, retainManualOverrideFor } = data || {}
       setFormData((prev) => ({
         ...prev,
         explanation: notes || '',
         supportLevel: level || '',
-        assessedBy: user?.name || '',
         endOfSupport: endDate ? new Date(endDate) : '',
         assessmentExpiresOn: retainManualOverrideFor
           ? Number(retainManualOverrideFor)
@@ -295,25 +311,27 @@ const SupportForm = ({ id, data, setEdit }) => {
     }
   }, [data])
 
+  if (isOpen)
+    return (
+      <Stack spacing={4} mt={2}>
+        <Text>{`You are about to delete the support : ${component?.name} from this component.`}</Text>
+        <Text fontWeight={500}>Are you sure you want to proceed?</Text>
+        <ButtonGroup>
+          <Button onClick={onClose}>Cancel</Button>
+          <Button
+            colorScheme='red'
+            onClick={handleRemove}
+            isLoading={deleteLoading}
+            loadingText='Deleting....'
+          >
+            Yes
+          </Button>
+        </ButtonGroup>
+      </Stack>
+    )
+
   return (
-    <Stack spacing={4}>
-      {/* ASSESSMENT */}
-      <FormControl hidden>
-        <FormLabel htmlFor='assessment'>Assessment</FormLabel>
-        <Select
-          sx={inputStyle}
-          name='assessment'
-          value={formData?.assessment}
-          isDisabled={customerView}
-          onChange={handleChange}
-        >
-          <option value='' style={{ background: 'lightgray' }}>
-            -- Select --
-          </option>
-          <option value='automatic'>Automatic</option>
-          <option value='manual'>Manual</option>
-        </Select>
-      </FormControl>
+    <Stack spacing={4} mt={2}>
       {/* SUPPRT LEVEL */}
       <FormControl>
         <FormLabel htmlFor='supportLevel'>Support Level</FormLabel>
@@ -376,19 +394,6 @@ const SupportForm = ({ id, data, setEdit }) => {
           onChange={handleChange}
         />
       </FormControl>
-      {/* ASSESSED BY */}
-      <FormControl hidden={!formData?.assessedBy} isDisabled>
-        <FormLabel htmlFor='assessedBy'>Assessed By</FormLabel>
-        <Input
-          sx={inputStyle}
-          name='assessedBy'
-          value={formData?.assessedBy}
-          placeholder='Enter name'
-          onChange={(e) =>
-            handleChange('support', 'assessedBy', e.target.value)
-          }
-        />
-      </FormControl>
       {/* ACTIONS */}
       <Flex w={'100%'} alignItems={'center'} justifyContent={'space-between'}>
         <ButtonGroup>
@@ -408,11 +413,10 @@ const SupportForm = ({ id, data, setEdit }) => {
         </ButtonGroup>
         {data && (
           <IconButton
+            onClick={onOpen}
             colorScheme='red'
             icon={<DeleteIcon />}
             title='Remove support'
-            onClick={handleRemove}
-            isLoading={deleteLoading}
           />
         )}
       </Flex>
