@@ -103,12 +103,7 @@ const ChecksSubHeader = (reset, isArchived) => {
         alignItems={'center'}
         justifyContent={'space-between'}
       >
-        <Stack
-          width={'100%'}
-          direction={'row'}
-          spacing={3}
-          alignItems={'flex-start'}
-        >
+        <Flex gap={2} flexWrap={'wrap'}>
           {/* SEARCH COMPONENTS */}
           <SearchFilter
             id='healthcheck'
@@ -122,9 +117,9 @@ const ChecksSubHeader = (reset, isArchived) => {
           {filterHead && (
             <CheckFilters reset={reset} filters={filterHead?.sbom?.filters} />
           )}
-        </Stack>
+        </Flex>
 
-        <Stack spacing={2} direction={'row'}>
+        <Flex gap={2}>
           <Tooltip label='Re-Check'>
             <IconButton
               fontSize={'sm'}
@@ -138,7 +133,7 @@ const ChecksSubHeader = (reset, isArchived) => {
             />
           </Tooltip>
           <RefreshBtn />
-        </Stack>
+        </Flex>
       </Flex>
     )
   }, [

@@ -64,7 +64,7 @@ const ChangelogFilterMenu = ({ id, setFilter }) => {
   if (error) return <Text pt={2}>Something went wrong...</Text>
 
   return (
-    <Flex alignItems={'center'} gap={3}>
+    <Flex alignItems={'center'} gap={2}>
       {/* TYPE FILTER */}
       <Box width={'fit-content'}>
         <Menu closeOnSelect={true}>

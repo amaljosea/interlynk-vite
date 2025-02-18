@@ -1,7 +1,7 @@
 import { useLazyQuery } from '@apollo/client'
 import { useState } from 'react'
 
-import { Box, Kbd, Stack, Text } from '@chakra-ui/react'
+import { Box, Flex, Kbd, Stack, Text } from '@chakra-ui/react'
 import {
   Menu,
   MenuItemOption,
@@ -122,7 +122,7 @@ const ProdFilterMenu = (props) => {
   }
 
   return (
-    <Stack direction={'row'} alignItems={'center'} gap={1}>
+    <Flex gap={2}>
       {/* ACTIVE */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
@@ -238,7 +238,7 @@ const ProdFilterMenu = (props) => {
           </MenuList>
         </Menu>
       </Box>
-    </Stack>
+    </Flex>
   )
 }
 

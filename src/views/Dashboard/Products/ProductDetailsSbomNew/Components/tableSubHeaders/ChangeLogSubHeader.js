@@ -18,11 +18,8 @@ const ChangeLogSubHeader = (
 ) => {
   const subHeader = useMemo(() => {
     return (
-      <Flex
-        sx={{ w: '100%', alignItems: 'center' }}
-        justifyContent={'space-between'}
-      >
-        <Flex sx={{ gap: 3, w: '100%', alignItems: 'flex-start' }}>
+      <Flex w='100%' justifyContent={'space-between'}>
+        <Flex gap={2} flexWrap={'wrap'}>
           <SearchFilter
             id='changelog'
             filterText={logSearch}

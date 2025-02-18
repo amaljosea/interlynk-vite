@@ -1,4 +1,4 @@
-import { Flex, Stack } from '@chakra-ui/react'
+import { Flex } from '@chakra-ui/react'
 
 import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
@@ -12,22 +12,24 @@ export const SubHeaderComponent = ({
   setActiveRow
 }) => {
   return (
-    <Flex width={'100%'} alignItems={'center'} gap={2}>
-      <Stack width={'100%'} direction={'row'} spacing={3} alignItems={'center'}>
+    <Flex gap={2} width={'100%'} justifyContent={'space-between'}>
+      <Flex gap={2}>
         <Filter setFilters={setFilters} />
-      </Stack>
+      </Flex>
 
-      {/* ADD LICNESE */}
-      <AddButton
-        label='Add License'
-        isDisabled={!createLic}
-        onClick={() => {
-          setActiveRow(null)
-          onOpen()
-        }}
-        aria-label='add_license'
-      />
-      <RefreshBtn />
+      <Flex gap={2}>
+        {/* ADD LICNESE */}
+        <AddButton
+          label='Add License'
+          isDisabled={!createLic}
+          onClick={() => {
+            setActiveRow(null)
+            onOpen()
+          }}
+          aria-label='add_license'
+        />
+        <RefreshBtn />
+      </Flex>
     </Flex>
   )
 }

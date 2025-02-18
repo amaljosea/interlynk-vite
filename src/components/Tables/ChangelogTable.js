@@ -6,14 +6,7 @@ import { customStyles, getChangelogColor } from 'utils/styleUtils'
 import ChangelogFilterMenu from 'views/Sbom/components/ChangelogFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import {
-  Flex,
-  Stack,
-  Tag,
-  Text,
-  Tooltip,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Flex, Tag, Text, Tooltip, useDisclosure } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import RefreshBtn from 'components/Icons/RefreshBtn'
@@ -219,17 +212,12 @@ const ChangelogTable = ({ activeEnv }) => {
   const subHeader = useMemo(() => {
     return (
       <Flex
+        mb={4}
         width={'100%'}
         alignItems={'center'}
         justifyContent={'space-between'}
-        mb={4}
       >
-        <Stack
-          spacing={3}
-          width={'100%'}
-          direction={'row'}
-          alignItems={'flex-start'}
-        >
+        <Flex gap={2}>
           <SearchFilter
             id='prodChangelog'
             filterText={searchInput}
@@ -245,7 +233,7 @@ const ChangelogTable = ({ activeEnv }) => {
               reset()
             }}
           />
-        </Stack>
+        </Flex>
 
         <RefreshBtn onClick={() => reset()} />
       </Flex>

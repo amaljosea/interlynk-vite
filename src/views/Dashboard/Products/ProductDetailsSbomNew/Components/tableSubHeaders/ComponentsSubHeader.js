@@ -33,12 +33,9 @@ const ComponentsSubHeader = ({
   // Use useMemo to memoize the component's JSX
   return useMemo(() => {
     return (
-      <Flex
-        sx={{ w: '100%', alignItems: 'flex-start', gap: 2 }}
-        justifyContent={'space-between'}
-      >
+      <Flex w={'100%'} justifyContent={'space-between'}>
         {/* Left Section: Filters and Search */}
-        <Flex sx={{ flexWrap: 'wrap', gap: 3, alignItems: 'flex-start' }}>
+        <Flex gap={2} flexWrap={'wrap'}>
           {/* SEARCH COMPONENTS */}
           <SearchFilter
             id='component'
@@ -52,7 +49,7 @@ const ComponentsSubHeader = ({
         </Flex>
 
         {/* Right Section: Actions */}
-        <Flex sx={{ gap: 2, justifyContent: 'flex-end' }}>
+        <Flex gap={2}>
           {/* SHOW HEATMAP */}
           {shouldShowDemoFeatures && (
             <Tooltip label='View Health Map'>

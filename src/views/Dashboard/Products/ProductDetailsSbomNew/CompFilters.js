@@ -158,7 +158,7 @@ const CompFilters = ({ reset }) => {
   }
 
   return (
-    <Stack direction={'row'} alignItems={'center'} gap={1}>
+    <Flex gap={2} alignItems={'center'}>
       {/* ECOSYSTEM */}
       <Box width={'fit-content'}>
         <Menu closeOnSelect={false}>
@@ -295,7 +295,7 @@ const CompFilters = ({ reset }) => {
         />
         <Text>Direct</Text>
       </Flex>
-    </Stack>
+    </Flex>
   )
 }
 

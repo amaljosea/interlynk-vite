@@ -1,28 +1,26 @@
 import { useRef } from 'react'
 import { vulnStatusTypes } from 'variables/general'
+import { severityList } from 'variables/general'
 
+import { Box, Button, Flex, Stack, useDisclosure } from '@chakra-ui/react'
 import {
-  Box,
-  Button,
-  Flex,
   Input,
   InputGroup,
   InputLeftAddon,
-  InputRightAddon,
+  InputRightAddon
+} from '@chakra-ui/react'
+import {
   Menu,
   MenuDivider,
   MenuItemOption,
   MenuList,
-  MenuOptionGroup,
-  Stack,
-  useDisclosure
+  MenuOptionGroup
 } from '@chakra-ui/react'
 
 import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
-import { severityList } from 'variables/general'
 
 const VulnFilters = ({ reset }) => {
   const { prodVulnState, dispatch } = useGlobalState()
@@ -109,7 +107,7 @@ const VulnFilters = ({ reset }) => {
   }
 
   return (
-    <Stack direction={'row'} alignItems={'center'} gap={1}>
+    <Flex gap={2} alignItems={'center'}>
       {/* COMPONENT */}
       <Box width={'fit-content'}>
         <Menu closeOnSelect={false}>
@@ -339,7 +337,7 @@ const VulnFilters = ({ reset }) => {
           </MenuList>
         </Menu>
       </Box>
-    </Stack>
+    </Flex>
   )
 }
 

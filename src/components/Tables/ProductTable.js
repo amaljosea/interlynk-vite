@@ -220,7 +220,7 @@ const ProductTable = (props) => {
         alignItems={'center'}
         justifyContent={'space-between'}
       >
-        <Stack direction={'row'} spacing={3} alignItems={'center'}>
+        <Flex gap={2}>
           {/* SEARCH PRODUCTS */}
           <ProductSearchFilter
             id='product'
@@ -238,8 +238,8 @@ const ProductTable = (props) => {
               setSelectedTags={setSelectedTags}
             />
           )}
-        </Stack>
-        <Stack direction={'row'} spacing={2} alignItems={'center'}>
+        </Flex>
+        <Flex gap={2}>
           {/* ADD GITHUB PROJECT */}
           {shouldShowDemoFeatures && isGithubConfigSaved && (
             <Tooltip label='Add GitHub Project'>
@@ -289,7 +289,7 @@ const ProductTable = (props) => {
               </Box>
             </Tooltip>
           </Box>
-        </Stack>
+        </Flex>
       </Flex>
     )
   }, [

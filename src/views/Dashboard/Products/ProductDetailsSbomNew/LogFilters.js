@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { Box, Menu, Stack } from '@chakra-ui/react'
+import { Box, Flex, Menu } from '@chakra-ui/react'
 
 import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
@@ -40,7 +40,7 @@ const LogFilters = ({ filters, setLogState }) => {
 
   if (filters) {
     return (
-      <Stack direction={'row'} alignItems={'center'} gap={1}>
+      <Flex gap={2} alignItems={'center'}>
         {/* USER */}
         <Box width={'fit-content'}>
           <Menu closeOnBlur={true}>
@@ -74,7 +74,7 @@ const LogFilters = ({ filters, setLogState }) => {
             />
           </Menu>
         </Box>
-      </Stack>
+      </Flex>
     )
   }
 

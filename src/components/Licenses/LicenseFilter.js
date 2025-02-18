@@ -1,13 +1,12 @@
 import { useState } from 'react'
 
 import {
-  Box,
   Menu,
   MenuItemOption,
   MenuList,
-  MenuOptionGroup,
-  Stack
+  MenuOptionGroup
 } from '@chakra-ui/react'
+import { Box, Flex } from '@chakra-ui/react'
 
 import MenuHeading from 'components/Misc/MenuHeading'
 
@@ -50,7 +49,7 @@ const LicenseFilter = ({ onFilter }) => {
   }
 
   return (
-    <Stack direction={'row'} alignItems={'center'} gap={1}>
+    <Flex gap={2} alignItems={'center'}>
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
           <MenuHeading title={'Status'} active={status[0]} />
@@ -79,7 +78,7 @@ const LicenseFilter = ({ onFilter }) => {
           </MenuList>
         </Menu>
       </Box>
-    </Stack>
+    </Flex>
   )
 }
 

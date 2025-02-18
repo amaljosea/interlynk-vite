@@ -34,32 +34,30 @@ const SearchFilter = ({ id, filterText, onChange, onFilter, onClear }) => {
   }, [handleKeyPress])
 
   return (
-    <>
-      <Box pos={'relative'} width={'300px'}>
-        <InputGroup>
-          <InputLeftElement pointerEvents='none'>
-            <SearchIcon color={secondaryTextColor} />
-          </InputLeftElement>
-          <Input
-            id={id}
-            name={id}
-            type='text'
-            fontSize='sm'
-            placeholder='Search'
-            ref={searchInputRef}
-            value={filterText}
-            onChange={onChange}
-            onKeyDown={onFilter}
+    <Box pos={'relative'} width={'300px'}>
+      <InputGroup>
+        <InputLeftElement pointerEvents='none'>
+          <SearchIcon color={secondaryTextColor} />
+        </InputLeftElement>
+        <Input
+          id={id}
+          name={id}
+          type='text'
+          fontSize='sm'
+          placeholder='Search'
+          ref={searchInputRef}
+          value={filterText}
+          onChange={onChange}
+          onKeyDown={onFilter}
+        />
+        <InputRightElement hidden={filterText === ''}>
+          <CloseIcon
+            onClick={onClear}
+            sx={{ fontSize: 10, cursor: 'pointer' }}
           />
-          <InputRightElement hidden={filterText === ''}>
-            <CloseIcon
-              onClick={onClear}
-              sx={{ fontSize: 10, cursor: 'pointer' }}
-            />
-          </InputRightElement>
-        </InputGroup>
-      </Box>
-    </>
+        </InputRightElement>
+      </InputGroup>
+    </Box>
   )
 }
 

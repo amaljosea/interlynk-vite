@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/client'
+import { severityList } from 'variables/general'
 
 import {
   Menu,
@@ -6,7 +7,7 @@ import {
   MenuList,
   MenuOptionGroup
 } from '@chakra-ui/react'
-import { Box, Stack } from '@chakra-ui/react'
+import { Box, Flex } from '@chakra-ui/react'
 
 import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
@@ -15,7 +16,6 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
 
 import { GetOrgRules } from 'graphQL/Queries'
-import { severityList } from 'variables/general'
 
 const CheckFilters = ({ filters, reset }) => {
   const activeTab = useQueryParam('tab')
@@ -56,7 +56,7 @@ const CheckFilters = ({ filters, reset }) => {
 
   if (filters) {
     return (
-      <Stack direction={'row'} alignItems={'center'} gap={1}>
+      <Flex gap={2} alignItems={'center'}>
         {/* CHECK ID */}
         {data && (
           <Box width={'fit-content'}>
@@ -137,7 +137,7 @@ const CheckFilters = ({ filters, reset }) => {
             />
           </Menu>
         </Box>
-      </Stack>
+      </Flex>
     )
   }
 
