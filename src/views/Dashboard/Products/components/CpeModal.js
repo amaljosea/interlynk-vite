@@ -2,21 +2,16 @@ import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
-import { validateCpe } from 'utils/cpeUtils'
+import { validateCpe, validateFields, validateLanguage } from 'utils/cpeUtils'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import { Box, Button, Flex, Grid, Textarea } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
 
-import Edition from 'components/CpeEditor/Edition'
-import Language from 'components/CpeEditor/Language'
-import Other from 'components/CpeEditor/Other'
+import CpeField from 'components/CpeEditor/CpeField'
 import Part from 'components/CpeEditor/Part'
 import Product from 'components/CpeEditor/Product'
-import SwEdition from 'components/CpeEditor/SwEdition'
 import TargetHardware from 'components/CpeEditor/TargetHardware'
-import TargetSoftware from 'components/CpeEditor/TargetSoftware'
-import Update from 'components/CpeEditor/Update'
 import Vendor from 'components/CpeEditor/Vendor'
 import Version from 'components/CpeEditor/Version'
 import EnvironmentSelector from 'components/EnvironmentSelector'
@@ -66,13 +61,29 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
     other: ''
   })
 
+  const isVendorValid = validateFields(cpeData?.vendor)
+  const isProductValid = validateFields(cpeData?.product)
+  const isUpdateValid = validateFields(cpeData?.update)
+  const isEditionValid = validateFields(cpeData?.edition)
+  const isLanguageValid = validateLanguage(cpeData?.language)
+  const isSwEditionValid = validateFields(cpeData?.swEdition)
+  const isTargetSoftWareValid = validateFields(cpeData?.targetSoftware)
+  const isOtherFieldValid = validateFields(cpeData?.other)
+
   const [error, setError] = useState('')
 
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
-  const isInvalid = ['part', 'vendor', 'product', 'version'].some(
-    (key) => !cpeData?.[key]
-  )
+  const isInvalid =
+    ['part', 'vendor', 'product', 'version'].some((key) => !cpeData?.[key]) ||
+    !isLanguageValid ||
+    !isEditionValid ||
+    !isUpdateValid ||
+    !isSwEditionValid ||
+    !isTargetSoftWareValid ||
+    !isOtherFieldValid ||
+    !isVendorValid ||
+    !isProductValid
 
   const [updateComponent, { loading }] = useMutation(UpdateComponent, {
     onCompleted: () => recheck()
@@ -230,15 +241,16 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
     }
   }
 
-  const onChange = (field, value) => {
-    setCpeData((prev) => ({ ...prev, [field]: value }))
-  }
-
-  const onBlur = (index, val) => {
+  const updateCpeString = (index, val) => {
     const cpeParts = value?.split(':')
     cpeParts[index] = val === '' ? '*' : val
     const cpe = cpeParts.join(':')
     setValue(cpe)
+  }
+
+  const onChange = (field, value, index) => {
+    updateCpeString(index, value)
+    setCpeData((prev) => ({ ...prev, [field]: value }))
   }
 
   const ActionBtn = () => (
@@ -322,78 +334,93 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
             <Part
               disabled={resolved}
               part={cpeData?.part}
-              onBlur={onBlur}
               onChange={onChange}
             />
             {/* VENDOR */}
             <Vendor
               disabled={resolved}
               vendor={cpeData?.vendor}
-              onBlur={onBlur}
               onChange={onChange}
+              isValid={isVendorValid}
             />
             {/* PRODUCT */}
             <Product
               disabled={resolved}
               product={cpeData?.product}
-              onBlur={onBlur}
               onChange={onChange}
+              isValid={isProductValid}
             />
             {/* VERSION */}
             <Version
               disabled={resolved}
               version={cpeData?.version}
-              onBlur={onBlur}
               onChange={onChange}
             />
             {/* UPDATE */}
-            <Update
-              disabled={resolved}
-              update={cpeData?.update}
-              onBlur={onBlur}
+            <CpeField
+              label='Update'
+              name='update'
+              value={cpeData?.update}
               onChange={onChange}
+              isValid={isUpdateValid}
+              disabled={resolved}
+              index={6}
             />
             {/* EDITION */}
-            <Edition
-              disabled={resolved}
-              edition={cpeData?.edition}
-              onBlur={onBlur}
+            <CpeField
+              label='Edition'
+              name='edition'
+              value={cpeData?.edition}
               onChange={onChange}
+              isValid={isEditionValid}
+              disabled={resolved}
+              index={7}
             />
             {/* LANGUAGE */}
-            <Language
-              disabled={resolved}
-              language={cpeData?.language}
-              onBlur={onBlur}
+            <CpeField
+              label='Language'
+              name='language'
+              value={cpeData?.language}
               onChange={onChange}
+              isValid={isLanguageValid}
+              disabled={resolved}
+              index={8}
             />
             {/* SW EDITION */}
-            <SwEdition
-              disabled={resolved}
-              swEdition={cpeData?.swEdition}
-              onBlur={onBlur}
+            <CpeField
+              label='SW Edition'
+              name='swEdition'
+              value={cpeData?.swEdition}
               onChange={onChange}
+              isValid={isSwEditionValid}
+              disabled={resolved}
+              index={9}
             />
             {/* TARGET SOFTWARE */}
-            <TargetSoftware
-              disabled={resolved}
-              targetSoftware={cpeData?.targetSoftware}
-              onBlur={onBlur}
+            <CpeField
+              label='Target Software'
+              name='targetSoftware'
+              value={cpeData?.targetSoftware}
               onChange={onChange}
+              isValid={isTargetSoftWareValid}
+              disabled={resolved}
+              index={10}
             />
             {/* TARGET HARDWARE */}
             <TargetHardware
               disabled={resolved}
               targetHardware={cpeData?.targetHardware}
-              onBlur={onBlur}
               onChange={onChange}
             />
             {/* OTHERE */}
-            <Other
-              disabled={resolved}
-              other={cpeData?.other}
-              onBlur={onBlur}
+            <CpeField
+              label='Other'
+              name='other'
+              value={cpeData?.other}
               onChange={onChange}
+              isValid={isOtherFieldValid}
+              disabled={resolved}
+              index={12}
             />
           </Grid>
           {!ruleExists && (

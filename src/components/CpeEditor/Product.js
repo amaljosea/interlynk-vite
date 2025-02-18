@@ -1,13 +1,13 @@
 import { useLazyQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
-import { FormControl, FormLabel } from '@chakra-ui/react'
+import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import LynkSelect from 'components/LynkSelect'
 
 import { CpeAutoComplete } from 'graphQL/Queries'
 
-const Product = ({ disabled, product, onChange, onBlur }) => {
+const Product = ({ disabled, product, onChange, isValid }) => {
   const [getCpe, { loading }] = useLazyQuery(CpeAutoComplete)
 
   const [value, setValue] = useState(null)
@@ -16,7 +16,11 @@ const Product = ({ disabled, product, onChange, onBlur }) => {
 
   const handleChange = (item) => {
     setValue(item)
-    onChange('product', item?.value)
+    onChange('product', item?.value, 4)
+  }
+
+  const onBlur = (index, val) => {
+    onChange('product', val, index)
   }
 
   const handleBlur = () => searchInput !== '' && onBlur(4, searchInput)
@@ -56,7 +60,7 @@ const Product = ({ disabled, product, onChange, onBlur }) => {
   }, [product])
 
   return (
-    <FormControl isRequired isDisabled={disabled}>
+    <FormControl isRequired isDisabled={disabled} isInvalid={!isValid}>
       <FormLabel>Product</FormLabel>
       <LynkSelect
         name='product'
@@ -66,14 +70,15 @@ const Product = ({ disabled, product, onChange, onBlur }) => {
         isSearchable={true}
         isLoading={loading}
         value={value}
-        onBlur={handleBlur}
         onChange={handleChange}
         inputValue={searchInput}
         options={options}
         isDisabled={disabled}
         noOptionsMessage={() => null}
         onInputChange={onInputChange}
+        onBlur={handleBlur}
       />
+      {!isValid && <FormErrorMessage>Invalid product format</FormErrorMessage>}
     </FormControl>
   )
 }

@@ -7,7 +7,7 @@ import LynkSelect from 'components/LynkSelect'
 
 import { CpeAutoComplete } from 'graphQL/Queries'
 
-const Version = ({ disabled, version, onChange, onBlur }) => {
+const Version = ({ disabled, version, onChange }) => {
   const [getCpe, { loading }] = useLazyQuery(CpeAutoComplete)
 
   const [value, setValue] = useState(null)
@@ -16,7 +16,11 @@ const Version = ({ disabled, version, onChange, onBlur }) => {
 
   const handleChange = (item) => {
     setValue(item)
-    onChange('version', item?.value)
+    onChange('version', item?.value, 5)
+  }
+
+  const onBlur = (index, val) => {
+    onChange('version', val, index)
   }
 
   const handleBlur = () => searchInput !== '' && onBlur(5, searchInput)
@@ -66,13 +70,13 @@ const Version = ({ disabled, version, onChange, onBlur }) => {
         isSearchable={true}
         isLoading={loading}
         value={value}
-        onBlur={handleBlur}
         onChange={handleChange}
         inputValue={searchInput}
         options={options}
         isDisabled={disabled}
         noOptionsMessage={() => null}
         onInputChange={onInputChange}
+        onBlur={handleBlur}
       />
     </FormControl>
   )

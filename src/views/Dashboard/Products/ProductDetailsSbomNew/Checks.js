@@ -2,6 +2,7 @@ import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import React, { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
+import { getUndefinedIfEmptyOrAll } from 'utils'
 import { customStyles } from 'utils/styleUtils'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
@@ -29,7 +30,6 @@ import AuthorModal from '../components/AuthorModal'
 import FixedModal from '../components/FixedModal'
 import ChecksColumns from './Components/tableColumns/ChecksColumns'
 import ChecksSubHeader from './Components/tableSubHeaders/ChecksSubHeader'
-import { getUndefinedIfEmptyOrAll } from 'utils'
 
 const Checks = ({ sbomData }) => {
   const params = useParams()

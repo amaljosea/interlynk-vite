@@ -1,20 +1,15 @@
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useState } from 'react'
-import { validateCpe } from 'utils/cpeUtils'
+import { validateCpe, validateFields, validateLanguage } from 'utils/cpeUtils'
 import IdentifierLabel from 'views/Dashboard/Products/components/IdentifierLabel'
 
 import { FormControl, Stack, Textarea } from '@chakra-ui/react'
 import { Button, ButtonGroup } from '@chakra-ui/react'
 
-import Edition from './Edition'
-import Language from './Language'
-import Other from './Other'
+import CpeField from './CpeField'
 import Part from './Part'
 import Product from './Product'
-import SwEdition from './SwEdition'
 import TargetHardware from './TargetHardware'
-import TargetSoftware from './TargetSoftware'
-import Update from './Update'
 import Vendor from './Vendor'
 import Version from './Version'
 
@@ -35,18 +30,19 @@ const CpeEditor = ({ value, setValue, isOpen, onOpen, onClose }) => {
     other: ''
   })
 
-  const onChange = (name, value) => {
-    setCpeData((prev) => ({
-      ...prev,
-      [name]: value
-    }))
-  }
-
-  const onBlur = (index, val) => {
+  const updateCpeString = (index, val) => {
     const cpeParts = value?.split(':')
     cpeParts[index] = val === '' ? '*' : val
     const cpe = cpeParts.join(':')
     setValue(cpe)
+  }
+
+  const onChange = (name, value, index) => {
+    updateCpeString(index, value)
+    setCpeData((prev) => ({
+      ...prev,
+      [name]: value
+    }))
   }
 
   const handleSave = () => {
@@ -60,36 +56,54 @@ const CpeEditor = ({ value, setValue, isOpen, onOpen, onClose }) => {
     onClose()
   }
 
-  const isInvalid = ['part', 'vendor', 'product', 'version'].some(
-    (key) => !cpeData?.[key]
-  )
+  const isVendorValid = validateFields(cpeData?.vendor)
+  const isProductValid = validateFields(cpeData?.product)
+  const isUpdateValid = validateFields(cpeData?.update)
+  const isEditionValid = validateFields(cpeData?.edition)
+  const isLanguageValid = validateLanguage(cpeData?.language)
+  const isSwEditionValid = validateFields(cpeData?.swEdition)
+  const isTargetSoftWareValid = validateFields(cpeData?.targetSoftware)
+  const isOtherFieldValid = validateFields(cpeData?.other)
+
+  const isInvalid =
+    ['part', 'vendor', 'product', 'version'].some((key) => !cpeData?.[key]) ||
+    !isLanguageValid ||
+    !isEditionValid ||
+    !isUpdateValid ||
+    !isSwEditionValid ||
+    !isTargetSoftWareValid ||
+    !isOtherFieldValid ||
+    !isVendorValid ||
+    !isProductValid
 
   useEffect(() => {
     if (value) {
       const matches = validateCpe(value)
       if (matches) {
         const allowedValues = ['a', 'h', 'o', 'A', 'H', 'O']
-        const components = value?.split(':')
+        const components = value.split(':')
         const isValid =
           components[2] && allowedValues.includes(components[2].toLowerCase())
-        setCpeData(() => ({
-          part: isValid ? components[2].toLowerCase() : '',
-          vendor: components[3]?.replace(/\*/g, '') || '',
-          product: components[4]?.replace(/\*/g, '') || '',
-          version: components[5]?.replace(/\*/g, '') || '',
-          update: components[6]?.replace(/\*/g, '') || '',
-          edition: components[7]?.replace(/\*/g, '') || '',
-          language: components[8]?.replace(/\*/g, '') || '',
-          swEdition: components[9]?.replace(/\*/g, '') || '',
-          targetSoftware: components[10]?.replace(/\*/g, '') || '',
-          targetHardware: components[11]?.replace(/\*/g, '') || '',
-          other: components[12]?.replace(/\*/g, '') || ''
+
+        setCpeData((prev) => ({
+          ...prev,
+          part: isValid ? components[2].toLowerCase() : prev.part,
+          vendor: components[3]?.replace(/\*/g, '') || prev.vendor,
+          product: components[4]?.replace(/\*/g, '') || prev.product,
+          version: components[5]?.replace(/\*/g, '') || prev.version,
+          update: components[6]?.replace(/\*/g, '') || prev.update,
+          edition: components[7]?.replace(/\*/g, '') || prev.edition,
+          language: components[8].replace(/\*/g, '') || prev.language,
+          swEdition: components[9]?.replace(/\*/g, '') || prev.swEdition,
+          targetSoftware:
+            components[10]?.replace(/\*/g, '') || prev.targetSoftware,
+          targetHardware:
+            components[11]?.replace(/\*/g, '') || prev.targetHardware,
+          other: components[12]?.replace(/\*/g, '') || prev.other
         }))
-      } else {
-        setValue('cpe:2.3:*:*:*:*:*:*:*:*:*:*:*')
       }
     }
-  }, [setValue, value])
+  }, [value, setCpeData])
 
   return (
     <Stack spacing={4}>
@@ -108,72 +122,90 @@ const CpeEditor = ({ value, setValue, isOpen, onOpen, onClose }) => {
           onChange={(e) => console.log(e.target.value)}
         />
       </FormControl>
-      <Part
-        disabled={false}
-        part={cpeData?.part}
-        onBlur={onBlur}
-        onChange={onChange}
-      />
+      <Part disabled={false} part={cpeData?.part} onChange={onChange} />
       <Vendor
         disabled={false}
         vendor={cpeData?.vendor}
-        onBlur={onBlur}
         onChange={onChange}
+        isValid={isVendorValid}
       />
       <Product
         disabled={false}
         product={cpeData?.product}
-        onBlur={onBlur}
         onChange={onChange}
+        isValid={isProductValid}
       />
       <Version
         disabled={false}
         version={cpeData?.version}
-        onBlur={onBlur}
         onChange={onChange}
       />
-      <Update
-        disabled={false}
-        update={cpeData?.update}
-        onBlur={onBlur}
+      {/* UPDATE */}
+      <CpeField
+        label='Update'
+        name='update'
+        value={cpeData?.update}
         onChange={onChange}
+        isValid={isUpdateValid}
+        disabled={false}
+        index={6}
       />
-      <Edition
-        disabled={false}
-        edition={cpeData?.edition}
-        onBlur={onBlur}
+      {/* Edition */}
+      <CpeField
+        label='Edition'
+        name='edition'
+        value={cpeData?.edition}
         onChange={onChange}
+        isValid={isEditionValid}
+        disabled={false}
+        index={7}
       />
-      <Language
-        disabled={false}
-        language={cpeData?.language}
-        onBlur={onBlur}
+      {/* Language */}
+      <CpeField
+        label='Language'
+        name='language'
+        value={cpeData?.language}
         onChange={onChange}
+        isValid={isLanguageValid}
+        disabled={false}
+        index={8}
       />
-      <SwEdition
-        disabled={false}
-        swEdition={cpeData?.swEdition}
-        onBlur={onBlur}
+      {/* SwEdition */}
+      <CpeField
+        label='SW Edition'
+        name='swEdition'
+        value={cpeData?.swEdition}
         onChange={onChange}
+        isValid={isSwEditionValid}
+        disabled={false}
+        index={9}
       />
-      <TargetSoftware
-        disabled={false}
-        targetSoftware={cpeData?.targetSoftware}
-        onBlur={onBlur}
+      {/* Target software */}
+      <CpeField
+        label='Target Software'
+        name='targetSoftware'
+        value={cpeData?.targetSoftware}
         onChange={onChange}
+        isValid={isTargetSoftWareValid}
+        disabled={false}
+        index={10}
       />
       <TargetHardware
         disabled={false}
         targetHardware={cpeData?.targetHardware}
-        onBlur={onBlur}
         onChange={onChange}
       />
-      <Other
+      {/* Other */}
+      <CpeField
+        label='Other'
+        name='other'
+        value={cpeData?.other}
+        onChange={onChange}
+        isValid={isOtherFieldValid}
         disabled={false}
-        other={cpeData?.other}
-        onBlur={onBlur}
-        onChange={onChange}
+        index={12}
       />
+
       <ButtonGroup justifyContent={'flex-end'}>
         <Button fontSize={'sm'} onClick={onClose} variant='ghost'>
           Close

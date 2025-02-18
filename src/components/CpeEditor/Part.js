@@ -1,6 +1,6 @@
 import { FormControl, FormLabel, Select } from '@chakra-ui/react'
 
-const Part = ({ disabled, part, onBlur, onChange }) => {
+const Part = ({ disabled, part, onChange }) => {
   const inputProps = { size: 'md', fontSize: 'sm', name: 'part' }
 
   return (
@@ -10,8 +10,7 @@ const Part = ({ disabled, part, onBlur, onChange }) => {
         {...inputProps}
         value={part}
         data-testid='cpe_part'
-        onBlur={(e) => onBlur(2, e.target.value)}
-        onChange={(e) => onChange('part', e.target.value)}
+        onChange={(e) => onChange('part', e.target.value, 2)}
       >
         <option value=''>-- Select --</option>
         <option value='a'>Application</option>

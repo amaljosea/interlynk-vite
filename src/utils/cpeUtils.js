@@ -20,3 +20,15 @@ export const validateCpe = (value) => {
     /^cpe:2\.3:[aho\*\-]?(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])?){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-])?)(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])?){4}$/
   return cpeRegex.test(value)
 }
+
+export const validateLanguage = (value) => {
+  // eslint-disable-next-line no-useless-escape
+  const languageRegex = /^(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-])?$/
+  return languageRegex.test(value)
+}
+
+export const validateFields = (value) => {
+  if (value?.trim() === '') return true // Allow empty string
+  const editionRegex = /^[a-zA-Z0-9_\-*]+$/
+  return editionRegex.test(value)
+}

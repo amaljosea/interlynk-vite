@@ -1,6 +1,6 @@
 import { FormControl, FormLabel, Select } from '@chakra-ui/react'
 
-const TargetHardware = ({ disabled, targetHardware, onChange, onBlur }) => {
+const TargetHardware = ({ disabled, targetHardware, onChange }) => {
   const inputProps = { size: 'md', fontSize: 'sm', name: 'targetHardware' }
 
   return (
@@ -9,8 +9,7 @@ const TargetHardware = ({ disabled, targetHardware, onChange, onBlur }) => {
       <Select
         {...inputProps}
         value={targetHardware}
-        onBlur={(e) => onBlur(11, e.target.value)}
-        onChange={(e) => onChange('targetHardware', e.target.value)}
+        onChange={(e) => onChange('targetHardware', e.target.value, 11)}
       >
         <option value=''>-- Select --</option>
         <option value='x64'>x64</option>
