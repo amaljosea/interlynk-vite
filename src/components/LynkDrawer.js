@@ -41,15 +41,21 @@ const LynkDrawer = ({
     >
       <DrawerOverlay />
       <DrawerContent>
-        <DrawerCloseButton mt={1} />
-        <DrawerHeader fontWeight='500' borderBottomWidth='1px'>
+        <DrawerCloseButton mt={'7px'} />
+        <DrawerHeader
+          fontWeight='500'
+          borderBottomWidth='1px'
+          paddingInline={'16px'}
+        >
           {title}
           {subtitle && <Box mt={1}>{subtitle}</Box>}
         </DrawerHeader>
 
-        <DrawerBody overflowX={'hidden'}>{children}</DrawerBody>
+        <DrawerBody paddingInline={'16px'} overflowX={'hidden'}>
+          {children}
+        </DrawerBody>
         <Divider hidden={noFooter} />
-        <DrawerFooter hidden={noFooter}>
+        <DrawerFooter paddingInline={'16px'} hidden={noFooter}>
           <HStack spacing={3}>
             <Button
               title={cancelButtonTitle}
