@@ -1,4 +1,5 @@
 import { gql } from '@apollo/client'
+import { useMemo } from 'react'
 import { SingleGraph } from 'views/Dashboard/Analytics/SingleGraph'
 
 import { Stack, Text, useTheme } from '@chakra-ui/react'
@@ -6,11 +7,12 @@ import { Stack, Text, useTheme } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import LynkLoader from 'components/Misc/LynkLoader'
 
-import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import useFetchAllNodes from 'hooks/useFetchAllNodes'
 
 const PatchVelocityMetrics = gql`
   query PatchVelocityMetrics(
     $first: Int
+    $after: String
     $projectIds: [Uuid!]
     $projectGroupIds: [Uuid!]
     $startDate: ISO8601Date
@@ -21,6 +23,7 @@ const PatchVelocityMetrics = gql`
     dailyMetrics {
       projectVulnMetrics(
         first: $first
+        after: $after
         projectIds: $projectIds
         projectGroupIds: $projectGroupIds
         startDate: $startDate
@@ -29,6 +32,12 @@ const PatchVelocityMetrics = gql`
         projectGroupLabelIds: $labelIds
       ) {
         totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
         nodes {
           date
           statusAgeAffected
@@ -49,16 +58,21 @@ const PatchVelocity = ({ filters }) => {
   const { product, label } = filters || {}
   const { startDate, endDate } = filters?.duration || {}
 
-  const { nodes, loading } = usePaginatedQuery(PatchVelocityMetrics, {
-    skip: startDate && endDate ? false : true,
-    selector: 'dailyMetrics.projectVulnMetrics',
-    variables: {
+  const variables = useMemo(
+    () => ({
       endDate,
       startDate,
-      first: 200,
       labelIds: label?.length > 0 ? label : [],
       projectGroupIds: product?.length > 0 ? product?.map((p) => p.value) : []
-    }
+    }),
+    [endDate, startDate, label, product]
+  )
+
+  const { data, loading } = useFetchAllNodes({
+    query: PatchVelocityMetrics,
+    variables,
+    selector: 'dailyMetrics.projectVulnMetrics',
+    skip: !startDate || !endDate
   })
 
   const processVulnMetricsByDate = (data) => {
@@ -101,7 +115,7 @@ const PatchVelocity = ({ filters }) => {
     return patchVelocity
   }
 
-  const vulnMetrics = processVulnMetricsByDate(nodes)
+  const vulnMetrics = processVulnMetricsByDate(data)
 
   const lines = [
     {

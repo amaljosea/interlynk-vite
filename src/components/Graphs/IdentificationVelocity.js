@@ -1,4 +1,5 @@
 import { gql } from '@apollo/client'
+import { useMemo } from 'react'
 import { SingleGraph } from 'views/Dashboard/Analytics/SingleGraph'
 import { getDays } from 'views/Dashboard/Analytics/utils'
 import { formatDate } from 'views/Dashboard/Analytics/utils'
@@ -8,11 +9,12 @@ import { Stack, Text, useTheme } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import LynkLoader from 'components/Misc/LynkLoader'
 
-import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import useFetchAllNodes from 'hooks/useFetchAllNodes'
 
 const IdentityVelocityMetrics = gql`
   query IdentityVelocityMetrics(
     $first: Int
+    $after: String
     $projectIds: [Uuid!]
     $projectGroupIds: [Uuid!]
     $startDate: ISO8601Date
@@ -23,6 +25,7 @@ const IdentityVelocityMetrics = gql`
     dailyMetrics {
       projectVulnMetrics(
         first: $first
+        after: $after
         projectIds: $projectIds
         projectGroupIds: $projectGroupIds
         startDate: $startDate
@@ -31,6 +34,12 @@ const IdentityVelocityMetrics = gql`
         projectGroupLabelIds: $labelIds
       ) {
         totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
         nodes {
           date
           statusAgeAffected
@@ -53,16 +62,21 @@ const IdentityVelocity = ({ filters }) => {
 
   const { dates } = getDays({ startDate, endDate })
 
-  const { nodes, loading } = usePaginatedQuery(IdentityVelocityMetrics, {
-    skip: startDate && endDate ? false : true,
-    selector: 'dailyMetrics.projectVulnMetrics',
-    variables: {
+  const variables = useMemo(
+    () => ({
       endDate,
       startDate,
-      first: 200,
       labelIds: label?.length > 0 ? label : [],
       projectGroupIds: product?.length > 0 ? product?.map((p) => p.value) : []
-    }
+    }),
+    [endDate, startDate, label, product]
+  )
+
+  const { data, loading } = useFetchAllNodes({
+    query: IdentityVelocityMetrics,
+    variables,
+    selector: 'dailyMetrics.projectVulnMetrics',
+    skip: !startDate || !endDate
   })
 
   const processVulnMetricsByDate = (data) => {
@@ -127,7 +141,7 @@ const IdentityVelocity = ({ filters }) => {
     }))
   }
 
-  const vulnMetrics = processVulnMetricsByDate(nodes)
+  const vulnMetrics = processVulnMetricsByDate(data)
 
   const lines = [
     {

@@ -1,4 +1,5 @@
 import { gql } from '@apollo/client'
+import { useMemo } from 'react'
 import { SingleGraph } from 'views/Dashboard/Analytics/SingleGraph'
 import { getDays } from 'views/Dashboard/Analytics/utils'
 import { formatDate } from 'views/Dashboard/Analytics/utils'
@@ -8,12 +9,13 @@ import { Stack, Text, useTheme } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import LynkLoader from 'components/Misc/LynkLoader'
 
+import useFetchAllNodes from 'hooks/useFetchAllNodes'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 const DeployVelocityMetrics = gql`
   query DeployVelocityMetrics(
     $first: Int
+    $after: String
     $projectIds: [Uuid!]
     $projectGroupIds: [Uuid!]
     $startDate: ISO8601Date
@@ -24,6 +26,7 @@ const DeployVelocityMetrics = gql`
     dailyMetrics {
       projectVulnMetrics(
         first: $first
+        after: $after
         projectIds: $projectIds
         projectGroupIds: $projectGroupIds
         startDate: $startDate
@@ -32,6 +35,12 @@ const DeployVelocityMetrics = gql`
         projectGroupLabelIds: $labelIds
       ) {
         totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
         nodes {
           date
           statusAgeAffected
@@ -54,23 +63,28 @@ const DeployVelocity = ({ filters }) => {
 
   const { dates } = getDays({ startDate, endDate })
 
-  const { nodes, loading } = usePaginatedQuery(DeployVelocityMetrics, {
-    skip: startDate && endDate ? false : true,
-    selector: 'dailyMetrics.projectVulnMetrics',
-    variables: {
+  const variables = useMemo(
+    () => ({
       endDate,
       startDate,
-      first: 200,
       projectNames: [envName],
       labelIds: label?.length > 0 ? label : [],
       sbomIds: version?.length > 0 ? version?.map((p) => p.value) : [],
       projectGroupIds: product?.length > 0 ? product?.map((p) => p.value) : []
-    }
+    }),
+    [endDate, startDate, envName, label, version, product]
+  )
+
+  const { data, loading } = useFetchAllNodes({
+    query: DeployVelocityMetrics,
+    variables,
+    selector: 'dailyMetrics.projectVulnMetrics',
+    skip: !startDate || !endDate
   })
 
-  const deployMetrics = nodes?.length
+  const deployMetrics = data?.length
     ? Object.values(
-        nodes.reduce((acc, item) => {
+        data.reduce((acc, item) => {
           const dateKey = item.date
           if (!acc[dateKey]) {
             acc[dateKey] = {

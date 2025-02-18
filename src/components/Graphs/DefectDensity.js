@@ -1,4 +1,5 @@
 import { gql } from '@apollo/client'
+import { useMemo } from 'react'
 import { SingleGraph } from 'views/Dashboard/Analytics/SingleGraph'
 import { getDays } from 'views/Dashboard/Analytics/utils'
 import { formatDate } from 'views/Dashboard/Analytics/utils'
@@ -8,12 +9,13 @@ import { Stack, Text, theme } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import LynkLoader from 'components/Misc/LynkLoader'
 
+import useFetchAllNodes from 'hooks/useFetchAllNodes'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 const DefectDensityMetrics = gql`
   query DefectDensityMetrics(
     $first: Int
+    $after: String
     $projectNames: [String!]
     $projectGroupIds: [Uuid!]
     $sbomIds: [Uuid!]
@@ -25,6 +27,7 @@ const DefectDensityMetrics = gql`
     dailyMetrics {
       sbomMetrics(
         first: $first
+        after: $after
         level: $level
         projectNames: $projectNames
         projectGroupIds: $projectGroupIds
@@ -33,6 +36,13 @@ const DefectDensityMetrics = gql`
         endDate: $endDate
         projectGroupLabelIds: $labelIds
       ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
         nodes {
           date
           vulnerabilityCount
@@ -52,23 +62,28 @@ const DefectDensity = ({ filters }) => {
 
   const { dates } = getDays({ startDate, endDate })
 
-  const { nodes, loading } = usePaginatedQuery(DefectDensityMetrics, {
-    skip: startDate && endDate ? false : true,
-    selector: 'dailyMetrics.sbomMetrics',
-    variables: {
+  const variables = useMemo(
+    () => ({
       endDate,
       startDate,
-      first: 200,
       projectNames: [envName],
       labelIds: label?.length > 0 ? label : [],
       sbomIds: version?.length > 0 ? version?.map((p) => p.value) : [],
       projectGroupIds: product?.length > 0 ? product?.map((p) => p.value) : []
-    }
+    }),
+    [endDate, startDate, envName, label, version, product]
+  )
+
+  const { data, loading } = useFetchAllNodes({
+    query: DefectDensityMetrics,
+    variables,
+    selector: 'dailyMetrics.sbomMetrics',
+    skip: !startDate || !endDate
   })
 
-  const defectMetrics = nodes?.length
+  const defectMetrics = data?.length
     ? Object.values(
-        nodes.reduce((acc, item) => {
+        data.reduce((acc, item) => {
           const dateKey = item.date
           const { vulnerabilityAffectedCount, vulnerabilityFixedCount } = item
           const activeVulnerabilityCount =
