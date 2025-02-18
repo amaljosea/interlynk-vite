@@ -54,6 +54,7 @@ const GlobalStateProvider = ({ children }) => {
     kinds: [],
     licenses: [],
     suppliers: [],
+    supportLevel: [],
     scope: '',
     direct: false,
     filters: null,

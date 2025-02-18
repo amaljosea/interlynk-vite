@@ -25,6 +25,7 @@ const prodCompReducer = (state, action) => {
         direction: 'DESC',
         pageIndex: 1,
         searchInput: '',
+        supportLevel: [],
         ecosystems: [],
         suppliers: [],
         licenses: [],
@@ -117,6 +118,14 @@ const prodCompReducer = (state, action) => {
       return {
         ...state,
         suppliers: toggleSelection(state.suppliers, payload),
+        pageIndex: 1,
+        after: '',
+        before: ''
+      }
+    case 'FILTER_SUPPORT':
+      return {
+        ...state,
+        supportLevel: [...payload]?.includes('all') ? [] : payload,
         pageIndex: 1,
         after: '',
         before: ''

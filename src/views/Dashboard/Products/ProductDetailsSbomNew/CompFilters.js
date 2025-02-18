@@ -51,10 +51,10 @@ const GetLicenses = gql`
 
 const supportLevels = [
   { id: 1, label: 'All', value: 'all' },
-  { id: 2, label: 'Unspecified', value: 'UNSPECIFIED' },
-  { id: 3, label: 'Actively Maintained', value: 'ACTIVELY_MAINTAINED' },
-  { id: 4, label: 'No Longer Maintained', value: 'NO_LONGER_MAINTAINED' },
-  { id: 5, label: 'Abandoned', value: 'ABANDONED' }
+  { id: 2, label: 'Unspecified', value: 'unspecified' },
+  { id: 3, label: 'Actively Maintained', value: 'actively_maintained' },
+  { id: 4, label: 'No Longer Maintained', value: 'no_longer_maintained' },
+  { id: 5, label: 'Abandoned', value: 'abandoned' }
 ]
 
 const CompFilters = ({ reset }) => {
@@ -62,7 +62,8 @@ const CompFilters = ({ reset }) => {
   const productId = params?.productid
   const sbomId = params?.sbomid
   const { prodCompState, dispatch } = useGlobalState()
-  const { ecosystems, kinds, licenses, scope, direct, include } = prodCompState
+  const { ecosystems, kinds, licenses, scope, direct, include, supportLevel } =
+    prodCompState
   const { prodCompDispatch } = dispatch
 
   const [compEcosystems, setCompEcosystems] = useState(['All'])
@@ -78,6 +79,11 @@ const CompFilters = ({ reset }) => {
   const variables = {
     productId,
     sbomId
+  }
+
+  const onFilterSupport = (value) => {
+    prodCompDispatch({ type: 'FILTER_SUPPORT', payload: value })
+    reset()
   }
 
   const onFilterType = (value) => {
@@ -205,9 +211,12 @@ const CompFilters = ({ reset }) => {
         </Menu>
       </Box>
       {/* SUPPORT LEVEL */}
-      <Box width={'fit-content'} hidden>
+      <Box width={'fit-content'}>
         <Menu closeOnSelect={false} isLazy>
-          <MenuHeading title={'Support Level'} />
+          <MenuHeading
+            title={'Support'}
+            active={supportLevel?.length !== 0 && !supportLevel.includes('all')}
+          />
           <MenuList
             minH='auto'
             maxH={'350px'}
@@ -215,7 +224,11 @@ const CompFilters = ({ reset }) => {
             fontSize={'sm'}
             overflowY={'scroll'}
           >
-            <MenuOptionGroup type={'checkbox'}>
+            <MenuOptionGroup
+              type={'checkbox'}
+              value={supportLevel}
+              onChange={onFilterSupport}
+            >
               {supportLevels?.map((item) => (
                 <MenuItemOption
                   key={item?.id}
@@ -226,8 +239,8 @@ const CompFilters = ({ reset }) => {
                 </MenuItemOption>
               ))}
             </MenuOptionGroup>
-            <MenuDivider />
-            <Flex flexDirection={'column'} alignItems={'flex-start'}>
+            <MenuDivider hidden />
+            <Flex hidden flexDirection={'column'} alignItems={'flex-start'}>
               <Stack pl={8}>
                 <Text>Start Date</Text>
                 <LynkDate />

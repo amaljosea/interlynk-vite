@@ -1748,6 +1748,7 @@ export const GetComponentData = gql`
     $licenses: [String!]
     $supplierName: [String!]
     $ecosystem: [String!]
+    $supportLevel: [String!]
     $kind: [String!]
     $internal: Boolean
     $primary: Boolean
@@ -1772,6 +1773,7 @@ export const GetComponentData = gql`
         primary: $primary
         direct: $direct
         orderBy: $orderBy
+        supportLevel: $supportLevel
         includeParts: $includeParts
       ) {
         totalCount

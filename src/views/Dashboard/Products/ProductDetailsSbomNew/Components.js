@@ -61,6 +61,7 @@ const Components = ({ sbomData }) => {
     direction,
     searchInput,
     ecosystems,
+    supportLevel,
     kinds,
     licenses,
     suppliers,
@@ -85,9 +86,19 @@ const Components = ({ sbomData }) => {
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
       direct: direct === true ? true : undefined,
+      supportLevel: getUndefinedIfEmptyOrAll(supportLevel),
       includeParts: include?.includes('parts') ? true : undefined
     }
-  }, [direct, ecosystems, include, kinds, licenses, scope, suppliers])
+  }, [
+    direct,
+    ecosystems,
+    include,
+    kinds,
+    licenses,
+    scope,
+    suppliers,
+    supportLevel
+  ])
 
   const isSortable = field !== '' && direction !== ''
 
