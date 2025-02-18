@@ -2,6 +2,14 @@ import React, { createContext, useState } from 'react'
 
 export const TabContext = createContext()
 
+const tabOptions = [
+  { name: 'details', label: 'Details' },
+  { name: 'identifiers', label: 'Identifiers' },
+  { name: 'supplier', label: 'Supplier' },
+  { name: 'links', label: 'Links' },
+  { name: 'relationships', label: 'Relationships' }
+]
+
 export const TabProvider = ({ children }) => {
   const initialTabData = {
     details: {
@@ -45,12 +53,12 @@ export const TabProvider = ({ children }) => {
     relations: false
   }
 
-  const [tab, setTab] = useState(0)
+  const [tab, setTab] = useState(tabOptions[0].name)
   const [alert, setAlert] = useState(false)
   const [tabData, setTabData] = useState(initialTabData)
   const [unsavedChanges, setUnsavedChanges] = useState(initialUnsavedChanges)
 
-  const onTabChange = (index) => setTab(index)
+  const onTabChange = (index) => setTab(tabOptions[index].name)
 
   const handleChange = (tab, field, value) => {
     setTabData((prevData) => ({
@@ -72,7 +80,7 @@ export const TabProvider = ({ children }) => {
   }
 
   const resetData = () => {
-    setTab(0)
+    setTab(tabOptions[0].name)
     setAlert(false)
     setTabData(initialTabData)
     setUnsavedChanges(initialUnsavedChanges)

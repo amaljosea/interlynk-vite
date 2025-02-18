@@ -3,6 +3,7 @@ import { TabContext } from 'context/TabContext'
 import { useContext, useState } from 'react'
 import { truncatedValue } from 'utils'
 import { hasWhiteSpace, validateUrl } from 'utils/formValidationUtils'
+import { componentLinkTypes } from 'variables/general'
 
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
 import {
@@ -13,8 +14,6 @@ import {
   Select,
   Stack,
   Text,
-  Th,
-  Thead,
   Tooltip
 } from '@chakra-ui/react'
 import { Table, Tbody, Td, Tr } from '@chakra-ui/react'
@@ -58,9 +57,10 @@ const CompLinks = ({ data }) => {
   const { links } = tabData
 
   const { data: compUrls } = useQuery(GetCompUrls, {
-    skip: tab === 4 ? false : true,
+    skip: tab === 'links' ? false : true,
     variables: { id, sbomId }
   })
+
   const { externalUrls } = compUrls?.component || ''
 
   const filterUrls = externalUrls?.map((item) => ({
@@ -150,10 +150,6 @@ const CompLinks = ({ data }) => {
     }
   }
 
-  const onDelete = (data) => {
-    setActiveLink(data)
-  }
-
   const handleLinkRemove = () => {
     const updatedList = filterUrls?.filter(
       (url) => url?.name !== activeLink?.name
@@ -164,7 +160,7 @@ const CompLinks = ({ data }) => {
         sbomId,
         urls: updatedList
       }
-    })
+    }).then(() => setActiveLink(null))
   }
 
   const isInvalid =
@@ -191,24 +187,7 @@ const CompLinks = ({ data }) => {
             onChange={handleTypeChange}
           >
             <option value=''>-- Select --</option>
-            {[
-              'vcs',
-              'issue-tracker',
-              'website',
-              'advisories',
-              'bom',
-              'mailing-list',
-              'social',
-              'chat',
-              'documentation',
-              'support',
-              'distribution',
-              'license',
-              'build-meta',
-              'build-system',
-              'release-notes',
-              'other'
-            ].map((item, index) => (
+            {componentLinkTypes?.map((item, index) => (
               <option key={index} value={item}>
                 {item}
               </option>
@@ -264,15 +243,6 @@ const CompLinks = ({ data }) => {
           </Text>
           {externalUrls?.length > 0 ? (
             <Table variant='simple' size='sm' mt={4}>
-              <Thead>
-                <Tr>
-                  <Th pl={0}>Link</Th>
-                  <Th pl={0}>Type</Th>
-                  <Th pr={0} isNumeric>
-                    Action
-                  </Th>
-                </Tr>
-              </Thead>
               <Tbody>
                 {externalUrls?.map((item, index) => (
                   <Tr key={index}>
@@ -282,10 +252,10 @@ const CompLinks = ({ data }) => {
                           <Tooltip label={item.url}>
                             {truncatedValue(item.url, 45)}
                           </Tooltip>
-                        ) : null}
+                        ) : (
+                          'N:A'
+                        )}
                       </Text>
-                    </Td>
-                    <Td pl={0}>
                       <Text mt={2} color={sameSecondaryText}>
                         {item?.name}
                       </Text>
@@ -308,9 +278,9 @@ const CompLinks = ({ data }) => {
                             fontSize={'sm'}
                             variant='outline'
                             colorScheme='red'
-                            isDisabled={loading}
-                            data-testid='confirm_delete_comp_link'
+                            isLoading={loading}
                             onClick={handleLinkRemove}
+                            data-testid='confirm_delete_comp_link'
                           >
                             Yes
                           </Button>
@@ -323,7 +293,7 @@ const CompLinks = ({ data }) => {
                           cursor={'pointer'}
                           icon={<DeleteIcon />}
                           data-testid='delete_comp_link'
-                          onClick={() => onDelete(item)}
+                          onClick={() => setActiveLink(item)}
                         />
                       )}
                     </Td>
@@ -333,7 +303,7 @@ const CompLinks = ({ data }) => {
             </Table>
           ) : (
             <Text mt={4} color={secondaryTextInverse}>
-              No existing links
+              No record to display
             </Text>
           )}
         </Flex>

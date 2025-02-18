@@ -5,6 +5,25 @@ import { getFullDate } from 'utils'
 
 import { Stack, Text } from '@chakra-ui/react'
 
+export const componentLinkTypes = [
+  'vcs',
+  'issue-tracker',
+  'website',
+  'advisories',
+  'bom',
+  'mailing-list',
+  'social',
+  'chat',
+  'documentation',
+  'support',
+  'distribution',
+  'license',
+  'build-meta',
+  'build-system',
+  'release-notes',
+  'other'
+]
+
 export const stages = [
   { value: 'none', label: 'None' },
   { value: 'design', label: 'Design' },

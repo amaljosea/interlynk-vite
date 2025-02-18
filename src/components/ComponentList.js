@@ -25,7 +25,7 @@ const ComponentList = ({ id, name, value, setValue }) => {
   }
 
   const { data: compData } = useQuery(GetTotalComponents, {
-    skip: tab === 4 ? false : true,
+    skip: tab === 'relationships' ? false : true,
     fetchPolicy: activeTab === 'components' ? false : true,
     variables: {
       ...compState

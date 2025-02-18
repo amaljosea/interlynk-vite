@@ -17,7 +17,6 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
-  SimpleGrid,
   Stack
 } from '@chakra-ui/react'
 
@@ -68,7 +67,7 @@ const CompSupplier = ({ data }) => {
   const [isDisabled, setIsDisabled] = useState(false)
 
   const { data: result } = useQuery(GetSupplier, {
-    skip: tab === 2 ? false : true,
+    skip: tab === 'supplier' ? false : true,
     variables: { id, sbomId }
   })
   const { suppliers } = result?.component || ''

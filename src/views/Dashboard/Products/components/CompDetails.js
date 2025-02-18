@@ -67,7 +67,7 @@ const CompDetails = ({ data, primaryComp }) => {
   let SBOMs = []
   const { data: allSboms } = useQuery(GetAllSboms, {
     fetchPolicy: 'network-only',
-    skip: tab === 0 && !customerView ? false : true,
+    skip: tab === 'details' && !customerView ? false : true,
     variables: {
       id: productId
     }

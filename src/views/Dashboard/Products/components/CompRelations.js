@@ -8,7 +8,6 @@ import {
   Box,
   Flex,
   Select,
-  SimpleGrid,
   Stack,
   Text,
   Tooltip,
@@ -82,7 +81,7 @@ const CompRelations = ({ data, compPath }) => {
   const [addRelation] = useMutation(CreateCompRelation)
   const [removeRelation] = useMutation(DeleteCompRelation)
   const { data: compDependency } = useQuery(GetCompDependency, {
-    skip: tab === 5 ? false : true,
+    skip: tab === 'relationships' ? false : true,
     variables: { compId: id, sbomId: sbomId }
   })
 
@@ -191,7 +190,7 @@ const CompRelations = ({ data, compPath }) => {
           direction={'column'}
           alignItems={'flex-start'}
         >
-          <SimpleGrid w={'100%'} columns={2} gap={4}>
+          <Stack w={'100%'}>
             {/* RELATION TYPE */}
             <FormControl>
               <FormLabel htmlFor='relType' color={headingTextColor}>
@@ -232,7 +231,7 @@ const CompRelations = ({ data, compPath }) => {
                 Component dependency already exists
               </FormErrorMessage>
             </FormControl>
-          </SimpleGrid>
+          </Stack>
           {/* ACTION */}
           {alert ? (
             <Stack spacing={4}>

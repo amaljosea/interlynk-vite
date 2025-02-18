@@ -101,7 +101,7 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
           {data && <CompInfo data={data} />}
         </DrawerHeader>
         <DrawerBody p={0}>
-          <Tabs isFitted index={tab} onChange={onTabChange}>
+          <Tabs isFitted onChange={onTabChange}>
             <TabList
               position={'fixed'}
               bg={secondaryBgColor}
