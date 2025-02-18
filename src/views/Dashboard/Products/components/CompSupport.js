@@ -3,14 +3,15 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getFullDateTime, isCustomerView } from 'utils'
 
-import { DeleteIcon } from '@chakra-ui/icons'
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import {
   Flex,
   IconButton,
   Select,
   SimpleGrid,
   Stack,
-  Text
+  Text,
+  Tooltip
 } from '@chakra-ui/react'
 import { Input, InputGroup, InputRightAddon } from '@chakra-ui/react'
 import { Button, ButtonGroup } from '@chakra-ui/react'
@@ -49,7 +50,7 @@ const CompSupport = ({ data, isOpen, onClose }) => {
       noFooter
       isOpen={isOpen}
       onClose={onClose}
-      title={'Edit Support'}
+      title={'Edit Support Status'}
       subtitle={data ? <CompInfo data={data} /> : null}
     >
       {loading ? (
@@ -94,6 +95,17 @@ const SupportCard = ({ setEdit, data }) => {
 
   return (
     <Stack spacing={4} mt={3}>
+      <Tooltip label='Edit'>
+        <IconButton
+          aria-label='Edit'
+          icon={<EditIcon />}
+          colorScheme='blue'
+          variant='solid'
+          fontSize={'sm'}
+          alignSelf='end'
+          onClick={() => setEdit(true)}
+        />
+      </Tooltip>
       <Stack spacing={3}>
         <SimpleGrid {...container}>
           <Text {...label}>Assessment</Text>
@@ -130,14 +142,6 @@ const SupportCard = ({ setEdit, data }) => {
           <Text {...infoStyle}>{notes || 'N/A'}</Text>
         </SimpleGrid>
       </Stack>
-      <Button
-        fontSize={'sm'}
-        w={'fit-content'}
-        colorScheme='blue'
-        onClick={() => setEdit(true)}
-      >
-        Update
-      </Button>
     </Stack>
   )
 }

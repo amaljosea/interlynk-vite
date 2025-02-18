@@ -443,6 +443,13 @@ const ComponentsColumns = ({
                         Edit Component
                       </MenuItem>
                       <MenuItem
+                        data-testid='edit_component_support'
+                        onClick={() => handleSupport(row)}
+                        isDisabled={status === 'signed' || !updateComponent}
+                      >
+                        Edit Support Status
+                      </MenuItem>
+                      <MenuItem
                         hidden={isFreeTier}
                         data-testid='view_license_status'
                         onClick={() => handleLicenseStatus(row)}
@@ -457,13 +464,6 @@ const ComponentsColumns = ({
                         isDisabled={status === 'signed' || !updateComponent}
                       >
                         Edit Notes
-                      </MenuItem>
-                      <MenuItem
-                        data-testid='edit_component_support'
-                        onClick={() => handleSupport(row)}
-                        isDisabled={status === 'signed' || !updateComponent}
-                      >
-                        Edit Component Support
                       </MenuItem>
                       <MenuItem
                         data-testid='view_component_vulns'

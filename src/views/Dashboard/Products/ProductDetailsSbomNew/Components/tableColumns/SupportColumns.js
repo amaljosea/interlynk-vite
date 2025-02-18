@@ -184,7 +184,7 @@ const SupportColumns = (
                       onOpen()
                     }}
                   >
-                    Edit Support
+                    Edit Support Status
                   </MenuItem>
                   {/* DELETE SUPPORT  */}
                   <MenuItem
