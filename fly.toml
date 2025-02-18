@@ -33,12 +33,6 @@ kill_timeout = 5
     hard_limit = 25
     soft_limit = 20
 
-   # Add custom HTTP headers
-  [[services.http_headers]]
-    for = "/*" # Apply to all requests
-    [services.http_headers.values]
-    X-Permitted-Cross-Domain-Policies = "master-only"
-
   [[services.tcp_checks]]
     interval = "15s"
     timeout = "2s"

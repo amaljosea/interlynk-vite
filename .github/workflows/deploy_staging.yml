@@ -68,5 +68,6 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Sync directory to S3
-      run: aws s3 sync build/ s3://staging.interlynk.io --acl public-read
+    - name: Sync directory to S3 with custom headers
+      run: |
+        aws s3 sync build/ s3://staging.interlynk.io --acl public-read --metadata-directive REPLACE --header "X-Permitted-Cross-Domain-Policies=master-only"
