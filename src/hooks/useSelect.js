@@ -29,6 +29,7 @@ export const useSelect = (type) => {
       ...baseStyles,
       color: primaryTextColor,
       overflow: 'hidden',
+      padding: '2px 6px',
       opacity: state.isDisabled ? 0.5 : 1,
       maxWidth: isBreadcrumb ? '200px' : isLynkSelect ? '100%' : 'inherit',
       minWidth: isBreadcrumb ? '120px' : 'inherit',
