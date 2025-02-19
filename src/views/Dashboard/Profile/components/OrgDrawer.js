@@ -91,7 +91,7 @@ const OrgDrawer = ({ isOpen, onClose }) => {
       onClose={onClose}
       noFooter={true}
     >
-      <FormControl id='name' mb={4} isInvalid={nameError !== ''}>
+      <FormControl id='name' mb={4} mt={'10px'} isInvalid={nameError !== ''}>
         <FormLabel mb='8px' textColor={secondaryTextInverse}>
           Name
         </FormLabel>

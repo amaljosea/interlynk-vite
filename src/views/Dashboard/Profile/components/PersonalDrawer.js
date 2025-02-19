@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { nameValidation, validPassword } from 'utils/formValidationUtils'
 
 import { EditIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { Avatar, Flex, IconButton, Text, Tooltip } from '@chakra-ui/react'
+import { Avatar, Box, Flex, IconButton, Text, Tooltip } from '@chakra-ui/react'
 import { Input, InputGroup, InputRightElement } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
@@ -233,168 +233,170 @@ const PersonalDrawer = ({ isOpen, onClose, inputRef }) => {
       onSubmit={handleSave}
       isLoading={userLoading || passLoading}
     >
-      <Text fontSize='12px' mb='12px' textColor={secondaryTextInverse}>
-        Profile picture
-      </Text>
-      <Flex alignItems='center' mb={4} height={'48px'}>
-        <Avatar
-          ml='10px'
-          name={name}
-          src={`${SERVER_URL}/${dp?.url}`}
-          ignoreFallback={dp?.url ? true : false}
-        />
-        {/* Only show Avatar when there's an image */}
-        <Flex ml='auto' gap={2}>
-          <Tooltip label='Upload Profile Picture'>
-            <IconButton
-              icon={<EditIcon />}
-              aria-label='Edit Profile Picture'
-              variant='outline'
-              onClick={onProfileClick}
-            />
-          </Tooltip>
-        </Flex>
-      </Flex>
-
-      {/* Name Input */}
-      <FormControl id='name' mb={6} isRequired isInvalid={nameError !== ''}>
-        <FormLabel>Name</FormLabel>
-        <Input
-          onChange={handleNameChange}
-          placeholder='Enter your name'
-          value={newUserName}
-          borderColor={nameError ? primaryErrorColor : 'inherit'}
-        />
-        <FormErrorMessage>{nameError}</FormErrorMessage>
-      </FormControl>
-
-      {/* Password Edit */}
-      {!isPasswordEdit && (
-        <Flex
-          gap={2}
-          alignItems={'flex-end'}
-          hidden={!orgData?.currentUser?.isPasswordSet}
-        >
-          <FormControl id='password'>
-            <FormLabel>Edit Password</FormLabel>
-            <Input
-              type='password'
-              isDisabled={true}
-              placeholder='************'
-            />
-          </FormControl>
-          <Tooltip label='Edit Password'>
-            <IconButton
-              variant='outline'
-              icon={<EditIcon />}
-              aria-label='Edit Password'
-              onClick={() => setIsPasswordEdit(true)}
-            />
-          </Tooltip>
-        </Flex>
-      )}
-
-      {/* Conditionally Render Password Edit Fields */}
-      {isPasswordEdit && (
-        <Flex flexDirection={'column'} gap={6}>
-          {/* Old Password */}
-          <FormControl>
-            <FormLabel>Current Password</FormLabel>
-            <InputGroup>
-              <Input
-                type={showOldPass ? 'text' : 'password'}
-                value={oldPassword}
-                onChange={handleOldPassChange}
-                placeholder='*******'
+      <Box marginTop={'10px'}>
+        <Text fontSize='12px' mb='12px' textColor={secondaryTextInverse}>
+          Profile picture
+        </Text>
+        <Flex alignItems='center' mb={4} height={'48px'}>
+          <Avatar
+            ml='10px'
+            name={name}
+            src={`${SERVER_URL}/${dp?.url}`}
+            ignoreFallback={dp?.url ? true : false}
+          />
+          {/* Only show Avatar when there's an image */}
+          <Flex ml='auto' gap={2}>
+            <Tooltip label='Upload Profile Picture'>
+              <IconButton
+                icon={<EditIcon />}
+                aria-label='Edit Profile Picture'
+                variant='outline'
+                onClick={onProfileClick}
               />
-              <InputRightElement width='3.1rem'>
-                <IconButton
-                  size='sm'
-                  onClick={onToggleOldPass}
-                  sx={{ h: '1.75rem', bg: 'transparent' }}
-                  icon={showOldPass ? <ViewOffIcon /> : <ViewIcon />}
-                />
-              </InputRightElement>
-            </InputGroup>
-          </FormControl>
+            </Tooltip>
+          </Flex>
+        </Flex>
 
-          {/* New Password */}
-          <FormControl
-            isInvalid={
-              oldPassword !== '' &&
-              newPassword !== '' &&
-              (newPassword === oldPassword || !validPassword(newPassword))
-            }
+        {/* Name Input */}
+        <FormControl id='name' mb={6} isRequired isInvalid={nameError !== ''}>
+          <FormLabel>Name</FormLabel>
+          <Input
+            onChange={handleNameChange}
+            placeholder='Enter your name'
+            value={newUserName}
+            borderColor={nameError ? primaryErrorColor : 'inherit'}
+          />
+          <FormErrorMessage>{nameError}</FormErrorMessage>
+        </FormControl>
+
+        {/* Password Edit */}
+        {!isPasswordEdit && (
+          <Flex
+            gap={2}
+            alignItems={'flex-end'}
+            hidden={!orgData?.currentUser?.isPasswordSet}
           >
-            <FormLabel>New Password</FormLabel>
-            <InputGroup>
+            <FormControl id='password'>
+              <FormLabel>Edit Password</FormLabel>
               <Input
-                type={showNewPass ? 'text' : 'password'}
-                value={newPassword}
-                onChange={handleNewPassChange}
-                placeholder='*******'
-                onBlur={handleCheckPassword}
+                type='password'
+                isDisabled={true}
+                placeholder='************'
               />
-              <InputRightElement width='3.1rem'>
-                <IconButton
-                  size='sm'
-                  onClick={onToggleNewPass}
-                  sx={{ h: '1.75rem', bg: 'transparent' }}
-                  icon={showNewPass ? <ViewOffIcon /> : <ViewIcon />}
-                />
-              </InputRightElement>
-            </InputGroup>
+            </FormControl>
+            <Tooltip label='Edit Password'>
+              <IconButton
+                variant='outline'
+                icon={<EditIcon />}
+                aria-label='Edit Password'
+                onClick={() => setIsPasswordEdit(true)}
+              />
+            </Tooltip>
+          </Flex>
+        )}
 
-            {newPassword !== '' && invalidPassword && (
-              <Text color={primaryErrorColor}>
-                <Text mb={1}>
-                  Your password must be 8-16 characters and contain:
-                </Text>
-                <Text>1. Lower case letters {`(a-z)`}</Text>
-                <Text>2. Upper case letters {`(A-Z)`}</Text>
-                <Text>3. Special characters {`(ex. !@#&$%*.)`}</Text>
-                <Text>4. Numbers {`(0-9)`}</Text>
-              </Text>
-            )}
-            {oldPassword !== '' &&
-              newPassword !== '' &&
-              oldPassword === newPassword && (
-                <Text fontSize='sm' color={primaryErrorColor}>
-                  Old password and new password cannot be the same
+        {/* Conditionally Render Password Edit Fields */}
+        {isPasswordEdit && (
+          <Flex flexDirection={'column'} gap={6}>
+            {/* Old Password */}
+            <FormControl>
+              <FormLabel>Current Password</FormLabel>
+              <InputGroup>
+                <Input
+                  type={showOldPass ? 'text' : 'password'}
+                  value={oldPassword}
+                  onChange={handleOldPassChange}
+                  placeholder='*******'
+                />
+                <InputRightElement width='3.1rem'>
+                  <IconButton
+                    size='sm'
+                    onClick={onToggleOldPass}
+                    sx={{ h: '1.75rem', bg: 'transparent' }}
+                    icon={showOldPass ? <ViewOffIcon /> : <ViewIcon />}
+                  />
+                </InputRightElement>
+              </InputGroup>
+            </FormControl>
+
+            {/* New Password */}
+            <FormControl
+              isInvalid={
+                oldPassword !== '' &&
+                newPassword !== '' &&
+                (newPassword === oldPassword || !validPassword(newPassword))
+              }
+            >
+              <FormLabel>New Password</FormLabel>
+              <InputGroup>
+                <Input
+                  type={showNewPass ? 'text' : 'password'}
+                  value={newPassword}
+                  onChange={handleNewPassChange}
+                  placeholder='*******'
+                  onBlur={handleCheckPassword}
+                />
+                <InputRightElement width='3.1rem'>
+                  <IconButton
+                    size='sm'
+                    onClick={onToggleNewPass}
+                    sx={{ h: '1.75rem', bg: 'transparent' }}
+                    icon={showNewPass ? <ViewOffIcon /> : <ViewIcon />}
+                  />
+                </InputRightElement>
+              </InputGroup>
+
+              {newPassword !== '' && invalidPassword && (
+                <Text color={primaryErrorColor}>
+                  <Text mb={1}>
+                    Your password must be 8-16 characters and contain:
+                  </Text>
+                  <Text>1. Lower case letters {`(a-z)`}</Text>
+                  <Text>2. Upper case letters {`(A-Z)`}</Text>
+                  <Text>3. Special characters {`(ex. !@#&$%*.)`}</Text>
+                  <Text>4. Numbers {`(0-9)`}</Text>
                 </Text>
               )}
-          </FormControl>
+              {oldPassword !== '' &&
+                newPassword !== '' &&
+                oldPassword === newPassword && (
+                  <Text fontSize='sm' color={primaryErrorColor}>
+                    Old password and new password cannot be the same
+                  </Text>
+                )}
+            </FormControl>
 
-          {/* Confirm Password */}
-          <FormControl isInvalid={passError !== ''}>
-            <FormLabel>Confirm Password</FormLabel>
-            <InputGroup>
-              <Input
-                type={showConfPass ? 'text' : 'password'}
-                value={confirmPassword}
-                onChange={handleConfirmChange}
-                isDisabled={
-                  !validPassword(newPassword) || oldPassword === newPassword
-                }
-                placeholder='*******'
-              />
-              <InputRightElement width='3.1rem'>
-                <IconButton
-                  size='sm'
-                  onClick={onToggleConfirmPass}
-                  sx={{ h: '1.75rem', bg: 'transparent' }}
-                  icon={showConfPass ? <ViewOffIcon /> : <ViewIcon />}
+            {/* Confirm Password */}
+            <FormControl isInvalid={passError !== ''}>
+              <FormLabel>Confirm Password</FormLabel>
+              <InputGroup>
+                <Input
+                  type={showConfPass ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={handleConfirmChange}
+                  isDisabled={
+                    !validPassword(newPassword) || oldPassword === newPassword
+                  }
+                  placeholder='*******'
                 />
-              </InputRightElement>
-            </InputGroup>
-            {passError !== '' && (
-              <Text fontSize='sm' color={primaryErrorColor}>
-                {passError}
-              </Text>
-            )}
-          </FormControl>
-        </Flex>
-      )}
+                <InputRightElement width='3.1rem'>
+                  <IconButton
+                    size='sm'
+                    onClick={onToggleConfirmPass}
+                    sx={{ h: '1.75rem', bg: 'transparent' }}
+                    icon={showConfPass ? <ViewOffIcon /> : <ViewIcon />}
+                  />
+                </InputRightElement>
+              </InputGroup>
+              {passError !== '' && (
+                <Text fontSize='sm' color={primaryErrorColor}>
+                  {passError}
+                </Text>
+              )}
+            </FormControl>
+          </Flex>
+        )}
+      </Box>
     </LynkDrawer>
   )
 }
