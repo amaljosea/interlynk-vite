@@ -178,16 +178,16 @@ const CompIdentifiers = ({ data }) => {
             />
             <ActionButton
               title={'Save'}
+              isLoading={loading}
               onClick={handleUpdateCom}
               hidden={purlOpen || cpeOpen}
-              isLoading={loading}
             />
           </Stack>
         ) : (
           <ActionButton
             title={'Save'}
-            onClick={handleSubmit}
             isLoading={loading}
+            onClick={handleSubmit}
             hidden={purlOpen || cpeOpen || customerView}
           />
         )}

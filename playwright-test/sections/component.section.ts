@@ -180,9 +180,8 @@ export default class ComponentSection {
           })
           await description.fill('testing')
           await copyright.fill('testing')
-          const detailsSave = this.page.getByRole('button', { name: 'Save' })
 
-          await detailsSave.click()
+          await this.page.getByRole('button', { name: 'Save' }).click()
           await this.page.waitForTimeout(2000)
 
           await this.page.getByRole('tab', { name: 'identifiers' }).click()
@@ -200,7 +199,7 @@ export default class ComponentSection {
           await this.page.keyboard.press('Enter')
           await this.page.waitForTimeout(1000)
 
-          await this.page.getByTestId('Save Identifiers').click()
+          await this.page.getByRole('button', { name: 'Save' }).click()
           await this.page.waitForTimeout(2000)
 
           await this.page.getByRole('tab', { name: 'suppliers' }).click()
@@ -216,11 +215,8 @@ export default class ComponentSection {
           await this.page
             .getByPlaceholder('Enter supplier email')
             .fill('sp@interlynk.io')
-          const supplierSave = this.page.getByRole('button', {
-            name: 'Add Supplier'
-          })
 
-          await supplierSave.click()
+          await this.page.getByRole('button', { name: 'Save' }).click()
           await this.page.waitForTimeout(2000)
 
           await this.page.locator("//button[@aria-label='comp_close']").click()
@@ -265,8 +261,7 @@ export default class ComponentSection {
           await this.page.getByPlaceholder('Add URL').fill('github.com')
           await this.page.waitForTimeout(2000)
 
-          await this.page.getByTestId('Add Link').click()
-
+          await this.page.getByRole('button', { name: 'Save' }).click()
           await this.page.waitForTimeout(4000)
 
           await this.page.getByLabel('Type*').selectOption('issue-tracker')
@@ -335,7 +330,7 @@ export default class ComponentSection {
           await this.page.waitForTimeout(2000)
           await this.page.keyboard.press('Enter')
 
-          await this.page.getByTestId('Add').click()
+          await this.page.getByRole('button', { name: 'Save' }).click()
           await this.page.waitForTimeout(2000)
 
           await this.page.getByTestId('delete_depends_on').first().click()

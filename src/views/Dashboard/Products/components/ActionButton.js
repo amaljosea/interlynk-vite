@@ -4,11 +4,11 @@ const ActionButton = (props) => {
   const { title, onClick, isLoading = false, isDisabled, hidden } = props
   return (
     <Button
+      name={title}
       hidden={hidden}
       onClick={onClick}
       variant='outline'
       colorScheme='blue'
-      data-testid={title}
       width={'fit-content'}
       isLoading={isLoading}
       loadingText='Saving...'

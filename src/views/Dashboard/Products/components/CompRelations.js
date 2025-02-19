@@ -240,9 +240,9 @@ const CompRelations = ({ data, compPath }) => {
                 msg='Saving will apply changes to this tab only. save other tabs separately to retain their data.'
               />
               <ActionButton
+                title={'Save'}
                 onClick={handleAdd}
                 isDisabled={isInvalid}
-                title={'Save'}
               />
             </Stack>
           ) : (
