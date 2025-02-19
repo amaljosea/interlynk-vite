@@ -6012,3 +6012,63 @@ export const GetLicenseStatusHistory = gql`
     }
   }
 `
+
+export const GetGlobalVulnsTotalCount = gql`
+  query GetGlobalVulnsTotalCount(
+    $search: String
+    $severity: [String!]
+    $projectIds: [Uuid!]
+    $projectGroupIds: [Uuid!]
+    $status: [String!]
+    $kev: Boolean
+    $epss: RangeInput
+    $field: VulnOrderByFields!
+    $direction: OrderByDirection!
+    $projectGroupLabelIds: [Uuid!]
+  ) {
+    organization {
+      default: vulns(
+        projectNames: ["default"]
+        search: $search
+        projectGroupIds: $projectGroupIds
+        status: $status
+        severity: $severity
+        kev: $kev
+        epss: $epss
+        projectGroupLabelIds: $projectGroupLabelIds
+        orderBy: { field: $field, direction: $direction }
+        projectIds: $projectIds
+      ) {
+        totalCount
+      }
+      development: vulns(
+        projectNames: ["development"]
+        search: $search
+        projectGroupIds: $projectGroupIds
+        status: $status
+        severity: $severity
+        kev: $kev
+        epss: $epss
+        projectGroupLabelIds: $projectGroupLabelIds
+        orderBy: { field: $field, direction: $direction }
+        projectIds: $projectIds
+      ) {
+        totalCount
+      }
+      production: vulns(
+        projectNames: ["production"]
+        search: $search
+        projectGroupIds: $projectGroupIds
+        status: $status
+        severity: $severity
+        kev: $kev
+        epss: $epss
+        projectGroupLabelIds: $projectGroupLabelIds
+        orderBy: { field: $field, direction: $direction }
+        projectIds: $projectIds
+      ) {
+        totalCount
+      }
+    }
+  }
+`

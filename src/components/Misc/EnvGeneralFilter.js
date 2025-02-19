@@ -21,30 +21,20 @@ const EnvGeneralFilter = (props) => {
   }
 
   const {
-    defaultTotalCount = 0,
-    developmentTotalCount = 0,
-    productionTotalCount = 0,
+    defaultTotalCount,
+    developmentTotalCount,
+    productionTotalCount,
     totalsLoading
   } = totalCounts
 
-  const defaultEnvs = totalsLoading ? <Spinner size='xs' /> : defaultTotalCount
-  const developmentEnvs = totalsLoading ? (
-    <Spinner size='xs' />
-  ) : (
-    developmentTotalCount
-  )
-  const productionEnvs = totalsLoading ? (
-    <Spinner size='xs' />
-  ) : (
-    productionTotalCount
-  )
+  const renderCount = (count) => (totalsLoading ? <Spinner size='xs' /> : count)
 
   return (
     <EnvironmentButtons
       isGeneralFilter={true}
-      getDefaultCount={defaultEnvs}
-      getDevelopmentCount={developmentEnvs}
-      getProductionCount={productionEnvs}
+      getDefaultCount={renderCount(defaultTotalCount)}
+      getDevelopmentCount={renderCount(developmentTotalCount)}
+      getProductionCount={renderCount(productionTotalCount)}
       variant={variant}
       colorScheme={colorScheme}
       onClick={handleButtonClick}

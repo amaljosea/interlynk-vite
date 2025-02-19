@@ -65,8 +65,7 @@ const Vulnerabilities = () => {
   const totalCounts = useEnvTotalCounts({
     filters,
     queryOptions: {
-      skip: tab === 'vulnerabilities',
-      selector: 'organization.vulns'
+      skip: tab === 'vulnerabilities'
     }
   })
 
