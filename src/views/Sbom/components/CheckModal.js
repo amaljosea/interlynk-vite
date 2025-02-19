@@ -7,14 +7,13 @@ import { ProductDetailsTabs } from 'utils/TabsObjects'
 import { componentTypes } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
-import { FormErrorMessage, List, ListItem, Stack } from '@chakra-ui/react'
+import { List, ListItem } from '@chakra-ui/react'
 import { Box, Button, Flex, Icon, Text, Tooltip } from '@chakra-ui/react'
 import { FormControl, FormLabel, Input, Select } from '@chakra-ui/react'
 
 import EnvironmentSelector from 'components/EnvironmentSelector'
 import LicenseField from 'components/Licenses/LicenseField'
 import LynkAlert from 'components/LynkAlert'
-import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
 import CompInfo from 'components/Misc/CompInfo'
 
@@ -61,14 +60,6 @@ const CheckModal = (props) => {
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
   const resolved = status === 'resolved'
 
-  const level =
-    component?.componentSupportLevel?.level
-      ?.replaceAll(' ', '_')
-      .toUpperCase() || ''
-  const endData = component?.componentSupportLevel?.endDate
-    ? new Date(component?.componentSupportLevel?.endDate)
-    : ''
-
   const compRef = useRef()
 
   // GET COMPONENT DATA
@@ -87,10 +78,7 @@ const CheckModal = (props) => {
   const [comp, setComp] = useState('')
   const [compType, setCompType] = useState(kind || '')
   const [compVersion, setCompVersion] = useState(version || '')
-  const [supportLevel, setSupportLevel] = useState(level || '')
-  const [endOfSupport, setEndOfSupport] = useState(endData)
   const [componentList, setComponentList] = useState([])
-  const [isValidDate, setIsValidDate] = useState(true)
   const [activeComp, setActiveComp] = useState(null)
   const [isDisabled, setIsDisabled] = useState(false)
   const [error, setError] = useState('')
@@ -104,16 +92,11 @@ const CheckModal = (props) => {
     shortDesc === 'Componet has deprecated license/s' ||
     shortDesc === 'Component has restrictive licenses specified'
   const isComponent =
-    isPrimary ||
-    isComponentType ||
-    isComponentVersion ||
-    isComponentLicense ||
-    isComponentSupport
+    isPrimary || isComponentType || isComponentVersion || isComponentLicense
 
   const isInvalidLicense = isComponentLicense && details?.licenses?.length === 0
 
   const isEmptyVersion = isComponentVersion && compVersion === ''
-  const isEmptySupport = isComponentSupport && supportLevel === ''
 
   const [updateComponent] = useMutation(UpdateComponent, {
     onCompleted: () => recheck()
@@ -155,18 +138,6 @@ const CheckModal = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [envLoading])
 
-  const handleDateChange = (newDate) => {
-    const isValidDate = newDate && !isNaN(newDate)
-    setEndOfSupport(newDate?._d)
-    if (newDate) {
-      if (isValidDate) {
-        setIsValidDate(true)
-      } else {
-        setIsValidDate(false)
-      }
-    }
-  }
-
   const handleComUpdate = () => {
     disableButtonTemporarily(setIsDisabled)
     if (resolved) {
@@ -183,8 +154,6 @@ const CheckModal = (props) => {
       updateComponent({
         variables: {
           sbomId: sbomId,
-          supportLevel: supportLevel || 'NONE',
-          endOfSupport: endOfSupport || '',
           id: isPrimary ? activeComp?.id : componentId,
           primary: isPrimary ? true : undefined,
           kind: isComponentType ? compType : undefined,
@@ -243,6 +212,8 @@ const CheckModal = (props) => {
   const handleSubmit = () => {
     if (isComponent) {
       handleComUpdate()
+    } else if (isComponentSupport) {
+      onClose()
     } else {
       onClose()
     }
@@ -285,27 +256,6 @@ const CheckModal = (props) => {
           value: undefined
         }
       ]
-    } else if (isComponentSupport) {
-      return [
-        {
-          subject: 'component',
-          operator: 'is',
-          field: 'component_name',
-          value: component?.name
-        },
-        {
-          subject: 'component',
-          operator: 'not_exists',
-          field: 'component_support_level',
-          value: undefined
-        },
-        {
-          subject: 'component',
-          operator: 'not_exists',
-          field: 'component_end_of_support',
-          value: undefined
-        }
-      ]
     }
   }
 
@@ -320,19 +270,6 @@ const CheckModal = (props) => {
           subject: 'component',
           field: 'component_licenses_exp',
           value: details?.licenses[0]?.value || ''
-        }
-      ]
-    } else if (isComponentSupport) {
-      return [
-        {
-          subject: 'component',
-          field: 'component_support_level',
-          value: supportLevel?.replaceAll(' ', '_').toUpperCase() || ''
-        },
-        {
-          subject: 'component',
-          field: 'component_end_of_support',
-          value: endOfSupport ? new Date(endOfSupport) : undefined
         }
       ]
     } else if (isComponentVersion) {
@@ -407,16 +344,13 @@ const CheckModal = (props) => {
     }
   }
 
-  const inputStyle = { size: 'md', fontSize: 'sm' }
-
   const disabled =
     isInvalidLicense ||
     isEmptyVersion ||
     isDisabled ||
     (isComponentLicense && details?.licenses?.length === 0)
 
-  const disabledRule =
-    isInvalidLicense || isEmptyVersion || isDisabled || isEmptySupport
+  const disabledRule = isInvalidLicense || isEmptyVersion || isDisabled
 
   const hideRule =
     !isComponentLicense && !isComponentVersion && !isComponentSupport
@@ -645,50 +579,6 @@ const CheckModal = (props) => {
             />
           )}
         </>
-      )}
-
-      {isComponentSupport && (
-        <Stack spacing={5}>
-          <FormControl isRequired>
-            <FormLabel htmlFor='supportLevel'>Support Level</FormLabel>
-            <Select
-              sx={inputStyle}
-              name='supportLevel'
-              value={supportLevel}
-              onChange={(e) => setSupportLevel(e.target.value)}
-            >
-              <option value=''>-- Select --</option>
-              <option value='UNSPECIFIED'>Unspecified</option>
-              <option value='ACTIVELY_MAINTAINED'>Actively Maintained</option>
-              <option value='NO_LONGER_MAINTAINED'>No Longer Maintained</option>
-              <option value='ABANDONED'>Abandoned</option>
-            </Select>
-          </FormControl>
-          {/* END-OF-SUPPORT DATE */}
-          <FormControl mb={5} isInvalid={!isValidDate}>
-            <FormLabel htmlFor='endOfSupport'>End-Of-Support Date</FormLabel>
-            <LynkDate
-              name='endOfSupport'
-              value={endOfSupport}
-              onChange={handleDateChange}
-            />
-            {!isValidDate && (
-              <FormErrorMessage>Please enter a valid datetime</FormErrorMessage>
-            )}
-          </FormControl>
-          {/* Environment Select */}
-          {!ruleExists && (
-            <EnvironmentSelector
-              ruleExists={ruleExists}
-              envLoading={envLoading}
-              defaultEnv={defaultEnv}
-              options={options}
-              selectedEnvironments={selectedEnvironments}
-              handleCheckboxChange={handleCheckboxChange}
-              fixed={resolved}
-            />
-          )}
-        </Stack>
       )}
 
       {isComponentLicense && (

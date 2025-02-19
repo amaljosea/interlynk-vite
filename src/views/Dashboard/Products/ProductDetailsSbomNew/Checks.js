@@ -30,6 +30,7 @@ import AuthorModal from '../components/AuthorModal'
 import FixedModal from '../components/FixedModal'
 import ChecksColumns from './Components/tableColumns/ChecksColumns'
 import ChecksSubHeader from './Components/tableSubHeaders/ChecksSubHeader'
+import Support from './SbomChecks/Support'
 
 const Checks = ({ sbomData }) => {
   const params = useParams()
@@ -288,7 +289,7 @@ const Checks = ({ sbomData }) => {
 
           {/* COMPONENT SUPPORT MODAL */}
           {COMP_SUPPORT.isOpen && (
-            <CheckModal
+            <Support
               activeRow={activeRow}
               ruleExists={ruleExists}
               recheck={handleRecheck}

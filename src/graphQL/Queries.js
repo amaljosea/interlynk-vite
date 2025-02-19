@@ -2628,8 +2628,17 @@ export const GetCheckResults = gql`
             purl
             cpes
             componentSupportLevel {
+              id
               level
               endDate
+              notes
+              retainManualOverrideFor
+              user {
+                id
+                name
+              }
+              updatedAt
+              createdAt
             }
             suppliers {
               id
