@@ -46,6 +46,7 @@ import { FaPlus } from 'react-icons/fa6'
 import { HiOutlineDuplicate } from 'react-icons/hi'
 import { IoMdWarning } from 'react-icons/io'
 import { LuArchive, LuGitCompare } from 'react-icons/lu'
+import SupportAnalysis from 'components/Modal/SupportAnalysis'
 
 // GET ACTIVCE PROJECT GROUP FOR PUBLIC VIEW
 export const GetShareProjectGroup = gql`
@@ -116,6 +117,7 @@ const VersionsTable = (props) => {
   const DELETE_SBOM = useDisclosure()
   const ARCHIVE_SBOM = useDisclosure()
   const AUTOMATION = useDisclosure()
+  const SUPPORT = useDisclosure()
 
   const tab = useQueryParam('tab')
 
@@ -194,6 +196,11 @@ const VersionsTable = (props) => {
   const handleAutomation = (row) => {
     setActiveRow(row)
     AUTOMATION.onOpen()
+  }
+
+  const handleSupportAnalaysis = (row) => {
+    setActiveRow(row)
+    SUPPORT.onOpen()
   }
 
   const onSelectLicenses = (row) => {
@@ -500,6 +507,14 @@ const VersionsTable = (props) => {
                   Rerun Automation
                 </MenuItem>
                 <MenuItem
+                  aria-label={`sbom-${row?.projectVersion}-support-analysis`}
+                  onClick={() => handleSupportAnalaysis(row)}
+                  hidden={signedUrlParams}
+                  isDisabled={!canReprocessSbom}
+                >
+                  Rerun Support Analysis
+                </MenuItem>
+                <MenuItem
                   hidden={signedUrlParams}
                   onClick={() => handleTransfer(row)}
                   aria-label={`sbom-${row?.projectVersion}-transfer`}
@@ -787,6 +802,15 @@ const VersionsTable = (props) => {
           productGroup={{ name }}
           isOpen={AUTOMATION.isOpen}
           onClose={AUTOMATION.onClose}
+        />
+      )}
+      {/* SUPPORT ANALYSIS RUN WARNING */}
+      {SUPPORT.isOpen && (
+        <SupportAnalysis
+          sbom={activeRow}
+          productGroup={{ name }}
+          isOpen={SUPPORT.isOpen}
+          onClose={SUPPORT.onClose}
         />
       )}
     </>

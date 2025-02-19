@@ -2769,3 +2769,11 @@ export const ComponentLicenseStatusUpdate = gql`
     }
   }
 `
+
+export const ReRunSbomSupportLevel = gql`
+  mutation ReRunSbomSupportLevel($sbomId: Uuid!) {
+    componentSupportLevelRun(input: { sbomId: $sbomId }) {
+      errors
+    }
+  }
+`
