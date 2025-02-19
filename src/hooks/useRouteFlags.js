@@ -1,5 +1,10 @@
 import { useLocation } from 'react-router-dom'
 
+function vendorRootCheck(pathname) {
+  const match = pathname.match(/^\/vendor(\/*)$/)
+  return !!match
+}
+
 export const useRouteFlags = () => {
   const { pathname } = useLocation()
 
@@ -26,6 +31,6 @@ export const useRouteFlags = () => {
 
     isVulnerabilitiesPage: pathname === '/vendor/vulnerabilities',
 
-    isVendorRootPage: pathname === '/vendor'
+    isVendorRootPage: pathname === '/vendor' || vendorRootCheck(pathname)
   }
 }
