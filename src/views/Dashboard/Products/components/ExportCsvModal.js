@@ -3,6 +3,7 @@ import { client } from 'context/ApolloWrapper'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { convertToCSV, downloadCSV, generateCsvFileName } from 'utils'
+import { fetchNodes } from 'utils'
 import { exportCsvTableConfig } from 'variables/general'
 
 import { Box, Button, Divider, Flex, Stack, Text, Wrap } from '@chakra-ui/react'
@@ -113,9 +114,6 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
       let allFetchedData = []
       let hasNextPage = true
       let endCursor = null
-
-      const fetchNodes = (res, selector) =>
-        selector.split('.').reduce((acc, key) => acc?.[key], res.data)
 
       if (rowsToExport === '200') {
         while (hasNextPage) {

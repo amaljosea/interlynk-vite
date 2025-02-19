@@ -1,8 +1,5 @@
 import { client } from 'context/ApolloWrapper'
-
-const fetchNodes = (res, selector) => {
-  return selector.split('.').reduce((acc, key) => acc?.[key], res.data)
-}
+import { fetchNodes } from 'utils'
 
 const fetchAllNodes = async ({ query, variables, selector }) => {
   let allNodes = []

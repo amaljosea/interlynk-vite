@@ -655,3 +655,7 @@ export const formatSupportLevel = (level) => {
   // Capitalize if there is only one word
   return level.charAt(0).toUpperCase() + level.slice(1).toLowerCase()
 }
+
+export const fetchNodes = (res, selector) => {
+  return selector.split('.').reduce((acc, key) => acc?.[key], res.data)
+}
