@@ -4,7 +4,6 @@ import { useParams } from 'react-router-dom'
 import { severityList } from 'variables/general'
 
 import {
-  Button,
   Center,
   Input,
   Select,
@@ -14,19 +13,11 @@ import {
   Text,
   Textarea
 } from '@chakra-ui/react'
-import {
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay
-} from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 import LynkDate from 'components/LynkDate'
+import LynkDrawer from 'components/LynkDrawer'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -170,142 +161,125 @@ const VulnDrawer = ({ data, isOpen, onClose }) => {
   }, [customVuln])
 
   return (
-    <Drawer size='sm' isOpen={isOpen} placement='right' onClose={onClose}>
-      <DrawerOverlay />
-      <DrawerContent>
-        <DrawerCloseButton mt={2} />
-        <DrawerHeader borderBottomWidth='1px'>
-          <Text>Edit Vulnerability</Text>
-          {data && <Tag colorScheme='blue'>{vuln?.vulnId}</Tag>}
-        </DrawerHeader>
-        <DrawerBody>
-          {dataLoading ? (
-            <Center h={'200px'}>
-              <Spinner />
-            </Center>
-          ) : (
-            <Stack spacing={4}>
-              <FormControl isRequired>
-                <FormLabel htmlFor='vulnIdentifier'>Identifier</FormLabel>
-                <Input
-                  fontSize={'sm'}
-                  name='vulnIdentifier'
-                  placeholder='Ex. CVE-2024-1234'
-                  value={formData?.vulnIdentifier}
-                  onChange={handleChange}
-                />
-              </FormControl>
-              <FormControl isRequired>
-                <FormLabel htmlFor='desc'>Description</FormLabel>
-                <Textarea
-                  name='desc'
-                  fontSize={'sm'}
-                  value={formData?.desc}
-                  onChange={handleChange}
-                  placeholder='Ex. Testing'
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel htmlFor='sev'>Severity</FormLabel>
-                <Select
-                  name='sev'
-                  fontSize={'sm'}
-                  value={formData?.sev}
-                  onChange={handleChange}
-                  textTransform={'capitalize'}
+    <LynkDrawer
+      title={'Edit Vulnerability'}
+      subtitle={data && <Tag colorScheme='blue'>{vuln?.vulnId}</Tag>}
+      isOpen={isOpen}
+      onClose={onClose}
+      isLoading={loading}
+      onSubmit={handleSubmit}
+      buttonLabel={'Update'}
+    >
+      {dataLoading ? (
+        <Center h={'200px'}>
+          <Spinner />
+        </Center>
+      ) : (
+        <Stack spacing={4}>
+          <FormControl isRequired>
+            <FormLabel htmlFor='vulnIdentifier'>Identifier</FormLabel>
+            <Input
+              fontSize={'sm'}
+              name='vulnIdentifier'
+              placeholder='Ex. CVE-2024-1234'
+              value={formData?.vulnIdentifier}
+              onChange={handleChange}
+            />
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel htmlFor='desc'>Description</FormLabel>
+            <Textarea
+              name='desc'
+              fontSize={'sm'}
+              value={formData?.desc}
+              onChange={handleChange}
+              placeholder='Ex. Testing'
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel htmlFor='sev'>Severity</FormLabel>
+            <Select
+              name='sev'
+              fontSize={'sm'}
+              value={formData?.sev}
+              onChange={handleChange}
+              textTransform={'capitalize'}
+            >
+              <option value=''>-- Select --</option>
+              {severityList?.map((item, index) => (
+                <option
+                  key={index}
+                  value={item}
+                  style={{ textTransform: 'capitalize' }}
                 >
-                  <option value=''>-- Select --</option>
-                  {severityList?.map((item, index) => (
-                    <option
-                      key={index}
-                      value={item}
-                      style={{ textTransform: 'capitalize' }}
-                    >
-                      {item}
+                  {item}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl>
+            <FormLabel htmlFor='publishedAt'>Published At</FormLabel>
+            <LynkDate
+              value={formData?.publishedAt}
+              onChange={(newDate) => handleDateChange('publishedAt', newDate)}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel htmlFor='lastModifiedAt'>Last Modified At</FormLabel>
+            <LynkDate
+              value={formData?.lastModifiedAt}
+              onChange={(newDate) =>
+                handleDateChange('lastModifiedAt', newDate)
+              }
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel htmlFor='purl'>PURL</FormLabel>
+            <Input
+              name='purl'
+              fontSize={'sm'}
+              value={formData?.purl}
+              onChange={handleChange}
+              placeholder='Ex. pkg:npm/example-package@1.0.0?platform=linux#src'
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel htmlFor='cpe'>CPE</FormLabel>
+            <Input
+              name='cpe'
+              fontSize={'sm'}
+              value={formData?.cpe}
+              onChange={handleChange}
+              placeholder='Ex. cpe:2.3:a:examplevendor:uniqueproduct:1.0.0:*:*:*:*:*:*:*'
+            />
+          </FormControl>
+          {!compLoading && nodes ? (
+            <FormControl>
+              <FormLabel htmlFor='componentId'>Component</FormLabel>
+              <Select
+                value={compId}
+                fontSize={'sm'}
+                name='componentId'
+                onChange={onChangeComponent}
+              >
+                <option value=''>-- Select --</option>
+                {[...nodes]
+                  .sort((a, b) => a?.name?.localeCompare(b?.name))
+                  .map((item, idx) => (
+                    <option key={idx} value={item?.id}>
+                      {item?.name}-{item?.version}
+                      {item?.primary ? ` [Primary Component]` : ''}
                     </option>
                   ))}
-                </Select>
-              </FormControl>
-              <FormControl>
-                <FormLabel htmlFor='publishedAt'>Published At</FormLabel>
-                <LynkDate
-                  value={formData?.publishedAt}
-                  onChange={(newDate) =>
-                    handleDateChange('publishedAt', newDate)
-                  }
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel htmlFor='lastModifiedAt'>Last Modified At</FormLabel>
-                <LynkDate
-                  value={formData?.lastModifiedAt}
-                  onChange={(newDate) =>
-                    handleDateChange('lastModifiedAt', newDate)
-                  }
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel htmlFor='purl'>PURL</FormLabel>
-                <Input
-                  name='purl'
-                  fontSize={'sm'}
-                  value={formData?.purl}
-                  onChange={handleChange}
-                  placeholder='Ex. pkg:npm/example-package@1.0.0?platform=linux#src'
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel htmlFor='cpe'>CPE</FormLabel>
-                <Input
-                  name='cpe'
-                  fontSize={'sm'}
-                  value={formData?.cpe}
-                  onChange={handleChange}
-                  placeholder='Ex. cpe:2.3:a:examplevendor:uniqueproduct:1.0.0:*:*:*:*:*:*:*'
-                />
-              </FormControl>
-              {!compLoading && nodes ? (
-                <FormControl>
-                  <FormLabel htmlFor='componentId'>Component</FormLabel>
-                  <Select
-                    value={compId}
-                    fontSize={'sm'}
-                    name='componentId'
-                    onChange={onChangeComponent}
-                  >
-                    <option value=''>-- Select --</option>
-                    {[...nodes]
-                      .sort((a, b) => a?.name?.localeCompare(b?.name))
-                      .map((item, idx) => (
-                        <option key={idx} value={item?.id}>
-                          {item?.name}-{item?.version}
-                          {item?.primary ? ` [Primary Component]` : ''}
-                        </option>
-                      ))}
-                  </Select>
-                </FormControl>
-              ) : (
-                <Text>Loading components...</Text>
-              )}
-              {error !== '' && <LynkAlert msg={error} />}
-            </Stack>
+              </Select>
+            </FormControl>
+          ) : (
+            <Text>Loading components...</Text>
           )}
-        </DrawerBody>
-        <DrawerFooter>
-          <Button title='Cancel' variant='outline' mr={3} onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            title={'Update'}
-            colorScheme='blue'
-            isLoading={loading}
-            onClick={handleSubmit}
-          >
-            Update
-          </Button>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+          {error !== '' && <LynkAlert msg={error} />}
+        </Stack>
+      )}
+    </LynkDrawer>
   )
 }
 
