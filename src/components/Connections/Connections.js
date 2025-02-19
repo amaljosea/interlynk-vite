@@ -125,10 +125,11 @@ const Connections = ({ org }) => {
       <Card p={0} boxShadow='none'>
         <CardHeader mb={'16px'} display={'flex'} flexDirection={'column'}>
           <Text fontSize='lg' color={primaryTextColor} fontWeight='bold'>
-            Connect Apps
+            Manage Integrations
           </Text>
           <Text fontSize={'sm'}>
-            Integrate with your favorite tools to streamline SBOM management.
+            Manage integration with other applications to streamline workflows
+            and notifications
           </Text>
         </CardHeader>
         <CardBody>
@@ -140,7 +141,7 @@ const Connections = ({ org }) => {
                 onConfigure={JIRA.onOpen}
                 isConnected={greenCheck.jira}
                 description={
-                  'Sync tasks within SBOM compliance, improving issue tracking and management.'
+                  'Jira integration allows easy creation of vulnerability, license or component issues on connected Jira boards.'
                 }
               />
             )}
@@ -151,7 +152,7 @@ const Connections = ({ org }) => {
                 onConfigure={SLACK.onOpen}
                 isConnected={greenCheck.slack}
                 description={
-                  'Get instant SBOM updates in Slack, ensuring real-time compliance monitoring.'
+                  'Slack integration supports delivering Interlynk notifications in configured Slack Channel.'
                 }
               />
             )}
@@ -162,7 +163,7 @@ const Connections = ({ org }) => {
                 onConfigure={TEAM.onOpen}
                 isConnected={greenCheck.teams}
                 description={
-                  'Track SBOM changes in Teams, boosting collaboration and compliance efficiency'
+                  'Microsoft Teams integration supports delivering Interlynk notifications in configured Teams Channel.'
                 }
               />
             )}
@@ -172,7 +173,7 @@ const Connections = ({ org }) => {
               onConfigure={EMAIL.onOpen}
               isConnected={greenCheck.email}
               description={
-                'Receive immediate SBOM alerts via email, staying informed on critical updates.'
+                'Email aliases can be configured to deliver all notificationns at organizational level or subscribed notifications at personal level.'
               }
             />
             {org && shouldShowDemoFeatures && (
