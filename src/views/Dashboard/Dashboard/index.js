@@ -89,6 +89,7 @@ export default function Dashboard() {
           textTransform={'capitalize'}
           _hover={{ colorScheme: 'blue' }}
           _active={{ colorScheme: 'blue' }}
+          cursor={'auto'}
         >
           {envName}
         </Button>
