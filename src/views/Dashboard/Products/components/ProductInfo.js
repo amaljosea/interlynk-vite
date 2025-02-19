@@ -1,5 +1,5 @@
 import { addDays, differenceInDays, parseISO } from 'date-fns'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getSignedUrlParams, truncatedValue } from 'utils'
 
@@ -8,7 +8,7 @@ import { Flex, Icon, IconButton, Stack, Text, Tooltip } from '@chakra-ui/react'
 
 import { SettingsTag } from 'components/Misc/SettingsTag'
 
-import useFetchAllPages from 'hooks/useFetchAllPages'
+import useFetchAllNodes from 'hooks/useFetchAllNodes'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetVersionsDate } from 'graphQL/Queries'
@@ -38,12 +38,20 @@ const ProductInfo = ({ settings, data, filters, handleSort }) => {
     automatedFixesEnabled
   } = settings || ''
 
-  const { data: versionDates } = useFetchAllPages(
-    GetVersionsDate,
-    { id: params?.productid, ...filters },
-    'project.sbomVersions',
-    { skip: signedUrlParams }
+  const variables = useMemo(
+    () => ({
+      id: params?.productid,
+      ...filters
+    }),
+    [params?.productid, filters]
   )
+
+  const { data: versionDates } = useFetchAllNodes({
+    query: GetVersionsDate,
+    variables,
+    selector: 'project.sbomVersions',
+    skip: signedUrlParams
+  })
 
   useEffect(() => {
     if (versionDates && dataRetentionDays) {
