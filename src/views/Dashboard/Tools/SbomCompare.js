@@ -12,10 +12,9 @@ import {
   Tag
 } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
-import { Skeleton, SkeletonCircle, SkeletonText } from '@chakra-ui/react'
+import { SkeletonCircle, SkeletonText } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
-import LynkAlert from 'components/LynkAlert'
 import LynkSelect from 'components/LynkSelect'
 import SbomInfo from 'components/SbomInfo'
 
@@ -63,33 +62,6 @@ const SbomCompare = ({
     'lightAndDarkBgColor'
   ])
 
-  const VersionSelect = (
-    <LynkSelect
-      components={{
-        DropdownIndicator: () => null
-      }}
-      value={selectedVersion}
-      onChange={(value) => onVersionChange(value)}
-      isSearchable
-      type='text'
-      placeholder='Select versions'
-      name='versions'
-      isDisabled={isSbomOne && selectedSboms?.length > 0}
-      options={uniqueVersions}
-      noOptionsMessage={() => null}
-    />
-  )
-
-  const LoadingSkeleton = (
-    <Skeleton height='40px' width='100%' borderRadius='md' />
-  )
-
-  const NoVersionAlert = <LynkAlert msg='No version available' />
-
-  const NoEnvironmentAlert = (
-    <LynkAlert status='info' msg='No Environment selected' />
-  )
-
   if (projectGrpLoading) {
     return (
       <Card>
@@ -104,6 +76,15 @@ const SbomCompare = ({
       ? secondaryGreenBorder
       : secondaryRedBorder
     : lightAndDarkBgColor
+
+  const isDisabled = isSbomOne
+    ? selectedSboms?.length > 0
+    : selectedVersionOne === null
+
+  const disableVersionField =
+    selectedProd === '' ||
+    (selectedProd !== '' && uniqueVersions.length === 0) ||
+    (isSbomOne && selectedSboms?.length > 0)
 
   return (
     <GridItem w='100%'>
@@ -156,15 +137,12 @@ const SbomCompare = ({
               <FormControl fontSize={'sm'}>
                 <FormLabel htmlFor='groupOne'>Product</FormLabel>
                 <Select
-                  name={isSbomOne ? 'groupOne' : 'groupTwo'}
-                  id={isSbomOne ? 'groupOne' : 'groupTwo'}
-                  isDisabled={
-                    isSbomOne
-                      ? selectedSboms?.length > 0
-                      : selectedVersionOne === null
-                  }
+                  fontSize={'sm'}
                   value={selectedGroup}
+                  isDisabled={isDisabled}
                   onChange={onSelectGroup}
+                  id={isSbomOne ? 'groupOne' : 'groupTwo'}
+                  name={isSbomOne ? 'groupOne' : 'groupTwo'}
                 >
                   <option value=''>-- Select --</option>
                   {data?.organization?.projectGroups?.nodes?.map(
@@ -181,16 +159,13 @@ const SbomCompare = ({
             <FormControl fontSize={'sm'}>
               <FormLabel htmlFor='productOne'>Environment</FormLabel>
               <Select
-                name={isSbomOne ? 'productOne' : 'productTwo'}
-                id={isSbomOne ? 'productOne' : 'productTwo'}
-                isDisabled={
-                  isSbomOne
-                    ? selectedSboms?.length > 0
-                    : selectedVersionOne === null
-                }
+                fontSize={'sm'}
                 value={selectedProd}
+                isDisabled={isDisabled}
                 onChange={onSelectProduct}
                 textTransform={'capitalize'}
+                id={isSbomOne ? 'productOne' : 'productTwo'}
+                name={isSbomOne ? 'productOne' : 'productTwo'}
               >
                 <option value={''}>-- Select --</option>
                 {productList?.length > 0 &&
@@ -213,13 +188,21 @@ const SbomCompare = ({
               >
                 Version
               </FormLabel>
-              {loading
-                ? LoadingSkeleton
-                : selectedProd !== '' && uniqueVersions.length === 0
-                  ? NoVersionAlert
-                  : selectedProd === ''
-                    ? NoEnvironmentAlert
-                    : VersionSelect}
+              <LynkSelect
+                type='text'
+                isSearchable
+                name='versions'
+                isLoading={loading}
+                value={selectedVersion}
+                options={uniqueVersions}
+                placeholder='-- Select --'
+                noOptionsMessage={() => null}
+                isDisabled={disableVersionField}
+                onChange={(value) => onVersionChange(value)}
+                components={{
+                  DropdownIndicator: () => null
+                }}
+              />
             </FormControl>
           </Stack>
         )}
