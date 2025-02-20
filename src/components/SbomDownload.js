@@ -1,5 +1,5 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { formatSupportLevel, getSignedUrlParams } from 'utils'
 import { exportExcel } from 'views/Sbom/DownloadUtils/excelUtils'
@@ -56,9 +56,6 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [isLoading, setIsLoading] = useState(false)
   const [downloadType, setDownloadType] = useState(null)
-
-  const initialRef = useRef(null)
-  const finalRef = useRef(null)
 
   //Download Original Sbom
   const downloadOriginalSbom = async () => {
@@ -328,8 +325,6 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
           sbom={sbom}
           isOpen={isOpen}
           onClose={onClose}
-          finalRef={finalRef}
-          initialRef={initialRef}
           downloadType={downloadType}
           version={sbom?.projectVersion}
           productName={sbom?.project?.projectGroup?.name}
