@@ -10,7 +10,6 @@ const PackageType = ({ disabled, type, onChange, onBlur }) => {
         size='md'
         name='type'
         value={type}
-        fontSize={'sm'}
         data-testid='purl_type'
         onBlur={(e) => onBlur('type', e.target.value)}
         onChange={(e) => onChange('type', e.target.value)}

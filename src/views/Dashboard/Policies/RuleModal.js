@@ -152,7 +152,6 @@ const RuleModal = ({ activeRow, data, isOpen, onClose }) => {
         <FormControl isRequired>
           <FormLabel fontSize={12}>Subject</FormLabel>
           <Select
-            fontSize={'sm'}
             value={subject}
             onChange={onSubjectChange}
             placeholder='-- Select --'
@@ -177,7 +176,6 @@ const RuleModal = ({ activeRow, data, isOpen, onClose }) => {
             value={operator}
             onChange={onOperatorChange}
             textTransform={'capitalize'}
-            fontSize='sm'
           >
             <option value=''>-- Select --</option>
             {filterOperators?.operators?.map((item, index) => (
@@ -200,7 +198,6 @@ const RuleModal = ({ activeRow, data, isOpen, onClose }) => {
               value={value}
               onChange={onValueChange}
               textTransform={'capitalize'}
-              fontSize='sm'
             >
               <option value=''>-- Select --</option>
               {severityList.map((item, index) => (

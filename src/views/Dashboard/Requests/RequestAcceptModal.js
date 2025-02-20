@@ -79,7 +79,7 @@ const RequestAcceptModal = ({ data, isOpen, onClose }) => {
       <Flex width={'100%'} direction={'column'} gap={4}>
         <FormControl isRequired>
           <FormLabel>Product</FormLabel>
-          <Select fontSize={'sm'} onChange={handleProductChange}>
+          <Select onChange={handleProductChange}>
             <option value=''>-- Select --</option>
             {productNames?.organization?.projectGroups?.nodes?.map(
               (item, index) => (
@@ -93,7 +93,6 @@ const RequestAcceptModal = ({ data, isOpen, onClose }) => {
         <FormControl isRequired>
           <FormLabel>Environment</FormLabel>
           <Select
-            fontSize={'sm'}
             onChange={(e) => {
               setProjectId(e.target.value)
             }}

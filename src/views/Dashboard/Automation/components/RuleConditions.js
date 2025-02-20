@@ -150,7 +150,7 @@ const RuleConditions = ({
                     placeholder='-- Subject --'
                     onBlurCapture={() => onSubjectBlur(item)}
                     textTransform={'capitalize'}
-                    sx={{ paddingLeft: '34px', fontSize: 'sm' }}
+                    sx={{ paddingLeft: '34px' }}
                     data-testid={`auto_conditon_subject_${index}`}
                   >
                     {conditions?.length > 1 &&
@@ -191,7 +191,6 @@ const RuleConditions = ({
                   onChange={(e) =>
                     onCondtionChange(e.target.value, item.id, 'operator')
                   }
-                  fontSize='sm'
                   placeholder='-- Operator --'
                   onBlur={() => onOperatorBlur(item)}
                   isDisabled={isSystem}
@@ -226,7 +225,7 @@ const RuleConditions = ({
                   onChange={(e) =>
                     onCondtionChange(e.target.value, item.id, 'value')
                   }
-                  sx={{ minW: 140, fontSize: 'sm' }}
+                  sx={{ minW: 140 }}
                 >
                   <option value=''>-- Select --</option>
                   <option value={'true'}>Yes</option>

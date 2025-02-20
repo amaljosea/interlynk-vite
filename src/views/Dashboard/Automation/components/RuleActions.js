@@ -94,7 +94,7 @@ const RuleActions = ({
                       conditions?.length === 0 ||
                       isSystem
                     }
-                    sx={{ paddingLeft: '34px', fontSize: 'sm' }}
+                    sx={{ paddingLeft: '34px' }}
                     data-testid={`auto_action_subject_${index}`}
                   >
                     {conditions?.some((item) => item?.category === 'component')
@@ -132,7 +132,7 @@ const RuleActions = ({
                   onChange={(e) =>
                     onActionChange(e.target.value, item.id, 'value')
                   }
-                  sx={{ minW: 140, fontSize: 'sm' }}
+                  sx={{ minW: 140 }}
                 >
                   <option value=''>-- Select --</option>
                   <option value={'true'}>Yes</option>
@@ -145,7 +145,7 @@ const RuleActions = ({
                   onChange={(e) =>
                     onActionChange(e.target.value, item.id, 'value')
                   }
-                  sx={{ minW: 140, fontSize: 'sm' }}
+                  sx={{ minW: 140 }}
                 >
                   <option value=''>-- Select --</option>
                   <option value='UNSPECIFIED'>Unspecified</option>

@@ -323,7 +323,6 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
             <FormLabel htmlFor='cpe'>CPE String</FormLabel>
             <Textarea
               type='text'
-              fontSize='sm'
               variant='filled'
               value={value}
               onChange={(e) => setValue(e.target.value)}

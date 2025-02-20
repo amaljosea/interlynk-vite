@@ -372,7 +372,6 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
               Policy Result
             </FormLabel>
             <Select
-              fontSize='sm'
               name='resultType'
               onChange={handleChange}
               value={formData?.resultType}
@@ -395,7 +394,6 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
               On Conditions
             </FormLabel>
             <Select
-              fontSize='sm'
               name='operator'
               onChange={handleChange}
               value={formData?.operator}

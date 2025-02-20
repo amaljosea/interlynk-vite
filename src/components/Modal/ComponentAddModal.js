@@ -114,7 +114,7 @@ function ComponentAddModal(props) {
     }
   })
 
-  const inputStyle = { size: 'md', fontSize: 'sm' }
+  const inputStyle = { size: 'md' }
 
   const {
     isOpen: isWarningOpen,
@@ -542,7 +542,6 @@ function ComponentAddModal(props) {
                   <Select
                     size='md'
                     id='relation'
-                    fontSize={'sm'}
                     value={relations?.relType}
                     onChange={(e) =>
                       handleChange('relations', 'relType', e.target.value)
@@ -565,7 +564,6 @@ function ComponentAddModal(props) {
                   <Select
                     size='md'
                     id='component'
-                    fontSize={'sm'}
                     value={relations?.to}
                     onChange={(e) =>
                       handleChange('relations', 'to', e.target.value)

@@ -130,7 +130,6 @@ const LifecycleModal = ({ data, isOpen, onClose }) => {
           <FormLabel htmlFor='stage'>Stage</FormLabel>
           <Select
             name='stage'
-            fontSize={'sm'}
             value={formData?.stage}
             onChange={handleChange}
             placeholder='-- Select --'

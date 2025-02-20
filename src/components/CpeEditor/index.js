@@ -116,7 +116,6 @@ const CpeEditor = ({ value, setValue, isOpen, onOpen, onClose }) => {
         />
         <Textarea
           type='text'
-          fontSize='sm'
           variant='filled'
           value={value}
           onChange={(e) => console.log(e.target.value)}

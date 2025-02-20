@@ -1,7 +1,7 @@
 import { FormControl, FormLabel, Select } from '@chakra-ui/react'
 
 const Part = ({ disabled, part, onChange }) => {
-  const inputProps = { size: 'md', fontSize: 'sm', name: 'part' }
+  const inputProps = { size: 'md', name: 'part' }
 
   return (
     <FormControl isRequired isDisabled={disabled}>

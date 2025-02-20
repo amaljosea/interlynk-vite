@@ -197,7 +197,6 @@ const CompRelations = ({ data, compPath }) => {
                 Type
               </FormLabel>
               <Select
-                fontSize='sm'
                 name='relationType'
                 value={relations?.relType}
                 onChange={(e) =>

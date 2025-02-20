@@ -1,7 +1,7 @@
 import { FormControl, FormLabel, Select } from '@chakra-ui/react'
 
 const TargetHardware = ({ disabled, targetHardware, onChange }) => {
-  const inputProps = { size: 'md', fontSize: 'sm', name: 'targetHardware' }
+  const inputProps = { size: 'md', name: 'targetHardware' }
 
   return (
     <FormControl isDisabled={disabled}>

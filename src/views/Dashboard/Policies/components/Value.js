@@ -78,7 +78,6 @@ const Value = (props) => {
             value={value}
             onChange={(e) => onChange(e.target.value, id, 'value')}
             textTransform={'capitalize'}
-            fontSize='sm'
             hidden={operator === 'EXISTS' || operator === 'NOT_EXISTS'}
           >
             <option value=''>-- select --</option>
@@ -100,7 +99,6 @@ const Value = (props) => {
             id='operator'
             name='operator'
             value={value}
-            fontSize={'sm'}
             onChange={(e) => onChange(e.target.value, id, 'value')}
             textTransform={'capitalize'}
           >
@@ -125,7 +123,6 @@ const Value = (props) => {
             value={value}
             onChange={(e) => onChange(e.target.value, id, 'value')}
             textTransform={'capitalize'}
-            fontSize='sm'
             hidden={operator === 'EXISTS' || operator === 'NOT_EXISTS'}
           >
             <option value=''>-- select --</option>
@@ -149,7 +146,6 @@ const Value = (props) => {
             value={value}
             onChange={(e) => onChange(e.target.value, id, 'value')}
             textTransform={'capitalize'}
-            fontSize='sm'
           >
             <option value=''>-- select --</option>
             {['complete', 'incomplete'].map((item, index) => (
@@ -175,7 +171,6 @@ const Value = (props) => {
               value={value}
               onChange={(e) => onChange(e.target.value, id, 'value')}
               textTransform={'capitalize'}
-              fontSize='sm'
               minWidth={140}
             >
               <option value=''>-- select --</option>
@@ -196,7 +191,6 @@ const Value = (props) => {
               value={value}
               onChange={(e) => onChange(e.target.value, id, 'value')}
               textTransform={'capitalize'}
-              fontSize='sm'
               minWidth={140}
             >
               <option value=''>-- select --</option>

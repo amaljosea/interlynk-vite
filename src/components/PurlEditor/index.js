@@ -109,7 +109,6 @@ const PurlEditor = ({ value, setValue, isOpen, onOpen, onClose }) => {
         <Textarea
           type='text'
           value={value}
-          fontSize='sm'
           variant='filled'
           onChange={(e) => console.log(e.target.value)}
         />

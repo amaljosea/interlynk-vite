@@ -242,7 +242,6 @@ const CustomVuln = ({ isOpen, onClose }) => {
           <FormLabel htmlFor='desc'>Description</FormLabel>
           <Textarea
             name='desc'
-            fontSize={'sm'}
             value={formData?.desc}
             onChange={handleChange}
             placeholder='Ex. Testing'
@@ -252,7 +251,6 @@ const CustomVuln = ({ isOpen, onClose }) => {
           <FormLabel htmlFor='sev'>Severity</FormLabel>
           <Select
             name='sev'
-            fontSize={'sm'}
             value={formData?.sev}
             onChange={handleChange}
             textTransform={'capitalize'}
@@ -318,7 +316,6 @@ const CustomVuln = ({ isOpen, onClose }) => {
           <FormControl>
             <FormLabel htmlFor='componentId'>Component</FormLabel>
             <Select
-              fontSize={'sm'}
               value={compId}
               name='componentId'
               onChange={onChangeComponent}

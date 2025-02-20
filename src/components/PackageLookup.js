@@ -95,7 +95,6 @@ const PackageLookup = () => {
         <FormLabel htmlFor='ecosystem'>Ecosystem</FormLabel>
         <Select
           name='ecosystem'
-          fontSize={'sm'}
           onChange={handleChange}
           textTransform={'uppercase'}
           value={formData?.ecosystem}

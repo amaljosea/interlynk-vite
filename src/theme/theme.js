@@ -178,25 +178,12 @@ export default extendTheme(
     breakpoints,
     components: {
       Steps,
-      Heading: {
-        baseStyle: {
-          fontFamily: 'inherit',
-          fontWeight: 'semibold'
-        }
-      },
-      FormLabel: {
-        baseStyle: {
-          fontSize: 12,
-          marginBottom: '4px'
-        }
-      },
-      Table: {
-        baseStyle: {
-          th: {
-            fontFamily: 'inherit'
-          }
-        }
-      }
+      Heading: { baseStyle: { fontFamily: 'inherit', fontWeight: 'semibold' } },
+      FormLabel: { baseStyle: { fontSize: 12, marginBottom: '4px' } },
+      Input: { variants: { outline: { field: { fontSize: 'sm' } } } },
+      Textarea: { variants: { outline: { field: { fontSize: 'sm' } } } },
+      Select: { variants: { outline: { field: { fontSize: 'sm' } } } },
+      Table: { baseStyle: { th: { fontFamily: 'inherit' } } }
     },
     colors,
     config: config

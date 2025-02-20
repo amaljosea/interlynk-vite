@@ -318,8 +318,8 @@ const RelationshipDrawer = (props) => {
                           Type
                         </FormLabel>
                         <Select
-                          id='relation'
                           size='sm'
+                          id='relation'
                           value={relation}
                           onChange={(e) => setRelation(e.target.value)}
                         >
@@ -342,8 +342,8 @@ const RelationshipDrawer = (props) => {
                             Component
                           </FormLabel>
                           <Select
-                            id='component'
                             size='sm'
+                            id='component'
                             value={component}
                             onChange={(e) => setComponent(e.target.value)}
                           >

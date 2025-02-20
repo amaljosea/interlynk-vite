@@ -52,7 +52,7 @@ const CompDetails = ({ data, primaryComp }) => {
   } = useContext(TabContext)
   const { details } = tabData
 
-  const inputStyle = { size: 'md', fontSize: 'sm' }
+  const inputStyle = { size: 'md'}
 
   const { sbomId, sbom } = data || ''
   const { id: productId } = sbom?.project || ''

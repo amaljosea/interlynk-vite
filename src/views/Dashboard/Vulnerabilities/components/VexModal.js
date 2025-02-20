@@ -348,7 +348,6 @@ const VexModal = ({
             <Select
               id='vexType'
               name='vexType'
-              fontSize='sm'
               value={statusTitle}
               onChange={handleStatusChange}
             >
@@ -369,7 +368,6 @@ const VexModal = ({
             <FormControl>
               <FormLabel htmlFor='justification'>Justification</FormLabel>
               <Select
-                fontSize='sm'
                 id='justification'
                 name='justification'
                 value={justification}
@@ -408,7 +406,6 @@ const VexModal = ({
                 placeholder='Add impact statement'
                 value={impactData}
                 onChange={(e) => setImpactData(e.target.value)}
-                fontSize='sm'
               />
             </FormControl>
           )}
@@ -429,7 +426,6 @@ const VexModal = ({
                 rows={3}
                 name='actionStatement'
                 id='actionStatement'
-                fontSize='sm'
                 value={actionStatement}
                 onChange={(e) => setActionStatement(e.target.value)}
                 placeholder='Example: This vulnerability can be mitigate by running the application with ENV_PROTECTED enabled or turning off Notifications under settings.'
@@ -442,7 +438,6 @@ const VexModal = ({
               <FormLabel htmlFor='response'>Response</FormLabel>
               {allCdx && (
                 <Select
-                  fontSize='sm'
                   id='response'
                   name='response'
                   value={response}
@@ -464,7 +459,6 @@ const VexModal = ({
             <FormControl width={'100%'} isRequired>
               <FormLabel htmlFor='fixedVersion'>Fixed Version</FormLabel>
               <Select
-                fontSize='sm'
                 id='fixedVersion'
                 name='fixedVersion'
                 value={selectedTag}
@@ -492,7 +486,6 @@ const VexModal = ({
                 rows={2}
                 name='details'
                 id='details'
-                fontSize='sm'
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
                 placeholder='Example: The vulnerability surfaced in the reports on March 13th 3pm and has been sent to PSIRT for analysis by 7pm.'
@@ -506,7 +499,6 @@ const VexModal = ({
               rows={2}
               name='internalNotes'
               id='internalNotes'
-              fontSize='sm'
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder='Example: John Appleseed has scanned the codebase and found two instances of function alls encrypt(). Next step: exploitability analysis.'
@@ -518,7 +510,6 @@ const VexModal = ({
               <FormControl>
                 <FormLabel>{fieldOne?.displayName}</FormLabel>
                 <Select
-                  fontSize='sm'
                   value={formValues ? formValues[fieldOne?.id] : ''}
                   onChange={(e) => handleChange(fieldOne?.id, e.target.value)}
                 >

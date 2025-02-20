@@ -274,7 +274,6 @@ ${customFields}
         <FormLabel>Description</FormLabel>
         <Textarea
           rows={'12'}
-          fontSize={'sm'}
           id='description'
           name='description'
           value={description}

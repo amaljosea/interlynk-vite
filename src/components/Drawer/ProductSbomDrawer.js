@@ -281,7 +281,6 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
                 />
                 <Textarea
                   size='md'
-                  fontSize={'sm'}
                   placeholder='Add description'
                   value={compDesc}
                   onChange={(e) => setCompDesc(e.target.value)}
@@ -333,7 +332,6 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
                   info={onCheck(`Component Type`)}
                 />
                 <Select
-                  fontSize={'sm'}
                   value={compKind}
                   id='componentType'
                   name='componentType'
@@ -385,10 +383,9 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
                   info={onCheck(`Component Scope`)}
                 />
                 <Select
+                  size='md'
                   id='compScope'
                   name='compScope'
-                  size='md'
-                  fontSize={'sm'}
                   value={compScope}
                   isDisabled={customerView}
                   onChange={(e) => setCompScope(e.target.value)}

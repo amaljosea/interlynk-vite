@@ -185,7 +185,6 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
             height={drawerSize === 'md' ? '80px' : '600px'}
             name='text'
             id='text'
-            fontSize={'sm'}
             value={text}
             placeholder='Add text'
             onChange={(e) => setText(e.target.value)}
@@ -272,10 +271,9 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
             <FormControl isDisabled={!updateLic}>
               <FormLabel htmlFor='attribution'>Attribution</FormLabel>
               <Select
+                value={attribution}
                 aria-label='license_attr'
                 onChange={(e) => setAttribution(e.target.value)}
-                value={attribution}
-                fontSize={'sm'}
               >
                 <option value='UNKNOWN'>Unknown</option>
                 <option value='YES'>Yes</option>
@@ -287,9 +285,8 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
             <FormControl isDisabled={!updateLic}>
               <FormLabel htmlFor='CopyLeft'>CopyLeft</FormLabel>
               <Select
-                onChange={(e) => setCopyLeft(e.target.value)}
                 value={copyLeft}
-                fontSize={'sm'}
+                onChange={(e) => setCopyLeft(e.target.value)}
               >
                 <option value='UNKNOWN'>Unknown</option>
                 <option value='PERMISSIVE'>Permissive</option>
@@ -381,7 +378,6 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
             <FormControl isDisabled={!updateLic}>
               <FormLabel htmlFor='state'>Status</FormLabel>
               <Select
-                fontSize={'sm'}
                 name='state'
                 value={state}
                 aria-label='license_status'

@@ -182,7 +182,6 @@ const CompLinks = ({ data }) => {
         <FormControl isRequired isInvalid={error}>
           <FormLabel>Type</FormLabel>
           <Select
-            fontSize={'sm'}
             value={links?.name}
             onChange={handleTypeChange}
           >

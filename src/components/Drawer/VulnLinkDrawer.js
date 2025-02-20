@@ -214,7 +214,6 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
                 <FormLabel>Type</FormLabel>
                 <Select
                   value={type}
-                  fontSize={'sm'}
                   onChange={handleTypeChange}
                 >
                   <option value=''>-- Select --</option>

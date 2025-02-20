@@ -7,7 +7,6 @@ const Operator = ({ index, data, onChange }) => {
   return (
     <FormControl isInvalid={opError}>
       <Select
-        fontSize='sm'
         id='operator'
         name='operator'
         value={operator}

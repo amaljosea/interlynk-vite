@@ -207,7 +207,6 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
               <FormControl>
                 <FormLabel>Comment</FormLabel>
                 <Textarea
-                  fontSize={'sm'}
                   value={comment}
                   maxLength={512}
                   placeholder={'Add some comment'}

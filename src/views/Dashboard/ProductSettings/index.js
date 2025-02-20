@@ -281,7 +281,6 @@ const Settings = ({ enabled, data, mfc }) => {
               </FormLabel>
               <Select
                 id='dataRetention'
-                fontSize={'sm'}
                 value={Number(dataRetentionDays) || 0}
                 onChange={(e) => onUpdate(e.target.value, 'dataRetention')}
                 isDisabled={!enabled || !editControls}
@@ -302,7 +301,6 @@ const Settings = ({ enabled, data, mfc }) => {
                 </Tooltip>
               </FormLabel>
               <Select
-                fontSize={'sm'}
                 value={organizationManufacturer?.id || ''}
                 onChange={(e) => onUpdate(e.target.value, 'manufacturer')}
                 isDisabled={!enabled || !editControls}

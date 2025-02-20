@@ -112,9 +112,9 @@ const SigningModal = ({
           <FormControl isRequired>
             <FormLabel>Algorithm</FormLabel>
             <Select
+              size='sm'
               id='algorithm'
               name='algorithm'
-              size='sm'
               value={algorithm}
               disabled={true}
               onChange={(e) => setAlgorithm(e.target.value)}
@@ -129,30 +129,27 @@ const SigningModal = ({
               <FormControl isRequired>
                 <FormLabel>Cerificate</FormLabel>
                 <Textarea
+                  rows={8}
                   value={certificate}
                   onChange={(e) => setCertificate(e.target.value)}
-                  fontSize={'sm'}
-                  rows={8}
                 />
               </FormControl>
               {/* CycloneDX Signature */}
               <FormControl isRequired>
                 <FormLabel>CycloneDX Signature</FormLabel>
                 <Textarea
+                  rows={2}
                   value={cycloneDxSign}
                   onChange={(e) => setCycloneDxSign(e.target.value)}
-                  fontSize={'sm'}
-                  rows={2}
                 />
               </FormControl>
               {/* SPDX Signature */}
               <FormControl isRequired>
                 <FormLabel>SPDX Signature</FormLabel>
                 <Textarea
+                  rows={2}
                   value={spdxSign}
                   onChange={(e) => setSpdxSign(e.target.value)}
-                  fontSize={'sm'}
-                  rows={2}
                 />
               </FormControl>
             </>

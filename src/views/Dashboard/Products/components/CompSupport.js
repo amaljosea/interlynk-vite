@@ -294,7 +294,7 @@ const SupportForm = ({ component, data, setEdit }) => {
       .finally(() => setEdit(false))
   }
 
-  const inputStyle = { size: 'md', fontSize: 'sm' }
+  const inputStyle = { size: 'md' }
 
   useEffect(() => {
     if (data) {

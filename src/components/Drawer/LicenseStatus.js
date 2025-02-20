@@ -114,7 +114,6 @@ const LicenseStatus = ({ data, isOpen, onClose }) => {
                 <FormControl>
                   <FormLabel htmlFor='licenseStatus'>Note</FormLabel>
                   <Select
-                    fontSize={'sm'}
                     name='licenseStatus'
                     onChange={handleChange}
                     value={formData?.licenseStatus}
@@ -131,7 +130,6 @@ const LicenseStatus = ({ data, isOpen, onClose }) => {
                 <FormControl>
                   <FormLabel htmlFor='licenseNotes'>Note</FormLabel>
                   <Textarea
-                    fontSize={'sm'}
                     maxLength={512}
                     name='licenseNotes'
                     onChange={handleChange}

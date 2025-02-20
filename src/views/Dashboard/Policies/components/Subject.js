@@ -49,7 +49,6 @@ const Subject = ({ index, data, onChange }) => {
           <Icon color={primaryBlueText} as={getIcon(subject)} />
         </InputLeftElement>
         <Select
-          fontSize='sm'
           value={subject}
           sx={{ paddingLeft: '34px' }}
           placeholder={loading ? 'Loading...' : '-- select --'}

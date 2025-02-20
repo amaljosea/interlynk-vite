@@ -190,7 +190,6 @@ const VulnDrawer = ({ data, isOpen, onClose }) => {
             <FormLabel htmlFor='desc'>Description</FormLabel>
             <Textarea
               name='desc'
-              fontSize={'sm'}
               value={formData?.desc}
               onChange={handleChange}
               placeholder='Ex. Testing'
@@ -200,7 +199,6 @@ const VulnDrawer = ({ data, isOpen, onClose }) => {
             <FormLabel htmlFor='sev'>Severity</FormLabel>
             <Select
               name='sev'
-              fontSize={'sm'}
               value={formData?.sev}
               onChange={handleChange}
               textTransform={'capitalize'}
@@ -258,7 +256,6 @@ const VulnDrawer = ({ data, isOpen, onClose }) => {
               <FormLabel htmlFor='componentId'>Component</FormLabel>
               <Select
                 value={compId}
-                fontSize={'sm'}
                 name='componentId'
                 onChange={onChangeComponent}
               >

@@ -97,7 +97,6 @@ const SbomTransfer = ({ sbom, isOpen, onClose, productGroup }) => {
         <FormLabel htmlFor='environment'>Environment</FormLabel>
         <Select
           value={value}
-          fontSize={'sm'}
           name={'environment'}
           onChange={(e) => setValue(e.target.value)}
         >

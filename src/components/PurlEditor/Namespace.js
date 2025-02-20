@@ -54,7 +54,7 @@ const Namespace = ({ disabled, namespace, type, onChange, onBlur }) => {
     }
   }
 
-  const inputProps = { size: 'md', fontSize: 'sm', name: 'namespace' }
+  const inputProps = { size: 'md', name: 'namespace' }
 
   useEffect(() => {
     if (isSearchable && namespace) {
