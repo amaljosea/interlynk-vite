@@ -7,12 +7,6 @@ import { sbomOrigin } from 'variables/general'
 export const getUndefinedIfEmptyOrAll = (value, allValue = 'all') =>
   value.includes(allValue) || value.length === 0 ? undefined : value
 
-export const formatToISO = (dateString) => {
-  const currentYear = new Date().getFullYear()
-  const fullDate = new Date(`${dateString} ${currentYear}`)
-  return fullDate.toISOString()
-}
-
 export const getFilterValue = (value, allValue = 'all') =>
   value.includes(allValue) || value.length === 0 ? undefined : value
 

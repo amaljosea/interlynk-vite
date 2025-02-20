@@ -295,22 +295,6 @@ export const AllOrganizations = gql`
   }
 `
 
-export const MyOrganizationsTotalCount = gql`
-  query MyOrganizationsTotalCount {
-    myOrganizations {
-      totalCount
-    }
-  }
-`
-
-export const AllOrganizationsTotalCount = gql`
-  query AllOrganizationsTotalCount($status: OrganizationStatusEnum) {
-    allOrganizations(status: $status) {
-      totalCount
-    }
-  }
-`
-
 // GET ORGANIZATION RULES
 export const GetOrgRules = gql`
   query GetOrgRules(
