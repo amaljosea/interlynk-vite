@@ -20,7 +20,8 @@ const Namespace = ({ disabled, namespace, type, onChange, onBlur }) => {
     onChange('namespace', item?.value)
   }
 
-  const handleBlur = () => searchInput !== '' && onBlur('namespace', searchInput)
+  const handleBlur = () =>
+    searchInput !== '' && onBlur('namespace', searchInput)
 
   const searchTypes = ['npm', 'maven', 'gem']
   const isSearchable = searchTypes?.includes(type)

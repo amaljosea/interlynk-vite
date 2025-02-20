@@ -1,20 +1,20 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import { hasWhiteSpace, validateUrl } from 'utils/formValidationUtils'
 
-import { Box, Button, Flex, Input } from '@chakra-ui/react'
+import { Button, Input, Stack } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import EnvironmentSelector from 'components/EnvironmentSelector'
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 import CompInfo from 'components/Misc/CompInfo'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
-import { useProjectGroup } from 'hooks/useProjectGroup'
 
 import { AutomationRuleCreate, addComSupplier } from 'graphQL/Mutation'
 import { updateComSupplier } from 'graphQL/Mutation'
@@ -24,30 +24,21 @@ import { BiCube } from 'react-icons/bi'
 const SupplierModal = (props) => {
   const { isOpen, onClose, activeRow, ruleExists, recheck } = props
 
-  const params = useParams()
-  const productId = params.productid
   const navigate = useNavigate()
   const { isFreeTier } = useGlobalQueryContext()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
   const { showToast } = useCustomToast()
-  const [options, setOptions] = useState([])
-  const [defaultEnv, setDefaultEnv] = useState('')
+
+  const [error, setError] = useState('')
   const [selectedEnvironments, setSelectedEnvironments] = useState([])
 
-  const { projects, loading: envLoading } = useProjectGroup({
-    projectGroupId: params.productgroupid
-  })
   const [createSupplier, { loading: createLoading }] = useMutation(
     addComSupplier,
-    {
-      onCompleted: () => recheck()
-    }
+    { onCompleted: () => recheck() }
   )
   const [updateSupplier, { loading: updateLoading }] = useMutation(
     updateComSupplier,
-    {
-      onCompleted: () => recheck()
-    }
+    { onCompleted: () => recheck() }
   )
   const [createRule, { loading: rlLoading }] = useMutation(AutomationRuleCreate)
 
@@ -69,6 +60,9 @@ const SupplierModal = (props) => {
   const [formData, setFormData] = useState(initialData)
   const [isValidUrl, setIsValidUrl] = useState('')
 
+  const isInvalid = formData?.url !== '' && !validateUrl(formData?.url)
+  const isDisabled = isInvalid || formData?.name === ''
+
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData((prev) => ({
@@ -79,60 +73,12 @@ const SupplierModal = (props) => {
 
   const containsSpace = hasWhiteSpace(formData?.url)
 
-  const handleCheckboxChange = (env, isChecked) => {
-    if (env.value === defaultEnv.value) {
-      // Default option cannot be unchecked
-      return
-    }
-
-    if (isChecked) {
-      setSelectedEnvironments((prev) => [...prev, env])
-    } else {
-      setSelectedEnvironments((prev) =>
-        prev.filter((item) => item.value !== env.value)
-      )
-    }
-  }
-
-  useEffect(() => {
-    const defaultOption = projects.find((project) => project.id === productId)
-    if (defaultOption) {
-      const defaultEnvObj = {
-        value: defaultOption.id,
-        label: defaultOption.name
-      }
-      setDefaultEnv(defaultEnvObj)
-      setSelectedEnvironments([defaultEnvObj])
-    }
-
-    const otherOptions = projects
-      .filter((project) => project.id !== productId)
-      .map((project) => ({
-        value: project.id,
-        label: project.name
-      }))
-    setOptions(otherOptions)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [envLoading])
-
-  const handleSave = () => {
-    const data = {
-      url: formData?.url,
-      name: formData?.name,
-      componentId: component?.id,
-      contactName: formData?.contactName,
-      contactEmail: formData?.contactEmail
-    }
-    if (component?.suppliers?.length > 0) {
-      updateSupplier({
-        variables: {
-          id: component?.suppliers[0].id,
-          ...data
-        }
-      }).finally(() => onClose())
-    } else {
-      createSupplier({ variables: data }).finally(() => onClose())
-    }
+  const data = {
+    url: formData?.url,
+    name: formData?.name,
+    componentId: component?.id,
+    contactName: formData?.contactName,
+    contactEmail: formData?.contactEmail
   }
 
   const handleCheckUrl = () => {
@@ -248,11 +194,6 @@ const SupplierModal = (props) => {
             status: 'error'
           })
         } else {
-          if (component?.suppliers?.length > 0) {
-            onClose()
-          } else {
-            handleSave()
-          }
           showToast({
             description: 'Rule added successfully',
             status: 'success'
@@ -269,21 +210,79 @@ const SupplierModal = (props) => {
     }
   }
 
-  const isInvalid = formData?.url !== '' && !validateUrl(formData?.url)
-  const disabled =
-    isInvalid || formData?.name === '' || createLoading || updateLoading
+  const handleCreate = async (applyRule) => {
+    try {
+      const res = await createSupplier({ variables: data })
+      if (res?.data?.compSupplierCreate?.errors?.length > 0) {
+        setError(res?.data?.compSupplierCreate?.errors[0])
+      } else {
+        showToast({
+          description: 'Supplier added successfully',
+          status: 'success'
+        })
+      }
+
+      if (applyRule) {
+        await handleRuleCreate()
+      }
+    } finally {
+      onClose()
+    }
+  }
+
+  const handleUpdate = async (applyRule) => {
+    try {
+      const res = await updateSupplier({
+        variables: {
+          id: component?.suppliers[0].id,
+          ...data
+        }
+      })
+      if (res?.data?.compSupplierUpdate?.errors?.length > 0) {
+        setError(res?.data?.compSupplierUpdate?.errors[0])
+      } else {
+        showToast({
+          description: 'Supplier updated successfully',
+          status: 'success'
+        })
+      }
+
+      if (applyRule) {
+        await handleRuleCreate()
+      }
+    } finally {
+      onClose()
+    }
+  }
+
+  const handleAutomation = async () => {
+    if (resolved) {
+      await handleRuleCreate().then(() => onClose())
+    } else {
+      component?.suppliers?.length > 0 ? handleUpdate(true) : handleCreate(true)
+    }
+  }
+
+  const handleSubmit = () => {
+    if (component?.suppliers?.length > 0) {
+      handleUpdate(false)
+    } else {
+      handleCreate(false)
+    }
+  }
 
   const ActionBtn = () => (
     <Button
       mr={'auto'}
-      variant='ghost'
       fontSize={'sm'}
-      isDisabled={disabled}
-      onClick={handleRuleCreate}
+      variant='ghost'
+      isLoading={rlLoading}
+      isDisabled={isDisabled}
+      loadingText='Loading...'
+      onClick={handleAutomation}
       hidden={friendlyId ? false : true}
       colorScheme={ruleExists ? 'green' : 'blue'}
       title={`${ruleExists ? 'View' : 'Save as'} Rule`}
-      isLoading={rlLoading || createLoading || updateLoading}
     >
       {ruleExists ? 'View' : 'Save as'} Rule
     </Button>
@@ -307,20 +306,22 @@ const SupplierModal = (props) => {
       <LynkModal
         Icon={BiCube}
         isOpen={isOpen}
-        hidden={resolved}
         onClose={onClose}
-        onSubmit={handleSave}
+        disabled={isInvalid}
         title={`Add Supplier`}
+        onSubmit={handleSubmit}
+        hideCancelButton={rlLoading}
+        hidden={resolved || rlLoading}
+        isLoading={createLoading || updateLoading}
         leftFooterContent={!isFreeTier && <ActionBtn />}
-        disabled={isInvalid || createLoading || updateLoading}
         buttonText={suppliers?.length > 0 ? 'Update' : 'Save'}
       >
-        {component && (
-          <Box mb={4}>
-            <CompInfo data={component} />
-          </Box>
-        )}
-        <Flex width={'100%'} direction={'column'} gap={4}>
+        <Stack mb={error || component ? 4 : 0}>
+          {error !== '' && <LynkAlert msg={error} />}
+          {component && <CompInfo data={component} />}
+        </Stack>
+
+        <Stack spacing={4}>
           {/* ORG NAME */}
           <FormControl isRequired isDisabled={resolved}>
             <FormLabel>Organization Name</FormLabel>
@@ -375,16 +376,13 @@ const SupplierModal = (props) => {
           </FormControl>
           {!ruleExists && (
             <EnvironmentSelector
-              ruleExists={ruleExists}
-              envLoading={envLoading}
-              defaultEnv={defaultEnv}
-              options={options}
-              selectedEnvironments={selectedEnvironments}
-              handleCheckboxChange={handleCheckboxChange}
               fixed={resolved}
+              ruleExists={ruleExists}
+              environments={selectedEnvironments}
+              setEnvironments={setSelectedEnvironments}
             />
           )}
-        </Flex>
+        </Stack>
       </LynkModal>
     </>
   )

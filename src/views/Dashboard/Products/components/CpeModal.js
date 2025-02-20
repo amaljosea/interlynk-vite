@@ -5,7 +5,7 @@ import { ProductDetailsTabs } from 'utils/TabsObjects'
 import { validateCpe, validateFields, validateLanguage } from 'utils/cpeUtils'
 
 import { InfoIcon } from '@chakra-ui/icons'
-import { Box, Button, Flex, Grid, Textarea } from '@chakra-ui/react'
+import { Box, Button, Flex, Grid, Tag } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
 
 import CpeField from 'components/CpeEditor/CpeField'
@@ -22,7 +22,6 @@ import CompInfo from 'components/Misc/CompInfo'
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
-import { useProjectGroup } from 'hooks/useProjectGroup'
 
 import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
 
@@ -33,18 +32,11 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
   const resolved = status === 'resolved'
   const params = useParams()
   const sbomId = params.sbomid
-  const productId = params.productid
   const navigate = useNavigate()
   const { showToast } = useCustomToast()
   const { isFreeTier } = useGlobalQueryContext()
 
-  const [options, setOptions] = useState([])
-  const [defaultEnv, setDefaultEnv] = useState('')
   const [selectedEnvironments, setSelectedEnvironments] = useState([])
-
-  const { projects, loading: envLoading } = useProjectGroup({
-    projectGroupId: params.productgroupid
-  })
 
   const [value, setValue] = useState('cpe:2.3:*:*:*:*:*:*:*:*:*:*:*')
   const [cpeData, setCpeData] = useState({
@@ -88,61 +80,6 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
   const [updateComponent, { loading }] = useMutation(UpdateComponent, {
     onCompleted: () => recheck()
   })
-
-  const handleCheckboxChange = (env, isChecked) => {
-    if (env.value === defaultEnv.value) {
-      // Default option cannot be unchecked
-      return
-    }
-
-    if (isChecked) {
-      setSelectedEnvironments((prev) => [...prev, env])
-    } else {
-      setSelectedEnvironments((prev) =>
-        prev.filter((item) => item.value !== env.value)
-      )
-    }
-  }
-
-  useEffect(() => {
-    const defaultOption = projects.find((project) => project.id === productId)
-    if (defaultOption) {
-      const defaultEnvObj = {
-        value: defaultOption.id,
-        label: defaultOption.name
-      }
-      setDefaultEnv(defaultEnvObj)
-      setSelectedEnvironments([defaultEnvObj])
-    }
-
-    const otherOptions = projects
-      .filter((project) => project.id !== productId)
-      .map((project) => ({
-        value: project.id,
-        label: project.name
-      }))
-    setOptions(otherOptions)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [envLoading])
-
-  // ON CPE UPDATE
-  const handleComUpdate = () => {
-    if (resolved) {
-      onClose()
-    } else {
-      if (validateCpe(value)) {
-        updateComponent({
-          variables: {
-            id: component?.id,
-            sbomId: sbomId,
-            cpes: [value]
-          }
-        }).then((res) => res?.data && onClose())
-      } else {
-        setError('Invalid CPE')
-      }
-    }
-  }
 
   const [createRule, { loading: ruleLoading }] =
     useMutation(AutomationRuleCreate)
@@ -225,7 +162,6 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
             status: 'error'
           })
         } else {
-          handleComUpdate()
           showToast({
             description: 'Rule added successfully for all selected projects.',
             status: 'success'
@@ -253,17 +189,60 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
     setCpeData((prev) => ({ ...prev, [field]: value }))
   }
 
+  // ON CPE UPDATE
+  const handleUpdate = async (applyRule) => {
+    try {
+      if (validateCpe(value)) {
+        const res = await updateComponent({
+          variables: {
+            id: component?.id,
+            sbomId: sbomId,
+            cpes: [value]
+          }
+        })
+
+        if (res?.data?.componentUpdate?.errors?.length > 0) {
+          setError(res?.data?.componentUpdate?.errors[0])
+        } else {
+          showToast({
+            description: 'Component updated successfully',
+            status: 'success'
+          })
+        }
+
+        if (applyRule) {
+          await handleRuleCreate()
+        }
+      } else {
+        setError('Invalid CPE')
+      }
+    } finally {
+      onClose()
+    }
+  }
+
+  const handleAutomation = async () => {
+    if (resolved) {
+      await handleRuleCreate().then(() => onClose())
+    } else {
+      handleUpdate(true)
+    }
+  }
+
+  const handleSubmit = () => handleUpdate(false)
+
   const ActionBtn = () => (
     <Button
       mr={'auto'}
-      variant='ghost'
       fontSize={'sm'}
-      onClick={handleRuleCreate}
+      variant='ghost'
+      isDisabled={isInvalid}
+      isLoading={ruleLoading}
+      loadingText='Loading...'
+      onClick={handleAutomation}
       hidden={friendlyId ? false : true}
-      isLoading={ruleLoading || loading}
       colorScheme={ruleExists ? 'green' : 'blue'}
       title={`${ruleExists ? 'View' : 'Save as'} Rule`}
-      isDisabled={ruleLoading || loading || isInvalid}
     >
       {ruleExists ? 'View' : 'Save as'} Rule
     </Button>
@@ -304,11 +283,13 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
         Icon={InfoIcon}
         isOpen={isOpen}
         onClose={onClose}
+        isLoading={loading}
         buttonText={'Save'}
+        disabled={isInvalid}
         title={'CPE Details'}
-        onSubmit={handleComUpdate}
-        hidden={status === 'resolved'}
-        disabled={loading || isInvalid}
+        onSubmit={handleSubmit}
+        hideCancelButton={ruleLoading}
+        hidden={status === 'resolved' || ruleLoading}
         leftFooterContent={!isFreeTier && <ActionBtn />}
       >
         {component && (
@@ -321,12 +302,9 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
           {/* CPE STRING */}
           <FormControl isReadOnly>
             <FormLabel htmlFor='cpe'>CPE String</FormLabel>
-            <Textarea
-              type='text'
-              variant='filled'
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-            />
+            <Tag py={2} w={'fit-content'}>
+              {value}
+            </Tag>
           </FormControl>
           <Grid templateColumns='repeat(2, 1fr)' gap={6}>
             {/* PART */}
@@ -424,13 +402,10 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
           </Grid>
           {!ruleExists && (
             <EnvironmentSelector
-              ruleExists={ruleExists}
-              envLoading={envLoading}
-              defaultEnv={defaultEnv}
-              options={options}
-              selectedEnvironments={selectedEnvironments}
-              handleCheckboxChange={handleCheckboxChange}
               fixed={resolved}
+              ruleExists={ruleExists}
+              environments={selectedEnvironments}
+              setEnvironments={setSelectedEnvironments}
             />
           )}
         </Flex>

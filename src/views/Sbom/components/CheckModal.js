@@ -7,7 +7,7 @@ import { ProductDetailsTabs } from 'utils/TabsObjects'
 import { componentTypes } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
-import { List, ListItem } from '@chakra-ui/react'
+import { List, ListItem, Stack } from '@chakra-ui/react'
 import { Box, Button, Flex, Icon, Text, Tooltip } from '@chakra-ui/react'
 import { FormControl, FormLabel, Input, Select } from '@chakra-ui/react'
 
@@ -21,7 +21,6 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
-import { useProjectGroup } from 'hooks/useProjectGroup'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
@@ -39,13 +38,7 @@ const CheckModal = (props) => {
   const { showToast } = useCustomToast()
   const { isFreeTier } = useGlobalQueryContext()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
-  const { projects, loading: envLoading } = useProjectGroup({
-    projectGroupId: params.productgroupid
-  })
 
-  const [options, setOptions] = useState([])
-  const [defaultEnv, setDefaultEnv] = useState('')
-  const [selectedEnvironments, setSelectedEnvironments] = useState([])
   const { tabData } = useContext(TabContext)
   const { details } = tabData
 
@@ -62,114 +55,65 @@ const CheckModal = (props) => {
 
   const compRef = useRef()
 
-  // GET COMPONENT DATA
-  const [getCompData, { data }] = useLazyQuery(GetComponentData, {
-    fetchPolicy: 'network-only'
-  })
-
-  const [createRule, { loading }] = useMutation(AutomationRuleCreate)
-
   const { prodCompState } = useGlobalState()
   const { field, direction } = prodCompState
+
+  const { AUTOMATION_RULES } = ProductDetailsTabs
+
+  const link = generateProductDetailPageUrlFromCurrentUrl({
+    paramsObj: {
+      tab: AUTOMATION_RULES
+    }
+  })
 
   const now = new Date()
   const timestamp = currentTime
   const currentTime = now.toISOString().slice(0, 16)
+
   const [comp, setComp] = useState('')
-  const [compType, setCompType] = useState(kind || '')
-  const [compVersion, setCompVersion] = useState(version || '')
-  const [componentList, setComponentList] = useState([])
+  const [error, setError] = useState('')
   const [activeComp, setActiveComp] = useState(null)
   const [isDisabled, setIsDisabled] = useState(false)
-  const [error, setError] = useState('')
+  const [compType, setCompType] = useState(kind || '')
+  const [componentList, setComponentList] = useState([])
+  const [compVersion, setCompVersion] = useState(version || '')
+  const [selectedEnvironments, setSelectedEnvironments] = useState([])
 
-  const isPrimary = shortDesc === 'Document has a primary component'
-  const isComponentType = shortDesc === 'Component has a type'
-  const isComponentVersion = shortDesc === 'Component has a version'
-  const isComponentSupport = shortDesc === 'Component has support level'
-  const isComponentLicense =
+  const PRIMARY_COMPONENT = shortDesc === 'Document has a primary component'
+  const CREATION_TIMESTAMP = shortDesc === 'Document creation timestamp'
+  const COMPONENT_TYPE =
+    shortDesc === 'Component has a type' ||
+    shortDesc === 'Component has a valid type'
+  const COMPONENT_VERSION = shortDesc === 'Component has a version'
+  const COMPONENT_LICENSE =
     shortDesc === 'Component has license/s specified' ||
     shortDesc === 'Componet has deprecated license/s' ||
     shortDesc === 'Component has restrictive licenses specified'
-  const isComponent =
-    isPrimary || isComponentType || isComponentVersion || isComponentLicense
 
-  const isInvalidLicense = isComponentLicense && details?.licenses?.length === 0
+  const isInvalidLicense = COMPONENT_LICENSE && details?.licenses?.length === 0
 
-  const isEmptyVersion = isComponentVersion && compVersion === ''
+  const isEmptyVersion = COMPONENT_VERSION && compVersion === ''
 
-  const [updateComponent] = useMutation(UpdateComponent, {
-    onCompleted: () => recheck()
+  const disabled =
+    isInvalidLicense ||
+    isEmptyVersion ||
+    isDisabled ||
+    (COMPONENT_LICENSE && details?.licenses?.length === 0)
+
+  const disabledRule = isInvalidLicense || isEmptyVersion || isDisabled
+
+  const hideRule = !COMPONENT_LICENSE && !COMPONENT_VERSION
+
+  const [getCompData, { data }] = useLazyQuery(GetComponentData, {
+    fetchPolicy: 'network-only'
   })
 
-  const handleCheckboxChange = (env, isChecked) => {
-    if (env.value === defaultEnv.value) {
-      // Default option cannot be unchecked
-      return
-    }
+  const [createRule, { loading: ruleLoading }] =
+    useMutation(AutomationRuleCreate)
 
-    if (isChecked) {
-      setSelectedEnvironments((prev) => [...prev, env])
-    } else {
-      setSelectedEnvironments((prev) =>
-        prev.filter((item) => item.value !== env.value)
-      )
-    }
-  }
-
-  useEffect(() => {
-    const defaultOption = projects.find((project) => project.id === productId)
-    if (defaultOption) {
-      const defaultEnvObj = {
-        value: defaultOption.id,
-        label: defaultOption.name
-      }
-      setDefaultEnv(defaultEnvObj)
-      setSelectedEnvironments([defaultEnvObj])
-    }
-
-    const otherOptions = projects
-      .filter((project) => project.id !== productId)
-      .map((project) => ({
-        value: project.id,
-        label: project.name
-      }))
-    setOptions(otherOptions)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [envLoading])
-
-  const handleComUpdate = () => {
-    disableButtonTemporarily(setIsDisabled)
-    if (resolved) {
-      onClose()
-    } else {
-      const hasLicense = details?.licenses?.length > 0
-      const isCustomLicense =
-        hasLicense && details.licenses[0].type === 'Custom License'
-
-      const license = isCustomLicense
-        ? transformLicenseString(details.licenses[0].value)
-        : details?.licenses?.[0]?.value || ''
-      const licensesExp = { licensesExp: license }
-      updateComponent({
-        variables: {
-          sbomId: sbomId,
-          id: isPrimary ? activeComp?.id : componentId,
-          primary: isPrimary ? true : undefined,
-          kind: isComponentType ? compType : undefined,
-          version: isComponentVersion ? compVersion : undefined,
-          licenses: license && !isPrimary ? licensesExp : undefined
-        }
-      }).then((res) => {
-        const { errors } = res?.data?.componentUpdate || ''
-        if (errors?.length) {
-          setError(errors[0])
-        } else {
-          onClose()
-        }
-      })
-    }
-  }
+  const [updateComponent, { loading: loading }] = useMutation(UpdateComponent, {
+    onCompleted: () => recheck()
+  })
 
   const handleComponentChange = (e) => {
     const value = e.target.value
@@ -204,23 +148,11 @@ const CheckModal = (props) => {
         return 'Component License'
       case 'Document has data license specified':
         return 'Component License'
-      case 'Component has support level':
-        return 'Component Support'
-    }
-  }
-
-  const handleSubmit = () => {
-    if (isComponent) {
-      handleComUpdate()
-    } else if (isComponentSupport) {
-      onClose()
-    } else {
-      onClose()
     }
   }
 
   const getConditionsAttributes = () => {
-    if (isComponentLicense) {
+    if (COMPONENT_LICENSE) {
       return [
         {
           subject: 'component',
@@ -241,7 +173,7 @@ const CheckModal = (props) => {
           value: undefined
         }
       ]
-    } else if (isComponentVersion) {
+    } else if (COMPONENT_VERSION) {
       return [
         {
           subject: 'component',
@@ -264,7 +196,7 @@ const CheckModal = (props) => {
   )
 
   const getActionsAttributes = () => {
-    if (isComponentLicense) {
+    if (COMPONENT_LICENSE) {
       return [
         {
           subject: 'component',
@@ -272,7 +204,7 @@ const CheckModal = (props) => {
           value: details?.licenses[0]?.value || ''
         }
       ]
-    } else if (isComponentVersion) {
+    } else if (COMPONENT_VERSION) {
       return [
         {
           subject: 'component',
@@ -284,14 +216,6 @@ const CheckModal = (props) => {
       return []
     }
   }
-
-  const { AUTOMATION_RULES } = ProductDetailsTabs
-
-  const link = generateProductDetailPageUrlFromCurrentUrl({
-    paramsObj: {
-      tab: AUTOMATION_RULES
-    }
-  })
 
   const handleRuleCreate = async () => {
     if (ruleExists) {
@@ -327,11 +251,6 @@ const CheckModal = (props) => {
         if (errors.length > 0) {
           setError(errors[0])
         } else {
-          if (isComponent) {
-            handleComUpdate()
-          } else {
-            onClose()
-          }
           showToast({
             description: 'Rule added successfully',
             status: 'success'
@@ -344,16 +263,68 @@ const CheckModal = (props) => {
     }
   }
 
-  const disabled =
-    isInvalidLicense ||
-    isEmptyVersion ||
-    isDisabled ||
-    (isComponentLicense && details?.licenses?.length === 0)
+  const handleComUpdate = async (applyRule) => {
+    try {
+      const hasLicense = details?.licenses?.length > 0
+      const isCustomLicense =
+        hasLicense && details.licenses[0].type === 'Custom License'
+      const license = isCustomLicense
+        ? transformLicenseString(details.licenses[0].value)
+        : details?.licenses?.[0]?.value || ''
+      const licensesExp = { licensesExp: license }
 
-  const disabledRule = isInvalidLicense || isEmptyVersion || isDisabled
+      const res = await updateComponent({
+        variables: {
+          sbomId: sbomId,
+          id: PRIMARY_COMPONENT ? activeComp?.id : componentId,
+          primary: PRIMARY_COMPONENT ? true : undefined,
+          kind: COMPONENT_TYPE ? compType : undefined,
+          version: COMPONENT_VERSION ? compVersion : undefined,
+          licenses: license && !PRIMARY_COMPONENT ? licensesExp : undefined
+        }
+      })
 
-  const hideRule =
-    !isComponentLicense && !isComponentVersion && !isComponentSupport
+      const { errors } = res?.data?.componentUpdate || ''
+      if (errors?.length) {
+        setError(errors[0])
+      }
+
+      if (applyRule) {
+        await handleRuleCreate()
+      }
+    } finally {
+      onClose()
+    }
+  }
+
+  const handleSubmit = () => handleComUpdate(false)
+
+  const handleAutomation = async () => {
+    if (resolved) {
+      await handleRuleCreate().then(() => onClose())
+    } else {
+      handleComUpdate(true)
+    }
+  }
+
+  const RuleAction = () => {
+    return (
+      <Button
+        mr={'auto'}
+        fontSize={'sm'}
+        variant='ghost'
+        hidden={hideRule}
+        loadingText='Loading...'
+        isLoading={ruleLoading}
+        isDisabled={disabledRule}
+        onClick={handleAutomation}
+        colorScheme={ruleExists ? 'green' : 'blue'}
+        title={`${ruleExists ? 'View' : 'Save as'} Rule`}
+      >
+        {ruleExists ? 'View' : 'Save as'} Rule
+      </Button>
+    )
+  }
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -368,7 +339,7 @@ const CheckModal = (props) => {
   }, [])
 
   useEffect(() => {
-    if (isPrimary) {
+    if (PRIMARY_COMPONENT) {
       getCompData({
         variables: {
           projectId: productId,
@@ -381,71 +352,33 @@ const CheckModal = (props) => {
         (res) => res.data && setComponentList(res.data.sbom.components.nodes)
       )
     }
-  }, [direction, field, getCompData, isPrimary, productId, sbomId])
+  }, [direction, field, getCompData, PRIMARY_COMPONENT, productId, sbomId])
 
   return (
     <LynkModal
       isOpen={isOpen}
+      Icon={BiWrench}
       onClose={onClose}
+      disabled={disabled}
+      buttonText={'Save'}
+      isLoading={loading}
       onSubmit={handleSubmit}
       title={heading(shortDesc)}
-      Icon={BiWrench}
-      disabled={disabled}
-      hidden={resolved}
-      buttonText={'Save'}
-      leftFooterContent={
-        !isFreeTier && (
-          <Button
-            mr={'auto'}
-            variant='ghost'
-            fontSize={'sm'}
-            hidden={hideRule}
-            isLoading={loading}
-            isDisabled={disabledRule}
-            onClick={handleRuleCreate}
-            colorScheme={ruleExists ? 'green' : 'blue'}
-            title={`${ruleExists ? 'View' : 'Save as'} Rule`}
-          >
-            {ruleExists ? 'View' : 'Save as'} Rule
-          </Button>
-        )
-      }
+      hideCancelButton={ruleLoading}
+      hidden={resolved || ruleLoading}
+      leftFooterContent={!isFreeTier && <RuleAction />}
     >
-      {error !== '' && (
-        <Box mb={4}>
-          <LynkAlert msg={error} />
-        </Box>
-      )}
+      <Stack mb={error || component ? 4 : 0}>
+        {error !== '' && <LynkAlert msg={error} />}
+        {component && <CompInfo data={component} />}
+      </Stack>
 
-      {component && (
-        <Box mb={4}>
-          <CompInfo data={component} />
-        </Box>
-      )}
-
-      {shortDesc === 'Document has a primary component' && (
-        <Flex
-          gap={4}
-          flexDirection={'column'}
-          alignItems={'flex-start'}
-          position={'relative'}
-        >
+      {PRIMARY_COMPONENT && (
+        <Stack spacing={4}>
           <FormControl isRequired isDisabled={resolved}>
             <FormLabel>Select</FormLabel>
             <Input value={comp} onChange={handleComponentChange} />
           </FormControl>
-          {/* Environment Select */}
-          {!ruleExists && (
-            <EnvironmentSelector
-              ruleExists={ruleExists}
-              envLoading={envLoading}
-              defaultEnv={defaultEnv}
-              options={options}
-              selectedEnvironments={selectedEnvironments}
-              handleCheckboxChange={handleCheckboxChange}
-              fixed={resolved}
-            />
-          )}
 
           {comp !== '' && componentList.length > 0 && (
             <Box
@@ -482,39 +415,24 @@ const CheckModal = (props) => {
               </List>
             </Box>
           )}
-        </Flex>
+        </Stack>
       )}
 
-      {shortDesc === 'Document creation timestamp' && (
-        <>
-          <FormControl isRequired isDisabled={resolved}>
-            <FormLabel>Created At</FormLabel>
-            <Input
-              placeholder='Select Time'
-              size='md'
-              type='datetime-local'
-              value={timestamp}
-              onChange={(e) => console.log(e.target.value)}
-            />
-          </FormControl>
-          {/* Environment Select */}
-          {!ruleExists && (
-            <EnvironmentSelector
-              ruleExists={ruleExists}
-              envLoading={envLoading}
-              defaultEnv={defaultEnv}
-              options={options}
-              selectedEnvironments={selectedEnvironments}
-              handleCheckboxChange={handleCheckboxChange}
-              fixed={resolved}
-            />
-          )}
-        </>
+      {CREATION_TIMESTAMP && (
+        <FormControl isRequired isDisabled={resolved}>
+          <FormLabel>Created At</FormLabel>
+          <Input
+            placeholder='Select Time'
+            size='md'
+            type='datetime-local'
+            value={timestamp}
+            onChange={(e) => console.log(e.target.value)}
+          />
+        </FormControl>
       )}
 
-      {(shortDesc === 'Component has a type' ||
-        shortDesc === 'Component has a valid type') && (
-        <>
+      {COMPONENT_TYPE && (
+        <Stack>
           <FormControl isDisabled={resolved}>
             <FormLabel>
               <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
@@ -542,66 +460,37 @@ const CheckModal = (props) => {
               ))}
             </Select>
           </FormControl>
-          {/* Environment Select */}
-          {!ruleExists && (
-            <EnvironmentSelector
-              ruleExists={ruleExists}
-              envLoading={envLoading}
-              defaultEnv={defaultEnv}
-              options={options}
-              selectedEnvironments={selectedEnvironments}
-              handleCheckboxChange={handleCheckboxChange}
-              fixed={resolved}
-            />
-          )}
-        </>
+        </Stack>
       )}
 
-      {shortDesc === 'Component has a version' && (
-        <>
-          <FormControl isRequired isDisabled={resolved}>
-            <FormLabel>Version</FormLabel>
-            <Input
-              value={compVersion}
-              onChange={(e) => setCompVersion(e.target.value)}
-            />
-          </FormControl>
-          {/* Environment Select */}
-          {!ruleExists && (
-            <EnvironmentSelector
-              ruleExists={ruleExists}
-              envLoading={envLoading}
-              defaultEnv={defaultEnv}
-              options={options}
-              selectedEnvironments={selectedEnvironments}
-              handleCheckboxChange={handleCheckboxChange}
-              fixed={resolved}
-            />
-          )}
-        </>
-      )}
-
-      {isComponentLicense && (
-        <>
-          <LicenseField
-            sbomView={false}
-            resolved={resolved}
-            license={licensesExp}
+      {COMPONENT_VERSION && (
+        <FormControl isRequired isDisabled={resolved}>
+          <FormLabel>Version</FormLabel>
+          <Input
+            value={compVersion}
+            onChange={(e) => setCompVersion(e.target.value)}
           />
-          {/* Environment Select */}
-          {!ruleExists && (
-            <EnvironmentSelector
-              ruleExists={ruleExists}
-              envLoading={envLoading}
-              defaultEnv={defaultEnv}
-              options={options}
-              selectedEnvironments={selectedEnvironments}
-              handleCheckboxChange={handleCheckboxChange}
-              fixed={resolved}
-            />
-          )}
-        </>
+        </FormControl>
       )}
+
+      {COMPONENT_LICENSE && (
+        <LicenseField
+          sbomView={false}
+          resolved={resolved}
+          license={licensesExp}
+        />
+      )}
+
+      <Stack mt={2}>
+        {!ruleExists && (
+          <EnvironmentSelector
+            fixed={resolved}
+            ruleExists={ruleExists}
+            environments={selectedEnvironments}
+            setEnvironments={setSelectedEnvironments}
+          />
+        )}
+      </Stack>
     </LynkModal>
   )
 }

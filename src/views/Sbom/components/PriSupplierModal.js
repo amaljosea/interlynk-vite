@@ -4,25 +4,22 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import { hasWhiteSpace, validateUrl } from 'utils/formValidationUtils'
 
-import {
-  Button,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input
-} from '@chakra-ui/react'
+import { Button, Input, Stack } from '@chakra-ui/react'
+import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import EnvironmentSelector from 'components/EnvironmentSelector'
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
-import { useProjectGroup } from 'hooks/useProjectGroup'
 
-import { supplierCreate, supplierUpdate } from 'graphQL/Mutation'
-import { AutomationRuleCreate } from 'graphQL/Mutation'
+import {
+  AutomationRuleCreate,
+  supplierCreate,
+  supplierUpdate
+} from 'graphQL/Mutation'
 
 import { BiShieldPlus } from 'react-icons/bi'
 
@@ -31,19 +28,12 @@ const PriSupplierModal = (props) => {
 
   const params = useParams()
   const sbomId = params.sbomid
-  const productId = params.productid
   const navigate = useNavigate()
   const { showToast } = useCustomToast()
   const { isFreeTier } = useGlobalQueryContext()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
-  const [options, setOptions] = useState([])
-  const [defaultEnv, setDefaultEnv] = useState('')
   const [selectedEnvironments, setSelectedEnvironments] = useState([])
-
-  const { projects, loading: envLoading } = useProjectGroup({
-    projectGroupId: params.productgroupid
-  })
 
   const { status } = activeRow || ''
   const resolved = status === 'resolved'
@@ -61,44 +51,9 @@ const PriSupplierModal = (props) => {
 
   const [formData, setFormData] = useState(initialData)
   const [isValidUrl, setIsValidUrl] = useState('')
+  const [error, setError] = useState('')
 
   const data = activeRow?.sbom ? activeRow?.sbom?.suppliers : activeRow
-
-  const handleCheckboxChange = (env, isChecked) => {
-    if (env.value === defaultEnv.value) {
-      // Default option cannot be unchecked
-      return
-    }
-
-    if (isChecked) {
-      setSelectedEnvironments((prev) => [...prev, env])
-    } else {
-      setSelectedEnvironments((prev) =>
-        prev.filter((item) => item.value !== env.value)
-      )
-    }
-  }
-
-  useEffect(() => {
-    const defaultOption = projects.find((project) => project.id === productId)
-    if (defaultOption) {
-      const defaultEnvObj = {
-        value: defaultOption.id,
-        label: defaultOption.name
-      }
-      setDefaultEnv(defaultEnvObj)
-      setSelectedEnvironments([defaultEnvObj])
-    }
-
-    const otherOptions = projects
-      .filter((project) => project.id !== productId)
-      .map((project) => ({
-        value: project.id,
-        label: project.name
-      }))
-    setOptions(otherOptions)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [envLoading])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -126,50 +81,6 @@ const PriSupplierModal = (props) => {
   })
 
   const [createRule, { loading: rlLoading }] = useMutation(AutomationRuleCreate)
-
-  const handleSave = () => {
-    if (resolved) {
-      onClose()
-    } else {
-      createSupplier({
-        variables: {
-          sbomId: sbomId,
-          url: formData?.url,
-          name: formData?.name,
-          contactName: formData?.contactName,
-          contactEmail: formData?.contactEmail
-        }
-      }).then((res) => {
-        if (res?.data) {
-          showToast({
-            description: 'Supplier added successfully',
-            status: 'success'
-          })
-          onClose()
-        }
-      })
-    }
-  }
-
-  const handleUpdate = () => {
-    updateSupplier({
-      variables: {
-        url: formData?.url,
-        name: formData?.name,
-        contactName: formData?.contactName,
-        contactEmail: formData?.contactEmail,
-        id: data?.length > 0 && data[0].id
-      }
-    }).then((res) => {
-      if (res?.data) {
-        showToast({
-          description: 'Supplier updated successfully',
-          status: 'success'
-        })
-        onClose()
-      }
-    })
-  }
 
   const conditionsAttributes = [
     {
@@ -264,7 +175,6 @@ const PriSupplierModal = (props) => {
             status: 'error'
           })
         } else {
-          handleSave()
           showToast({
             description: 'Rule added successfully for all selected projects.',
             status: 'success'
@@ -279,6 +189,95 @@ const PriSupplierModal = (props) => {
       }
     }
   }
+
+  const handleCreate = async (applyRule) => {
+    try {
+      const res = await createSupplier({
+        variables: {
+          sbomId: sbomId,
+          url: formData?.url,
+          name: formData?.name,
+          contactName: formData?.contactName,
+          contactEmail: formData?.contactEmail
+        }
+      })
+      if (res?.data?.sbomSupplierCreate?.errors?.length > 0) {
+        setError(res?.data?.sbomSupplierCreate?.errors[0])
+      } else {
+        showToast({
+          description: 'Supplier addedd successfully',
+          status: 'success'
+        })
+      }
+
+      if (applyRule) {
+        await handleRuleCreate()
+      }
+    } finally {
+      onClose()
+    }
+  }
+
+  const handleUpdate = async (applyRule) => {
+    try {
+      const res = await updateSupplier({
+        variables: {
+          url: formData?.url,
+          name: formData?.name,
+          contactName: formData?.contactName,
+          contactEmail: formData?.contactEmail,
+          id: data?.length > 0 && data[0].id
+        }
+      })
+      if (res?.data?.sbomSupplierUpdate?.errors?.length > 0) {
+        setError(res?.data?.sbomSupplierUpdate?.errors[0])
+      } else {
+        showToast({
+          description: 'Supplier updated successfully',
+          status: 'success'
+        })
+      }
+
+      if (applyRule) {
+        await handleRuleCreate()
+      }
+    } finally {
+      onClose()
+    }
+  }
+
+  const handleSubmit = () => {
+    if (hasSuppliers) {
+      handleUpdate(false)
+    } else {
+      handleCreate(false)
+    }
+  }
+
+  const handleAutomation = async () => {
+    if (resolved) {
+      await handleRuleCreate().then(() => onClose())
+    } else {
+      hasSuppliers ? handleUpdate(true) : handleCreate(true)
+    }
+  }
+
+  const RuleAction = () => (
+    <Button
+      mr={'auto'}
+      fontSize={'sm'}
+      variant='ghost'
+      isLoading={rlLoading}
+      loadingText='Loading...'
+      onClick={handleAutomation}
+      hidden={friendlyId ? false : true}
+      isDisabled={isInvalid || !formData?.name}
+      colorScheme={ruleExists ? 'green' : 'blue'}
+      title={`${ruleExists ? 'View' : 'Save as'} Rule`}
+    >
+      {ruleExists ? 'View' : 'Save as'} Rule
+    </Button>
+  )
 
   useEffect(() => {
     if (data?.length > 0) {
@@ -300,33 +299,19 @@ const PriSupplierModal = (props) => {
       <LynkModal
         isOpen={isOpen}
         onClose={onClose}
-        hidden={resolved}
         Icon={BiShieldPlus}
-        disabled={isInvalid || crLoading || upLoading}
-        title={`${hasSuppliers ? 'Update' : 'Add'} ${friendlyId ? 'SBOM' : ''} Supplier`}
+        disabled={isInvalid}
+        onSubmit={handleSubmit}
+        hideCancelButton={rlLoading}
+        hidden={resolved || rlLoading}
+        isLoading={crLoading || upLoading}
         buttonText={hasSuppliers ? 'Update' : 'Save'}
-        onSubmit={hasSuppliers ? handleUpdate : handleSave}
-        leftFooterContent={
-          !isFreeTier && (
-            <Button
-              mr={'auto'}
-              fontSize={'sm'}
-              variant='ghost'
-              onClick={handleRuleCreate}
-              hidden={friendlyId ? false : true}
-              colorScheme={ruleExists ? 'green' : 'blue'}
-              isLoading={rlLoading || crLoading || upLoading}
-              title={`${ruleExists ? 'View' : 'Save as'} Rule`}
-              isDisabled={
-                isInvalid || crLoading || upLoading || !formData?.name
-              }
-            >
-              {ruleExists ? 'View' : 'Save as'} Rule
-            </Button>
-          )
-        }
+        leftFooterContent={!isFreeTier && <RuleAction />}
+        title={`${hasSuppliers ? 'Update' : 'Add'} ${friendlyId ? 'SBOM' : ''} Supplier`}
       >
-        <Flex width={'100%'} direction={'column'} gap={4}>
+        {error !== '' && <LynkAlert msg={error} />}
+
+        <Stack spacing={4}>
           {/* ORG NAME */}
           <FormControl isRequired isDisabled={resolved}>
             <FormLabel>Organization Name</FormLabel>
@@ -381,16 +366,13 @@ const PriSupplierModal = (props) => {
           </FormControl>
           {!ruleExists && (
             <EnvironmentSelector
-              ruleExists={ruleExists}
-              envLoading={envLoading}
-              defaultEnv={defaultEnv}
-              options={options}
-              selectedEnvironments={selectedEnvironments}
-              handleCheckboxChange={handleCheckboxChange}
               fixed={resolved}
+              ruleExists={ruleExists}
+              environments={selectedEnvironments}
+              setEnvironments={setSelectedEnvironments}
             />
           )}
-        </Flex>
+        </Stack>
       </LynkModal>
     </>
   )

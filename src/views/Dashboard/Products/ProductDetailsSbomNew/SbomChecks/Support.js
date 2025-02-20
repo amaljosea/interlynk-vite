@@ -276,10 +276,11 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
     return (
       <Button
         mr={'auto'}
-        variant='ghost'
         fontSize={'sm'}
+        variant='ghost'
         isDisabled={disabled}
         isLoading={ruleLoading}
+        loadingText='Loading...'
         onClick={handleAutomation}
         colorScheme={ruleExists ? 'green' : 'blue'}
         title={`${ruleExists ? 'View' : 'Save as'} Rule`}
@@ -332,11 +333,12 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
       isOpen={isOpen}
       Icon={BiWrench}
       onClose={onClose}
-      hidden={resolved}
       disabled={disabled}
       buttonText={'Save'}
       onSubmit={handleSubmit}
       title={'Component Support'}
+      hideCancelButton={ruleLoading}
+      hidden={resolved || ruleLoading}
       isLoading={createLoading || updateLoading}
       leftFooterContent={!isFreeTier && <RuleAction />}
     >

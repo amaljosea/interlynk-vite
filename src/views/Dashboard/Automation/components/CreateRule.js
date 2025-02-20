@@ -1,6 +1,5 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
 import { disableButtonTemporarily } from 'utils'
 
 import { EditIcon } from '@chakra-ui/icons'
@@ -18,12 +17,7 @@ import { FaPlus } from 'react-icons/fa6'
 import RuleActions from './RuleActions'
 import RuleConditions from './RuleConditions'
 
-const CreateRule = ({ data, isOpen, onClose, subOperators, projects }) => {
-  const params = useParams()
-  const projectId = params?.productid
-
-  const [options, setOptions] = useState([])
-  const [defaultEnv, setDefaultEnv] = useState('')
+const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
   const [selectedEnvironments, setSelectedEnvironments] = useState([])
 
   const { automationConditionSubjectFieldMapping } = subOperators || []
@@ -322,43 +316,6 @@ const CreateRule = ({ data, isOpen, onClose, subOperators, projects }) => {
     }
   }
 
-  const handleCheckboxChange = (env, isChecked) => {
-    if (env.value === defaultEnv.value) {
-      // Default option cannot be unchecked
-      return
-    }
-
-    if (isChecked) {
-      setSelectedEnvironments((prev) => [...prev, env])
-    } else {
-      setSelectedEnvironments((prev) =>
-        prev.filter((item) => item.value !== env.value)
-      )
-    }
-  }
-
-  useEffect(() => {
-    const defaultOption = projects.find((project) => project.id === projectId)
-    if (defaultOption) {
-      const defaultEnvObj = {
-        value: defaultOption.id,
-        label: defaultOption.name
-      }
-      setDefaultEnv(defaultEnvObj)
-      setSelectedEnvironments([defaultEnvObj])
-    }
-
-    const otherOptions = projects
-      .filter((project) => project.id !== projectId)
-      .map((project) => ({
-        value: project.id,
-
-        label: project.name
-      }))
-    setOptions(otherOptions)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projects])
-
   useEffect(() => {
     if (data) {
       const { name, automationActions, automationConditions } = data || ''
@@ -481,10 +438,8 @@ const CreateRule = ({ data, isOpen, onClose, subOperators, projects }) => {
         {/* Environment Select */}
         {!data && (
           <EnvironmentSelector
-            defaultEnv={defaultEnv}
-            options={options}
-            selectedEnvironments={selectedEnvironments}
-            handleCheckboxChange={handleCheckboxChange}
+            environments={selectedEnvironments}
+            setEnvironments={setSelectedEnvironments}
           />
         )}
         {/* ERROR HANDLING */}

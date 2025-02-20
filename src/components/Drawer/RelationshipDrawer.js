@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 import { ArrowDownIcon } from '@chakra-ui/icons'
 import {
@@ -10,11 +10,10 @@ import {
   Select,
   Stack,
   Text,
-  Tooltip,
-  useDisclosure
+  Tooltip
 } from '@chakra-ui/react'
 import { Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
-import { Tag, TagCloseButton, TagLabel } from '@chakra-ui/react'
+import { Tag, TagLabel } from '@chakra-ui/react'
 import {
   FormControl,
   FormErrorIcon,
@@ -34,21 +33,18 @@ import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 import LoadingSpinner from 'components/LoadingSpinner'
+import LynkAlert from 'components/LynkAlert'
 import CompInfo from 'components/Misc/CompInfo'
-import RelDeleteModal from 'components/RelDeleteModal'
 
-import useCustomToast from 'hooks/useCustomToast'
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { CreateCompRelation, DeleteCompRelation } from 'graphQL/Mutation'
-import { AutomationRuleCreate } from 'graphQL/Mutation'
+import { CreateCompRelation } from 'graphQL/Mutation'
 import {
   GetAllComponents,
   GetCompDependency,
+  GetComponentPath,
   GetTotalComponents
 } from 'graphQL/Queries'
 
@@ -69,38 +65,30 @@ const findShortestPath = (pathArray, currentShortestPath = []) => {
 }
 
 const RelationshipDrawer = (props) => {
-  const { isOpen, onClose, activeRow, compPath, ruleExists, recheck } = props
+  const { isOpen, onClose, activeRow, recheck } = props
 
   const params = useParams()
-  const productId = params.productid
-  const sbomId = params.sbomid
-  const navigate = useNavigate()
-  const { isFreeTier } = useGlobalQueryContext()
   const activeTab = useQueryParam('tab')
-  const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
-
-  const { status, component: comp } = activeRow || ''
-  const { id: compId, name: compName, version: compVersion } = comp || ''
-  const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
-  const resolved = status === 'resolved'
-
-  const isCompRelation = shortDesc === 'Component has relationship/s'
-
-  const [dependencyOfList, setDependencyOfList] = useState([])
-  const [dependsOnList, setDependsOnList] = useState([])
-  const [relation, setRelation] = useState('')
-  const [component, setComponent] = useState('')
-  const [activeComp, setActiveComp] = useState(null)
-  const [isAdded, setIsAdded] = useState(false)
-
   const { prodCompState } = useGlobalState()
-  const { field, direction } = prodCompState
   const { primaryBlueText, headingTextColor } = useThemeColor([
     'primaryBlueText',
     'headingTextColor'
   ])
 
-  const showToast = useCustomToast()
+  const sbomId = params.sbomid
+  const productId = params.productid
+  const { field, direction } = prodCompState
+
+  const { status, component: comp } = activeRow || ''
+  const { id: compId, name: compName, version: compVersion } = comp || ''
+  const { shortDesc } = activeRow?.organizationRule?.rule || ''
+  const resolved = status === 'resolved'
+
+  const [error, setError] = useState('')
+  const [dependencyOfList, setDependencyOfList] = useState([])
+  const [dependsOnList, setDependsOnList] = useState([])
+  const [relation, setRelation] = useState('')
+  const [component, setComponent] = useState('')
 
   const compState = {
     projectId: productId,
@@ -109,6 +97,15 @@ const RelationshipDrawer = (props) => {
     direction: direction
   }
 
+  const { data: compRelation, loading: comPathLoading } = useQuery(
+    GetComponentPath,
+    {
+      skip: isOpen ? false : true,
+      variables: { compId: comp?.id, sbomId: sbomId }
+    }
+  )
+  const { pathToPrimary } = compRelation?.component || ''
+
   const { data: compData } = useQuery(GetTotalComponents, {
     skip: isOpen ? false : true,
     fetchPolicy: activeTab === 'components' ? false : true,
@@ -116,8 +113,6 @@ const RelationshipDrawer = (props) => {
       ...compState
     }
   })
-
-  const [createRule, { loading }] = useMutation(AutomationRuleCreate)
 
   const { data: allComponents } = useQuery(GetAllComponents, {
     skip: compData ? false : true,
@@ -134,23 +129,52 @@ const RelationshipDrawer = (props) => {
   })
 
   const isLoading = props?.comPathLoading || !allComponents
+  const shortestPath =
+    pathToPrimary?.length > 0 && findShortestPath(pathToPrimary)[0]
 
-  const [addRelation] = useMutation(CreateCompRelation, {
-    onCompleted: () => recheck()
-  })
-  const [removeRelation] = useMutation(DeleteCompRelation)
+  const [addRelation, { loading: createLoading }] = useMutation(
+    CreateCompRelation,
+    { onCompleted: () => recheck() }
+  )
+
   const { data: compDependency } = useQuery(GetCompDependency, {
     skip: isOpen ? false : true,
     variables: { compId: compId || activeRow?.id, sbomId: sbomId }
   })
 
-  const shortestPath = findShortestPath(compPath)[0]
+  const list = dependsOnList?.filter((item) => item?.toComp?.id === component)
 
-  const {
-    isOpen: isDelOpen,
-    onOpen: onDelOpen,
-    onClose: onDelClose
-  } = useDisclosure()
+  const compInfo = {
+    name: compName || '',
+    version: activeRow?.version || compVersion
+  }
+
+  const disabled = relation === '' || component === '' || list.length > 0
+
+  const handleAdd = async () => {
+    await addRelation({
+      variables: {
+        to: component,
+        relType: relation,
+        from: compId || activeRow?.id
+      }
+    })
+      .then((res) => {
+        if (res?.data?.componentRelationCreate?.errors?.length > 0) {
+          setError(res?.data?.componentRelationCreate?.errors[0])
+        } else {
+          setDependsOnList((prev) => [
+            ...prev,
+            res?.data?.componentRelationCreate?.compRelation
+          ])
+        }
+      })
+      .finally(() => {
+        setRelation('')
+        setComponent('')
+        onClose()
+      })
+  }
 
   useEffect(() => {
     if (compDependency) {
@@ -158,123 +182,6 @@ const RelationshipDrawer = (props) => {
       setDependsOnList(compDependency.component.dependsOn)
     }
   }, [compDependency])
-
-  const list = dependsOnList?.filter((item) => item?.toComp?.id === component)
-
-  const handleAdd = () => {
-    addRelation({
-      variables: {
-        from: compId || activeRow?.id,
-        to: component,
-        relType: relation
-      }
-    }).then((res) => {
-      if (res?.data) {
-        setIsAdded(true)
-        setDependsOnList((prev) => [
-          ...prev,
-          res?.data?.componentRelationCreate?.compRelation
-        ])
-      }
-    })
-    setRelation('')
-    setComponent('')
-  }
-
-  const handleRemove = async () => {
-    await removeRelation({
-      variables: { relId: activeComp.id }
-    })
-      .then((res) => {
-        if (res.data) {
-          console.log(res.data)
-          const filterData = dependsOnList.filter(
-            (item) => item.id !== activeComp.id
-          )
-          setDependsOnList(filterData)
-        }
-      })
-      .finally(() => {
-        onDelClose()
-      })
-  }
-
-  const getConditionsAttributes = () => {
-    return [
-      {
-        subject: 'component',
-        operator: 'is',
-        field: 'component_name',
-        value: compName
-      },
-      {
-        subject: 'component',
-        operator: 'is',
-        field: 'component_version',
-        value: compVersion
-      },
-      {
-        subject: 'component',
-        operator: 'not_exists',
-        field: 'component_relationship',
-        value: undefined
-      }
-    ]
-  }
-
-  const getActionsAttributes = () => {
-    return [
-      {
-        subject: 'component',
-        field: 'component_relationship',
-        value: component
-      }
-    ]
-  }
-
-  const handleRuleCreate = () => {
-    if (ruleExists) {
-      localStorage.setItem('activeProdTab', 2)
-      navigate(generateProductDetailPageUrlFromCurrentUrl())
-    } else {
-      createRule({
-        variables: {
-          active: true,
-          name: shortDesc,
-          projectId: productId,
-          checkComponent: compName,
-          checkVersion: compVersion,
-          checkIdentifier: friendlyId,
-          automationConditionsAttributes: getConditionsAttributes(),
-          automationActionsAttributes: getActionsAttributes()
-        }
-      }).then((res) => {
-        const errors = res?.data?.automationRuleCreate?.errors
-        if (errors?.length > 0) {
-          onClose()
-          showToast({
-            description: `Unable to create rule, please try again.`,
-            status: 'error'
-          })
-        } else {
-          if (isCompRelation) {
-            handleAdd()
-          } else {
-            onClose()
-          }
-          showToast({
-            description: 'Rule added successfully',
-            status: 'success'
-          })
-        }
-      })
-    }
-  }
-
-  const compInfo = {
-    name: compName || '',
-    version: activeRow?.version || compVersion
-  }
 
   return (
     <Drawer
@@ -286,290 +193,220 @@ const RelationshipDrawer = (props) => {
     >
       <DrawerOverlay />
       <DrawerContent>
-        <DrawerCloseButton onClick={handleAdd} />
+        <DrawerCloseButton mt={2} onClick={onClose} />
         <DrawerHeader borderBottomWidth='1px'>Relationships</DrawerHeader>
-        {isLoading ? (
-          <LoadingSpinner />
-        ) : (
-          <>
-            <DrawerBody>
-              <Card px={0} mx={0}>
-                <CardHeader>
-                  <CompInfo data={compInfo} />
-                </CardHeader>
-                <CardBody>
-                  <Flex
-                    flexDir={'column'}
-                    alignItems={'flex-start'}
-                    width={'100%'}
-                    gap={4}
-                  >
-                    {/* CREATE RELATIONSHIP */}
-                    <Stack
-                      mt={6}
-                      gap={2}
-                      width={'100%'}
-                      hidden={resolved}
-                      direction={'column'}
-                      alignItems={'flex-start'}
-                    >
-                      <FormControl>
-                        <FormLabel htmlFor='relation' color={headingTextColor}>
-                          Type
+        <DrawerBody>
+          {isLoading || comPathLoading ? (
+            <LoadingSpinner />
+          ) : (
+            <Card px={0} mx={0}>
+              <CardHeader>
+                <CompInfo data={compInfo} />
+              </CardHeader>
+              <CardBody>
+                <Flex
+                  flexDir={'column'}
+                  alignItems={'flex-start'}
+                  width={'100%'}
+                  gap={4}
+                >
+                  {/* CREATE RELATIONSHIP */}
+                  <Stack mt={6} width={'100%'} spacing={4} hidden={resolved}>
+                    <FormControl>
+                      <FormLabel htmlFor='relation' color={headingTextColor}>
+                        Type
+                      </FormLabel>
+                      <Select
+                        id='relation'
+                        value={relation}
+                        onChange={(e) => setRelation(e.target.value)}
+                      >
+                        <option value=''>-- Select --</option>
+                        {[{ value: 'depends_on', label: 'Depends On' }].map(
+                          (item, idx) => (
+                            <option key={idx} value={item.value}>
+                              {item.label}
+                            </option>
+                          )
+                        )}
+                      </Select>
+                    </FormControl>
+                    {allComponents && (
+                      <FormControl isInvalid={list.length > 0}>
+                        <FormLabel htmlFor='component' color={headingTextColor}>
+                          Component
                         </FormLabel>
                         <Select
-                          size='sm'
-                          id='relation'
-                          value={relation}
-                          onChange={(e) => setRelation(e.target.value)}
+                          id='component'
+                          value={component}
+                          onChange={(e) => setComponent(e.target.value)}
                         >
                           <option value=''>-- Select --</option>
-                          {[{ value: 'depends_on', label: 'Depends On' }].map(
-                            (item, idx) => (
-                              <option key={idx} value={item.value}>
-                                {item.label}
-                              </option>
+                          {[...allComponents.sbom.components.nodes]
+                            .filter((com) =>
+                              shortDesc
+                                ? com?.name !== compName
+                                : com?.name !== name
                             )
-                          )}
+                            .sort((a, b) => a?.name?.localeCompare(b?.name))
+                            .map((item, idx) => (
+                              <option key={idx} value={item.id}>
+                                {item.name}-{item.version}
+                                {item.primary ? ` [Primary Component]` : ''}
+                              </option>
+                            ))}
                         </Select>
+                        {list.length !== 0 && (
+                          <FormErrorMessage>
+                            <FormErrorIcon />
+                            Component dependency already exists
+                          </FormErrorMessage>
+                        )}
                       </FormControl>
-                      {allComponents && (
-                        <FormControl isInvalid={list.length > 0}>
-                          <FormLabel
-                            htmlFor='component'
-                            color={headingTextColor}
-                          >
-                            Component
-                          </FormLabel>
-                          <Select
-                            size='sm'
-                            id='component'
-                            value={component}
-                            onChange={(e) => setComponent(e.target.value)}
-                          >
-                            <option value=''>-- Select --</option>
-                            {[...allComponents.sbom.components.nodes]
-                              .filter((com) =>
-                                shortDesc
-                                  ? com?.name !== compName
-                                  : com?.name !== name
-                              )
-                              .sort((a, b) => a?.name?.localeCompare(b?.name))
-                              .map((item, idx) => (
-                                <option key={idx} value={item.id}>
-                                  {item.name}-{item.version}
-                                  {item.primary ? ` [Primary Component]` : ''}
-                                </option>
-                              ))}
-                          </Select>
-                          {list.length !== 0 && (
-                            <FormErrorMessage>
-                              <FormErrorIcon />
-                              Component dependency already exists
-                            </FormErrorMessage>
-                          )}
-                        </FormControl>
-                      )}
-
-                      <Flex
-                        width={'100%'}
-                        alignItems={'center'}
-                        justifyContent={'space-between'}
-                      >
-                        {!isFreeTier && (
-                          <Button
-                            hidden
-                            mr={'auto'}
-                            fontSize={'sm'}
-                            isLoading={loading}
-                            onClick={handleRuleCreate}
-                            colorScheme={ruleExists ? 'green' : 'blue'}
-                            title={`${ruleExists ? 'View' : 'Save as'} Rule`}
-                          >
-                            {ruleExists ? 'View' : 'Save as'} Rule
-                          </Button>
-                        )}
-
-                        <Button
-                          size='md'
-                          width={'fit-content'}
-                          colorScheme='blue'
-                          onClick={handleAdd}
-                          isDisabled={
-                            relation === '' ||
-                            component === '' ||
-                            list.length > 0
-                          }
-                          title={shortDesc ? 'Save' : 'Add'}
-                        >
-                          {shortDesc ? 'Save' : 'Add'}
-                        </Button>
-                      </Flex>
-                    </Stack>
-
-                    {/* COMONENT RELATIONSIP DATA */}
-                    <Table mt={6} width={'100%'}>
-                      <Thead>
-                        <Tr>
-                          {['Type', 'Component'].map((item, index) => (
-                            <Th key={index} pl={0} width={'100px'}>
-                              <Box>{item}</Box>
-                            </Th>
-                          ))}
-                        </Tr>
-                      </Thead>
-                      <Tbody>
-                        {/* Dependency Of */}
-                        <Tr>
-                          <Td pl={0} width={'120px'}>
-                            <Text fontSize='xs' fontWeight={'medium'}>
-                              Dependency Of
-                            </Text>
-                          </Td>
-                          <Td pl={0} width={'300px'}>
-                            <Flex
-                              flexDirection={'row'}
-                              flexWrap={'wrap'}
-                              gap={2}
-                            >
-                              {dependencyOfList.map((comp, index) => (
-                                <Tag
-                                  size={'sm'}
-                                  key={index}
-                                  variant='subtle'
-                                  colorScheme={'blue'}
-                                  width={'fit-content'}
-                                >
-                                  <TagLabel>
-                                    {comp.fromComp.name}-{comp.fromComp.version}
-                                  </TagLabel>
-                                </Tag>
-                              ))}
-                            </Flex>
-                          </Td>
-                        </Tr>
-                        <Tr>
-                          <Td pl={0} width={'120px'}>
-                            <Text fontSize='xs' fontWeight={'medium'}>
-                              Depends On
-                            </Text>
-                          </Td>
-                          <Td pl={0} width={'300px'}>
-                            <Flex
-                              flexDirection={'row'}
-                              flexWrap={'wrap'}
-                              gap={2}
-                            >
-                              {[...dependsOnList]
-                                .sort(
-                                  (a, b) =>
-                                    new Date(b?.updatedAt) -
-                                    new Date(a?.updatedAt)
-                                )
-                                .map((comp, index) => (
-                                  <Tooltip
-                                    key={index}
-                                    label={comp?.toComp?.name}
-                                    placement='top'
-                                  >
-                                    <Tag
-                                      size={'sm'}
-                                      variant='subtle'
-                                      colorScheme={
-                                        index == 0 && isAdded ? 'green' : 'blue'
-                                      }
-                                      width={'fit-content'}
-                                    >
-                                      <TagLabel>
-                                        {comp?.toComp?.name?.substring(0, 50)}-
-                                        {comp?.toComp?.version}
-                                      </TagLabel>
-                                      <TagCloseButton
-                                        hidden={resolved}
-                                        onClick={() => {
-                                          setActiveComp(comp)
-                                          onDelOpen()
-                                        }}
-                                      />
-                                    </Tag>
-                                  </Tooltip>
-                                ))}
-                            </Flex>
-                          </Td>
-                        </Tr>
-                      </Tbody>
-                    </Table>
-
-                    {isDelOpen && activeComp && (
-                      <RelDeleteModal
-                        isOpen={isOpen}
-                        onClose={onClose}
-                        handleRemove={handleRemove}
-                        activeComp={activeComp}
-                      />
                     )}
+                    {error !== '' && <LynkAlert msg={error} />}
+                    <Button
+                      w={'fit-content'}
+                      colorScheme='blue'
+                      onClick={handleAdd}
+                      isDisabled={disabled}
+                      loadingText='Loading...'
+                      isLoading={createLoading}
+                      title={shortDesc ? 'Save' : 'Add'}
+                    >
+                      {shortDesc ? 'Save' : 'Add'}
+                    </Button>
+                  </Stack>
 
-                    {/* PATHS */}
-                    <Text fontSize={'lg'} fontWeight={'medium'} mt={6}>
-                      Tree View
-                    </Text>
-                    {compPath?.length > 0 ? (
-                      <Stack
-                        width={'100%'}
-                        mt={10}
-                        dir='column'
-                        spacing={2}
-                        alignItems={'center'}
-                        justifyContent={'center'}
-                      >
-                        {shortestPath.path?.length > 0 ? (
-                          shortestPath.path.map((item, index) => (
-                            <>
-                              <Tag
-                                key={item.id}
-                                size='sm'
-                                colorScheme={
-                                  index === 0 ||
-                                  index === shortestPath.path.length - 1
-                                    ? 'blue'
-                                    : 'green'
-                                }
-                              >
-                                {item.name} - {item.version}
-                              </Tag>
-                              {index !== shortestPath.path.length - 1 && (
-                                <ArrowDownIcon
-                                  width={4}
-                                  height={4}
-                                  color={primaryBlueText}
-                                />
-                              )}
-                            </>
-                          ))
-                        ) : (
-                          <Text fontSize={'sm'}>
-                            Component is not connected to Primary component
+                  {/* COMONENT RELATIONSIP DATA */}
+                  <Table mt={6} width={'100%'}>
+                    <Thead>
+                      <Tr>
+                        {['Type', 'Component'].map((item, index) => (
+                          <Th key={index} pl={0} width={'100px'}>
+                            <Box>{item}</Box>
+                          </Th>
+                        ))}
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {/* Dependency Of */}
+                      <Tr>
+                        <Td pl={0} width={'120px'}>
+                          <Text fontSize='xs' fontWeight={'medium'}>
+                            Dependency Of
                           </Text>
-                        )}
-                      </Stack>
-                    ) : (
-                      <Stack
-                        width={'100%'}
-                        alignItems={'center'}
-                        justifyContent={'center'}
-                      >
-                        <Tag size='sm' colorScheme='green'>
-                          {activeRow?.name || compName} -{' '}
-                          {activeRow?.version || compVersion}
-                        </Tag>
-                      </Stack>
-                    )}
-                  </Flex>
-                </CardBody>
-              </Card>
-            </DrawerBody>
-          </>
-        )}
+                        </Td>
+                        <Td pl={0} width={'300px'}>
+                          <Flex flexDirection={'row'} flexWrap={'wrap'} gap={2}>
+                            {dependencyOfList.map((comp, index) => (
+                              <Tag
+                                size={'sm'}
+                                key={index}
+                                width={'fit-content'}
+                              >
+                                <TagLabel>
+                                  {comp.fromComp.name}-{comp.fromComp.version}
+                                </TagLabel>
+                              </Tag>
+                            ))}
+                          </Flex>
+                        </Td>
+                      </Tr>
+                      <Tr>
+                        <Td pl={0} width={'120px'}>
+                          <Text fontSize='xs' fontWeight={'medium'}>
+                            Depends On
+                          </Text>
+                        </Td>
+                        <Td pl={0} width={'300px'}>
+                          <Flex flexDirection={'row'} flexWrap={'wrap'} gap={2}>
+                            {[...dependsOnList]
+                              .sort(
+                                (a, b) =>
+                                  new Date(b?.updatedAt) -
+                                  new Date(a?.updatedAt)
+                              )
+                              .map((comp, index) => (
+                                <Tooltip
+                                  key={index}
+                                  label={comp?.toComp?.name}
+                                  placement='top'
+                                >
+                                  <Tag size={'sm'} width={'fit-content'}>
+                                    <TagLabel>
+                                      {comp?.toComp?.name?.substring(0, 50)}-
+                                      {comp?.toComp?.version}
+                                    </TagLabel>
+                                  </Tag>
+                                </Tooltip>
+                              ))}
+                          </Flex>
+                        </Td>
+                      </Tr>
+                    </Tbody>
+                  </Table>
+
+                  {/* PATHS */}
+                  <Text fontSize={'lg'} fontWeight={'medium'} mt={6}>
+                    Tree View
+                  </Text>
+                  {pathToPrimary?.length > 0 ? (
+                    <Stack
+                      width={'100%'}
+                      mt={10}
+                      dir='column'
+                      spacing={2}
+                      alignItems={'center'}
+                      justifyContent={'center'}
+                    >
+                      {shortestPath.path?.length > 0 ? (
+                        shortestPath.path.map((item, index) => (
+                          <>
+                            <Tag
+                              key={item.id}
+                              size='sm'
+                              colorScheme={
+                                index === 0 ||
+                                index === shortestPath.path.length - 1
+                                  ? 'blue'
+                                  : 'green'
+                              }
+                            >
+                              {item.name} - {item.version}
+                            </Tag>
+                            {index !== shortestPath.path.length - 1 && (
+                              <ArrowDownIcon
+                                width={4}
+                                height={4}
+                                color={primaryBlueText}
+                              />
+                            )}
+                          </>
+                        ))
+                      ) : (
+                        <Text fontSize={'sm'}>
+                          Component is not connected to Primary component
+                        </Text>
+                      )}
+                    </Stack>
+                  ) : (
+                    <Stack
+                      width={'100%'}
+                      alignItems={'center'}
+                      justifyContent={'center'}
+                    >
+                      <Tag size='sm' colorScheme='green'>
+                        {activeRow?.name || compName} -{' '}
+                        {activeRow?.version || compVersion}
+                      </Tag>
+                    </Stack>
+                  )}
+                </Flex>
+              </CardBody>
+            </Card>
+          )}
+        </DrawerBody>
       </DrawerContent>
     </Drawer>
   )

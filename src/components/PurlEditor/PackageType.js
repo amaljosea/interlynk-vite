@@ -1,8 +1,8 @@
-
-import { FormControl, FormLabel, Select } from '@chakra-ui/react'
 import { packageTypes } from 'variables/general'
 
-const PackageType = ({ disabled, type, onChange, onBlur }) => {
+import { FormControl, FormLabel, Select } from '@chakra-ui/react'
+
+const PackageType = ({ disabled, type, onChange }) => {
   return (
     <FormControl isDisabled={disabled}>
       <FormLabel htmlFor='type'>Package Type</FormLabel>
@@ -11,7 +11,6 @@ const PackageType = ({ disabled, type, onChange, onBlur }) => {
         name='type'
         value={type}
         data-testid='purl_type'
-        onBlur={(e) => onBlur('type', e.target.value)}
         onChange={(e) => onChange('type', e.target.value)}
       >
         {packageTypes?.map((option) => (

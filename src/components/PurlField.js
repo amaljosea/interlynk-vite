@@ -9,24 +9,36 @@ import { FormControl, FormErrorMessage } from '@chakra-ui/react'
 
 const PurlField = ({ isOpen, onOpen, onClose }) => {
   const customerView = isCustomerView()
-  const { tabData, handleChange } = useContext(TabContext)
+  const { tabData, setTabData } = useContext(TabContext)
   const { identifiers } = tabData || ''
 
   const onChange = (e) => {
     const { value } = e.target
     const inputValue = value?.trim()
-    handleChange('identifiers', 'purl', inputValue)
-    handleChange('identifiers', 'purlError', '')
+    setTabData((prev) => ({
+      ...prev,
+      identifiers: {
+        ...prev.identifiers,
+        purl: inputValue,
+        purlError: ''
+      }
+    }))
   }
 
-  const onBlur = (e) => {
-    if (e.target.value !== '') {
+  const onBlur = (event) => {
+    const { value } = event.target
+    console.log('value', value)
+    if (value !== '') {
       try {
-        PackageURL.fromString(e.target.value)
-        handleChange('identifiers', 'purlError', '')
-      } catch (ex) {
-        console.error('ex', ex.message)
-        handleChange('identifiers', 'purlError', ex.message)
+        PackageURL.fromString(value)
+      } catch (error) {
+        setTabData((prev) => ({
+          ...prev,
+          identifiers: {
+            ...prev.identifiers,
+            purlError: error?.message
+          }
+        }))
       }
     }
   }

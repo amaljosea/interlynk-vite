@@ -24,7 +24,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { recheckHealth } from 'graphQL/Mutation'
 import { GetCheckResults, GetProductData } from 'graphQL/Queries'
-import { GetComponentPath } from 'graphQL/Queries'
 
 import AuthorModal from '../components/AuthorModal'
 import FixedModal from '../components/FixedModal'
@@ -64,10 +63,6 @@ const Checks = ({ sbomData }) => {
     skip: activeTab === 'checks' ? false : true,
     variables: { projectId: productId, sbomId }
   })
-
-  const [getComPath, { data: relation, loading: comPathLoading }] =
-    useLazyQuery(GetComponentPath)
-  const { pathToPrimary } = relation?.component || ''
 
   const { sbom } = prodData || ''
 
@@ -170,9 +165,7 @@ const Checks = ({ sbomData }) => {
 
     // COMPONENT HAS RELATIONSHIP
     if (shortDesc === 'Component has relationship/s') {
-      getComPath({
-        variables: { compId: row?.component?.id, sbomId: sbomId }
-      }).then((res) => res?.data && COMP_RELATION.onOpen())
+      return COMP_RELATION.onOpen()
     }
 
     // PURL MODAL
@@ -361,7 +354,7 @@ const Checks = ({ sbomData }) => {
             />
           )}
 
-          {/* AUTHOR DRAWER */}
+          {/* DOCUMENT AUTHOR DRAWER */}
           {DOC_AUTHOR.isOpen && (
             <AuthorModal
               recheck={handleRecheck}
@@ -388,10 +381,8 @@ const Checks = ({ sbomData }) => {
               activeRow={activeRow}
               ruleExists={ruleExists}
               recheck={handleRecheck}
-              compPath={pathToPrimary}
               isOpen={COMP_RELATION.isOpen}
               onClose={COMP_RELATION.onClose}
-              comPathLoading={comPathLoading}
             />
           )}
         </>

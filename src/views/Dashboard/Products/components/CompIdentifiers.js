@@ -45,7 +45,7 @@ const CompIdentifiers = ({ data }) => {
       PackageURL.fromString(identifiers?.purl)
       setPurlValue(identifiers?.purl)
     } catch (ex) {
-      setPurlValue('pkg:type/name@version')
+      setPurlValue('')
     }
     setPurlOpen(true)
   }
@@ -93,41 +93,39 @@ const CompIdentifiers = ({ data }) => {
   }
 
   useEffect(() => {
-    if (data) {
-      const { cpes, purl } = data || {}
-      // HANDLE PURL
-      const updatePurl = (msg) => {
+    if (data?.cpes && data?.cpes?.length > 0) {
+      setTabData((prev) => ({
+        ...prev,
+        identifiers: {
+          ...prev.identifiers,
+          cpe: data?.cpes[0]
+        }
+      }))
+    }
+  }, [data?.cpes, setTabData])
+
+  useEffect(() => {
+    if (data?.purl) {
+      try {
+        const pkg = PackageURL.fromString(data?.purl)
         setTabData((prev) => ({
           ...prev,
           identifiers: {
             ...prev.identifiers,
-            purl: purl ? decodeURI(purl) : '',
-            purlError: msg
+            purl: pkg.toString()
           }
         }))
-      }
-      if (purl) {
-        try {
-          PackageURL.fromString(decodeURI(purl))
-          updatePurl('')
-        } catch (ex) {
-          updatePurl(ex?.message)
-        }
-      } else {
-        updatePurl(true)
-      }
-      // HANDLE CPE
-      if (cpes?.length > 0) {
+      } catch (error) {
         setTabData((prev) => ({
           ...prev,
           identifiers: {
             ...prev.identifiers,
-            cpe: cpes[0]
+            purlError: error?.message
           }
         }))
       }
     }
-  }, [data, setTabData])
+  }, [data?.purl, setTabData])
 
   return (
     <>
@@ -140,9 +138,7 @@ const CompIdentifiers = ({ data }) => {
         {/* PURL INPUI */}
         {purlOpen ? (
           <PurlEditor
-            value={purlValue}
             isOpen={purlOpen}
-            setValue={setPurlValue}
             onOpen={() => setPurlOpen(true)}
             onClose={() => setPurlOpen(false)}
           />

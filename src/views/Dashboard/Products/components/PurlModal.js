@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 
-import { Box, Button, Flex } from '@chakra-ui/react'
-import { FormControl, Textarea } from '@chakra-ui/react'
+import { Button, Stack, Tag } from '@chakra-ui/react'
 
 import EnvironmentSelector from 'components/EnvironmentSelector'
 import LynkAlert from 'components/LynkAlert'
@@ -20,12 +19,10 @@ import Version from 'components/PurlEditor/Version'
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
-import { useProjectGroup } from 'hooks/useProjectGroup'
 
 import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
 
 import { FaCircleInfo } from 'react-icons/fa6'
-import { examplePURLs } from 'variables/general'
 
 const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
   const { status, component } = activeRow || ''
@@ -36,21 +33,12 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
 
   const params = useParams()
   const sbomId = params.sbomid
-  const productId = params.productid
   const navigate = useNavigate()
   const { showToast } = useCustomToast()
 
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
-  const [value, setValue] = useState('pkg:type/name@version')
-
-  const [options, setOptions] = useState([])
-  const [defaultEnv, setDefaultEnv] = useState('')
   const [selectedEnvironments, setSelectedEnvironments] = useState([])
-
-  const { projects, loading: envLoading } = useProjectGroup({
-    projectGroupId: params.productgroupid
-  })
 
   const [error, setError] = useState('')
   const [purlData, setPurlData] = useState({
@@ -61,6 +49,13 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
     qualifiers: ''
   })
 
+  const TYPE = purlData?.type || ``
+  const NAMESPACE = purlData?.namespace ? `/${purlData?.namespace}` : ``
+  const NAME = purlData?.name ? `/${purlData?.name}` : ``
+  const VERSION = purlData?.version ? `@${purlData?.version}` : ``
+  const QUALIFIERS = purlData?.qualifiers ? `?${purlData?.qualifiers}` : ``
+  const PURL_STRING = `pkg:${TYPE}${NAMESPACE}${NAME}${VERSION}${QUALIFIERS}`
+
   const isInvalid =
     ['name', 'type'].some((key) => !purlData?.[key]) ||
     (purlData?.type === 'swift' && !purlData?.namespace)
@@ -69,83 +64,19 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
     onCompleted: () => recheck()
   })
 
-  const handleCheckboxChange = (env, isChecked) => {
-    if (env.value === defaultEnv.value) {
-      // Default option cannot be unchecked
-      return
-    }
-
-    if (isChecked) {
-      setSelectedEnvironments((prev) => [...prev, env])
-    } else {
-      setSelectedEnvironments((prev) =>
-        prev.filter((item) => item.value !== env.value)
-      )
-    }
-  }
-
-  useEffect(() => {
-    const defaultOption = projects.find((project) => project.id === productId)
-    if (defaultOption) {
-      const defaultEnvObj = {
-        value: defaultOption.id,
-        label: defaultOption.name
-      }
-      setDefaultEnv(defaultEnvObj)
-      setSelectedEnvironments([defaultEnvObj])
-    }
-
-    const otherOptions = projects
-      .filter((project) => project.id !== productId)
-      .map((project) => ({
-        value: project.id,
-        label: project.name
-      }))
-    setOptions(otherOptions)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [envLoading])
-
-  const onChange = (field, value) => {
+  const onChange = (name, value) => {
     setError('')
-    const filterValue = value?.replace(/\s/g, '')
-    setPurlData((prev) => ({ ...prev, [field]: filterValue }))
-    if (field === 'type') {
-      setValue(examplePURLs[value])
-    }
+    setPurlData((prev) => ({
+      ...prev,
+      [name]: value || ''
+    }))
   }
 
-  const onBlur = (field, item) => {
-    try {
-      const pkg = PackageURL.fromString(value)
-      if (field === 'qualifiers') {
-        const convertedObject = {}
-        const params = new URLSearchParams(item?.value)
-        for (const [key, value] of params) {
-          convertedObject[key] = value
-        }
-        pkg[field] = convertedObject
-        setValue(pkg.toString())
-      } else {
-        pkg[field] = item?.value || field
-        setValue(pkg.toString())
-      }
-    } catch (error) {
-      console.log('Something went wrong', error)
-    }
-  }
-
-  const handleComUpdate = () => {
-    if (resolved) {
-      onClose()
-    } else {
-      updateComponent({
-        variables: {
-          id: component?.id,
-          sbomId: sbomId,
-          purl: value
-        }
-      }).then((res) => res?.data && onClose())
-    }
+  const onBlur = (field, inputValue) => {
+    setPurlData((prev) => ({
+      ...prev,
+      [field]: inputValue || ''
+    }))
   }
 
   const [createRule, { loading: ruleLoading }] =
@@ -180,7 +111,7 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
     {
       subject: 'component',
       field: 'component_purl',
-      value: value
+      value: PURL_STRING
     }
   ]
 
@@ -228,7 +159,6 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
             status: 'error'
           })
         } else {
-          handleComUpdate()
           showToast({
             description: 'Rule added successfully',
             status: 'success'
@@ -244,14 +174,52 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
     }
   }
 
+  const handleUpdate = async (applyRule) => {
+    try {
+      const res = await updateComponent({
+        variables: {
+          purl: PURL_STRING,
+          sbomId: sbomId,
+          id: component?.id
+        }
+      })
+
+      if (res?.data?.componentUpdate?.errors?.length > 0) {
+        setError(res?.data?.componentUpdate?.errors[0])
+      } else {
+        showToast({
+          description: 'Component updated successfully',
+          status: 'success'
+        })
+      }
+
+      if (applyRule) {
+        await handleRuleCreate()
+      }
+    } finally {
+      onClose()
+    }
+  }
+
+  const handleAutomation = async () => {
+    if (resolved) {
+      await handleRuleCreate().then(() => onClose())
+    } else {
+      handleUpdate(true)
+    }
+  }
+
+  const handleSubmit = () => handleUpdate(false)
+
   const ActionBtn = () => (
     <Button
-      variant='ghost'
       mr={'auto'}
       fontSize={'sm'}
-      onClick={handleRuleCreate}
+      variant='ghost'
+      loadingText='Loading...'
+      isLoading={ruleLoading}
+      onClick={handleAutomation}
       hidden={friendlyId ? false : true}
-      isLoading={ruleLoading || loading}
       colorScheme={ruleExists ? 'green' : 'blue'}
       title={`${ruleExists ? 'View' : 'Save as'} Rule`}
       isDisabled={ruleLoading || loading || isInvalid}
@@ -262,9 +230,8 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
 
   useEffect(() => {
     if (purl) {
-      setValue(purl)
       try {
-        const data = PackageURL.fromString(purl)
+        const data = PackageURL.fromString(decodeURI(purl))
         setPurlData((prev) => ({
           ...prev,
           type: data?.type || '',
@@ -278,7 +245,7 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
             : ''
         }))
       } catch (error) {
-        setError(error?.message)
+        console.log('Error', error)
       }
     }
   }, [purl])
@@ -287,33 +254,30 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
     <LynkModal
       isOpen={isOpen}
       onClose={onClose}
-      hidden={resolved}
       buttonText={'Save'}
       Icon={FaCircleInfo}
+      isLoading={loading}
+      disabled={isInvalid}
       title={'PURL Details'}
-      onSubmit={handleComUpdate}
-      disabled={isInvalid || loading}
+      onSubmit={handleSubmit}
+      hideCancelButton={ruleLoading}
+      hidden={resolved || ruleLoading}
       leftFooterContent={!isFreeTier && <ActionBtn />}
     >
-      {component && (
-        <Box mb={4}>
-          <CompInfo data={component} />
-        </Box>
-      )}
-      <Flex width={'100%'} direction={'column'} gap={4}>
-        {error && <LynkAlert msg={error} />}
+      <Stack mb={error || component ? 4 : 0}>
+        {error !== '' && <LynkAlert msg={error} />}
+        {component && <CompInfo data={component} />}
+      </Stack>
+
+      <Stack spacing={4}>
         {/* Package URL */}
-        <FormControl isReadOnly>
-          <Textarea
-            type='text'
-            value={value}
-            variant='filled'
-            onChange={(e) => console.log(e.target.value)}
-          />
-        </FormControl>
+        {purlData?.type && (
+          <Tag mt={2} py={2} w={'fit-content'}>
+            {PURL_STRING}
+          </Tag>
+        )}
         {/* Type */}
         <PackageType
-          onBlur={onBlur}
           onChange={onChange}
           disabled={resolved}
           type={purlData?.type}
@@ -351,16 +315,13 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
         />
         {!ruleExists && (
           <EnvironmentSelector
-            ruleExists={ruleExists}
-            envLoading={envLoading}
-            defaultEnv={defaultEnv}
-            options={options}
-            selectedEnvironments={selectedEnvironments}
-            handleCheckboxChange={handleCheckboxChange}
             fixed={resolved}
+            ruleExists={ruleExists}
+            environments={selectedEnvironments}
+            setEnvironments={setSelectedEnvironments}
           />
         )}
-      </Flex>
+      </Stack>
     </LynkModal>
   )
 }
