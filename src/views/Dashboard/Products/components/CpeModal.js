@@ -302,7 +302,7 @@ const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
           {/* CPE STRING */}
           <FormControl isReadOnly>
             <FormLabel htmlFor='cpe'>CPE String</FormLabel>
-            <Tag py={2} w={'fit-content'}>
+            <Tag py={2} w={'fit-content'} wordBreak={'break-all'}>
               {value}
             </Tag>
           </FormControl>

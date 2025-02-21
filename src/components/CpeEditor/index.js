@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from 'react'
 import { validateCpe, validateFields, validateLanguage } from 'utils/cpeUtils'
 import IdentifierLabel from 'views/Dashboard/Products/components/IdentifierLabel'
 
-import { FormControl, Stack, Textarea } from '@chakra-ui/react'
+import { FormControl, Stack, Tag } from '@chakra-ui/react'
 import { Button, ButtonGroup } from '@chakra-ui/react'
 
 import CpeField from './CpeField'
@@ -114,12 +114,9 @@ const CpeEditor = ({ value, setValue, isOpen, onOpen, onClose }) => {
           onClose={onClose}
           title={`CPE`}
         />
-        <Textarea
-          type='text'
-          variant='filled'
-          value={value}
-          onChange={(e) => console.log(e.target.value)}
-        />
+        <Tag mt={2} py={2} w={'fit-content'} wordBreak={'break-all'}>
+          {value}
+        </Tag>
       </FormControl>
       <Part disabled={false} part={cpeData?.part} onChange={onChange} />
       <Vendor

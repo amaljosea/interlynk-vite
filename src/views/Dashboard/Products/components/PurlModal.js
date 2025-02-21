@@ -272,7 +272,7 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
       <Stack spacing={4}>
         {/* Package URL */}
         {purlData?.type && (
-          <Tag mt={2} py={2} w={'fit-content'}>
+          <Tag mt={2} py={2} w={'fit-content'} wordBreak={'break-all'}>
             {PURL_STRING}
           </Tag>
         )}

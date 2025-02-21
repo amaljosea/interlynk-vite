@@ -116,7 +116,7 @@ const PurlEditor = ({ isOpen, onOpen, onClose }) => {
           title={`Package URL (PURL)`}
         />
         {purlData?.type && (
-          <Tag mt={2} py={2} w={'fit-content'}>
+          <Tag mt={2} py={2} w={'fit-content'} wordBreak={'break-all'}>
             {PURL_STRING}
           </Tag>
         )}
