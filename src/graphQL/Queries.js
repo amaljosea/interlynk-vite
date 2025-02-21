@@ -6056,3 +6056,44 @@ export const GetGlobalVulnsTotalCount = gql`
     }
   }
 `
+
+export const GetActivities = gql`
+  query GetActivities($projectId: Uuid!, $sbomId: Uuid!) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
+      sbomActivities {
+        id
+        sbom {
+          id
+        }
+        runId
+        runType
+        invocation
+        user {
+          id
+          name
+        }
+        startTime
+        endTime
+        sbomActivityDetails {
+          subjectType
+          subjectId
+          subject {
+            ... on Sbom {
+              id
+            }
+            ... on SbomComponent {
+              id
+              name
+              version
+              purl
+              cpes
+            }
+          }
+          action
+          result
+        }
+      }
+    }
+  }
+`
