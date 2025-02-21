@@ -52,8 +52,6 @@ const CompDetails = ({ data, primaryComp }) => {
   } = useContext(TabContext)
   const { details } = tabData
 
-  const inputStyle = { fontSize: 'sm' }
-
   const { sbomId, sbom } = data || ''
   const { id: productId } = sbom?.project || ''
 
@@ -238,7 +236,6 @@ const CompDetails = ({ data, primaryComp }) => {
           />
           <Input
             name='name'
-            sx={inputStyle}
             value={details?.name}
             placeholder='Enter name'
             onChange={(e) => handleChange('details', 'name', e.target.value)}
@@ -257,7 +254,6 @@ const CompDetails = ({ data, primaryComp }) => {
           />
           <Input
             name='version'
-            sx={inputStyle}
             value={details?.version}
             placeholder='Enter version'
             onChange={(e) => handleChange('details', 'version', e.target.value)}
@@ -275,7 +271,6 @@ const CompDetails = ({ data, primaryComp }) => {
             info={onCheck(`Component Description`)}
           />
           <Textarea
-            sx={inputStyle}
             name='description'
             value={details?.description}
             placeholder='Add description'
@@ -292,7 +287,6 @@ const CompDetails = ({ data, primaryComp }) => {
             info={onCheck(`Component Copyright`)}
           />
           <Textarea
-            sx={inputStyle}
             name='copyright'
             value={details?.copyright}
             placeholder='Add copyright'
@@ -311,7 +305,6 @@ const CompDetails = ({ data, primaryComp }) => {
           <Input
             name='group'
             value={details?.group}
-            sx={inputStyle}
             placeholder='Add group'
             onChange={(e) => handleChange('details', 'group', e.target.value)}
           />
@@ -326,7 +319,6 @@ const CompDetails = ({ data, primaryComp }) => {
           <Select
             name='kind'
             value={details?.kind}
-            sx={inputStyle}
             textTransform={'capitalize'}
             onChange={(e) => handleChange('details', 'kind', e.target.value)}
           >
@@ -357,7 +349,6 @@ const CompDetails = ({ data, primaryComp }) => {
           />
           <Select
             name='scope'
-            sx={inputStyle}
             value={details?.scope}
             onChange={(e) => handleChange('details', 'scope', e.target.value)}
           >

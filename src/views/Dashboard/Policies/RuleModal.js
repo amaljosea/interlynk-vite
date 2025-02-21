@@ -150,7 +150,7 @@ const RuleModal = ({ activeRow, data, isOpen, onClose }) => {
       <Flex width={'100%'} direction={'column'} gap={4}>
         {error !== '' && <LynkAlert msg={error} />}
         <FormControl isRequired>
-          <FormLabel fontSize={12}>Subject</FormLabel>
+          <FormLabel>Subject</FormLabel>
           <Select
             value={subject}
             onChange={onSubjectChange}
@@ -169,7 +169,7 @@ const RuleModal = ({ activeRow, data, isOpen, onClose }) => {
           </Select>
         </FormControl>
         <FormControl isRequired>
-          <FormLabel fontSize={12}>Operator</FormLabel>
+          <FormLabel>Operator</FormLabel>
           <Select
             id='operator'
             name='operator'
@@ -191,7 +191,7 @@ const RuleModal = ({ activeRow, data, isOpen, onClose }) => {
         </FormControl>
         {subject === 'VULNERABILITY_SEV' && (
           <FormControl isRequired>
-            <FormLabel fontSize={12}>Value</FormLabel>
+            <FormLabel>Value</FormLabel>
             <Select
               id='operator'
               name='operator'
@@ -216,7 +216,7 @@ const RuleModal = ({ activeRow, data, isOpen, onClose }) => {
           <Grid templateColumns={`repeat(2,1fr)`} gap={4}>
             <GridItem>
               <FormControl isRequired>
-                <FormLabel fontSize={12}>Min</FormLabel>
+                <FormLabel>Min</FormLabel>
                 <Input
                   type='text'
                   name='min'
@@ -228,7 +228,7 @@ const RuleModal = ({ activeRow, data, isOpen, onClose }) => {
             </GridItem>
             <GridItem>
               <FormControl isRequired>
-                <FormLabel fontSize={12}>Max</FormLabel>
+                <FormLabel>Max</FormLabel>
                 <Input
                   type='text'
                   name='max'
@@ -243,7 +243,7 @@ const RuleModal = ({ activeRow, data, isOpen, onClose }) => {
         )}
         {subject !== 'VULNERABILITY_SEV' && operator !== 'RANGE' && (
           <FormControl isRequired>
-            <FormLabel fontSize={12}>Value</FormLabel>
+            <FormLabel>Value</FormLabel>
             <Input
               type='text'
               name='value'

@@ -340,9 +340,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
         >
           {/* POLICY NAME */}
           <FormControl isRequired>
-            <FormLabel htmlFor='name' fontSize={12}>
-              Name
-            </FormLabel>
+            <FormLabel htmlFor='name'>Name</FormLabel>
             <Input
               type='text'
               name='name'
@@ -354,12 +352,8 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
           </FormControl>
           {/* POLICY DESCTIPTION */}
           <FormControl>
-            <FormLabel htmlFor='desc' fontSize={12}>
-              Description
-            </FormLabel>
+            <FormLabel htmlFor='desc'>Description</FormLabel>
             <Textarea
-              size='sm'
-              type='text'
               name='desc'
               value={formData?.desc}
               onChange={handleChange}
@@ -368,9 +362,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
           </FormControl>
           {/* POLICY RESULT AND TYPE */}
           <FormControl isRequired>
-            <FormLabel htmlFor='resultType' fontSize={12}>
-              Policy Result
-            </FormLabel>
+            <FormLabel htmlFor='resultType'>Policy Result</FormLabel>
             <Select
               name='resultType'
               onChange={handleChange}
@@ -390,9 +382,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
             </Select>
           </FormControl>
           <FormControl isRequired>
-            <FormLabel htmlFor='operator' fontSize={12}>
-              On Conditions
-            </FormLabel>
+            <FormLabel htmlFor='operator'>On Conditions</FormLabel>
             <Select
               name='operator'
               onChange={handleChange}
@@ -414,9 +404,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
           <Divider />
           {/* CONDITIONS */}
           <FormControl isRequired>
-            <FormLabel htmlFor='conditions' fontSize={12}>
-              Conditions
-            </FormLabel>
+            <FormLabel htmlFor='conditions'>Conditions</FormLabel>
             <PolicyConditions
               conditions={conditions}
               setConditions={setConditions}
@@ -441,9 +429,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
           <Divider />
           {/* APPLY CONDITION */}
           <FormControl>
-            <FormLabel htmlFor='doesNptapplyTo' fontSize={12}>
-              Does not apply to
-            </FormLabel>
+            <FormLabel htmlFor='doesNptapplyTo'>Does not apply to</FormLabel>
             <Stack spacing={5} mt={3}>
               <Checkbox
                 name={'isPrimary'}

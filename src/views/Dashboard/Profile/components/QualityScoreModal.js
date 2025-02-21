@@ -87,7 +87,7 @@ const QualityScoreModal = ({ data, isOpen, onClose }) => {
       title={`${data?.length > 0 ? 'Update' : 'Add'} Compliance`}
     >
       <FormControl>
-        <FormLabel fontSize={12}>SBOM Quality Score</FormLabel>
+        <FormLabel>SBOM Quality Score</FormLabel>
         <Spacer mt={2} />
         <LynkSelect
           value={item}

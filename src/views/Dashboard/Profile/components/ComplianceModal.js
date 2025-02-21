@@ -115,7 +115,7 @@ const ComplianceModal = ({ data, isOpen, onClose }) => {
       title={`${data?.length > 0 ? 'Update' : 'Add'} Compliance`}
     >
       <FormControl>
-        <FormLabel fontSize={12}>Applicable Compliance</FormLabel>
+        <FormLabel>Applicable Compliance</FormLabel>
         <Spacer mt={2} />
         <LynkSelect
           isMulti

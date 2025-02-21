@@ -114,8 +114,6 @@ function ComponentAddModal(props) {
     }
   })
 
-  const inputStyle = { size: 'md' }
-
   const {
     isOpen: isWarningOpen,
     onOpen: onWarningOpen,
@@ -273,7 +271,6 @@ function ComponentAddModal(props) {
                   />
                   <Input
                     name='name'
-                    sx={inputStyle}
                     value={details?.name}
                     placeholder='Enter name'
                     onChange={(e) =>
@@ -289,7 +286,6 @@ function ComponentAddModal(props) {
                     info={onCheck(`Component Description`)}
                   />
                   <Textarea
-                    sx={inputStyle}
                     name='description'
                     value={details?.description}
                     placeholder='Add description'
@@ -306,7 +302,6 @@ function ComponentAddModal(props) {
                     info={onCheck(`Component Copyright`)}
                   />
                   <Textarea
-                    sx={inputStyle}
                     name='copyright'
                     value={details?.copyright}
                     placeholder='Add copyright'
@@ -328,7 +323,6 @@ function ComponentAddModal(props) {
                   />
                   <Input
                     name='version'
-                    sx={inputStyle}
                     value={details?.version}
                     placeholder='Enter version'
                     onChange={(e) =>
@@ -350,7 +344,6 @@ function ComponentAddModal(props) {
                   <Input
                     name='group'
                     value={details?.group}
-                    sx={inputStyle}
                     placeholder='Add group'
                     onChange={(e) =>
                       handleChange('details', 'group', e.target.value)
@@ -367,7 +360,6 @@ function ComponentAddModal(props) {
                   <Select
                     name='kind'
                     aria-label='kind'
-                    sx={inputStyle}
                     value={details?.kind}
                     isDisabled={customerView}
                     textTransform={'capitalize'}
@@ -427,7 +419,6 @@ function ComponentAddModal(props) {
                   <Select
                     name='scope'
                     value={details?.scope}
-                    sx={inputStyle}
                     isDisabled={customerView}
                     onChange={(e) =>
                       handleChange('details', 'scope', e.target.value)
@@ -449,7 +440,6 @@ function ComponentAddModal(props) {
                     info={onCheck(`Support Level`)}
                   />
                   <Select
-                    sx={inputStyle}
                     name='supportLevel'
                     value={details?.supportLevel}
                     isDisabled={customerView}

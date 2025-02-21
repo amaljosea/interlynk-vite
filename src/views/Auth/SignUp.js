@@ -184,9 +184,7 @@ function SignUp() {
             or
           </Text>
           <FormControl>
-            <FormLabel ms='4px' fontWeight='normal'>
-              Name
-            </FormLabel>
+            <FormLabel ms='4px'>Name</FormLabel>
             <Input
               fontSize='sm'
               ms='4px'
@@ -196,9 +194,7 @@ function SignUp() {
               mb='24px'
               size='lg'
             />
-            <FormLabel ms='4px' fontWeight='normal'>
-              Email
-            </FormLabel>
+            <FormLabel ms='4px'>Email</FormLabel>
             <Input
               fontSize='sm'
               ms='4px'
@@ -208,9 +204,7 @@ function SignUp() {
               mb='24px'
               size='lg'
             />
-            <FormLabel ms='4px' fontWeight='normal'>
-              Password
-            </FormLabel>
+            <FormLabel ms='4px'>Password</FormLabel>
             <Input
               fontSize='sm'
               ms='4px'
@@ -222,7 +216,7 @@ function SignUp() {
             />
             <FormControl display='flex' alignItems='center' mb='24px'>
               <LynkSwitch id='remember-login' colorScheme='teal' me='10px' />
-              <FormLabel htmlFor='remember-login' mb='0' fontWeight='normal'>
+              <FormLabel htmlFor='remember-login' mb='0'>
                 Remember me
               </FormLabel>
             </FormControl>

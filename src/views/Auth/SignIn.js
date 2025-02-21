@@ -62,9 +62,7 @@ function SignIn() {
               Enter your email and password to sign in
             </Text>
             <FormControl>
-              <FormLabel ms='4px' fontWeight='normal'>
-                Email
-              </FormLabel>
+              <FormLabel ms='4px'>Email</FormLabel>
               <Input
                 borderRadius='15px'
                 mb='24px'
@@ -73,9 +71,7 @@ function SignIn() {
                 placeholder='Your email adress'
                 size='lg'
               />
-              <FormLabel ms='4px' fontWeight='normal'>
-                Password
-              </FormLabel>
+              <FormLabel ms='4px'>Password</FormLabel>
               <Input
                 borderRadius='15px'
                 mb='36px'
@@ -86,12 +82,7 @@ function SignIn() {
               />
               <FormControl display='flex' alignItems='center'>
                 <LynkSwitch id='remember-login' colorScheme='teal' me='10px' />
-                <FormLabel
-                  htmlFor='remember-login'
-                  mb='0'
-                  ms='1'
-                  fontWeight='normal'
-                >
+                <FormLabel htmlFor='remember-login' mb='0' ms='1'>
                   Remember me
                 </FormLabel>
               </FormControl>
