@@ -7,19 +7,12 @@ import { hasWhiteSpace, validateUrl } from 'utils/formValidationUtils'
 import { componentTypes, infoData, sbomPhases } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
-import {
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay
-} from '@chakra-ui/react'
 import { Button, Flex, Stack, Text, Tooltip } from '@chakra-ui/react'
 import { Checkbox, Divider, Input, Select, Textarea } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import LicenseField from 'components/Licenses/LicenseField'
+import LynkDrawer from 'components/LynkDrawer'
 import LynkSelect from 'components/LynkSelect'
 import LynkFormLabel from 'components/Misc/LynkLabel'
 
@@ -250,256 +243,254 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
 
   return (
     <>
-      <Drawer isOpen={isOpen} placement='right' onClose={onClose} size='md'>
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerCloseButton mt={2} />
-          <DrawerHeader borderBottomWidth='1px'>Build Version</DrawerHeader>
-          <DrawerBody overflowX={'hidden'}>
-            <Stack direction={'column'} spacing={4} pt={2} pb={4}>
-              {/* Name */}
-              <FormControl isRequired isReadOnly={customerView}>
-                <LynkFormLabel
-                  label='Name'
-                  htmlFor='compName'
-                  info={onCheck(`Component Name`)}
-                />
-                <Input
-                  size='md'
-                  fontSize={'sm'}
-                  placeholder='Enter name'
-                  value={compName}
-                  onChange={(e) => setCompName(e.target.value)}
-                />
-              </FormControl>
-              {/* Description */}
-              <FormControl isReadOnly={customerView}>
-                <LynkFormLabel
-                  label='Description'
-                  htmlFor='compDescription'
-                  info={onCheck(`Component Description`)}
-                />
-                <Textarea
-                  size='md'
-                  placeholder='Add description'
-                  value={compDesc}
-                  onChange={(e) => setCompDesc(e.target.value)}
-                />
-              </FormControl>
-              {/* Version */}
-              <FormControl
-                isRequired
-                isReadOnly={customerView}
-                isInvalid={invalidVersion}
-              >
-                <LynkFormLabel
-                  label='Version'
-                  htmlFor='compVersion'
-                  info={onCheck(`Component Version`)}
-                />
-                <Input
-                  size='md'
-                  fontSize={'sm'}
-                  placeholder='Enter version'
-                  value={compVersion}
-                  onChange={(e) => setCompVersion(e.target.value)}
-                />
-                <FormErrorMessage>
-                  This version of the product already exists. Continuing will
-                  override one of these versions.
-                </FormErrorMessage>
-              </FormControl>
-              {/* GROUP */}
-              <FormControl isReadOnly={customerView}>
-                <LynkFormLabel
-                  label='Group'
-                  htmlFor='groupInfo'
-                  info={onCheck(`Component Group`)}
-                />
-                <Input
-                  size='md'
-                  fontSize={'sm'}
-                  placeholder='Add group'
-                  value={groupInfo}
-                  onChange={(e) => setGroupInfo(e.target.value)}
-                />
-              </FormControl>
-              {/* KIND */}
-              <FormControl isRequired>
-                <LynkFormLabel
-                  label='Type'
-                  htmlFor='componentType'
-                  info={onCheck(`Component Type`)}
-                />
-                <Select
-                  value={compKind}
-                  id='componentType'
-                  name='componentType'
-                  isDisabled={customerView}
-                  onChange={(e) => setCompKind(e.target.value)}
-                  textTransform={'capitalize'}
+      <LynkDrawer
+        title={'Build Version'}
+        isOpen={isOpen}
+        onClose={onClose}
+        noFooter
+      >
+        <Stack direction={'column'} spacing={4} pt={2} pb={4}>
+          {/* Name */}
+          <FormControl isRequired isReadOnly={customerView}>
+            <LynkFormLabel
+              label='Name'
+              htmlFor='compName'
+              info={onCheck(`Component Name`)}
+            />
+            <Input
+              size='md'
+              fontSize={'sm'}
+              placeholder='Enter name'
+              value={compName}
+              onChange={(e) => setCompName(e.target.value)}
+            />
+          </FormControl>
+          {/* Description */}
+          <FormControl isReadOnly={customerView}>
+            <LynkFormLabel
+              label='Description'
+              htmlFor='compDescription'
+              info={onCheck(`Component Description`)}
+            />
+            <Textarea
+              size='md'
+              placeholder='Add description'
+              value={compDesc}
+              onChange={(e) => setCompDesc(e.target.value)}
+            />
+          </FormControl>
+          {/* Version */}
+          <FormControl
+            isRequired
+            isReadOnly={customerView}
+            isInvalid={invalidVersion}
+          >
+            <LynkFormLabel
+              label='Version'
+              htmlFor='compVersion'
+              info={onCheck(`Component Version`)}
+            />
+            <Input
+              size='md'
+              fontSize={'sm'}
+              placeholder='Enter version'
+              value={compVersion}
+              onChange={(e) => setCompVersion(e.target.value)}
+            />
+            <FormErrorMessage>
+              This version of the product already exists. Continuing will
+              override one of these versions.
+            </FormErrorMessage>
+          </FormControl>
+          {/* GROUP */}
+          <FormControl isReadOnly={customerView}>
+            <LynkFormLabel
+              label='Group'
+              htmlFor='groupInfo'
+              info={onCheck(`Component Group`)}
+            />
+            <Input
+              size='md'
+              fontSize={'sm'}
+              placeholder='Add group'
+              value={groupInfo}
+              onChange={(e) => setGroupInfo(e.target.value)}
+            />
+          </FormControl>
+          {/* KIND */}
+          <FormControl isRequired>
+            <LynkFormLabel
+              label='Type'
+              htmlFor='componentType'
+              info={onCheck(`Component Type`)}
+            />
+            <Select
+              value={compKind}
+              id='componentType'
+              name='componentType'
+              isDisabled={customerView}
+              onChange={(e) => setCompKind(e.target.value)}
+              textTransform={'capitalize'}
+            >
+              <option value=''>-- Select --</option>
+              {componentTypes?.map((item, index) => (
+                <option
+                  key={index}
+                  value={item}
+                  style={{ textTransform: 'capitalize' }}
                 >
-                  <option value=''>-- Select --</option>
-                  {componentTypes?.map((item, index) => (
-                    <option
-                      key={index}
-                      value={item}
-                      style={{ textTransform: 'capitalize' }}
-                    >
-                      {item}
-                    </option>
-                  ))}
-                </Select>
-              </FormControl>
-              {/* PHASES */}
-              <FormControl hidden={customerView}>
-                <LynkFormLabel
-                  label='Phases'
-                  htmlFor='compPhases'
-                  info={onCheck(`SBOM Phases`)}
-                />
-                <LynkSelect
-                  isMulti={true}
-                  value={phases}
-                  name='compPhases'
-                  isClearable={true}
-                  isSearchable={true}
-                  options={sbomPhases}
-                  onChange={onPhaseChange}
-                  placeholder={'Add phase'}
-                />
-              </FormControl>
-              {/* LICENSES */}
-              <LicenseField
-                sbomView={true}
-                isDisabled={customerView}
-                license={sbom ? sbom.licensesExp : null}
-              />
-              {/* SCOPE */}
-              <FormControl>
-                <LynkFormLabel
-                  label='Scope'
-                  htmlFor='compScope'
-                  info={onCheck(`Component Scope`)}
-                />
-                <Select
-                  size='md'
-                  id='compScope'
-                  name='compScope'
-                  value={compScope}
-                  isDisabled={customerView}
-                  onChange={(e) => setCompScope(e.target.value)}
-                >
-                  <option value='' style={{ background: 'lightgray' }}>
-                    -- Select --
-                  </option>
-                  <option value='excluded'>Excluded</option>
-                  <option value='optional'>Optional</option>
-                  <option value='required'>Required</option>
-                </Select>
-              </FormControl>
-              {/* SUPPLIER */}
-              <Stack>
-                <Text fontWeight={'semibold'}>Supplier Details</Text>
-                <Divider />
-              </Stack>
-              {/* ORG NAME */}
-              <FormControl isRequired>
-                <FormLabel>Organization Name</FormLabel>
-                <Input
-                  name='name'
-                  fontSize={'sm'}
-                  autoComplete='off'
-                  onChange={handleChange}
-                  value={formData?.name}
-                  placeholder='Enter organization name'
-                />
-              </FormControl>
-              {/* ORG URL */}
-              <FormControl isInvalid={isInvalidSupplier || containsSpace}>
-                <FormLabel>URL</FormLabel>
-                <Input
-                  name='url'
-                  fontSize={'sm'}
-                  autoComplete='off'
-                  onChange={handleChange}
-                  placeholder='Enter URL'
-                  onBlur={handleCheckUrl}
-                  value={formData?.url}
-                />
-                <FormErrorMessage>{isValidUrl}</FormErrorMessage>
-              </FormControl>
-              {/* SUPPLIER NAME */}
-              <FormControl>
-                <FormLabel>Contact Name</FormLabel>
-                <Input
-                  minLength={4}
-                  fontSize={'sm'}
-                  maxLength={256}
-                  autoComplete='no'
-                  name='contactName'
-                  onChange={handleChange}
-                  value={formData?.contactName}
-                  placeholder='Enter supplier name'
-                />
-              </FormControl>
-              {/* SUPPLIER EMAIL */}
-              <FormControl isInvalid={isInvalidEmail}>
-                <FormLabel>Contact Email</FormLabel>
-                <Input
-                  type='email'
-                  fontSize={'sm'}
-                  autoComplete='off'
-                  name='contactEmail'
-                  onChange={handleChange}
-                  onBlur={handleCheckEmail}
-                  value={formData?.contactEmail}
-                  placeholder='Enter supplier email'
-                />
-                <FormErrorMessage>{error}</FormErrorMessage>
-              </FormControl>
-              {/* PRIMARY COMPONENT */}
-              <FormControl isReadOnly={customerView} isDisabled>
-                <Flex alignItems={'center'} gap={2}>
-                  <Checkbox size='sm' colorScheme='blue' defaultChecked={true}>
-                    Primary component
-                  </Checkbox>
-                  <Tooltip label={onCheck(`Primary Component`)}>
-                    <InfoIcon fontSize={14} color={primaryBlueText} />
-                  </Tooltip>
-                </Flex>
-              </FormControl>
-              {/* INTERNAL COMPONENT */}
-              <FormControl isReadOnly={customerView}>
-                <Flex alignItems={'center'} gap={2}>
-                  <Checkbox
-                    size='sm'
-                    colorScheme='blue'
-                    isChecked={isInternal}
-                    onChange={() => setIsInternal(!isInternal)}
-                  >
-                    Internal component
-                  </Checkbox>
-                  <Tooltip label={onCheck(`Internal Component`)}>
-                    <InfoIcon fontSize={14} color={primaryBlueText} />
-                  </Tooltip>
-                </Flex>
-              </FormControl>
-              <Button
-                title='Save SBOM'
+                  {item}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+          {/* PHASES */}
+          <FormControl hidden={customerView}>
+            <LynkFormLabel
+              label='Phases'
+              htmlFor='compPhases'
+              info={onCheck(`SBOM Phases`)}
+            />
+            <LynkSelect
+              isMulti={true}
+              value={phases}
+              name='compPhases'
+              isClearable={true}
+              isSearchable={true}
+              options={sbomPhases}
+              onChange={onPhaseChange}
+              placeholder={'Add phase'}
+            />
+          </FormControl>
+          {/* LICENSES */}
+          <LicenseField
+            sbomView={true}
+            isDisabled={customerView}
+            license={sbom ? sbom.licensesExp : null}
+          />
+          {/* SCOPE */}
+          <FormControl>
+            <LynkFormLabel
+              label='Scope'
+              htmlFor='compScope'
+              info={onCheck(`Component Scope`)}
+            />
+            <Select
+              size='md'
+              id='compScope'
+              name='compScope'
+              value={compScope}
+              isDisabled={customerView}
+              onChange={(e) => setCompScope(e.target.value)}
+            >
+              <option value='' style={{ background: 'lightgray' }}>
+                -- Select --
+              </option>
+              <option value='excluded'>Excluded</option>
+              <option value='optional'>Optional</option>
+              <option value='required'>Required</option>
+            </Select>
+          </FormControl>
+          {/* SUPPLIER */}
+          <Stack>
+            <Text fontWeight={'semibold'}>Supplier Details</Text>
+            <Divider />
+          </Stack>
+          {/* ORG NAME */}
+          <FormControl isRequired>
+            <FormLabel>Organization Name</FormLabel>
+            <Input
+              name='name'
+              fontSize={'sm'}
+              autoComplete='off'
+              onChange={handleChange}
+              value={formData?.name}
+              placeholder='Enter organization name'
+            />
+          </FormControl>
+          {/* ORG URL */}
+          <FormControl isInvalid={isInvalidSupplier || containsSpace}>
+            <FormLabel>URL</FormLabel>
+            <Input
+              name='url'
+              fontSize={'sm'}
+              autoComplete='off'
+              onChange={handleChange}
+              placeholder='Enter URL'
+              onBlur={handleCheckUrl}
+              value={formData?.url}
+            />
+            <FormErrorMessage>{isValidUrl}</FormErrorMessage>
+          </FormControl>
+          {/* SUPPLIER NAME */}
+          <FormControl>
+            <FormLabel>Contact Name</FormLabel>
+            <Input
+              minLength={4}
+              fontSize={'sm'}
+              maxLength={256}
+              autoComplete='no'
+              name='contactName'
+              onChange={handleChange}
+              value={formData?.contactName}
+              placeholder='Enter supplier name'
+            />
+          </FormControl>
+          {/* SUPPLIER EMAIL */}
+          <FormControl isInvalid={isInvalidEmail}>
+            <FormLabel>Contact Email</FormLabel>
+            <Input
+              type='email'
+              fontSize={'sm'}
+              autoComplete='off'
+              name='contactEmail'
+              onChange={handleChange}
+              onBlur={handleCheckEmail}
+              value={formData?.contactEmail}
+              placeholder='Enter supplier email'
+            />
+            <FormErrorMessage>{error}</FormErrorMessage>
+          </FormControl>
+          {/* PRIMARY COMPONENT */}
+          <FormControl isReadOnly={customerView} isDisabled>
+            <Flex alignItems={'center'} gap={2}>
+              <Checkbox size='sm' colorScheme='blue' defaultChecked={true}>
+                Primary component
+              </Checkbox>
+              <Tooltip label={onCheck(`Primary Component`)}>
+                <InfoIcon fontSize={14} color={primaryBlueText} />
+              </Tooltip>
+            </Flex>
+          </FormControl>
+          {/* INTERNAL COMPONENT */}
+          <FormControl isReadOnly={customerView}>
+            <Flex alignItems={'center'} gap={2}>
+              <Checkbox
+                size='sm'
                 colorScheme='blue'
-                variant={'outline'}
-                isLoading={isLoading}
-                width={'fit-content'}
-                isDisabled={isInvalid}
-                onClick={onCreateSBOM}
+                isChecked={isInternal}
+                onChange={() => setIsInternal(!isInternal)}
               >
-                Save
-              </Button>
-            </Stack>
-          </DrawerBody>
-        </DrawerContent>
-      </Drawer>
+                Internal component
+              </Checkbox>
+              <Tooltip label={onCheck(`Internal Component`)}>
+                <InfoIcon fontSize={14} color={primaryBlueText} />
+              </Tooltip>
+            </Flex>
+          </FormControl>
+          <Button
+            title='Save SBOM'
+            colorScheme='blue'
+            variant={'outline'}
+            isLoading={isLoading}
+            width={'fit-content'}
+            isDisabled={isInvalid}
+            onClick={onCreateSBOM}
+          >
+            Save
+          </Button>
+        </Stack>
+      </LynkDrawer>
     </>
   )
 }
