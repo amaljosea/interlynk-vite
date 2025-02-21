@@ -418,12 +418,9 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
         {!ruleExists && (
           <EnvironmentSelector
             fixed={resolved}
-            options={options}
             ruleExists={ruleExists}
-            envLoading={envLoading}
-            defaultEnv={defaultEnv}
-            selectedEnvironments={selectedEnvironments}
-            handleCheckboxChange={handleCheckboxChange}
+            environments={selectedEnvironments}
+            setEnvironments={setSelectedEnvironments}
           />
         )}
       </Stack>
