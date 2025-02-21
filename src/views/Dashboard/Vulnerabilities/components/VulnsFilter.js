@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { Box, Flex, Stack, Text } from '@chakra-ui/react'
@@ -13,8 +13,12 @@ import CustomList from 'components/Misc/CustomList'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 import MenuHeading from 'components/Misc/MenuHeading'
 
+import { useGlobalState } from 'hooks/useGlobalState'
+
 const VulnFilters = ({ setFilter, sbomVersions, prodGroups }) => {
   const params = useParams()
+
+  const { envName } = useGlobalState()
 
   const getProductName = (id) =>
     prodGroups?.find((item) => item?.id === id)?.name
@@ -38,7 +42,7 @@ const VulnFilters = ({ setFilter, sbomVersions, prodGroups }) => {
       versions: filterValue
     }))
   }
-  const [envs, setEnvs] = useState([])
+  const [envs, setEnvs] = useState([`${envName}`])
   const onFilterEnv = async (value) => {
     const filterValue = value?.includes('all') ? undefined : value
     setEnvs(value?.includes('all') ? [] : value)
@@ -47,6 +51,14 @@ const VulnFilters = ({ setFilter, sbomVersions, prodGroups }) => {
       projectNames: filterValue
     }))
   }
+
+  useEffect(() => {
+    setFilter((oldFilters) => ({
+      ...oldFilters,
+      projectNames: [`${envName}`]
+    }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const [isComplete, setIsComplete] = useState(false)
   const onFilterComplete = async (e) => {
@@ -87,7 +99,7 @@ const VulnFilters = ({ setFilter, sbomVersions, prodGroups }) => {
       : []
 
   const uniqueList =
-  filteredVersions?.length > 0 ? [...new Set(filteredVersions)] : []
+    filteredVersions?.length > 0 ? [...new Set(filteredVersions)] : []
 
   const productOptions = prodGroups?.map((item) => item?.id)
   const envOptions = ['default', 'development', 'production', 'others']
