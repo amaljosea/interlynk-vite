@@ -7,7 +7,7 @@ import LynkSelect from 'components/LynkSelect'
 
 import { CpeAutoComplete } from 'graphQL/Queries'
 
-const Version = ({ disabled, version, onChange }) => {
+const Version = ({ disabled, version, onChange, product }) => {
   const [getCpe, { loading }] = useLazyQuery(CpeAutoComplete)
 
   const [value, setValue] = useState(null)
@@ -35,7 +35,8 @@ const Version = ({ disabled, version, onChange }) => {
             ecosystem: 'cpe',
             search: {
               version: value
-            }
+            },
+            hints: product ? { cpe: { product } } : undefined
           }
         }
       }).then((res) => {

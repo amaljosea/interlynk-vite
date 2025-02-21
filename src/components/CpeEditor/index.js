@@ -131,12 +131,14 @@ const CpeEditor = ({ value, setValue, isOpen, onOpen, onClose }) => {
       <Product
         disabled={false}
         product={cpeData?.product}
+        vendor={cpeData?.vendor}
         onChange={onChange}
         isValid={isProductValid}
       />
       <Version
         disabled={false}
         version={cpeData?.version}
+        product={cpeData?.product}
         onChange={onChange}
       />
       {/* UPDATE */}
