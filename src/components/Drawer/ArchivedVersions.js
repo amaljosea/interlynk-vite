@@ -5,12 +5,6 @@ import { getFullDate, timeSince, truncatedValue } from 'utils'
 
 import {
   ButtonGroup,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay,
   Flex,
   IconButton,
   Stack,
@@ -20,6 +14,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import LynkDrawer from 'components/LynkDrawer'
 import ArchiveSbom from 'components/Modal/ArchiveSbom'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -95,75 +90,59 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
 
   return (
     <>
-      <Drawer
-        size='md'
+      <LynkDrawer
+        title={'Archived Versions'}
         isOpen={isOpen}
-        placement='right'
         onClose={onClose}
-        closeOnOverlayClick={false}
+        noFooter
       >
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerCloseButton mt={2} />
-          <DrawerHeader borderBottomWidth='1px'>Archived Versions</DrawerHeader>
-          <DrawerBody>
-            {loading ? (
-              <CustomLoader />
-            ) : (
+        {loading ? (
+          <CustomLoader />
+        ) : (
+          <Flex my={2} gap={5} flexDir={'column'} alignItems={'flex-center'}>
+            {sbomArchived?.map((item, index) => (
               <Flex
-                my={2}
-                gap={5}
-                flexDir={'column'}
-                alignItems={'flex-center'}
+                w={'full'}
+                key={index}
+                alignItems={'center'}
+                justifyContent={'space-between'}
               >
-                {sbomArchived?.map((item, index) => (
-                  <Flex
-                    w={'full'}
-                    key={index}
-                    alignItems={'center'}
-                    justifyContent={'space-between'}
-                  >
-                    <Stack spacing={0}>
-                      <Text>
-                        {truncatedValue(item?.project?.projectGroup?.name, 20)}{' '}
-                        : {truncatedValue(item?.projectVersion, 20)}
-                      </Text>
-                      <Tooltip
-                        label={getFullDate(item?.createdAt)}
-                        placement='top'
-                      >
-                        <Text color={sameSecondaryText} fontSize={'sm'}>
-                          Last updated {timeSince(item?.createdAt)}
-                        </Text>
-                      </Tooltip>
-                    </Stack>
-                    <ButtonGroup>
-                      <Tooltip label='View' placement='top'>
-                        <IconButton
-                          size='sm'
-                          colorScheme='blue'
-                          title='View archived version'
-                          onClick={() => onView(item)}
-                          icon={<FaEye size={16} />}
-                        />
-                      </Tooltip>
-                      <Tooltip label='Restore' placement='top'>
-                        <IconButton
-                          size='sm'
-                          colorScheme='blue'
-                          aria-label={`sbom-${item?.projectVersion}-restore`}
-                          onClick={() => onRestore(item)}
-                          icon={<MdOutlineUnarchive size={20} />}
-                        />
-                      </Tooltip>
-                    </ButtonGroup>
-                  </Flex>
-                ))}
+                <Stack spacing={0}>
+                  <Text>
+                    {truncatedValue(item?.project?.projectGroup?.name, 20)} :{' '}
+                    {truncatedValue(item?.projectVersion, 20)}
+                  </Text>
+                  <Tooltip label={getFullDate(item?.createdAt)} placement='top'>
+                    <Text color={sameSecondaryText} fontSize={'sm'}>
+                      Last updated {timeSince(item?.createdAt)}
+                    </Text>
+                  </Tooltip>
+                </Stack>
+                <ButtonGroup>
+                  <Tooltip label='View' placement='top'>
+                    <IconButton
+                      size='sm'
+                      colorScheme='blue'
+                      title='View archived version'
+                      onClick={() => onView(item)}
+                      icon={<FaEye size={16} />}
+                    />
+                  </Tooltip>
+                  <Tooltip label='Restore' placement='top'>
+                    <IconButton
+                      size='sm'
+                      colorScheme='blue'
+                      aria-label={`sbom-${item?.projectVersion}-restore`}
+                      onClick={() => onRestore(item)}
+                      icon={<MdOutlineUnarchive size={20} />}
+                    />
+                  </Tooltip>
+                </ButtonGroup>
               </Flex>
-            )}
-          </DrawerBody>
-        </DrawerContent>
-      </Drawer>
+            ))}
+          </Flex>
+        )}
+      </LynkDrawer>
 
       {/* ARCHIVE VERSION */}
       {isWarnOpen && (
