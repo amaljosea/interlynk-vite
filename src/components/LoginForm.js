@@ -173,14 +173,13 @@ const LoginForm = () => {
                 />
               </InputRightElement>
             </InputGroup>
-            <Link to={'/reset_password'}>
-              <FormHelperText
-                textAlign={'right'}
-                _hover={{ color: primaryBlueText }}
-              >
-                Forgot password ?
-              </FormHelperText>
-            </Link>
+            <FormHelperText display='flex' justifyContent='flex-end'>
+              <Link to='/reset_password'>
+                <Text _hover={{ color: primaryBlueText }}>
+                  Forgot password?
+                </Text>
+              </Link>
+            </FormHelperText>
           </FormControl>
           <Button
             width='full'
