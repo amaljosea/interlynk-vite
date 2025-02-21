@@ -445,7 +445,9 @@ const ComponentsColumns = ({
                       <MenuItem
                         data-testid='edit_component_support'
                         onClick={() => handleSupport(row)}
-                        isDisabled={status === 'signed' || !updateComponent}
+                        isDisabled={
+                          status === 'signed' || !updateComponent || isFreeTier
+                        }
                       >
                         Edit Support Status
                       </MenuItem>

@@ -291,7 +291,11 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
           </MenuItem>
           <Divider hidden={signedUrlParams} />
           {/*  SBOM EXCEL DOWNLOAD */}
-          <MenuItem onClick={downloadExcel} hidden={signedUrlParams}>
+          <MenuItem
+            isDisabled={isFreeTier}
+            onClick={downloadExcel}
+            hidden={signedUrlParams}
+          >
             <Stack spacing={1}>
               <Box {...title} spacing={1}>
                 Excel
@@ -301,14 +305,22 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
           </MenuItem>
           <Divider hidden={signedUrlParams} />
           {/* Support Level CSV */}
-          <MenuItem onClick={downloadSupport} hidden={signedUrlParams}>
+          <MenuItem
+            isDisabled={isFreeTier}
+            hidden={signedUrlParams}
+            onClick={downloadSupport}
+          >
             <Stack spacing={1}>
               <Box {...title}>CSV (Support Levels)</Box>
               <Box {...subTitle}>Download component support levels as CSV</Box>
             </Stack>
           </MenuItem>
           <Divider hidden={signedUrlParams} />
-          <MenuItem onClick={downloadOriginal} hidden={signedUrlParams}>
+          <MenuItem
+            isDisabled={isFreeTier}
+            hidden={signedUrlParams}
+            onClick={downloadOriginal}
+          >
             <Stack spacing={1}>
               <Box {...title}>Original</Box>
               <Box {...subTitle}>

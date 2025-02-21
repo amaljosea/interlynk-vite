@@ -252,14 +252,14 @@ const Settings = ({ enabled, data, mfc }) => {
             <Flex align='center'>
               <LynkSwitch
                 size='md'
-                colorScheme='blue'
                 me='10px'
+                colorScheme='blue'
                 id='enableSupportLevel'
                 isChecked={enableSupportLevel || false}
                 onChange={(e) =>
                   onUpdate(e.target.checked, 'enableSupportLevel')
                 }
-                isDisabled={!enabled || !editControls}
+                isDisabled={!enabled || !editControls || isFreeTier}
               />
               <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
                 Component Support Analysis
