@@ -51,7 +51,17 @@ const LynkDrawer = ({
           {subtitle && <Box mt={1}>{subtitle}</Box>}
         </DrawerHeader>
 
-        <DrawerBody paddingInline={'16px'} overflowX={'hidden'}>
+        <DrawerBody
+          paddingInline={'16px'}
+          overflowX={'hidden'}
+          sx={{
+            '&::-webkit-scrollbar': {
+              display: 'none'
+            },
+            '-ms-overflow-style': 'none',
+            'scrollbar-width': 'none'
+          }}
+        >
           {children}
         </DrawerBody>
         <Divider hidden={noFooter} />
