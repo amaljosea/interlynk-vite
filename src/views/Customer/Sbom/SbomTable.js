@@ -24,7 +24,6 @@ const tabs = [
   'vulnerabilities',
   'licenses',
   'policies',
-  'support',
   'checks',
   'changelog'
 ]
@@ -87,7 +86,6 @@ const SbomTable = ({ data, loading, error }) => {
                 {(item === 'parts' ||
                   item === 'checks' ||
                   item === 'changelog' ||
-                  item === 'support' ||
                   item === 'policies') && (
                   <FaLock
                     color={secondaryTextInverse}
@@ -112,7 +110,6 @@ const SbomTable = ({ data, loading, error }) => {
             <TabPanel px={0}>
               <Licenses />
             </TabPanel>
-            <TabPanel px={0}></TabPanel>
             <TabPanel px={0}></TabPanel>
             <TabPanel px={0}></TabPanel>
             <TabPanel px={0}></TabPanel>

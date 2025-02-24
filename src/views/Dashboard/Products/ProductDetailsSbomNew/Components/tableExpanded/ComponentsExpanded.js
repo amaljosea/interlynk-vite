@@ -48,6 +48,10 @@ const ExpandedComponent = (props) => {
         )
       : ''
     const endOfSupportDate = data?.componentSupportLevel?.endDate
+    const assessmentExpiresOn =
+      data?.componentSupportLevel?.retainManualOverrideFor
+    const supportExplanation = data?.componentSupportLevel?.notes
+    const lastAssessedBy = data?.componentSupportLevel?.user?.name
 
     const purlColor = purl && primaryBlueText
     const cpesColor = cpes?.length > 0 && primaryBlueText
@@ -190,11 +194,29 @@ const ExpandedComponent = (props) => {
             label='Support Level'
             value={supportLevel || 'N/A'}
           />
-          {/*  End-of-Support Date */}
+          {/* End-of-Support Date */}
           <DetailItem
             hidden={customerView}
             label='End-of-Support Date'
             value={getDate(endOfSupportDate) || 'N/A'}
+          />
+          {/* ASSESSMENT EXPIERS ON */}
+          <DetailItem
+            hidden={customerView}
+            label='Assessment Expiers On'
+            value={assessmentExpiresOn ? `${assessmentExpiresOn} Days` : 'N/A'}
+          />
+          {/* SUPPORT EXPLANATION */}
+          <DetailItem
+            hidden={customerView}
+            label='Support Explanation'
+            value={supportExplanation || 'N/A'}
+          />
+          {/* LAST ASSESSED BY */}
+          <DetailItem
+            hidden={customerView}
+            label='Last Assessed By'
+            value={lastAssessedBy || 'N/A'}
           />
         </Grid>
       </Box>

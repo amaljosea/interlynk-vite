@@ -1817,6 +1817,12 @@ export const GetComponentData = gql`
           componentSupportLevel {
             level
             endDate
+            notes
+            retainManualOverrideFor
+            user {
+              id
+              name
+            }
           }
           externalUrls {
             name

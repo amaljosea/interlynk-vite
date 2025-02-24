@@ -74,8 +74,7 @@ const CompSupport = ({ data, isOpen, onClose }) => {
 }
 
 const SupportCard = ({ setEdit, data }) => {
-  const { level, endDate, notes, retainManualOverrideFor, updatedAt, user } =
-    data || {}
+  const { level, updatedAt, user } = data || {}
 
   const { sameSecondaryText, grayBorderColor } = useThemeColor([
     'sameSecondaryText',
@@ -119,22 +118,6 @@ const SupportCard = ({ setEdit, data }) => {
           </Text>
         </SimpleGrid>
         <SimpleGrid {...container}>
-          <Text {...label}>End-of-Support Date</Text>
-          <Text {...infoStyle}>{endDate ? getFullDate(endDate) : 'N/A'}</Text>
-        </SimpleGrid>
-        <SimpleGrid {...container}>
-          <Text {...label}>Assessment Expries On</Text>
-          <Text {...infoStyle}>
-            {retainManualOverrideFor
-              ? `${retainManualOverrideFor} Days`
-              : 'N/A'}{' '}
-          </Text>
-        </SimpleGrid>
-        <SimpleGrid {...container}>
-          <Text {...label}>Explation</Text>
-          <Text {...infoStyle}>{notes || 'N/A'}</Text>
-        </SimpleGrid>
-        <SimpleGrid {...container}>
           <Text {...label}>Last Assessed</Text>
           {updatedAt ? (
             <Tooltip label={getFullDate(updatedAt)}>
@@ -143,10 +126,6 @@ const SupportCard = ({ setEdit, data }) => {
           ) : (
             <Text {...infoStyle}>{'N/A'}</Text>
           )}
-        </SimpleGrid>
-        <SimpleGrid {...container}>
-          <Text {...label}>Last Assessed By</Text>
-          <Text {...infoStyle}>{user?.name || 'N/A'}</Text>
         </SimpleGrid>
       </Stack>
     </Stack>
