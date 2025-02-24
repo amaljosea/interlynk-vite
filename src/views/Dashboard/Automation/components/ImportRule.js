@@ -1,5 +1,5 @@
 import { gql, useMutation } from '@apollo/client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { Flex, FormControl, FormLabel, Input, Text } from '@chakra-ui/react'
@@ -44,6 +44,42 @@ const ImportRule = (props) => {
 
   const [importRule, { loading }] = useMutation(AutomationRulesImport)
 
+  useEffect(() => {
+    const handleGlobalDragOver = (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      if (!isDragActive) setIsDragActive(true)
+    }
+
+    const handleGlobalDragLeave = (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      if (e.relatedTarget === null) {
+        setIsDragActive(false)
+      }
+    }
+
+    const handleGlobalDrop = (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      setIsDragActive(false)
+      if (e.dataTransfer.files.length > 0) {
+        handleDrop(e)
+      }
+    }
+
+    window.addEventListener('dragover', handleGlobalDragOver)
+    window.addEventListener('dragleave', handleGlobalDragLeave)
+    window.addEventListener('drop', handleGlobalDrop)
+
+    return () => {
+      window.removeEventListener('dragover', handleGlobalDragOver)
+      window.removeEventListener('dragleave', handleGlobalDragLeave)
+      window.removeEventListener('drop', handleGlobalDrop)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const handleDrop = (e) => {
     e.preventDefault()
     e.stopPropagation()
@@ -61,18 +97,6 @@ const ImportRule = (props) => {
         )
       }
     }
-  }
-
-  const handleDragOver = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragActive(true)
-  }
-
-  const handleDragLeave = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragActive(false)
   }
 
   const handleFileChange = (event) => {
@@ -130,10 +154,7 @@ const ImportRule = (props) => {
             borderRadius='md'
             textAlign='center'
             overflow={'hidden'}
-            onDrop={handleDrop}
             borderStyle='dashed'
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
             borderColor={isDragActive ? primaryBlueText : grayBorderColor}
             onClick={() => document.getElementById('fileInput').click()}
           >
@@ -151,10 +172,10 @@ const ImportRule = (props) => {
                 fontWeight={500}
               >
                 {isDragActive
-                  ? 'Drop the file here'
+                  ? 'Drop the file anywhere'
                   : selectedFile
                     ? selectedFile.name
-                    : 'Drop JSON file, or click to select a file'}
+                    : 'Drop JSON file anywhere, or click to select'}
               </Text>
               <Text hidden={!loading}>Uploading...</Text>
             </Flex>
