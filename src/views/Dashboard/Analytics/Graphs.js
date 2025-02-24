@@ -23,7 +23,7 @@ export const Graphs = ({ filters }) => {
 
   if (!product?.length || !version?.length || !duration) {
     return (
-      <SimpleGrid w={'100%'} columns={3} gap={6}>
+      <SimpleGrid w={'100%'} columns={[2, 3]} gap={6}>
         {[1, 2, 3, 4, 5, 6].map((item) => (
           <Card key={item}>
             <CardBody py={16} alignItem='center' justifyContent='center'>
@@ -47,7 +47,7 @@ export const Graphs = ({ filters }) => {
     )
 
   return (
-    <SimpleGrid gap={6} width={'100%'} columns={3}>
+    <SimpleGrid gap={6} width={'100%'} columns={[2, 3]}>
       <ComponentCount filters={filters} />
       <LicenseCount filters={filters} />
       <VulnBySeverity filters={filters} />
