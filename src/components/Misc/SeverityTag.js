@@ -1,12 +1,8 @@
 import { sevColor } from 'utils/styleUtils'
 
-import { Tag, TagLabel, Text } from '@chakra-ui/react'
-
-import { useThemeColor } from 'hooks/useThemeColors'
+import { Tag, TagLabel } from '@chakra-ui/react'
 
 const SeverityTag = ({ value }) => {
-  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
-
   if (value) {
     return (
       <Tag
@@ -24,9 +20,9 @@ const SeverityTag = ({ value }) => {
   }
 
   return (
-    <Text w={'120px'} textAlign={'center'} color={primaryTextColor}>
-      N/A
-    </Text>
+    <Tag w={'120px'}>
+      <TagLabel mx={'auto'}>N/A</TagLabel>
+    </Tag>
   )
 }
 
