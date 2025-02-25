@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/react'
 import { MainRoutes } from 'MainRoutes.js'
 import { ApolloWrapper } from 'context/ApolloWrapper.js'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom/client'
 import ReactGA from 'react-ga4'
 import { BrowserRouter } from 'react-router-dom'
 import theme, { config } from 'theme/theme.js'
@@ -37,7 +37,9 @@ Sentry.init({
   replaysOnErrorSampleRate: 1.0 // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
 })
 
-ReactDOM.render(
+const root = ReactDOM.createRoot(document.getElementById('root'))
+
+root.render(
   <React.StrictMode>
     <BrowserRouter>
       <GlobalStateProvider>
@@ -51,6 +53,5 @@ ReactDOM.render(
         </ChakraProvider>
       </GlobalStateProvider>
     </BrowserRouter>
-  </React.StrictMode>,
-  document.getElementById('root')
+  </React.StrictMode>
 )
