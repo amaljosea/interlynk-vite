@@ -76,7 +76,8 @@ const SbomDetails = ({ sbomData }) => {
     checksEnabled,
     vulnScanningEnabled: vulnScan,
     internalCompMatchingEnabled: internalComp,
-    automatedFixesEnabled
+    automatedFixesEnabled,
+    enableSupportLevel
   } = projectSetting || ''
   const hasFinished = vulnRunStatus === 'FINISHED'
 
@@ -290,7 +291,7 @@ const SbomDetails = ({ sbomData }) => {
                     <SettingsTag
                       label={'Component Support Analysis'}
                       icon={<FaLayerGroup />}
-                      isDisabled={!hasFinished || !vulnScan}
+                      isDisabled={!hasFinished || !enableSupportLevel}
                       rounded
                     />
                     <Divider width={3} borderColor={sameSecondaryText} />
