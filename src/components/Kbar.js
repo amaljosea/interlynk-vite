@@ -42,8 +42,9 @@ const Kbar = () => {
     isProductVersionPage,
     isProductDetailsPage,
     isProductsPage,
-    isVulnerabilityRelatedPage,
-    isProductsRelatedPage
+    isProductsRelatedPage,
+    isGlobalVulnerabilitiesPage,
+    isSingleVulnerabilityPage
   } = useRouteFlags()
 
   const {
@@ -211,6 +212,11 @@ const Kbar = () => {
       } else if (isProductsPage) {
         const link = '/vendor/dashboard'
         navigate(link)
+      } else if (isGlobalVulnerabilitiesPage) {
+        const link = '/vendor/vulnerabilities'
+        navigate(link)
+      } else if (isSingleVulnerabilityPage) {
+        navigate(-1)
       } else {
         return
       }
@@ -225,7 +231,7 @@ const Kbar = () => {
     keywords: ['/'],
     icon: <FaRegFile color={sameSecondaryText} />,
     perform: () => {
-      if (isVulnerabilityRelatedPage) {
+      if (isGlobalVulnerabilitiesPage) {
         const link = '/vendor/vulnerabilities'
         navigate(link)
       } else if (isProductsRelatedPage) {

@@ -6,7 +6,8 @@ function vendorRootCheck(pathname) {
 }
 
 export const useRouteFlags = () => {
-  const { pathname } = useLocation()
+  const { pathname, search } = useLocation()
+  const searchParams = new URLSearchParams(search)
 
   return {
     isVulnerabilityDetailsPage:
@@ -31,6 +32,14 @@ export const useRouteFlags = () => {
 
     isVulnerabilitiesPage: pathname === '/vendor/vulnerabilities',
 
-    isVendorRootPage: pathname === '/vendor' || vendorRootCheck(pathname)
+    isVendorRootPage: pathname === '/vendor' || vendorRootCheck(pathname),
+
+    isGlobalVulnerabilitiesPage:
+      pathname.startsWith('/vendor/vulnerabilities') &&
+      searchParams.get('tab') === 'productVulnerabilities' &&
+      !!searchParams.get('vulnId'),
+
+    isSingleVulnerabilityPage:
+      pathname === '/vendor/vulnerabilities' && !!searchParams.get('vulnId')
   }
 }
