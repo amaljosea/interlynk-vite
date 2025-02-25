@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 
 import { GetProjectsCustomer, GetProjectsVendor } from 'graphQL/Queries'
 
