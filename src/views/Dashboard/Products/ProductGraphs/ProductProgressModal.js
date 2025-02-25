@@ -3,14 +3,6 @@ import { useState } from 'react'
 import {
   Box,
   Button,
-  Divider,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay,
   Flex,
   Menu,
   MenuButton,
@@ -20,6 +12,8 @@ import {
   Tag,
   Text
 } from '@chakra-ui/react'
+
+import LynkDrawer from 'components/LynkDrawer'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -221,18 +215,16 @@ const ProductProgressModal = ({ isOpen, onClose, name }) => {
   }
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose} size='xl'>
-      <DrawerOverlay />
-      <DrawerContent>
-        <DrawerHeader>
-          <Text fontSize={20} fontWeight={500}>
-            Product TrailLynk
-          </Text>
-          <Tag colorScheme='blue'>{name}</Tag>
-        </DrawerHeader>
-        <Divider />
-        <DrawerCloseButton marginTop={4} />
-        <Flex m={5} justifyContent={'space-between'} alignItems={'center'}>
+    <>
+      <LynkDrawer
+        title={'Product TrailLynk'}
+        subtitle={<Tag colorScheme='blue'>{name}</Tag>}
+        isOpen={isOpen}
+        onClose={onClose}
+        size='xl'
+        noFooter
+      >
+        <Flex my={2} justifyContent={'space-between'} alignItems={'center'}>
           <Flex gap={4}>
             <FilterMenu
               title={'Components'}
@@ -277,28 +269,24 @@ const ProductProgressModal = ({ isOpen, onClose, name }) => {
             </Menu>
           </Flex>
         </Flex>
-        <Divider />
-
-        <DrawerBody borderRadius={10} p={0}>
-          <Flex gap={4} minHeight={600} p={5} justifyContent={'space-evenly'}>
-            {renderTree(defaultData, 'default')}
-            {renderTree(developmentData, 'development')}
-            {renderTree(productionData, 'production')}
-          </Flex>
-        </DrawerBody>
-        <DrawerFooter justifyContent={'flex-start'}>
-          <Flex gap={12}>
-            <LegendItem color={secondaryTextColor} label={'Path'} />
-            {targetComponent && (
-              <LegendItem color={primaryErrorColor} label={'Components'} />
-            )}
-            {targetVulnerability && (
-              <LegendItem color={vibrantBlue} label={'Vulnerability'} />
-            )}
-          </Flex>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+        {/* <Divider /> */}
+        <Flex gap={4} minHeight={600} mt={4} justifyContent={'space-evenly'}>
+          {renderTree(defaultData, 'default')}
+          {renderTree(developmentData, 'development')}
+          {renderTree(productionData, 'production')}
+        </Flex>
+        {/* Bottom */}
+        <Flex position={'fixed'} bottom={5} gap={12}>
+          <LegendItem color={secondaryTextColor} label={'Path'} />
+          {targetComponent && (
+            <LegendItem color={primaryErrorColor} label={'Components'} />
+          )}
+          {targetVulnerability && (
+            <LegendItem color={vibrantBlue} label={'Vulnerability'} />
+          )}
+        </Flex>
+      </LynkDrawer>
+    </>
   )
 }
 
