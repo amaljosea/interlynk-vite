@@ -15,16 +15,9 @@ import {
 } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
-import {
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay
-} from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import LynkDrawer from 'components/LynkDrawer'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -260,66 +253,60 @@ const ComplianceChecks = (props) => {
   }
 
   return (
-    <Drawer size='md' isOpen={isOpen} placement='right' onClose={onClose}>
-      <DrawerOverlay />
-      <DrawerContent>
-        <DrawerCloseButton mt={2} />
-        <DrawerHeader pl={4}>
-          <Text fontWeight={'medium'}>Compliance Checks</Text>
-          <Tag
-            mt={1}
-            hidden={!name}
-            fontSize={'xs'}
-            w={'fit-content'}
-            colorScheme='blue'
-            textAlign={'right'}
-            wordBreak={'break-all'}
-          >
-            {name}
-          </Tag>
-        </DrawerHeader>
-        <Divider />
-        <DrawerBody p={0}>
-          <Tabs index={tab} onChange={onTabChange}>
-            <TabList
-              position={'fixed'}
-              bg={secondaryBgColor}
-              zIndex={1}
-              left={0}
-              right={0}
+    <LynkDrawer
+      title={'Compliance Checks'}
+      subtitle={
+        <Tag
+          hidden={!name}
+          fontSize={'xs'}
+          w={'fit-content'}
+          colorScheme='blue'
+          textAlign={'right'}
+          wordBreak={'break-all'}
+        >
+          {name}
+        </Tag>
+      }
+      isOpen={isOpen}
+      onClose={onClose}
+      noFooter
+    >
+      <Tabs index={tab} onChange={onTabChange}>
+        <TabList
+          position={'fixed'}
+          bg={secondaryBgColor}
+          zIndex={1}
+          left={0}
+          right={0}
+          top={!name ? '60px' : '90px'}
+        >
+          {tabs.map((item, index) => (
+            <Tab
+              py={3.5}
+              key={index}
+              fontSize={'sm'}
+              textTransform={'uppercase'}
+              _focus={{ outline: 'none', bg: 'none' }}
             >
-              {tabs.map((item, index) => (
-                <Tab
-                  py={3.5}
-                  key={index}
-                  fontSize={'sm'}
-                  textTransform={'uppercase'}
-                  _focus={{ outline: 'none', bg: 'none' }}
-                >
-                  {item}
-                </Tab>
-              ))}
-            </TabList>
-            <TabPanels pos={'relative'} top={14} overflowX={'hidden'}>
-              {tabs?.map((item, index) => (
-                <TabPanel key={index}>
-                  {item === 'bsi' ? (
-                    <Center py={24} color={sameSecondaryText}>
-                      Coming Soon...
-                    </Center>
-                  ) : (
-                    <ScoreBoard
-                      loading={getLoading(item)}
-                      data={getData(item)}
-                    />
-                  )}
-                </TabPanel>
-              ))}
-            </TabPanels>
-          </Tabs>
-        </DrawerBody>
-      </DrawerContent>
-    </Drawer>
+              {item}
+            </Tab>
+          ))}
+        </TabList>
+        <TabPanels pos={'relative'} top={14} overflowX={'hidden'}>
+          {tabs?.map((item, index) => (
+            <TabPanel padding={0} key={index}>
+              {item === 'bsi' ? (
+                <Center py={24} color={sameSecondaryText}>
+                  Coming Soon...
+                </Center>
+              ) : (
+                <ScoreBoard loading={getLoading(item)} data={getData(item)} />
+              )}
+            </TabPanel>
+          ))}
+        </TabPanels>
+      </Tabs>
+    </LynkDrawer>
   )
 }
 
