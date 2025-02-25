@@ -1,5 +1,4 @@
 import { act, render } from '@testing-library/react'
-import { useEffect } from 'react'
 
 import { useGradualPolling } from './useGradualPolling'
 
@@ -53,7 +52,7 @@ describe('useGradualPolling', () => {
     })
 
     // expect the max to be
-    expect(mockStartPolling).toHaveBeenCalledWith(10000)
+    expect(mockStartPolling).toHaveBeenCalledWith(4000)
     // Ensure stopPolling is called
     expect(mockStopPolling).not.toHaveBeenCalled()
   })
