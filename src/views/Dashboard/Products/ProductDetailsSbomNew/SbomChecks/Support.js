@@ -1,9 +1,9 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 
-import { Box, Button, Select, Stack } from '@chakra-ui/react'
+import { Button, Select, Stack } from '@chakra-ui/react'
 import { NumberInput, NumberInputField } from '@chakra-ui/react'
 import { Input, InputGroup, InputRightAddon } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
@@ -17,7 +17,6 @@ import CompInfo from 'components/Misc/CompInfo'
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
-import { useProjectGroup } from 'hooks/useProjectGroup'
 
 import {
   AutomationRuleCreate,
@@ -28,7 +27,6 @@ import {
 import { BiWrench } from 'react-icons/bi'
 
 const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
-  const params = useParams()
   const navigate = useNavigate()
   const { showToast } = useCustomToast()
   const { isFreeTier } = useGlobalQueryContext()
@@ -41,8 +39,6 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
   const inputStyle = { size: 'md', fontSize: 'sm' }
 
   const [error, setError] = useState('')
-  const [options, setOptions] = useState([])
-  const [defaultEnv, setDefaultEnv] = useState('')
   const [selectedEnvironments, setSelectedEnvironments] = useState([])
   const [formData, setFormData] = useState({
     supportLevel: '',
@@ -54,15 +50,13 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
   const [createRule, { loading: ruleLoading }] =
     useMutation(AutomationRuleCreate)
   const [createSupport, { loading: createLoading }] = useMutation(
-    componentSupportLevelCreate
+    componentSupportLevelCreate,
+    { onCompleted: () => recheck() }
   )
   const [updateSupport, { loading: updateLoading }] = useMutation(
-    componentSupportLevelUpdate
+    componentSupportLevelUpdate,
+    { onCompleted: () => recheck() }
   )
-
-  const { projects, loading: envLoading } = useProjectGroup({
-    projectGroupId: params.productgroupid
-  })
 
   const resolved = status === 'resolved'
   const disabled =
@@ -92,20 +86,6 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
       ...prev,
       [field]: newDate ? newDate._d : ''
     }))
-  }
-
-  const handleCheckboxChange = (env, isChecked) => {
-    if (env.value === defaultEnv.value) {
-      // Default option cannot be unchecked
-      return
-    }
-    if (isChecked) {
-      setSelectedEnvironments((prev) => [...prev, env])
-    } else {
-      setSelectedEnvironments((prev) =>
-        prev.filter((item) => item.value !== env.value)
-      )
-    }
   }
 
   const conditions = [
@@ -291,28 +271,6 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
   }
 
   useEffect(() => {
-    const defaultOption = projects.find(
-      (project) => project.id === params?.productid
-    )
-    if (defaultOption) {
-      const defaultEnvObj = {
-        value: defaultOption.id,
-        label: defaultOption.name
-      }
-      setDefaultEnv(defaultEnvObj)
-      setSelectedEnvironments([defaultEnvObj])
-    }
-    const otherOptions = projects
-      .filter((project) => project.id !== params?.productid)
-      .map((project) => ({
-        value: project.id,
-        label: project.name
-      }))
-    setOptions(otherOptions)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [envLoading])
-
-  useEffect(() => {
     if (componentSupportLevel) {
       const { level, endDate, notes, retainManualOverrideFor } =
         componentSupportLevel || {}
@@ -342,18 +300,12 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
       isLoading={createLoading || updateLoading}
       leftFooterContent={!isFreeTier && <RuleAction />}
     >
+      <Stack mb={error || component ? 4 : 0}>
+        {error !== '' && <LynkAlert msg={error} />}
+        {component && <CompInfo data={component} />}
+      </Stack>
+
       <Stack spacing={4} mt={2}>
-        {error !== '' && (
-          <Box>
-            <LynkAlert msg={error} />
-          </Box>
-        )}
-        {/* COMPONENT INFO */}
-        {component && (
-          <Box w={'fit-content'}>
-            <CompInfo data={component} />
-          </Box>
-        )}
         {/* SUPPRT LEVEL */}
         <FormControl isRequired>
           <FormLabel htmlFor='supportLevel'>Support Level</FormLabel>
