@@ -148,7 +148,6 @@ const Compliance = ({ sbomData }) => {
               fontSize={'14px'}
               fontWeight={'light'}
               color={headingTextColor}
-              pt={item?.complianceType === 'bsi' ? 5 : 0}
             >
               {getDesc(item?.complianceType) || ''}
               <chakra.span
