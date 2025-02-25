@@ -111,7 +111,7 @@ const ComponentsColumns = ({
             />
           )
           return (
-            <Flex sx={{ alignItems: 'center', gap: 2, my: 3 }}>
+            <Flex sx={{ alignItems: 'center', gap: 2, my: 4 }}>
               <Box width={'50px'}>
                 <IconButton icon={icon} isRound={true} variant='solid' />
               </Box>
@@ -194,7 +194,11 @@ const ComponentsColumns = ({
       {
         id: 'COMPONENTS_VERSION',
         name: 'VERSION',
-        selector: (row) => <Text color={primaryTextColor}>{row?.version}</Text>,
+        selector: (row) => (
+          <Text my={4} color={primaryTextColor}>
+            {row?.version}
+          </Text>
+        ),
         wrap: true,
         width: customerView ? '12%' : '10%',
         sortable: true
