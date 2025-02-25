@@ -5,12 +5,6 @@ import { getComponentHealthScoreFromLocalData } from 'utils/getComponentHealthSc
 
 import {
   Center,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay,
   Grid,
   SimpleGrid,
   Skeleton,
@@ -21,6 +15,7 @@ import {
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
+import LynkDrawer from 'components/LynkDrawer'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
@@ -111,52 +106,43 @@ const HealthMap = ({ isOpen, onClose }) => {
   const unknownData = seriesTwo?.sort((a, b) => a?.score - b?.score)
 
   return (
-    <Drawer
+    <LynkDrawer
+      title={'Component Health Heat Map'}
       size='lg'
       isOpen={isOpen}
       onClose={onClose}
-      placement='right'
-      closeOnOverlayClick={true}
+      noFooter
     >
-      <DrawerOverlay />
-      <DrawerContent>
-        <DrawerCloseButton />
-        <DrawerHeader borderBottomWidth='1px'>
-          Component Health Heat Map
-        </DrawerHeader>
-        <DrawerBody p={1}>
-          {loading ? (
-            <Stack direction={'column'} p={5} spacing={6}>
-              <Skeleton width={'100%'} height={32} />
-              <Skeleton width={'100%'} height={32} />
-            </Stack>
-          ) : (
-            <SimpleGrid width={'100%'} columns={1} spacing='24px'>
-              <Card width={'100%'}>
-                <Tag colorScheme='blue' width={'fit-content'} mb={6}>
-                  Known Components
-                </Tag>
-                {knownData?.length > 0 && (
-                  <Grid templateColumns='repeat(30, 1fr)' gap={1}>
-                    <HeatMap data={knownData} />
-                  </Grid>
-                )}
-              </Card>
-              <Card width={'100%'}>
-                <Tag colorScheme='blue' width={'fit-content'} mb={6}>
-                  Unknown Components
-                </Tag>
-                {unknownData?.length > 0 && (
-                  <Grid templateColumns='repeat(30, 1fr)' gap={1}>
-                    <HeatMap data={unknownData} />
-                  </Grid>
-                )}
-              </Card>
-            </SimpleGrid>
-          )}
-        </DrawerBody>
-      </DrawerContent>
-    </Drawer>
+      {loading ? (
+        <Stack direction={'column'} spacing={6}>
+          <Skeleton width={'100%'} height={32} />
+          <Skeleton width={'100%'} height={32} />
+        </Stack>
+      ) : (
+        <SimpleGrid width={'100%'} columns={1} spacing='24px'>
+          <Card width={'100%'} padding={0} mt={5}>
+            <Tag colorScheme='blue' width={'fit-content'} mb={6}>
+              Known Components
+            </Tag>
+            {knownData?.length > 0 && (
+              <Grid templateColumns='repeat(30, 1fr)' gap={1}>
+                <HeatMap data={knownData} />
+              </Grid>
+            )}
+          </Card>
+          <Card width={'100%'} padding={0}>
+            <Tag colorScheme='blue' width={'fit-content'} mb={6}>
+              Unknown Components
+            </Tag>
+            {unknownData?.length > 0 && (
+              <Grid templateColumns='repeat(30, 1fr)' gap={1}>
+                <HeatMap data={unknownData} />
+              </Grid>
+            )}
+          </Card>
+        </SimpleGrid>
+      )}
+    </LynkDrawer>
   )
 }
 
