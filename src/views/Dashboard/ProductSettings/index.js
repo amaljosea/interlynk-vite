@@ -38,6 +38,7 @@ const Settings = ({ enabled, data, mfc }) => {
     dataRetentionDays,
     jiraProject,
     checksEnabled,
+    enableAutoArchive,
     organizationManufacturer,
     automatedFixesEnabled,
     internalCompMatchingEnabled,
@@ -49,25 +50,6 @@ const Settings = ({ enabled, data, mfc }) => {
   const { data: projectOptions } = useQuery(GetJiraProjects, {
     skip: activeTab !== 'settings'
   })
-
-  useEffect(() => {
-    if (projectOptions?.jira) {
-      setOptions(
-        projectOptions.jira?.projects?.map((project) => ({
-          value: project.key,
-          label: project.name
-        }))
-      )
-    }
-  }, [projectOptions])
-
-  useEffect(() => {
-    if (jiraProject) {
-      setProject({ value: jiraProject, label: jiraProject })
-    } else {
-      setProject(null)
-    }
-  }, [jiraProject])
 
   const { showToast } = useCustomToast()
   const [checks, setChecks] = useState(false)
@@ -111,6 +93,8 @@ const Settings = ({ enabled, data, mfc }) => {
         return 'Data Retaintion'
       case 'jira':
         return 'Default JIRA project'
+      case 'autoArchive':
+        return 'Auto archive'
     }
   }
 
@@ -125,6 +109,7 @@ const Settings = ({ enabled, data, mfc }) => {
         intcomp: field === 'internalComp' ? val : undefined,
         autofix: field === 'automation' ? val : undefined,
         vulnscan: field === 'vulnScan' ? val : undefined,
+        enableAutoArchive: field === 'autoArchive' ? val : undefined,
         copyVexFromPrevious: field === 'copyVexFromPrevious' ? val : undefined,
         mfcId: field === 'manufacturer' ? val : undefined,
         enableSupportLevel: field === 'enableSupportLevel' ? val : undefined,
@@ -150,124 +135,92 @@ const Settings = ({ enabled, data, mfc }) => {
     return result?.desc
   }
 
+  const ProductSetting = ({ id, label, value }) => (
+    <Flex align='center'>
+      <LynkSwitch
+        id={id}
+        size='md'
+        me='10px'
+        isChecked={value || false}
+        isDisabled={!enabled || !editControls}
+        onChange={(e) => onUpdate(e.target.checked, id)}
+      />
+      <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
+        {label}
+      </Text>
+      <Tooltip label={onCheck(`${label}`)}>
+        <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
+      </Tooltip>
+    </Flex>
+  )
+
+  useEffect(() => {
+    if (projectOptions?.jira) {
+      setOptions(
+        projectOptions.jira?.projects?.map((project) => ({
+          value: project.key,
+          label: project.name
+        }))
+      )
+    }
+  }, [projectOptions])
+
+  useEffect(() => {
+    if (jiraProject) {
+      setProject({ value: jiraProject, label: jiraProject })
+    } else {
+      setProject(null)
+    }
+  }, [jiraProject])
+
   return (
     <>
       <CardBody py={4}>
         <SimpleGrid w={'100%'} columns={2} gap={6}>
           {/* COLUMNS 1 */}
           <Stack spacing={4}>
-            {/* VULN SCAN */}
-            <Flex align='center'>
-              <LynkSwitch
-                size='md'
-                colorScheme='blue'
-                me='10px'
-                id='vulnScan'
-                isChecked={vulnScanningEnabled || false}
-                onChange={(e) => onUpdate(e.target.checked, 'vulnScan')}
-                isDisabled={!enabled || !editControls}
-              />
-              <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
-                Vulnerability Scan
-              </Text>
-              <Tooltip label={onCheck(`Vulnerability Scan`)}>
-                <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
-              </Tooltip>
-            </Flex>
-            {/* COPY VEX FROM PREVIOUS */}
-            <Flex align='center'>
-              <LynkSwitch
-                size='md'
-                colorScheme='blue'
-                me='10px'
-                id='copyVexFromPrevious'
-                isChecked={copyVexFromPrevious || false}
-                onChange={(e) =>
-                  onUpdate(e.target.checked, 'copyVexFromPrevious')
-                }
-                isDisabled={!enabled || !editControls}
-              />
-              <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
-                Retain Vulnerability Status
-              </Text>
-              <Tooltip label={onCheck(`Retain Vulnerability Status`)}>
-                <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
-              </Tooltip>
-            </Flex>
-            {/* APPLY CHECK */}
-            <Flex align='center'>
-              <LynkSwitch
-                size='md'
-                colorScheme='blue'
-                me='10px'
-                id='checks'
-                isChecked={checksEnabled || false}
-                onChange={(e) => onUpdate(e.target.checked, 'checks')}
-                isDisabled={!enabled || !editControls}
-              />
-              <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
-                Checks
-              </Text>
-              <Tooltip label={onCheck(`Checks`)}>
-                <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
-              </Tooltip>
-            </Flex>
             {/* APPLY AUTOMATION */}
-            <Flex align='center'>
-              <LynkSwitch
-                size='md'
-                colorScheme='blue'
-                me='10px'
-                id='automation'
-                isChecked={automatedFixesEnabled || false}
-                onChange={(e) => onUpdate(e.target.checked, 'automation')}
-                isDisabled={!enabled || !editControls}
-              />
-              <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
-                Automation
-              </Text>
-              <Tooltip label={onCheck(`Automation`)}>
-                <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
-              </Tooltip>
-            </Flex>
-            {/* APPLY INTERNAL COMPONENTS */}
-            <Flex align='center'>
-              <LynkSwitch
-                size='md'
-                colorScheme='blue'
-                me='10px'
-                id='internalComp'
-                isChecked={internalCompMatchingEnabled || false}
-                onChange={(e) => onUpdate(e.target.checked, 'internalComp')}
-                isDisabled={!enabled || !editControls}
-              />
-              <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
-                Internal Component Labeling
-              </Text>
-              <Tooltip label={onCheck(`Internal Component Labeling`)}>
-                <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
-              </Tooltip>
-            </Flex>
+            <ProductSetting
+              id={'automation'}
+              label={'Automation'}
+              value={automatedFixesEnabled}
+            />
+            {/* APPLY CHECK */}
+            <ProductSetting
+              id={'checks'}
+              label={'Checks'}
+              value={checksEnabled}
+            />
             {/* COMPONENT SUPPORT ANALYSIS */}
-            <Flex align='center'>
-              <LynkSwitch
-                size='md'
-                me='10px'
-                colorScheme='blue'
-                id='enableSupportLevel'
-                isChecked={enableSupportLevel || false}
-                onChange={(e) =>
-                  onUpdate(e.target.checked, 'enableSupportLevel')
-                }
-                isDisabled={!enabled || !editControls || isFreeTier}
-              />
-              <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
-                Component Support Analysis
-              </Text>
-              <Tooltip label={onCheck(`Component Support Analysis`)}>
-                <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
-              </Tooltip>
-            </Flex>
+            <ProductSetting
+              id={'enableSupportLevel'}
+              value={enableSupportLevel}
+              label={'Component Support Analysis'}
+            />
+            {/* AUTO ARCHIVE */}
+            <ProductSetting
+              id={'autoArchive'}
+              label={'Auto Archive'}
+              value={enableAutoArchive}
+            />
+            {/* APPLY INTERNAL COMPONENTS */}
+            <ProductSetting
+              id={'internalComp'}
+              value={internalCompMatchingEnabled}
+              label={'Internal Component Labeling'}
+            />
+            {/* COPY VEX FROM PREVIOUS */}
+            <ProductSetting
+              id={'copyVexFromPrevious'}
+              value={copyVexFromPrevious}
+              label={'Retain Vulnerability Status'}
+            />
+            {/* VULN SCAN */}
+            <ProductSetting
+              id={'vulnScan'}
+              value={vulnScanningEnabled}
+              label={'Vulnerability Scan'}
+            />
           </Stack>
           {/* COLUMN 2 */}
           <Stack spacing={4}>

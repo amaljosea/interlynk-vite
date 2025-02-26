@@ -860,6 +860,14 @@ export const infoData = [
     desc: `This setting lets you choose whether components are marked as internal when you import an SBOM.`
   },
   {
+    title: `Auto Archive`,
+    desc: `This setting will auto-archive any enabled versions which is not the latest uploaded version.`
+  },
+  {
+    title: `Component Support Analysis`,
+    desc: `This setting analysis component support`
+  },
+  {
     title: `Data Retaintion`,
     desc: `This setting lets you choose how long the SBOM data is kept before it's deleted. Once it's gone, you can't get it back.`
   },

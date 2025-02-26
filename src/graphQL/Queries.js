@@ -523,6 +523,7 @@ export const GetProjectSettings = gql`
       projectSetting {
         id
         checksEnabled
+        enableAutoArchive
         automatedFixesEnabled
         dataRetentionDays
         internalCompMatchingEnabled
