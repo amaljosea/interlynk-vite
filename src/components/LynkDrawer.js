@@ -28,6 +28,7 @@ const LynkDrawer = ({
   cancelButtonTitle = 'Cancel',
   noFooter = false,
   hideCancelButton = false,
+  placement = 'right',
   children
 }) => {
   const { secondaryTextInverse } = useThemeColor(['secondaryTextInverse'])
@@ -37,7 +38,7 @@ const LynkDrawer = ({
       isOpen={isOpen}
       onClose={onClose}
       closeOnOverlayClick={false}
-      placement='right'
+      placement={placement}
     >
       <DrawerOverlay />
       <DrawerContent>

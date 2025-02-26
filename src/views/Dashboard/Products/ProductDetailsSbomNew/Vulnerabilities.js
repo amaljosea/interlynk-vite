@@ -7,20 +7,13 @@ import { customStyles } from 'utils/styleUtils'
 import VexModal from 'views/Dashboard/Vulnerabilities/components/VexModal'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
 
-import { Flex, Text, useDisclosure } from '@chakra-ui/react'
-import {
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay
-} from '@chakra-ui/react'
+import { Flex, useDisclosure } from '@chakra-ui/react'
 
 import JiraCreateIssueModal from 'components/Connections/JiraCreateIssueModal'
 import CustomLoader from 'components/CustomLoader'
 import VulnDrawer from 'components/Drawer/VulnDrawer'
 import VulnLinkDrawer from 'components/Drawer/VulnLinkDrawer'
+import LynkDrawer from 'components/LynkDrawer'
 import CvssCard from 'components/Misc/CvssCard'
 import CustomVuln from 'components/Modal/CustomVuln'
 import Pagination from 'components/Pagination'
@@ -362,33 +355,24 @@ const Vulnerabilities = ({ sbomData }) => {
       )}
       {/* COPY DATA TABLE */}
       {IMPORT.isOpen && nodes && (
-        <Drawer
+        <LynkDrawer
+          title={'Import Vulnerability Status'}
           size='full'
           placement='bottom'
           isOpen={IMPORT.isOpen}
-          onClose={IMPORT.onClose}
+          onClose={() => {
+            prodVulnDispatch({ type: 'RESET_IMPORT_SBOMS' })
+            IMPORT.onClose()
+          }}
+          noFooter
         >
-          <DrawerOverlay />
-          <DrawerContent>
-            <DrawerCloseButton
-              onClick={() => prodVulnDispatch({ type: 'RESET_IMPORT_SBOMS' })}
-            />
-            <DrawerHeader>
-              <Text fontSize={20} fontWeight={'medium'}>
-                Import Vulnerability Status
-              </Text>
-            </DrawerHeader>
-            <DrawerBody mt={2}>
-              {/* IMPORT WIZARD */}
-              <ImportWizard
-                variant='circle'
-                currentSbomId={sbomId}
-                currentProductId={productId}
-                onClose={IMPORT.onClose}
-              />
-            </DrawerBody>
-          </DrawerContent>
-        </Drawer>
+          <ImportWizard
+            variant='circle'
+            currentSbomId={sbomId}
+            currentProductId={productId}
+            onClose={IMPORT.onClose}
+          />
+        </LynkDrawer>
       )}
 
       {VEX.isOpen && selectedVulns.length > 0 && (
