@@ -17,6 +17,7 @@ import General from './General'
 import Licenses from './Licenses'
 import Parts from './Parts'
 import Policies from './Policies'
+import Support from './Support'
 import Vulnerabilities from './Vulnerabilities'
 
 const SbomTable = ({ data, loading, error }) => {
@@ -29,12 +30,13 @@ const SbomTable = ({ data, loading, error }) => {
     'vulnerabilities',
     'licenses',
     'policies',
+    'support',
     'checks',
     'compliance',
     'changelog'
   ]
 
-  const excludedTabs = new Set(['parts', 'compliance'])
+  const excludedTabs = new Set(['parts', 'compliance', 'support'])
 
   const filterTabs = isFreeTier
     ? tabs?.filter((item) => !excludedTabs.has(item))
@@ -95,6 +97,11 @@ const SbomTable = ({ data, loading, error }) => {
             <TabPanel px={0}>
               <Policies sbomData={data} />
             </TabPanel>
+            {!isFreeTier && (
+              <TabPanel px={0}>
+                <Support />
+              </TabPanel>
+            )}
             <TabPanel px={0}>
               <Checks sbomData={data} />
             </TabPanel>

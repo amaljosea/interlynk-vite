@@ -3895,6 +3895,54 @@ export const GetSbomSupportTab = gql`
   }
 `
 
+export const GetCompSupportData = gql`
+  query GetComponentSupportData(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      components(
+        sbomId: $sbomId
+        first: $first
+        last: $last
+        after: $after
+        before: $before
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          hasPreviousPage
+          startCursor
+        }
+        nodes {
+          name
+          version
+          purl
+          componentSupportLevel {
+            componentId
+            createdAt
+            endDate
+            id
+            level
+            notes
+            retainManualOverrideFor
+            updatedAt
+            userId
+            user {
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 // GET SUPPORT INFO
 export const GetSupportTab = gql`
   query GetSupportTab(
