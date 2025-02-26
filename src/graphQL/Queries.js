@@ -523,6 +523,7 @@ export const GetProjectSettings = gql`
       projectSetting {
         id
         checksEnabled
+        enableAutoArchive
         automatedFixesEnabled
         dataRetentionDays
         internalCompMatchingEnabled
@@ -3888,6 +3889,54 @@ export const GetSbomSupportTab = gql`
           productVersion
           recordType
           updatedAt
+        }
+      }
+    }
+  }
+`
+
+export const GetCompSupportData = gql`
+  query GetComponentSupportData(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      components(
+        sbomId: $sbomId
+        first: $first
+        last: $last
+        after: $after
+        before: $before
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          hasPreviousPage
+          startCursor
+        }
+        nodes {
+          name
+          version
+          purl
+          componentSupportLevel {
+            componentId
+            createdAt
+            endDate
+            id
+            level
+            notes
+            retainManualOverrideFor
+            updatedAt
+            userId
+            user {
+              name
+            }
+          }
         }
       }
     }

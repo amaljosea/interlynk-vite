@@ -1,6 +1,7 @@
 import { gql } from '@apollo/client'
 import { useMemo } from 'react'
 import { SingleGraph } from 'views/Dashboard/Analytics/SingleGraph'
+import { getDays } from 'views/Dashboard/Analytics/utils'
 
 import { Stack, Text, useTheme } from '@chakra-ui/react'
 
@@ -57,6 +58,8 @@ const PatchVelocity = ({ filters }) => {
 
   const { product, label } = filters || {}
   const { startDate, endDate } = filters?.duration || {}
+
+  const { dates } = getDays({ startDate, endDate })
 
   const variables = useMemo(
     () => ({
@@ -115,7 +118,15 @@ const PatchVelocity = ({ filters }) => {
     return patchVelocity
   }
 
-  const vulnMetrics = processVulnMetricsByDate(data)
+  const defaultData = dates?.map((date) => ({
+    date,
+    velocity: 0,
+    cumulativeFixed: 0,
+    cumulativeAffected: 0
+  }))
+
+  const vulnMetrics =
+    data?.length > 0 ? processVulnMetricsByDate(data) : defaultData
 
   const lines = [
     {

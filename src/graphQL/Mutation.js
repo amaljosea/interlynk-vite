@@ -372,6 +372,7 @@ export const ProjectSettingUpdate = gql`
     $mfcId: Uuid
     $jiraProject: String
     $enableSupportLevel: Boolean
+    $enableAutoArchive: Boolean
   ) {
     projectSettingUpdate(
       input: {
@@ -385,6 +386,7 @@ export const ProjectSettingUpdate = gql`
         organizationManufacturerId: $mfcId
         jiraProject: $jiraProject
         enableSupportLevel: $enableSupportLevel
+        enableAutoArchive: $enableAutoArchive
       }
     ) {
       projectSetting {

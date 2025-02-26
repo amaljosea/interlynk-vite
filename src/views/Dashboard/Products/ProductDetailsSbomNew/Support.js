@@ -14,9 +14,10 @@ import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { GetSbomSupportTab } from 'graphQL/Queries'
+import { GetCompSupportData } from 'graphQL/Queries'
 
 import SupportColumns from './Components/tableColumns/SupportColumns'
+import SupportExpand from './Components/tableExpanded/SupportExpanded'
 import SupportSubHeader from './Components/tableSubHeaders/SupportSubHeader'
 
 const Support = () => {
@@ -32,10 +33,10 @@ const Support = () => {
   const [activeRow, setActiveRow] = useState(null)
 
   const { nodes, paginationProps, loading, reset } = usePaginatedQuery(
-    GetSbomSupportTab,
+    GetCompSupportData,
     {
       skip: activeTab === 'support' ? false : true,
-      selector: 'sbom.supports',
+      selector: 'sbom.components',
       variables: { sbomId, projectId: projectId }
     }
   )
@@ -50,16 +51,19 @@ const Support = () => {
     <>
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
+          subHeader
+          expandableRows
+          persistTableHead
+          responsive={true}
           columns={columns}
           data={nodes || []}
-          customStyles={customStyles(headingTextColor)}
+          expandOnRowClicked
           defaultSortAsc={false}
           progressPending={loading}
-          persistTableHead
-          subHeader
           subHeaderComponent={subHeader}
           progressComponent={<CustomLoader />}
-          responsive={true}
+          expandableRowsComponent={SupportExpand}
+          customStyles={customStyles(headingTextColor)}
         />
 
         {/* PAGINATION */}
