@@ -872,6 +872,10 @@ export const infoData = [
     desc: `This setting lets you choose how long the SBOM data is kept before it's deleted. Once it's gone, you can't get it back.`
   },
   {
+    title: `Support Analysis`,
+    desc: `This setting lets you control if Interlynk's component support analysis should be automatically applied to the component support status`
+  },
+  {
     title: `Manufacturer`,
     desc: (
       <Stack>
