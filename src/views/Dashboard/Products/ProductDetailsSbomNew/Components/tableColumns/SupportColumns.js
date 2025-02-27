@@ -36,9 +36,14 @@ const SupportColumns = () => {
         name: 'ASSESSMENT',
         wrap: true,
         selector: (row) => (
-          <Tag w={'120px'} colorScheme='blue'>
+          <Tag
+            w={'120px'}
+            colorScheme={
+              row?.componentSupportLevel?.user?.name ? 'blue' : 'green'
+            }
+          >
             <TagLabel mx={'auto'}>
-              {row?.componentSupportLevel?.user?.id ? 'Manual' : 'Automatic'}
+              {row?.componentSupportLevel?.user?.name ? 'Manual' : 'Automatic'}
             </TagLabel>
           </Tag>
         )
@@ -51,7 +56,7 @@ const SupportColumns = () => {
           if (row?.componentSupportLevel?.level) {
             return (
               <Text color={primaryTextColor} textTransform={'capitalize'}>
-                {row?.componentSupportLevel?.level}
+                {row?.componentSupportLevel?.level?.replaceAll('_', ' ')}
               </Text>
             )
           }
