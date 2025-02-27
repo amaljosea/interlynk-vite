@@ -355,6 +355,7 @@ const Components = ({ sbomData }) => {
           expandOnRowClicked
           onSort={handleSort}
           defaultSortAsc={false}
+          defaultSortFieldId={field}
           progressPending={loading}
           onRowClicked={handleRowClick}
           subHeaderComponent={subHeader}

@@ -181,7 +181,7 @@ const Changelog = () => {
           data={nodes}
           onSort={handleSort}
           defaultSortAsc={false}
-          defaultSortFieldId={field}
+          defaultSortFieldId='ACTIVITY_LOGS_CREATED_AT'
           customStyles={customStyles(headingTextColor)}
           progressPending={loading}
           progressComponent={<CustomLoader />}
