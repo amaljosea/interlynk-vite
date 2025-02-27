@@ -140,7 +140,7 @@ const SupportCard = ({ setEdit, data }) => {
           </Text>
         </SimpleGrid>
         <SimpleGrid {...container}>
-          <Text {...label}>Assessed By</Text>
+          <Text {...label}>Last Assessed By</Text>
           <Text {...infoStyle} textTransform={'capitalize'}>
             {user?.name || 'N/A'}
           </Text>

@@ -65,7 +65,7 @@ const SupportColumns = () => {
       },
       {
         id: 'SUPPORT_END_OF_DATE',
-        name: 'END OF DATE',
+        name: 'END-OF-SUPPORT DATE',
         wrap: true,
         selector: (row) => {
           if (row?.componentSupportLevel?.endDate) {

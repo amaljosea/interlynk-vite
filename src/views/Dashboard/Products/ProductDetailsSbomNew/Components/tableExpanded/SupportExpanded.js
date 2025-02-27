@@ -21,11 +21,11 @@ const SupportExpand = (props) => {
       >
         <Grid templateColumns='repeat(3, 1fr)' py={2} gap={6}>
           {/* ASSESSED DATE */}
-          <DetailItem label='Assessed Date' value={lastAssessedAt} />
+          <DetailItem label='Last Assessed' value={lastAssessedAt} />
           {/* ASSESSED BY */}
-          <DetailItem label='Assessed By' value={lastAssessedBy} />
+          <DetailItem label='Last Assessed By' value={lastAssessedBy} />
           {/* INTERNAL NOTES */}
-          <DetailItem label='Internal Notes' value={internalNotes} />
+          <DetailItem label='Support Explanation' value={internalNotes} />
         </Grid>
       </Box>
     )
