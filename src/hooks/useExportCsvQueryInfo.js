@@ -1,11 +1,14 @@
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { GetCompVulnData, GetComponentData } from 'graphQL/Queries'
-import { GetVulnData } from 'graphQL/Queries'
-import { GetSbomLicensesTable } from 'graphQL/Queries'
-import { GetGlobalVulns } from 'graphQL/Queries'
-import { GetSbomSupportTab } from 'graphQL/Queries'
+import {
+  GetCompSupportData,
+  GetCompVulnData,
+  GetComponentData,
+  GetGlobalVulns,
+  GetSbomLicensesTable,
+  GetVulnData
+} from 'graphQL/Queries'
 
 import useQueryParam from './useQueryParam'
 
@@ -93,7 +96,7 @@ const useExportCsvQueryInfo = (tableType, rowsToExport, searchFilters) => {
 
       case 'SBOM Support View':
         return {
-          query: GetSbomSupportTab,
+          query: GetCompSupportData,
           variables: {
             sbomId,
             projectId: productId,
@@ -102,8 +105,8 @@ const useExportCsvQueryInfo = (tableType, rowsToExport, searchFilters) => {
           },
 
           skip: !sbomId,
-          selector: 'sbom.supports.nodes',
-          pageInfoSelector: 'sbom.supports.pageInfo'
+          selector: 'sbom.components.nodes',
+          pageInfoSelector: 'sbom.components.pageInfo'
         }
 
       default:

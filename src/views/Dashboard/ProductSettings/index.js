@@ -179,48 +179,118 @@ const Settings = ({ enabled, data, mfc }) => {
         <SimpleGrid w={'100%'} columns={2} gap={6}>
           {/* COLUMNS 1 */}
           <Stack spacing={4}>
-            {/* APPLY AUTOMATION */}
-            <ProductSetting
-              id={'automation'}
-              label={'Automation'}
-              value={automatedFixesEnabled}
-            />
             {/* APPLY CHECK */}
-            <ProductSetting
-              id={'checks'}
-              label={'Checks'}
-              value={checksEnabled}
-            />
-            {/* COMPONENT SUPPORT ANALYSIS */}
-            <ProductSetting
-              id={'enableSupportLevel'}
-              value={enableSupportLevel}
-              label={'Component Support Analysis'}
-            />
-            {/* AUTO ARCHIVE */}
-            <ProductSetting
-              id={'autoArchive'}
-              label={'Auto Archive'}
-              value={enableAutoArchive}
-            />
+            <Flex align='center'>
+              <LynkSwitch
+                size='md'
+                colorScheme='blue'
+                me='10px'
+                id='checks'
+                isChecked={checksEnabled || false}
+                onChange={(e) => onUpdate(e.target.checked, 'checks')}
+                isDisabled={!enabled || !editControls}
+              />
+              <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
+                Run SBOM Checks
+              </Text>
+              <Tooltip label={onCheck(`Checks`)}>
+                <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
+              </Tooltip>
+            </Flex>
             {/* APPLY INTERNAL COMPONENTS */}
-            <ProductSetting
-              id={'internalComp'}
-              value={internalCompMatchingEnabled}
-              label={'Internal Component Labeling'}
-            />
-            {/* COPY VEX FROM PREVIOUS */}
-            <ProductSetting
-              id={'copyVexFromPrevious'}
-              value={copyVexFromPrevious}
-              label={'Retain Vulnerability Status'}
-            />
+            <Flex align='center'>
+              <LynkSwitch
+                size='md'
+                colorScheme='blue'
+                me='10px'
+                id='internalComp'
+                isChecked={internalCompMatchingEnabled || false}
+                onChange={(e) => onUpdate(e.target.checked, 'internalComp')}
+                isDisabled={!enabled || !editControls}
+              />
+              <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
+                Run Internal Labeling
+              </Text>
+              <Tooltip label={onCheck(`Internal Component Labeling`)}>
+                <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
+              </Tooltip>
+            </Flex>
+            {/* APPLY AUTOMATION */}
+            <Flex align='center'>
+              <LynkSwitch
+                size='md'
+                colorScheme='blue'
+                me='10px'
+                id='automation'
+                isChecked={automatedFixesEnabled || false}
+                onChange={(e) => onUpdate(e.target.checked, 'automation')}
+                isDisabled={!enabled || !editControls}
+              />
+              <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
+                Apply Automation Rules
+              </Text>
+              <Tooltip label={onCheck(`Automation`)}>
+                <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
+              </Tooltip>
+            </Flex>
             {/* VULN SCAN */}
-            <ProductSetting
-              id={'vulnScan'}
-              value={vulnScanningEnabled}
-              label={'Vulnerability Scan'}
-            />
+            <Flex align='center'>
+              <LynkSwitch
+                size='md'
+                colorScheme='blue'
+                me='10px'
+                id='vulnScan'
+                isChecked={vulnScanningEnabled || false}
+                onChange={(e) => onUpdate(e.target.checked, 'vulnScan')}
+                isDisabled={!enabled || !editControls}
+              />
+              <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
+                Run Vulnerability Scan
+              </Text>
+              <Tooltip label={onCheck(`Vulnerability Scan`)}>
+                <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
+              </Tooltip>
+            </Flex>
+            {/* COMPONENT SUPPORT ANALYSIS */}
+            <Flex align='center'>
+              <LynkSwitch
+                size='md'
+                me='10px'
+                colorScheme='blue'
+                id='enableSupportLevel'
+                isChecked={enableSupportLevel || false}
+                onChange={(e) =>
+                  onUpdate(e.target.checked, 'enableSupportLevel')
+                }
+                isDisabled={!enabled || !editControls || isFreeTier}
+              />
+              <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
+                Run Component Support Analysis
+              </Text>
+              <Tooltip label={onCheck(`Support Analysis`)}>
+                <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
+              </Tooltip>
+            </Flex>
+            {/* COPY VEX FROM PREVIOUS */}
+            <Flex align='center'>
+              <LynkSwitch
+                size='md'
+                colorScheme='blue'
+                me='10px'
+                id='copyVexFromPrevious'
+                isChecked={copyVexFromPrevious || false}
+                onChange={(e) =>
+                  onUpdate(e.target.checked, 'copyVexFromPrevious')
+                }
+                isDisabled={!enabled || !editControls}
+              />
+              <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
+                Retain Vulnerability Status with Version
+              </Text>
+              <Tooltip label={onCheck(`Retain Vulnerability Status`)}>
+                <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
+              </Tooltip>
+            </Flex>
           </Stack>
           {/* COLUMN 2 */}
           <Stack spacing={4}>

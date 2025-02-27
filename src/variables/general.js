@@ -872,6 +872,10 @@ export const infoData = [
     desc: `This setting lets you choose how long the SBOM data is kept before it's deleted. Once it's gone, you can't get it back.`
   },
   {
+    title: `Support Analysis`,
+    desc: `This setting lets you control if Interlynk's component support analysis should be automatically applied to the component support status`
+  },
+  {
     title: `Manufacturer`,
     desc: (
       <Stack>
@@ -1402,28 +1406,31 @@ export const exportCsvTableConfig = {
   },
   'SBOM Support View': {
     defaultSelectedColumns: [
-      'Product name',
-      'Product version',
-      'IDs',
-      'Deprecated',
-      'Outdated',
-      'End of Life',
-      'End of Service',
-      'Updated'
+      'Name',
+      'Version',
+      'Assessment',
+      'Support Level',
+      'End Of Date'
     ],
-    additionalColumns: [],
+    additionalColumns: ['Assessed Date', 'Assessed By', 'Internal Notes'],
     mapDataForExport: (data) => {
       return data.map((row) => {
-        console.log({ row })
+        const { name, version, componentSupportLevel } = row || {}
+        const { level, endDate, user, notes, updatedAt } =
+          componentSupportLevel || {}
         return {
-          'Product name': row?.productName || row?.name,
-          'Product version': row?.productVersion || row?.version,
-          IDs: row?.idUri,
-          Deprecated: row?.deprecated ? 'Yes' : 'No',
-          Outdated: row?.outdated ? 'Yes' : 'No',
-          'End of Life': row?.eol,
-          'End of Service': row?.eos,
-          Updated: row?.updatedAt
+          Name: name,
+          Version: version,
+          Assessment: user?.id ? 'Manual' : 'Automatic',
+          'Support Level': level ? level?.replaceAll('_', ' ') : 'N/A',
+          'End Of Date': endDate
+            ? new Date(endDate).toLocaleDateString()
+            : 'N/A',
+          'Assessed Date': updatedAt
+            ? new Date(updatedAt).toLocaleDateString()
+            : 'N/A',
+          'Assessed By': user?.name || 'N/A',
+          'Internal Notes': notes || 'N/A'
         }
       })
     }

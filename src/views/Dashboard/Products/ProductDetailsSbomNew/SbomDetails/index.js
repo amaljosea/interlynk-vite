@@ -255,48 +255,48 @@ const SbomDetails = ({ sbomData }) => {
                     hidden={signedUrlParams}
                   >
                     <SettingsTag
-                      label={'Imported'}
+                      label={`Imported Successfully`}
                       icon={<DownloadIcon />}
                       rounded
                     />
                     <Divider width={3} borderColor={sameSecondaryText} />
                     <SettingsTag
-                      label={'Checks'}
+                      label={`Checks ${checksEnabled ? 'Completed' : 'Skipped'}`}
                       icon={<Search2Icon />}
                       isDisabled={!checksEnabled}
                       rounded
                     />
                     <Divider width={3} borderColor={sameSecondaryText} />
                     <SettingsTag
-                      label={'Internal Labeling'}
+                      label={`Internal Labeling ${internalComp ? 'Completed' : 'Skipped'}`}
                       icon={<FaTag />}
                       isDisabled={!internalComp}
                       rounded
                     />
                     <Divider width={3} borderColor={sameSecondaryText} />
                     <SettingsTag
-                      label={'Automation'}
+                      label={`Automation ${automatedFixesEnabled ? 'Completed' : 'Skipped'}`}
                       icon={<FaRobot />}
                       isDisabled={!automatedFixesEnabled}
                       rounded
                     />
                     <Divider width={3} borderColor={sameSecondaryText} />
                     <SettingsTag
-                      label={'Vulnerability Scan'}
+                      label={`Vulnerability Scan ${!vulnScan ? 'Disabled' : hasFinished ? 'Completed' : 'Pending'}`}
                       icon={<FaBug />}
                       isDisabled={!hasFinished || !vulnScan}
                       rounded
                     />
                     <Divider width={3} borderColor={sameSecondaryText} />
                     <SettingsTag
-                      label={'Component Support Analysis'}
+                      label={`Component Support Analysis ${!enableSupportLevel ? 'Disabled' : hasFinished ? 'Completed' : 'Skipped'}`}
                       icon={<FaLayerGroup />}
                       isDisabled={!hasFinished || !enableSupportLevel}
                       rounded
                     />
                     <Divider width={3} borderColor={sameSecondaryText} />
                     <SettingsTag
-                      label={'Ready'}
+                      label={`SBOM ${hasFinished ? 'Ready' : 'not ready'}`}
                       icon={<FaCircleCheck />}
                       isDisabled={!hasFinished}
                       rounded
