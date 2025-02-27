@@ -15,16 +15,9 @@ import {
   Tooltip
 } from '@chakra-ui/react'
 import { Table, Tbody, Td, Tr } from '@chakra-ui/react'
-import {
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay
-} from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
+
+import LynkDrawer from 'components/LynkDrawer'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -193,146 +186,123 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
       setCurrentData(urls)
     }
   }, [currentExternalUrls])
-
+  //
   return (
-    <Drawer size='sm' isOpen={isOpen} placement='right' onClose={onClose}>
-      <DrawerOverlay />
-      <DrawerContent>
-        <DrawerCloseButton mt={2} />
-        <DrawerHeader borderBottomWidth='1px'>
-          <Text>Edit Links</Text>
-          {data && <Tag colorScheme='blue'>{vuln?.vulnId}</Tag>}
-        </DrawerHeader>
-        <DrawerBody>
-          <form onSubmit={handleLinkAdd}>
-            <Flex
-              alignItems={'flex-start'}
-              sx={{ mt: 4, gap: 3, flexDir: 'column' }}
-            >
-              {/* NAME */}
-              <FormControl isRequired isInvalid={error !== ''}>
-                <FormLabel>Type</FormLabel>
-                <Select
-                  value={type}
-                  onChange={handleTypeChange}
-                >
-                  <option value=''>-- Select --</option>
-                  {[
-                    'issue-tracker',
-                    'advisories',
-                    'documentation',
-                    'other'
-                  ].map((item, index) => (
-                    <option key={index} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </Select>
-                <FormErrorMessage data-testid='vuln_link_error'>
-                  {error}
-                </FormErrorMessage>
-              </FormControl>
-              {/* URL */}
-              <FormControl
-                isRequired
-                isInvalid={
-                  (link !== '' && !validateUrl(link.trim())) || containsSpace
-                }
-              >
-                <FormLabel>Link</FormLabel>
-                <Input
-                  value={link}
-                  fontSize={'sm'}
-                  placeholder='Add URL'
-                  onBlur={handleCheckUrl}
-                  onChange={handleLinkChange}
-                />
-                <FormErrorMessage>{linkError}</FormErrorMessage>
-              </FormControl>
-              {/* ACTIONS */}
-              <Button
-                type='submit'
-                title='Add link'
-                colorScheme='blue'
-                isDisabled={isDisabled}
-              >
-                Add
-              </Button>
-              {/* TABLE */}
-              <Flex width={'100%'} flexDir={'column'}>
-                <Text size='md' my={2}>
-                  Existing Links
-                </Text>
-                {externalData?.length > 0 || currentData?.length > 0 ? (
-                  <Table variant='simple' size='sm' mt={4}>
-                    <Tbody>
-                      {externalData?.length > 0 &&
-                        externalData?.map((item, index) => (
-                          <Tr key={index}>
-                            <Td pl={0} wordBreak={'break-all'}>
-                              <Text>
-                                {item?.url ? (
-                                  <Tooltip label={item.url}>
-                                    {truncatedValue(item.url, 45)}
-                                  </Tooltip>
-                                ) : null}
-                              </Text>
-                              <Text mt={2} color={sameSecondaryText}>
-                                {item?.name}
-                              </Text>
-                            </Td>
-                            <Td pr={0} isNumeric>
-                              <DeleteAction id={item?.id} />
-                            </Td>
-                          </Tr>
-                        ))}
-                      {currentData?.length > 0 &&
-                        currentData?.map((item, index) => (
-                          <Tr key={index}>
-                            <Td pl={0} wordBreak={'break-all'}>
-                              <Text>
-                                {item?.url ? (
-                                  <Tooltip label={item.url}>
-                                    {truncatedValue(item.url, 45)}
-                                  </Tooltip>
-                                ) : null}
-                              </Text>
-                              <Text mt={2} color={sameSecondaryText}>
-                                {item?.name}
-                              </Text>
-                            </Td>
-                            <Td pr={0} isNumeric>
-                              <DeleteAction id={item?.id} />
-                            </Td>
-                          </Tr>
-                        ))}
-                    </Tbody>
-                  </Table>
-                ) : (
-                  <Text mt={4} color={secondaryTextInverse}>
-                    No existing links
-                  </Text>
-                )}
-              </Flex>
-            </Flex>
-          </form>
-        </DrawerBody>
-        <DrawerFooter>
-          <Button title='Cancel' variant='outline' mr={3} onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            title='Save'
-            colorScheme='blue'
-            onClick={handleSave}
-            isLoading={loading}
-            aria-label='save_vuln_links'
+    <LynkDrawer
+      title={'Edit Links'}
+      subtitle={data && <Tag colorScheme='blue'>{vuln?.vulnId}</Tag>}
+      isOpen={isOpen}
+      onClose={onClose}
+      onSubmit={handleSave}
+      isLoading={loading}
+    >
+      <form onSubmit={handleLinkAdd}>
+        <Flex
+          alignItems={'flex-start'}
+          sx={{ mt: 4, gap: 3, flexDir: 'column' }}
+        >
+          {/* NAME */}
+          <FormControl isRequired isInvalid={error !== ''}>
+            <FormLabel>Type</FormLabel>
+            <Select value={type} onChange={handleTypeChange}>
+              <option value=''>-- Select --</option>
+              {['issue-tracker', 'advisories', 'documentation', 'other'].map(
+                (item, index) => (
+                  <option key={index} value={item}>
+                    {item}
+                  </option>
+                )
+              )}
+            </Select>
+            <FormErrorMessage data-testid='vuln_link_error'>
+              {error}
+            </FormErrorMessage>
+          </FormControl>
+          {/* URL */}
+          <FormControl
+            isRequired
+            isInvalid={
+              (link !== '' && !validateUrl(link.trim())) || containsSpace
+            }
           >
-            Save
+            <FormLabel>Link</FormLabel>
+            <Input
+              value={link}
+              fontSize={'sm'}
+              placeholder='Add URL'
+              onBlur={handleCheckUrl}
+              onChange={handleLinkChange}
+            />
+            <FormErrorMessage>{linkError}</FormErrorMessage>
+          </FormControl>
+          {/* ACTIONS */}
+          <Button
+            type='submit'
+            title='Add link'
+            colorScheme='blue'
+            isDisabled={isDisabled}
+          >
+            Add
           </Button>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+          {/* TABLE */}
+          <Flex width={'100%'} flexDir={'column'}>
+            <Text size='md' my={2}>
+              Existing Links
+            </Text>
+            {externalData?.length > 0 || currentData?.length > 0 ? (
+              <Table variant='simple' size='sm' mt={4}>
+                <Tbody>
+                  {externalData?.length > 0 &&
+                    externalData?.map((item, index) => (
+                      <Tr key={index}>
+                        <Td pl={0} wordBreak={'break-all'}>
+                          <Text>
+                            {item?.url ? (
+                              <Tooltip label={item.url}>
+                                {truncatedValue(item.url, 45)}
+                              </Tooltip>
+                            ) : null}
+                          </Text>
+                          <Text mt={2} color={sameSecondaryText}>
+                            {item?.name}
+                          </Text>
+                        </Td>
+                        <Td pr={0} isNumeric>
+                          <DeleteAction id={item?.id} />
+                        </Td>
+                      </Tr>
+                    ))}
+                  {currentData?.length > 0 &&
+                    currentData?.map((item, index) => (
+                      <Tr key={index}>
+                        <Td pl={0} wordBreak={'break-all'}>
+                          <Text>
+                            {item?.url ? (
+                              <Tooltip label={item.url}>
+                                {truncatedValue(item.url, 45)}
+                              </Tooltip>
+                            ) : null}
+                          </Text>
+                          <Text mt={2} color={sameSecondaryText}>
+                            {item?.name}
+                          </Text>
+                        </Td>
+                        <Td pr={0} isNumeric>
+                          <DeleteAction id={item?.id} />
+                        </Td>
+                      </Tr>
+                    ))}
+                </Tbody>
+              </Table>
+            ) : (
+              <Text mt={4} color={secondaryTextInverse}>
+                No existing links
+              </Text>
+            )}
+          </Flex>
+        </Flex>
+      </form>
+    </LynkDrawer>
   )
 }
 
