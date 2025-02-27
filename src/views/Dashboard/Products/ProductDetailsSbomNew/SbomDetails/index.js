@@ -30,7 +30,13 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetProjectSettings } from 'graphQL/Queries'
 
-import { FaBug, FaCubes, FaLongArrowAltRight, FaRobot } from 'react-icons/fa'
+import {
+  FaArchive,
+  FaBug,
+  FaCubes,
+  FaLongArrowAltRight,
+  FaRobot
+} from 'react-icons/fa'
 import { FaCircleCheck, FaLayerGroup, FaTag } from 'react-icons/fa6'
 
 import LifecycleModal from '../../components/LifecycleModal'
@@ -74,6 +80,7 @@ const SbomDetails = ({ sbomData }) => {
   const { projectSetting } = settings?.project || ''
   const {
     checksEnabled,
+    enableAutoArchive,
     vulnScanningEnabled: vulnScan,
     internalCompMatchingEnabled: internalComp,
     automatedFixesEnabled,
@@ -275,6 +282,13 @@ const SbomDetails = ({ sbomData }) => {
                     />
                     <Divider width={3} borderColor={sameSecondaryText} />
                     <SettingsTag
+                      label={`Auto Archive ${enableAutoArchive ? 'Completed' : 'Skipped'}`}
+                      icon={<FaArchive />}
+                      isDisabled={!enableAutoArchive}
+                      rounded
+                    />
+                    <Divider width={3} borderColor={sameSecondaryText} />
+                    <SettingsTag
                       label={`Automation ${automatedFixesEnabled ? 'Completed' : 'Skipped'}`}
                       icon={<FaRobot />}
                       isDisabled={!automatedFixesEnabled}
@@ -287,12 +301,17 @@ const SbomDetails = ({ sbomData }) => {
                       isDisabled={!hasFinished || !vulnScan}
                       rounded
                     />
-                    <Divider width={3} borderColor={sameSecondaryText} />
+                    <Divider
+                      width={3}
+                      hidden={isFreeTier}
+                      borderColor={sameSecondaryText}
+                    />
                     <SettingsTag
+                      rounded
+                      hidden={isFreeTier}
                       label={`Component Support Analysis ${!enableSupportLevel ? 'Disabled' : hasFinished ? 'Completed' : 'Skipped'}`}
                       icon={<FaLayerGroup />}
                       isDisabled={!hasFinished || !enableSupportLevel}
-                      rounded
                     />
                     <Divider width={3} borderColor={sameSecondaryText} />
                     <SettingsTag

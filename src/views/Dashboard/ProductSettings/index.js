@@ -38,9 +38,9 @@ const Settings = ({ enabled, data, mfc }) => {
     dataRetentionDays,
     jiraProject,
     checksEnabled,
-    enableAutoArchive,
     organizationManufacturer,
     automatedFixesEnabled,
+    enableAutoArchive,
     internalCompMatchingEnabled,
     copyVexFromPrevious,
     vulnScanningEnabled,
@@ -50,6 +50,25 @@ const Settings = ({ enabled, data, mfc }) => {
   const { data: projectOptions } = useQuery(GetJiraProjects, {
     skip: activeTab !== 'settings'
   })
+
+  useEffect(() => {
+    if (projectOptions?.jira) {
+      setOptions(
+        projectOptions.jira?.projects?.map((project) => ({
+          value: project.key,
+          label: project.name
+        }))
+      )
+    }
+  }, [projectOptions])
+
+  useEffect(() => {
+    if (jiraProject) {
+      setProject({ value: jiraProject, label: jiraProject })
+    } else {
+      setProject(null)
+    }
+  }, [jiraProject])
 
   const { showToast } = useCustomToast()
   const [checks, setChecks] = useState(false)
@@ -94,7 +113,7 @@ const Settings = ({ enabled, data, mfc }) => {
       case 'jira':
         return 'Default JIRA project'
       case 'autoArchive':
-        return 'Auto archive'
+        return 'Auto Archive'
     }
   }
 
@@ -136,7 +155,7 @@ const Settings = ({ enabled, data, mfc }) => {
   }
 
   const ProductSetting = ({ id, label, value }) => (
-    <Flex align='center'>
+    <Flex align='center' hidden={id === 'enableSupportLevel' && isFreeTier}>
       <LynkSwitch
         id={id}
         size='md'
@@ -154,25 +173,6 @@ const Settings = ({ enabled, data, mfc }) => {
     </Flex>
   )
 
-  useEffect(() => {
-    if (projectOptions?.jira) {
-      setOptions(
-        projectOptions.jira?.projects?.map((project) => ({
-          value: project.key,
-          label: project.name
-        }))
-      )
-    }
-  }, [projectOptions])
-
-  useEffect(() => {
-    if (jiraProject) {
-      setProject({ value: jiraProject, label: jiraProject })
-    } else {
-      setProject(null)
-    }
-  }, [jiraProject])
-
   return (
     <>
       <CardBody py={4}>
@@ -180,117 +180,47 @@ const Settings = ({ enabled, data, mfc }) => {
           {/* COLUMNS 1 */}
           <Stack spacing={4}>
             {/* APPLY CHECK */}
-            <Flex align='center'>
-              <LynkSwitch
-                size='md'
-                colorScheme='blue'
-                me='10px'
-                id='checks'
-                isChecked={checksEnabled || false}
-                onChange={(e) => onUpdate(e.target.checked, 'checks')}
-                isDisabled={!enabled || !editControls}
-              />
-              <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
-                Run SBOM Checks
-              </Text>
-              <Tooltip label={onCheck(`Checks`)}>
-                <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
-              </Tooltip>
-            </Flex>
+            <ProductSetting
+              id={'checks'}
+              value={checksEnabled}
+              label={'Run SBOM Checks'}
+            />
             {/* APPLY INTERNAL COMPONENTS */}
-            <Flex align='center'>
-              <LynkSwitch
-                size='md'
-                colorScheme='blue'
-                me='10px'
-                id='internalComp'
-                isChecked={internalCompMatchingEnabled || false}
-                onChange={(e) => onUpdate(e.target.checked, 'internalComp')}
-                isDisabled={!enabled || !editControls}
-              />
-              <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
-                Run Internal Labeling
-              </Text>
-              <Tooltip label={onCheck(`Internal Component Labeling`)}>
-                <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
-              </Tooltip>
-            </Flex>
+            <ProductSetting
+              id={'internalComp'}
+              label={'Run Internal Labeling'}
+              value={internalCompMatchingEnabled}
+            />
+            {/* AUTO ARCHIVE */}
+            <ProductSetting
+              id={'autoArchive'}
+              label={'Run Auto Archive'}
+              value={enableAutoArchive}
+            />
             {/* APPLY AUTOMATION */}
-            <Flex align='center'>
-              <LynkSwitch
-                size='md'
-                colorScheme='blue'
-                me='10px'
-                id='automation'
-                isChecked={automatedFixesEnabled || false}
-                onChange={(e) => onUpdate(e.target.checked, 'automation')}
-                isDisabled={!enabled || !editControls}
-              />
-              <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
-                Apply Automation Rules
-              </Text>
-              <Tooltip label={onCheck(`Automation`)}>
-                <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
-              </Tooltip>
-            </Flex>
+            <ProductSetting
+              id={'automation'}
+              value={automatedFixesEnabled}
+              label={'Apply Automation Rules'}
+            />
             {/* VULN SCAN */}
-            <Flex align='center'>
-              <LynkSwitch
-                size='md'
-                colorScheme='blue'
-                me='10px'
-                id='vulnScan'
-                isChecked={vulnScanningEnabled || false}
-                onChange={(e) => onUpdate(e.target.checked, 'vulnScan')}
-                isDisabled={!enabled || !editControls}
-              />
-              <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
-                Run Vulnerability Scan
-              </Text>
-              <Tooltip label={onCheck(`Vulnerability Scan`)}>
-                <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
-              </Tooltip>
-            </Flex>
+            <ProductSetting
+              id={'vulnScan'}
+              value={vulnScanningEnabled}
+              label={'Run Vulnerability Scan'}
+            />
             {/* COMPONENT SUPPORT ANALYSIS */}
-            <Flex align='center'>
-              <LynkSwitch
-                size='md'
-                me='10px'
-                colorScheme='blue'
-                id='enableSupportLevel'
-                isChecked={enableSupportLevel || false}
-                onChange={(e) =>
-                  onUpdate(e.target.checked, 'enableSupportLevel')
-                }
-                isDisabled={!enabled || !editControls || isFreeTier}
-              />
-              <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
-                Run Component Support Analysis
-              </Text>
-              <Tooltip label={onCheck(`Support Analysis`)}>
-                <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
-              </Tooltip>
-            </Flex>
+            <ProductSetting
+              id={'enableSupportLevel'}
+              value={enableSupportLevel}
+              label={'Run Component Support Analysis'}
+            />
             {/* COPY VEX FROM PREVIOUS */}
-            <Flex align='center'>
-              <LynkSwitch
-                size='md'
-                colorScheme='blue'
-                me='10px'
-                id='copyVexFromPrevious'
-                isChecked={copyVexFromPrevious || false}
-                onChange={(e) =>
-                  onUpdate(e.target.checked, 'copyVexFromPrevious')
-                }
-                isDisabled={!enabled || !editControls}
-              />
-              <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
-                Retain Vulnerability Status with Version
-              </Text>
-              <Tooltip label={onCheck(`Retain Vulnerability Status`)}>
-                <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
-              </Tooltip>
-            </Flex>
+            <ProductSetting
+              id={'copyVexFromPrevious'}
+              value={copyVexFromPrevious}
+              label={'Retain Vulnerability Status with Version'}
+            />
           </Stack>
           {/* COLUMN 2 */}
           <Stack spacing={4}>

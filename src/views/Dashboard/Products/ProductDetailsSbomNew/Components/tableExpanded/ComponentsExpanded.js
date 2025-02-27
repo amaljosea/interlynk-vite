@@ -11,6 +11,7 @@ import { Box, Flex, Grid, Tag, Text, VStack } from '@chakra-ui/react'
 import DetailItem from 'components/Misc/DetailItem'
 import SupplierTag from 'components/SupplierTag'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const ExpandedComponent = (props) => {
@@ -26,6 +27,7 @@ const ExpandedComponent = (props) => {
 
   const customerView = isCustomerView()
   const signedUrlParams = getSignedUrlParams()
+  const { isFreeTier } = useGlobalQueryContext()
 
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
@@ -183,40 +185,44 @@ const ExpandedComponent = (props) => {
             valueStyle={cpes?.length > 0 && { color: cpesColor }}
           />
           {/* Scope */}
-          <DetailItem label='Scope' value={scope || 'N/A'} />
+          <DetailItem
+            label='Scope'
+            value={scope || 'N/A'}
+            valueStyle={{ textTransform: 'capitalize' }}
+          />
           {/* Licenses */}
           <DetailItem label='Licenses' value={licensesExp || 'N/A'} />
           {/*  OpenSSF Scorecard */}
           <DetailItem label='OpenSSF Scorecard' value={openSsfScore || 'N/A'} />
           {/* Support Level */}
           <DetailItem
-            hidden={customerView}
             label='Support Level'
             value={supportLevel || 'N/A'}
+            hidden={customerView || isFreeTier}
           />
           {/* End-of-Support Date */}
           <DetailItem
-            hidden={customerView}
             label='End-of-Support Date'
+            hidden={customerView || isFreeTier}
             value={getDate(endOfSupportDate) || 'N/A'}
           />
           {/* ASSESSMENT EXPIERS ON */}
           <DetailItem
-            hidden={customerView}
             label='Assessment Expiers On'
+            hidden={customerView || isFreeTier}
             value={assessmentExpiresOn ? `${assessmentExpiresOn} Days` : 'N/A'}
           />
           {/* SUPPORT EXPLANATION */}
           <DetailItem
-            hidden={customerView}
             label='Support Explanation'
+            hidden={customerView || isFreeTier}
             value={supportExplanation || 'N/A'}
           />
           {/* LAST ASSESSED BY */}
           <DetailItem
-            hidden={customerView}
             label='Last Assessed By'
             value={lastAssessedBy || 'N/A'}
+            hidden={customerView || isFreeTier}
           />
         </Grid>
       </Box>

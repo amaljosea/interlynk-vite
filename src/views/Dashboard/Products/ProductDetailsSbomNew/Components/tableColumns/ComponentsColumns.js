@@ -447,11 +447,10 @@ const ComponentsColumns = ({
                         Edit Component
                       </MenuItem>
                       <MenuItem
-                        data-testid='edit_component_support'
+                        hidden={isFreeTier}
                         onClick={() => handleSupport(row)}
-                        isDisabled={
-                          status === 'signed' || !updateComponent || isFreeTier
-                        }
+                        data-testid='edit_component_support'
+                        isDisabled={status === 'signed' || !updateComponent}
                       >
                         Edit Support Status
                       </MenuItem>
