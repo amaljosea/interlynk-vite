@@ -6,6 +6,7 @@ import { truncatedValue } from 'utils'
 import { ArrowDownIcon } from '@chakra-ui/icons'
 import {
   Box,
+  Divider,
   Flex,
   Select,
   Stack,
@@ -176,12 +177,19 @@ const CompRelations = ({ data, compPath }) => {
   return (
     <>
       <Flex
-        px={6}
         pb={20}
         gap={4}
         h={'80vh'}
         flexDir={'column'}
         alignItems={'flex-start'}
+        overflow={'auto'}
+        sx={{
+          '&::-webkit-scrollbar': {
+            display: 'none'
+          },
+          '-ms-overflow-style': 'none',
+          'scrollbar-width': 'none'
+        }}
       >
         {/* CREATE RELATIONSHIP */}
         <Stack
@@ -189,6 +197,7 @@ const CompRelations = ({ data, compPath }) => {
           width={'100%'}
           direction={'column'}
           alignItems={'flex-start'}
+          mb={2}
         >
           <Stack w={'100%'}>
             {/* RELATION TYPE */}
@@ -252,9 +261,9 @@ const CompRelations = ({ data, compPath }) => {
             />
           )}
         </Stack>
-
+        <Divider />
         {/* COMONENT RELATIONSIP DATA */}
-        <Table mt={6} width={'100%'}>
+        <Table mt={2} width={'100%'}>
           <Thead>
             <Tr>
               {['Type', 'Component'].map((item, index) => (
@@ -352,7 +361,7 @@ const CompRelations = ({ data, compPath }) => {
         )}
 
         {/* PATHS */}
-        <Text fontSize={'lg'} fontWeight={'medium'} mt={6}>
+        <Text fontSize={'lg'} fontWeight={'medium'} mt={2}>
           Tree View
         </Text>
         {compPath?.length > 0 ? (

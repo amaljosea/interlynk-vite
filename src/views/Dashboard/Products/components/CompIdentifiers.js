@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { isCustomerView } from 'utils'
 
-import { Divider, Stack } from '@chakra-ui/react'
+import { Stack } from '@chakra-ui/react'
 
 import CpeEditor from 'components/CpeEditor'
 import CpeField from 'components/CpeField'
@@ -130,7 +130,6 @@ const CompIdentifiers = ({ data }) => {
   return (
     <>
       <Stack
-        px={6}
         spacing={4}
         direction={'column'}
         height={cpeOpen || purlOpen ? '100%' : '70vh'}
@@ -165,7 +164,6 @@ const CompIdentifiers = ({ data }) => {
             onClose={() => setCpeOpen(false)}
           />
         )}
-        <Divider hidden={cpeOpen || purlOpen || customerView} />
         {alert ? (
           <Stack spacing={4}>
             <LynkAlert

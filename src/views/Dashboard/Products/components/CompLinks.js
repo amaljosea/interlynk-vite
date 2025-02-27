@@ -171,20 +171,11 @@ const CompLinks = ({ data }) => {
 
   return (
     <>
-      <Flex
-        w={'100%'}
-        px={6}
-        gap={4}
-        direction={'column'}
-        alignItems={'flex-start'}
-      >
+      <Flex w={'100%'} gap={4} direction={'column'} alignItems={'flex-start'}>
         {/* NAME */}
         <FormControl isRequired isInvalid={error}>
           <FormLabel>Type</FormLabel>
-          <Select
-            value={links?.name}
-            onChange={handleTypeChange}
-          >
+          <Select value={links?.name} onChange={handleTypeChange}>
             <option value=''>-- Select --</option>
             {componentLinkTypes?.map((item, index) => (
               <option key={index} value={item}>

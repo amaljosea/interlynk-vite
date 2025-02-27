@@ -6,16 +6,9 @@ import { useParams } from 'react-router-dom'
 import { getSignedUrlParams, isCustomerView } from 'utils'
 
 import { Box, Flex, Text, Tooltip } from '@chakra-ui/react'
-import {
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay
-} from '@chakra-ui/react'
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 
+import LynkDrawer from 'components/LynkDrawer'
 import CompInfo from 'components/Misc/CompInfo'
 
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -80,72 +73,65 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
   const cpeWarning = cpeVersion && data?.version !== cpeVersion
 
   return (
-    <Drawer
-      size='md'
+    <LynkDrawer
+      title={
+        <Flex alignItems='center' gap={1}>
+          <Text fontWeight={'medium'}>
+            {signedUrlParams ? 'Component' : 'Edit Component'}
+          </Text>
+          {purlWarning && <Warning type={'purl'} />}
+          {cpeWarning && <Warning type={'cpe'} />}
+        </Flex>
+      }
+      subtitle={data && <CompInfo data={data} />}
       isOpen={isOpen}
-      placement='right'
       onClose={onClose}
-      closeOnOverlayClick={false}
+      noFooter
     >
-      <DrawerOverlay />
-      <DrawerContent>
-        <DrawerCloseButton mt={3} onClick={resetData} aria-label='comp_close' />
-        <DrawerHeader borderBottomWidth='1px'>
-          <Flex gap={2} mb={1} alignItems={'center'}>
-            <Text fontWeight={'medium'}>
-              {signedUrlParams ? 'Component' : 'Edit Component'}
-            </Text>
-            {purlWarning && <Warning type={'purl'} />}
-            {cpeWarning && <Warning type={'cpe'} />}
-          </Flex>
-          {data && <CompInfo data={data} />}
-        </DrawerHeader>
-        <DrawerBody p={0}>
-          <Tabs isFitted onChange={onTabChange}>
-            <TabList
-              position={'fixed'}
-              bg={secondaryBgColor}
-              zIndex={11}
-              left={0}
-              right={0}
+      <Tabs px={0} isFitted onChange={onTabChange}>
+        <TabList
+          position={'fixed'}
+          bg={secondaryBgColor}
+          zIndex={11}
+          left={0}
+          right={0}
+          top={!data ? '60px' : '90px'}
+        >
+          {tabs.map((item, index) => (
+            <Tab
+              py={3.5}
+              key={index}
+              fontSize={'sm'}
+              name={item}
+              textTransform={'capitalize'}
+              _focus={{ outline: 'none', bg: 'none' }}
             >
-              {tabs.map((item, index) => (
-                <Tab
-                  py={3.5}
-                  key={index}
-                  fontSize={'sm'}
-                  name={item}
-                  textTransform={'capitalize'}
-                  _focus={{ outline: 'none', bg: 'none' }}
-                >
-                  {item?.replace('_', ' ')}
-                </Tab>
-              ))}
-            </TabList>
-            <TabPanels pos={'relative'} top={12} overflowX={'hidden'}>
-              <TabPanel px={0}>
-                <CompDetails data={data} primaryComp={primaryComp} />
-              </TabPanel>
-              <TabPanel px={0}>
-                <CompIdentifiers data={data} />
-              </TabPanel>
-              <TabPanel px={0}>
-                <CompSupplier data={data} />
-              </TabPanel>
-              <TabPanel px={0}>
-                <CompLinks data={data} />
-              </TabPanel>
-              <TabPanel px={0}>
-                <CompRelations
-                  data={data}
-                  compPath={comPath?.component?.pathToPrimary}
-                />
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
-        </DrawerBody>
-      </DrawerContent>
-    </Drawer>
+              {item?.replace('_', ' ')}
+            </Tab>
+          ))}
+        </TabList>
+        <TabPanels pos={'relative'} top={12} overflowX={'hidden'} p={0}>
+          <TabPanel px={0}>
+            <CompDetails data={data} primaryComp={primaryComp} />
+          </TabPanel>
+          <TabPanel px={0}>
+            <CompIdentifiers data={data} />
+          </TabPanel>
+          <TabPanel px={0}>
+            <CompSupplier data={data} />
+          </TabPanel>
+          <TabPanel px={0}>
+            <CompLinks data={data} />
+          </TabPanel>
+          <TabPanel px={0}>
+            <CompRelations
+              data={data}
+              compPath={comPath?.component?.pathToPrimary}
+            />
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+    </LynkDrawer>
   )
 }
 

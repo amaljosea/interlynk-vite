@@ -11,7 +11,6 @@ import {
 import {
   Button,
   ButtonGroup,
-  Divider,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -205,7 +204,7 @@ const CompSupplier = ({ data }) => {
   }, [data, setTabData])
 
   return (
-    <Flex width={'100%'} direction={'column'} gap={4} px={6} pb={20}>
+    <Flex width={'100%'} direction={'column'} gap={4} pb={20}>
       {/* ORG NAME */}
       <FormControl isRequired>
         <FormLabel>Organization Name</FormLabel>
@@ -263,7 +262,7 @@ const CompSupplier = ({ data }) => {
         />
         <FormErrorMessage>{emailError}</FormErrorMessage>
       </FormControl>
-      <Divider />
+
       {alert ? (
         <Stack spacing={4}>
           <LynkAlert
