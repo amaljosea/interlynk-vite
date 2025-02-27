@@ -389,7 +389,7 @@ const SupportForm = ({ component, data, setEdit }) => {
           </NumberInput>
           <InputRightAddon>Days</InputRightAddon>
         </InputGroup>
-        <FormErrorMessage>Value must be 1 to 365</FormErrorMessage>
+        <FormErrorMessage>Value must be between 1 and 365</FormErrorMessage>
       </FormControl>
       {/* EXPLANATION */}
       <FormControl>
