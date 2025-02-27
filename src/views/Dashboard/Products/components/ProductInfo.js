@@ -9,16 +9,25 @@ import { Flex, Icon, IconButton, Stack, Text, Tooltip } from '@chakra-ui/react'
 import { SettingsTag } from 'components/Misc/SettingsTag'
 
 import useFetchAllNodes from 'hooks/useFetchAllNodes'
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetVersionsDate } from 'graphQL/Queries'
 
-import { FaBug, FaRobot, FaTag, FaWindowMaximize } from 'react-icons/fa6'
+import { FaArchive } from 'react-icons/fa'
+import {
+  FaBug,
+  FaLayerGroup,
+  FaRobot,
+  FaTag,
+  FaWindowMaximize
+} from 'react-icons/fa6'
 import { IoMdWarning } from 'react-icons/io'
 
 const ProductInfo = ({ settings, data, filters, handleSort }) => {
   const params = useParams()
   const signedUrlParams = getSignedUrlParams()
+  const { isFreeTier } = useGlobalQueryContext()
 
   const { name, description } = data || ''
 
@@ -32,7 +41,9 @@ const ProductInfo = ({ settings, data, filters, handleSort }) => {
 
   const {
     checksEnabled,
+    enableAutoArchive,
     dataRetentionDays,
+    enableSupportLevel,
     vulnScanningEnabled,
     internalCompMatchingEnabled,
     automatedFixesEnabled
@@ -95,23 +106,34 @@ const ProductInfo = ({ settings, data, filters, handleSort }) => {
         <Stack mt={description ? 1 : 0} direction='row' alignItems={'center'}>
           <SettingsTag
             icon={<Search2Icon />}
-            label={`Checks ${checksEnabled ? 'Enabled' : 'Disabled'}`}
             isDisabled={!checksEnabled}
+            label={`Checks ${checksEnabled ? 'Enabled' : 'Disabled'}`}
           />
           <SettingsTag
             icon={<FaTag />}
-            label={`Internal Labeling ${internalCompMatchingEnabled ? 'Enabled' : 'Disabled'}`}
             isDisabled={!internalCompMatchingEnabled}
+            label={`Internal Labeling ${internalCompMatchingEnabled ? 'Enabled' : 'Disabled'}`}
           />
           <SettingsTag
-            icon={<FaBug />}
-            label={`Vulnerability Scan ${vulnScanningEnabled ? 'Enabled' : 'Disabled'}`}
-            isDisabled={!vulnScanningEnabled}
+            icon={<FaArchive />}
+            isDisabled={!enableAutoArchive}
+            label={`Auto Archive ${enableAutoArchive ? 'Enabled' : 'Disabled'}`}
           />
           <SettingsTag
             icon={<FaRobot />}
-            label={`Automation ${automatedFixesEnabled ? 'Enabled' : 'Disabled'}`}
             isDisabled={!automatedFixesEnabled}
+            label={`Automation ${automatedFixesEnabled ? 'Enabled' : 'Disabled'}`}
+          />
+          <SettingsTag
+            icon={<FaBug />}
+            isDisabled={!vulnScanningEnabled}
+            label={`Vulnerability Scan ${vulnScanningEnabled ? 'Enabled' : 'Disabled'}`}
+          />
+          <SettingsTag
+            hidden={isFreeTier}
+            icon={<FaLayerGroup />}
+            isDisabled={!enableSupportLevel}
+            label={`Component Support Analysis ${enableSupportLevel ? 'Enabled' : 'Disabled'}`}
           />
           {warning && (
             <Tooltip

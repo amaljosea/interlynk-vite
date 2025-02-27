@@ -1,9 +1,9 @@
 import { Box, IconButton, Tooltip } from '@chakra-ui/react'
 
-export const SettingsTag = ({ icon, label, isDisabled, rounded }) => {
+export const SettingsTag = ({ icon, label, isDisabled, rounded, hidden }) => {
   return (
     <Tooltip label={label}>
-      <Box>
+      <Box hidden={hidden}>
         <IconButton
           borderRadius={rounded ? 'full' : 'md'}
           size='xs'

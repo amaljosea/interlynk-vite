@@ -840,7 +840,7 @@ export const infoData = [
     desc: `Supplier identifies the name and email of the organization that built, distributed or packaged the application. For open-source components, Supplier can refer to the name of the project or entity distributing the project.`
   },
   {
-    title: `Vulnerability Scan`,
+    title: `Run Vulnerability Scan`,
     desc: `This setting lets you turn on or off vulnerability scanning for your system. It's best to keep this turned on.`
   },
   {
@@ -848,32 +848,28 @@ export const infoData = [
     desc: `This settings lets you turn on or off copying of vulnerability status, when an sbom is imported, whose version matches an existing one.`
   },
   {
-    title: `Checks`,
+    title: `Run SBOM Checks`,
     desc: `This setting lets you decide whether to turn on or off SBOM checks when importing. These checks help you find any issues with the SBOMs you're bringing in.`
   },
   {
-    title: `Automation`,
+    title: `Apply Automation Rules`,
     desc: `This setting decides whether the automation rules set up for the environment should run when importing SBOMs.`
   },
   {
-    title: `Internal Component Labeling`,
+    title: `Run Internal Labeling`,
     desc: `This setting lets you choose whether components are marked as internal when you import an SBOM.`
   },
   {
-    title: `Auto Archive`,
+    title: `Run Auto Archive`,
     desc: `This setting will auto-archive any enabled versions which is not the latest uploaded version.`
   },
   {
-    title: `Component Support Analysis`,
-    desc: `This setting analysis component support`
-  },
-  {
-    title: `Data Retaintion`,
-    desc: `This setting lets you choose how long the SBOM data is kept before it's deleted. Once it's gone, you can't get it back.`
-  },
-  {
-    title: `Support Analysis`,
+    title: `Run Component Support Analysis`,
     desc: `This setting lets you control if Interlynk's component support analysis should be automatically applied to the component support status`
+  },
+  {
+    title: `Retain Vulnerability Status with Version`,
+    desc: `This setting lets you choose how long the SBOM data is kept before it's deleted. Once it's gone, you can't get it back.`
   },
   {
     title: `Manufacturer`,

@@ -6,6 +6,7 @@ import { getFullDate, isCustomerView, timeSince } from 'utils'
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import {
   Flex,
+  FormErrorMessage,
   IconButton,
   Select,
   SimpleGrid,
@@ -146,7 +147,8 @@ const SupportForm = ({ component, data, setEdit }) => {
   })
 
   const isDisabled =
-    formData?.supportLevel === '' && formData?.endOfSupport === ''
+    (formData?.supportLevel === '' && formData?.endOfSupport === '') ||
+    formData?.assessmentExpiresOn > 365
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -340,13 +342,12 @@ const SupportForm = ({ component, data, setEdit }) => {
         />
       </FormControl>
       {/* RETAIN MANNUAL OVERRIDE */}
-      <FormControl>
+      <FormControl isInvalid={formData?.assessmentExpiresOn > 365}>
         <FormLabel htmlFor='assessmentExpiresOn'>
           Assessment Expires On
         </FormLabel>
         <InputGroup>
           <NumberInput
-            max={365}
             w={'100%'}
             name='assessmentExpiresOn'
             value={formData?.assessmentExpiresOn}
@@ -361,6 +362,7 @@ const SupportForm = ({ component, data, setEdit }) => {
           </NumberInput>
           <InputRightAddon>Days</InputRightAddon>
         </InputGroup>
+        <FormErrorMessage>Value must be 1 to 365</FormErrorMessage>
       </FormControl>
       {/* EXPLANATION */}
       <FormControl>

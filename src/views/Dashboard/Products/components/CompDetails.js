@@ -8,7 +8,6 @@ import { componentTypes } from 'variables/general'
 import { InfoIcon } from '@chakra-ui/icons'
 import {
   Checkbox,
-  Divider,
   Input,
   Select,
   Stack,
@@ -226,7 +225,7 @@ const CompDetails = ({ data, primaryComp }) => {
 
   return (
     <>
-      <Stack direction={'column'} spacing={4} px={6}>
+      <Stack direction={'column'} spacing={4}>
         {/* Name */}
         <FormControl isDisabled={customerView} isRequired>
           <LynkFormLabel
@@ -396,7 +395,7 @@ const CompDetails = ({ data, primaryComp }) => {
             </Tooltip>
           </FormLabel>
         </FormControl>
-        <Divider hidden={customerView} />
+
         {alert ? (
           <Stack spacing={4}>
             <LynkAlert
