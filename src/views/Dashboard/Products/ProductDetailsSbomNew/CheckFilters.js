@@ -7,7 +7,7 @@ import {
   MenuList,
   MenuOptionGroup
 } from '@chakra-ui/react'
-import { Box, Flex } from '@chakra-ui/react'
+import { Flex } from '@chakra-ui/react'
 
 import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
@@ -59,84 +59,76 @@ const CheckFilters = ({ filters, reset }) => {
       <Flex gap={2} alignItems={'center'}>
         {/* CHECK ID */}
         {data && (
-          <Box width={'fit-content'}>
-            <Menu closeOnSelect={false}>
-              <MenuHeading title={'Check ID'} active={checkId?.length !== 0} />
-              <MenuList
-                fontSize={'sm'}
-                minHeight={'auto'}
-                maxHeight={'300px'}
-                overflow={'hidden'}
-                overflowY={'scroll'}
+          <Menu closeOnSelect={false}>
+            <MenuHeading title={'Check ID'} active={checkId?.length !== 0} />
+            <MenuList
+              fontSize={'sm'}
+              minHeight={'auto'}
+              maxHeight={'300px'}
+              overflow={'hidden'}
+              overflowY={'scroll'}
+            >
+              <MenuOptionGroup
+                type='checkbox'
+                value={checkId}
+                onChange={onFilterCheckId}
               >
-                <MenuOptionGroup
-                  type='checkbox'
-                  value={checkId}
-                  onChange={onFilterCheckId}
-                >
-                  <MenuItemOption value={'all'} fontSize={'sm'}>
-                    All
-                  </MenuItemOption>
-                  {[...data.organization.organizationRules]
-                    .sort((a, b) => {
-                      const extractNumber = (str) => str.match(/\d+/) || [-1]
-                      const numberA = parseInt(
-                        extractNumber(a.rule.friendlyId)[0],
-                        10
-                      )
-                      const numberB = parseInt(
-                        extractNumber(b.rule.friendlyId)[0],
-                        10
-                      )
-                      return numberA - numberB
-                    })
-                    .map((item, index) => (
-                      <MenuItemOption
-                        key={index}
-                        value={item.rule.friendlyId}
-                        fontSize={'sm'}
-                      >
-                        {item.rule.friendlyId}: {item.rule.shortDesc}
-                      </MenuItemOption>
-                    ))}
-                </MenuOptionGroup>
-              </MenuList>
-            </Menu>
-          </Box>
+                <MenuItemOption value={'all'} fontSize={'sm'}>
+                  All
+                </MenuItemOption>
+                {[...data.organization.organizationRules]
+                  .sort((a, b) => {
+                    const extractNumber = (str) => str.match(/\d+/) || [-1]
+                    const numberA = parseInt(
+                      extractNumber(a.rule.friendlyId)[0],
+                      10
+                    )
+                    const numberB = parseInt(
+                      extractNumber(b.rule.friendlyId)[0],
+                      10
+                    )
+                    return numberA - numberB
+                  })
+                  .map((item, index) => (
+                    <MenuItemOption
+                      key={index}
+                      value={item.rule.friendlyId}
+                      fontSize={'sm'}
+                    >
+                      {item.rule.friendlyId}: {item.rule.shortDesc}
+                    </MenuItemOption>
+                  ))}
+              </MenuOptionGroup>
+            </MenuList>
+          </Menu>
         )}
         {/* CATEGORY */}
-        <Box width={'fit-content'}>
-          <Menu closeOnSelect={false}>
-            <MenuHeading title={'Category'} active={category?.length !== 0} />
-            <CustomList
-              value={category}
-              options={checkCategories}
-              onChange={onFilterCategory}
-            />
-          </Menu>
-        </Box>
+        <Menu closeOnSelect={false}>
+          <MenuHeading title={'Category'} active={category?.length !== 0} />
+          <CustomList
+            value={category}
+            options={checkCategories}
+            onChange={onFilterCategory}
+          />
+        </Menu>
         {/* SEVERITY */}
-        <Box width={'fit-content'}>
-          <Menu closeOnSelect={false}>
-            <MenuHeading title={'Severity'} active={severity?.length !== 0} />
-            <CustomList
-              value={severity}
-              onChange={onFilterSeverity}
-              options={severityList}
-            />
-          </Menu>
-        </Box>
+        <Menu closeOnSelect={false}>
+          <MenuHeading title={'Severity'} active={severity?.length !== 0} />
+          <CustomList
+            value={severity}
+            onChange={onFilterSeverity}
+            options={severityList}
+          />
+        </Menu>
         {/* STATUS */}
-        <Box width={'fit-content'}>
-          <Menu closeOnSelect={false}>
-            <MenuHeading title={'Resolution'} active={status?.length !== 0} />
-            <CustomList
-              value={status}
-              options={checkStatuses}
-              onChange={onFilterStatus}
-            />
-          </Menu>
-        </Box>
+        <Menu closeOnSelect={false}>
+          <MenuHeading title={'Resolution'} active={status?.length !== 0} />
+          <CustomList
+            value={status}
+            options={checkStatuses}
+            onChange={onFilterStatus}
+          />
+        </Menu>
       </Flex>
     )
   }

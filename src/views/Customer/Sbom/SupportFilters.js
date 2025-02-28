@@ -23,7 +23,7 @@ const SupportFilters = ({ reset }) => {
   }
 
   return (
-    <Stack direction={'row'} alignItems={'center'} gap={1}>
+    <Stack direction={'row'} alignItems={'center'} gap={2}>
       <Menu closeOnSelect={false} isLazy>
         <MenuHeading
           title={'Support'}

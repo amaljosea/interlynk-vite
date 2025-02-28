@@ -1,7 +1,7 @@
 import { useLazyQuery } from '@apollo/client'
 import { useState } from 'react'
 
-import { Box, Flex, Kbd, Stack, Text } from '@chakra-ui/react'
+import { Flex, Kbd, Stack, Text } from '@chakra-ui/react'
 import {
   Menu,
   MenuItemOption,
@@ -124,23 +124,21 @@ const ProdFilterMenu = (props) => {
   return (
     <Flex gap={2}>
       {/* ACTIVE */}
-      <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={false}>
-          <MenuHeading
-            title={'Active'}
-            active={enabled !== ''}
-            name='active_filter'
-          />
-          <CustomList
-            type='radio'
-            onChange={onFilterActive}
-            options={['yes', 'no']}
-            value={enabled}
-          />
-        </Menu>
-      </Box>
+      <Menu closeOnSelect={false}>
+        <MenuHeading
+          title={'Active'}
+          active={enabled !== ''}
+          name='active_filter'
+        />
+        <CustomList
+          type='radio'
+          onChange={onFilterActive}
+          options={['yes', 'no']}
+          value={enabled}
+        />
+      </Menu>
       {/* LABELS */}
-      <Box width={'fit-content'} position={'relative'} hidden={isFreeTier}>
+      {!isFreeTier && (
         <Menu closeOnSelect={false}>
           <MenuHeading
             title={'Labels'}
@@ -206,38 +204,36 @@ const ProdFilterMenu = (props) => {
             </Stack>
           </MenuList>
         </Menu>
-      </Box>
+      )}
       {/* LIFE STAGE */}
-      <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={false}>
-          <MenuHeading title={'Lifestage'} active={lifestage?.length !== 0} />
-          <MenuList
-            minW={'280px'}
-            maxW={'400px'}
-            minH='auto'
-            maxH={'320px'}
-            fontSize={'sm'}
-            overflowY={'scroll'}
+      <Menu closeOnSelect={false}>
+        <MenuHeading title={'Lifestage'} active={lifestage?.length !== 0} />
+        <MenuList
+          minW={'280px'}
+          maxW={'400px'}
+          minH='auto'
+          maxH={'320px'}
+          fontSize={'sm'}
+          overflowY={'scroll'}
+        >
+          <MenuOptionGroup
+            type={'checkbox'}
+            value={lifestage}
+            onChange={onFilterLifestage}
           >
-            <MenuOptionGroup
-              type={'checkbox'}
-              value={lifestage}
-              onChange={onFilterLifestage}
-            >
-              {stages?.map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  fontSize={'sm'}
-                  value={item}
-                  textTransform={'capitalize'}
-                >
-                  {item?.replaceAll('_', ' ')}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
-      </Box>
+            {stages?.map((item, index) => (
+              <MenuItemOption
+                key={index}
+                fontSize={'sm'}
+                value={item}
+                textTransform={'capitalize'}
+              >
+                {item?.replaceAll('_', ' ')}
+              </MenuItemOption>
+            ))}
+          </MenuOptionGroup>
+        </MenuList>
+      </Menu>
     </Flex>
   )
 }

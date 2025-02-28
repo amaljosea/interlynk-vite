@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 
-import { Box, Flex, Menu, Text } from '@chakra-ui/react'
+import { Flex, Menu, Text } from '@chakra-ui/react'
 
 import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
@@ -66,44 +66,38 @@ const ChangelogFilterMenu = ({ id, setFilter }) => {
   return (
     <Flex alignItems={'center'} gap={2}>
       {/* TYPE FILTER */}
-      <Box width={'fit-content'}>
-        <Menu closeOnSelect={true}>
-          <MenuHeading title={'Type'} active={type.length !== 0} />
-          {logChangeTypes?.length > 0 && (
-            <CustomList
-              value={type}
-              options={typeOptions}
-              onChange={onFilterType}
-            />
-          )}
-        </Menu>
-      </Box>
+      <Menu closeOnSelect={true}>
+        <MenuHeading title={'Type'} active={type.length !== 0} />
+        {logChangeTypes?.length > 0 && (
+          <CustomList
+            value={type}
+            options={typeOptions}
+            onChange={onFilterType}
+          />
+        )}
+      </Menu>
       {/* USER FILTER */}
-      <Box width={'fit-content'}>
-        <Menu closeOnSelect={true}>
-          <MenuHeading title={'User'} active={user.length !== 0} />
-          {logChangeBys?.length > 0 && (
-            <CustomList
-              value={user}
-              options={userOptions}
-              onChange={onFilterUser}
-            />
-          )}
-        </Menu>
-      </Box>
+      <Menu closeOnSelect={true}>
+        <MenuHeading title={'User'} active={user.length !== 0} />
+        {logChangeBys?.length > 0 && (
+          <CustomList
+            value={user}
+            options={userOptions}
+            onChange={onFilterUser}
+          />
+        )}
+      </Menu>
       {/* OBJECTS FILTER */}
-      <Box width={'fit-content'}>
-        <Menu closeOnSelect={true}>
-          <MenuHeading title={'Object'} active={object.length !== 0} />
-          {logChangeObjects?.length > 0 && (
-            <CustomList
-              value={object}
-              options={objectOptions}
-              onChange={onFilterObject}
-            />
-          )}
-        </Menu>
-      </Box>
+      <Menu closeOnSelect={true}>
+        <MenuHeading title={'Object'} active={object.length !== 0} />
+        {logChangeObjects?.length > 0 && (
+          <CustomList
+            value={object}
+            options={objectOptions}
+            onChange={onFilterObject}
+          />
+        )}
+      </Menu>
     </Flex>
   )
 }
