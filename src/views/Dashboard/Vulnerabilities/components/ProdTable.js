@@ -265,7 +265,7 @@ const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
         justifyContent={'space-between'}
       >
         {/* FILTER */}
-        <Stack spacing={4} alignItems={'center'} direction={'row'}>
+        <Stack spacing={2} alignItems={'center'} direction={'row'}>
           <SearchFilter
             id='globalVulns'
             filterText={filterInput}
