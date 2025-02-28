@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { gql, useMutation, useQuery } from '@apollo/client'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
@@ -38,6 +38,16 @@ import VulnerabilityColumns from './Components/tableColumns/VulnerabilityColumns
 import ExpandedComponent from './Components/tableExpanded/VulnerabilityExpanded'
 import VulnerabilitySubHeader from './Components/tableSubHeaders/VulnerabilitySubHeader'
 
+export const GetProjectSettings = gql`
+  query GetProjectSettings($id: Uuid!) {
+    project(id: $id) {
+      projectSetting {
+        vulnScanningEnabled
+      }
+    }
+  }
+`
+
 const Vulnerabilities = ({ sbomData }) => {
   const params = useParams()
   const productId = params.productid
@@ -48,6 +58,16 @@ const Vulnerabilities = ({ sbomData }) => {
   const { data: configs } = useQuery(GetOrgConnections, {
     fetchPolicy: 'network-only'
   })
+
+  const { data: projectSettings, loading: projectSettingsLoad } = useQuery(
+    GetProjectSettings,
+    {
+      variables: { id: productId }
+    }
+  )
+
+  const isVulnScanEnabled =
+    projectSettings?.project?.projectSetting?.vulnScanningEnabled
 
   const jiraConnection = configs?.organization?.connections?.nodes?.find(
     (item) => item?.connection?.__typename === 'JiraConnection'
@@ -210,6 +230,13 @@ const Vulnerabilities = ({ sbomData }) => {
 
   // SCAN VULN
   const handleScan = useCallback(async () => {
+    if (!isVulnScanEnabled) {
+      showToast({
+        description: 'Vulnerability scan is disabled in product settings',
+        status: 'warning'
+      })
+      return
+    }
     await onVulnScan({
       variables: { id: sbomId }
     }).then((res) => {
@@ -235,7 +262,8 @@ const Vulnerabilities = ({ sbomData }) => {
     reset,
     sbomData?.vulnRunStatus,
     sbomId,
-    showToast
+    showToast,
+    isVulnScanEnabled
   ])
 
   const handleWarning = (row) => {
@@ -259,7 +287,8 @@ const Vulnerabilities = ({ sbomData }) => {
     selectedVulns,
     signedUrlParams,
     vulnSearch,
-    onCreateCustomVuln
+    onCreateCustomVuln,
+    projectSettingsLoad
   })
 
   const handleSort = (column, sortDirection) => {
