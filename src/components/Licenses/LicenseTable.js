@@ -247,6 +247,18 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
     }
   ]
 
+  const handleSort = async (column, sortDirection) => {
+    if (column && column.id && sortDirection) {
+      setFilters((oldFilters) => ({
+        ...oldFilters,
+        orderBy: {
+          field: column?.id,
+          direction: sortDirection?.toUpperCase()
+        }
+      }))
+    }
+  }
+
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
@@ -257,17 +269,9 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
           data={licenses}
           customStyles={customStyles(headingTextColor)}
           defaultSortAsc={false}
-          defaultSortFieldId={'UPDATED_AT'}
+          defaultSortFieldId='ORGANIZATION_LICENSES_UPDATED_AT'
           progressComponent={<CustomLoader />}
-          onSort={(column, sortDirection) => {
-            setFilters((oldFilters) => ({
-              ...oldFilters,
-              orderBy: {
-                field: column?.id,
-                direction: sortDirection?.toUpperCase()
-              }
-            }))
-          }}
+          onSort={handleSort}
           subHeader
           responsive
           persistTableHead
