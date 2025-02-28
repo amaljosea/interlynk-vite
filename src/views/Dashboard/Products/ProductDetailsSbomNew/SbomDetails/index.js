@@ -315,7 +315,7 @@ const SbomDetails = ({ sbomData }) => {
                       hidden={isFreeTier}
                       label={`Component Support Analysis ${!enableSupportLevel ? 'Disabled' : hasFinished ? 'Completed' : 'Skipped'}`}
                       icon={<FaLayerGroup />}
-                      isDisabled={!hasFinished || !enableSupportLevel}
+                      isDisabled={!enableSupportLevel}
                     />
                     <Divider width={3} borderColor={sameSecondaryText} />
                     <SettingsTag
