@@ -63,7 +63,11 @@ const CompSupport = ({ data, isOpen, onClose }) => {
             <SupportForm
               setEdit={setEdit}
               data={componentSupportLevel}
-              component={{ id: data?.id, name: data?.name }}
+              component={{
+                id: data?.id,
+                name: data?.name,
+                internal: data?.internal
+              }}
             />
           ) : (
             <SupportCard setEdit={setEdit} data={componentSupportLevel} />
@@ -170,12 +174,13 @@ const SupportForm = ({ component, data, setEdit }) => {
     supportLevel: '',
     endOfSupport: '',
     explanation: '',
-    assessmentExpiresOn: 0
+    assessmentExpiresOn: 365
   })
 
   const isDisabled =
     (formData?.supportLevel === '' && formData?.endOfSupport === '') ||
-    formData?.assessmentExpiresOn > 365
+    (!component?.internal && formData?.assessmentExpiresOn < 1) ||
+    (!component?.internal && formData?.assessmentExpiresOn > 365)
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -369,7 +374,10 @@ const SupportForm = ({ component, data, setEdit }) => {
         />
       </FormControl>
       {/* RETAIN MANNUAL OVERRIDE */}
-      <FormControl isInvalid={formData?.assessmentExpiresOn > 365}>
+      <FormControl
+        isInvalid={formData?.assessmentExpiresOn > 365}
+        isRequired={!component?.internal}
+      >
         <FormLabel htmlFor='assessmentExpiresOn'>
           Assessment Expires On
         </FormLabel>

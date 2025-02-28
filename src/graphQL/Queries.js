@@ -3929,6 +3929,7 @@ export const GetCompSupportData = gql`
           id
           name
           version
+          internal
           updatedAt
           componentSupportLevel {
             componentId
