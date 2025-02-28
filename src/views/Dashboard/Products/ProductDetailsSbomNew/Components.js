@@ -207,13 +207,15 @@ const Components = ({ sbomData }) => {
   }
 
   const handleSort = async (column, sortDirection) => {
-    prodCompDispatch({
-      type: 'SET_SORT_ORDER',
-      payload: {
-        field: column.id,
-        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-      }
-    })
+    if (column && column.id && sortDirection) {
+      prodCompDispatch({
+        type: 'SET_SORT_ORDER',
+        payload: {
+          field: column.id,
+          direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+        }
+      })
+    }
   }
 
   const handleRowClick = (row) => {

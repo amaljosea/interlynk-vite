@@ -145,11 +145,13 @@ const Changelog = () => {
   )
 
   const handleSort = async (column, sortDirection) => {
-    setLogState((oldFilters) => ({
-      ...oldFilters,
-      field: column?.id,
-      direction: sortDirection.toUpperCase()
-    }))
+    if (column && column.id && sortDirection) {
+      setLogState((oldFilters) => ({
+        ...oldFilters,
+        field: column?.id,
+        direction: sortDirection.toUpperCase()
+      }))
+    }
   }
 
   const rowStyles = [
