@@ -36,7 +36,7 @@ export const SearchBar = () => {
         placeholder='Search..'
         onClick={query?.toggle}
       />
-      <Box pos='absolute' top='0.2rem' right={1.5}>
+      <Box pos='absolute' top='0.2rem' right={1.5} zIndex={1}>
         <Kbd>{os?.startsWith('Windows') ? 'Ctrl' : 'Cmd'} + K</Kbd>
       </Box>
     </InputGroup>
