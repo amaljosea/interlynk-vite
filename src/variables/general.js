@@ -1406,7 +1406,7 @@ export const exportCsvTableConfig = {
       'Version',
       'Assessment',
       'Support Level',
-      'End-Of-Support Date'
+      'End Of Support'
     ],
     additionalColumns: ['Assessed Date', 'Last Assessed By', 'Explanation'],
     mapDataForExport: (data) => {
@@ -1419,7 +1419,7 @@ export const exportCsvTableConfig = {
           Version: version,
           Assessment: user?.id ? 'Manual' : 'Automatic',
           'Support Level': level ? level?.replaceAll('_', ' ') : 'N/A',
-          'End-Of-Support Date': endDate
+          'End Of Support': endDate
             ? new Date(endDate).toLocaleDateString()
             : 'N/A',
           'Assessed Date': updatedAt
