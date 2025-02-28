@@ -157,7 +157,12 @@ export const InternalComponents = () => {
         justifyContent={'space-between'}
       >
         <Flex flexDirection={'column'}>
-          <Text fontSize='lg' color={primaryTextColor} fontWeight='bold'>
+          <Text
+            fontSize='lg'
+            color={primaryTextColor}
+            fontWeight='bold'
+            textAlign={'start'}
+          >
             Internal Components
           </Text>
           <Text fontSize={'sm'}>

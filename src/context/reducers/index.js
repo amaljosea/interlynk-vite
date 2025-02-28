@@ -6,6 +6,7 @@ import prodRulesReducer from './prodRulesReducer'
 import prodVulnReducer from './prodVulnReducer'
 import sbomCheckReducer from './sbomCheckReducer'
 import sbomReducer from './sbomReducer'
+import supportReducer from './supportReducer'
 import toolsReducer from './toolsReducer'
 import versionReducer from './versionReducer'
 
@@ -19,5 +20,6 @@ export {
   prodReducer,
   versionReducer,
   toolsReducer,
-  sbomCheckReducer
+  sbomCheckReducer,
+  supportReducer
 }

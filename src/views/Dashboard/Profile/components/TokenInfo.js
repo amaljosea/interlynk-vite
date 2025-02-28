@@ -97,7 +97,12 @@ const TokenInfo = () => {
         justifyContent={'space-between'}
       >
         <Flex flexDirection={'column'}>
-          <Text fontSize='lg' color={primaryTextColor} fontWeight='bold'>
+          <Text
+            fontSize='lg'
+            color={primaryTextColor}
+            fontWeight='bold'
+            textAlign={'start'}
+          >
             Security Tokens
           </Text>
           <Text fontSize={'sm'}>

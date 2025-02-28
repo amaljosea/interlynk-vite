@@ -1406,9 +1406,9 @@ export const exportCsvTableConfig = {
       'Version',
       'Assessment',
       'Support Level',
-      'End Of Date'
+      'End-Of-Support Date'
     ],
-    additionalColumns: ['Assessed Date', 'Assessed By', 'Internal Notes'],
+    additionalColumns: ['Assessed Date', 'Last Assessed By', 'Explanation'],
     mapDataForExport: (data) => {
       return data.map((row) => {
         const { name, version, componentSupportLevel } = row || {}
@@ -1419,14 +1419,14 @@ export const exportCsvTableConfig = {
           Version: version,
           Assessment: user?.id ? 'Manual' : 'Automatic',
           'Support Level': level ? level?.replaceAll('_', ' ') : 'N/A',
-          'End Of Date': endDate
+          'End-Of-Support Date': endDate
             ? new Date(endDate).toLocaleDateString()
             : 'N/A',
           'Assessed Date': updatedAt
             ? new Date(updatedAt).toLocaleDateString()
             : 'N/A',
-          'Assessed By': user?.name || 'N/A',
-          'Internal Notes': notes || 'N/A'
+          'Last Assessed By': user?.name || 'N/A',
+          Explanation: notes || 'N/A'
         }
       })
     }
@@ -2010,4 +2010,12 @@ export const upgradePlanAllFeatures = [
   managementAndReportingFeatures,
   supportFeatures,
   integrationsFeatures
+]
+
+export const supportLevels = [
+  { id: 1, label: 'All', value: 'all' },
+  { id: 2, label: 'Unspecified', value: 'unspecified' },
+  { id: 3, label: 'Actively Maintained', value: 'actively_maintained' },
+  { id: 4, label: 'No Longer Maintained', value: 'no_longer_maintained' },
+  { id: 5, label: 'Abandoned', value: 'abandoned' }
 ]

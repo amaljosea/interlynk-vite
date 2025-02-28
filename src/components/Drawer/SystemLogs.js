@@ -24,16 +24,9 @@ import {
   Tooltip
 } from '@chakra-ui/react'
 import { List, ListIcon, ListItem } from '@chakra-ui/react'
-import {
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay
-} from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import LynkDrawer from 'components/LynkDrawer'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -101,48 +94,46 @@ const SystemLogs = ({ isOpen, onClose }) => {
       : []
 
   return (
-    <Drawer size='lg' isOpen={isOpen} placement='right' onClose={onClose}>
-      <DrawerOverlay />
-      <DrawerContent>
-        <DrawerCloseButton mt={3} />
-        <DrawerHeader borderBottomWidth='1px'>
-          <Text fontWeight={'medium'}>System Log</Text>
-        </DrawerHeader>
-        <DrawerBody>
-          {loading ? (
-            <CustomLoader />
-          ) : (
-            <Accordion m={0} px={2} allowToggle>
-              {filterData?.map((row, index) => (
-                <AccordionItem
-                  key={index}
-                  borderTop={index === 0 ? 0 : '-moz-initial'}
+    <LynkDrawer
+      title={'System Log'}
+      size='lg'
+      isOpen={isOpen}
+      placement='right'
+      onClose={onClose}
+      noFooter
+    >
+      {loading ? (
+        <CustomLoader />
+      ) : (
+        <Accordion m={0} px={2} allowToggle>
+          {filterData?.map((row, index) => (
+            <AccordionItem
+              key={index}
+              borderTop={index === 0 ? 0 : '-moz-initial'}
+            >
+              <AccordionButton px={1} py={2} w={'100%'}>
+                <SimpleGrid
+                  gap={4}
+                  columns={2}
+                  w={'100%'}
+                  justifyContent={'space-between'}
                 >
-                  <AccordionButton px={1} py={2} w={'100%'}>
-                    <SimpleGrid
-                      gap={4}
-                      columns={2}
-                      w={'100%'}
-                      justifyContent={'space-between'}
-                    >
-                      {/* LEFT */}
-                      <LogInfo row={row} />
-                      {/* RIGHT */}
-                      <LogDuration row={row} />
-                    </SimpleGrid>
+                  {/* LEFT */}
+                  <LogInfo row={row} />
+                  {/* RIGHT */}
+                  <LogDuration row={row} />
+                </SimpleGrid>
 
-                    <AccordionIcon color={sameSecondaryText} />
-                  </AccordionButton>
-                  <AccordionPanel px={1} pb={4}>
-                    <ExpandedComponent data={row} />
-                  </AccordionPanel>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          )}
-        </DrawerBody>
-      </DrawerContent>
-    </Drawer>
+                <AccordionIcon color={sameSecondaryText} />
+              </AccordionButton>
+              <AccordionPanel px={1} pb={4}>
+                <ExpandedComponent data={row} />
+              </AccordionPanel>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      )}
+    </LynkDrawer>
   )
 }
 

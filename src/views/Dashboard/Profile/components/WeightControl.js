@@ -252,14 +252,18 @@ const WeightControl = () => {
                   value={threshold}
                   onChange={(e) => setThreshold(e.target.value)}
                 />
-                <FormErrorMessage>Value must be 1 to 365</FormErrorMessage>
+                <FormErrorMessage>
+                  Value must be between 1 and 365
+                </FormErrorMessage>
               </FormControl>
               <FormControl w={'400px'}>
                 <FormLabel>
                   Declare Package Abondoned After {`(Days)`}
                 </FormLabel>
                 <Input defaultValue={'365'} />
-                <FormErrorMessage>Value must be 1 to 365</FormErrorMessage>
+                <FormErrorMessage>
+                  Value must be between 1 and 365
+                </FormErrorMessage>
               </FormControl>
             </Stack>
           </CardBody>

@@ -5,6 +5,7 @@ import {
   prodReducer,
   prodVulnReducer,
   sbomReducer,
+  supportReducer,
   toolsReducer,
   versionReducer
 } from 'context/reducers'
@@ -128,6 +129,13 @@ const GlobalStateProvider = ({ children }) => {
     searchInput: '',
     filters: null
   })
+  // COMPONENT SUPPORT
+  const [supportState, supportDispatch] = useReducer(supportReducer, {
+    level: [],
+    field: 'COMPONENTS_UPDATED_AT',
+    direction: 'DESC',
+    searchInput: ''
+  })
   // GLOBAL VULNERABILITIES
   const [globalVulnState, globalVulnDispatch] = useReducer(globalVulnReducer, {
     field: 'VULNS_PUBLISHED_AT',
@@ -173,6 +181,7 @@ const GlobalStateProvider = ({ children }) => {
         setSelectedSbom,
         labelIds,
         setLabelIds,
+        supportState,
         dispatch: {
           prodDispatch,
           prodCompDispatch,
@@ -181,7 +190,8 @@ const GlobalStateProvider = ({ children }) => {
           versionDispatch,
           toolsDispatch,
           sbomCheckDispatch,
-          globalVulnDispatch
+          globalVulnDispatch,
+          supportDispatch
         }
       }}
     >

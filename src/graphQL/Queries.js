@@ -3903,6 +3903,9 @@ export const GetCompSupportData = gql`
     $last: Int
     $after: String
     $before: String
+    $search: String
+    $supportLevel: [String!]
+    $orderBy: ComponentOrderByInput
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       components(
@@ -3911,6 +3914,9 @@ export const GetCompSupportData = gql`
         last: $last
         after: $after
         before: $before
+        search: $search
+        orderBy: $orderBy
+        supportLevel: $supportLevel
       ) {
         totalCount
         pageInfo {
@@ -3920,9 +3926,10 @@ export const GetCompSupportData = gql`
           startCursor
         }
         nodes {
+          id
           name
           version
-          purl
+          updatedAt
           componentSupportLevel {
             componentId
             createdAt

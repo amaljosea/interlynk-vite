@@ -1,6 +1,7 @@
 import { gql, useLazyQuery } from '@apollo/client'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { supportLevels } from 'variables/general'
 
 import { Box, Button, Flex, Stack, Text } from '@chakra-ui/react'
 import {
@@ -48,14 +49,6 @@ const GetLicenses = gql`
     }
   }
 `
-
-const supportLevels = [
-  { id: 1, label: 'All', value: 'all' },
-  { id: 2, label: 'Unspecified', value: 'unspecified' },
-  { id: 3, label: 'Actively Maintained', value: 'actively_maintained' },
-  { id: 4, label: 'No Longer Maintained', value: 'no_longer_maintained' },
-  { id: 5, label: 'Abandoned', value: 'abandoned' }
-]
 
 const CompFilters = ({ reset }) => {
   const params = useParams()

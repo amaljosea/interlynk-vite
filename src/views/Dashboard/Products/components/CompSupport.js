@@ -75,7 +75,8 @@ const CompSupport = ({ data, isOpen, onClose }) => {
 }
 
 const SupportCard = ({ setEdit, data }) => {
-  const { level, updatedAt, user } = data || {}
+  const { level, updatedAt, user, endDate, retainManualOverrideFor, notes } =
+    data || {}
 
   const { sameSecondaryText, grayBorderColor } = useThemeColor([
     'sameSecondaryText',
@@ -116,6 +117,32 @@ const SupportCard = ({ setEdit, data }) => {
           <Text {...label}>Support Level</Text>
           <Text {...infoStyle} textTransform={'capitalize'}>
             {level?.replaceAll('_', ' ') || 'N/A'}
+          </Text>
+        </SimpleGrid>
+        <SimpleGrid {...container}>
+          <Text {...label}>End of Support</Text>
+          <Text {...infoStyle} textTransform={'capitalize'}>
+            {endDate ? new Date(endDate).toLocaleDateString() : 'N/A'}
+          </Text>
+        </SimpleGrid>
+        <SimpleGrid {...container}>
+          <Text {...label}>Assessment Expires On</Text>
+          <Text {...infoStyle} textTransform={'capitalize'}>
+            {retainManualOverrideFor
+              ? `${retainManualOverrideFor} Days`
+              : 'N/A'}
+          </Text>
+        </SimpleGrid>
+        <SimpleGrid {...container}>
+          <Text {...label}>Explanation</Text>
+          <Text {...infoStyle} textTransform={'capitalize'}>
+            {notes || 'N/A'}
+          </Text>
+        </SimpleGrid>
+        <SimpleGrid {...container}>
+          <Text {...label}>Last Assessed By</Text>
+          <Text {...infoStyle} textTransform={'capitalize'}>
+            {user?.name || 'N/A'}
           </Text>
         </SimpleGrid>
         <SimpleGrid {...container}>
@@ -362,7 +389,7 @@ const SupportForm = ({ component, data, setEdit }) => {
           </NumberInput>
           <InputRightAddon>Days</InputRightAddon>
         </InputGroup>
-        <FormErrorMessage>Value must be 1 to 365</FormErrorMessage>
+        <FormErrorMessage>Value must be between 1 and 365</FormErrorMessage>
       </FormControl>
       {/* EXPLANATION */}
       <FormControl>

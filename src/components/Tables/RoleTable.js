@@ -145,7 +145,12 @@ const RoleTable = () => {
         justifyContent={'space-between'}
       >
         <Flex flexDirection={'column'}>
-          <Text fontSize='lg' color={primaryTextColor} fontWeight='bold'>
+          <Text
+            fontSize='lg'
+            color={primaryTextColor}
+            fontWeight='bold'
+            textAlign={'start'}
+          >
             Roles Management
           </Text>
           <Text fontSize={'sm'}>

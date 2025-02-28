@@ -1,32 +1,26 @@
 import { useMemo } from 'react'
-import { useParams } from 'react-router-dom'
 import { isCustomerView } from 'utils'
+import SupportFilters from 'views/Customer/Sbom/SupportFilters'
 import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { Flex, Stack } from '@chakra-ui/react'
 
-import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 
-const SupportSubHeader = (
+const SupportSubHeader = ({
   reset,
   filterText,
-  onSearchInputChange,
-  handleClear,
   handleSearch,
-  onOpen,
-  setActiveRow
-) => {
-  const params = useParams()
+  handleClear,
+  onSearchInputChange
+}) => {
   const customerView = isCustomerView()
 
   const subHeader = useMemo(() => {
     return (
       <Flex w={'100%'} alignItems={'center'} justifyContent={'space-between'}>
-        {params?.sbomid ? (
-          <div></div>
-        ) : (
+        <Flex gap={2} flexWrap={'wrap'}>
           <SearchFilter
             id='support'
             filterText={filterText}
@@ -34,17 +28,9 @@ const SupportSubHeader = (
             onClear={handleClear}
             onFilter={handleSearch}
           />
-        )}
+          <SupportFilters reset={reset} />
+        </Flex>
         <Stack spacing={2} alignItems={'center'} direction={'row'}>
-          {!params?.sbomid && (
-            <AddButton
-              label='Create Support'
-              onClick={() => {
-                setActiveRow(null)
-                onOpen()
-              }}
-            />
-          )}
           {!customerView && <ExportCsv tableType='SBOM Support View' />}
           <RefreshBtn onClick={() => reset()} />
         </Stack>
@@ -55,11 +41,8 @@ const SupportSubHeader = (
     filterText,
     handleClear,
     handleSearch,
-    onOpen,
     onSearchInputChange,
-    params?.sbomid,
-    reset,
-    setActiveRow
+    reset
   ])
 
   return subHeader
