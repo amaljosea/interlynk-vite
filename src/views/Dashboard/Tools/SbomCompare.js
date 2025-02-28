@@ -83,7 +83,7 @@ const SbomCompare = ({
 
   const disableVersionField =
     selectedProd === '' ||
-    (selectedProd !== '' && uniqueVersions.length === 0) ||
+    (selectedProd !== '' && uniqueVersions?.length === 0) ||
     (isSbomOne && selectedSboms?.length > 0)
 
   return (
