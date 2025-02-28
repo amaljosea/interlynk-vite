@@ -130,6 +130,10 @@ const SbomDetails = ({ sbomData }) => {
     }
   })
 
+  const isSbomPending =
+    [checksEnabled, internalComp, automatedFixesEnabled].includes(undefined) ||
+    (vulnScan ? !hasFinished : vulnScan === undefined)
+
   return (
     <>
       <Flex direction={'row'} alignItems={'flex-start'} gap={5} width={'100%'}>
@@ -315,9 +319,9 @@ const SbomDetails = ({ sbomData }) => {
                     />
                     <Divider width={3} borderColor={sameSecondaryText} />
                     <SettingsTag
-                      label={`SBOM ${hasFinished ? 'Ready' : 'not ready'}`}
+                      label={`SBOM ${!isSbomPending ? 'Ready' : 'not ready'}`}
                       icon={<FaCircleCheck />}
-                      isDisabled={!hasFinished}
+                      isDisabled={isSbomPending}
                       rounded
                     />
                   </Flex>
