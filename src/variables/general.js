@@ -2011,3 +2011,11 @@ export const upgradePlanAllFeatures = [
   supportFeatures,
   integrationsFeatures
 ]
+
+export const supportLevels = [
+  { id: 1, label: 'All', value: 'all' },
+  { id: 2, label: 'Unspecified', value: 'unspecified' },
+  { id: 3, label: 'Actively Maintained', value: 'actively_maintained' },
+  { id: 4, label: 'No Longer Maintained', value: 'no_longer_maintained' },
+  { id: 5, label: 'Abandoned', value: 'abandoned' }
+]

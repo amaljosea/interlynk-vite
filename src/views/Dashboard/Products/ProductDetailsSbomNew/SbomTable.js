@@ -20,6 +20,19 @@ import Policies from './Policies'
 import Support from './Support'
 import Vulnerabilities from './Vulnerabilities'
 
+const tabNames = {
+  general: 'General',
+  parts: 'Parts',
+  components: 'Components',
+  vulnerabilities: 'Vulnerabilities',
+  licenses: 'Licenses',
+  policies: 'Policies',
+  support: 'Support Status',
+  checks: 'Checks',
+  compliance: 'Compliance',
+  changelog: 'Change Log'
+}
+
 const SbomTable = ({ data, loading, error }) => {
   const { isFreeTier } = useGlobalQueryContext()
 
@@ -76,7 +89,7 @@ const SbomTable = ({ data, loading, error }) => {
                 _focus={{ outline: 'none' }}
                 className={`${item}`}
               >
-                {item === 'changelog' ? 'change log' : item}
+                {tabNames[item]}
               </Tab>
             ))}
           </TabList>
