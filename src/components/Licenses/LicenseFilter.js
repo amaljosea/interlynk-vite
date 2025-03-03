@@ -6,7 +6,7 @@ import {
   MenuList,
   MenuOptionGroup
 } from '@chakra-ui/react'
-import { Box, Flex } from '@chakra-ui/react'
+import { Flex } from '@chakra-ui/react'
 
 import MenuHeading from 'components/Misc/MenuHeading'
 
@@ -50,34 +50,30 @@ const LicenseFilter = ({ onFilter }) => {
 
   return (
     <Flex gap={2} alignItems={'center'}>
-      <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
-          <MenuHeading title={'Status'} active={status[0]} />
-          <MenuList fontSize={'sm'}>
-            <MenuOptionGroup
-              type='checkbox'
-              value={status}
-              onChange={handleStatusChange}
-            >
-              {generateMenuItems(availableStatus)}
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
-      </Box>
-      <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
-          <MenuHeading title={'License Type'} active={spdx[0]} />
-          <MenuList fontSize={'sm'}>
-            <MenuOptionGroup
-              type='checkbox'
-              value={spdx}
-              onChange={handleSpdxChange}
-            >
-              {generateMenuItems(availableSpdxFilters)}
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
-      </Box>
+      <Menu closeOnSelect={true}>
+        <MenuHeading title={'Status'} active={status[0]} />
+        <MenuList fontSize={'sm'}>
+          <MenuOptionGroup
+            type='checkbox'
+            value={status}
+            onChange={handleStatusChange}
+          >
+            {generateMenuItems(availableStatus)}
+          </MenuOptionGroup>
+        </MenuList>
+      </Menu>
+      <Menu closeOnSelect={true}>
+        <MenuHeading title={'License Type'} active={spdx[0]} />
+        <MenuList fontSize={'sm'}>
+          <MenuOptionGroup
+            type='checkbox'
+            value={spdx}
+            onChange={handleSpdxChange}
+          >
+            {generateMenuItems(availableSpdxFilters)}
+          </MenuOptionGroup>
+        </MenuList>
+      </Menu>
     </Flex>
   )
 }

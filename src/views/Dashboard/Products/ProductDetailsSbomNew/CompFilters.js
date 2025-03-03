@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { supportLevels } from 'variables/general'
 
-import { Box, Button, Flex, Stack, Text } from '@chakra-ui/react'
+import { Button, Flex, Stack, Text } from '@chakra-ui/react'
 import {
   Menu,
   MenuDivider,
@@ -153,132 +153,120 @@ const CompFilters = ({ reset }) => {
   return (
     <Flex gap={2} alignItems={'center'}>
       {/* ECOSYSTEM */}
-      <Box width={'fit-content'}>
-        <Menu closeOnSelect={false}>
-          <MenuHeading
-            title={'Ecosystem'}
-            active={ecosystems?.length !== 0}
-            onClick={() => onCheckFilters('Ecosystem')}
-          />
-          <LynkMenuList
-            type='Ecosystem'
-            value={ecosystems}
-            onFilter={onFilter}
-            loading={ecoLoading}
-            options={compEcosystems}
-          />
-        </Menu>
-      </Box>
+      <Menu closeOnSelect={false}>
+        <MenuHeading
+          title={'Ecosystem'}
+          active={ecosystems?.length !== 0}
+          onClick={() => onCheckFilters('Ecosystem')}
+        />
+        <LynkMenuList
+          type='Ecosystem'
+          value={ecosystems}
+          onFilter={onFilter}
+          loading={ecoLoading}
+          options={compEcosystems}
+        />
+      </Menu>
       {/* KIND */}
-      <Box width={'fit-content'}>
-        <Menu closeOnSelect={false}>
-          <MenuHeading
-            title={'Type'}
-            active={kinds?.length !== 0}
-            onClick={() => onCheckFilters('Kind')}
-          />
-          <LynkMenuList
-            type='Kind'
-            value={kinds}
-            onFilter={onFilter}
-            options={compKinds}
-            loading={kindLoading}
-          />
-        </Menu>
-      </Box>
+      <Menu closeOnSelect={false}>
+        <MenuHeading
+          title={'Type'}
+          active={kinds?.length !== 0}
+          onClick={() => onCheckFilters('Kind')}
+        />
+        <LynkMenuList
+          type='Kind'
+          value={kinds}
+          onFilter={onFilter}
+          options={compKinds}
+          loading={kindLoading}
+        />
+      </Menu>
       {/* LICENSES */}
-      <Box width={'fit-content'}>
-        <Menu closeOnSelect={false}>
-          <MenuHeading
-            title={'Licenses'}
-            active={licenses?.length !== 0}
-            onClick={() => onCheckFilters('License')}
-          />
-          <LynkMenuList
-            type='Licenses'
-            value={licenses}
-            onFilter={onFilter}
-            loading={licLoading}
-            options={compLicenses}
-          />
-        </Menu>
-      </Box>
+      <Menu closeOnSelect={false}>
+        <MenuHeading
+          title={'Licenses'}
+          active={licenses?.length !== 0}
+          onClick={() => onCheckFilters('License')}
+        />
+        <LynkMenuList
+          type='Licenses'
+          value={licenses}
+          onFilter={onFilter}
+          loading={licLoading}
+          options={compLicenses}
+        />
+      </Menu>
       {/* SUPPORT LEVEL */}
-      <Box width={'fit-content'}>
-        <Menu closeOnSelect={false} isLazy>
-          <MenuHeading
-            title={'Support'}
-            active={supportLevel?.length !== 0 && !supportLevel.includes('all')}
-          />
-          <MenuList
-            minH='auto'
-            maxH={'350px'}
-            minW={'300px'}
-            fontSize={'sm'}
-            overflowY={'scroll'}
+      <Menu closeOnSelect={false} isLazy>
+        <MenuHeading
+          title={'Support'}
+          active={supportLevel?.length !== 0 && !supportLevel.includes('all')}
+        />
+        <MenuList
+          minH='auto'
+          maxH={'350px'}
+          minW={'300px'}
+          fontSize={'sm'}
+          overflowY={'scroll'}
+        >
+          <MenuOptionGroup
+            type={'checkbox'}
+            value={supportLevel}
+            onChange={onFilterSupport}
           >
-            <MenuOptionGroup
-              type={'checkbox'}
-              value={supportLevel}
-              onChange={onFilterSupport}
-            >
-              {supportLevels?.map((item) => (
-                <MenuItemOption
-                  key={item?.id}
-                  fontSize={'sm'}
-                  value={item?.value}
-                >
-                  {item?.label}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-            <MenuDivider hidden />
-            <Flex hidden flexDirection={'column'} alignItems={'flex-start'}>
-              <Stack pl={8}>
-                <Text>Start Date</Text>
-                <LynkDate />
-                <Text>End Date</Text>
-                <LynkDate />
-              </Stack>
-              <Button ml={8} my={3} size='sm'>
-                Submit
-              </Button>
-            </Flex>
-          </MenuList>
-        </Menu>
-      </Box>
-      {/* TYPE */}
-      <Box width={'fit-content'}>
-        <Menu closeOnSelect={false}>
-          <MenuHeading
-            title={'Visibility'}
-            active={scope !== '' && scope !== 'all'}
-          />
-          <CustomList
-            type='radio'
-            options={['primary', 'internal']}
-            value={scope}
-            onChange={onFilterType}
-          />
-        </Menu>
-      </Box>
-      {/* INCLUDE */}
-      <Box width={'fit-content'}>
-        <Menu closeOnSelect={false}>
-          <MenuHeading title={'Include'} active={include.length !== 0} />
-          <MenuList fontSize={'sm'}>
-            <MenuOptionGroup
-              type='checkbox'
-              value={include}
-              onChange={onFilterInclude}
-            >
-              <MenuItemOption value={'parts'} fontSize={'sm'}>
-                Parts
+            {supportLevels?.map((item) => (
+              <MenuItemOption
+                key={item?.id}
+                fontSize={'sm'}
+                value={item?.value}
+              >
+                {item?.label}
               </MenuItemOption>
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
-      </Box>
+            ))}
+          </MenuOptionGroup>
+          <MenuDivider hidden />
+          <Flex hidden flexDirection={'column'} alignItems={'flex-start'}>
+            <Stack pl={8}>
+              <Text>Start Date</Text>
+              <LynkDate />
+              <Text>End Date</Text>
+              <LynkDate />
+            </Stack>
+            <Button ml={8} my={3} size='sm'>
+              Submit
+            </Button>
+          </Flex>
+        </MenuList>
+      </Menu>
+      {/* TYPE */}
+      <Menu closeOnSelect={false}>
+        <MenuHeading
+          title={'Visibility'}
+          active={scope !== '' && scope !== 'all'}
+        />
+        <CustomList
+          type='radio'
+          options={['primary', 'internal']}
+          value={scope}
+          onChange={onFilterType}
+        />
+      </Menu>
+      {/* INCLUDE */}
+      <Menu closeOnSelect={false}>
+        <MenuHeading title={'Include'} active={include.length !== 0} />
+        <MenuList fontSize={'sm'}>
+          <MenuOptionGroup
+            type='checkbox'
+            value={include}
+            onChange={onFilterInclude}
+          >
+            <MenuItemOption value={'parts'} fontSize={'sm'}>
+              Parts
+            </MenuItemOption>
+          </MenuOptionGroup>
+        </MenuList>
+      </Menu>
       {/* DIRECT */}
       <Flex align='center' gap={2}>
         <LynkSwitch

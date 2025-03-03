@@ -2,8 +2,9 @@ import { useQuery } from '@apollo/client'
 import { useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { vulnStatusTypes } from 'variables/general'
+import { severityList } from 'variables/general'
 
-import { Box, Button, Flex, Stack, useDisclosure } from '@chakra-ui/react'
+import { Button, Flex, Stack, useDisclosure } from '@chakra-ui/react'
 import {
   Menu,
   MenuDivider,
@@ -26,7 +27,6 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useRouteFlags } from 'hooks/useRouteFlags'
 
 import { GetProductNames } from 'graphQL/Queries'
-import { severityList } from 'variables/general'
 
 const GlobalVulnsFilters = ({ reset }) => {
   const params = useParams()
@@ -159,10 +159,7 @@ const GlobalVulnsFilters = ({ reset }) => {
         setValue={onFilterLabel}
       />
       {/* PRODUCTS */}
-      <Box
-        width={'fit-content'}
-        display={params?.productgroupid ? 'none' : 'block'}
-      >
+      {!params?.productgroupid && (
         <Menu closeOnSelect={false}>
           <MenuHeading title={'Product'} active={getStatus('products')} />
           <MenuList
@@ -187,100 +184,91 @@ const GlobalVulnsFilters = ({ reset }) => {
             </MenuOptionGroup>
           </MenuList>
         </Menu>
-      </Box>
+      )}
       {/* SEVERITY */}
-      <Box width={'fit-content'}>
-        <Menu closeOnSelect={false}>
-          <MenuHeading title={'Severity'} active={getStatus('severities')} />
-          <CustomList
-            options={severityList}
-            value={severity}
-            onChange={onFilterSeverity}
-          />
-        </Menu>
-      </Box>
+      <Menu closeOnSelect={false}>
+        <MenuHeading title={'Severity'} active={getStatus('severities')} />
+        <CustomList
+          options={severityList}
+          value={severity}
+          onChange={onFilterSeverity}
+        />
+      </Menu>
       {/* KEV */}
-      <Box width={'fit-content'}>
-        <Menu closeOnSelect={false}>
-          <MenuHeading title={'KEV'} active={getStatus('kev')} />
-          <CustomList
-            type='radio'
-            options={['yes', 'no']}
-            value={kev}
-            onChange={onFilterKev}
-          />
-        </Menu>
-      </Box>
+      <Menu closeOnSelect={false}>
+        <MenuHeading title={'KEV'} active={getStatus('kev')} />
+        <CustomList
+          type='radio'
+          options={['yes', 'no']}
+          value={kev}
+          onChange={onFilterKev}
+        />
+      </Menu>
       {/* EPSS */}
-      <Box width={'fit-content'}>
-        <Menu closeOnSelect={false} isOpen={isOpen} onClose={onClose}>
-          <MenuHeading
-            title={'EPSS'}
-            onClick={onOpen}
-            active={getStatus('epss')}
-          />
-          <MenuList fontSize={'sm'}>
-            <MenuOptionGroup type='radio' value={epss} onChange={onFilterEpss}>
-              <MenuItemOption value={'all'} fontSize={'sm'}>
-                All
+      <Menu closeOnSelect={false} isOpen={isOpen} onClose={onClose}>
+        <MenuHeading
+          title={'EPSS'}
+          onClick={onOpen}
+          active={getStatus('epss')}
+        />
+        <MenuList fontSize={'sm'}>
+          <MenuOptionGroup type='radio' value={epss} onChange={onFilterEpss}>
+            <MenuItemOption value={'all'} fontSize={'sm'}>
+              All
+            </MenuItemOption>
+            {['0-0.1', '0.1-1', '1-10', '10-100'].map((item, index) => (
+              <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                {`${item} %`}
               </MenuItemOption>
-              {['0-0.1', '0.1-1', '1-10', '10-100'].map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize={'sm'}>
-                  {`${item} %`}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-            <MenuDivider />
-            <Flex flexDirection={'column'} alignItems={'flex-start'}>
-              <Stack direction={'column'} alignItems={'center'} pl={8}>
-                <InputGroup size='sm'>
-                  <InputLeftAddon width={14}>Min</InputLeftAddon>
-                  <Input
-                    type='number'
-                    width={'64px'}
-                    id='minValue'
-                    name='minValue'
-                    value={minEpss}
-                    ref={minRef}
-                    onKeyDown={onMinKeyDown}
-                    onChange={onChangeMinEpss}
-                  />
-                  <InputRightAddon>%</InputRightAddon>
-                </InputGroup>
-                <InputGroup size='sm'>
-                  <InputLeftAddon width={14}>Max</InputLeftAddon>
-                  <Input
-                    type='number'
-                    width={'64px'}
-                    id='maxValue'
-                    name='maxValue'
-                    value={maxEpss}
-                    ref={maxRef}
-                    onKeyDown={onMaxKeyDown}
-                    onChange={onChangeMaxEpss}
-                  />
-                  <InputRightAddon>%</InputRightAddon>
-                </InputGroup>
-              </Stack>
-              <Button
-                ml={8}
-                my={3}
-                size='sm'
-                onClick={handleSubmit}
-                title='Vuln EPSS filter submit'
-                isDisabled={Number(maxEpss) <= Number(minEpss) || maxEpss === 0}
-              >
-                Submit
-              </Button>
-            </Flex>
-          </MenuList>
-        </Menu>
-      </Box>
+            ))}
+          </MenuOptionGroup>
+          <MenuDivider />
+          <Flex flexDirection={'column'} alignItems={'flex-start'}>
+            <Stack direction={'column'} alignItems={'center'} pl={8}>
+              <InputGroup size='sm'>
+                <InputLeftAddon width={14}>Min</InputLeftAddon>
+                <Input
+                  type='number'
+                  width={'64px'}
+                  id='minValue'
+                  name='minValue'
+                  value={minEpss}
+                  ref={minRef}
+                  onKeyDown={onMinKeyDown}
+                  onChange={onChangeMinEpss}
+                />
+                <InputRightAddon>%</InputRightAddon>
+              </InputGroup>
+              <InputGroup size='sm'>
+                <InputLeftAddon width={14}>Max</InputLeftAddon>
+                <Input
+                  type='number'
+                  width={'64px'}
+                  id='maxValue'
+                  name='maxValue'
+                  value={maxEpss}
+                  ref={maxRef}
+                  onKeyDown={onMaxKeyDown}
+                  onChange={onChangeMaxEpss}
+                />
+                <InputRightAddon>%</InputRightAddon>
+              </InputGroup>
+            </Stack>
+            <Button
+              ml={8}
+              my={3}
+              size='sm'
+              onClick={handleSubmit}
+              title='Vuln EPSS filter submit'
+              isDisabled={Number(maxEpss) <= Number(minEpss) || maxEpss === 0}
+            >
+              Submit
+            </Button>
+          </Flex>
+        </MenuList>
+      </Menu>
       {/* STATUS */}
-      <Box
-        width={'fit-content'}
-        display={params?.productgroupid ? 'none' : 'block'}
-      >
+      {!params?.productgroupid && (
         <Menu closeOnSelect={false}>
           <MenuHeading title={'Status'} active={getStatus('statuses')} />
           <CustomList
@@ -289,7 +277,7 @@ const GlobalVulnsFilters = ({ reset }) => {
             onChange={onFilterStatus}
           />
         </Menu>
-      </Box>
+      )}
     </Stack>
   )
 }

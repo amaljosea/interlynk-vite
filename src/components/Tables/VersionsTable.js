@@ -29,6 +29,7 @@ import AutomationWarning from 'components/Modal/AutomationWarning'
 import DeleteSbom from 'components/Modal/DeleteSbom'
 import ReprocessSbom from 'components/Modal/ReprocessSbom'
 import SbomTransfer from 'components/Modal/SbomTransfer'
+import SupportAnalysis from 'components/Modal/SupportAnalysis'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -46,7 +47,6 @@ import { FaPlus } from 'react-icons/fa6'
 import { HiOutlineDuplicate } from 'react-icons/hi'
 import { IoMdWarning } from 'react-icons/io'
 import { LuArchive, LuGitCompare } from 'react-icons/lu'
-import SupportAnalysis from 'components/Modal/SupportAnalysis'
 
 // GET ACTIVCE PROJECT GROUP FOR PUBLIC VIEW
 export const GetShareProjectGroup = gql`
@@ -457,6 +457,7 @@ const VersionsTable = (props) => {
           </Tooltip>
         )
       },
+      wrap: true,
       right: 'true',
       sortable: true
     },
@@ -474,6 +475,7 @@ const VersionsTable = (props) => {
           </Tooltip>
         )
       },
+      wrap: true,
       sortable: true,
       right: 'true'
     },

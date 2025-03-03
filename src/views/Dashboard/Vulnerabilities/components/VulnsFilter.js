@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { Box, Flex, Stack, Text } from '@chakra-ui/react'
+import { Flex, Text } from '@chakra-ui/react'
 import {
   Menu,
   MenuItemOption,
@@ -120,13 +120,9 @@ const VulnFilters = ({ setFilter, sbomVersions, prodGroups }) => {
   }
 
   return (
-    <Stack direction={'row'} alignItems={'center'} gap={2}>
+    <>
       {/* PRODUCTS */}
-      <Box
-        width={'fit-content'}
-        position={'relative'}
-        hidden={params?.productid}
-      >
+      {!params?.productid && (
         <Menu closeOnSelect={false}>
           <MenuHeading title={'Products'} active={getStatus('products')} />
           <MenuList
@@ -159,13 +155,9 @@ const VulnFilters = ({ setFilter, sbomVersions, prodGroups }) => {
             </MenuOptionGroup>
           </MenuList>
         </Menu>
-      </Box>
+      )}
       {/* ENVIRONMENT */}
-      <Box
-        width={'fit-content'}
-        position={'relative'}
-        hidden={params?.productid}
-      >
+      {!params?.productid && (
         <Menu closeOnSelect={false}>
           <MenuHeading title={'Environment'} active={getStatus('envs')} />
           <CustomList
@@ -174,20 +166,18 @@ const VulnFilters = ({ setFilter, sbomVersions, prodGroups }) => {
             options={envOptions}
           />
         </Menu>
-      </Box>
+      )}
       {/* VERSIONS */}
-      <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={false}>
-          <MenuHeading title={'Versions'} active={getStatus('versions')} />
-          {sbomVersions?.length > 0 && (
-            <CustomList
-              value={versions}
-              options={versionOptions}
-              onChange={onFilterVesion}
-            />
-          )}
-        </Menu>
-      </Box>
+      <Menu closeOnSelect={false}>
+        <MenuHeading title={'Versions'} active={getStatus('versions')} />
+        {sbomVersions?.length > 0 && (
+          <CustomList
+            value={versions}
+            options={versionOptions}
+            onChange={onFilterVesion}
+          />
+        )}
+      </Menu>
       {/* INCOMPLETE STATUS */}
       <Flex align='center' gap={2}>
         <LynkSwitch
@@ -197,7 +187,7 @@ const VulnFilters = ({ setFilter, sbomVersions, prodGroups }) => {
         />
         <Text>Incomplete Only</Text>
       </Flex>
-    </Stack>
+    </>
   )
 }
 

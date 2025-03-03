@@ -9,6 +9,7 @@ import { Flex, useDisclosure } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
+import SupportStatus from 'components/Modal/SupportStatus'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -37,8 +38,11 @@ const Support = () => {
 
   const CARD = useDisclosure()
   const EDIT = useDisclosure()
+  const STATUS = useDisclosure()
 
   const [activeRow, setActiveRow] = useState(null)
+  const [toggleClear, setToggleClear] = useState(false)
+  const [selectedItems, setSelectedItems] = useState([])
   const [filterText, setFilterText] = useState(searchInput || '')
 
   const isSortable = field !== '' && direction !== ''
@@ -100,9 +104,22 @@ const Support = () => {
     })
   }
 
+  const handleChange = (state) => setSelectedItems(state?.selectedRows)
+
   const handleSupport = (row) => {
     setActiveRow(row)
     EDIT.onOpen()
+  }
+
+  const handleStatus = (row) => {
+    setActiveRow(row)
+    STATUS.onOpen()
+  }
+
+  const clearSelection = () => {
+    setSelectedItems([])
+    setToggleClear(true)
+    STATUS.onClose()
   }
 
   // SUB HEADER
@@ -111,7 +128,9 @@ const Support = () => {
     filterText,
     handleSearch,
     handleClear,
-    onSearchInputChange
+    onSearchInputChange,
+    handleStatus,
+    selectedItems
   })
 
   // COLUMNS
@@ -122,6 +141,7 @@ const Support = () => {
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           subHeader
+          selectableRows
           expandableRows
           persistTableHead
           responsive={true}
@@ -133,6 +153,9 @@ const Support = () => {
           progressPending={loading}
           defaultSortFieldId={field}
           subHeaderComponent={subHeader}
+          clearSelectedRows={toggleClear}
+          className='data-table-container'
+          onSelectedRowsChange={handleChange}
           progressComponent={<CustomLoader />}
           expandableRowsComponent={SupportExpand}
           customStyles={customStyles(headingTextColor)}
@@ -163,6 +186,15 @@ const Support = () => {
           data={activeRow}
           isOpen={EDIT.isOpen}
           onClose={EDIT.onClose}
+        />
+      )}
+
+      {STATUS.isOpen && selectedItems?.length > 0 && (
+        <SupportStatus
+          isOpen={STATUS.isOpen}
+          onClose={STATUS.onClose}
+          handleClear={clearSelection}
+          selectedItems={selectedItems}
         />
       )}
     </>
