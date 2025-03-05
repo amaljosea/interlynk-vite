@@ -8,14 +8,6 @@ import EnvModal from 'views/Dashboard/Products/components/EnvModal'
 
 import { AddIcon, CheckCircleIcon, DeleteIcon } from '@chakra-ui/icons'
 import {
-  Button,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay,
   Flex,
   IconButton,
   Stack,
@@ -25,6 +17,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import LynkDrawer from 'components/LynkDrawer'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -162,43 +155,33 @@ const EnvironmentDrawer = ({
 
   return (
     <>
-      <Drawer isOpen={isOpen} placement='right' size='lg' onClose={onClose}>
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerCloseButton />
-          <DrawerHeader>Environments</DrawerHeader>
-          <DrawerBody>
-            <Flex flexDir={'column'} width={'100%'}>
-              <DataTable
-                columns={columns}
-                data={
-                  data?.projectGroup
-                    ? filterEnvList(data?.projectGroup?.projects)
-                    : []
-                }
-                customStyles={customStyles}
-                defaultSortAsc
-                defaultSortFieldId={'NAME'}
-                progressPending={data?.projectGroup ? false : true}
-                progressComponent={<CustomLoader />}
-                subHeader
-                subHeaderComponent={Header}
-                persistTableHead
-                responsive={true}
-              />
-            </Flex>
-          </DrawerBody>
-
-          <DrawerFooter display={'none'}>
-            <Button title='Cancel' mr={3} onClick={onClose}>
-              Cancel
-            </Button>
-            <Button title='Save' colorScheme='blue'>
-              Save
-            </Button>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
+      <LynkDrawer
+        title={'Environments'}
+        isOpen={isOpen}
+        size='lg'
+        onClose={onClose}
+        noFooter
+      >
+        <Flex flexDir={'column'} width={'100%'}>
+          <DataTable
+            columns={columns}
+            data={
+              data?.projectGroup
+                ? filterEnvList(data?.projectGroup?.projects)
+                : []
+            }
+            customStyles={customStyles}
+            defaultSortAsc
+            defaultSortFieldId={'NAME'}
+            progressPending={data?.projectGroup ? false : true}
+            progressComponent={<CustomLoader />}
+            subHeader
+            subHeaderComponent={Header}
+            persistTableHead
+            responsive={true}
+          />
+        </Flex>
+      </LynkDrawer>
 
       {/* ADD PROJECT */}
       {isProdOpen && (

@@ -9,17 +9,10 @@ import { Divider, Select, Textarea } from '@chakra-ui/react'
 import { Button, ButtonGroup } from '@chakra-ui/react'
 import { Flex, Stack, Text } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
-import {
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay
-} from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import LynkAlert from 'components/LynkAlert'
+import LynkDrawer from 'components/LynkDrawer'
 import CompInfo from 'components/Misc/CompInfo'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -96,130 +89,124 @@ const LicenseStatus = ({ data, isOpen, onClose }) => {
       : []
 
   return (
-    <Drawer size='md' isOpen={isOpen} placement='right' onClose={onClose}>
-      <DrawerOverlay />
-      <DrawerContent>
-        <DrawerCloseButton mt={3} />
-        <DrawerHeader borderBottomWidth='1px'>
-          <Text mb={1} fontWeight={'medium'}>
-            Edit License Status
-          </Text>
-          {data && <CompInfo data={data} />}
-        </DrawerHeader>
-        <DrawerBody>
-          <Stack spacing={4}>
-            {edit ? (
-              <Stack spacing={4} ref={noteForm}>
-                {/* STATUS */}
-                <FormControl>
-                  <FormLabel htmlFor='licenseStatus'>Note</FormLabel>
-                  <Select
-                    name='licenseStatus'
-                    onChange={handleChange}
-                    value={formData?.licenseStatus}
-                  >
-                    <option value=''>-- Select --</option>
-                    {licenseStatusTypes.map((item, index) => (
-                      <option key={index} value={item}>
-                        {item}
-                      </option>
-                    ))}
-                  </Select>
-                </FormControl>
-                {/* NOTE */}
-                <FormControl>
-                  <FormLabel htmlFor='licenseNotes'>Note</FormLabel>
-                  <Textarea
-                    maxLength={512}
-                    name='licenseNotes'
-                    onChange={handleChange}
-                    value={formData?.licenseNotes}
-                    placeholder={'Add some notes'}
-                  />
-                </FormControl>
-                {error !== '' && <LynkAlert msg={error} />}
-                {/* NOTE ACTIONS */}
-                <ButtonGroup>
-                  <Button
-                    w={'24'}
-                    fontSize={'sm'}
-                    variant='outline'
-                    colorScheme='blue'
-                    onClick={() => setEdit(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    w={'24'}
-                    fontSize={'sm'}
-                    variant='solid'
-                    colorScheme='blue'
-                    onClick={handleSubmit}
-                    isDisabled={isDisabled}
-                    isLoading={updateLoading}
-                  >
-                    Save
-                  </Button>
-                </ButtonGroup>
-              </Stack>
-            ) : (
-              <Button
-                mt={2}
-                w={'full'}
-                fontSize={'sm'}
-                leftIcon={<AddIcon />}
-                onClick={handleUpdate}
+    <LynkDrawer
+      title={'Edit License Status'}
+      subtitle={data && <CompInfo data={data} />}
+      isOpen={isOpen}
+      onClose={onClose}
+      noFooter
+    >
+      <Stack spacing={4}>
+        {edit ? (
+          <Stack spacing={4} ref={noteForm}>
+            {/* STATUS */}
+            <FormControl>
+              <FormLabel htmlFor='licenseStatus'>Note</FormLabel>
+              <Select
+                name='licenseStatus'
+                onChange={handleChange}
+                value={formData?.licenseStatus}
               >
-                Update Status
+                <option value=''>-- Select --</option>
+                {licenseStatusTypes.map((item, index) => (
+                  <option key={index} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+            {/* NOTE */}
+            <FormControl>
+              <FormLabel htmlFor='licenseNotes'>Note</FormLabel>
+              <Textarea
+                maxLength={512}
+                name='licenseNotes'
+                onChange={handleChange}
+                value={formData?.licenseNotes}
+                placeholder={'Add some notes'}
+              />
+            </FormControl>
+            {error !== '' && <LynkAlert msg={error} />}
+            {/* NOTE ACTIONS */}
+            <ButtonGroup>
+              <Button
+                w={'24'}
+                fontSize={'sm'}
+                variant='outline'
+                colorScheme='blue'
+                onClick={() => setEdit(false)}
+              >
+                Cancel
               </Button>
-            )}
-            <Divider />
-            {statusLoading ? (
-              <CustomLoader />
-            ) : (
-              <Stack>
-                {filterData?.length > 0 ? (
-                  <Stack spacing={6} mb={4}>
-                    {filterData?.map((item, index) => (
-                      <Flex
-                        gap={8}
-                        key={index}
-                        justify='space-between'
-                        alignItems={'flex-start'}
+              <Button
+                w={'24'}
+                fontSize={'sm'}
+                variant='solid'
+                colorScheme='blue'
+                onClick={handleSubmit}
+                isDisabled={isDisabled}
+                isLoading={updateLoading}
+              >
+                Save
+              </Button>
+            </ButtonGroup>
+          </Stack>
+        ) : (
+          <Button
+            mt={2}
+            w={'full'}
+            fontSize={'sm'}
+            leftIcon={<AddIcon />}
+            onClick={handleUpdate}
+          >
+            Update Status
+          </Button>
+        )}
+        <Divider />
+        {statusLoading ? (
+          <CustomLoader />
+        ) : (
+          <Stack>
+            {filterData?.length > 0 ? (
+              <Stack spacing={6} mb={4}>
+                {filterData?.map((item, index) => (
+                  <Flex
+                    gap={8}
+                    key={index}
+                    justify='space-between'
+                    alignItems={'flex-start'}
+                  >
+                    <Stack spacing={0} maxW='320px'>
+                      <Text
+                        fontSize={'sm'}
+                        whiteSpace='pre-wrap'
+                        wordBreak='break-word'
                       >
-                        <Stack spacing={0} maxW='320px'>
-                          <Text
-                            fontSize={'sm'}
-                            whiteSpace='pre-wrap'
-                            wordBreak='break-word'
-                          >
-                            {item?.values?.license_status}
-                          </Text>
-                          <Text fontSize={'xs'} color={sameSecondaryText}>
-                            {item?.values?.license_notes}
-                          </Text>
-                        </Stack>
-                        <Text
-                          fontSize={'xs'}
-                          textAlign='right'
-                          color={sameSecondaryText}
-                        >
-                          {timeSince(item?.createdAt)}
-                        </Text>
-                      </Flex>
-                    ))}
-                  </Stack>
-                ) : (
-                  <Text textAlign={'center'} color={sameSecondaryText}>
-                    No record to display
-                  </Text>
-                )}
+                        {item?.values?.license_status}
+                      </Text>
+                      <Text fontSize={'xs'} color={sameSecondaryText}>
+                        {item?.values?.license_notes}
+                      </Text>
+                    </Stack>
+                    <Text
+                      fontSize={'xs'}
+                      textAlign='right'
+                      color={sameSecondaryText}
+                    >
+                      {timeSince(item?.createdAt)}
+                    </Text>
+                  </Flex>
+                ))}
               </Stack>
+            ) : (
+              <Text textAlign={'center'} color={sameSecondaryText}>
+                No record to display
+              </Text>
             )}
           </Stack>
-        </DrawerBody>
-      </DrawerContent>
-    </Drawer>
+        )}
+      </Stack>
+    </LynkDrawer>
   )
 }
 

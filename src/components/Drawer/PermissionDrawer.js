@@ -1,22 +1,11 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 
-import {
-  Box,
-  Checkbox,
-  Divider,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay,
-  Stack,
-  Tag
-} from '@chakra-ui/react'
+import { Box, Checkbox, Divider, Stack, Tag } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import LynkAlert from 'components/LynkAlert'
+import LynkDrawer from 'components/LynkDrawer'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -116,68 +105,60 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole }) => {
   }
 
   return (
-    <Drawer
+    <LynkDrawer
+      title={`Permissions for ${activeRole?.name || ''}`}
       isOpen={isOpen}
-      placement='right'
-      size='md'
       onClose={onClose}
-      closeOnOverlayClick={false}
+      noFooter
     >
-      <DrawerOverlay />
-      <DrawerContent>
-        <DrawerCloseButton />
-        <DrawerHeader>Permissions for {activeRole?.name || ''}</DrawerHeader>
-        <DrawerBody>
-          {loading ? (
-            <CustomLoader />
-          ) : (
-            <Stack spacing={6} dir='column'>
-              {readOnly && (
-                <Tag width={'fit-content'} colorScheme='red'>
-                  {activeRole?.name} permissions cannot be modified
-                </Tag>
-              )}
-              {error !== '' && <LynkAlert msg={error} />}
-              <Stack spacing={4} dir='blue'>
-                {/* ORGANIZATION MANAGEMENT */}
-                <Permissions category={'Organization Management'} />
-                <Divider />
-                {/* PROJECT GROUP MANAGEMENT */}
-                <Permissions category={'Product Management'} />
-                <Divider />
-                {/* PROJECT MANAGEMENT */}
-                <Permissions category={'Product Environment Management'} />
-                <Divider />
-                {/* SBOM MANAGEMENT */}
-                <Permissions category={'SBOM Management'} />
-                <Divider />
-                {/* USER MANAGEMENT */}
-                <Permissions category={'User Management'} />
-                <Divider />
-                {/* VULN MANAGEMENT */}
-                <Permissions category={'Vulnerability Management'} />
-                <Divider />
-                {/* LICENSE MANAGEMENT */}
-                <Permissions category={'License Management'} />
-                <Divider />
-                {/* POLICY MANAGEMENT */}
-                <Permissions category={'Policy Management'} />
-                <Divider />
-                {/* SUPPORT MANAGEMENT */}
-                <Permissions category={'Support Management'} />
-                <Divider />
-                {/* VENDOR MANAGEMENT */}
-                <Permissions category={'Vendor Management'} />
-                <Divider />
-                {/* CONNECTION MANAGEMENT */}
-                <Permissions category={'Connection Management'} />
-                <Divider />
-              </Stack>
-            </Stack>
+      {loading ? (
+        <CustomLoader />
+      ) : (
+        <Stack spacing={6} mt={2} dir='column'>
+          {readOnly && (
+            <Tag width={'fit-content'} colorScheme='red'>
+              {activeRole?.name} permissions cannot be modified
+            </Tag>
           )}
-        </DrawerBody>
-      </DrawerContent>
-    </Drawer>
+          {error !== '' && <LynkAlert msg={error} />}
+          <Stack spacing={4} dir='blue'>
+            {/* ORGANIZATION MANAGEMENT */}
+            <Permissions category={'Organization Management'} />
+            <Divider />
+            {/* PROJECT GROUP MANAGEMENT */}
+            <Permissions category={'Product Management'} />
+            <Divider />
+            {/* PROJECT MANAGEMENT */}
+            <Permissions category={'Product Environment Management'} />
+            <Divider />
+            {/* SBOM MANAGEMENT */}
+            <Permissions category={'SBOM Management'} />
+            <Divider />
+            {/* USER MANAGEMENT */}
+            <Permissions category={'User Management'} />
+            <Divider />
+            {/* VULN MANAGEMENT */}
+            <Permissions category={'Vulnerability Management'} />
+            <Divider />
+            {/* LICENSE MANAGEMENT */}
+            <Permissions category={'License Management'} />
+            <Divider />
+            {/* POLICY MANAGEMENT */}
+            <Permissions category={'Policy Management'} />
+            <Divider />
+            {/* SUPPORT MANAGEMENT */}
+            <Permissions category={'Support Management'} />
+            <Divider />
+            {/* VENDOR MANAGEMENT */}
+            <Permissions category={'Vendor Management'} />
+            <Divider />
+            {/* CONNECTION MANAGEMENT */}
+            <Permissions category={'Connection Management'} />
+            <Divider />
+          </Stack>
+        </Stack>
+      )}
+    </LynkDrawer>
   )
 }
 

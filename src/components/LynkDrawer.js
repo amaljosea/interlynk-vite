@@ -29,6 +29,7 @@ const LynkDrawer = ({
   noFooter = false,
   hideCancelButton = false,
   placement = 'right',
+  noHeader = false,
   children
 }) => {
   const { secondaryTextInverse } = useThemeColor(['secondaryTextInverse'])
@@ -47,6 +48,7 @@ const LynkDrawer = ({
           fontWeight='500'
           borderBottomWidth='1px'
           paddingInline={'16px'}
+          hidden={noHeader}
         >
           {title}
           {subtitle && <Box mt={1}>{subtitle}</Box>}

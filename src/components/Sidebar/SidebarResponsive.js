@@ -6,11 +6,6 @@ import { HamburgerIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerOverlay,
   Flex,
   Link,
   Stack,
@@ -20,6 +15,7 @@ import {
 
 import IconBox from 'components/Icons/IconBox'
 import { InterlynkLogo } from 'components/Icons/Icons'
+import LynkDrawer from 'components/LynkDrawer'
 import { Separator } from 'components/Separator/Separator'
 import { SidebarHelp } from 'components/Sidebar/SidebarHelp'
 
@@ -185,34 +181,22 @@ function SidebarResponsive(props) {
         ref={btnRef}
         onClick={onOpen}
       />
-      <Drawer
+      <LynkDrawer
         isOpen={isOpen}
         onClose={onClose}
+        size={'sm'}
         placement={document.documentElement.dir === 'rtl' ? 'right' : 'left'}
+        noFooter
+        noHeader
       >
-        <DrawerOverlay />
-        <DrawerContent
-          w='250px'
-          maxW='250px'
-          ms={{ sm: '16px' }}
-          my={{ sm: '16px' }}
-          borderRadius='16px'
-        >
-          <DrawerCloseButton
-            _focus={{ boxShadow: 'none' }}
-            _hover={{ boxShadow: 'none' }}
-          />
-          <DrawerBody maxW='250px' px='1rem'>
-            <Box maxW='100%' h='100vh'>
-              <Box>{brand}</Box>
-              <Stack direction='column' mb='40px'>
-                <Box>{createLinks(filteredRoutes)}</Box>
-              </Stack>
-              <SidebarHelp />
-            </Box>
-          </DrawerBody>
-        </DrawerContent>
-      </Drawer>
+        <Box maxW='100%' h='100vh'>
+          <Box>{brand}</Box>
+          <Stack direction='column' mb='40px'>
+            <Box>{createLinks(filteredRoutes)}</Box>
+          </Stack>
+          <SidebarHelp />
+        </Box>
+      </LynkDrawer>
     </Flex>
   )
 }

@@ -10,19 +10,12 @@ import { Button, Checkbox, Divider, Input, Stack, Tag } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 import { Flex, IconButton, Text, Tooltip } from '@chakra-ui/react'
 import { useClipboard } from '@chakra-ui/react'
-import {
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay
-} from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
 import CopyButton from 'components/Icons/CopyButton'
 import LynkDate from 'components/LynkDate'
+import LynkDrawer from 'components/LynkDrawer'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -247,69 +240,68 @@ const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
   ]
 
   return (
-    <Drawer size='lg' isOpen={isOpen} placement='right' onClose={onClose}>
-      <DrawerOverlay />
-      <DrawerContent>
-        <DrawerCloseButton mt={2} />
-        <DrawerHeader borderBottomWidth='1px'>
-          <Text mb={1}>ShareLynks</Text>
-          <Tag colorScheme='blue' wordBreak={'break-all'}>
-            {name ? truncatedValue(name, 20) : ''}
-          </Tag>
-        </DrawerHeader>
-        <DrawerBody>
-          <Stack hidden={!show} mt={1} spacing={3}>
-            <FormControl isInvalid={!isValidDate} hidden={noExpire}>
-              <FormLabel htmlFor='expire'>Expiration Date</FormLabel>
-              <LynkDate
-                key={selectedDate}
-                value={selectedDate}
-                onChange={handleDateChange}
-              />
-              {!isValidDate && (
-                <FormErrorMessage>
-                  Please enter a valid expiry date
-                </FormErrorMessage>
-              )}
-            </FormControl>
-            <FormControl>
-              <Checkbox isChecked={noExpire} onChange={handleExpireChange}>
-                No Expiration
-              </Checkbox>
-            </FormControl>
-            <Flex gap={2} justifyContent={'flex-end'} alignItems={'center'}>
-              <Button fontSize={'sm'} onClick={() => onToggle(false)}>
-                Cancel
-              </Button>
-              <Button
-                fontSize={'sm'}
-                colorScheme='blue'
-                isDisabled={isDisabled}
-                isLoading={createLoading}
-                onClick={handleCreateLynk}
-                aria-label='save_sharelynk'
-              >
-                Add
-              </Button>
-            </Flex>
-          </Stack>
-          <Divider hidden={!show} my={4} />
-          <DataTable
-            subHeader={!show}
-            persistTableHead
-            responsive={true}
-            columns={columns}
-            data={nodes || []}
-            defaultSortAsc={false}
-            progressPending={loading}
-            subHeaderComponent={subHeader}
-            defaultSortFieldId={'UPDATED_AT'}
-            progressComponent={<CustomLoader />}
-            customStyles={customStyles(headingTextColor)}
+    <LynkDrawer
+      title={'ShareLynks'}
+      subtitle={
+        <Tag colorScheme='blue' wordBreak={'break-all'}>
+          {name ? truncatedValue(name, 20) : ''}
+        </Tag>
+      }
+      size='lg'
+      isOpen={isOpen}
+      onClose={onClose}
+      noFooter
+    >
+      <Stack hidden={!show} mt={1} spacing={3}>
+        <FormControl isInvalid={!isValidDate} hidden={noExpire}>
+          <FormLabel htmlFor='expire'>Expiration Date</FormLabel>
+          <LynkDate
+            key={selectedDate}
+            value={selectedDate}
+            onChange={handleDateChange}
           />
-        </DrawerBody>
-      </DrawerContent>
-    </Drawer>
+          {!isValidDate && (
+            <FormErrorMessage>
+              Please enter a valid expiry date
+            </FormErrorMessage>
+          )}
+        </FormControl>
+        <FormControl>
+          <Checkbox isChecked={noExpire} onChange={handleExpireChange}>
+            No Expiration
+          </Checkbox>
+        </FormControl>
+        <Flex gap={2} justifyContent={'flex-end'} alignItems={'center'}>
+          <Button fontSize={'sm'} onClick={() => onToggle(false)}>
+            Cancel
+          </Button>
+          <Button
+            fontSize={'sm'}
+            colorScheme='blue'
+            isDisabled={isDisabled}
+            isLoading={createLoading}
+            onClick={handleCreateLynk}
+            aria-label='save_sharelynk'
+          >
+            Add
+          </Button>
+        </Flex>
+      </Stack>
+      <Divider hidden={!show} my={4} />
+      <DataTable
+        subHeader={!show}
+        persistTableHead
+        responsive={true}
+        columns={columns}
+        data={nodes || []}
+        defaultSortAsc={false}
+        progressPending={loading}
+        subHeaderComponent={subHeader}
+        defaultSortFieldId={'UPDATED_AT'}
+        progressComponent={<CustomLoader />}
+        customStyles={customStyles(headingTextColor)}
+      />
+    </LynkDrawer>
   )
 }
 
