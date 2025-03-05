@@ -28,9 +28,8 @@ export default function AdminNavbarLinks(props) {
   const sbomId = params.sbomid
   const productId = params.productid
   const { organization } = useGlobalState()
-  const { setColorMode } = useColorMode()
-  const mode = getItem('chakra-ui-color-mode')
-  const [currentMode, setCurrentMode] = useState(mode || 'system')
+  const { colorMode, setColorMode } = useColorMode()
+  const [currentMode, setCurrentMode] = useState(colorMode || 'system')
 
   const signedUrlParams = getSignedUrlParams()
 
@@ -56,25 +55,8 @@ export default function AdminNavbarLinks(props) {
 
   const onThemeChange = (mode) => {
     setCurrentMode(mode)
-    if (mode === 'system') {
-      removeItem('chakra-ui-color-mode')
-    } else {
-      setColorMode(mode)
-      setItem('chakra-ui-color-mode', mode)
-    }
+    setColorMode(mode)
   }
-
-  useEffect(() => {
-    if (currentMode === 'system') {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-      const systemThemeChange = () =>
-        setColorMode(mediaQuery?.matches ? 'dark' : 'light')
-      systemThemeChange()
-      removeItem('chakra-ui-color-mode')
-      mediaQuery?.addListener(systemThemeChange)
-      return () => mediaQuery?.removeListener(systemThemeChange)
-    }
-  }, [currentMode, setColorMode])
 
   return (
     <Flex gap={3} alignItems='center' flexDirection='row'>

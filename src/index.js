@@ -7,7 +7,11 @@ import ReactGA from 'react-ga4'
 import { BrowserRouter } from 'react-router-dom'
 import theme, { config } from 'theme/theme.js'
 
-import { ChakraProvider, ColorModeScript } from '@chakra-ui/react'
+import {
+  ChakraProvider,
+  ColorModeScript,
+  createLocalStorageManager
+} from '@chakra-ui/react'
 
 import ChatbotPreview from 'components/ChatbotPreview'
 import ScrollToTop from 'components/ScrollToTop.js'
@@ -38,13 +42,21 @@ Sentry.init({
 })
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
+const manager = createLocalStorageManager('chakra-ui-color-mode')
 
 root.render(
   <React.StrictMode>
     <BrowserRouter>
       <GlobalStateProvider>
-        <ChakraProvider theme={theme} resetCSS={true}>
-          <ColorModeScript initialColorMode={config?.initialColorMode} />
+        <ChakraProvider
+          theme={theme}
+          resetCSS={true}
+          colorModeManager={manager}
+        >
+          <ColorModeScript
+            initialColorMode={config?.initialColorMode}
+            storageKey='chakra-ui-color-mode'
+          />
           <ChatbotPreview />
           <ScrollToTop />
           <ApolloWrapper>
