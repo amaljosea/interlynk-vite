@@ -1,9 +1,22 @@
 import { useMutation } from '@apollo/client'
-import { Step, Steps, useSteps } from 'chakra-ui-steps'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { Box, Button, Flex } from '@chakra-ui/react'
+import {
+  Box,
+  Button,
+  Flex,
+  Step,
+  StepDescription,
+  StepIcon,
+  StepIndicator,
+  StepNumber,
+  StepSeparator,
+  StepStatus,
+  StepTitle,
+  Stepper,
+  useSteps
+} from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -14,12 +27,7 @@ import StepOne from './Wizard/StepOne'
 import StepThree from './Wizard/StepThree'
 import StepTwo from './Wizard/StepTwo'
 
-const ImportWizard = ({
-  variant,
-  currentSbomId,
-  currentProductId,
-  onClose
-}) => {
+const ImportWizard = ({ currentSbomId, currentProductId, onClose }) => {
   const params = useParams()
   const groupId = params.productgroupid
   const { secondaryBgColor } = useThemeColor(['secondaryBgColor'])
@@ -29,8 +37,6 @@ const ImportWizard = ({
   const { prodVulnState, dispatch } = useGlobalState()
   const { selectedVulns } = prodVulnState
   const { prodVulnDispatch } = dispatch
-
-  const { nextStep, prevStep, activeStep } = useSteps({ initialStep: 0 })
 
   const [sbomId, setSbomId] = useState('')
   const [selectedGroup, setSelectedGroup] = useState(groupId || '')
@@ -49,56 +55,60 @@ const ImportWizard = ({
       )
       compVexImport({
         variables: { vulnsToImport: importData }
-      }).then((res) => res?.data && nextStep())
+      }).then((res) => res?.data && goToNext())
     }
   }
 
-  const steps = [
-    {
-      label: 'Product',
-      component: (
-        <StepOne
-          setSbomId={setSbomId}
-          currentSbomId={currentSbomId}
-          currentProductId={currentProductId}
-          selectedGroupId={selectedGroup}
-          setSelectedGroupId={setSelectedGroup}
-          selectedProd={selectedProd}
-          setSelectedProd={setSelectedProd}
-          selectedVersion={selectedVersion}
-          setSelectedVersion={setSelectedVersion}
-          uniqVersions={uniqVersions}
-          setUniqVersions={setUniqVersions}
-        />
-      )
-    },
-    {
-      label: 'Import',
-      component: <StepTwo currentSbomId={currentSbomId} sbomId={sbomId} />
-    }
-  ]
+  const steps = [{ title: 'Product' }, { title: 'Import' }]
+
+  const { activeStep, goToNext, goToPrevious } = useSteps({
+    index: 0,
+    count: steps.length
+  })
 
   const hasCompletedAllSteps = activeStep === steps.length
 
   return (
     <Flex flexDir='column' width='100%'>
-      <Box position='fixed' top={20} left={6} right={6}>
-        <Steps variant={variant} colorScheme='blue' activeStep={activeStep}>
-          {steps.map(({ label, component }, index) => (
-            <Step label={label} key={index}>
-              <Flex
-                width={'100%'}
-                flexDir={'column'}
-                alignItems={'center'}
-                transform={'scale(0.9)'}
-                justifyContent={'center'}
-                sx={{ p: 8, rounded: 'md' }}
-              >
-                {component}
-              </Flex>
-            </Step>
-          ))}
-        </Steps>
+      <Stepper index={activeStep} size='lg' padding={2}>
+        {steps.map((step, index) => (
+          <Step key={index}>
+            <StepIndicator>
+              <StepStatus
+                complete={<StepIcon />}
+                incomplete={<StepNumber />}
+                active={<StepNumber />}
+              />
+            </StepIndicator>
+
+            <Box flexShrink='0'>
+              <StepTitle>{step.title}</StepTitle>
+              <StepDescription>{step.description}</StepDescription>
+            </Box>
+
+            <StepSeparator />
+          </Step>
+        ))}
+      </Stepper>
+      <Box marginTop={100}>
+        {activeStep === 0 && (
+          <StepOne
+            setSbomId={setSbomId}
+            currentSbomId={currentSbomId}
+            currentProductId={currentProductId}
+            selectedGroupId={selectedGroup}
+            setSelectedGroupId={setSelectedGroup}
+            selectedProd={selectedProd}
+            setSelectedProd={setSelectedProd}
+            selectedVersion={selectedVersion}
+            setSelectedVersion={setSelectedVersion}
+            uniqVersions={uniqVersions}
+            setUniqVersions={setUniqVersions}
+          />
+        )}
+        {activeStep === 1 && (
+          <StepTwo currentSbomId={currentSbomId} sbomId={sbomId} />
+        )}
       </Box>
       {hasCompletedAllSteps && (
         <Flex
@@ -142,7 +152,7 @@ const ImportWizard = ({
                 onClick={() => {
                   prodVulnDispatch({ type: 'RESET_SELECTED_VULN' })
                   prodVulnDispatch({ type: 'RESET_IMPORT_SBOMS' })
-                  prevStep()
+                  goToPrevious()
                   setSelectedVersion('')
                 }}
               >
@@ -155,7 +165,7 @@ const ImportWizard = ({
                 variant='solid'
                 title='Next'
                 colorScheme='blue'
-                onClick={nextStep}
+                onClick={goToNext}
                 aria-label='vulnStepOne'
                 disabled={
                   selectedVersion === '' ||
