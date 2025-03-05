@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { capitalizeFirstLetter } from 'utils'
 
-import { Select, Stack, Tag, Text } from '@chakra-ui/react'
+import { Flex, Select, Stack, Tag, Text } from '@chakra-ui/react'
 import { FormControl, FormHelperText, FormLabel } from '@chakra-ui/react'
 
 import FileUpload from 'components/FileUpload'
@@ -96,45 +96,46 @@ const UploadModal = ({ isOpen, onClose, group }) => {
         disabled={!selectedFile || loading}
         buttonText='Upload'
       >
-        {!params?.productgroupid && (
-          <Tag colorScheme='blue' mb={4}>
-            <Text fontWeight={'medium'} wordBreak={'break-all'}>
-              {group?.name}
-            </Text>
-          </Tag>
-        )}
-        {errorMessage !== '' && <LynkAlert msg={errorMessage} />}
-        <Stack spacing={6} minHeight='290px'>
-          <FormControl>
-            <FormLabel>Environment</FormLabel>
-            <Select
-              id='dataRetention'
-              value={selectedEnv}
-              textTransform={'capitalize'}
-              onChange={(e) => setSelectedEnv(e.target.value)}
-            >
-              {projects
-                ?.sort((a, b) => a?.name?.localeCompare(b?.name))
-                ?.map((item) => (
-                  <option key={item?.id} value={item?.id}>
-                    {capitalizeFirstLetter(item?.name)}
-                  </option>
-                ))}
-            </Select>
-            <FormHelperText color={secondaryTextColor} fontSize={12}>
-              Interlynk supports importing CycloneDX versions 1.2-1.5 in JSON
-              and XML formats and SPDX 2.2 and 2.3 in JSON format.
-            </FormHelperText>
-          </FormControl>
-          <FileUpload
-            selectedFile={selectedFile}
-            setSelectedFile={setSelectedFile}
-            isLoading={loading}
-            error={error}
-            errorMessage={errorMessage}
-            setErrorMessage={setErrorMessage}
-          />
-        </Stack>
+        <Flex flexDir={'column'} gap={3} alignItems={'flex-start'}>
+          {!params?.productgroupid && (
+            <Tag colorScheme='blue' mb={4}>
+              <Text fontWeight={'medium'} wordBreak={'break-all'}>
+                {group?.name}
+              </Text>
+            </Tag>
+          )}
+          {errorMessage !== '' && <LynkAlert msg={errorMessage} />}
+          <Stack spacing={6} minHeight='290px'>
+            <FormControl>
+              <FormLabel>Environment</FormLabel>
+              <Select
+                id='dataRetention'
+                value={selectedEnv}
+                textTransform={'capitalize'}
+                onChange={(e) => setSelectedEnv(e.target.value)}
+              >
+                {projects
+                  ?.sort((a, b) => a?.name?.localeCompare(b?.name))
+                  ?.map((item) => (
+                    <option key={item?.id} value={item?.id}>
+                      {capitalizeFirstLetter(item?.name)}
+                    </option>
+                  ))}
+              </Select>
+              <FormHelperText color={secondaryTextColor} fontSize={12}>
+                Interlynk supports importing CycloneDX versions 1.2-1.5 in JSON
+                and XML formats and SPDX 2.2 and 2.3 in JSON format.
+              </FormHelperText>
+            </FormControl>
+            <FileUpload
+              selectedFile={selectedFile}
+              setSelectedFile={setSelectedFile}
+              isLoading={loading}
+              error={error}
+              setErrorMessage={setErrorMessage}
+            />
+          </Stack>
+        </Flex>
       </LynkModal>
     </>
   )
