@@ -90,7 +90,7 @@ const ImportWizard = ({ currentSbomId, currentProductId, onClose }) => {
           </Step>
         ))}
       </Stepper>
-      <Box marginTop={100}>
+      <Box marginTop={45}>
         {activeStep === 0 && (
           <StepOne
             setSbomId={setSbomId}
