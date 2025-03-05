@@ -2,7 +2,6 @@ import { useLazyQuery, useMutation } from '@apollo/client'
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { getFullDate, timeSince } from 'utils'
-import { isCustomerView } from 'utils'
 
 import { CheckIcon } from '@chakra-ui/icons'
 import { Box, Button, IconButton, Stack, Text, Tooltip } from '@chakra-ui/react'
@@ -12,6 +11,7 @@ import RowComponent from 'components/RowComponent'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { checkResultUpdate } from 'graphQL/Mutation'
@@ -36,7 +36,7 @@ const ChecksColumns = (
   const productId = params.productid
   const sbomId = params.sbomid
 
-  const customerView = isCustomerView()
+  const { isCustomerView } = useRouteFlags()
 
   const { primaryTextColor } = useThemeColor([
     'headingTextColor',
@@ -259,7 +259,7 @@ const ChecksColumns = (
                       fontWeight='normal'
                       icon={<BiSolidWrench size={18} />}
                       onClick={() => onCheckOpen(row)}
-                      disabled={customerView || !isEditable || isArchived}
+                      disabled={isCustomerView || !isEditable || isArchived}
                     />
                   </Tooltip>
 
@@ -271,7 +271,7 @@ const ChecksColumns = (
                       fontWeight='normal'
                       icon={<GoSkip size={18} />}
                       onClick={() => updateIssue(id, 'ignored')}
-                      disabled={customerView || !editChecks || isArchived}
+                      disabled={isCustomerView || !editChecks || isArchived}
                     />
                   </Tooltip>
                 </Stack>
@@ -287,7 +287,7 @@ const ChecksColumns = (
                   leftIcon={<CheckIcon />}
                   title={isPrimary ? 'Fixed' : 'View'}
                   onClick={() => (isPrimary ? null : FIXED.onOpen())}
-                  disabled={customerView || !editChecks || isArchived}
+                  disabled={isCustomerView || !editChecks || isArchived}
                 >
                   {isPrimary ? 'Fixed' : 'View'}
                 </Button>
@@ -333,7 +333,7 @@ const ChecksColumns = (
     setActiveRow,
     updateComp,
     editChecks,
-    customerView,
+    isCustomerView,
     isArchived,
     activeRow,
     loadingRules,

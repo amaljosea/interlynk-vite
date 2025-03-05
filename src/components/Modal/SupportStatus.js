@@ -1,6 +1,5 @@
 import { useMutation } from '@apollo/client'
 import { useState } from 'react'
-import { isCustomerView } from 'utils'
 
 import { FormErrorMessage, Select, Stack } from '@chakra-ui/react'
 import { Input, InputGroup, InputRightAddon } from '@chakra-ui/react'
@@ -11,10 +10,12 @@ import { SupportIcon } from 'components/Icons/Icons'
 import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
 
+import { useRouteFlags } from 'hooks/useRouteFlags'
+
 import { componentSupportLevelCreate } from 'graphQL/Mutation'
 
 const SupportStatus = ({ isOpen, selectedItems, handleClear }) => {
-  const customerView = isCustomerView()
+  const { isCustomerView } = useRouteFlags()
 
   const inputStyle = { size: 'md' }
 
@@ -100,7 +101,7 @@ const SupportStatus = ({ isOpen, selectedItems, handleClear }) => {
             sx={inputStyle}
             name='supportLevel'
             value={formData?.supportLevel}
-            isDisabled={customerView}
+            isDisabled={isCustomerView}
             onChange={handleChange}
           >
             <option value='' style={{ background: 'lightgray' }}>

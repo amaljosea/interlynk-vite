@@ -2,7 +2,6 @@ import { useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { isCustomerView } from 'utils'
 import { hasWhiteSpace, validateUrl } from 'utils/formValidationUtils'
 import { componentTypes, infoData, sbomPhases } from 'variables/general'
 
@@ -18,6 +17,7 @@ import LynkFormLabel from 'components/Misc/LynkLabel'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CreateComponent, sbomCreate, supplierCreate } from 'graphQL/Mutation'
@@ -27,13 +27,13 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
   const params = useParams()
   const { sbomState } = useGlobalState()
   const { showToast } = useCustomToast()
-  const customerView = isCustomerView()
+  const { isCustomerView } = useRouteFlags()
 
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   // GET PRIMARY COMPONENT
   const { data } = useQuery(GetPrimaryComponent, {
-    skip: !customerView && isOpen && sbom?.id ? false : true,
+    skip: !isCustomerView && isOpen && sbom?.id ? false : true,
     variables: {
       projectId: params?.productid,
       sbomId: sbom?.id,
@@ -187,7 +187,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
   let SBOMs = []
   const { data: allSboms } = useQuery(GetAllSboms, {
     fetchPolicy: 'network-only',
-    skip: customerView,
+    skip: isCustomerView,
     variables: {
       id: productId
     }
@@ -251,7 +251,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
       >
         <Stack direction={'column'} spacing={4} pt={2} pb={4}>
           {/* Name */}
-          <FormControl isRequired isReadOnly={customerView}>
+          <FormControl isRequired isReadOnly={isCustomerView}>
             <LynkFormLabel
               label='Name'
               htmlFor='compName'
@@ -266,7 +266,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
             />
           </FormControl>
           {/* Description */}
-          <FormControl isReadOnly={customerView}>
+          <FormControl isReadOnly={isCustomerView}>
             <LynkFormLabel
               label='Description'
               htmlFor='compDescription'
@@ -282,7 +282,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
           {/* Version */}
           <FormControl
             isRequired
-            isReadOnly={customerView}
+            isReadOnly={isCustomerView}
             isInvalid={invalidVersion}
           >
             <LynkFormLabel
@@ -303,7 +303,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
             </FormErrorMessage>
           </FormControl>
           {/* GROUP */}
-          <FormControl isReadOnly={customerView}>
+          <FormControl isReadOnly={isCustomerView}>
             <LynkFormLabel
               label='Group'
               htmlFor='groupInfo'
@@ -328,7 +328,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
               value={compKind}
               id='componentType'
               name='componentType'
-              isDisabled={customerView}
+              isDisabled={isCustomerView}
               onChange={(e) => setCompKind(e.target.value)}
               textTransform={'capitalize'}
             >
@@ -345,7 +345,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
             </Select>
           </FormControl>
           {/* PHASES */}
-          <FormControl hidden={customerView}>
+          <FormControl hidden={isCustomerView}>
             <LynkFormLabel
               label='Phases'
               htmlFor='compPhases'
@@ -365,7 +365,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
           {/* LICENSES */}
           <LicenseField
             sbomView={true}
-            isDisabled={customerView}
+            isDisabled={isCustomerView}
             license={sbom ? sbom.licensesExp : null}
           />
           {/* SCOPE */}
@@ -380,7 +380,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
               id='compScope'
               name='compScope'
               value={compScope}
-              isDisabled={customerView}
+              isDisabled={isCustomerView}
               onChange={(e) => setCompScope(e.target.value)}
             >
               <option value='' style={{ background: 'lightgray' }}>
@@ -452,7 +452,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
             <FormErrorMessage>{error}</FormErrorMessage>
           </FormControl>
           {/* PRIMARY COMPONENT */}
-          <FormControl isReadOnly={customerView} isDisabled>
+          <FormControl isReadOnly={isCustomerView} isDisabled>
             <Flex alignItems={'center'} gap={2}>
               <Checkbox size='sm' colorScheme='blue' defaultChecked={true}>
                 Primary component
@@ -463,7 +463,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
             </Flex>
           </FormControl>
           {/* INTERNAL COMPONENT */}
-          <FormControl isReadOnly={customerView}>
+          <FormControl isReadOnly={isCustomerView}>
             <Flex alignItems={'center'} gap={2}>
               <Checkbox
                 size='sm'

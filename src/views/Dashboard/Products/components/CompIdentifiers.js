@@ -3,7 +3,6 @@ import { TabContext } from 'context/TabContext'
 import { PackageURL } from 'packageurl-js'
 import { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { isCustomerView } from 'utils'
 
 import { Stack } from '@chakra-ui/react'
 
@@ -15,6 +14,7 @@ import PurlField from 'components/PurlField'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 
 import { UpdateComponent } from 'graphQL/Mutation'
 
@@ -24,7 +24,7 @@ const CompIdentifiers = ({ data }) => {
   const { showToast } = useCustomToast()
   const params = useParams()
   const sbomId = params.sbomid
-  const customerView = isCustomerView()
+  const { isCustomerView } = useRouteFlags()
 
   const { tabData, setTabData, saveChanges, unsavedChanges, alert, setAlert } =
     useContext(TabContext)
@@ -182,7 +182,7 @@ const CompIdentifiers = ({ data }) => {
             title={'Save'}
             isLoading={loading}
             onClick={handleSubmit}
-            hidden={purlOpen || cpeOpen || customerView}
+            hidden={purlOpen || cpeOpen || isCustomerView}
           />
         )}
       </Stack>

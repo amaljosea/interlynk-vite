@@ -1,12 +1,12 @@
-import { isCustomerView } from 'utils'
-
 import { Link, Stack, Text, Tooltip } from '@chakra-ui/react'
 import { Tag, TagCloseButton, TagLabel, TagRightIcon } from '@chakra-ui/react'
+
+import { useRouteFlags } from 'hooks/useRouteFlags'
 
 import { FaPen } from 'react-icons/fa6'
 
 const SupplierTag = ({ item, premission, onEdit, onDelete, editable }) => {
-  const customerView = isCustomerView()
+  const { isCustomerView } = useRouteFlags()
   const { contactName, contactEmail, url, name } = item || {}
   const supplierURL = url?.startsWith('http') ? item.url : `http://${url}`
 
@@ -42,7 +42,7 @@ const SupplierTag = ({ item, premission, onEdit, onDelete, editable }) => {
       )}
       <TagCloseButton
         aria-label='supplier_delete'
-        hidden={premission || customerView}
+        hidden={premission || isCustomerView}
         onClick={() => onDelete(item)}
       />
     </Tag>

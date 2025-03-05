@@ -1,14 +1,14 @@
 import { useMemo } from 'react'
-import { isCustomerView } from 'utils'
 import { parseLicenseString } from 'utils'
 
 import { Flex, Tag, TagLabel, Text } from '@chakra-ui/react'
 
+import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const LicenseColumns = () => {
   const { primaryTextColor } = useThemeColor(['primaryTextColor'])
-  const customerView = isCustomerView()
+  const { isCustomerView } = useRouteFlags()
 
   return useMemo(() => {
     const columns = [
@@ -16,7 +16,7 @@ const LicenseColumns = () => {
       {
         id: 'LICENSE_EXPRESSION',
         name: 'LICENSE EXPRESSION',
-        width: customerView ? '' : '20%',
+        width: isCustomerView ? '' : '20%',
         wrap: true,
         selector: ({ licenseExpression }) => {
           return (
@@ -32,7 +32,7 @@ const LicenseColumns = () => {
       {
         id: 'COMPONENTS',
         name: 'COMPONENTS',
-        width: customerView ? '' : '50%',
+        width: isCustomerView ? '' : '50%',
         wrap: true,
         selector: ({ components }) => {
           let sortedComponents = [...components]
@@ -93,12 +93,12 @@ const LicenseColumns = () => {
           )
         },
         right: 'true',
-        omit: customerView ? true : false
+        omit: isCustomerView ? true : false
       }
     ]
 
     return columns
-  }, [primaryTextColor, customerView])
+  }, [primaryTextColor, isCustomerView])
 }
 
 export default LicenseColumns

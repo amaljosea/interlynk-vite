@@ -2,11 +2,7 @@ import { useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import React, { useContext, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import {
-  getSignedUrlParams,
-  isCustomerView,
-  transformLicenseString
-} from 'utils'
+import { getSignedUrlParams, transformLicenseString } from 'utils'
 import { componentTypes, infoData } from 'variables/general'
 
 import { InfoIcon, WarningTwoIcon } from '@chakra-ui/icons'
@@ -32,6 +28,7 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import useQueryParam from 'hooks/useQueryParam'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CreateCompRelation, CreateComponent } from 'graphQL/Mutation'
@@ -47,7 +44,7 @@ function ComponentAddModal(props) {
   const productId = params.productid
   const sbomId = params.sbomid
   const signedUrlParams = getSignedUrlParams()
-  const customerView = isCustomerView()
+  const { isCustomerView } = useRouteFlags()
 
   const { tabData, handleChange, resetData, setTabData } =
     useContext(TabContext)
@@ -263,7 +260,7 @@ function ComponentAddModal(props) {
               <DividerWithText text='OR' />
               <Stack spacing={4}>
                 {/* Name */}
-                <FormControl isRequired isReadOnly={customerView}>
+                <FormControl isRequired isReadOnly={isCustomerView}>
                   <LynkFormLabel
                     label='Name'
                     htmlFor='name'
@@ -279,7 +276,7 @@ function ComponentAddModal(props) {
                   />
                 </FormControl>
                 {/* Description */}
-                <FormControl isReadOnly={customerView}>
+                <FormControl isReadOnly={isCustomerView}>
                   <LynkFormLabel
                     label='Description'
                     htmlFor='compDescription'
@@ -295,7 +292,7 @@ function ComponentAddModal(props) {
                   />
                 </FormControl>
                 {/* Copyright */}
-                <FormControl isReadOnly={customerView}>
+                <FormControl isReadOnly={isCustomerView}>
                   <LynkFormLabel
                     label='Copyright'
                     htmlFor='copyright'
@@ -313,7 +310,7 @@ function ComponentAddModal(props) {
                 {/* Version */}
                 <FormControl
                   isRequired
-                  isReadOnly={customerView}
+                  isReadOnly={isCustomerView}
                   isInvalid={invalidVersion}
                 >
                   <LynkFormLabel
@@ -335,7 +332,7 @@ function ComponentAddModal(props) {
                   </FormErrorMessage>
                 </FormControl>
                 {/* GROUP */}
-                <FormControl isReadOnly={customerView}>
+                <FormControl isReadOnly={isCustomerView}>
                   <LynkFormLabel
                     label='Group'
                     htmlFor='groupInfo'
@@ -361,7 +358,7 @@ function ComponentAddModal(props) {
                     name='kind'
                     aria-label='kind'
                     value={details?.kind}
-                    isDisabled={customerView}
+                    isDisabled={isCustomerView}
                     textTransform={'capitalize'}
                     onChange={(e) =>
                       handleChange('details', 'kind', e.target.value)
@@ -419,7 +416,7 @@ function ComponentAddModal(props) {
                   <Select
                     name='scope'
                     value={details?.scope}
-                    isDisabled={customerView}
+                    isDisabled={isCustomerView}
                     onChange={(e) =>
                       handleChange('details', 'scope', e.target.value)
                     }
@@ -442,7 +439,7 @@ function ComponentAddModal(props) {
                   <Select
                     name='supportLevel'
                     value={details?.supportLevel}
-                    isDisabled={customerView}
+                    isDisabled={isCustomerView}
                     onChange={(e) =>
                       handleChange('details', 'supportLevel', e.target.value)
                     }
@@ -482,7 +479,7 @@ function ComponentAddModal(props) {
                   )}
                 </FormControl>
                 {/* PRIMARY COMPONENT */}
-                <FormControl isReadOnly={customerView}>
+                <FormControl isReadOnly={isCustomerView}>
                   <Flex alignItems={'center'} gap={2}>
                     <Checkbox
                       size='sm'
@@ -499,7 +496,7 @@ function ComponentAddModal(props) {
                   </Flex>
                 </FormControl>
                 {/* INTERNAL COMPONENT */}
-                <FormControl isReadOnly={customerView}>
+                <FormControl isReadOnly={isCustomerView}>
                   <Flex alignItems={'center'} gap={2}>
                     <Checkbox
                       size='sm'

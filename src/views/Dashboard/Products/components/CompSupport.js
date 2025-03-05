@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getFullDate, isCustomerView, timeSince } from 'utils'
+import { getFullDate, timeSince } from 'utils'
 
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import {
@@ -26,6 +26,7 @@ import LynkDrawer from 'components/LynkDrawer'
 import CompInfo from 'components/Misc/CompInfo'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
@@ -165,7 +166,7 @@ const SupportCard = ({ setEdit, data }) => {
 }
 
 const SupportForm = ({ component, data, setEdit }) => {
-  const customerView = isCustomerView()
+  const { isCustomerView } = useRouteFlags()
   const { showToast } = useCustomToast()
 
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -352,7 +353,7 @@ const SupportForm = ({ component, data, setEdit }) => {
           sx={inputStyle}
           name='supportLevel'
           value={formData?.supportLevel}
-          isDisabled={customerView}
+          isDisabled={isCustomerView}
           onChange={handleChange}
         >
           <option value='' style={{ background: 'lightgray' }}>

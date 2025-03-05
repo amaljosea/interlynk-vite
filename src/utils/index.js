@@ -57,10 +57,6 @@ export const isMobileOrTablet = () => {
   )
 }
 
-export const isCustomerView = () => {
-  return window.location.pathname.startsWith('/customer')
-}
-
 export const getSignedUrlParams = () => {
   return sessionStorage.getItem('signedUrlParams')
 }

@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react'
-import { isCustomerView } from 'utils'
 import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -7,6 +6,8 @@ import { Flex, IconButton, Tooltip } from '@chakra-ui/react'
 
 import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
+
+import { useRouteFlags } from 'hooks/useRouteFlags'
 
 import { RiFundsBoxFill } from 'react-icons/ri'
 
@@ -29,7 +30,7 @@ const ComponentsSubHeader = ({
   direction,
   reset
 }) => {
-  const customerView = isCustomerView()
+  const { isCustomerView } = useRouteFlags()
   // Use useMemo to memoize the component's JSX
   return useMemo(() => {
     return (
@@ -62,7 +63,7 @@ const ComponentsSubHeader = ({
             </Tooltip>
           )}
           {/* CREATE COMPONENT */}
-          {!customerView && (
+          {!isCustomerView && (
             <AddButton
               label='Add Component'
               onClick={onCreateComponent}
@@ -73,7 +74,7 @@ const ComponentsSubHeader = ({
           )}
 
           {/* EXPORT CSV */}
-          {!customerView && (
+          {!isCustomerView && (
             <ExportCsv
               tableType='SBOM Components View'
               filters={{
@@ -105,7 +106,7 @@ const ComponentsSubHeader = ({
     field,
     direction,
     reset,
-    customerView
+    isCustomerView
   ])
 }
 
