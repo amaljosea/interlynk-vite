@@ -131,8 +131,14 @@ const SbomDetails = ({ sbomData }) => {
   })
 
   const isSbomPending =
-    [checksEnabled, internalComp, automatedFixesEnabled].includes(undefined) ||
-    (vulnScan ? !hasFinished : vulnScan === undefined)
+    [
+      checksEnabled,
+      internalComp,
+      automatedFixesEnabled,
+      enableAutoArchive,
+      vulnScan
+    ].includes(undefined) ||
+    (vulnScan && !hasFinished)
 
   return (
     <>
