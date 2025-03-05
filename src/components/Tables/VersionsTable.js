@@ -32,6 +32,7 @@ import SbomTransfer from 'components/Modal/SbomTransfer'
 import SupportAnalysis from 'components/Modal/SupportAnalysis'
 import Pagination from 'components/Pagination'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useGradualPolling } from 'hooks/useGradualPolling'
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -78,6 +79,7 @@ const VersionsTable = (props) => {
   const params = useParams()
   const productId = params.productid
   const signedUrlParams = getSignedUrlParams()
+  const { isFreeTier } = useGlobalQueryContext()
   const {
     clearSelect,
     setClearSelect,
@@ -503,7 +505,7 @@ const VersionsTable = (props) => {
                 <MenuItem
                   aria-label={`sbom-${row?.projectVersion}-automation`}
                   onClick={() => handleAutomation(row)}
-                  hidden={signedUrlParams}
+                  hidden={signedUrlParams || isFreeTier}
                   isDisabled={!canReprocessSbom}
                 >
                   Rerun Automation
@@ -511,7 +513,7 @@ const VersionsTable = (props) => {
                 <MenuItem
                   aria-label={`sbom-${row?.projectVersion}-support-analysis`}
                   onClick={() => handleSupportAnalaysis(row)}
-                  hidden={signedUrlParams}
+                  hidden={signedUrlParams || isFreeTier}
                   isDisabled={!canReprocessSbom}
                 >
                   Rerun Support Analysis
