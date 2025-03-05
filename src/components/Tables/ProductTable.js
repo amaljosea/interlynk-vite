@@ -43,6 +43,7 @@ import ProdLabel from 'components/Label/ProdLabel'
 import EnvList from 'components/Misc/EnvList'
 import LynkAction from 'components/Misc/LynkAction'
 import LynkSwitch from 'components/Misc/LynkSwitch'
+import BitbucketProjects from 'components/Modal/BitbucketProjects'
 
 import useGithubConfigSaved from 'hooks/useGithubConfigSaved'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -53,10 +54,14 @@ import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { DeleteProjectGroup } from 'graphQL/Mutation'
-import { GetLabels, GetTotalProduct } from 'graphQL/Queries'
+import {
+  GetBitbucketConnection,
+  GetLabels,
+  GetTotalProduct
+} from 'graphQL/Queries'
 
 import { FaGithub } from 'react-icons/fa'
-import { FaTag } from 'react-icons/fa6'
+import { FaBitbucket, FaTag } from 'react-icons/fa6'
 
 import Pagination from '../Pagination'
 
@@ -69,6 +74,14 @@ const ProductTable = (props) => {
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
   const { data, reset, loading, paginationProps } = props
+
+  const { data: conn } = useQuery(GetBitbucketConnection, {
+    skip: orgView && !isFreeTier ? false : true
+  })
+  const connections = conn?.organization?.connections?.nodes || []
+  const bitbucket = connections?.some(
+    (item) => item?.connection?.__typename === 'BitbucketConnection'
+  )
 
   const { data: prodData } = useQuery(GetTotalProduct, {
     skip: orgView && isFreeTier ? false : true,
@@ -117,6 +130,7 @@ const ProductTable = (props) => {
   const WARNING = useDisclosure()
   const SHARELYNK = useDisclosure()
   const GITHUB = useDisclosure()
+  const BITBUCKET = useDisclosure()
 
   const canAddProduct = useHasPermission({
     parentKey: 'view_product_group',
@@ -261,8 +275,15 @@ const ProductTable = (props) => {
               hidden={signedUrlParams || isFreeTier}
             />
           </Tooltip>
-          {/* REFRESH */}
-          <RefreshBtn />
+          {!isFreeTier && bitbucket && (
+            <Tooltip label='Import from Bitbucket'>
+              <IconButton
+                colorScheme='blue'
+                icon={<FaBitbucket />}
+                onClick={BITBUCKET.onOpen}
+              />
+            </Tooltip>
+          )}
           {/* ADD PRODUCT */}
           <Box position='relative'>
             <Tooltip
@@ -289,6 +310,8 @@ const ProductTable = (props) => {
               </Box>
             </Tooltip>
           </Box>
+          {/* REFRESH */}
+          <RefreshBtn />
         </Flex>
       </Flex>
     )
@@ -306,6 +329,8 @@ const ProductTable = (props) => {
     LABEL.onOpen,
     canAddProduct,
     isFreeTier,
+    bitbucket,
+    BITBUCKET.onOpen,
     totalCount,
     PRODUCT
   ])
@@ -667,6 +692,14 @@ const ProductTable = (props) => {
       {/* Labels */}
       {LABEL.isOpen && (
         <TagDrawer isOpen={LABEL.isOpen} onClose={LABEL.onClose} />
+      )}
+
+      {/* BitBucket Projects */}
+      {BITBUCKET.isOpen && (
+        <BitbucketProjects
+          isOpen={BITBUCKET.isOpen}
+          onClose={BITBUCKET.onClose}
+        />
       )}
     </>
   )

@@ -1,9 +1,10 @@
 import { useQuery } from '@apollo/client'
 import { renderHook } from '@testing-library/react'
 
+import { useRouteFlags } from 'hooks/useRouteFlags'
+
 import { GetProjectsCustomer, GetProjectsVendor } from 'graphQL/Queries'
 
-import { isCustomerView } from '../utils'
 import { useProjectGroup } from './useProjectGroup'
 
 jest.mock('@apollo/client', () => ({
@@ -11,12 +12,13 @@ jest.mock('@apollo/client', () => ({
   gql: jest.fn() // Mock the gql function
 }))
 
-jest.mock('../utils', () => ({
-  isCustomerView: jest.fn()
+jest.mock('hooks/useRouteFlags', () => ({
+  useRouteFlags: jest.fn()
 }))
 
 describe('useProjectGroup', () => {
   const projectGroupId = '123'
+
   const mockDataCustomer = {
     shareLynkQuery: {
       projectGroup: {
@@ -43,7 +45,7 @@ describe('useProjectGroup', () => {
   })
 
   it('should fetch projects for customer', () => {
-    isCustomerView.mockReturnValue(true)
+    useRouteFlags.mockReturnValue({ isCustomerView: true })
     useQuery.mockReturnValue({ data: mockDataCustomer, loading: false })
 
     const { result } = renderHook(() => useProjectGroup({ projectGroupId }))
@@ -65,7 +67,7 @@ describe('useProjectGroup', () => {
   })
 
   it('should fetch projects for vendor', () => {
-    isCustomerView.mockReturnValue(false)
+    useRouteFlags.mockReturnValue({ isCustomerView: false })
     useQuery.mockReturnValue({ data: mockDataVendor, loading: false })
 
     const { result } = renderHook(() => useProjectGroup({ projectGroupId }))
@@ -85,7 +87,7 @@ describe('useProjectGroup', () => {
   })
 
   it('should indicate loading state', () => {
-    isCustomerView.mockReturnValue(true)
+    useRouteFlags.mockReturnValue({ isCustomerView: true })
     useQuery.mockReturnValue({ data: undefined, loading: true })
 
     const { result } = renderHook(() => useProjectGroup({ projectGroupId }))

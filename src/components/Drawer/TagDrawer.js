@@ -2,19 +2,11 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { isValidHexCode } from 'utils'
 
-import {
-  Divider,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay,
-  Flex
-} from '@chakra-ui/react'
+import { Divider } from '@chakra-ui/react'
 
 import LabelCreator from 'components/Label/LabelCreator'
 import LabelList from 'components/Label/LabelList'
+import LynkDrawer from 'components/LynkDrawer'
 
 import useCustomToast from 'hooks/useCustomToast'
 
@@ -103,31 +95,21 @@ const TagDrawer = ({ isOpen, onClose }) => {
   }, [nodes])
 
   return (
-    <>
-      <Drawer
-        size='md'
-        isOpen={isOpen}
-        placement='right'
-        onClose={onClose}
-        closeOnOverlayClick={false}
-      >
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerCloseButton mt={2} />
-          <DrawerHeader borderBottomWidth='1px'>Manage Tags</DrawerHeader>
-          <DrawerBody as={Flex} sx={{ mt: 2, gap: 4, flexDirection: 'column' }}>
-            <LabelCreator onAddLabel={addLabel} />
-            <Divider />
-            <LabelList
-              labels={labels}
-              loading={loading}
-              onDeleteLabel={deleteLabel}
-              onEditLabel={editLabel}
-            />
-          </DrawerBody>
-        </DrawerContent>
-      </Drawer>
-    </>
+    <LynkDrawer
+      title={'Manage Tags'}
+      isOpen={isOpen}
+      onClose={onClose}
+      noFooter
+    >
+      <LabelCreator onAddLabel={addLabel} />
+      <Divider />
+      <LabelList
+        labels={labels}
+        loading={loading}
+        onDeleteLabel={deleteLabel}
+        onEditLabel={editLabel}
+      />
+    </LynkDrawer>
   )
 }
 

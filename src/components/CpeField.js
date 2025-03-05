@@ -1,18 +1,19 @@
 import { useLazyQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useState } from 'react'
-import { isCustomerView } from 'utils'
 import { validateCPEString } from 'utils/cpeUtils'
 import IdentifierLabel from 'views/Dashboard/Products/components/IdentifierLabel'
 
 import { FormControl, FormErrorMessage } from '@chakra-ui/react'
+
+import { useRouteFlags } from 'hooks/useRouteFlags'
 
 import { CpeAutoComplete } from 'graphQL/Queries'
 
 import LynkSelect from './LynkSelect'
 
 const CpeField = ({ isOpen, onOpen, onClose }) => {
-  const customerView = isCustomerView()
+  const { isCustomerView } = useRouteFlags()
   const { tabData, handleChange } = useContext(TabContext)
   const { identifiers } = tabData || ''
 
@@ -81,7 +82,7 @@ const CpeField = ({ isOpen, onOpen, onClose }) => {
 
   return (
     <FormControl
-      isDisabled={customerView}
+      isDisabled={isCustomerView}
       isInvalid={identifiers?.cpe && !isValid}
     >
       <IdentifierLabel
@@ -101,11 +102,11 @@ const CpeField = ({ isOpen, onOpen, onClose }) => {
         isLoading={loading}
         onChange={onChange}
         filterOption={null}
-        isDisabled={customerView}
+        isDisabled={isCustomerView}
         inputValue={searchInput}
         noOptionsMessage={() => null}
         onInputChange={onInputChange}
-        isClearable={customerView ? false : true}
+        isClearable={isCustomerView ? false : true}
       />
       <FormErrorMessage>{error || ''}</FormErrorMessage>
     </FormControl>

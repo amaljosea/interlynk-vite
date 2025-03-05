@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import {
   Box,
@@ -37,17 +37,41 @@ const FileUpload = ({
     'primaryErrorColor'
   ])
 
-  const handleDragOver = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragActive(true)
-  }
+  useEffect(() => {
+    const handleGlobalDragOver = (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      if (!isDragActive) setIsDragActive(true)
+    }
 
-  const handleDragLeave = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragActive(false)
-  }
+    const handleGlobalDragLeave = (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      if (e.relatedTarget === null) {
+        setIsDragActive(false)
+      }
+    }
+
+    const handleGlobalDrop = (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      setIsDragActive(false)
+      if (e.dataTransfer.files.length > 0) {
+        handleDrop(e)
+      }
+    }
+
+    window.addEventListener('dragover', handleGlobalDragOver)
+    window.addEventListener('dragleave', handleGlobalDragLeave)
+    window.addEventListener('drop', handleGlobalDrop)
+
+    return () => {
+      window.removeEventListener('dragover', handleGlobalDragOver)
+      window.removeEventListener('dragleave', handleGlobalDragLeave)
+      window.removeEventListener('drop', handleGlobalDrop)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleDrop = (e) => {
     e.preventDefault()
@@ -102,10 +126,7 @@ const FileUpload = ({
             borderRadius='md'
             textAlign='center'
             overflow={'hidden'}
-            onDrop={handleDrop}
             borderStyle='dashed'
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
             borderColor={isDragActive ? primaryBlueText : grayBorderColor}
             onClick={() => document.getElementById('fileInput').click()}
           >
@@ -124,7 +145,7 @@ const FileUpload = ({
                 fontWeight={500}
               >
                 {isDragActive
-                  ? 'Drop the file here'
+                  ? 'Drop the file anywhere'
                   : selectedFile
                     ? selectedFile.name
                     : 'Drop SBOM here, or click to select a file'}

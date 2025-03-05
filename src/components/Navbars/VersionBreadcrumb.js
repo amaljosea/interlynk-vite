@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import AsyncSelect from 'react-select/async'
-import { isCustomerView, truncatedValue } from 'utils'
+import { truncatedValue } from 'utils'
 
 import { Spinner } from '@chakra-ui/react'
 
@@ -10,6 +10,7 @@ import CustomDropdownIndicator from 'components/Misc/CustomDropdownIndicator'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useLazyDropDown } from 'hooks/useLazyDropDown'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
@@ -20,7 +21,7 @@ import { GetArchivedVersions } from 'graphQL/Queries'
 
 const VersionBreadcrumb = ({ selectStyles }) => {
   const navigate = useNavigate()
-  const customerView = isCustomerView()
+  const { isCustomerView } = useRouteFlags()
   const { sbomHookData, orgView } = useGlobalQueryContext()
   const params = useParams()
   const location = useLocation()
@@ -35,14 +36,14 @@ const VersionBreadcrumb = ({ selectStyles }) => {
   const sbomId = params.sbomid
 
   const { data: archiveData } = useQuery(GetArchivedVersions, {
-    skip: customerView,
+    skip: isCustomerView,
     variables: { id: prodID }
   })
   const { sbomArchived } = archiveData?.project || ''
   const archivedVersion = sbomArchived?.find((item) => item?.id === sbomId)
 
   const { data: versionName, loading } = useQuery(GetVersionName, {
-    skip: customerView,
+    skip: isCustomerView,
     variables: {
       projectId: prodID,
       sbomId: sbomId

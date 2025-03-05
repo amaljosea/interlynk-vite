@@ -10,6 +10,8 @@ export const useRouteFlags = () => {
   const searchParams = new URLSearchParams(search)
 
   return {
+    isCustomerView: pathname.startsWith('/customer'),
+
     isVulnerabilityDetailsPage:
       pathname.includes('products') &&
       pathname.includes('env') &&

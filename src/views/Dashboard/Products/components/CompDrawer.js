@@ -3,7 +3,7 @@ import { TabContext } from 'context/TabContext'
 import { PackageURL } from 'packageurl-js'
 import { useContext } from 'react'
 import { useParams } from 'react-router-dom'
-import { getSignedUrlParams, isCustomerView } from 'utils'
+import { getSignedUrlParams } from 'utils'
 
 import { Box, Flex, Text, Tooltip } from '@chakra-ui/react'
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
@@ -11,6 +11,7 @@ import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 import LynkDrawer from 'components/LynkDrawer'
 import CompInfo from 'components/Misc/CompInfo'
 
+import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetComponentPath } from 'graphQL/Queries'
@@ -38,10 +39,10 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
   const params = useParams()
   const sbomId = params.sbomid
   const { secondaryBgColor } = useThemeColor(['secondaryBgColor'])
-  const customerView = isCustomerView()
+  const { isCustomerView } = useRouteFlags()
   const signedUrlParams = getSignedUrlParams()
 
-  const tabs = customerView
+  const tabs = isCustomerView
     ? ['details', 'identifiers']
     : ['details', 'identifiers', 'suppliers', 'links', 'relationships']
 
@@ -52,7 +53,7 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
   const isPart = sbomId !== bomId
 
   const { data: comPath } = useQuery(GetComponentPath, {
-    skip: isOpen && !customerView ? false : true,
+    skip: isOpen && !isCustomerView ? false : true,
     variables: { compId: data?.id, sbomId: isPart ? bomId : sbomId }
   })
 

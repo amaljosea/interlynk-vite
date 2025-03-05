@@ -40,7 +40,7 @@ const LabelCreator = ({ onAddLabel }) => {
   }
 
   return (
-    <Flex width='100%' gap={4} flexDir={'column'}>
+    <Flex width='100%' gap={4} flexDir={'column'} mt={2} mb={4}>
       <ProdLabel
         item={{ color: previewColor, name: name || 'Label Preview' }}
       />

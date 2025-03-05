@@ -2779,3 +2779,101 @@ export const ReRunSbomSupportLevel = gql`
     }
   }
 `
+
+export const CreateBitbucketConnection = gql`
+  mutation CreateBitbucketConnection(
+    $username: String!
+    $apiToken: String!
+    $workspace: String!
+    $enabled: Boolean
+  ) {
+    bitbucketConnectionCreate(
+      input: {
+        enabled: $enabled
+        apiToken: $apiToken
+        userName: $username
+        workspace: $workspace
+      }
+    ) {
+      errors
+      organizationConnection {
+        connection {
+          ... on BitbucketConnection {
+            apiToken
+            createdAt
+            id
+            organizationId
+            updatedAt
+            userName
+          }
+        }
+      }
+    }
+  }
+`
+
+export const UpdateBitbucketConnection = gql`
+  mutation UpdateBitbucketConnection(
+    $id: ID!
+    $username: String!
+    $apiToken: String!
+    $workspace: String!
+    $enabled: Boolean
+  ) {
+    bitbucketConnectionUpdate(
+      input: {
+        enabled: $enabled
+        userName: $username
+        apiToken: $apiToken
+        workspace: $workspace
+        organizationConnectionId: $id
+      }
+    ) {
+      errors
+      organizationConnection {
+        connection {
+          ... on BitbucketConnection {
+            apiToken
+            createdAt
+            id
+            organizationId
+            updatedAt
+            userName
+          }
+        }
+      }
+    }
+  }
+`
+
+export const DeleteBitbucketConnection = gql`
+  mutation DeleteBitbucketConnection($id: ID!) {
+    bitbucketConnectionDelete(input: { organizationConnectionId: $id }) {
+      errors
+    }
+  }
+`
+
+export const BitbucketRepositoryBulkImport = gql`
+  mutation BitbucketRepositoryBulkImport(
+    $input: BitbucketRepositoryBulkImportInput!
+  ) {
+    bitbucketRepositoryBulkImport(input: $input) {
+      repositories {
+        id
+        uuid
+        name
+        fullName
+        slug
+        workspace
+        mainbranch
+        importStatus
+        importError
+        lastImportedAt
+        createdAt
+        updatedAt
+      }
+      errors
+    }
+  }
+`

@@ -33,6 +33,7 @@
     "react-hooks/rules-of-hooks": "warn",
     "react/no-deprecated": "warn",
     "unused-imports/no-unused-imports": "warn",
+    "no-console": ["warn", { "allow": ["warn", "info"] }],
     "no-restricted-imports": [
       "error",
       {

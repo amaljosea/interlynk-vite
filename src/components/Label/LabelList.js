@@ -53,7 +53,7 @@ const LabelList = ({ loading, labels, onDeleteLabel, onEditLabel }) => {
   if (loading) return <CustomLoader />
 
   return (
-    <Stack>
+    <Stack mt={4}>
       <Text fontSize={'sm'} color={sameSecondaryText}>
         {labels?.length} Labels
       </Text>

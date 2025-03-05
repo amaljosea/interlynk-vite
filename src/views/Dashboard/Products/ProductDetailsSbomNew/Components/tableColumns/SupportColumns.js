@@ -138,7 +138,7 @@ const SupportColumns = ({ handleSupport }) => {
                     onClick={() => handleSupport(row)}
                     data-testid='edit_component_support'
                   >
-                    Edit Status
+                    Edit Support Status
                   </MenuItem>
                 </MenuList>
               </Portal>

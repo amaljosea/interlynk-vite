@@ -1,16 +1,16 @@
 import { truncatedValue } from 'utils'
-import { isCustomerView } from 'utils'
 
 import { Text, useDisclosure } from '@chakra-ui/react'
 
 import useQueryParam from 'hooks/useQueryParam'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import ComponentCard from './Misc/ComponentCard'
 
 const RowComponent = ({ content }) => {
   const tab = useQueryParam('tab')
-  const customerView = isCustomerView()
+  const { isCustomerView } = useRouteFlags()
   const { primaryBlueText, primaryTextColor } = useThemeColor([
     'primaryBlueText',
     'primaryTextColor'
@@ -20,7 +20,7 @@ const RowComponent = ({ content }) => {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const onView = () => (customerView ? null : onOpen())
+  const onView = () => (isCustomerView ? null : onOpen())
 
   const getValue = () => {
     if (typeof content === 'string') {

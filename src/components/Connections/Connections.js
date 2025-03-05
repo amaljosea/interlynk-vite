@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react'
 
 import { Flex, Text, useDisclosure } from '@chakra-ui/react'
 
+import CustomLoader from 'components/CustomLoader'
+
 import useGithubConfigSaved from 'hooks/useGithubConfigSaved'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -13,6 +15,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { GetOrgConnections, GetPersonalConnections } from 'graphQL/Queries'
 
 import { FaGithub } from 'react-icons/fa'
+import { FaBitbucket } from 'react-icons/fa6'
 
 import jiraPng from '../../assets/img/Jira.png'
 import mailPng from '../../assets/img/Mail.png'
@@ -21,6 +24,7 @@ import teamsPng from '../../assets/img/Teams.png'
 import Card from '../Card/Card'
 import CardBody from '../Card/CardBody'
 import CardHeader from '../Card/CardHeader'
+import BitbucketConfigModal from './BitbucketConfigModal'
 import ConnectionCard from './ConnectionCard'
 import EmailConfigModal from './EmailConfigModal'
 import GithubConfigModal from './GithubConfigModal'
@@ -33,7 +37,10 @@ const Connections = ({ org }) => {
   const isGithubConfigSaved = useGithubConfigSaved()
   const { orgView, isFreeTier } = useGlobalQueryContext()
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
-  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
+  const { primaryTextColor, primaryBlueText } = useThemeColor([
+    'primaryTextColor',
+    'primaryBlueText'
+  ])
 
   const updateCon = useHasPermission({
     parentKey: 'view_connections',
@@ -42,21 +49,26 @@ const Connections = ({ org }) => {
 
   const isIntegration =
     activetab === 'integrations' || activetab === 'integrations-org'
-  const { data } = useQuery(org ? GetOrgConnections : GetPersonalConnections, {
-    skip: !orgView ? true : isIntegration ? false : true
-  })
+  const { data, loading } = useQuery(
+    org ? GetOrgConnections : GetPersonalConnections,
+    {
+      skip: !orgView ? true : isIntegration ? false : true
+    }
+  )
 
   const JIRA = useDisclosure()
   const SLACK = useDisclosure()
   const TEAM = useDisclosure()
   const EMAIL = useDisclosure()
   const GITHUB = useDisclosure()
+  const BITBUCKET = useDisclosure()
 
   const [greenCheck, setGreenCheck] = useState({
     jira: false,
     slack: false,
     teams: false,
-    github: false
+    github: false,
+    bitbucket: false
   })
 
   const [hostId, setHostId] = useState(null)
@@ -65,6 +77,7 @@ const Connections = ({ org }) => {
   const [teamsData, setTeamsData] = useState([])
   const [emailData, setEmailData] = useState([])
   const [githubData, setGithubData] = useState(null)
+  const [bitbucketData, setBitbucketData] = useState(null)
 
   const handleConnectionData = (connections) => {
     connections.forEach((connection) => {
@@ -89,10 +102,33 @@ const Connections = ({ org }) => {
           setGreenCheck((prev) => ({ ...prev, github: true }))
           setGithubData(connection)
           break
+        case 'BitbucketConnection':
+          setGreenCheck((prev) => ({ ...prev, bitbucket: true }))
+          setBitbucketData(connection)
+          break
         default:
           break
       }
     })
+  }
+
+  const getDescription = (type) => {
+    switch (type) {
+      case 'Jira':
+        return 'Jira integration allows easy creation of vulnerability, license or component issues on connected Jira boards.'
+      case 'Slack':
+        return 'Slack integration supports delivering Interlynk notifications in configured Slack Channel.'
+      case 'Teams':
+        return 'Microsoft Teams integration supports delivering Interlynk notifications in configured Teams Channel.'
+      case 'Email':
+        return 'Email aliases can be configured to deliver all notificationns at organizational level or subscribed notifications at personal level.'
+      case 'Github':
+        return 'Monitor SBOM directly in GitHub, simplifying compliance checks within repositories'
+      case 'BitBucket':
+        return 'Monitor SBOM directly in BitBucket, simplifying compliance checks within repositories'
+      default:
+        return ''
+    }
   }
 
   useEffect(() => {
@@ -101,6 +137,7 @@ const Connections = ({ org }) => {
     setTeamsData(null)
     setEmailData(null)
     setGithubData(null)
+    setBitbucketData(null)
 
     const hostId = org ? data?.organization?.id : data?.organizationUser?.id
     setHostId(hostId)
@@ -120,6 +157,8 @@ const Connections = ({ org }) => {
     }
   }, [isGithubConfigSaved])
 
+  if (loading) return <CustomLoader />
+
   return (
     <>
       <Card p={0} boxShadow='none'>
@@ -134,15 +173,23 @@ const Connections = ({ org }) => {
         </CardHeader>
         <CardBody>
           <Flex wrap='wrap' gap={'20px'}>
+            {!isFreeTier && (
+              <ConnectionCard
+                name='BitBucket'
+                icon={FaBitbucket}
+                color={primaryBlueText}
+                onConfigure={BITBUCKET.onOpen}
+                isConnected={greenCheck.bitbucket}
+                description={getDescription('BitBucket')}
+              />
+            )}
             {org && !isFreeTier && (
               <ConnectionCard
                 iconSrc={jiraPng}
                 name='Jira'
                 onConfigure={JIRA.onOpen}
                 isConnected={greenCheck.jira}
-                description={
-                  'Jira integration allows easy creation of vulnerability, license or component issues on connected Jira boards.'
-                }
+                description={getDescription('Jira')}
               />
             )}
             {!isFreeTier && (
@@ -151,9 +198,7 @@ const Connections = ({ org }) => {
                 name='Slack'
                 onConfigure={SLACK.onOpen}
                 isConnected={greenCheck.slack}
-                description={
-                  'Slack integration supports delivering Interlynk notifications in configured Slack Channel.'
-                }
+                description={getDescription('Slack')}
               />
             )}
             {!isFreeTier && (
@@ -162,9 +207,7 @@ const Connections = ({ org }) => {
                 name='Teams'
                 onConfigure={TEAM.onOpen}
                 isConnected={greenCheck.teams}
-                description={
-                  'Microsoft Teams integration supports delivering Interlynk notifications in configured Teams Channel.'
-                }
+                description={getDescription('Teams')}
               />
             )}
             <ConnectionCard
@@ -172,9 +215,7 @@ const Connections = ({ org }) => {
               name='Email'
               onConfigure={EMAIL.onOpen}
               isConnected={greenCheck.email}
-              description={
-                'Email aliases can be configured to deliver all notificationns at organizational level or subscribed notifications at personal level.'
-              }
+              description={getDescription('Email')}
             />
             {org && shouldShowDemoFeatures && (
               <ConnectionCard
@@ -184,14 +225,23 @@ const Connections = ({ org }) => {
                 isConnected={greenCheck.github}
                 isDisabled={!updateCon}
                 color={primaryTextColor}
-                description={
-                  'Monitor SBOM directly in GitHub, simplifying compliance checks within repositories'
-                }
+                description={getDescription('Github')}
               />
             )}
           </Flex>
         </CardBody>
       </Card>
+
+      {BITBUCKET.isOpen && (
+        <BitbucketConfigModal
+          org={org}
+          data={bitbucketData}
+          updateCon={updateCon}
+          isOpen={BITBUCKET.isOpen}
+          onClose={BITBUCKET.onClose}
+          setGreenCheck={setGreenCheck}
+        />
+      )}
 
       {JIRA.isOpen && (
         <JiraConfigModal

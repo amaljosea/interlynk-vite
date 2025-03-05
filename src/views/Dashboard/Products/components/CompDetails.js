@@ -1,7 +1,7 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect } from 'react'
-import { isCustomerView, transformLicenseString } from 'utils'
+import { transformLicenseString } from 'utils'
 import { infoData } from 'variables/general'
 import { componentTypes } from 'variables/general'
 
@@ -24,6 +24,7 @@ import PrimaryWarning from 'components/Modal/PrimaryWarning'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UpdateComponent } from 'graphQL/Mutation'
@@ -34,7 +35,7 @@ import ActionButton from './ActionButton'
 
 const CompDetails = ({ data, primaryComp }) => {
   const { showToast } = useCustomToast()
-  const customerView = isCustomerView()
+  const { isCustomerView } = useRouteFlags()
 
   const { dispatch } = useGlobalState()
   const { prodCompDispatch } = dispatch
@@ -64,7 +65,7 @@ const CompDetails = ({ data, primaryComp }) => {
   let SBOMs = []
   const { data: allSboms } = useQuery(GetAllSboms, {
     fetchPolicy: 'network-only',
-    skip: tab === 'details' && !customerView ? false : true,
+    skip: tab === 'details' && !isCustomerView ? false : true,
     variables: {
       id: productId
     }
@@ -227,7 +228,7 @@ const CompDetails = ({ data, primaryComp }) => {
     <>
       <Stack direction={'column'} spacing={4}>
         {/* Name */}
-        <FormControl isDisabled={customerView} isRequired>
+        <FormControl isDisabled={isCustomerView} isRequired>
           <LynkFormLabel
             label='Name'
             htmlFor='name'
@@ -243,7 +244,7 @@ const CompDetails = ({ data, primaryComp }) => {
         {/* Version */}
         <FormControl
           isRequired
-          isDisabled={customerView}
+          isDisabled={isCustomerView}
           isInvalid={invalidVersion}
         >
           <LynkFormLabel
@@ -263,7 +264,7 @@ const CompDetails = ({ data, primaryComp }) => {
           </FormErrorMessage>
         </FormControl>
         {/* Description */}
-        <FormControl isDisabled={customerView}>
+        <FormControl isDisabled={isCustomerView}>
           <LynkFormLabel
             label='Description'
             htmlFor='compDescription'
@@ -279,7 +280,7 @@ const CompDetails = ({ data, primaryComp }) => {
           />
         </FormControl>
         {/* Copyright */}
-        <FormControl isDisabled={customerView}>
+        <FormControl isDisabled={isCustomerView}>
           <LynkFormLabel
             label='Copyright'
             htmlFor='copyright'
@@ -295,7 +296,7 @@ const CompDetails = ({ data, primaryComp }) => {
           />
         </FormControl>
         {/* GROUP */}
-        <FormControl isDisabled={customerView}>
+        <FormControl isDisabled={isCustomerView}>
           <LynkFormLabel
             label='Group'
             htmlFor='groupInfo'
@@ -309,7 +310,7 @@ const CompDetails = ({ data, primaryComp }) => {
           />
         </FormControl>
         {/* KIND */}
-        <FormControl isRequired isDisabled={customerView}>
+        <FormControl isRequired isDisabled={isCustomerView}>
           <LynkFormLabel
             label='Type'
             htmlFor='componentType'
@@ -336,11 +337,11 @@ const CompDetails = ({ data, primaryComp }) => {
         {/* LICENSES */}
         <LicenseField
           sbomView={false}
-          isDisabled={customerView}
+          isDisabled={isCustomerView}
           license={data?.licensesExp}
         />
         {/* SCOPE */}
-        <FormControl isDisabled={customerView}>
+        <FormControl isDisabled={isCustomerView}>
           <LynkFormLabel
             label='Scope'
             htmlFor='compScope'
@@ -360,7 +361,7 @@ const CompDetails = ({ data, primaryComp }) => {
           </Select>
         </FormControl>
         {/* PRIMARY COMPONENT */}
-        <FormControl isDisabled={customerView}>
+        <FormControl isDisabled={isCustomerView}>
           <FormLabel>
             <Checkbox
               size='sm'
@@ -377,7 +378,7 @@ const CompDetails = ({ data, primaryComp }) => {
           </FormLabel>
         </FormControl>
         {/* INTERNAL COMPONENT */}
-        <FormControl isDisabled={customerView}>
+        <FormControl isDisabled={isCustomerView}>
           <FormLabel>
             <Checkbox
               size='sm'
@@ -411,7 +412,7 @@ const CompDetails = ({ data, primaryComp }) => {
         ) : (
           <ActionButton
             title={'Save'}
-            hidden={customerView}
+            hidden={isCustomerView}
             isDisabled={isInvalid}
             onClick={handleSubmit}
           />

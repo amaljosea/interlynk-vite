@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client'
-import { isCustomerView, parseLicenseString } from 'utils'
+import { parseLicenseString } from 'utils'
 import { transformLicenseString } from 'utils'
 
 import { useDisclosure } from '@chakra-ui/react'
@@ -11,6 +11,7 @@ import ActiveBtn from 'components/Misc/ActiveBtn'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { sbomUpdate } from 'graphQL/Mutation'
@@ -20,7 +21,7 @@ import { FaPen, FaScaleBalanced } from 'react-icons/fa6'
 import ConfirmationModal from '../../components/ConfirmationModal'
 
 const License = ({ data, permission }) => {
-  const customerView = isCustomerView()
+  const { isCustomerView } = useRouteFlags()
   const { showToast } = useCustomToast()
   const { sbomState, dispatch } = useGlobalState()
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
@@ -124,7 +125,7 @@ const License = ({ data, permission }) => {
           <LicenseField
             sbomView={true}
             license={license}
-            isDisabled={customerView}
+            isDisabled={isCustomerView}
           />
         </LynkModal>
       )}

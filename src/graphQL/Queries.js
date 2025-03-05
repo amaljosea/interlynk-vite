@@ -4796,6 +4796,17 @@ export const GetOrgConnections = gql`
           id
           enabled
           connection {
+            ... on BitbucketConnection {
+              id
+              userName
+              apiToken
+              workspace
+              createdAt
+              updatedAt
+              userName
+              checkWorkspaceAccess
+              checkRepositoryAccess
+            }
             ... on JiraConnection {
               userName
               apiToken
@@ -4821,6 +4832,22 @@ export const GetOrgConnections = gql`
                 notificationType
                 frequency
               }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+export const GetBitbucketConnection = gql`
+  query GetBitbucketConnection {
+    organization {
+      connections {
+        nodes {
+          connection {
+            ... on BitbucketConnection {
+              id
             }
           }
         }
@@ -6156,6 +6183,31 @@ export const GetActivities = gql`
           action
           result
         }
+      }
+    }
+  }
+`
+
+export const BitbucketRepositories = gql`
+  query BitbucketRepositories {
+    bitbucketApiRepositories(first: 10) {
+      edges {
+        node {
+          uuid
+          name
+          fullName
+          slug
+          workspace
+          mainbranch
+          isImported
+        }
+        cursor
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
       }
     }
   }

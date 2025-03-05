@@ -1,14 +1,15 @@
 import { TabContext } from 'context/TabContext'
 import { PackageURL } from 'packageurl-js'
 import { useContext } from 'react'
-import { isCustomerView } from 'utils'
 import IdentifierLabel from 'views/Dashboard/Products/components/IdentifierLabel'
 
 import { Input } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage } from '@chakra-ui/react'
 
+import { useRouteFlags } from 'hooks/useRouteFlags'
+
 const PurlField = ({ isOpen, onOpen, onClose }) => {
-  const customerView = isCustomerView()
+  const { isCustomerView } = useRouteFlags()
   const { tabData, setTabData } = useContext(TabContext)
   const { identifiers } = tabData || ''
 
@@ -45,7 +46,7 @@ const PurlField = ({ isOpen, onOpen, onClose }) => {
 
   return (
     <FormControl
-      isDisabled={customerView}
+      isDisabled={isCustomerView}
       isInvalid={identifiers?.purl !== '' && identifiers?.purlError !== ''}
     >
       <IdentifierLabel

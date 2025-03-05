@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-import { isCustomerView } from 'utils'
 import SupportFilters from 'views/Customer/Sbom/SupportFilters'
 import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -7,6 +6,8 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { Flex, IconButton, Stack, Tooltip } from '@chakra-ui/react'
 
 import RefreshBtn from 'components/Icons/RefreshBtn'
+
+import { useRouteFlags } from 'hooks/useRouteFlags'
 
 import { FaPen } from 'react-icons/fa6'
 
@@ -19,7 +20,7 @@ const SupportSubHeader = ({
   handleStatus,
   selectedItems
 }) => {
-  const customerView = isCustomerView()
+  const { isCustomerView } = useRouteFlags()
 
   const subHeader = useMemo(() => {
     return (
@@ -35,7 +36,7 @@ const SupportSubHeader = ({
           <SupportFilters reset={reset} />
         </Flex>
         <Stack spacing={2} alignItems={'center'} direction={'row'}>
-          {!customerView && selectedItems?.length > 0 && (
+          {!isCustomerView && selectedItems?.length > 0 && (
             <Tooltip label={'Set Status'}>
               <IconButton
                 icon={<FaPen />}
@@ -44,13 +45,13 @@ const SupportSubHeader = ({
               />
             </Tooltip>
           )}
-          {!customerView && <ExportCsv tableType='SBOM Support View' />}
+          {!isCustomerView && <ExportCsv tableType='SBOM Support View' />}
           <RefreshBtn onClick={() => reset()} />
         </Stack>
       </Flex>
     )
   }, [
-    customerView,
+    isCustomerView,
     filterText,
     handleClear,
     handleSearch,

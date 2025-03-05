@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client'
 import PropTypes from 'prop-types'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { isCustomerView, permissionList, truncatedValue } from 'utils'
+import { permissionList, truncatedValue } from 'utils'
 
 import { ChevronRightIcon } from '@chakra-ui/icons'
 import { Grid, GridItem } from '@chakra-ui/react'
@@ -12,6 +12,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProjectGroup } from 'hooks/useProjectGroup'
 import useQueryParam from 'hooks/useQueryParam'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useSelect } from 'hooks/useSelect'
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -26,6 +27,7 @@ export default function AdminNavbar(props) {
   const partsContext = usePartsContext()
   const { setUserPermissions } = useGlobalState()
   const { sbomHookData, orgView } = useGlobalQueryContext()
+  const { isCustomerView } = useRouteFlags()
 
   const location = useLocation()
   const params = useParams()
@@ -96,9 +98,7 @@ export default function AdminNavbar(props) {
         >
           <BreadcrumbItem color={mainText}>
             <Link
-              to={
-                !isCustomerView() ? '/vendor/dashboard' : '/customer/products'
-              }
+              to={!isCustomerView ? '/vendor/dashboard' : '/customer/products'}
               color={'secondaryText'}
             >
               Interlynk

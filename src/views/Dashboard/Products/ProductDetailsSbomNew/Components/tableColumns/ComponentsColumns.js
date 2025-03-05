@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { isValidPurl, parseLicenseString, truncatedValue } from 'utils'
-import { getFullDate, isCustomerView, timeSince } from 'utils'
+import { getFullDate, timeSince } from 'utils'
 import { GetIcon } from 'utils/styleUtils'
 
 import { ViewIcon } from '@chakra-ui/icons'
@@ -21,6 +21,7 @@ import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 import { HealthScore } from 'components/HealthScore'
 import ExternalLink from 'components/Misc/ExternalLink'
 
+import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
@@ -77,7 +78,7 @@ const ComponentsColumns = ({
     'primaryErrorColor'
   ])
 
-  const customerView = isCustomerView()
+  const { isCustomerView } = useRouteFlags()
 
   return useMemo(() => {
     const columns = [
@@ -186,7 +187,7 @@ const ComponentsColumns = ({
             </Flex>
           )
         },
-        width: customerView ? '30%' : '25%',
+        width: isCustomerView ? '30%' : '25%',
         wrap: true,
         sortable: true
       },
@@ -200,7 +201,7 @@ const ComponentsColumns = ({
           </Text>
         ),
         wrap: true,
-        width: customerView ? '12%' : '10%',
+        width: isCustomerView ? '12%' : '10%',
         sortable: true
       },
       // COMPONENT HEALTH
@@ -218,7 +219,7 @@ const ComponentsColumns = ({
           )
         },
         width: '10%',
-        omit: isFreeTier || customerView
+        omit: isFreeTier || isCustomerView
       },
       // IDENTIFIERS
       {
@@ -414,7 +415,7 @@ const ComponentsColumns = ({
               <ExternalLink
                 link={issueTracker}
                 icon={
-                  customerView ? (
+                  isCustomerView ? (
                     <FaHouseUser color={onCheck(issueTracker)} fontSize={16} />
                   ) : (
                     <FaListCheck color={onCheck(issueTracker)} fontSize={16} />
@@ -428,7 +429,7 @@ const ComponentsColumns = ({
                   <FaLightbulb color={onCheck(distribution)} fontSize={16} />
                 }
               />
-              {!customerView ? (
+              {!isCustomerView ? (
                 <Menu>
                   <MenuButton
                     as={IconButton}
@@ -540,7 +541,7 @@ const ComponentsColumns = ({
 
     return columns
   }, [
-    customerView,
+    isCustomerView,
     isFreeTier,
     isArchived,
     sbomId,

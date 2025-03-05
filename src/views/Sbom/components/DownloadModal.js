@@ -2,7 +2,7 @@ import { gql, useLazyQuery, useQuery } from '@apollo/client'
 import { client } from 'context/ApolloWrapper'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getSignedUrlParams, isCustomerView, truncatedValue } from 'utils'
+import { getSignedUrlParams, truncatedValue } from 'utils'
 
 import { DownloadIcon } from '@chakra-ui/icons'
 import {
@@ -24,6 +24,7 @@ import LynkModal from 'components/LynkModal'
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
@@ -56,7 +57,7 @@ const DownloadModal = (props) => {
   const { organization } = useGlobalState()
   const { superAdmin } = organization?.currentUser || ''
   const signedUrlParams = getSignedUrlParams()
-  const customerView = isCustomerView()
+  const { isCustomerView } = useRouteFlags()
 
   const [getData] = useLazyQuery(
     signedUrlParams ? SignedSbomDownload : DownloadSBOM
@@ -68,7 +69,7 @@ const DownloadModal = (props) => {
     error: prodDescErr
   } = useQuery(GetProjectGroup, {
     variables: { id: params?.productgroupid },
-    skip: customerView
+    skip: isCustomerView
   })
 
   const productDescription = data?.projectGroup.description

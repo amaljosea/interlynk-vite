@@ -1,9 +1,5 @@
 import { useMemo } from 'react'
-import {
-  capitalizeFirstLetter,
-  getSignedUrlParams,
-  isCustomerView
-} from 'utils'
+import { capitalizeFirstLetter, getSignedUrlParams } from 'utils'
 import { openSsf } from 'variables/general'
 
 import { Box, Flex, Grid, Tag, Text, VStack } from '@chakra-ui/react'
@@ -12,6 +8,7 @@ import DetailItem from 'components/Misc/DetailItem'
 import SupplierTag from 'components/SupplierTag'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const ExpandedComponent = (props) => {
@@ -25,7 +22,7 @@ const ExpandedComponent = (props) => {
   } = props
   const openSSF = openSsf?.find((item) => item?.name === data?.purl)
 
-  const customerView = isCustomerView()
+  const { isCustomerView } = useRouteFlags()
   const signedUrlParams = getSignedUrlParams()
   const { isFreeTier } = useGlobalQueryContext()
 
@@ -62,9 +59,9 @@ const ExpandedComponent = (props) => {
       value ? `${new Date(value).toLocaleDateString()}` : `N/A`
 
     const showSupplierForEnterprise =
-      !customerView && !signedUrlParams && suppliers?.length === 0
+      !isCustomerView && !signedUrlParams && suppliers?.length === 0
 
-    const showCustomerSupplier = customerView && suppliers?.length === 0
+    const showCustomerSupplier = isCustomerView && suppliers?.length === 0
 
     return (
       <Box
@@ -130,9 +127,9 @@ const ExpandedComponent = (props) => {
                       variant='subtle'
                       colorScheme={'blue'}
                       sx={{ p: 1, workBreak: 'break-all' }}
-                      cursor={customerView ? 'inherit' : 'pointer'}
+                      cursor={isCustomerView ? 'inherit' : 'pointer'}
                       onClick={() =>
-                        !customerView && handleGraphView(comp?.toComp)
+                        !isCustomerView && handleGraphView(comp?.toComp)
                       }
                     >
                       <Text wordBreak={'break-all'}>
@@ -156,9 +153,9 @@ const ExpandedComponent = (props) => {
                     key={index}
                     variant='subtle'
                     colorScheme={'blue'}
-                    cursor={customerView ? 'inherit' : 'pointer'}
+                    cursor={isCustomerView ? 'inherit' : 'pointer'}
                     onClick={() =>
-                      !customerView && handleGraphView(comp?.fromComp)
+                      !isCustomerView && handleGraphView(comp?.fromComp)
                     }
                   >
                     <Text wordBreak={'break-all'}>
@@ -171,7 +168,7 @@ const ExpandedComponent = (props) => {
           {/* PURL */}
           <DetailItem
             cursor='pointer'
-            onClick={() => (customerView ? null : onCheckPurl(data))}
+            onClick={() => (isCustomerView ? null : onCheckPurl(data))}
             value={purl ? purlForDisplay : 'N/A'}
             label='PURL'
             valueStyle={purl && { color: purlColor }}
@@ -181,7 +178,7 @@ const ExpandedComponent = (props) => {
             cursor={cpes?.length > 0 ? 'pointer' : 'default'}
             label='CPES'
             value={cpes?.length > 0 ? cpes[0] : 'N/A'}
-            onClick={() => (customerView ? null : onCheckCpe(data))}
+            onClick={() => (isCustomerView ? null : onCheckCpe(data))}
             valueStyle={cpes?.length > 0 && { color: cpesColor }}
           />
           {/* Scope */}
@@ -198,31 +195,31 @@ const ExpandedComponent = (props) => {
           <DetailItem
             label='Support Level'
             value={supportLevel || 'N/A'}
-            hidden={customerView || isFreeTier}
+            hidden={isCustomerView || isFreeTier}
           />
           {/* End-of-Support Date */}
           <DetailItem
             label='End-of-Support Date'
-            hidden={customerView || isFreeTier}
+            hidden={isCustomerView || isFreeTier}
             value={getDate(endOfSupportDate) || 'N/A'}
           />
           {/* ASSESSMENT EXPIERS ON */}
           <DetailItem
             label='Assessment Expires On'
-            hidden={customerView || isFreeTier}
+            hidden={isCustomerView || isFreeTier}
             value={assessmentExpiresOn ? `${assessmentExpiresOn} Days` : 'N/A'}
           />
           {/* SUPPORT EXPLANATION */}
           <DetailItem
             label='Support Explanation'
-            hidden={customerView || isFreeTier}
+            hidden={isCustomerView || isFreeTier}
             value={supportExplanation || 'N/A'}
           />
           {/* LAST ASSESSED BY */}
           <DetailItem
             label='Last Assessed By'
             value={lastAssessedBy || 'N/A'}
-            hidden={customerView || isFreeTier}
+            hidden={isCustomerView || isFreeTier}
           />
         </Grid>
       </Box>
@@ -230,7 +227,7 @@ const ExpandedComponent = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     data,
-    customerView,
+    isCustomerView,
     signedUrlParams,
     openSSF?.score,
     handleGraphView,

@@ -1,5 +1,6 @@
 import { gql, useQuery } from '@apollo/client'
-import { isCustomerView } from 'utils'
+
+import { useRouteFlags } from 'hooks/useRouteFlags'
 
 export const GetProjectsVendor = gql`
   query GetProjectsVendor($projectGroupId: Uuid!) {
@@ -36,15 +37,15 @@ export const GetProjectsCustomer = gql`
 `
 
 export const useProjectGroup = ({ projectGroupId }) => {
-  const isCustomer = isCustomerView()
+  const { isCustomerView } = useRouteFlags()
   const { data, loading } = useQuery(
-    isCustomer ? GetProjectsCustomer : GetProjectsVendor,
+    isCustomerView ? GetProjectsCustomer : GetProjectsVendor,
     {
       skip: !projectGroupId,
       variables: { projectGroupId }
     }
   )
-  const projectGroup = isCustomer
+  const projectGroup = isCustomerView
     ? data?.shareLynkQuery?.projectGroup
     : data?.projectGroup
 

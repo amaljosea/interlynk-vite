@@ -1,13 +1,14 @@
 import { useMemo } from 'react'
-import { isCustomerView } from 'utils'
 import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
 
 import { Flex } from '@chakra-ui/react'
 
 import RefreshBtn from 'components/Icons/RefreshBtn'
 
+import { useRouteFlags } from 'hooks/useRouteFlags'
+
 const LicensesSubHeader = () => {
-  const customerView = isCustomerView()
+  const { isCustomerView } = useRouteFlags()
   const subHeader = useMemo(() => {
     return (
       <Flex
@@ -17,12 +18,12 @@ const LicensesSubHeader = () => {
         gap={2}
       >
         {/* EXPORT CSV */}
-        {!customerView && <ExportCsv tableType='SBOM License View' />}
+        {!isCustomerView && <ExportCsv tableType='SBOM License View' />}
 
         <RefreshBtn />
       </Flex>
     )
-  }, [customerView])
+  }, [isCustomerView])
 
   return subHeader
 }

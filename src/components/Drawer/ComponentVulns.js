@@ -6,17 +6,10 @@ import { customStyles, statusColor } from 'utils/styleUtils'
 
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { Flex, Stack, Text } from '@chakra-ui/react'
-import {
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay
-} from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import ExternalNavIcon from 'components/Icons/ExternalNavIcon'
+import LynkDrawer from 'components/LynkDrawer'
 import CompInfo from 'components/Misc/CompInfo'
 import SeverityTag from 'components/Misc/SeverityTag'
 import Pagination from 'components/Pagination'
@@ -114,38 +107,27 @@ const ComponentVulns = ({ data, isOpen, onClose }) => {
   ]
 
   return (
-    <Drawer
+    <LynkDrawer
+      title={'Vulnerabilities'}
+      subtitle={data && <CompInfo data={data} />}
       size='lg'
       isOpen={isOpen}
-      placement='right'
       onClose={onClose}
-      closeOnOverlayClick={false}
+      noFooter
     >
-      <DrawerOverlay />
-      <DrawerContent>
-        <DrawerCloseButton mt={3} />
-        <DrawerHeader borderBottomWidth='1px'>
-          <Text mb={1} fontWeight={'medium'}>
-            Vulnerabilities
-          </Text>
-          {data && <CompInfo data={data} />}
-        </DrawerHeader>
-        <DrawerBody>
-          <Stack>
-            <DataTable
-              responsive
-              columns={columns}
-              data={nodes || []}
-              customStyles={customStyles(headingTextColor)}
-              progressPending={loading}
-              progressComponent={<CustomLoader />}
-              persistTableHead
-            />
-            <Pagination {...paginationProps} />
-          </Stack>
-        </DrawerBody>
-      </DrawerContent>
-    </Drawer>
+      <Stack>
+        <DataTable
+          responsive
+          columns={columns}
+          data={nodes || []}
+          customStyles={customStyles(headingTextColor)}
+          progressPending={loading}
+          progressComponent={<CustomLoader />}
+          persistTableHead
+        />
+        <Pagination {...paginationProps} />
+      </Stack>
+    </LynkDrawer>
   )
 }
 
