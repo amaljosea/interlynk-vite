@@ -68,8 +68,9 @@ const SupportColumns = ({ handleSupport }) => {
         )
       },
       {
-        id: 'SUPPORT_LEVEL',
+        id: 'COMPONENT_SUPPORT_LEVELS_LEVEL',
         name: 'SUPPORT LEVEL',
+        sortable: true,
         wrap: true,
         selector: (row) => {
           if (row?.componentSupportLevel?.level) {
@@ -83,8 +84,9 @@ const SupportColumns = ({ handleSupport }) => {
         }
       },
       {
-        id: 'END_OF_SUPPORT',
+        id: 'COMPONENT_SUPPORT_LEVELS_END_DATE',
         name: 'END OF SUPPORT',
+        sortable: true,
         wrap: true,
         selector: (row) => {
           if (row?.componentSupportLevel?.endDate) {
