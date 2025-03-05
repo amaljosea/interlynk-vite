@@ -1,4 +1,4 @@
-import { CheckIcon } from '@chakra-ui/icons'
+import { CheckCircleIcon } from '@chakra-ui/icons'
 import { Button, Flex, Text } from '@chakra-ui/react'
 
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -15,16 +15,9 @@ const ConnectionCard = ({
   description,
   color
 }) => {
-  const {
-    primaryTextColor,
-    primaryBlueText,
-    secondaryTextInverse,
-    lightAndDarkBgColor
-  } = useThemeColor([
+  const { primaryTextColor, secondaryTextInverse } = useThemeColor([
     'primaryTextColor',
-    'primaryBlueText',
-    'secondaryTextInverse',
-    'lightAndDarkBgColor'
+    'secondaryTextInverse'
   ])
 
   const canUpdate = useHasPermission({
@@ -64,33 +57,19 @@ const ConnectionCard = ({
           </Text>
         </Flex>
 
-        <Text fontSize={'12px'} color={secondaryTextInverse}>
+        <Text height={'54px'} fontSize={'12px'} color={secondaryTextInverse}>
           {description}
         </Text>
 
         {/* Button */}
         <Button
-          colorScheme={isConnected ? 'blue' : 'white'}
-          size='md'
+          fontSize='sm'
           title='Configure'
-          width={isConnected ? '150px' : '120px'}
-          color={isConnected ? lightAndDarkBgColor : primaryBlueText}
-          bg={isConnected ? primaryBlueText : ''}
-          leftIcon={
-            isConnected ? (
-              <CheckIcon
-                w={'20px'}
-                h={'20px'}
-                color={primaryBlueText}
-                bg={lightAndDarkBgColor}
-                borderRadius='full'
-                p={1}
-              />
-            ) : undefined
-          }
           onClick={onConfigure}
-          border={!isConnected && '1px solid'}
           isDisabled={!canUpdate}
+          width={isConnected ? '150px' : '120px'}
+          colorScheme={isConnected ? 'blue' : 'gray'}
+          leftIcon={isConnected ? <CheckCircleIcon /> : undefined}
         >
           {isConnected ? 'Configured' : 'Configure'}
         </Button>
