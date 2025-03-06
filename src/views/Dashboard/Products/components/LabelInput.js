@@ -39,7 +39,7 @@ const LabelInput = ({ data, setOpen, onOpenLabel, nodes }) => {
     }).then((res) => {
       const error = res?.data?.projectGroupUpdate?.errors
       if (error?.length > 0) {
-        console.log(res.data.projectGroupUpdate.errors[0])
+        console.warn(res.data.projectGroupUpdate.errors[0])
       }
     })
   }

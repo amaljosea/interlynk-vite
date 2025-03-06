@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 export const validateUrl = (url) => {
   const urlRegex =
     // eslint-disable-next-line no-useless-escape

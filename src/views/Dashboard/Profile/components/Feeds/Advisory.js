@@ -13,7 +13,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { OrgSettingCreate, OrgSettingUpdate } from 'graphQL/Mutation'
 
-const AdvisoryFeeds = ({ data, manageFeeds }) => {
+const AdvisoryFeeds = ({ data }) => {
   const { inverseSecondaryBgColor, sameSecondaryText } = useThemeColor([
     'inverseSecondaryBgColor',
     'sameSecondaryText'

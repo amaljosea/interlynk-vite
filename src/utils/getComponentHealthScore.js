@@ -76,12 +76,6 @@ export const getComponentHealthScore = (componentData) => {
     scoreSecurity = componentData['OpenSSF Scorecard'] * 10
   }
 
-  console.log({
-    scoreAge,
-    scoreCommunity,
-    scoreSecurity
-  })
-
   return {
     healthScore: round(
       scoreAge * weightAge +

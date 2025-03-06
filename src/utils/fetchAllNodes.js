@@ -33,7 +33,7 @@ const fetchAllNodes = async ({ query, variables, selector }) => {
       }
     }
   } catch (error) {
-    console.error('Error fetching nodes:', error)
+    console.warn('Error fetching nodes:', error)
   }
 
   return allNodes

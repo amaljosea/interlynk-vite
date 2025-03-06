@@ -100,7 +100,6 @@ const SbomDetails = () => {
 
   useEffect(() => {
     window.onpopstate = () => {
-      console.log(`Pressed back button`)
       handlePart()
     }
   })

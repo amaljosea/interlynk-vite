@@ -257,7 +257,6 @@ const CheckModal = (props) => {
           })
         }
       } catch (error) {
-        console.error('Error during rule creation', error)
         setError('An unexpected error occurred.')
       }
     }
@@ -421,13 +420,7 @@ const CheckModal = (props) => {
       {CREATION_TIMESTAMP && (
         <FormControl isRequired isDisabled={resolved}>
           <FormLabel>Created At</FormLabel>
-          <Input
-            placeholder='Select Time'
-            size='md'
-            type='datetime-local'
-            value={timestamp}
-            onChange={(e) => console.log(e.target.value)}
-          />
+          <Text>{timestamp}</Text>
         </FormControl>
       )}
 

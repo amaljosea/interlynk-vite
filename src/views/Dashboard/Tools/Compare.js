@@ -90,7 +90,6 @@ const Compare = ({ selectedSboms }) => {
         }
       }).then((res) => {
         if (res?.data) {
-          console.log(res.data)
           setFirstSbomInfo(res.data.sbom)
         }
       })

@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { Flex, IconButton, Stack, Tooltip } from '@chakra-ui/react'
+import { Flex, IconButton, Tooltip } from '@chakra-ui/react'
 
 import RefreshBtn from 'components/Icons/RefreshBtn'
 

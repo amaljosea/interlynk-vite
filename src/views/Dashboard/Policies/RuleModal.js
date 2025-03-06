@@ -127,7 +127,6 @@ const RuleModal = ({ activeRow, data, isOpen, onClose }) => {
 
   useEffect(() => {
     if (data) {
-      console.log('data', data)
       setValue(data?.value || '')
       setOperator(data?.operator || '')
       setSubject(data?.subject || '')

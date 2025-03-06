@@ -164,7 +164,7 @@ describe('fetchAllNodes', () => {
     const mockError = new Error('API Error')
     client.query.mockRejectedValueOnce(mockError)
 
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
+    const consoleSpy = jest.spyOn(console, 'warn').mockImplementation()
 
     const result = await fetchAllNodes({
       query: mockQuery,

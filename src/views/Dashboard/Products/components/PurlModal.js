@@ -165,7 +165,6 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
           })
         }
       } catch (error) {
-        console.error('Error during rule creation:', error)
         showToast({
           description: 'An unexpected error occurred while creating the rule.',
           status: 'error'
@@ -245,7 +244,7 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
             : ''
         }))
       } catch (error) {
-        console.log('Error', error)
+        console.warn('Error', error)
       }
     }
   }, [purl])

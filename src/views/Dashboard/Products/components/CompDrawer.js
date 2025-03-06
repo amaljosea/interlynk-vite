@@ -46,7 +46,7 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
     ? ['details', 'identifiers']
     : ['details', 'identifiers', 'suppliers', 'links', 'relationships']
 
-  const { resetData, tab, tabData, onTabChange } = useContext(TabContext)
+  const { tabData, onTabChange } = useContext(TabContext)
   const { purl, cpe } = tabData?.identifiers || {}
 
   const { sbomId: bomId } = data || ''
@@ -62,7 +62,7 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
       const pkg = PackageURL.fromString(value)
       return pkg?.version || null
     } catch (error) {
-      console.log('Something went wrong', error)
+      console.warn('Something went wrong', error)
     }
   }
 

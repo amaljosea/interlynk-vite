@@ -85,10 +85,7 @@ const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
         sbomId: component?.sbom?.id,
         componentVulnId: id
       }
-    }).then((res) => {
-      console.log(res?.data)
-      SBOM.onOpen()
-    })
+    }).then(() => SBOM.onOpen())
   }
 
   // COLUMNS

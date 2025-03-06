@@ -64,7 +64,6 @@ const ComponentList = ({ id, name, value, setValue }) => {
           label: `${item?.name} - ${item?.version}`,
           value: item?.id
         }))
-      console.log('result', result)
       setOptions(result)
     }
   }, [name, nodes, relations?.relType])

@@ -17,7 +17,6 @@ const ToolsFilterMenu = () => {
   const { toolsDispatch } = dispatch
 
   const onFilterStatus = (value) => {
-    console.log('value', value)
     if (value === 'all') {
       toolsDispatch({ type: 'FILTER_DIFF', payload: '' })
     } else {

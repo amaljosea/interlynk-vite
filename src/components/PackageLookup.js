@@ -43,7 +43,7 @@ const PackageLookup = () => {
         return []
       }
     } else {
-      console.log('Invalid license')
+      console.warn('Invalid license')
       return []
     }
   }

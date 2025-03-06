@@ -35,20 +35,11 @@ const CompIdentifiers = ({ data }) => {
 
   const [updateComponent, { loading }] = useMutation(UpdateComponent)
 
-  const [purlValue, setPurlValue] = useState('')
   const [cpeValue, setCpeValue] = useState('')
   const [purlOpen, setPurlOpen] = useState(false)
   const [cpeOpen, setCpeOpen] = useState(false)
 
-  const handlePurlModal = () => {
-    try {
-      PackageURL.fromString(identifiers?.purl)
-      setPurlValue(identifiers?.purl)
-    } catch (ex) {
-      setPurlValue('')
-    }
-    setPurlOpen(true)
-  }
+  const handlePurlModal = () => setPurlOpen(true)
 
   const handleCpeModal = () => {
     setCpeValue(identifiers?.cpe || 'cpe:2.3:*:*:*:*:*:*:*:*:*:*:*')

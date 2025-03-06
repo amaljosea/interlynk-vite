@@ -126,7 +126,7 @@ const SbomDetails = ({ sbomData }) => {
 
   useEffect(() => {
     window.onpopstate = () => {
-      console.log(`Pressed back button`)
+      console.warn(`Pressed back button`)
       handlePart()
     }
   })

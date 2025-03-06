@@ -32,7 +32,7 @@ export const logoutUser = async () => {
       }
     })
   } catch (error) {
-    console.error('Logout failed')
+    console.warn('Logout failed')
   } finally {
     clearData()
     navigate('/auth')
@@ -40,6 +40,6 @@ export const logoutUser = async () => {
 }
 
 const logError = () => {
-  console.log('Cookies:', Cookies.get())
-  console.log('Session:', localStorage)
+  console.warn('Cookies:', Cookies.get())
+  console.warn('Session:', localStorage)
 }

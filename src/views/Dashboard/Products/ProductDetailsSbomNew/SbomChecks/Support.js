@@ -159,7 +159,6 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
           })
         }
       } catch (error) {
-        console.error('Error during rule creation', error)
         setError('An unexpected error occurred.')
       }
     }

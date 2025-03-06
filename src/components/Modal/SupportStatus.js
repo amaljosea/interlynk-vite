@@ -75,7 +75,7 @@ const SupportStatus = ({ isOpen, selectedItems, handleClear }) => {
         })
           .then((res) => {
             const { errors } = res?.data?.componentSupportLevelCreate || {}
-            console.log('Something went wrong', errors)
+            console.warn('Something went wrong', errors)
           })
           .finally(() => handleClear())
       })

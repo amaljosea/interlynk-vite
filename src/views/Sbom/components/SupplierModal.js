@@ -200,7 +200,6 @@ const SupplierModal = (props) => {
           })
         }
       } catch (error) {
-        console.error('Error during rule creation:', error)
         onClose()
         showToast({
           description: 'An unexpected error occurred while creating the rule.',

@@ -192,7 +192,6 @@ const AuthorModal = ({ isOpen, onClose, ruleExists, recheck }) => {
           })
         }
       } catch (error) {
-        console.error('Error during rule creation:', error)
         showToast({
           description: 'An unexpected error occurred while creating the rule.',
           status: 'error'
