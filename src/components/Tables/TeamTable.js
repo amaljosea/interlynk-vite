@@ -2,7 +2,6 @@ import { useMutation, useQuery } from '@apollo/client'
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
-import { isCustomerView } from 'utils'
 import { customStyles } from 'utils/styleUtils'
 import { FREE_TIER_USER_LIMIT } from 'variables/general'
 import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
@@ -37,6 +36,7 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { InviteUser, deleteOrgUser } from 'graphQL/Mutation'
@@ -56,7 +56,7 @@ function userTimeStart(row) {
 
 const TeamTable = () => {
   const activetab = useQueryParam('tab')
-  const customerView = isCustomerView()
+  const { isCustomerView } = useRouteFlags()
   const { showToast } = useCustomToast()
   const { organization } = useGlobalState()
   const SERVER_URL = process.env.REACT_APP_SERVER
@@ -314,7 +314,7 @@ const TeamTable = () => {
 
         <Flex sx={{ gap: 2, justifyContent: 'flex-end' }}>
           {/* EXPORT CSV */}
-          {!customerView && (
+          {!isCustomerView && (
             <ExportCsv
               tableType='Users'
               filters={{
@@ -357,7 +357,7 @@ const TeamTable = () => {
     numberOfUsers,
     TEAM.onOpen,
     inviteUser,
-    customerView
+    isCustomerView
   ])
 
   const handleRemove = async () => {
