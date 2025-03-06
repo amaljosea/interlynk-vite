@@ -212,7 +212,6 @@ const ChangelogTable = ({ activeEnv }) => {
   const subHeader = useMemo(() => {
     return (
       <Flex
-        mb={4}
         width={'100%'}
         alignItems={'center'}
         justifyContent={'space-between'}

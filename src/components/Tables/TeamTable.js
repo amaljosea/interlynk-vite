@@ -4,6 +4,7 @@ import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
 import { customStyles } from 'utils/styleUtils'
 import { FREE_TIER_USER_LIMIT } from 'variables/general'
+import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
 import RoleModal from 'views/Dashboard/Profile/components/RoleModal'
 import TeamModal from 'views/Dashboard/Profile/components/TeamModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -35,6 +36,7 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { InviteUser, deleteOrgUser } from 'graphQL/Mutation'
@@ -54,6 +56,7 @@ function userTimeStart(row) {
 
 const TeamTable = () => {
   const activetab = useQueryParam('tab')
+  const { isCustomerView } = useRouteFlags()
   const { showToast } = useCustomToast()
   const { organization } = useGlobalState()
   const SERVER_URL = process.env.REACT_APP_SERVER
@@ -299,13 +302,7 @@ const TeamTable = () => {
   // HEADER SECTION
   const subHeaderComponent = useMemo(() => {
     return (
-      <Flex
-        sx={{
-          w: '100%',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}
-      >
+      <Flex w={'100%'} alignItems={'center'} justifyContent={'space-between'}>
         {/* SEARCH COMPONENTS */}
         <SearchFilter
           id='team'
@@ -316,6 +313,15 @@ const TeamTable = () => {
         />
 
         <Flex sx={{ gap: 2, justifyContent: 'flex-end' }}>
+          {/* EXPORT CSV */}
+          {!isCustomerView && (
+            <ExportCsv
+              tableType='Users'
+              filters={{
+                search: searchInput !== '' ? searchInput : undefined
+              }}
+            />
+          )}
           {/* INVITE USER */}
           <Box position='relative'>
             <Tooltip
@@ -343,14 +349,15 @@ const TeamTable = () => {
       </Flex>
     )
   }, [
+    handleClear,
+    handleSearch,
     searchInput,
     onSearchInputChange,
-    handleSearch,
-    handleClear,
-    TEAM,
-    inviteUser,
     isFreeTier,
-    numberOfUsers
+    numberOfUsers,
+    TEAM.onOpen,
+    inviteUser,
+    isCustomerView
   ])
 
   const handleRemove = async () => {

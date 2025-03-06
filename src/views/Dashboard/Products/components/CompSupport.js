@@ -131,7 +131,7 @@ const SupportCard = ({ setEdit, data }) => {
           </Text>
         </SimpleGrid>
         <SimpleGrid {...container}>
-          <Text {...label}>Assessment Expires On</Text>
+          <Text {...label}>Assessment Expires In</Text>
           <Text {...infoStyle} textTransform={'capitalize'}>
             {retainManualOverrideFor
               ? `${retainManualOverrideFor} Days`

@@ -7,13 +7,17 @@ import {
   GetComponentData,
   GetGlobalVulns,
   GetSbomLicensesTable,
+  GetTeam,
   GetVulnData
 } from 'graphQL/Queries'
 
+import { useGlobalState } from './useGlobalState'
 import useQueryParam from './useQueryParam'
 
 const useExportCsvQueryInfo = (tableType, rowsToExport, searchFilters) => {
   const params = useParams()
+  const activetab = useQueryParam('tab')
+  const { organization } = useGlobalState()
 
   const productId = params.productid
   const sbomId = params.sbomid
@@ -109,6 +113,15 @@ const useExportCsvQueryInfo = (tableType, rowsToExport, searchFilters) => {
           pageInfoSelector: 'sbom.components.pageInfo'
         }
 
+      case 'Users':
+        return {
+          query: GetTeam,
+          variables: { ...searchFilters },
+          skip: !organization ? true : activetab === 'users' ? false : true,
+          selector: 'organization.organizationUsers.nodes',
+          pageInfoSelector: 'organization.organizationUsers.pageInfo'
+        }
+
       default:
         return { query: null, variables: {}, skip: true, selector: null }
     }
@@ -116,10 +129,12 @@ const useExportCsvQueryInfo = (tableType, rowsToExport, searchFilters) => {
     tableType,
     sbomId,
     productId,
-    productGroupId,
-    vulnId,
     rowsToExport,
-    searchFilters
+    searchFilters,
+    vulnId,
+    productGroupId,
+    organization,
+    activetab
   ])
 
   return queryInfo
