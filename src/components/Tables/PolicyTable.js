@@ -544,7 +544,7 @@ const PolicyTable = () => {
 
   return (
     <>
-      <Card>
+      <Card padding={productId ? '0px' : '22px'}>
         <Flex flexDir={'column'} width={'100%'}>
           <DataTable
             columns={columns}
