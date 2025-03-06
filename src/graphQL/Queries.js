@@ -6212,3 +6212,43 @@ export const BitbucketRepositories = gql`
     }
   }
 `
+
+export const GetTeam = gql`
+  query GetTeam($first: Int, $last: Int, $after: String, $before: String) {
+    organization {
+      organizationUsers(
+        after: $after
+        before: $before
+        first: $first
+        last: $last
+      ) {
+        nodes {
+          user {
+            id
+            name
+            email
+            role {
+              id
+              name
+              permissions
+            }
+            createdAt
+            invitationStatus
+            invitationAcceptedAt
+            profileImage {
+              filename
+              url
+            }
+          }
+        }
+        pageInfo {
+          endCursor
+          hasNextPage
+          hasPreviousPage
+          startCursor
+        }
+        totalCount
+      }
+    }
+  }
+`

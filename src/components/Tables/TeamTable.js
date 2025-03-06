@@ -2,8 +2,10 @@ import { useMutation, useQuery } from '@apollo/client'
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
+import { isCustomerView } from 'utils'
 import { customStyles } from 'utils/styleUtils'
 import { FREE_TIER_USER_LIMIT } from 'variables/general'
+import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
 import RoleModal from 'views/Dashboard/Profile/components/RoleModal'
 import TeamModal from 'views/Dashboard/Profile/components/TeamModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -54,6 +56,7 @@ function userTimeStart(row) {
 
 const TeamTable = () => {
   const activetab = useQueryParam('tab')
+  const customerView = isCustomerView()
   const { showToast } = useCustomToast()
   const { organization } = useGlobalState()
   const SERVER_URL = process.env.REACT_APP_SERVER
@@ -299,13 +302,7 @@ const TeamTable = () => {
   // HEADER SECTION
   const subHeaderComponent = useMemo(() => {
     return (
-      <Flex
-        sx={{
-          w: '100%',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}
-      >
+      <Flex w={'100%'} alignItems={'center'} justifyContent={'space-between'}>
         {/* SEARCH COMPONENTS */}
         <SearchFilter
           id='team'
@@ -316,6 +313,15 @@ const TeamTable = () => {
         />
 
         <Flex sx={{ gap: 2, justifyContent: 'flex-end' }}>
+          {/* EXPORT CSV */}
+          {!customerView && (
+            <ExportCsv
+              tableType='Users'
+              filters={{
+                search: searchInput !== '' ? searchInput : undefined
+              }}
+            />
+          )}
           {/* INVITE USER */}
           <Box position='relative'>
             <Tooltip
@@ -343,14 +349,15 @@ const TeamTable = () => {
       </Flex>
     )
   }, [
+    handleClear,
+    handleSearch,
     searchInput,
     onSearchInputChange,
-    handleSearch,
-    handleClear,
-    TEAM,
-    inviteUser,
     isFreeTier,
-    numberOfUsers
+    numberOfUsers,
+    TEAM.onOpen,
+    inviteUser,
+    customerView
   ])
 
   const handleRemove = async () => {

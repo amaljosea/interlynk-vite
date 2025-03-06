@@ -15,6 +15,7 @@ import LynkModal from 'components/LynkModal'
 import useCustomToast from 'hooks/useCustomToast'
 import useExportCsvQueryInfo from 'hooks/useExportCsvQueryInfo'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useProjectGroup } from 'hooks/useProjectGroup'
 import useQueryParam from 'hooks/useQueryParam'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
@@ -27,7 +28,7 @@ import { FaFileCsv } from 'react-icons/fa6'
 const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
   const params = useParams()
   const { showToast } = useCustomToast()
-
+  const { organization } = useGlobalState()
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
   const vulnId = useQueryParam('vulnId') || params.vulnerabilityid
@@ -98,6 +99,8 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
     return config ? config.mapDataForExport(fetchedNodes) : []
   }
 
+  const orgName = organization?.name?.replaceAll(' ', '-') || 'test-interlynk'
+
   const fileName = generateCsvFileName({
     tableType,
     rowsToExport,
@@ -105,7 +108,8 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
     product: sbomHookData.projectGroupName,
     version: sbomHookData.versionName,
     vulnId,
-    projectGroupName
+    projectGroupName,
+    orgName
   })
 
   const handleExport = async () => {

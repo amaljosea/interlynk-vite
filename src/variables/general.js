@@ -1430,6 +1430,26 @@ export const exportCsvTableConfig = {
         }
       })
     }
+  },
+  Users: {
+    defaultSelectedColumns: ['Name', 'Email', 'Role', 'Joined', 'Status'],
+    additionalColumns: [],
+    mapDataForExport: (data) => {
+      return data?.map((row) => {
+        const { user } = row || {}
+        const { email, name, role, invitationAcceptedAt, invitationStatus } =
+          user || {}
+        return {
+          Name: name || 'N/A',
+          Email: email || 'N/A',
+          Role: role?.name || 'N/A',
+          Joined: invitationAcceptedAt
+            ? new Date(invitationAcceptedAt).toLocaleDateString()
+            : 'N/A',
+          Status: invitationStatus?.replace(/_/g, ' ') || 'N/A'
+        }
+      })
+    }
   }
 }
 
