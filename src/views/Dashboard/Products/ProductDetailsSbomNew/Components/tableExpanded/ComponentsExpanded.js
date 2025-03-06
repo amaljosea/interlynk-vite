@@ -205,7 +205,7 @@ const ExpandedComponent = (props) => {
           />
           {/* ASSESSMENT EXPIERS ON */}
           <DetailItem
-            label='Assessment Expires On'
+            label='Assessment Expires In'
             hidden={isCustomerView || isFreeTier}
             value={assessmentExpiresOn ? `${assessmentExpiresOn} Days` : 'N/A'}
           />
