@@ -95,7 +95,6 @@ const VulnFilters = ({ reset }) => {
   }
 
   const onFilterInclude = (value) => {
-    console.log('value', value)
     prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: value })
     reset()
   }

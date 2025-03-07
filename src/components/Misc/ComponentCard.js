@@ -127,7 +127,7 @@ const ComponentCard = ({ value, isOpen, onClose }) => {
         const result = PackageURL.fromString(purl)
         setPkg(result)
       } catch (ex) {
-        console.error('ex', ex)
+        console.warn('ex', ex)
       }
     }
   }, [purl])

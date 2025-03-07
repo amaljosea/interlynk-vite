@@ -43,7 +43,7 @@ const LynkDrawer = ({
     >
       <DrawerOverlay />
       <DrawerContent>
-        <DrawerCloseButton mt={'7px'} />
+        <DrawerCloseButton mt={'7px'} aria-label='comp_close' />
         <DrawerHeader
           fontWeight='500'
           borderBottomWidth='1px'

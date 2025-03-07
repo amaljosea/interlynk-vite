@@ -26,8 +26,17 @@ const CompIdentifiers = ({ data }) => {
   const sbomId = params.sbomid
   const { isCustomerView } = useRouteFlags()
 
-  const { tabData, setTabData, saveChanges, unsavedChanges, alert, setAlert } =
-    useContext(TabContext)
+  const {
+    tabData,
+    setTabData,
+    saveChanges,
+    unsavedChanges,
+    alert,
+    setAlert,
+    alertMessageSetter,
+    alertMessage
+  } = useContext(TabContext)
+
   const { identifiers } = tabData
 
   const { dispatch } = useGlobalState()
@@ -35,20 +44,11 @@ const CompIdentifiers = ({ data }) => {
 
   const [updateComponent, { loading }] = useMutation(UpdateComponent)
 
-  const [purlValue, setPurlValue] = useState('')
   const [cpeValue, setCpeValue] = useState('')
   const [purlOpen, setPurlOpen] = useState(false)
   const [cpeOpen, setCpeOpen] = useState(false)
 
-  const handlePurlModal = () => {
-    try {
-      PackageURL.fromString(identifiers?.purl)
-      setPurlValue(identifiers?.purl)
-    } catch (ex) {
-      setPurlValue('')
-    }
-    setPurlOpen(true)
-  }
+  const handlePurlModal = () => setPurlOpen(true)
 
   const handleCpeModal = () => {
     setCpeValue(identifiers?.cpe || 'cpe:2.3:*:*:*:*:*:*:*:*:*:*:*')
@@ -68,7 +68,7 @@ const CompIdentifiers = ({ data }) => {
       if (errors?.length > 0) {
         showToast({ description: errors[0], status: 'error' })
       } else {
-        saveChanges()
+        saveChanges('identifiers')
         showToast({
           description: 'Identifiers updated successfully',
           status: 'success'
@@ -81,6 +81,7 @@ const CompIdentifiers = ({ data }) => {
   const checkData = () => {
     // eslint-disable-next-line no-unused-vars
     const { identifiers, ...rest } = unsavedChanges
+    alertMessageSetter(rest)
     return Object.values(rest).some((value) => value === true)
   }
 
@@ -166,10 +167,7 @@ const CompIdentifiers = ({ data }) => {
         )}
         {alert ? (
           <Stack spacing={4}>
-            <LynkAlert
-              status='warning'
-              msg='Saving will apply changes to this tab only. save other tabs separately to retain their data.'
-            />
+            <LynkAlert status='warning' msg={alertMessage} />
             <ActionButton
               title={'Save'}
               isLoading={loading}

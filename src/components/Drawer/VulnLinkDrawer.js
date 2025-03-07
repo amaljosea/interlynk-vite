@@ -60,7 +60,6 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
 
   const handleCheckUrl = () => {
     const trimmedLink = link.trim()
-    console.log(trimmedLink)
     if (!validateUrl(trimmedLink)) {
       setLinkError('Please enter a valid URL')
     }

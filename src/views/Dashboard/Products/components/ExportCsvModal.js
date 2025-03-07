@@ -174,7 +174,7 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
         }
       }
     } catch (error) {
-      console.error('Export Error:', error)
+      console.warn('Export Error:', error)
       showToast({
         description:
           'Internal error during data download. Please try again in a few minutes.',

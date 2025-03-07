@@ -331,7 +331,6 @@ const Components = ({ sbomData }) => {
 
   useEffect(() => {
     if (selectedComp) {
-      console.log('selectedComp', selectedComp)
       handleGraphView(selectedComp)
     }
   }, [handleGraphView, selectedComp])

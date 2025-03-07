@@ -134,7 +134,6 @@ export const exportExcel = async (
     }
   } catch (error) {
     setIsLoading(false)
-    console.error('Error fetching components:', error)
   }
 
   const dataForSheetTwo = allComponents.map((component) => ({
@@ -182,7 +181,6 @@ export const exportExcel = async (
     }
   } catch (error) {
     setIsLoading(false)
-    console.error('Error fetching vulnerabilities:', error)
   }
 
   const dataForSheetThree = allVulns.map((vulnerability) => ({

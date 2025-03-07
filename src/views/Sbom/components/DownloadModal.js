@@ -138,7 +138,6 @@ const DownloadModal = (props) => {
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      console.log(`URL`, url)
       a.download = `${productName}-${version}.${type}.json`
       a.click()
       URL.revokeObjectURL(url)
@@ -251,7 +250,6 @@ const DownloadModal = (props) => {
           spec: spec === 'SPDX-Lite' ? 'SPDX' : spec
         }
       }).then((res) => {
-        console.log(`res`, res)
         const { called, variables } = res || ''
         if (called) {
           setIsLoading(false)
@@ -272,7 +270,6 @@ const DownloadModal = (props) => {
         }
       })
     } catch (error) {
-      console.log(`Error`, error)
       showToast({
         description: `Internal error during SBOM download. Please try again in a few minutes.`,
         status: 'error'

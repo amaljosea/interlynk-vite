@@ -1,8 +1,8 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { TabContext } from 'context/TabContext'
-import { useContext, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { hasWhiteSpace, validateUrl } from 'utils/formValidationUtils'
+import { validateEmail } from 'utils/formValidationUtils'
 import { componentTypes, infoData, sbomPhases } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
@@ -43,8 +43,6 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
 
   const { nodes } = data?.sbom?.components || ''
 
-  const { saveChanges } = useContext(TabContext)
-
   const productId = params.productid
 
   const [phases, setPhases] = useState([])
@@ -56,11 +54,6 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
   const [compScope, setCompScope] = useState('')
   const [isInternal, setIsInternal] = useState(false)
   const [error, setError] = useState('')
-
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return emailRegex.test(email)
-  }
 
   const initialData = useMemo(
     () => ({
@@ -145,7 +138,6 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
       }
     }).then((res) => {
       if (res?.data) {
-        saveChanges()
         handleSave(id)
       }
     })

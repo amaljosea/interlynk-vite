@@ -2,7 +2,6 @@ import { useQuery } from '@apollo/client'
 import { TourProvider, useTour } from '@reactour/tour'
 import NotFound from 'assets/svg/not-found.svg'
 import Cookies from 'js-cookie'
-import { jwtDecode } from 'jwt-decode'
 import { KBarProvider } from 'kbar'
 import React, { useEffect } from 'react'
 import { Outlet, useNavigate, useParams } from 'react-router-dom'
@@ -59,15 +58,6 @@ export default function Admin() {
   const { data, error, loading } = useQuery(GetOrganization, {
     skip: isVendorPage && authToken ? false : true
   })
-
-  const isTokenExpired = (token) => {
-    const decodedToken = jwtDecode(token)
-    if (!decodedToken) {
-      return true
-    }
-    const currentTime = Date.now() / 1000
-    return decodedToken.exp < currentTime
-  }
 
   const onTourUpdate = (value) => {
     document?.body?.classList.remove('no-scroll')

@@ -15,7 +15,7 @@ const ComponentList = ({ id, name, value, setValue }) => {
   const { tab, tabData, setTabData, handleChange } = useContext(TabContext)
 
   const [options, setOptions] = useState([])
-  const { relations } = tabData
+  const { relationships } = tabData
 
   const compState = {
     projectId: params?.productid,
@@ -40,7 +40,10 @@ const ComponentList = ({ id, name, value, setValue }) => {
     },
     onCompleted: (data) => {
       if (data) {
-        setTabData((prev) => ({ ...prev, relations: { to: '', relType: '' } }))
+        setTabData((prev) => ({
+          ...prev,
+          relationships: { to: '', relType: '' }
+        }))
       }
     }
   })
@@ -48,7 +51,7 @@ const ComponentList = ({ id, name, value, setValue }) => {
 
   const onChange = (item) => {
     setValue(item)
-    handleChange('relations', 'to', item?.value)
+    handleChange('relationships', 'to', item?.value)
   }
 
   useEffect(() => {
@@ -56,7 +59,7 @@ const ComponentList = ({ id, name, value, setValue }) => {
       const result = [...nodes]
         .filter((com) => com?.name !== name)
         .sort((a, b) =>
-          relations?.relType === 'dependency_of'
+          relationships?.relType === 'dependency_of'
             ? b?.name?.localeCompare(a?.name)
             : a?.name?.localeCompare(b?.name)
         )
@@ -64,10 +67,9 @@ const ComponentList = ({ id, name, value, setValue }) => {
           label: `${item?.name} - ${item?.version}`,
           value: item?.id
         }))
-      console.log('result', result)
       setOptions(result)
     }
-  }, [name, nodes, relations?.relType])
+  }, [name, nodes, relationships?.relType])
 
   return (
     <LynkSelect

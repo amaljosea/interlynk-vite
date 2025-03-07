@@ -145,8 +145,7 @@ const Vulnerabilities = ({ sbomData }) => {
       activeTab === 'vulnerabilities'
         ? false
         : true,
-    variables: { sbomIds, componentVulnIds },
-    onCompleted: (data) => console.log('Parts', data)
+    variables: { sbomIds, componentVulnIds }
   })
 
   const [activeRow, setActiveRow] = useState(null)

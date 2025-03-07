@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+
 /* eslint-disable no-restricted-syntax */
 import InterlynkLogo from 'assets/img/logo.png'
 import React, { useEffect, useState } from 'react'

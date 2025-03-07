@@ -44,8 +44,6 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
     }
   })
 
-  console.log('sbomAlts', sbomAlts)
-
   const handleWarning = (item) => {
     setActiveSbom(item)
     PROMOTE_WARNING.onOpen()

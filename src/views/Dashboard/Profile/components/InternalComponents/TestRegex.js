@@ -63,7 +63,7 @@ export const TextRegex = ({ regex, ignoreCase }) => {
         description: `Something went wrong, please try again.`,
         status: 'error'
       })
-      console.log(error.message)
+      console.warn(error.message)
     }
     return { isMatch }
   }
