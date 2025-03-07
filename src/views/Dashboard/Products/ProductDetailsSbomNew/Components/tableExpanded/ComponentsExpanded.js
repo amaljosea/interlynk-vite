@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { capitalizeFirstLetter, getSignedUrlParams } from 'utils'
+import { calculateExpiryDate } from 'utils'
 import { openSsf } from 'variables/general'
 
 import { Box, Flex, Grid, Tag, Text, VStack } from '@chakra-ui/react'
@@ -20,6 +21,9 @@ const ExpandedComponent = (props) => {
     onCheckCpe,
     handleGraphView
   } = props
+  const { componentSupportLevel } = data || {}
+  const { level, retainManualOverrideFor, notes, user } =
+    componentSupportLevel || {}
   const openSSF = openSsf?.find((item) => item?.name === data?.purl)
 
   const { isCustomerView } = useRouteFlags()
@@ -41,16 +45,15 @@ const ExpandedComponent = (props) => {
     const scope = data?.scope
     const licensesExp = data?.licensesExp
     const openSsfScore = openSSF?.score
-    const supportLevel = data?.componentSupportLevel?.level
-      ? capitalizeFirstLetter(
-          data?.componentSupportLevel?.level?.replaceAll('_', ' ')
-        )
+    const supportLevel = level
+      ? capitalizeFirstLetter(level?.replaceAll('_', ' '))
       : ''
-    const endOfSupportDate = data?.componentSupportLevel?.endDate
-    const assessmentExpiresOn =
-      data?.componentSupportLevel?.retainManualOverrideFor
-    const supportExplanation = data?.componentSupportLevel?.notes
-    const lastAssessedBy = data?.componentSupportLevel?.user?.name
+    const endOfSupportDate = componentSupportLevel?.endDate
+    const assessmentExpiresOn = retainManualOverrideFor
+      ? calculateExpiryDate(retainManualOverrideFor)
+      : 'N/A'
+    const supportExplanation = notes
+    const lastAssessedBy = user?.name
 
     const purlColor = purl && primaryBlueText
     const cpesColor = cpes?.length > 0 && primaryBlueText
@@ -205,9 +208,9 @@ const ExpandedComponent = (props) => {
           />
           {/* ASSESSMENT EXPIERS ON */}
           <DetailItem
-            label='Assessment Expires In'
+            label='Assessment Expires On'
             hidden={isCustomerView || isFreeTier}
-            value={assessmentExpiresOn ? `${assessmentExpiresOn} Days` : 'N/A'}
+            value={assessmentExpiresOn}
           />
           {/* SUPPORT EXPLANATION */}
           <DetailItem

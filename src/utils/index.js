@@ -652,6 +652,12 @@ export const fetchNodes = (res, selector) => {
   return selector?.split('.')?.reduce((acc, key) => acc?.[key], res?.data)
 }
 
+export const calculateExpiryDate = (days) => {
+  const today = new Date()
+  today.setUTCDate(today.getUTCDate() + days)
+  return today.toLocaleDateString()
+}
+
 export const setIntensity = (level) => {
   switch (level) {
     case 'unspecified':
