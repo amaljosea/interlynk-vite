@@ -99,6 +99,11 @@ const SupportColumns = ({ handleSupport }) => {
             )
           }
           return <Text color={primaryTextColor}>N/A</Text>
+        },
+        sortFunction: (a, b) => {
+          const dateA = new Date(a?.componentSupportLevel?.endDate)
+          const dateB = new Date(b?.componentSupportLevel?.endDate)
+          return dateA - dateB
         }
       },
       {
