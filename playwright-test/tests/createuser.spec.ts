@@ -25,7 +25,7 @@ test('should add organization, check string, and delete entry', async ({
   const loginPage = new LoginPage(page)
   await loginPage.appLoginCommonFunctionality(email, password)
   await page.getByLabel('settings').click()
-  await page.getByRole('banner').getByRole('button').first().click()
+  await page.locator(`//button[@aria-label='add_user']`).click()
   await page.getByLabel('Email*').click()
   await page.getByLabel('Email*').fill('aaa@yopmail.com')
   await page.getByRole('button', { name: 'Add' }).click()
