@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { getFullDate, timeSince } from 'utils'
+import { setIntensity } from 'utils'
 
 import { IconButton, Portal, Text, Tooltip } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
@@ -54,32 +55,35 @@ const SupportColumns = ({ handleSupport }) => {
         id: 'SUPPORT_ASSESSMENT',
         name: 'ASSESSMENT',
         wrap: true,
-        selector: (row) => (
-          <Tag
-            w={'120px'}
-            colorScheme={
-              row?.componentSupportLevel?.user?.name ? 'blue' : 'green'
-            }
-          >
-            <TagLabel mx={'auto'}>
-              {row?.componentSupportLevel?.user?.name ? 'Manual' : 'Automatic'}
-            </TagLabel>
-          </Tag>
-        )
+        selector: (row) => {
+          const { user } = row?.componentSupportLevel || {}
+          return (
+            <Text color={primaryTextColor}>
+              {user?.name ? 'Manual' : 'Automatic'}
+            </Text>
+          )
+        }
       },
       {
         id: 'SUPPORT_LEVEL',
         name: 'SUPPORT LEVEL',
         wrap: true,
         selector: (row) => {
-          if (row?.componentSupportLevel?.level) {
+          const { level } = row?.componentSupportLevel || {}
+          if (level) {
             return (
-              <Text color={primaryTextColor} textTransform={'capitalize'}>
-                {row?.componentSupportLevel?.level?.replaceAll('_', ' ')}
-              </Text>
+              <Tag w={'184px'} colorScheme={setIntensity(level)}>
+                <TagLabel mx={'auto'} textTransform={'capitalize'}>
+                  {level?.replaceAll('_', ' ')}
+                </TagLabel>
+              </Tag>
             )
           }
-          return <Text color={primaryTextColor}>N/A</Text>
+          return (
+            <Tag w={'184px'}>
+              <TagLabel mx={'auto'}>N/A</TagLabel>
+            </Tag>
+          )
         }
       },
       {
@@ -87,12 +91,11 @@ const SupportColumns = ({ handleSupport }) => {
         name: 'END OF SUPPORT',
         wrap: true,
         selector: (row) => {
-          if (row?.componentSupportLevel?.endDate) {
+          const { endDate } = row?.componentSupportLevel || {}
+          if (endDate) {
             return (
               <Text color={primaryTextColor}>
-                {new Date(
-                  row?.componentSupportLevel?.endDate
-                ).toLocaleDateString()}
+                {new Date(endDate).toLocaleDateString()}
               </Text>
             )
           }

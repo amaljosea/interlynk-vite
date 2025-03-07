@@ -651,3 +651,18 @@ export const formatSupportLevel = (level) => {
 export const fetchNodes = (res, selector) => {
   return selector?.split('.')?.reduce((acc, key) => acc?.[key], res?.data)
 }
+
+export const setIntensity = (level) => {
+  switch (level) {
+    case 'unspecified':
+      return 'cyan'
+    case 'actively_maintained':
+      return 'green'
+    case 'no_longer_maintained':
+      return 'orange'
+    case 'abandoned':
+      return 'red'
+    default:
+      return 'gray'
+  }
+}
