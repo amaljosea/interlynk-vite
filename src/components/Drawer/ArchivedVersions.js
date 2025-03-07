@@ -37,7 +37,7 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
   const [activeRow, setActiveRow] = useState(null)
 
   const { data: versions } = useQuery(GetVersions, {
-    skip: isOpen ? false : true,
+    skip: !isOpen,
     variables: {
       id: productId,
       first: 100,
@@ -46,14 +46,14 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
     }
   })
 
-  const { nodes } = versions?.project?.sbomVersions || ''
+  const { nodes } = versions?.project?.sbomVersions || { nodes: [] }
 
-  const { data, loading } = useQuery(GetArchivedVersions, {
-    skip: isOpen ? false : true,
+  const { data, loading: archivedLoading } = useQuery(GetArchivedVersions, {
+    skip: !isOpen,
     variables: { id: productId }
   })
 
-  const { sbomArchived } = data?.project || ''
+  const { sbomArchived } = data?.project || { sbomArchived: [] }
 
   const {
     isOpen: isWarnOpen,
@@ -61,7 +61,7 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
     onClose: onWarnClose
   } = useDisclosure()
 
-  const onRestore = (row) => {
+  const handleRestore = (row) => {
     const isExists = nodes?.some(
       (item) => item?.projectVersion === row?.projectVersion
     )
@@ -69,7 +69,7 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
       showToast({
         title: 'Restore Version',
         description:
-          'An existing version with same value found. Please delete previous version to restore this one.',
+          'An existing version with the same value found. Please delete the previous version to restore this one.',
         status: 'info'
       })
     } else {
@@ -78,7 +78,7 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
     }
   }
 
-  const onView = (row) => {
+  const handleView = (row) => {
     const link = generateProductVersionDetailPageUrlFromCurrentUrl({
       sbomid: row?.id,
       paramsObj: {
@@ -88,60 +88,74 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
     navigate(link)
   }
 
+  const renderArchivedVersions = () => {
+    if (archivedLoading) {
+      return <CustomLoader />
+    }
+
+    if (sbomArchived.length === 0) {
+      return (
+        <Text textAlign='center' marginY={10}>
+          No archived versions found.
+        </Text>
+      )
+    }
+
+    return (
+      <Flex my={2} gap={5} flexDir={'column'} alignItems={'flex-center'}>
+        {sbomArchived.map((item, index) => (
+          <Flex
+            w={'full'}
+            key={index}
+            alignItems={'center'}
+            justifyContent={'space-between'}
+          >
+            <Stack spacing={0}>
+              <Text>
+                {truncatedValue(item?.project?.projectGroup?.name, 20)} :{' '}
+                {truncatedValue(item?.projectVersion, 20)}
+              </Text>
+              <Tooltip label={getFullDate(item?.createdAt)} placement='top'>
+                <Text color={sameSecondaryText} fontSize={'sm'}>
+                  Last updated {timeSince(item?.createdAt)}
+                </Text>
+              </Tooltip>
+            </Stack>
+            <ButtonGroup>
+              <Tooltip label='View' placement='top'>
+                <IconButton
+                  size='sm'
+                  colorScheme='blue'
+                  title='View archived version'
+                  onClick={() => handleView(item)}
+                  icon={<FaEye size={16} />}
+                />
+              </Tooltip>
+              <Tooltip label='Restore' placement='top'>
+                <IconButton
+                  size='sm'
+                  colorScheme='blue'
+                  aria-label={`sbom-${item?.projectVersion}-restore`}
+                  onClick={() => handleRestore(item)}
+                  icon={<MdOutlineUnarchive size={20} />}
+                />
+              </Tooltip>
+            </ButtonGroup>
+          </Flex>
+        ))}
+      </Flex>
+    )
+  }
+
   return (
     <>
       <LynkDrawer
-        title={'Archived Versions'}
+        title='Archived Versions'
         isOpen={isOpen}
         onClose={onClose}
         noFooter
       >
-        {loading ? (
-          <CustomLoader />
-        ) : (
-          <Flex my={2} gap={5} flexDir={'column'} alignItems={'flex-center'}>
-            {sbomArchived?.map((item, index) => (
-              <Flex
-                w={'full'}
-                key={index}
-                alignItems={'center'}
-                justifyContent={'space-between'}
-              >
-                <Stack spacing={0}>
-                  <Text>
-                    {truncatedValue(item?.project?.projectGroup?.name, 20)} :{' '}
-                    {truncatedValue(item?.projectVersion, 20)}
-                  </Text>
-                  <Tooltip label={getFullDate(item?.createdAt)} placement='top'>
-                    <Text color={sameSecondaryText} fontSize={'sm'}>
-                      Last updated {timeSince(item?.createdAt)}
-                    </Text>
-                  </Tooltip>
-                </Stack>
-                <ButtonGroup>
-                  <Tooltip label='View' placement='top'>
-                    <IconButton
-                      size='sm'
-                      colorScheme='blue'
-                      title='View archived version'
-                      onClick={() => onView(item)}
-                      icon={<FaEye size={16} />}
-                    />
-                  </Tooltip>
-                  <Tooltip label='Restore' placement='top'>
-                    <IconButton
-                      size='sm'
-                      colorScheme='blue'
-                      aria-label={`sbom-${item?.projectVersion}-restore`}
-                      onClick={() => onRestore(item)}
-                      icon={<MdOutlineUnarchive size={20} />}
-                    />
-                  </Tooltip>
-                </ButtonGroup>
-              </Flex>
-            ))}
-          </Flex>
-        )}
+        {renderArchivedVersions()}
       </LynkDrawer>
 
       {/* ARCHIVE VERSION */}
