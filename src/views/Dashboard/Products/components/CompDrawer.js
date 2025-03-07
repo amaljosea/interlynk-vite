@@ -43,10 +43,10 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
   const signedUrlParams = getSignedUrlParams()
 
   const tabs = isCustomerView
-    ? ['details', 'identifiers']
-    : ['details', 'identifiers', 'suppliers', 'links', 'relationships']
+    ? ['Details', 'Identifiers']
+    : ['Details', 'Identifiers', 'Suppliers', 'Links', 'Relationships']
 
-  const { tabData, onTabChange } = useContext(TabContext)
+  const { resetData, tabData, onTabChange } = useContext(TabContext)
   const { purl, cpe } = tabData?.identifiers || {}
 
   const { sbomId: bomId } = data || ''
@@ -73,6 +73,11 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
   const cpeVersion = cpeString ? cpeString[5]?.replace(/\*/g, '') : null
   const cpeWarning = cpeVersion && data?.version !== cpeVersion
 
+  const onCloseDrawer = () => {
+    resetData()
+    onClose()
+  }
+
   return (
     <LynkDrawer
       title={
@@ -86,7 +91,7 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
       }
       subtitle={data && <CompInfo data={data} />}
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={onCloseDrawer}
       noFooter
     >
       <Tabs px={0} isFitted onChange={onTabChange}>

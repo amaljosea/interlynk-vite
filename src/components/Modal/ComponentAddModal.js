@@ -48,7 +48,7 @@ function ComponentAddModal(props) {
 
   const { tabData, handleChange, resetData, setTabData } =
     useContext(TabContext)
-  const { details, identifiers, relations } = tabData || ''
+  const { details, identifiers, relationships } = tabData || ''
 
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
@@ -107,7 +107,10 @@ function ComponentAddModal(props) {
     },
     onCompleted: (data) => {
       data && setAllComponents(data?.sbom?.components?.nodes)
-      setTabData((prev) => ({ ...prev, relations: { relType: '', to: '' } }))
+      setTabData((prev) => ({
+        ...prev,
+        relationships: { relType: '', to: '' }
+      }))
     }
   })
 
@@ -159,12 +162,12 @@ function ComponentAddModal(props) {
             description: `Data added successfully`,
             status: 'success'
           })
-          if (relations && component) {
+          if (relationships && component) {
             addRelation({
               variables: {
                 from: component?.id,
-                to: relations?.to,
-                relType: relations?.relType
+                to: relationships?.to,
+                relType: relationships?.relType
               }
             })
           }
@@ -529,9 +532,9 @@ function ComponentAddModal(props) {
                   <Select
                     size='md'
                     id='relation'
-                    value={relations?.relType}
+                    value={relationships?.relType}
                     onChange={(e) =>
-                      handleChange('relations', 'relType', e.target.value)
+                      handleChange('relationships', 'relType', e.target.value)
                     }
                   >
                     <option value=''>-- Select --</option>
@@ -551,9 +554,9 @@ function ComponentAddModal(props) {
                   <Select
                     size='md'
                     id='component'
-                    value={relations?.to}
+                    value={relationships?.to}
                     onChange={(e) =>
-                      handleChange('relations', 'to', e.target.value)
+                      handleChange('relationships', 'to', e.target.value)
                     }
                   >
                     <option value=''>-- Select --</option>

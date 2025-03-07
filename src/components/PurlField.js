@@ -28,6 +28,7 @@ const PurlField = ({ isOpen, onOpen, onClose }) => {
 
   const onBlur = (event) => {
     const { value } = event.target
+
     if (value !== '') {
       try {
         PackageURL.fromString(value)

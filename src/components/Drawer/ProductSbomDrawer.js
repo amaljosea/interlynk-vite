@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { TabContext } from 'context/TabContext'
-import { useContext, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { hasWhiteSpace, validateUrl } from 'utils/formValidationUtils'
 import { validateEmail } from 'utils/formValidationUtils'
@@ -43,8 +42,6 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
   })
 
   const { nodes } = data?.sbom?.components || ''
-
-  const { saveChanges } = useContext(TabContext)
 
   const productId = params.productid
 
@@ -141,7 +138,6 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
       }
     }).then((res) => {
       if (res?.data) {
-        saveChanges()
         handleSave(id)
       }
     })

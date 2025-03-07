@@ -64,9 +64,11 @@ const CompRelations = ({ data, compPath }) => {
     saveChanges,
     unsavedChanges,
     alert,
-    setAlert
+    setAlert,
+    alertMessage,
+    alertMessageSetter
   } = useContext(TabContext)
-  const { relations } = tabData
+  const { relationships } = tabData
 
   const [dependencyOfList, setDependencyOfList] = useState([])
   const [dependsOnList, setDependsOnList] = useState([])
@@ -102,22 +104,22 @@ const CompRelations = ({ data, compPath }) => {
   }, [compDependency])
 
   const list = dependsOnList?.filter(
-    (item) => item?.toComp?.id === relations?.to
+    (item) => item?.toComp?.id === relationships?.to
   )
 
   const handleAdd = () => {
-    const isDependsOn = relations?.relType === 'depends_on'
+    const isDependsOn = relationships?.relType === 'depends_on'
     addRelation({
       variables: {
-        from: isDependsOn ? id : relations?.to,
-        to: isDependsOn ? relations?.to : id,
+        from: isDependsOn ? id : relationships?.to,
+        to: isDependsOn ? relationships?.to : id,
         relType: 'depends_on'
       }
     }).then((res) => {
       if (res?.data) {
-        saveChanges()
+        saveChanges('relationships')
         setIsAdded(true)
-        if (relations?.relType === 'dependency_of') {
+        if (relationships?.relType === 'dependency_of') {
           setDependencyOfList((prev) => [
             ...prev,
             res?.data?.componentRelationCreate?.compRelation
@@ -135,12 +137,13 @@ const CompRelations = ({ data, compPath }) => {
       }
     })
     setComponent(null)
-    setTabData((prev) => ({ ...prev, relations: { to: '', relType: '' } }))
+    setTabData((prev) => ({ ...prev, relationships: { to: '', relType: '' } }))
   }
 
   const checkData = () => {
     // eslint-disable-next-line no-unused-vars
-    const { relations, ...rest } = unsavedChanges
+    const { relationships, ...rest } = unsavedChanges
+    alertMessageSetter(rest)
     return Object.values(rest).some((value) => value === true)
   }
 
@@ -172,7 +175,7 @@ const CompRelations = ({ data, compPath }) => {
   }
 
   const isInvalid =
-    relations?.relType === '' || relations?.to === '' || list.length > 0
+    relationships?.relType === '' || relationships?.to === '' || list.length > 0
 
   return (
     <>
@@ -207,9 +210,9 @@ const CompRelations = ({ data, compPath }) => {
               </FormLabel>
               <Select
                 name='relationType'
-                value={relations?.relType}
+                value={relationships?.relType}
                 onChange={(e) =>
-                  handleChange('relations', 'relType', e.target.value)
+                  handleChange('relationships', 'relType', e.target.value)
                 }
               >
                 <option value=''>-- Select --</option>
@@ -243,10 +246,7 @@ const CompRelations = ({ data, compPath }) => {
           {/* ACTION */}
           {alert ? (
             <Stack spacing={4}>
-              <LynkAlert
-                status='warning'
-                msg='Saving will apply changes to this tab only. save other tabs separately to retain their data.'
-              />
+              <LynkAlert status='warning' msg={alertMessage} />
               <ActionButton
                 title={'Save'}
                 onClick={handleAdd}

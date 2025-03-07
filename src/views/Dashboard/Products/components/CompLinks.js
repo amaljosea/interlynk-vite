@@ -52,7 +52,9 @@ const CompLinks = ({ data }) => {
     saveChanges,
     unsavedChanges,
     alert,
-    setAlert
+    setAlert,
+    alertMessage,
+    alertMessageSetter
   } = useContext(TabContext)
   const { links } = tabData
 
@@ -125,7 +127,7 @@ const CompLinks = ({ data }) => {
       }
     }).then((res) => {
       if (res?.data) {
-        saveChanges()
+        saveChanges('links')
         showToast({
           description: 'Links updated successfully',
           status: 'success'
@@ -139,6 +141,7 @@ const CompLinks = ({ data }) => {
   const checkData = () => {
     // eslint-disable-next-line no-unused-vars
     const { links, ...rest } = unsavedChanges
+    alertMessageSetter(rest)
     return Object.values(rest).some((value) => value === true)
   }
 
@@ -207,10 +210,7 @@ const CompLinks = ({ data }) => {
         </FormControl>
         {alert ? (
           <Stack spacing={4}>
-            <LynkAlert
-              status='warning'
-              msg='Saving will apply changes to this tab only. save other tabs separately to retain their data.'
-            />
+            <LynkAlert status='warning' msg={alertMessage} />
             <ActionButton
               title={'Save'}
               isDisabled={isInvalid}

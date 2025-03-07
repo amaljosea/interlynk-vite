@@ -48,7 +48,9 @@ const CompDetails = ({ data, primaryComp }) => {
     handleChange,
     saveChanges,
     alert,
-    setAlert
+    setAlert,
+    alertMessage,
+    alertMessageSetter
   } = useContext(TabContext)
   const { details } = tabData
 
@@ -119,7 +121,7 @@ const CompDetails = ({ data, primaryComp }) => {
       if (errors?.length > 0) {
         showToast({ description: errors[0], status: 'error' })
       } else {
-        saveChanges()
+        saveChanges('details')
         showToast({
           description: 'Details updated successfully',
           status: 'success'
@@ -132,6 +134,8 @@ const CompDetails = ({ data, primaryComp }) => {
   const checkData = () => {
     // eslint-disable-next-line no-unused-vars
     const { details, ...rest } = unsavedChanges
+
+    alertMessageSetter(rest)
     return Object.values(rest).some((value) => value === true)
   }
 
@@ -399,10 +403,7 @@ const CompDetails = ({ data, primaryComp }) => {
 
         {alert ? (
           <Stack spacing={4}>
-            <LynkAlert
-              status='warning'
-              msg='Saving will apply changes to this tab only. save other tabs separately to retain their data.'
-            />
+            <LynkAlert status='warning' msg={alertMessage} />
             <ActionButton
               title={'Save'}
               isDisabled={isInvalid}
