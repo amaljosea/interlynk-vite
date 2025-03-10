@@ -91,11 +91,7 @@ const VulnFilters = ({ reset }) => {
   }
 
   const onFilterDirect = (e) => {
-    const { checked } = e.target
-    prodVulnDispatch({
-      type: 'FILTER_DIRECT',
-      payload: checked ? 'direct only' : undefined
-    })
+    prodVulnDispatch({ type: 'FILTER_DIRECT', payload: e.target.checked })
     reset()
   }
 
@@ -316,7 +312,7 @@ const VulnFilters = ({ reset }) => {
           isChecked={direct}
           onChange={onFilterDirect}
         />
-        <Text>Direct Only</Text>
+        <Text fontSize='sm'>Direct Only</Text>
       </Flex>
     </Flex>
   )
