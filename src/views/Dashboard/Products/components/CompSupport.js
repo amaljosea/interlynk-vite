@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getFullDate, timeSince } from 'utils'
+import { calculateExpiryDate, getFullDate, timeSince } from 'utils'
 
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import {
@@ -131,10 +131,10 @@ const SupportCard = ({ setEdit, data }) => {
           </Text>
         </SimpleGrid>
         <SimpleGrid {...container}>
-          <Text {...label}>Assessment Expires In</Text>
+          <Text {...label}>Assessment Expires On</Text>
           <Text {...infoStyle} textTransform={'capitalize'}>
             {retainManualOverrideFor
-              ? `${retainManualOverrideFor} Days`
+              ? calculateExpiryDate(retainManualOverrideFor)
               : 'N/A'}
           </Text>
         </SimpleGrid>
