@@ -123,7 +123,7 @@ const Vulnerabilities = ({ sbomData }) => {
         status: statues.length > 0 ? statues : undefined,
         kev: setKEV(kev),
         epss: epssRange,
-        direct: direct === 'direct only' ? true : undefined,
+        direct: direct ? true : undefined,
         includeRetracted: include.includes('retracted') ? true : false,
         vexComplete: vexComplete === 'all' ? undefined : false,
         orderBy: setOrder(searchInput)

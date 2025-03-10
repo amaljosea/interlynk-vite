@@ -85,7 +85,7 @@ const GlobalStateProvider = ({ children }) => {
     epss: '',
     minEpss: 0,
     maxEpss: 0,
-    direct: 'all',
+    direct: false,
     filters: null,
     selectedVulns: [],
     importSbom: [],
