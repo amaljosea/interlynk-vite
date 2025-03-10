@@ -1,8 +1,8 @@
-import { useMutation } from '@apollo/client'
+import { useLazyQuery, useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { Button, IconButton, Stack, Text } from '@chakra-ui/react'
+import { Button, IconButton, Select, Stack, Text } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
 import { Input, InputGroup, InputRightElement } from '@chakra-ui/react'
 
@@ -15,8 +15,9 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import {
   CreateBitbucketConnection,
   DeleteBitbucketConnection,
-  UpdateBitbucketConnection
+  UpdateBitbucketWorkspace
 } from 'graphQL/Mutation'
+import { BitbucketWorkspace } from 'graphQL/Queries'
 
 import { IoSettingsOutline } from 'react-icons/io5'
 
@@ -24,12 +25,16 @@ const BitbucketConfigModal = (props) => {
   const { isOpen, onClose, setGreenCheck, data, updateCon } = props
 
   const { showToast } = useCustomToast()
+  const { mutedBorder } = useThemeColor(['mutedBorder'])
 
   const [error, setError] = useState('')
+  const [connection, setConnection] = useState(null)
+  const [showApiToken, setShowApiToken] = useState(false)
+  const [workspaceList, setWorkspaceList] = useState([])
   const [formData, setFormData] = useState({
-    workspace: '',
     username: '',
-    apiToken: ''
+    apiToken: '',
+    workspace: ''
   })
 
   const handleChange = (e) => {
@@ -41,52 +46,55 @@ const BitbucketConfigModal = (props) => {
     setError('')
   }
 
-  const [showApiToken, setShowApiToken] = useState(false)
+  const [getWorksapces] = useLazyQuery(BitbucketWorkspace)
 
-  const disabled =
-    formData?.workspace === '' ||
-    formData?.username === '' ||
-    formData?.apiToken === ''
-
-  const [updateConnection, { loading: updateLoading }] = useMutation(
-    UpdateBitbucketConnection
-  )
   const [createConnection, { loading: createLoading }] = useMutation(
     CreateBitbucketConnection
+  )
+  const [updateWorkspace, { loading: workspaceLoading }] = useMutation(
+    UpdateBitbucketWorkspace
   )
   const [deleteConnection, { loading: deleteLoading }] = useMutation(
     DeleteBitbucketConnection
   )
 
-  const { primaryBgColor } = useThemeColor(['primaryBgColor'])
-
-  const handleSave = () => {
+  const handleVerify = () => {
     createConnection({
       variables: { enabled: true, ...formData }
     }).then((res) => {
       if (res?.data?.bitbucketConnectionCreate?.errors?.length === 0) {
+        setConnection(
+          res?.data?.bitbucketConnectionCreate?.organizationConnection
+        )
+        getWorksapces({ variables: { first: 10 } }).then((res) => {
+          const { edges } = res?.data?.bitbucketWorkspaces || {}
+          if (edges?.length > 0) {
+            setWorkspaceList(edges)
+          }
+        })
         showToast({
           title: 'Configuration saved.',
           description:
             'Your BitBucket configuration has been successfully saved.',
           status: 'success'
         })
-        onClose()
       } else {
         setError(res?.data?.bitbucketConnectionCreate?.errors[0])
       }
     })
   }
 
-  const handleUpdate = () => {
-    updateConnection({
-      variables: { id: data?.id, enabled: true, ...formData }
+  const handleAddWorkspace = () => {
+    updateWorkspace({
+      variables: {
+        organizationConnectionId: connection?.id,
+        workspace: formData?.workspace
+      }
     }).then((res) => {
       if (res?.data?.bitbucketConnectionUpdate?.errors?.length === 0) {
         showToast({
-          title: 'Configuration saved.',
-          description:
-            'Your BitBucket configuration has been successfully updated.',
+          title: 'Workspace added.',
+          description: 'Bitbucket workspace has been successfully updated.',
           status: 'success'
         })
         onClose()
@@ -102,8 +110,7 @@ const BitbucketConfigModal = (props) => {
         setGreenCheck((prev) => ({ ...prev, bitbucket: false }))
         showToast({
           title: 'Configuration deleted.',
-          description:
-            'Your BitBucket configuration has been successfully deleted.',
+          description: 'Bitbucket configuration has been successfully deleted.',
           status: 'success'
         })
         onClose()
@@ -116,20 +123,26 @@ const BitbucketConfigModal = (props) => {
   const handleToggleVisibility = () => setShowApiToken(!showApiToken)
 
   const handleSubmit = () => {
-    if (data?.connection?.id) {
-      handleUpdate()
+    if (connection?.id) {
+      handleAddWorkspace()
     } else {
-      handleSave()
+      handleVerify()
     }
   }
+
+  const showDeleteBtn = data && !connection
+  const disabled =
+    formData?.username === '' ||
+    formData?.apiToken === '' ||
+    !updateCon ||
+    (connection?.id && formData?.workspace === '')
 
   useEffect(() => {
     if (data) {
       setFormData((prev) => ({
         ...prev,
         username: data.connection?.userName,
-        apiToken: data?.connection?.apiToken,
-        workspace: data.connection?.workspace
+        apiToken: data?.connection?.apiToken
       }))
     }
   }, [data])
@@ -139,22 +152,22 @@ const BitbucketConfigModal = (props) => {
       isOpen={isOpen}
       onClose={onClose}
       hideCancelButton
+      disabled={disabled}
       onSubmit={handleSubmit}
       Icon={IoSettingsOutline}
-      hidden={data?.connection?.id}
-      disabled={disabled || !updateCon}
-      title={'BitBucket Configuration'}
-      buttonText={data ? 'Update' : 'Save'}
-      isLoading={createLoading || updateLoading}
+      title={'Bitbucket Configuration'}
+      buttonText={connection ? 'Save' : 'Verify'}
+      isLoading={createLoading || workspaceLoading}
+      hidden={!connection && data?.connection?.userName}
       rightFooterContent={
-        data && (
+        showDeleteBtn && (
           <Button
             colorScheme='red'
             onClick={handleDelete}
             isDisabled={!updateCon}
             isLoading={deleteLoading}
             loadingText='Deleting....'
-            title='Delete BitBucket Configuration'
+            title='Delete Bitbucket Configuration'
           >
             Delete
           </Button>
@@ -164,16 +177,10 @@ const BitbucketConfigModal = (props) => {
       <Stack spacing={4}>
         {error && <LynkAlert msg={error} />}
 
-        <FormControl isRequired isDisabled={!updateCon || data?.connection?.id}>
-          <FormLabel>Workspace</FormLabel>
-          <Input
-            name='workspace'
-            onChange={handleChange}
-            value={formData?.workspace}
-            placeholder='Enter workspace'
-          />
-        </FormControl>
-        <FormControl isRequired isDisabled={!updateCon || data?.connection?.id}>
+        <FormControl
+          isRequired
+          isDisabled={!updateCon || data?.connection?.userName}
+        >
           <FormLabel>Username</FormLabel>
           <Input
             name='username'
@@ -182,7 +189,10 @@ const BitbucketConfigModal = (props) => {
             placeholder='Enter username'
           />
         </FormControl>
-        <FormControl isRequired isDisabled={!updateCon || data?.connection?.id}>
+        <FormControl
+          isRequired
+          isDisabled={!updateCon || data?.connection?.userName}
+        >
           <FormLabel>API Token</FormLabel>
           <InputGroup size='md'>
             <Input
@@ -207,8 +217,30 @@ const BitbucketConfigModal = (props) => {
             </InputRightElement>
           </InputGroup>
         </FormControl>
-        {data?.connection && (
-          <Stack p={4} mt={2} borderRadius='md' bg={primaryBgColor}>
+        {connection && (
+          <FormControl isRequired>
+            <FormLabel>Workspace</FormLabel>
+            <Select
+              name='workspace'
+              value={formData?.workspace}
+              onChange={handleChange}
+            >
+              <option value=''>-- Select --</option>
+              {workspaceList?.map((item, index) => (
+                <option key={index} value={item?.node?.name}>
+                  {item?.node?.name}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+        )}
+        {!connection && data?.connection && (
+          <Stack
+            p={4}
+            mt={2}
+            borderRadius='md'
+            border={`1px solid ${mutedBorder}`}
+          >
             <Text fontWeight='bold' mb={1}>
               Verification Details:
             </Text>
@@ -227,6 +259,10 @@ const BitbucketConfigModal = (props) => {
             <Text>
               <span style={{ fontWeight: 600 }}>Repository Access:</span>{' '}
               {data?.connection?.checkRepositoryAccess ? 'Yes' : 'No'}
+            </Text>
+            <Text>
+              <span style={{ fontWeight: 600 }}>Webhook Access:</span>{' '}
+              {data?.connection?.checkWebhookAccess ? 'Yes' : 'No'}
             </Text>
           </Stack>
         )}
