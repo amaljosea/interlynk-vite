@@ -15,7 +15,10 @@ const Pagination = ({
   paginationHidden = false,
   loading
 }) => {
-  if (paginationHidden) {
+  if (
+    paginationHidden ||
+    (totalCount < paginationSizes[0] && !hasPreviousPage)
+  ) {
     return null
   }
   const totalPages = Math.ceil(totalCount / totalRows) || 1
