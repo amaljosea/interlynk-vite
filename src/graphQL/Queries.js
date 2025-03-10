@@ -4800,10 +4800,10 @@ export const GetOrgConnections = gql`
               id
               userName
               apiToken
-              workspace
               createdAt
               updatedAt
-              userName
+              workspace
+              checkWebhookAccess
               checkWorkspaceAccess
               checkRepositoryAccess
             }
@@ -6182,6 +6182,27 @@ export const GetActivities = gql`
           }
           action
           result
+        }
+      }
+    }
+  }
+`
+
+export const BitbucketWorkspace = gql`
+  query BitbucketWorkspace($first: Int) {
+    bitbucketWorkspaces(first: $first) {
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      edges {
+        cursor
+        node {
+          uuid
+          name
+          slug
         }
       }
     }

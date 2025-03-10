@@ -1,5 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
+import { validateEmail } from 'utils/formValidationUtils'
 
 import { Box, Button, HStack, Input, Select, Stack } from '@chakra-ui/react'
 import { Icon, IconButton } from '@chakra-ui/react'
@@ -52,6 +53,14 @@ const ConfigModal = ({
     'grayBorderColor',
     'primaryErrorColor'
   ])
+
+  const handleCheckEmail = (e) => {
+    const { value } = e.target
+    const isInvalidEmail = value !== '' && !validateEmail(value)
+    if (isInvalidEmail) {
+      setErrorMessage('Please enter a valid email')
+    }
+  }
 
   useEffect(() => {
     if (data && !error) {
@@ -279,85 +288,87 @@ const ConfigModal = ({
 
   return (
     <LynkModal
+      Icon={icon}
+      title={title}
       type='default'
       isOpen={isOpen}
       onClose={onClose}
       buttonText='Save'
-      Icon={icon}
-      title={title}
-      disabled={!updateCon}
       isLoading={createLoading || updateLoading}
       onSubmit={data ? handleUpdate : handleSave}
+      disabled={!updateCon || errorMessage !== ''}
     >
       <Stack spacing={4}>
-        {configs.map((config, index) => (
-          <HStack key={index} width='100%' alignItems='start'>
-            <FormControl>
-              <Box position='relative'>
-                <Input
-                  w='270px'
-                  placeholder={addressPlaceholder}
-                  value={config.address}
-                  onChange={(e) =>
-                    handleChange(index, 'address', e.target.value)
-                  }
-                  // borderColor={
-                  //   !config.isValid ? primaryErrorColor : grayBorderColor
-                  // }
-                  isDisabled={!updateCon}
-                />
-                <FormErrorMessage
-                  color={primaryErrorColor}
-                  fontSize='sm'
-                  minHeight='20px'
-                >
-                  {config.error || ' '}
-                </FormErrorMessage>
-              </Box>
-            </FormControl>
+        {configs.map((config, index) => {
+          const { address, frequency, notificationType, error } = config || {}
 
-            <Select
-              value={config.notificationType}
-              onChange={(e) =>
-                handleChange(index, 'notificationType', e.target.value)
-              }
-              isDisabled={!updateCon}
-            >
-              {options.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </Select>
-
-            <Select
-              value={config.frequency}
-              onChange={(e) => handleChange(index, 'frequency', e.target.value)}
-              isDisabled={!updateCon}
-            >
-              <option value='Instant'>Instant</option>
-            </Select>
-
-            {updateCon && (
-              <IconButton
-                border='1px solid'
-                borderColor={grayBorderColor}
-                variant='ghost'
-                isLoading={deleteLoading}
-                aria-label='Delete configuration'
-                onClick={() => handleRemoveConfig(index)}
-                icon={
-                  <Icon
-                    as={MdDeleteOutline}
-                    w={5}
-                    h={5}
-                    color={primaryErrorColor}
+          return (
+            <HStack key={index} width='100%' alignItems='start'>
+              <FormControl isInvalid={error}>
+                <Box position='relative'>
+                  <Input
+                    w='270px'
+                    value={address}
+                    isDisabled={!updateCon}
+                    placeholder={addressPlaceholder}
+                    onChange={(e) =>
+                      handleChange(index, 'address', e.target.value)
+                    }
+                    onBlur={(e) => {
+                      if (title === 'Email Configuration') {
+                        handleCheckEmail(e)
+                      }
+                    }}
                   />
+                  <FormErrorMessage>{config?.error}</FormErrorMessage>
+                </Box>
+              </FormControl>
+
+              <Select
+                isDisabled={!updateCon}
+                value={notificationType}
+                onChange={(e) =>
+                  handleChange(index, 'notificationType', e.target.value)
                 }
-              />
-            )}
-          </HStack>
-        ))}
+              >
+                {options.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
+
+              <Select
+                value={frequency}
+                isDisabled={!updateCon}
+                onChange={(e) =>
+                  handleChange(index, 'frequency', e.target.value)
+                }
+              >
+                <option value='Instant'>Instant</option>
+              </Select>
+
+              {updateCon && (
+                <IconButton
+                  border='1px solid'
+                  borderColor={grayBorderColor}
+                  variant='ghost'
+                  isLoading={deleteLoading}
+                  aria-label='Delete configuration'
+                  onClick={() => handleRemoveConfig(index)}
+                  icon={
+                    <Icon
+                      as={MdDeleteOutline}
+                      w={5}
+                      h={5}
+                      color={primaryErrorColor}
+                    />
+                  }
+                />
+              )}
+            </HStack>
+          )
+        })}
         {updateCon && (
           <Button
             title='Add new connection'

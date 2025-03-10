@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { getFullDate } from 'utils'
+import { calculateExpiryDate, getFullDate } from 'utils'
 
 import { Box, Grid } from '@chakra-ui/react'
 
@@ -7,12 +7,16 @@ import DetailItem from 'components/Misc/DetailItem'
 
 const SupportExpand = (props) => {
   const { data } = props
-  const { notes, user, updatedAt } = data?.componentSupportLevel || {}
+  const { notes, user, updatedAt, retainManualOverrideFor } =
+    data?.componentSupportLevel || {}
 
   return useMemo(() => {
     const internalNotes = notes || 'N/A'
     const lastAssessedBy = user?.name || 'N/A'
     const lastAssessedAt = updatedAt ? getFullDate(updatedAt) : 'N/A'
+    const assessmentExpiresOn = retainManualOverrideFor
+      ? calculateExpiryDate(retainManualOverrideFor)
+      : 'N/A'
 
     return (
       <Box
@@ -26,10 +30,15 @@ const SupportExpand = (props) => {
           <DetailItem label='Last Assessed By' value={lastAssessedBy} />
           {/* INTERNAL NOTES */}
           <DetailItem label='Support Explanation' value={internalNotes} />
+          {/* ASSESSMENT EXPIERS ON */}
+          <DetailItem
+            label='Assessment Expires On'
+            value={assessmentExpiresOn}
+          />
         </Grid>
       </Box>
     )
-  }, [notes, updatedAt, user?.name])
+  }, [notes, retainManualOverrideFor, updatedAt, user?.name])
 }
 
 export default SupportExpand

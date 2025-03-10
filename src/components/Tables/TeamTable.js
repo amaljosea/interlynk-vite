@@ -335,6 +335,7 @@ const TeamTable = () => {
             >
               <Box>
                 <AddButton
+                  aria-label='add_user'
                   onClick={TEAM.onOpen}
                   isDisabled={
                     !inviteUser ||
