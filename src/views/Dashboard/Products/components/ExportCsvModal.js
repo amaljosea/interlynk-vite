@@ -225,7 +225,7 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
             </Text>
           </Checkbox>
         )}
-        {tableType === 'SBOM Support View' && shouldShowDemoFeatures && (
+        {tableType === 'Support Status View' && shouldShowDemoFeatures && (
           <Checkbox mt={1} size='md' colorScheme='blue'>
             <Text fontSize='14px' fontWeight='500' color={primaryTextColor}>
               Include Actively Supported Components

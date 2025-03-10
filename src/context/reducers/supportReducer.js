@@ -30,6 +30,11 @@ const supportReducer = (state, action) => {
         ...state,
         level: [...payload]?.includes('all') ? [] : payload
       }
+    case 'FILTER_INCLUDE':
+      return {
+        ...state,
+        include: payload
+      }
     default:
       return state
   }

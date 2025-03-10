@@ -98,7 +98,7 @@ const useExportCsvQueryInfo = (tableType, rowsToExport, searchFilters) => {
           pageInfoSelector: 'organization.vulns.pageInfo'
         }
 
-      case 'SBOM Support View':
+      case 'Support Status View':
         return {
           query: GetCompSupportData,
           variables: {

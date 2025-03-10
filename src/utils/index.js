@@ -413,7 +413,7 @@ export const generateCsvFileName = ({
     'Vulnerability View': projectGroupName
       ? `${projectGroupName}-Vulnerabilities-${filterStatus}-${rowCount}.csv`
       : `Vulnerabilities-${filterStatus}-${rowCount}.csv`,
-    'SBOM Support View': `${product}-${version}-Support-${filterStatus}-${rowCount}.csv`,
+    'Support Status View': `${product}-${version}-Support-${filterStatus}-${rowCount}.csv`,
     Users: `${orgName}-Users.csv`
   }
 

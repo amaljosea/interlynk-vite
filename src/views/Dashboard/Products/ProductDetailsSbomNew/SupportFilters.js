@@ -1,11 +1,11 @@
 import { supportLevels } from 'variables/general'
 
 import {
+  Flex,
   Menu,
   MenuItemOption,
   MenuList,
-  MenuOptionGroup,
-  Stack
+  MenuOptionGroup
 } from '@chakra-ui/react'
 
 import MenuHeading from 'components/Misc/MenuHeading'
@@ -14,7 +14,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 
 const SupportFilters = ({ reset }) => {
   const { supportState, dispatch } = useGlobalState()
-  const { level } = supportState
+  const { level, include } = supportState
   const { supportDispatch } = dispatch
 
   const onFilterSupport = (value) => {
@@ -22,8 +22,13 @@ const SupportFilters = ({ reset }) => {
     reset()
   }
 
+  const onFilterInclude = (value) => {
+    supportDispatch({ type: 'FILTER_INCLUDE', payload: value })
+    reset()
+  }
+
   return (
-    <Stack direction={'row'} alignItems={'center'} gap={2}>
+    <Flex alignItems={'center'} gap={2}>
       <Menu closeOnSelect={false} isLazy>
         <MenuHeading
           title={'Support'}
@@ -53,7 +58,21 @@ const SupportFilters = ({ reset }) => {
           </MenuOptionGroup>
         </MenuList>
       </Menu>
-    </Stack>
+      <Menu closeOnSelect={false}>
+        <MenuHeading title={'Include'} active={include?.length !== 0} />
+        <MenuList fontSize={'sm'}>
+          <MenuOptionGroup
+            type='checkbox'
+            value={include}
+            onChange={onFilterInclude}
+          >
+            <MenuItemOption value={'parts'} fontSize={'sm'}>
+              Parts
+            </MenuItemOption>
+          </MenuOptionGroup>
+        </MenuList>
+      </Menu>
+    </Flex>
   )
 }
 

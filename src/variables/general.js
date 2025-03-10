@@ -1400,7 +1400,7 @@ export const exportCsvTableConfig = {
       })
     }
   },
-  'SBOM Support View': {
+  'Support Status View': {
     defaultSelectedColumns: [
       'Name',
       'Version',

@@ -3904,6 +3904,7 @@ export const GetCompSupportData = gql`
     $after: String
     $before: String
     $search: String
+    $includeParts: Boolean
     $supportLevel: [String!]
     $orderBy: ComponentOrderByInput
   ) {
@@ -3916,6 +3917,7 @@ export const GetCompSupportData = gql`
         before: $before
         search: $search
         orderBy: $orderBy
+        includeParts: $includeParts
         supportLevel: $supportLevel
       ) {
         totalCount
