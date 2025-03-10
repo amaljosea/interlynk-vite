@@ -115,12 +115,12 @@ const Vulnerabilities = ({ sbomData }) => {
       skip: sbomId && activeTab === 'vulnerabilities' ? false : true,
       selector: 'sbom.vulns',
       variables: {
-        direct: direct,
         sbomId: sbomId,
         epss: epssRange,
         kev: setKEV(kev),
         projectId: productId,
         orderBy: setOrder(searchInput),
+        direct: direct ? true : undefined,
         search: searchInput !== '' ? searchInput.trim() : undefined,
         severity: severities.length > 0 ? severities : undefined,
         source: include.includes('parts') ? undefined : 'COMPONENT',

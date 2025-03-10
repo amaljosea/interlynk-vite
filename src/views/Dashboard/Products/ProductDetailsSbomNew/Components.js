@@ -79,7 +79,7 @@ const Components = ({ sbomData }) => {
 
   const compData = useMemo(() => {
     return {
-      direct: direct,
+      direct: direct ? true : undefined,
       ecosystem: getUndefinedIfEmptyOrAll(ecosystems),
       kind: getUndefinedIfEmptyOrAll(kinds),
       licenses: getUndefinedIfEmptyOrAll(licenses),
