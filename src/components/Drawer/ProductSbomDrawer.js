@@ -161,6 +161,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
       }
     }).then((res) => {
       if (res.data.sbomCreate.errors.length === 0) {
+        setCompVersion('')
         handleCreateComp(res?.data?.sbomCreate?.sbom?.id)
       } else {
         showToast({
