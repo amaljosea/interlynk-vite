@@ -62,18 +62,19 @@ export const vulnStatusTypes = [
 ]
 
 export const componentTypes = [
-  'application',
-  'container',
-  'data',
-  'device',
-  'device-driver',
-  'file',
-  'firmware',
-  'framework',
-  'library',
-  'machine-learning-model',
-  'operating-system',
-  'platform'
+  { value: '', label: '-- Select --' },
+  { value: 'application', label: 'Application' },
+  { value: 'container', label: 'Container' },
+  { value: 'data', label: 'Data' },
+  { value: 'device', label: 'Device' },
+  { value: 'device-driver', label: 'Device Driver' },
+  { value: 'file', label: 'File' },
+  { value: 'firmware', label: 'Firmware' },
+  { value: 'framework', label: 'Framework' },
+  { value: 'library', label: 'Library' },
+  { value: 'machine-learning-model', label: 'Machine Learning Model' },
+  { value: 'operating-system', label: 'Operating System' },
+  { value: 'platform', label: 'Platform' }
 ]
 
 export const namespaceOptions = {
