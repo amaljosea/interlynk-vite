@@ -135,7 +135,7 @@ const ProdFilterMenu = (props) => {
         />
       </Menu>
       {/* LABELS */}
-      {!isFreeTier && (
+      {!isFreeTier && prodLabels?.length > 1 && (
         <Menu closeOnSelect={false}>
           <MenuHeading
             title={'Labels'}
