@@ -110,7 +110,7 @@ const useExportCsvQueryInfo = (
             sbomId,
             projectId: productId,
             first: parseInt(rowsToExport, 10) || 0,
-            search: searchFilters?.search || undefined,
+            ...searchFilters,
             includeParts: partsFilter ? true : undefined
           },
 

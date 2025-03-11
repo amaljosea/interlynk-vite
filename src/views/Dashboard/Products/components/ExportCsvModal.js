@@ -223,9 +223,7 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
               onChange={() => setApplyFilters(!applyFilters)}
             >
               <Text fontSize='14px' fontWeight='500' color={primaryTextColor}>
-                {tableType === 'Support Status View'
-                  ? 'Search'
-                  : 'Apply search and filters'}
+                Apply search and filters
               </Text>
             </Checkbox>
           )}
@@ -237,7 +235,7 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
               onChange={() => setPartsFilter(!partsFilter)}
             >
               <Text fontSize='14px' fontWeight='500' color={primaryTextColor}>
-                Parts
+                Apply Parts
               </Text>
             </Checkbox>
           )}
