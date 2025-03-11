@@ -3933,6 +3933,16 @@ export const GetCompSupportData = gql`
           version
           internal
           updatedAt
+          sbom {
+            id
+            project {
+              projectGroup {
+                name
+              }
+            }
+            projectVersion
+          }
+
           componentSupportLevel {
             componentId
             createdAt
