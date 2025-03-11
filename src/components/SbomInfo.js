@@ -35,7 +35,7 @@ const SbomInfo = ({ data }) => {
       value: (
         <Flex gap={2} flexWrap={'wrap'} alignItems={'center'}>
           {data?.tools?.length > 0 ? (
-            data?.tools.map((item, index) => (
+            data?.tools?.slice(0, 3)?.map((item, index) => (
               <Tag key={index} colorScheme='teal'>
                 <TagLabel>
                   {item?.name} - {truncatedValue(item?.version, 15)}
@@ -43,17 +43,21 @@ const SbomInfo = ({ data }) => {
               </Tag>
             ))
           ) : (
-            <TagLabel>N/A</TagLabel>
+            <Tag>N/A</Tag>
+          )}
+
+          {data?.tools?.length > 3 && (
+            <Tag>+{data?.tools?.length - 3} More</Tag>
           )}
         </Flex>
       )
     },
     {
-      label: 'Author',
+      label: 'Authors',
       value: (
         <Flex gap={2} flexWrap={'wrap'} alignItems={'center'}>
           {data?.authors.length > 0 ? (
-            data?.authors.map((item, index) => (
+            data?.authors?.slice(0, 3)?.map((item, index) => (
               <Tag key={index} colorScheme='blue' width={'fit-content'}>
                 <TagLabel>
                   {item.name} {item?.email && `- ${item.email}`}
@@ -62,6 +66,10 @@ const SbomInfo = ({ data }) => {
             ))
           ) : (
             <Tag>N/A</Tag>
+          )}
+
+          {data?.authors?.length > 3 && (
+            <Tag>+{data?.authors?.length - 3} More</Tag>
           )}
         </Flex>
       )
