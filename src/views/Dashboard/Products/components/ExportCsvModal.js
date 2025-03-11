@@ -214,10 +214,9 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
             <Tag colorScheme='cyan'>{tableType}</Tag>
           </Box>
         )}
-        <Flex gap={6} alignItems={'center'}>
+        <Flex gap={6} mt={1} alignItems={'center'}>
           {filters && (
             <Checkbox
-              mt={1}
               size='md'
               colorScheme='blue'
               isChecked={applyFilters}
