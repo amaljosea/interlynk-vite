@@ -8,9 +8,11 @@ const InfoLabel = ({ title, onCheck }) => {
   return (
     <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
       <Text fontSize={'sm'}>{title}</Text>
-      <Tooltip label={onCheck} placement='top'>
-        <InfoIcon color={primaryBlueText} cursor={'pointer'} />
-      </Tooltip>
+      {title !== 'Data License' && (
+        <Tooltip label={onCheck} placement='top'>
+          <InfoIcon color={primaryBlueText} cursor={'pointer'} />
+        </Tooltip>
+      )}
     </Flex>
   )
 }
