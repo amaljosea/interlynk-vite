@@ -109,7 +109,7 @@ const General = ({ data, loading, error }) => {
 
   return (
     <CardBody>
-      <Stack spacing={3} mt={8}>
+      <Stack w={'100%'} spacing={3} mt={2}>
         {sbomData?.map((item, index) => (
           <Grid key={index} {...container}>
             <GridItem colSpan={3}>
