@@ -235,7 +235,7 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
               onChange={() => setPartsFilter(!partsFilter)}
             >
               <Text fontSize='14px' fontWeight='500' color={primaryTextColor}>
-                Apply Parts
+                Parts
               </Text>
             </Checkbox>
           )}
