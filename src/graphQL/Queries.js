@@ -72,24 +72,45 @@ export const UserSettings = gql`
 
 // GET USERS
 export const GetUsers = gql`
-  query GetUsers($search: String) {
+  query GetUsers(
+    $search: String
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
     organization {
-      users(search: $search) {
-        id
-        name
-        email
-        role {
+      users(
+        search: $search
+        after: $after
+        before: $before
+        first: $first
+        last: $last
+      ) {
+        nodes {
           id
           name
-          permissions
+          email
+          role {
+            id
+            name
+            permissions
+          }
+          createdAt
+          invitationStatus
+          invitationAcceptedAt
+          profileImage {
+            filename
+            url
+          }
         }
-        createdAt
-        invitationStatus
-        invitationAcceptedAt
-        profileImage {
-          filename
-          url
+        pageInfo {
+          endCursor
+          hasNextPage
+          hasPreviousPage
+          startCursor
         }
+        totalCount
       }
     }
   }
@@ -6241,46 +6262,6 @@ export const BitbucketRepositories = gql`
         hasPreviousPage
         startCursor
         endCursor
-      }
-    }
-  }
-`
-
-export const GetTeam = gql`
-  query GetTeam($first: Int, $last: Int, $after: String, $before: String) {
-    organization {
-      organizationUsers(
-        after: $after
-        before: $before
-        first: $first
-        last: $last
-      ) {
-        nodes {
-          user {
-            id
-            name
-            email
-            role {
-              id
-              name
-              permissions
-            }
-            createdAt
-            invitationStatus
-            invitationAcceptedAt
-            profileImage {
-              filename
-              url
-            }
-          }
-        }
-        pageInfo {
-          endCursor
-          hasNextPage
-          hasPreviousPage
-          startCursor
-        }
-        totalCount
       }
     }
   }
