@@ -112,10 +112,10 @@ const General = ({ data, loading, error }) => {
       <Stack spacing={3} mt={8}>
         {sbomData?.map((item, index) => (
           <Grid key={index} {...container}>
-            <GridItem colSpan={2}>
+            <GridItem colSpan={3}>
               <InfoLabel title={item?.label} onCheck={onCheck(item?.label)} />
             </GridItem>
-            <GridItem colSpan={10}>{item?.value}</GridItem>
+            <GridItem colSpan={9}>{item?.value}</GridItem>
           </Grid>
         ))}
       </Stack>
