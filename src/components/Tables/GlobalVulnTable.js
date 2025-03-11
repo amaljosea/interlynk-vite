@@ -233,22 +233,21 @@ const GlobalVulnTable = (props) => {
     },
     {
       id: 'PRODUCT_LIST',
-      name: 'PRODUCTS',
+      name: 'ACTION',
       selector: (row) => {
         return (
-          <>
-            <Tooltip label={'View affected products'} placement={'left'}>
-              <IconButton
-                variant={'solid'}
-                colorScheme={'blue'}
-                icon={<FaEye />}
-                onClick={() => {
-                  onOpen()
-                  setActiveRow(row)
-                }}
-              />
-            </Tooltip>
-          </>
+          <Tooltip label={'View affected products'} placement={'left'}>
+            <IconButton
+              size='sm'
+              variant={'solid'}
+              colorScheme={'blue'}
+              icon={<FaEye />}
+              onClick={() => {
+                onOpen()
+                setActiveRow(row)
+              }}
+            />
+          </Tooltip>
         )
       },
       right: 'true',
