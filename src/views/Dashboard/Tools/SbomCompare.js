@@ -51,17 +51,12 @@ const SbomCompare = ({
     disabled
   } = compareButtonProps
 
-  const {
-    primaryTextColor,
-    secondaryGreenBorder,
-    secondaryRedBorder,
-    lightAndDarkBgColor
-  } = useThemeColor([
-    'primaryTextColor',
-    'secondaryGreenBorder',
-    'secondaryRedBorder',
-    'lightAndDarkBgColor'
-  ])
+  const { primaryTextColor, secondaryGreenBorder, secondaryRedBorder } =
+    useThemeColor([
+      'primaryTextColor',
+      'secondaryGreenBorder',
+      'secondaryRedBorder'
+    ])
 
   const envOptions =
     productList?.length > 0
@@ -90,11 +85,7 @@ const SbomCompare = ({
     )
   }
 
-  const cardBgColor = isToolsDrawer
-    ? isSbomOne
-      ? secondaryGreenBorder
-      : secondaryRedBorder
-    : lightAndDarkBgColor
+  const cardBorder = isSbomOne ? secondaryGreenBorder : secondaryRedBorder
 
   const isDisabled = isSbomOne
     ? selectedSboms?.length > 0
@@ -121,7 +112,13 @@ const SbomCompare = ({
 
   return (
     <GridItem w='100%'>
-      <Card width='100%' p={8} h='450px' overflowY='scroll' bg={cardBgColor}>
+      <Card
+        p={8}
+        h='450px'
+        width='100%'
+        overflowY='scroll'
+        border={`1px solid ${cardBorder}`}
+      >
         <Flex
           alignItems={'flex-start'}
           flexWrap={'wrap'}
