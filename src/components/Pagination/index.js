@@ -15,12 +15,31 @@ const Pagination = ({
   paginationHidden = false,
   loading
 }) => {
-  if (
-    paginationHidden ||
-    (totalCount < paginationSizes[0] && !hasPreviousPage)
-  ) {
+  if (paginationHidden || totalCount < 1) {
     return null
   }
+
+  const noPaginationRequired =
+    !hasNextPage && !hasPreviousPage && totalCount < paginationSizes[0]
+
+  const countText =
+    totalCount === 1
+      ? `Showing all ${totalCount} item`
+      : `Showing all ${totalCount} items`
+
+  if (noPaginationRequired) {
+    return (
+      <Flex
+        justifyContent={'end'}
+        alignItems={'center'}
+        gap={4}
+        marginTop={'20px'}
+      >
+        <Text>{countText}</Text>
+      </Flex>
+    )
+  }
+
   const totalPages = Math.ceil(totalCount / totalRows) || 1
 
   return (
