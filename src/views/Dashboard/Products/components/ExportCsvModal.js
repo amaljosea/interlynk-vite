@@ -60,6 +60,7 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
   const [selectedColumns, setSelectedColumns] = useState([])
   const [availableColumns, setAvailableColumns] = useState([])
   const [applyFilters, setApplyFilters] = useState(true)
+  const [partsFilter, setPartsFilter] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   const searchFilters = applyFilters ? filters : {}
@@ -67,7 +68,8 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
   const queryInfo = useExportCsvQueryInfo(
     tableType,
     rowsToExport,
-    searchFilters
+    searchFilters,
+    partsFilter
   )
 
   const { sbomHookData } = useGlobalQueryContext()
@@ -212,19 +214,32 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
             <Tag colorScheme='cyan'>{tableType}</Tag>
           </Box>
         )}
-        {filters && (
-          <Checkbox
-            mt={1}
-            size='md'
-            colorScheme='blue'
-            isChecked={applyFilters}
-            onChange={() => setApplyFilters(!applyFilters)}
-          >
-            <Text fontSize='14px' fontWeight='500' color={primaryTextColor}>
-              Apply search and filters
-            </Text>
-          </Checkbox>
-        )}
+        <Flex gap={6} mt={1} alignItems={'center'}>
+          {filters && (
+            <Checkbox
+              size='md'
+              colorScheme='blue'
+              isChecked={applyFilters}
+              onChange={() => setApplyFilters(!applyFilters)}
+            >
+              <Text fontSize='14px' fontWeight='500' color={primaryTextColor}>
+                Apply search and filters
+              </Text>
+            </Checkbox>
+          )}
+          {tableType === 'Support Status View' && filters && (
+            <Checkbox
+              size='md'
+              colorScheme='blue'
+              isChecked={partsFilter}
+              onChange={() => setPartsFilter(!partsFilter)}
+            >
+              <Text fontSize='14px' fontWeight='500' color={primaryTextColor}>
+                Parts
+              </Text>
+            </Checkbox>
+          )}
+        </Flex>
         {tableType === 'Support Status View' && shouldShowDemoFeatures && (
           <Checkbox mt={1} size='md' colorScheme='blue'>
             <Text fontSize='14px' fontWeight='500' color={primaryTextColor}>
