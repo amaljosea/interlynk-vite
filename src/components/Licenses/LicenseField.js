@@ -1,7 +1,7 @@
 import { useLazyQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useCallback, useContext, useEffect, useState } from 'react'
-import ReactSelect, { components } from 'react-select'
+import { components } from 'react-select'
 import { getSignedUrlParams, parseLicenseString } from 'utils'
 import { infoData } from 'variables/general'
 
@@ -9,16 +9,14 @@ import { Flex, Stack, Text, VStack } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { FormControl } from '@chakra-ui/react'
 
+import LynkSelect from 'components/LynkSelect'
 import LynkFormLabel from 'components/Misc/LynkLabel'
 
 import { useDebounce } from 'hooks/useDebounce'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useSelect } from 'hooks/useSelect'
-import { useThemeColor } from 'hooks/useThemeColors'
 
 import { LicenseAutoComplete } from 'graphQL/Queries'
-
-import { MdClose } from 'react-icons/md'
 
 const LicenseField = ({ resolved, sbomView, license }) => {
   const { style } = useSelect('field')
@@ -38,7 +36,6 @@ const LicenseField = ({ resolved, sbomView, license }) => {
 
   const [searchText, setSearchText] = useState('')
   const debouncedSearchTerm = useDebounce(searchText, 300)
-  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const formatLicenseString = (str = '') => {
     const matchingWords = ['or', 'and', 'with']
@@ -184,13 +181,20 @@ const LicenseField = ({ resolved, sbomView, license }) => {
     )
   }
 
-  const ClearIndicator = (props) => {
-    return (
-      <components.ClearIndicator {...props}>
-        <MdClose fontSize={16} color={primaryTextColor} cursor='pointer' />
-      </components.ClearIndicator>
-    )
-  }
+  const formattedOptions = licenseList.map((license) => ({
+    ...license,
+    label:
+      license.type === 'Custom License'
+        ? parseLicenseString(license.label)
+        : license.label
+  }))
+
+  const selectedValue = normalizedLicenseString
+    ? {
+        value: normalizedLicenseString.value,
+        label: parseLicenseString(normalizedLicenseString.label)
+      }
+    : null
 
   return (
     <>
@@ -202,40 +206,24 @@ const LicenseField = ({ resolved, sbomView, license }) => {
             info={!sbomView ? onCheck(`Component License`) : null}
           />
           {/* LICENSE */}
-          <ReactSelect
+          <LynkSelect
             name='license'
             styles={style}
             className='react-select'
-            isClearable={resolved ? false : true}
-            isSearchable={resolved ? false : true}
+            isClearable={!resolved}
+            isSearchable={!resolved}
             isDisabled={signedUrlParams}
             isLoading={loading}
             noOptionsMessage={() =>
               resolved || signedUrlParams ? null : `Please search...`
             }
             components={{
-              ClearIndicator,
-              DropdownIndicator: () => null,
-              IndicatorSeparator: () => null,
               Menu,
               MenuList,
               Option
             }}
-            value={
-              normalizedLicenseString
-                ? {
-                    value: normalizedLicenseString.value,
-                    label: parseLicenseString(normalizedLicenseString.label)
-                  }
-                : null
-            }
-            options={licenseList.map((license) => ({
-              ...license,
-              label:
-                license.type === 'Custom License'
-                  ? parseLicenseString(license.label)
-                  : license.label
-            }))}
+            value={selectedValue}
+            options={formattedOptions}
             onChange={onLicenseChange}
             onInputChange={setSearchText}
             placeholder={'Search for a License'}

@@ -25,6 +25,10 @@ const LynkSelect = (props) => {
     )
   }
 
+  const shouldShowDropdown = props.isMulti
+    ? props.dropDown && Array.isArray(props.value) && props.value.length === 0
+    : props.dropDown
+
   return props.isCreatable ? (
     <CreatableSelect
       {...props}
@@ -32,7 +36,7 @@ const LynkSelect = (props) => {
       className='react-select'
       components={{
         ClearIndicator,
-        DropdownIndicator: props.dropDown
+        DropdownIndicator: shouldShowDropdown
           ? CustomDropdownIndicator
           : () => null,
         IndicatorSeparator: () => null
@@ -45,10 +49,11 @@ const LynkSelect = (props) => {
       className='react-select'
       components={{
         ClearIndicator,
-        DropdownIndicator: props.dropDown
+        DropdownIndicator: shouldShowDropdown
           ? CustomDropdownIndicator
           : () => null,
-        IndicatorSeparator: () => null
+        IndicatorSeparator: () => null,
+        ...(props.components || {})
       }}
     />
   )
