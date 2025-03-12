@@ -1,0 +1,13 @@
+diff --git a/node_modules/@chakra-ui/react/dist/cjs/checkbox/checkbox-context.cjs b/node_modules/@chakra-ui/react/dist/cjs/checkbox/checkbox-context.cjs
+index 901e780..1af120b 100644
+--- a/node_modules/@chakra-ui/react/dist/cjs/checkbox/checkbox-context.cjs
++++ b/node_modules/@chakra-ui/react/dist/cjs/checkbox/checkbox-context.cjs
+@@ -1,7 +1,7 @@
+ 'use client';
+ 'use strict';
+ 
+-var context = require('@chakra-ui/utils/context');
++var context = require('@chakra-ui/utils');
+ 
+ const [CheckboxGroupProvider, useCheckboxGroupContext] = context.createContext({
+   name: "CheckboxGroupContext",
