@@ -11,6 +11,7 @@ import {
   Select,
   SimpleGrid,
   Stack,
+  Tag,
   Text,
   Tooltip,
   useDisclosure
@@ -36,8 +37,6 @@ import {
 } from 'graphQL/Mutation'
 import { GetComponentSupportLevels } from 'graphQL/Queries'
 
-import { FaBuilding } from 'react-icons/fa6'
-
 const CompSupport = ({ data, isOpen, onClose }) => {
   const params = useParams()
 
@@ -56,13 +55,9 @@ const CompSupport = ({ data, isOpen, onClose }) => {
       <Flex gap={2}>
         <CompInfo data={data} />
         {data?.internal && (
-          <Tooltip label={'Internal'}>
-            <IconButton
-              size='xs'
-              colorScheme={'blue'}
-              icon={<FaBuilding size={14} />}
-            />
-          </Tooltip>
+          <Tag w={'fit-content'} colorScheme='blue'>
+            Internal
+          </Tag>
         )}
       </Flex>
     )
