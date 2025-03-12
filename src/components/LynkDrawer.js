@@ -1,6 +1,6 @@
 import {
   Box,
-  Divider,
+  Divider, // eslint-disable-next-line no-restricted-imports
   Drawer,
   DrawerBody,
   DrawerCloseButton,

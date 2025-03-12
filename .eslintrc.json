@@ -52,6 +52,11 @@
             "name": "@chakra-ui/react",
             "importNames": ["useColorModeValue"],
             "message": "Please use 'useThemeColor' hook and values from 'theme' instead."
+          },
+          {
+            "name": "@chakra-ui/react",
+            "importNames": ["Drawer"],
+            "message": "Please use 'LynkDrawer'instead."
           }
         ]
       }
