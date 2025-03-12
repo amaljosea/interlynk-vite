@@ -90,7 +90,7 @@ const Vulnerabilities = () => {
             </Tab>
           ))}
         </TabList>
-        <Flex position='absolute' right={9} top={5}>
+        <Flex position='absolute' right={3.5} top={-0.5}>
           {tab !== 'vulnerabilities' && tab === 'productVulnerabilities' && (
             <EnvGeneralFilter reset={reset} totalCounts={totalCounts} />
           )}

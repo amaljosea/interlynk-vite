@@ -2,6 +2,8 @@ import { MockedProvider } from '@apollo/client/testing'
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
 
+import { ChakraProvider } from '@chakra-ui/react'
+
 import Automation from '.'
 
 jest.mock('axios', () => ({
@@ -44,7 +46,9 @@ jest.mock('@chakra-ui/react', () => ({
 test('Automation page renders correctly', () => {
   render(
     <MockedProvider mocks={[]} addTypename={false}>
-      <Automation />
+      <ChakraProvider>
+        <Automation />
+      </ChakraProvider>
     </MockedProvider>
   )
   const textElement = screen.getByText('RULE')
