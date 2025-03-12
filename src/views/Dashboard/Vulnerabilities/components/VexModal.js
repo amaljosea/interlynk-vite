@@ -121,11 +121,13 @@ const VexModal = ({
       switch (status) {
         case 'In Triage':
           setStagOne('green')
+          setStagCustom('gray')
           details ? setStagTwo('green') : setStagTwo('gray')
           notes ? setStagThree('green') : setStagThree('gray')
           break
         case 'Not Affected':
           setStagOne('green')
+          setStagCustom('gray')
           if (!justification && !impactData) {
             setStagTwo('red')
           } else {
@@ -146,6 +148,7 @@ const VexModal = ({
           break
         case 'Fixed':
           setStagOne('green')
+          setStagCustom('gray')
           notes ? setStagTwo('green') : setStagTwo('gray')
           break
         default:
