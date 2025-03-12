@@ -19,6 +19,7 @@ import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import LicenseField from 'components/Licenses/LicenseField'
 import LynkAlert from 'components/LynkAlert'
+import LynkSelect from 'components/LynkSelect'
 import LynkFormLabel from 'components/Misc/LynkLabel'
 import PrimaryWarning from 'components/Modal/PrimaryWarning'
 
@@ -320,23 +321,23 @@ const CompDetails = ({ data, primaryComp }) => {
             htmlFor='componentType'
             info={onCheck(`Component Type`)}
           />
-          <Select
+          <LynkSelect
             name='kind'
-            value={details?.kind}
-            textTransform={'capitalize'}
-            onChange={(e) => handleChange('details', 'kind', e.target.value)}
-          >
-            <option value=''>-- Select --</option>
-            {componentTypes?.map((item, index) => (
-              <option
-                key={index}
-                value={item}
-                style={{ textTransform: 'capitalize' }}
-              >
-                {item}
-              </option>
-            ))}
-          </Select>
+            aria-label='kind'
+            value={
+              componentTypes.find((item) => item.value === details?.kind) || ''
+            }
+            isDisabled={isCustomerView}
+            onChange={(selectedOption) =>
+              handleChange('details', 'kind', selectedOption?.value)
+            }
+            options={componentTypes}
+            dropDown={true}
+            placeholder={
+              componentTypes.find((item) => item.value === details?.kind)
+                ?.label || '--Select--'
+            }
+          />
         </FormControl>
         {/* LICENSES */}
         <LicenseField

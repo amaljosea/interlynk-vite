@@ -9,12 +9,13 @@ import { componentTypes } from 'variables/general'
 import { InfoIcon } from '@chakra-ui/icons'
 import { List, ListItem, Stack } from '@chakra-ui/react'
 import { Box, Button, Flex, Icon, Text, Tooltip } from '@chakra-ui/react'
-import { FormControl, FormLabel, Input, Select } from '@chakra-ui/react'
+import { FormControl, FormLabel, Input } from '@chakra-ui/react'
 
 import EnvironmentSelector from 'components/EnvironmentSelector'
 import LicenseField from 'components/Licenses/LicenseField'
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
+import LynkSelect from 'components/LynkSelect'
 import CompInfo from 'components/Misc/CompInfo'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -435,23 +436,16 @@ const CheckModal = (props) => {
                 </Tooltip>
               </Flex>
             </FormLabel>
-            <Select
+            <LynkSelect
               id='type'
               name='type'
-              value={compType}
-              onChange={(e) => setCompType(e.target.value)}
-            >
-              <option value=''>-- Select --</option>
-              {componentTypes?.map((item, index) => (
-                <option
-                  key={index}
-                  value={item}
-                  style={{ textTransform: 'capitalize' }}
-                >
-                  {item}
-                </option>
-              ))}
-            </Select>
+              value={
+                componentTypes.find((item) => item.value === compType) || ''
+              }
+              onChange={(selectedOption) => setCompType(selectedOption?.value)}
+              options={componentTypes}
+              dropDown={true}
+            />
           </FormControl>
         </Stack>
       )}
