@@ -27,7 +27,7 @@ export default function AdminNavbarLinks(props) {
   const params = useParams()
   const sbomId = params.sbomid
   const productId = params.productid
-  const { organization } = useGlobalState()
+  const { organization, setOrganization } = useGlobalState()
   const { setColorMode } = useColorMode()
   const mode = getItem('chakra-ui-color-mode')
   const [currentMode, setCurrentMode] = useState(mode || 'system')
@@ -38,7 +38,10 @@ export default function AdminNavbarLinks(props) {
 
   const handleLogout = async () => {
     setLoading(true)
-    await logoutUser().then(() => setLoading(false))
+    await logoutUser().then(() => {
+      setLoading(false)
+      setOrganization(null)
+    })
   }
 
   const { setIsOpen, setCurrentStep } = useTour()
