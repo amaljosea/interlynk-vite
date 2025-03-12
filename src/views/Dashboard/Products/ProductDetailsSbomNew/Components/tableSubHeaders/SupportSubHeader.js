@@ -50,10 +50,7 @@ const SupportSubHeader = ({
           {!isCustomerView && (
             <ExportCsv
               tableType='Support Status View'
-              filters={{
-                supportLevel: supportData?.supportLevel,
-                search: supportData?.search
-              }}
+              filters={{ ...supportData }}
             />
           )}
           <RefreshBtn onClick={() => reset()} />
