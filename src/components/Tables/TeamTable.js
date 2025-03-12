@@ -79,7 +79,7 @@ const TeamTable = () => {
   const [activeRow, setActiveRow] = useState(null)
   const [searchInput, setSearchInput] = useState('')
   const [filterText, setFilterText] = useState('')
-  const [deleteUser] = useMutation(deleteOrgUser)
+  const [deleteUser, { loading: deleteLoading }] = useMutation(deleteOrgUser)
 
   const [inviteUsers] = useMutation(InviteUser)
 
@@ -434,13 +434,14 @@ const TeamTable = () => {
       {/* REMOVE User */}
       {USER.isOpen && activeRow && (
         <LynkModal
+          Icon={BiTrash}
+          buttonColor='red'
+          buttonText='Remove'
           isOpen={USER.isOpen}
+          title={'Remove User'}
           onClose={USER.onClose}
           onSubmit={handleRemove}
-          title={'Remove User'}
-          Icon={BiTrash}
-          buttonText='Remove'
-          buttonColor='red'
+          isLoading={deleteLoading}
         >
           <Stack
             spacing={2}

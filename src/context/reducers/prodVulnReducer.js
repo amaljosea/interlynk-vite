@@ -19,7 +19,7 @@ const prodVulnReducer = (state, action) => {
         epss: '',
         min: 0,
         max: 0,
-        direct: 'all',
+        direct: false,
         statusTitle: '',
         statusName: '',
         justification: '',

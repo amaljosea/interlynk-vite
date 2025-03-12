@@ -61,7 +61,7 @@ const Name = ({ disabled, name, type, onChange, onBlur }) => {
   }, [isSearchable, name])
 
   return (
-    <FormControl isDisabled={disabled}>
+    <FormControl isDisabled={disabled} isRequired>
       <FormLabel>Name</FormLabel>
       {isSearchable ? (
         <LynkSelect

@@ -3904,6 +3904,7 @@ export const GetCompSupportData = gql`
     $after: String
     $before: String
     $search: String
+    $includeParts: Boolean
     $supportLevel: [String!]
     $orderBy: ComponentOrderByInput
   ) {
@@ -3916,6 +3917,7 @@ export const GetCompSupportData = gql`
         before: $before
         search: $search
         orderBy: $orderBy
+        includeParts: $includeParts
         supportLevel: $supportLevel
       ) {
         totalCount
@@ -3931,6 +3933,16 @@ export const GetCompSupportData = gql`
           version
           internal
           updatedAt
+          sbom {
+            id
+            project {
+              projectGroup {
+                name
+              }
+            }
+            projectVersion
+          }
+
           componentSupportLevel {
             componentId
             createdAt

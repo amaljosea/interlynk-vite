@@ -47,7 +47,7 @@ const AuthorModal = ({ isOpen, onClose, ruleExists, recheck }) => {
   const [createRule, { loading: ruleLoading }] =
     useMutation(AutomationRuleCreate)
   const [createAuthor, { loading }] = useMutation(authorCreate, {
-    onCompleted: () => recheck()
+    onCompleted: () => (activeTab === 'checks' ? recheck() : null)
   })
 
   const { nodes } = usePaginatedQuery(GetCheckResults, {

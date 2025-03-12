@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { vulnStatusTypes } from 'variables/general'
 import { severityList } from 'variables/general'
 
-import { Button, Flex, Stack, useDisclosure } from '@chakra-ui/react'
+import { Button, Flex, Stack, Text, useDisclosure } from '@chakra-ui/react'
 import {
   Input,
   InputGroup,
@@ -18,6 +18,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomList from 'components/Misc/CustomList'
+import LynkSwitch from 'components/Misc/LynkSwitch'
 import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -89,8 +90,8 @@ const VulnFilters = ({ reset }) => {
     reset()
   }
 
-  const onFilterDirect = (value) => {
-    prodVulnDispatch({ type: 'FILTER_DIRECT', payload: value })
+  const onFilterDirect = (e) => {
+    prodVulnDispatch({ type: 'FILTER_DIRECT', payload: e.target.checked })
     reset()
   }
 
@@ -109,10 +110,7 @@ const VulnFilters = ({ reset }) => {
     <Flex gap={2} alignItems={'center'}>
       {/* COMPONENT */}
       <Menu closeOnSelect={false}>
-        <MenuHeading
-          title={'Component'}
-          active={direct !== 'all' || components?.length > 0}
-        />
+        <MenuHeading title={'Component'} active={components?.length > 0} />
         <MenuList
           minH={'auto'}
           maxH={'300px'}
@@ -121,32 +119,15 @@ const VulnFilters = ({ reset }) => {
           overflowY={'scroll'}
         >
           <MenuOptionGroup
-            title='Dependency'
-            type='radio'
-            value={direct}
-            onChange={onFilterDirect}
-            textAlign={'left'}
-          >
-            {['all', 'direct only'].map((item, index) => (
-              <MenuItemOption
-                key={index}
-                value={item}
-                textTransform={'capitalize'}
-                fontSize={'sm'}
-              >
-                {item}
-              </MenuItemOption>
-            ))}
-          </MenuOptionGroup>
-          <MenuDivider />
-          <MenuOptionGroup
-            title='Name'
             type='checkbox'
             textAlign={'left'}
             value={components}
             onChange={onFilterCompName}
             fontSize='sm'
           >
+            <MenuItemOption value={'all'} fontSize={'sm'}>
+              All
+            </MenuItemOption>
             {vulnCompNames?.map((item, index) => (
               <MenuItemOption key={index} value={item} fontSize={'sm'}>
                 {item}
@@ -324,6 +305,15 @@ const VulnFilters = ({ reset }) => {
           </MenuOptionGroup>
         </MenuList>
       </Menu>
+      {/* DIRECT */}
+      <Flex align='center' gap={2}>
+        <LynkSwitch
+          id='isDirect'
+          isChecked={direct}
+          onChange={onFilterDirect}
+        />
+        <Text fontSize='sm'>Direct Only</Text>
+      </Flex>
     </Flex>
   )
 }

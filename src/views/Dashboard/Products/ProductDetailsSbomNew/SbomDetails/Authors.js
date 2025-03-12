@@ -94,7 +94,7 @@ const Authors = ({ data, permission }) => {
           isOpen={DELETE_AUTHOR?.isOpen}
           onClose={DELETE_AUTHOR?.onClose}
           onConfirm={() => handleRemove(activeTool?.id)}
-          name={`${activeTool?.name}-${activeTool?.email} `}
+          name={`${activeTool?.name}${activeTool?.email ? ` - ${activeTool.email}` : ''}`}
           description={`You are about to delete the Author : ${activeTool?.name}-${activeTool?.email} from this version.`}
         />
       )}

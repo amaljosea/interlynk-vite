@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
-import { getFullDate, timeSince } from 'utils'
-import { setIntensity } from 'utils'
+import { useParams } from 'react-router-dom'
+import { getFullDate, setIntensity, timeSince } from 'utils'
 
-import { IconButton, Portal, Text, Tooltip } from '@chakra-ui/react'
+import { IconButton, Portal, Stack, Text, Tooltip } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
@@ -13,6 +13,8 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { FaEllipsisV } from 'react-icons/fa'
 
 const SupportColumns = ({ handleSupport }) => {
+  const params = useParams()
+  const sbomId = params.sbomid
   const { isFreeTier } = useGlobalQueryContext()
 
   const { primaryTextColor, secondaryTextColor } = useThemeColor([
@@ -32,11 +34,34 @@ const SupportColumns = ({ handleSupport }) => {
         name: 'NAME',
         sortable: true,
         wrap: true,
+        width: '20%',
         selector: (row) => {
+          const { name, sbom } = row || {}
+          const { projectVersion, project } = sbom || {}
+          const { projectGroup } = project || {}
+          const isPart = sbomId !== sbom?.id
+
           return (
-            <Text my={4} color={primaryTextColor} data-tag='allowRowEvents'>
-              {row?.name}
-            </Text>
+            <Stack my={4} spacing={1}>
+              <Text
+                fontWeight={'medium'}
+                color={primaryTextColor}
+                data-tag='allowRowEvents'
+              >
+                {name}
+              </Text>
+              {isPart && (
+                <Text
+                  fontSize={12}
+                  w='fit-content'
+                  fontWeight={'normal'}
+                  color={primaryTextColor}
+                >
+                  {projectGroup?.name}{' '}
+                  {projectVersion ? `: ${projectVersion}` : ''}
+                </Text>
+              )}
+            </Stack>
           )
         }
       },
@@ -157,6 +182,7 @@ const SupportColumns = ({ handleSupport }) => {
     handleSupport,
     isFreeTier,
     primaryTextColor,
+    sbomId,
     secondaryTextColor,
     updateComponent
   ])

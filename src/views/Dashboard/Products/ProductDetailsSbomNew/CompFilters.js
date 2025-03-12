@@ -274,7 +274,7 @@ const CompFilters = ({ reset }) => {
           isChecked={direct}
           onChange={onFilterDirect}
         />
-        <Text>Direct</Text>
+        <Text fontSize='sm'>Direct Only</Text>
       </Flex>
     </Flex>
   )

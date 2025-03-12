@@ -1,7 +1,7 @@
 import BSI from 'assets/img/bsi.jpg'
 import FDA from 'assets/img/fda.jpg'
 import NTIA from 'assets/img/ntia.jpg'
-import { getFullDate } from 'utils'
+import { capitalizeFirstLetter, getFullDate } from 'utils'
 
 import { Stack, Text } from '@chakra-ui/react'
 
@@ -824,7 +824,7 @@ export const infoData = [
     desc: `Creatat At is the date and time that the SBOM describing this version was produced. This can be different than when the SBOM was imported into the Interlynk system.`
   },
   {
-    title: `SBOM Phases`,
+    title: `Phases`,
     desc: `Phases identify the product lifecycle phase(s) that this SBOM represents.`
   },
   {
@@ -1400,7 +1400,7 @@ export const exportCsvTableConfig = {
       })
     }
   },
-  'SBOM Support View': {
+  'Support Status View': {
     defaultSelectedColumns: [
       'Name',
       'Version',
@@ -1417,8 +1417,10 @@ export const exportCsvTableConfig = {
         return {
           Name: name,
           Version: version,
-          Assessment: user?.id ? 'Manual' : 'Automatic',
-          'Support Level': level ? level?.replaceAll('_', ' ') : 'N/A',
+          Assessment: user?.name ? 'Manual' : 'Automatic',
+          'Support Level': level
+            ? capitalizeFirstLetter(level?.replaceAll('_', ' '))
+            : 'N/A',
           'End Of Support': endDate
             ? new Date(endDate).toLocaleDateString()
             : 'N/A',

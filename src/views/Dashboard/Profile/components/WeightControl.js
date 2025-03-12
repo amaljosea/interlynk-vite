@@ -246,7 +246,9 @@ const WeightControl = () => {
                 isRequired
                 isInvalid={!threshold || threshold > 365}
               >
-                <FormLabel>Declare Abondoned After {`(Days)`}</FormLabel>
+                <FormLabel>
+                  Consider Repository Abandoned After Inactive {`(in days)`}
+                </FormLabel>
                 <Input
                   type='number'
                   value={threshold}
@@ -258,7 +260,7 @@ const WeightControl = () => {
               </FormControl>
               <FormControl w={'400px'}>
                 <FormLabel>
-                  Declare Package Abondoned After {`(Days)`}
+                  Consider Package Abandoned After Inactive {`(in days)`}
                 </FormLabel>
                 <Input defaultValue={'365'} />
                 <FormErrorMessage>

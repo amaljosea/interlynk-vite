@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getUndefinedIfEmptyOrAll } from 'utils'
@@ -31,7 +31,7 @@ const Support = () => {
   const activeTab = useQueryParam('tab')
 
   const { supportState, dispatch } = useGlobalState()
-  const { level, field, direction, searchInput } = supportState
+  const { level, include, field, direction, searchInput } = supportState
   const { supportDispatch } = dispatch
 
   const { headingTextColor } = useThemeColor(['headingTextColor'])
@@ -47,17 +47,24 @@ const Support = () => {
 
   const isSortable = field !== '' && direction !== ''
 
+  const supportData = useMemo(() => {
+    return {
+      supportLevel: getUndefinedIfEmptyOrAll(level),
+      search: searchInput !== '' ? searchInput : undefined,
+      orderBy: isSortable ? { field, direction } : undefined,
+      includeParts: include?.includes('parts') ? true : undefined
+    }
+  }, [direction, field, include, isSortable, level, searchInput])
+
   const { nodes, paginationProps, loading, reset } = usePaginatedQuery(
     GetCompSupportData,
     {
       skip: activeTab === 'support' ? false : true,
       selector: 'sbom.components',
       variables: {
-        sbomId,
-        projectId: projectId,
-        supportLevel: getUndefinedIfEmptyOrAll(level),
-        search: searchInput !== '' ? searchInput : undefined,
-        orderBy: isSortable ? { field, direction } : undefined
+        ...supportData,
+        sbomId: sbomId,
+        projectId: projectId
       }
     }
   )
@@ -130,7 +137,8 @@ const Support = () => {
     handleClear,
     onSearchInputChange,
     handleStatus,
-    selectedItems
+    selectedItems,
+    supportData
   })
 
   // COLUMNS

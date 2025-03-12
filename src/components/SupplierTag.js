@@ -40,11 +40,12 @@ const SupplierTag = ({ item, premission, onEdit, onDelete, editable }) => {
           sx={{ fontSize: 12, opacity: 0.5, cursor: 'pointer' }}
         />
       )}
-      <TagCloseButton
-        aria-label='supplier_delete'
-        hidden={premission || isCustomerView}
-        onClick={() => onDelete(item)}
-      />
+      {editable && !isCustomerView && (
+        <TagCloseButton
+          aria-label='supplier_delete'
+          onClick={() => onDelete(item)}
+        />
+      )}
     </Tag>
   )
 }

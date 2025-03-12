@@ -1,5 +1,6 @@
 //User in Compare under tools and also compare in toolsDrawer from versionsTable
-import { envOrderList, truncatedValue } from 'utils'
+import AsyncSelect from 'react-select/async'
+import { capitalizeFirstLetter, envOrderList, truncatedValue } from 'utils'
 
 import {
   Button,
@@ -7,14 +8,14 @@ import {
   GridItem,
   Heading,
   IconButton,
-  Select,
   Stack,
   Tag
 } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
-import { SkeletonCircle, SkeletonText } from '@chakra-ui/react'
+import { Skeleton, SkeletonCircle, SkeletonText } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
+import LynkAlert from 'components/LynkAlert'
 import LynkSelect from 'components/LynkSelect'
 import SbomInfo from 'components/SbomInfo'
 
@@ -24,7 +25,6 @@ import { FaCodeCompare, FaX } from 'react-icons/fa6'
 
 const SbomCompare = ({
   isSbomOne,
-  data,
   selectedVersion,
   projectGrpLoading,
   onVersionChange,
@@ -39,7 +39,8 @@ const SbomCompare = ({
   onSelectProduct,
   productList,
   compareButtonProps = {},
-  isToolsDrawer
+  isToolsDrawer,
+  lazyDropDownProps
 }) => {
   const {
     firstSbomInfo,
@@ -50,17 +51,30 @@ const SbomCompare = ({
     disabled
   } = compareButtonProps
 
-  const {
-    primaryTextColor,
-    secondaryGreenBorder,
-    secondaryRedBorder,
-    lightAndDarkBgColor
-  } = useThemeColor([
-    'primaryTextColor',
-    'secondaryGreenBorder',
-    'secondaryRedBorder',
-    'lightAndDarkBgColor'
-  ])
+  const { primaryTextColor, secondaryGreenBorder, secondaryRedBorder } =
+    useThemeColor([
+      'primaryTextColor',
+      'secondaryGreenBorder',
+      'secondaryRedBorder'
+    ])
+
+  const envOptions =
+    productList?.length > 0
+      ? envOrderList(productList).map((item) => ({
+          label: capitalizeFirstLetter(item.label),
+          value: item.value
+        }))
+      : []
+
+  const LoadingSkeleton = (
+    <Skeleton height='40px' width='100%' borderRadius='md' />
+  )
+
+  const NoVersionAlert = <LynkAlert msg='No version available' />
+
+  const NoEnvironmentAlert = (
+    <LynkAlert status='info' msg='No Environment selected' />
+  )
 
   if (projectGrpLoading) {
     return (
@@ -71,11 +85,7 @@ const SbomCompare = ({
     )
   }
 
-  const cardBgColor = isToolsDrawer
-    ? isSbomOne
-      ? secondaryGreenBorder
-      : secondaryRedBorder
-    : lightAndDarkBgColor
+  const cardBorder = isSbomOne ? secondaryGreenBorder : secondaryRedBorder
 
   const isDisabled = isSbomOne
     ? selectedSboms?.length > 0
@@ -86,9 +96,29 @@ const SbomCompare = ({
     (selectedProd !== '' && uniqueVersions?.length === 0) ||
     (isSbomOne && selectedSboms?.length > 0)
 
+  const VersionSelect = (
+    <LynkSelect
+      value={selectedVersion?.label}
+      onChange={(value) => onVersionChange(value)}
+      isSearchable
+      type='text'
+      placeholder={selectedVersion?.label || '--Select--'}
+      name='versions'
+      isDisabled={disableVersionField}
+      options={uniqueVersions}
+      dropDown={true}
+    />
+  )
+
   return (
     <GridItem w='100%'>
-      <Card width='100%' p={8} h='450px' overflowY='scroll' bg={cardBgColor}>
+      <Card
+        p={8}
+        h='450px'
+        width='100%'
+        overflowY='scroll'
+        border={`1px solid ${cardBorder}`}
+      >
         <Flex
           alignItems={'flex-start'}
           flexWrap={'wrap'}
@@ -133,76 +163,49 @@ const SbomCompare = ({
             height={'285px'}
           >
             {/* PROJECT GROUPS */}
-            {data?.organization?.projectGroups?.nodes?.length > 0 && (
-              <FormControl fontSize={'sm'}>
-                <FormLabel htmlFor='groupOne'>Product</FormLabel>
-                <Select
-                  fontSize={'sm'}
-                  value={selectedGroup}
-                  isDisabled={isDisabled}
-                  onChange={onSelectGroup}
-                  id={isSbomOne ? 'groupOne' : 'groupTwo'}
-                  name={isSbomOne ? 'groupOne' : 'groupTwo'}
-                >
-                  <option value=''>-- Select --</option>
-                  {data?.organization?.projectGroups?.nodes?.map(
-                    (item, index) => (
-                      <option key={index} value={item.id}>
-                        {truncatedValue(item.name, 50)}
-                      </option>
-                    )
-                  )}
-                </Select>
-              </FormControl>
-            )}
+
+            <FormControl fontSize={'sm'}>
+              <FormLabel htmlFor='groupOne'>Product</FormLabel>
+              <AsyncSelect
+                {...{
+                  ...lazyDropDownProps,
+                  onChange: onSelectGroup,
+                  value: null,
+                  isDisabled: isDisabled,
+                  id: isSbomOne ? 'groupOne' : 'groupTwo',
+                  placeholder: selectedGroup?.name || '--Select--'
+                }}
+              />
+            </FormControl>
+
             {/* ENVIRONMENT */}
             <FormControl fontSize={'sm'}>
               <FormLabel htmlFor='productOne'>Environment</FormLabel>
-              <Select
-                fontSize={'sm'}
-                value={selectedProd}
-                isDisabled={isDisabled}
-                onChange={onSelectProduct}
-                textTransform={'capitalize'}
+              <LynkSelect
                 id={isSbomOne ? 'productOne' : 'productTwo'}
+                value={selectedProd?.label || null}
+                onChange={onSelectProduct}
+                type='text'
+                placeholder={selectedProd?.label || '--Select--'}
                 name={isSbomOne ? 'productOne' : 'productTwo'}
-              >
-                <option value={''}>-- Select --</option>
-                {productList?.length > 0 &&
-                  envOrderList(productList).map((item, index) => (
-                    <option
-                      key={index}
-                      value={item.value}
-                      style={{ textTransform: 'capitalize' }}
-                    >
-                      {item.label}
-                    </option>
-                  ))}
-              </Select>
+                isSearchable={false}
+                isDisabled={isDisabled}
+                options={envOptions}
+                dropDown={true}
+              />
             </FormControl>
             {/* VERSION */}
             <FormControl fontSize={'sm'}>
-              <FormLabel
-                htmlFor={isSbomOne ? 'versionOne' : 'versionTwo'}
-                fontSize='md'
-              >
+              <FormLabel htmlFor={isSbomOne ? 'versionOne' : 'versionTwo'}>
                 Version
               </FormLabel>
-              <LynkSelect
-                type='text'
-                isSearchable
-                name='versions'
-                isLoading={loading}
-                value={selectedVersion}
-                options={uniqueVersions}
-                placeholder='-- Select --'
-                noOptionsMessage={() => null}
-                isDisabled={disableVersionField}
-                onChange={(value) => onVersionChange(value)}
-                components={{
-                  DropdownIndicator: () => null
-                }}
-              />
+              {loading
+                ? LoadingSkeleton
+                : selectedProd?.value && uniqueVersions.length === 0
+                  ? NoVersionAlert
+                  : !selectedProd?.value
+                    ? NoEnvironmentAlert
+                    : VersionSelect}
             </FormControl>
           </Stack>
         )}

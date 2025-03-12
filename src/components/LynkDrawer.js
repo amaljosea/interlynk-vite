@@ -81,6 +81,7 @@ const LynkDrawer = ({
               {cancelButtonTitle}
             </Button>
             <Button
+              aria-label='drawer_submit'
               colorScheme='blue'
               isLoading={isLoading}
               isDisabled={isDisabled}
