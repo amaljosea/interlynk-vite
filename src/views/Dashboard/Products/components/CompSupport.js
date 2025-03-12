@@ -36,6 +36,8 @@ import {
 } from 'graphQL/Mutation'
 import { GetComponentSupportLevels } from 'graphQL/Queries'
 
+import { FaBuilding } from 'react-icons/fa6'
+
 const CompSupport = ({ data, isOpen, onClose }) => {
   const params = useParams()
 
@@ -48,13 +50,31 @@ const CompSupport = ({ data, isOpen, onClose }) => {
 
   const { componentSupportLevel } = supports?.component || {}
 
+  const Header = () => {
+    if (!data) return null
+    return (
+      <Flex gap={2}>
+        <CompInfo data={data} />
+        {data?.internal && (
+          <Tooltip label={'Internal'}>
+            <IconButton
+              size='xs'
+              colorScheme={'blue'}
+              icon={<FaBuilding size={14} />}
+            />
+          </Tooltip>
+        )}
+      </Flex>
+    )
+  }
+
   return (
     <LynkDrawer
       noFooter
       isOpen={isOpen}
       onClose={onClose}
+      subtitle={<Header />}
       title={'Edit Support Status'}
-      subtitle={data ? <CompInfo data={data} /> : null}
     >
       {loading ? (
         <CustomLoader />
