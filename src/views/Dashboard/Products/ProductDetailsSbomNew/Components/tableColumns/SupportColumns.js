@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { getFullDate, setIntensity, timeSince } from 'utils'
 
-import { IconButton, Portal, Text, Tooltip } from '@chakra-ui/react'
+import { Badge, IconButton, Portal, Text, Tooltip } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
@@ -39,7 +39,12 @@ const SupportColumns = ({ handleSupport }) => {
           const { name } = row || {}
           return (
             <Text my={3} color={primaryTextColor} data-tag='allowRowEvents'>
-              {name}
+              {name}{' '}
+              {row?.sbom?.id !== sbomId && (
+                <span>
+                  <Badge colorScheme='blue'>P</Badge>
+                </span>
+              )}
             </Text>
           )
         }
@@ -58,7 +63,7 @@ const SupportColumns = ({ handleSupport }) => {
         }
       },
       {
-        id: 'SUPPORT_LEVEL',
+        id: 'COMPONENT_SUPPORT_LEVELS_LEVEL',
         name: 'SUPPORT LEVEL',
         wrap: true,
         selector: (row) => {
@@ -77,10 +82,11 @@ const SupportColumns = ({ handleSupport }) => {
               <TagLabel mx={'auto'}>N/A</TagLabel>
             </Tag>
           )
-        }
+        },
+        sortable: true
       },
       {
-        id: 'END_OF_SUPPORT',
+        id: 'COMPONENT_SUPPORT_LEVELS_END_DATE',
         name: 'END OF SUPPORT',
         wrap: true,
         selector: (row) => {
@@ -93,21 +99,31 @@ const SupportColumns = ({ handleSupport }) => {
             )
           }
           return <Text color={primaryTextColor}>N/A</Text>
+        },
+        sortable: true,
+        sortFunction: (a, b) => {
+          const dateA = new Date(a?.componentSupportLevel?.endDate)
+          const dateB = new Date(b?.componentSupportLevel?.endDate)
+          return dateB - dateA
         }
       },
       {
-        id: 'COMPONENTS_UPDATED_AT',
+        id: 'COMPONENT_SUPPORT_LEVELS_UPDATED_AT',
         name: 'UPDATED',
         selector: (row) => {
           const { componentSupportLevel } = row || {}
-          const { updatedAt } = componentSupportLevel || {}
 
           if (!componentSupportLevel)
             return <Text color={primaryTextColor}>N/A</Text>
 
           return (
-            <Tooltip label={getFullDate(updatedAt)} placement={'top'}>
-              <Text color={primaryTextColor}>{timeSince(updatedAt)}</Text>
+            <Tooltip
+              placement={'top'}
+              label={getFullDate(componentSupportLevel?.updatedAt)}
+            >
+              <Text color={primaryTextColor}>
+                {timeSince(componentSupportLevel?.updatedAt)}
+              </Text>
             </Tooltip>
           )
         },
@@ -115,7 +131,7 @@ const SupportColumns = ({ handleSupport }) => {
         sortFunction: (a, b) => {
           const dateA = new Date(a?.componentSupportLevel?.updatedAt)
           const dateB = new Date(b?.componentSupportLevel?.updatedAt)
-          return dateA - dateB // Sort in descending order
+          return dateB - dateA
         },
         right: 'true',
         wrap: true
