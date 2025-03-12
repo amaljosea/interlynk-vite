@@ -3942,7 +3942,6 @@ export const GetCompSupportData = gql`
             }
             projectVersion
           }
-
           componentSupportLevel {
             componentId
             createdAt

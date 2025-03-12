@@ -317,25 +317,17 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
               htmlFor='componentType'
               info={onCheck(`Component Type`)}
             />
-            <Select
-              value={compKind}
+            <LynkSelect
               id='componentType'
               name='componentType'
+              value={
+                componentTypes.find((item) => item.value === compKind) || ''
+              }
               isDisabled={isCustomerView}
-              onChange={(e) => setCompKind(e.target.value)}
-              textTransform={'capitalize'}
-            >
-              <option value=''>-- Select --</option>
-              {componentTypes?.map((item, index) => (
-                <option
-                  key={index}
-                  value={item}
-                  style={{ textTransform: 'capitalize' }}
-                >
-                  {item}
-                </option>
-              ))}
-            </Select>
+              onChange={(selectedOption) => setCompKind(selectedOption?.value)}
+              options={componentTypes}
+              dropDown={true}
+            />
           </FormControl>
           {/* PHASES */}
           <FormControl hidden={isCustomerView}>

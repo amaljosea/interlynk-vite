@@ -3,14 +3,23 @@ import { TabContext } from 'context/TabContext'
 import { useContext, useState } from 'react'
 
 import { SearchIcon } from '@chakra-ui/icons'
-import { Button, Input, Select, Stack } from '@chakra-ui/react'
+import { Button, Input, Stack } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
 
 import { GetPackageData } from 'graphQL/Queries'
 
 import LynkAlert from './LynkAlert'
+import LynkSelect from './LynkSelect'
 
-const ecosystems = ['cargo', 'go', 'pypi', 'maven', 'npm', 'nuget']
+const ecosystems = [
+  { value: '', label: '-- SELECT --' },
+  { value: 'cargo', label: 'Cargo' },
+  { value: 'go', label: 'Go' },
+  { value: 'pypi', label: 'PyPI' },
+  { value: 'maven', label: 'Maven' },
+  { value: 'npm', label: 'NPM' },
+  { value: 'nuget', label: 'NuGet' }
+]
 
 const PackageLookup = () => {
   const [lookup, { loading }] = useLazyQuery(GetPackageData)
@@ -27,6 +36,12 @@ const PackageLookup = () => {
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+    setError('')
+  }
+
+  const handleSelect = (val) => {
+    const { value } = val
+    setFormData((prev) => ({ ...prev, ecosystem: value }))
     setError('')
   }
 
@@ -93,23 +108,20 @@ const PackageLookup = () => {
       {error !== '' && <LynkAlert msg={error} />}
       <FormControl>
         <FormLabel htmlFor='ecosystem'>Ecosystem</FormLabel>
-        <Select
+        <LynkSelect
           name='ecosystem'
-          onChange={handleChange}
-          textTransform={'uppercase'}
-          value={formData?.ecosystem}
-        >
-          <option value=''>-- Select --</option>
-          {ecosystems?.map((item, index) => (
-            <option
-              key={index}
-              value={item}
-              style={{ textTransform: 'uppercase' }}
-            >
-              {item}
-            </option>
-          ))}
-        </Select>
+          onChange={handleSelect}
+          value={
+            ecosystems.find((item) => item.value === formData?.ecosystem) || ''
+          }
+          options={ecosystems}
+          isCreatable={false}
+          dropDown={true}
+          placeholder={
+            ecosystems.find((item) => item.value === formData?.ecosystem)
+              ?.label || '--SELECT--'
+          }
+        />
       </FormControl>
       <FormControl>
         <FormLabel htmlFor='name'>Name</FormLabel>

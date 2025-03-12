@@ -62,18 +62,19 @@ export const vulnStatusTypes = [
 ]
 
 export const componentTypes = [
-  'application',
-  'container',
-  'data',
-  'device',
-  'device-driver',
-  'file',
-  'firmware',
-  'framework',
-  'library',
-  'machine-learning-model',
-  'operating-system',
-  'platform'
+  { value: '', label: '-- Select --' },
+  { value: 'application', label: 'Application' },
+  { value: 'container', label: 'Container' },
+  { value: 'data', label: 'Data' },
+  { value: 'device', label: 'Device' },
+  { value: 'device-driver', label: 'Device Driver' },
+  { value: 'file', label: 'File' },
+  { value: 'firmware', label: 'Firmware' },
+  { value: 'framework', label: 'Framework' },
+  { value: 'library', label: 'Library' },
+  { value: 'machine-learning-model', label: 'Machine Learning Model' },
+  { value: 'operating-system', label: 'Operating System' },
+  { value: 'platform', label: 'Platform' }
 ]
 
 export const namespaceOptions = {
@@ -1408,12 +1409,21 @@ export const exportCsvTableConfig = {
       'Support Level',
       'End Of Support'
     ],
-    additionalColumns: ['Assessed Date', 'Last Assessed By', 'Explanation'],
-    mapDataForExport: (data) => {
+    additionalColumns: [
+      'Part',
+      'Assessed Date',
+      'Last Assessed By',
+      'Explanation'
+    ],
+    mapDataForExport: (data, filters) => {
       return data.map((row) => {
-        const { name, version, componentSupportLevel } = row || {}
+        const { name, version, sbom, componentSupportLevel } = row || {}
         const { level, endDate, user, notes, updatedAt } =
           componentSupportLevel || {}
+
+        const { projectVersion, project } = sbom || {}
+        const { projectGroup } = project || {}
+
         return {
           Name: name,
           Version: version,
@@ -1428,7 +1438,10 @@ export const exportCsvTableConfig = {
             ? new Date(updatedAt).toLocaleDateString()
             : 'N/A',
           'Last Assessed By': user?.name || 'N/A',
-          Explanation: notes || 'N/A'
+          Explanation: notes || 'N/A',
+          Part: filters?.includeParts
+            ? `${projectGroup?.name} ${projectVersion && `: ${projectVersion}`}`
+            : 'N/A'
         }
       })
     }

@@ -98,7 +98,7 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
 
   const mapDataForExport = (fetchedNodes) => {
     const config = exportCsvTableConfig[tableType]
-    return config ? config.mapDataForExport(fetchedNodes) : []
+    return config ? config.mapDataForExport(fetchedNodes, filters) : []
   }
 
   const orgName = organization?.name?.replaceAll(' ', '-') || 'test-interlynk'
@@ -227,7 +227,7 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
               </Text>
             </Checkbox>
           )}
-          {tableType === 'Support Status View' && filters && (
+          {tableType === 'Support Status View' && filters?.includeParts && (
             <Checkbox
               size='md'
               colorScheme='blue'
@@ -235,7 +235,7 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
               onChange={() => setPartsFilter(!partsFilter)}
             >
               <Text fontSize='14px' fontWeight='500' color={primaryTextColor}>
-                Parts
+                Part
               </Text>
             </Checkbox>
           )}

@@ -14,6 +14,8 @@ import {
   InputRightAddon
 } from '@chakra-ui/react'
 
+import LynkSelect from 'components/LynkSelect'
+
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { MdDeleteOutline } from 'react-icons/md'
@@ -185,25 +187,17 @@ const Value = (props) => {
       {subject === 'COMPONENT_TYPE' &&
         (operator === 'IS' || operator === 'IS_NOT' || operator === '') && (
           <FormControl isRequired>
-            <Select
+            <LynkSelect
               id='compType'
               name='compType'
-              value={value}
-              onChange={(e) => onChange(e.target.value, id, 'value')}
-              textTransform={'capitalize'}
+              value={componentTypes.find((item) => item.value === value) || ''}
+              onChange={(selectedOption) =>
+                onChange(selectedOption?.value, id, 'value')
+              }
+              options={componentTypes}
+              dropDown={true}
               minWidth={140}
-            >
-              <option value=''>-- select --</option>
-              {componentTypes?.map((item, index) => (
-                <option
-                  key={index}
-                  value={item}
-                  style={{ textTransform: 'capitalize' }}
-                >
-                  {item}
-                </option>
-              ))}
-            </Select>
+            />
           </FormControl>
         )}
       {operator === 'RANGE' && (
