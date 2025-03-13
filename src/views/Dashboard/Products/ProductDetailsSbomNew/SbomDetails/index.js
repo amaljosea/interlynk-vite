@@ -175,6 +175,7 @@ const SbomDetails = ({ sbomData }) => {
                         isCurrentPage={!!part.url}
                         key={part.url}
                         color={primaryBlueText}
+                        cursor={'pointer'}
                       >
                         <BreadcrumbLink
                           onClick={() => {

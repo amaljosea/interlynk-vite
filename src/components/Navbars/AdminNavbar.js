@@ -122,6 +122,7 @@ export default function AdminNavbar(props) {
                   isCurrentPage={!!part.url}
                   key={part.url}
                   color={mainText}
+                  cursor={'pointer'}
                 >
                   <BreadcrumbLink
                     onClick={() => {
