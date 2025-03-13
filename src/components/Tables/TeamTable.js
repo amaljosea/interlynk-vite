@@ -31,10 +31,12 @@ import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import LynkModal from 'components/LynkModal'
 import LynkAction from 'components/Misc/LynkAction'
+import Pagination from 'components/Pagination'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
 import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -83,14 +85,13 @@ const TeamTable = () => {
 
   const [inviteUsers] = useMutation(InviteUser)
 
-  const { data: userData, loading } = useQuery(GetUsers, {
+  const { nodes, loading, paginationProps } = usePaginatedQuery(GetUsers, {
+    selector: 'organization.users',
     skip: !organization ? true : activetab === 'users' ? false : true,
     variables: { search: filterText === '' ? undefined : filterText }
   })
 
-  const numberOfUsers = userData?.organization?.users.length
-
-  const { users } = userData?.organization || ''
+  const numberOfUsers = nodes?.length
 
   const inviteUser = useHasPermission({
     parentKey: 'view_users',
@@ -398,7 +399,7 @@ const TeamTable = () => {
         subHeader
         responsive={true}
         columns={columns}
-        data={users || []}
+        data={nodes || []}
         defaultSortAsc={false}
         progressPending={loading}
         defaultSortFieldId={'joinedDate'}
@@ -411,6 +412,8 @@ const TeamTable = () => {
         )}
         subHeaderComponent={subHeaderComponent}
       />
+
+      <Pagination {...paginationProps} />
 
       {/* ADD / UPDATE User */}
       {TEAM.isOpen && (

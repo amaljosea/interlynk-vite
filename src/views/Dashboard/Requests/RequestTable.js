@@ -107,11 +107,13 @@ const RequestTable = (props) => {
   )
 
   const handleSort = async (column, sortDirection) => {
-    setFilters((oldFilters) => ({
-      ...oldFilters,
-      field: column?.id,
-      direction: sortDirection.toUpperCase()
-    }))
+    if (column && column.id && sortDirection) {
+      setFilters((oldFilters) => ({
+        ...oldFilters,
+        field: column?.id,
+        direction: sortDirection.toUpperCase()
+      }))
+    }
   }
 
   // SUB HEADER
@@ -308,7 +310,7 @@ const RequestTable = (props) => {
           data={data}
           customStyles={customStyles(headingTextColor)}
           onSort={handleSort}
-          defaultSortFieldId={field}
+          defaultSortFieldId='REQUESTS_REQUESTED_AT'
           defaultSortAsc={false}
           progressPending={loading}
           persistTableHead

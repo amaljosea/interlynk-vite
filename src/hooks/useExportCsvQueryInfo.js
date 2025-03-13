@@ -7,7 +7,7 @@ import {
   GetComponentData,
   GetGlobalVulns,
   GetSbomLicensesTable,
-  GetTeam,
+  GetUsers,
   GetVulnData
 } from 'graphQL/Queries'
 
@@ -113,7 +113,6 @@ const useExportCsvQueryInfo = (
             ...searchFilters,
             includeParts: partsFilter ? true : undefined
           },
-
           skip: !sbomId,
           selector: 'sbom.components.nodes',
           pageInfoSelector: 'sbom.components.pageInfo'
@@ -121,11 +120,11 @@ const useExportCsvQueryInfo = (
 
       case 'Users':
         return {
-          query: GetTeam,
+          query: GetUsers,
           variables: { ...searchFilters },
           skip: !organization ? true : activetab === 'users' ? false : true,
-          selector: 'organization.organizationUsers.nodes',
-          pageInfoSelector: 'organization.organizationUsers.pageInfo'
+          selector: 'organization.users.nodes',
+          pageInfoSelector: 'organization.users.pageInfo'
         }
 
       default:

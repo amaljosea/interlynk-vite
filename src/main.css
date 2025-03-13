@@ -220,6 +220,12 @@ td.rdtYear:hover {
   border-color: #3182ce;
 }
 
+.data-table-container input[type='checkbox']:disabled {
+  background-color: #e2e8f0;
+  border-color: #cbd5e0;
+  cursor: not-allowed;
+}
+
 .data-table-container input[type='checkbox']:checked::before {
   content: '✓';
   color: white;

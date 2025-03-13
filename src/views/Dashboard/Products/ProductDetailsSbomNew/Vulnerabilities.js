@@ -396,7 +396,6 @@ const Vulnerabilities = ({ sbomData }) => {
           noFooter
         >
           <ImportWizard
-            variant='circle'
             currentSbomId={sbomId}
             currentProductId={productId}
             onClose={IMPORT.onClose}

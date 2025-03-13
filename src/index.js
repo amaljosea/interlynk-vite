@@ -2,12 +2,16 @@ import * as Sentry from '@sentry/react'
 import { MainRoutes } from 'MainRoutes.js'
 import { ApolloWrapper } from 'context/ApolloWrapper.js'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom/client'
 import ReactGA from 'react-ga4'
 import { BrowserRouter } from 'react-router-dom'
 import theme, { config } from 'theme/theme.js'
 
-import { ChakraProvider, ColorModeScript } from '@chakra-ui/react'
+import {
+  ChakraProvider,
+  ColorModeScript,
+  createLocalStorageManager
+} from '@chakra-ui/react'
 
 import ChatbotPreview from 'components/ChatbotPreview'
 import ScrollToTop from 'components/ScrollToTop.js'
@@ -37,12 +41,22 @@ Sentry.init({
   replaysOnErrorSampleRate: 1.0 // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
 })
 
-ReactDOM.render(
+const root = ReactDOM.createRoot(document.getElementById('root'))
+const manager = createLocalStorageManager('chakra-ui-color-mode')
+
+root.render(
   <React.StrictMode>
     <BrowserRouter>
       <GlobalStateProvider>
-        <ChakraProvider theme={theme} resetCSS={true}>
-          <ColorModeScript initialColorMode={config?.initialColorMode} />
+        <ChakraProvider
+          theme={theme}
+          resetCSS={true}
+          colorModeManager={manager}
+        >
+          <ColorModeScript
+            initialColorMode={config?.initialColorMode}
+            storageKey='chakra-ui-color-mode'
+          />
           <ChatbotPreview />
           <ScrollToTop />
           <ApolloWrapper>
@@ -51,6 +65,5 @@ ReactDOM.render(
         </ChakraProvider>
       </GlobalStateProvider>
     </BrowserRouter>
-  </React.StrictMode>,
-  document.getElementById('root')
+  </React.StrictMode>
 )

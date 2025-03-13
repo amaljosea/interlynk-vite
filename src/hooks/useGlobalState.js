@@ -133,8 +133,8 @@ const GlobalStateProvider = ({ children }) => {
   const [supportState, supportDispatch] = useReducer(supportReducer, {
     level: [],
     include: [],
-    field: 'COMPONENTS_UPDATED_AT',
-    direction: 'DESC',
+    field: 'COMPONENT_SUPPORT_LEVELS_UPDATED_AT',
+    direction: 'ASC',
     searchInput: ''
   })
   // GLOBAL VULNERABILITIES
