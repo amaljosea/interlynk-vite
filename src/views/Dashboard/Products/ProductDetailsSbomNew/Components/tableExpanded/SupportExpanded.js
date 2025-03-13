@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { useParams } from 'react-router-dom'
 import { calculateExpiryDate, getFullDate } from 'utils'
 
 import { Box, Grid } from '@chakra-ui/react'
@@ -7,8 +8,16 @@ import DetailItem from 'components/Misc/DetailItem'
 
 const SupportExpand = (props) => {
   const { data } = props
+  const params = useParams()
+  const sbomId = params.sbomid
+
+  const { version, sbom } = data || {}
   const { notes, user, updatedAt, retainManualOverrideFor } =
     data?.componentSupportLevel || {}
+
+  const { projectVersion, project } = sbom || {}
+  const { projectGroup } = project || {}
+  const isPart = sbomId !== sbom?.id
 
   return useMemo(() => {
     const internalNotes = notes || 'N/A'
@@ -17,6 +26,9 @@ const SupportExpand = (props) => {
     const assessmentExpiresOn = retainManualOverrideFor
       ? calculateExpiryDate(retainManualOverrideFor)
       : 'N/A'
+    const part = isPart
+      ? `${projectGroup?.name} ${projectVersion && `: ${projectVersion}`}`
+      : `N/A`
 
     return (
       <Box
@@ -24,6 +36,10 @@ const SupportExpand = (props) => {
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
         <Grid templateColumns='repeat(3, 1fr)' py={2} gap={6}>
+          {/* COMPONENT VERSION */}
+          <DetailItem label='Version' value={version} />
+          {/* PART */}
+          <DetailItem label='Part' value={part} />
           {/* ASSESSED DATE */}
           <DetailItem label='Last Assessed' value={lastAssessedAt} />
           {/* ASSESSED BY */}
@@ -38,7 +54,16 @@ const SupportExpand = (props) => {
         </Grid>
       </Box>
     )
-  }, [notes, retainManualOverrideFor, updatedAt, user?.name])
+  }, [
+    isPart,
+    notes,
+    projectGroup?.name,
+    projectVersion,
+    retainManualOverrideFor,
+    updatedAt,
+    user?.name,
+    version
+  ])
 }
 
 export default SupportExpand

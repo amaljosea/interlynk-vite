@@ -1,16 +1,13 @@
-import createPersistedState from 'use-persisted-state'
-
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import useQueryParam from 'hooks/useQueryParam'
 
-const usePartsState = createPersistedState('parts')
-const { createContext, useEffect } = require('react')
+const { createContext, useEffect, useState } = require('react')
 
 export const useProductParts = () => {
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
-  const [parts, setParts] = usePartsState([])
+  const [parts, setParts] = useState([])
   const partsQueryParam = useQueryParam('parts')
 
   const isParts = partsQueryParam === 'true'

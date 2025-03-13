@@ -157,7 +157,7 @@ const Support = () => {
           data={nodes || []}
           expandOnRowClicked
           onSort={handleSort}
-          defaultSortAsc={false}
+          defaultSortAsc={true}
           progressPending={loading}
           defaultSortFieldId={field}
           subHeaderComponent={subHeader}
@@ -167,6 +167,7 @@ const Support = () => {
           progressComponent={<CustomLoader />}
           expandableRowsComponent={SupportExpand}
           customStyles={customStyles(headingTextColor)}
+          selectableRowDisabled={(row) => row?.sbom?.id !== sbomId}
         />
 
         {/* PAGINATION */}

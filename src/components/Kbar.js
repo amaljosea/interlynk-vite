@@ -11,11 +11,10 @@ import {
 import { Fragment, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { truncatedValue } from 'utils'
-import { removeItem } from 'utils/localStorageUtils'
 import { allDefaultActions, settingActions } from 'variables/general'
 
 import { SearchIcon } from '@chakra-ui/icons'
-import { useColorMode } from '@chakra-ui/system'
+import { useColorMode } from '@chakra-ui/react'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -275,15 +274,7 @@ const Kbar = () => {
       keywords: 'system theme',
       section: 'Theme',
       icon: <FaDesktop color={secondaryTextInverse} />,
-      perform: () => {
-        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-        const systemThemeChange = () =>
-          setColorMode(mediaQuery?.matches ? 'dark' : 'light')
-        systemThemeChange()
-        removeItem('chakra-ui-color-mode')
-        mediaQuery?.addListener(systemThemeChange)
-        return () => mediaQuery?.removeListener(systemThemeChange)
-      },
+      perform: () => setColorMode('system'),
       parent: 'theme'
     }
   )

@@ -134,14 +134,14 @@ export default function Admin() {
 
   const handleLogout = async () => {
     await logoutUser()
-    navigate('/auth')
+    setOrganization(null)
   }
 
   useEffect(() => {
     if (!authToken) {
-      logoutUser().then(() => navigate('/auth'))
+      logoutUser().then(() => setOrganization(null))
     }
-  }, [authToken, navigate])
+  }, [authToken, setOrganization])
 
   useEffect(() => {
     if (isVendorRootPage) {

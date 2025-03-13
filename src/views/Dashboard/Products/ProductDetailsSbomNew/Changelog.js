@@ -145,11 +145,13 @@ const Changelog = () => {
   )
 
   const handleSort = async (column, sortDirection) => {
-    setLogState((oldFilters) => ({
-      ...oldFilters,
-      field: column?.id,
-      direction: sortDirection.toUpperCase()
-    }))
+    if (column && column.id && sortDirection) {
+      setLogState((oldFilters) => ({
+        ...oldFilters,
+        field: column?.id,
+        direction: sortDirection.toUpperCase()
+      }))
+    }
   }
 
   const rowStyles = [
@@ -181,7 +183,7 @@ const Changelog = () => {
           data={nodes}
           onSort={handleSort}
           defaultSortAsc={false}
-          defaultSortFieldId={field}
+          defaultSortFieldId='ACTIVITY_LOGS_CREATED_AT'
           customStyles={customStyles(headingTextColor)}
           progressPending={loading}
           progressComponent={<CustomLoader />}

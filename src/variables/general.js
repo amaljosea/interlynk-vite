@@ -1451,9 +1451,8 @@ export const exportCsvTableConfig = {
     additionalColumns: [],
     mapDataForExport: (data) => {
       return data?.map((row) => {
-        const { user } = row || {}
         const { email, name, role, invitationAcceptedAt, invitationStatus } =
-          user || {}
+          row || {}
         return {
           Name: name || 'N/A',
           Email: email || 'N/A',
