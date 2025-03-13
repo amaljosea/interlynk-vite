@@ -1,21 +1,18 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useState } from 'react'
-import { truncatedValue } from 'utils'
+import { findShortestPath, truncatedValue } from 'utils'
 
 import { ArrowDownIcon } from '@chakra-ui/icons'
 import {
-  Box,
   Divider,
   Flex,
   Select,
   Stack,
   Text,
-  Tooltip,
   useDisclosure
 } from '@chakra-ui/react'
-import { Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
-import { Tag, TagCloseButton, TagLabel } from '@chakra-ui/react'
+import { Tag } from '@chakra-ui/react'
 import {
   FormControl,
   FormErrorIcon,
@@ -23,6 +20,7 @@ import {
   FormLabel
 } from '@chakra-ui/react'
 
+import CompRelationTypes from 'components/CompRelationTypes'
 import ComponentList from 'components/ComponentList'
 import LynkAlert from 'components/LynkAlert'
 import RelDeleteModal from 'components/RelDeleteModal'
@@ -34,22 +32,6 @@ import { CreateCompRelation, DeleteCompRelation } from 'graphQL/Mutation'
 import { GetCompDependency } from 'graphQL/Queries'
 
 import ActionButton from './ActionButton'
-
-const findShortestPath = (pathArray, currentShortestPath = []) => {
-  if (!pathArray || pathArray.length === 0) {
-    return currentShortestPath
-  }
-  const shortestPath = pathArray.reduce((minPath, currentPath) => {
-    if (currentPath.depth < minPath.depth) {
-      return currentPath
-    }
-    return minPath
-  }, pathArray[0])
-  return findShortestPath(shortestPath.path, [
-    ...currentShortestPath,
-    shortestPath
-  ])
-}
 
 const CompRelations = ({ data, compPath }) => {
   const { showToast } = useCustomToast()
@@ -83,7 +65,7 @@ const CompRelations = ({ data, compPath }) => {
 
   const [addRelation] = useMutation(CreateCompRelation)
   const [removeRelation] = useMutation(DeleteCompRelation)
-  const { data: compDependency } = useQuery(GetCompDependency, {
+  const { data: compDependency, loading } = useQuery(GetCompDependency, {
     skip: tab === 'relationships' ? false : true,
     variables: { compId: id, sbomId: sbomId }
   })
@@ -95,13 +77,6 @@ const CompRelations = ({ data, compPath }) => {
     onOpen: onDelOpen,
     onClose: onDelClose
   } = useDisclosure()
-
-  useEffect(() => {
-    if (compDependency) {
-      setDependencyOfList(compDependency.component.dependencyOf)
-      setDependsOnList(compDependency.component.dependsOn)
-    }
-  }, [compDependency])
 
   const list = dependsOnList?.filter(
     (item) => item?.toComp?.id === relationships?.to
@@ -174,8 +149,20 @@ const CompRelations = ({ data, compPath }) => {
       .finally(() => onDelClose())
   }
 
+  const handleDelete = (comp) => {
+    setActiveComp(comp)
+    onDelOpen()
+  }
+
   const isInvalid =
     relationships?.relType === '' || relationships?.to === '' || list.length > 0
+
+  useEffect(() => {
+    if (compDependency) {
+      setDependencyOfList(compDependency.component.dependencyOf)
+      setDependsOnList(compDependency.component.dependsOn)
+    }
+  }, [compDependency])
 
   return (
     <>
@@ -196,7 +183,7 @@ const CompRelations = ({ data, compPath }) => {
       >
         {/* CREATE RELATIONSHIP */}
         <Stack
-          gap={2}
+          gap={4}
           width={'100%'}
           direction={'column'}
           alignItems={'flex-start'}
@@ -262,104 +249,15 @@ const CompRelations = ({ data, compPath }) => {
           )}
         </Stack>
         <Divider />
-        {/* COMONENT RELATIONSIP DATA */}
-        <Table mt={2} width={'100%'}>
-          <Thead>
-            <Tr>
-              {['Type', 'Component'].map((item, index) => (
-                <Th key={index} pl={0} width={'100px'}>
-                  <Box>{item}</Box>
-                </Th>
-              ))}
-            </Tr>
-          </Thead>
-          <Tbody>
-            {/* Dependency Of */}
-            <Tr>
-              <Td pl={0} width={'120px'}>
-                <Text fontSize='xs' fontWeight={'medium'}>
-                  Dependency Of
-                </Text>
-              </Td>
-              <Td pl={0} width={'300px'}>
-                <Flex flexDirection={'row'} flexWrap={'wrap'} gap={2}>
-                  {dependencyOfList.map((comp, index) => (
-                    <Tag
-                      size={'sm'}
-                      key={index}
-                      variant='subtle'
-                      colorScheme={'blue'}
-                      width={'fit-content'}
-                    >
-                      <TagLabel>
-                        {truncatedValue(comp?.fromComp?.name, 20)}-
-                        {truncatedValue(comp?.fromComp?.version, 20)}
-                      </TagLabel>
-                      <TagCloseButton
-                        data-testid='delete_depends_on'
-                        onClick={() => {
-                          setActiveComp(comp)
-                          onDelOpen()
-                        }}
-                      />
-                    </Tag>
-                  ))}
-                </Flex>
-              </Td>
-            </Tr>
-            <Tr>
-              <Td pl={0} width={'120px'}>
-                <Text fontSize='xs' fontWeight={'medium'}>
-                  Depends On
-                </Text>
-              </Td>
-              <Td pl={0} width={'300px'}>
-                <Flex flexDirection={'row'} flexWrap={'wrap'} gap={2}>
-                  {[...dependsOnList]
-                    .sort(
-                      (a, b) => new Date(b?.updatedAt) - new Date(a?.updatedAt)
-                    )
-                    .map((comp, index) => (
-                      <Tooltip
-                        key={index}
-                        label={comp?.toComp?.name}
-                        placement='top'
-                      >
-                        <Tag
-                          size={'sm'}
-                          variant='subtle'
-                          colorScheme={index == 0 && isAdded ? 'green' : 'blue'}
-                          width={'fit-content'}
-                        >
-                          <TagLabel>
-                            {truncatedValue(comp?.toComp?.name, 20)}-
-                            {truncatedValue(comp?.toComp?.version, 20)}
-                          </TagLabel>
-                          <TagCloseButton
-                            data-testid='delete_depends_on'
-                            onClick={() => {
-                              setActiveComp(comp)
-                              onDelOpen()
-                            }}
-                          />
-                        </Tag>
-                      </Tooltip>
-                    ))}
-                </Flex>
-              </Td>
-            </Tr>
-          </Tbody>
-        </Table>
-
-        {isDelOpen && activeComp && (
-          <RelDeleteModal
-            isOpen={isDelOpen}
-            onClose={onDelClose}
-            activeComp={activeComp}
-            handleRemove={handleRemove}
-          />
-        )}
-
+        {/* RELATION TYPES */}
+        <CompRelationTypes
+          loading={loading}
+          isAdded={isAdded}
+          handleDelete={handleDelete}
+          dependsOnList={dependsOnList}
+          dependencyOfList={dependencyOfList}
+        />
+        <Divider />
         {/* PATHS */}
         <Text fontSize={'lg'} fontWeight={'medium'} mt={2}>
           Tree View
@@ -410,6 +308,15 @@ const CompRelations = ({ data, compPath }) => {
           </Stack>
         )}
       </Flex>
+
+      {isDelOpen && activeComp && (
+        <RelDeleteModal
+          isOpen={isDelOpen}
+          onClose={onDelClose}
+          activeComp={activeComp}
+          handleRemove={handleRemove}
+        />
+      )}
     </>
   )
 }

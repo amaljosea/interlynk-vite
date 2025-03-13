@@ -672,3 +672,19 @@ export const setIntensity = (level) => {
       return 'gray'
   }
 }
+
+export const findShortestPath = (pathArray, currentShortestPath = []) => {
+  if (!pathArray || pathArray.length === 0) {
+    return currentShortestPath
+  }
+  const shortestPath = pathArray.reduce((minPath, currentPath) => {
+    if (currentPath.depth < minPath.depth) {
+      return currentPath
+    }
+    return minPath
+  }, pathArray[0])
+  return findShortestPath(shortestPath.path, [
+    ...currentShortestPath,
+    shortestPath
+  ])
+}
