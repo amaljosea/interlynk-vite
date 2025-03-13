@@ -27,13 +27,13 @@ const CompRelationTypes = (props) => {
           </Text>
         ) : (
           <Flex flexDirection={'row'} flexWrap={'wrap'} gap={2}>
-            {dependencyOfList.map((comp, index) => (
+            {dependencyOfList.map((comp) => (
               <Tag
                 size={'sm'}
-                key={index}
                 variant='subtle'
                 colorScheme={'blue'}
                 width={'fit-content'}
+                key={comp?.fromComp?.id}
               >
                 <TagLabel>
                   {truncatedValue(comp?.fromComp?.name, 20)}-
@@ -61,7 +61,11 @@ const CompRelationTypes = (props) => {
             {[...dependsOnList]
               .sort((a, b) => new Date(b?.updatedAt) - new Date(a?.updatedAt))
               .map((comp, index) => (
-                <Tooltip key={index} label={comp?.toComp?.name} placement='top'>
+                <Tooltip
+                  placement='top'
+                  key={comp?.toComp?.id}
+                  label={comp?.toComp?.name}
+                >
                   <Tag
                     size={'sm'}
                     variant='subtle'
