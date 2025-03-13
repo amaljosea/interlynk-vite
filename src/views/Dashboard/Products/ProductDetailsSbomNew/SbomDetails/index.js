@@ -37,7 +37,8 @@ import {
   FaLongArrowAltRight,
   FaRobot
 } from 'react-icons/fa'
-import { FaCircleCheck, FaLayerGroup, FaTag } from 'react-icons/fa6'
+import { FaCircleCheck, FaTag } from 'react-icons/fa6'
+import { TbActivity } from 'react-icons/tb'
 
 import LifecycleModal from '../../components/LifecycleModal'
 
@@ -125,7 +126,7 @@ const SbomDetails = ({ sbomData }) => {
 
   useEffect(() => {
     window.onpopstate = () => {
-      console.log(`Pressed back button`)
+      console.warn(`Pressed back button`)
       handlePart()
     }
   })
@@ -292,7 +293,7 @@ const SbomDetails = ({ sbomData }) => {
                     />
                     <Divider width={3} borderColor={sameSecondaryText} />
                     <SettingsTag
-                      label={`Auto Archive ${enableAutoArchive ? 'Completed' : 'Skipped'}`}
+                      label={`Auto Archive ${!enableAutoArchive ? 'Disabled' : hasFinished ? 'Completed' : 'Skipped'}`}
                       icon={<FaArchive />}
                       isDisabled={!enableAutoArchive}
                       rounded
@@ -320,7 +321,7 @@ const SbomDetails = ({ sbomData }) => {
                       rounded
                       hidden={isFreeTier}
                       label={`Component Support Analysis ${!enableSupportLevel ? 'Disabled' : hasFinished ? 'Completed' : 'Skipped'}`}
-                      icon={<FaLayerGroup />}
+                      icon={<TbActivity />}
                       isDisabled={!enableSupportLevel}
                     />
                     <Divider width={3} borderColor={sameSecondaryText} />

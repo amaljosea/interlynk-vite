@@ -105,6 +105,7 @@ const Vulnerabilities = ({ sbomData }) => {
     },
     [prodVulnState?.direction, prodVulnState?.field]
   )
+
   /*   getEpssRangeArray */
   const epssRange = parseEpssRange(epss)
 
@@ -114,19 +115,19 @@ const Vulnerabilities = ({ sbomData }) => {
       skip: sbomId && activeTab === 'vulnerabilities' ? false : true,
       selector: 'sbom.vulns',
       variables: {
-        projectId: productId,
         sbomId: sbomId,
+        epss: epssRange,
+        kev: setKEV(kev),
+        projectId: productId,
+        orderBy: setOrder(searchInput),
+        direct: direct ? true : undefined,
         search: searchInput !== '' ? searchInput.trim() : undefined,
         severity: severities.length > 0 ? severities : undefined,
         source: include.includes('parts') ? undefined : 'COMPONENT',
         componentName: components.length > 0 ? components : undefined,
         status: statues.length > 0 ? statues : undefined,
-        kev: setKEV(kev),
-        epss: epssRange,
-        direct: direct === 'direct only' ? true : undefined,
         includeRetracted: include.includes('retracted') ? true : false,
-        vexComplete: vexComplete === 'all' ? undefined : false,
-        orderBy: setOrder(searchInput)
+        vexComplete: vexComplete === 'all' ? undefined : false
       }
     }
   )
@@ -145,8 +146,7 @@ const Vulnerabilities = ({ sbomData }) => {
       activeTab === 'vulnerabilities'
         ? false
         : true,
-    variables: { sbomIds, componentVulnIds },
-    onCompleted: (data) => console.log('Parts', data)
+    variables: { sbomIds, componentVulnIds }
   })
 
   const [activeRow, setActiveRow] = useState(null)
@@ -396,7 +396,6 @@ const Vulnerabilities = ({ sbomData }) => {
           noFooter
         >
           <ImportWizard
-            variant='circle'
             currentSbomId={sbomId}
             currentProductId={productId}
             onClose={IMPORT.onClose}

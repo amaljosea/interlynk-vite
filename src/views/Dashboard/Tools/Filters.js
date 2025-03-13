@@ -1,10 +1,10 @@
 import {
   Box,
+  Flex,
   Menu,
   MenuItemOption,
   MenuList,
-  MenuOptionGroup,
-  Stack
+  MenuOptionGroup
 } from '@chakra-ui/react'
 
 import MenuHeading from 'components/Misc/MenuHeading'
@@ -17,7 +17,6 @@ const ToolsFilterMenu = () => {
   const { toolsDispatch } = dispatch
 
   const onFilterStatus = (value) => {
-    console.log('value', value)
     if (value === 'all') {
       toolsDispatch({ type: 'FILTER_DIFF', payload: '' })
     } else {
@@ -34,7 +33,7 @@ const ToolsFilterMenu = () => {
   }
 
   return (
-    <Stack direction={'row'} alignItems={'center'} gap={2}>
+    <Flex alignItems={'center'} gap={2}>
       {/* STATUS */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu placement='top' closeOnSelect={false}>
@@ -100,7 +99,7 @@ const ToolsFilterMenu = () => {
           </MenuList>
         </Menu>
       </Box>
-    </Stack>
+    </Flex>
   )
 }
 

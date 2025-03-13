@@ -274,7 +274,7 @@ const DiffTable = ({ diffs, isLoading, sbomOne, sbomTwo }) => {
           justifyContent={'flex-start'}
           mb={4}
           px={4}
-          gap={4}
+          gap={2}
         >
           <SearchFilter
             id='compareVersions'

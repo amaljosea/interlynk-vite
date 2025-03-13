@@ -25,10 +25,6 @@ export const useSbomCompare = ({ sbomIdOne, sbomIdTwo }) => {
 
   const { sbomOne, sbomTwo, diffs } = dataResolved || {}
 
-  console.log({
-    data
-  })
-
   return {
     sbomOne,
     sbomTwo,

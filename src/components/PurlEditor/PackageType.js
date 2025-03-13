@@ -4,7 +4,7 @@ import { FormControl, FormLabel, Select } from '@chakra-ui/react'
 
 const PackageType = ({ disabled, type, onChange }) => {
   return (
-    <FormControl isDisabled={disabled}>
+    <FormControl isDisabled={disabled} isRequired>
       <FormLabel htmlFor='type'>Package Type</FormLabel>
       <Select
         size='md'

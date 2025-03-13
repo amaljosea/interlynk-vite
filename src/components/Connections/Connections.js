@@ -175,7 +175,7 @@ const Connections = ({ org }) => {
           <Flex wrap='wrap' gap={'20px'}>
             {!isFreeTier && (
               <ConnectionCard
-                name='BitBucket'
+                name='Bitbucket'
                 icon={FaBitbucket}
                 color={primaryBlueText}
                 onConfigure={BITBUCKET.onOpen}

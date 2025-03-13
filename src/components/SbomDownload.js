@@ -96,7 +96,6 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
       }
       setIsLoading(false)
     } catch (error) {
-      console.error('Error downloading original SBOM:', error)
       showToast({
         description: `Internal error during SBOM download. Please try again in a few minutes.`,
         status: 'error'
@@ -193,7 +192,6 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
 
       setIsLoading(false)
     } catch (error) {
-      console.error('Error downloading support level CSV:', error)
       showToast({
         description: 'Error processing the SBOM CSV download.',
         status: 'error'
@@ -216,7 +214,7 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
         params?.sbomid
       )
     } catch (err) {
-      console.log(err)
+      console.warn(err)
       showToast({
         description:
           'Error downloading SBOM spreadsheet. Please try again later.',

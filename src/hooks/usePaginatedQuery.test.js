@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client'
-import { act, renderHook } from '@testing-library/react-hooks'
+import { act, renderHook } from '@testing-library/react'
 
 import { usePaginatedQuery } from './usePaginatedQuery'
 

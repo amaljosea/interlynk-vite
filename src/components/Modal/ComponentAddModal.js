@@ -9,7 +9,7 @@ import { InfoIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import { useDisclosure } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 import { Flex, Stack, Text, Tooltip } from '@chakra-ui/react'
-import { Checkbox, Input, Select, Textarea } from '@chakra-ui/react'
+import { Checkbox, Input, Textarea } from '@chakra-ui/react'
 
 import CpeEditor from 'components/CpeEditor'
 import CpeField from 'components/CpeField'
@@ -17,6 +17,7 @@ import DividerWithText from 'components/DividerWithText'
 import LicenseField from 'components/Licenses/LicenseField'
 import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
+import LynkSelect from 'components/LynkSelect'
 import CompInfo from 'components/Misc/CompInfo'
 import LynkFormLabel from 'components/Misc/LynkLabel'
 import PrimaryWarning from 'components/Modal/PrimaryWarning'
@@ -48,7 +49,7 @@ function ComponentAddModal(props) {
 
   const { tabData, handleChange, resetData, setTabData } =
     useContext(TabContext)
-  const { details, identifiers, relations } = tabData || ''
+  const { details, identifiers, relationships } = tabData || ''
 
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
@@ -82,6 +83,38 @@ function ComponentAddModal(props) {
   defaultDate.setDate(defaultDate.getDate() + 90)
   const [isValidDate, setIsValidDate] = useState(true)
 
+  const scopeOptions = [
+    { value: '', label: '-- Select --' },
+    { value: 'excluded', label: 'Excluded' },
+    { value: 'optional', label: 'Optional' },
+    { value: 'required', label: 'Required' }
+  ]
+
+  const supportLevels = [
+    { value: '', label: '-- Select --' },
+    { value: 'UNSPECIFIED', label: 'Unspecified' },
+    { value: 'ACTIVELY_MAINTAINED', label: 'Actively Maintained' },
+    { value: 'NO_LONGER_MAINTAINED', label: 'No Longer Maintained' },
+    { value: 'ABANDONED', label: 'Abandoned' }
+  ]
+
+  const relationshipTypes = [
+    { value: '', label: '-- Select --' },
+    { value: 'depends_on', label: 'Depends On' }
+  ]
+
+  const componentOptions = [...allComponents]
+    ?.sort((a, b) => a?.name?.localeCompare(b?.name))
+    .map((item) => ({
+      value: item.id,
+      label: `${item.name}-${item.version}`
+    }))
+
+  componentOptions.unshift({
+    value: '',
+    label: '-- Select --'
+  })
+
   const handleDateChange = (newDate) => {
     const isValidDate = newDate && !isNaN(newDate)
     setTabData((prev) => ({
@@ -107,7 +140,10 @@ function ComponentAddModal(props) {
     },
     onCompleted: (data) => {
       data && setAllComponents(data?.sbom?.components?.nodes)
-      setTabData((prev) => ({ ...prev, relations: { relType: '', to: '' } }))
+      setTabData((prev) => ({
+        ...prev,
+        relationships: { relType: '', to: '' }
+      }))
     }
   })
 
@@ -159,12 +195,12 @@ function ComponentAddModal(props) {
             description: `Data added successfully`,
             status: 'success'
           })
-          if (relations && component) {
+          if (relationships && component) {
             addRelation({
               variables: {
                 from: component?.id,
-                to: relations?.to,
-                relType: relations?.relType
+                to: relationships?.to,
+                relType: relationships?.relType
               }
             })
           }
@@ -354,27 +390,26 @@ function ComponentAddModal(props) {
                     htmlFor='componentType'
                     info={onCheck(`Component Type`)}
                   />
-                  <Select
+                  <LynkSelect
                     name='kind'
                     aria-label='kind'
-                    value={details?.kind}
-                    isDisabled={isCustomerView}
-                    textTransform={'capitalize'}
-                    onChange={(e) =>
-                      handleChange('details', 'kind', e.target.value)
+                    value={
+                      componentTypes.find(
+                        (item) => item.value === details?.kind
+                      ) || ''
                     }
-                  >
-                    <option value=''>-- Select --</option>
-                    {componentTypes?.map((item, index) => (
-                      <option
-                        key={index}
-                        value={item}
-                        style={{ textTransform: 'capitalize' }}
-                      >
-                        {item}
-                      </option>
-                    ))}
-                  </Select>
+                    isDisabled={isCustomerView}
+                    onChange={(selectedOption) =>
+                      handleChange('details', 'kind', selectedOption?.value)
+                    }
+                    options={componentTypes}
+                    dropDown={true}
+                    placeholder={
+                      componentTypes.find(
+                        (item) => item.value === details?.kind
+                      )?.label || '--Select--'
+                    }
+                  />
                 </FormControl>
                 {/* LICENSES */}
                 <LicenseField
@@ -413,21 +448,20 @@ function ComponentAddModal(props) {
                     htmlFor='compScope'
                     info={onCheck(`Component Scope`)}
                   />
-                  <Select
+                  <LynkSelect
                     name='scope'
-                    value={details?.scope}
-                    isDisabled={isCustomerView}
-                    onChange={(e) =>
-                      handleChange('details', 'scope', e.target.value)
+                    value={
+                      scopeOptions.find(
+                        (item) => item.value === details?.scope
+                      ) || ''
                     }
-                  >
-                    <option value='' style={{ background: 'lightgray' }}>
-                      -- Select --
-                    </option>
-                    <option value='excluded'>Excluded</option>
-                    <option value='optional'>Optional</option>
-                    <option value='required'>Required</option>
-                  </Select>
+                    isDisabled={isCustomerView}
+                    onChange={(selectedOption) => {
+                      handleChange('details', 'scope', selectedOption?.value)
+                    }}
+                    options={scopeOptions}
+                    dropDown={true}
+                  />
                 </FormControl>
                 {/* SUPPRT LEVEL */}
                 <FormControl hidden={signedUrlParams}>
@@ -436,26 +470,24 @@ function ComponentAddModal(props) {
                     htmlFor='supportLevel'
                     info={onCheck(`Support Level`)}
                   />
-                  <Select
+                  <LynkSelect
                     name='supportLevel'
-                    value={details?.supportLevel}
-                    isDisabled={isCustomerView}
-                    onChange={(e) =>
-                      handleChange('details', 'supportLevel', e.target.value)
+                    value={
+                      supportLevels.find(
+                        (item) => item.value === details?.supportLevel
+                      ) || ''
                     }
-                  >
-                    <option value='' style={{ background: 'lightgray' }}>
-                      -- Select --
-                    </option>
-                    <option value='UNSPECIFIED'>Unspecified</option>
-                    <option value='ACTIVELY_MAINTAINED'>
-                      Actively Maintained
-                    </option>
-                    <option value='NO_LONGER_MAINTAINED'>
-                      No Longer Maintained
-                    </option>
-                    <option value='ABANDONED'>Abandoned</option>
-                  </Select>
+                    isDisabled={isCustomerView}
+                    onChange={(selectedOption) =>
+                      handleChange(
+                        'details',
+                        'supportLevel',
+                        selectedOption?.value
+                      )
+                    }
+                    options={supportLevels}
+                    dropDown={true}
+                  />
                 </FormControl>
                 {/* END-OF-SUPPORT DATE */}
                 <FormControl
@@ -526,45 +558,44 @@ function ComponentAddModal(props) {
                   <FormLabel htmlFor='relation' color={headingTextColor}>
                     Type
                   </FormLabel>
-                  <Select
+                  <LynkSelect
                     size='md'
                     id='relation'
-                    value={relations?.relType}
-                    onChange={(e) =>
-                      handleChange('relations', 'relType', e.target.value)
+                    value={
+                      relationshipTypes.find(
+                        (item) => item.value === relationships?.relType
+                      ) || ''
                     }
-                  >
-                    <option value=''>-- Select --</option>
-                    {[{ value: 'depends_on', label: 'Depends On' }].map(
-                      (item, idx) => (
-                        <option key={idx} value={item.value}>
-                          {item.label}
-                        </option>
+                    onChange={(selectedOption) =>
+                      handleChange(
+                        'relationships',
+                        'relType',
+                        selectedOption?.value
                       )
-                    )}
-                  </Select>
+                    }
+                    options={relationshipTypes}
+                    dropDown={true}
+                  />
                 </FormControl>
                 <FormControl hidden={signedUrlParams}>
                   <FormLabel htmlFor='component' color={headingTextColor}>
                     Component
                   </FormLabel>
-                  <Select
+                  <LynkSelect
                     size='md'
                     id='component'
-                    value={relations?.to}
-                    onChange={(e) =>
-                      handleChange('relations', 'to', e.target.value)
+                    value={
+                      componentOptions.find(
+                        (item) => item.value === relationships?.to
+                      ) || ''
                     }
-                  >
-                    <option value=''>-- Select --</option>
-                    {[...allComponents]
-                      .sort((a, b) => a?.name?.localeCompare(b?.name))
-                      .map((item, idx) => (
-                        <option key={idx} value={item.id}>
-                          {item.name}-{item.version}
-                        </option>
-                      ))}
-                  </Select>
+                    onChange={(selectedOption) =>
+                      handleChange('relationships', 'to', selectedOption?.value)
+                    }
+                    options={componentOptions}
+                    isCreatable={false}
+                    dropDown={true}
+                  />
                 </FormControl>
               </Stack>
             </>

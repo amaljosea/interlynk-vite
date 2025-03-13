@@ -21,7 +21,7 @@ const PurlCard = ({ value, isOpen, onClose }) => {
       const data = PackageURL.fromString(decodeURI(value))
       return data
     } catch (error) {
-      console.log('error', error)
+      console.warn('error', error)
     }
   }
 

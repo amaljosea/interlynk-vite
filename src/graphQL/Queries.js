@@ -72,24 +72,45 @@ export const UserSettings = gql`
 
 // GET USERS
 export const GetUsers = gql`
-  query GetUsers($search: String) {
+  query GetUsers(
+    $search: String
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
     organization {
-      users(search: $search) {
-        id
-        name
-        email
-        role {
+      users(
+        search: $search
+        after: $after
+        before: $before
+        first: $first
+        last: $last
+      ) {
+        nodes {
           id
           name
-          permissions
+          email
+          role {
+            id
+            name
+            permissions
+          }
+          createdAt
+          invitationStatus
+          invitationAcceptedAt
+          profileImage {
+            filename
+            url
+          }
         }
-        createdAt
-        invitationStatus
-        invitationAcceptedAt
-        profileImage {
-          filename
-          url
+        pageInfo {
+          endCursor
+          hasNextPage
+          hasPreviousPage
+          startCursor
         }
+        totalCount
       }
     }
   }
@@ -3904,6 +3925,7 @@ export const GetCompSupportData = gql`
     $after: String
     $before: String
     $search: String
+    $includeParts: Boolean
     $supportLevel: [String!]
     $orderBy: ComponentOrderByInput
   ) {
@@ -3916,6 +3938,7 @@ export const GetCompSupportData = gql`
         before: $before
         search: $search
         orderBy: $orderBy
+        includeParts: $includeParts
         supportLevel: $supportLevel
       ) {
         totalCount
@@ -3931,6 +3954,15 @@ export const GetCompSupportData = gql`
           version
           internal
           updatedAt
+          sbom {
+            id
+            project {
+              projectGroup {
+                name
+              }
+            }
+            projectVersion
+          }
           componentSupportLevel {
             componentId
             createdAt
@@ -4800,10 +4832,10 @@ export const GetOrgConnections = gql`
               id
               userName
               apiToken
-              workspace
               createdAt
               updatedAt
-              userName
+              workspace
+              checkWebhookAccess
               checkWorkspaceAccess
               checkRepositoryAccess
             }
@@ -6182,6 +6214,27 @@ export const GetActivities = gql`
           }
           action
           result
+        }
+      }
+    }
+  }
+`
+
+export const BitbucketWorkspace = gql`
+  query BitbucketWorkspace($first: Int) {
+    bitbucketWorkspaces(first: $first) {
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      edges {
+        cursor
+        node {
+          uuid
+          name
+          slug
         }
       }
     }

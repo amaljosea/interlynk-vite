@@ -50,7 +50,7 @@ const TeamModal = ({ isOpen, onClose, data, changeRole }) => {
         }
       })
     } catch (error) {
-      console.log(`Error`, error)
+      console.warn(`Error`, error)
     }
   }
 

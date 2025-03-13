@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-import SupportFilters from 'views/Customer/Sbom/SupportFilters'
 import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -11,6 +10,8 @@ import { useRouteFlags } from 'hooks/useRouteFlags'
 
 import { FaPen } from 'react-icons/fa6'
 
+import SupportFilters from '../../SupportFilters'
+
 const SupportSubHeader = ({
   reset,
   filterText,
@@ -18,7 +19,8 @@ const SupportSubHeader = ({
   handleClear,
   onSearchInputChange,
   handleStatus,
-  selectedItems
+  selectedItems,
+  supportData
 }) => {
   const { isCustomerView } = useRouteFlags()
 
@@ -45,20 +47,26 @@ const SupportSubHeader = ({
               />
             </Tooltip>
           )}
-          {!isCustomerView && <ExportCsv tableType='SBOM Support View' />}
+          {!isCustomerView && (
+            <ExportCsv
+              tableType='Support Status View'
+              filters={{ ...supportData }}
+            />
+          )}
           <RefreshBtn onClick={() => reset()} />
         </Stack>
       </Flex>
     )
   }, [
-    isCustomerView,
     filterText,
+    onSearchInputChange,
     handleClear,
     handleSearch,
-    handleStatus,
-    onSearchInputChange,
     reset,
-    selectedItems?.length
+    isCustomerView,
+    selectedItems?.length,
+    handleStatus,
+    supportData
   ])
 
   return subHeader

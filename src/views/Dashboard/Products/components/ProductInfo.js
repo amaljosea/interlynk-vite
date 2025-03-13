@@ -15,14 +15,9 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { GetVersionsDate } from 'graphQL/Queries'
 
 import { FaArchive } from 'react-icons/fa'
-import {
-  FaBug,
-  FaLayerGroup,
-  FaRobot,
-  FaTag,
-  FaWindowMaximize
-} from 'react-icons/fa6'
+import { FaBug, FaRobot, FaTag, FaWindowMaximize } from 'react-icons/fa6'
 import { IoMdWarning } from 'react-icons/io'
+import { TbActivity } from 'react-icons/tb'
 
 const ProductInfo = ({ settings, data, filters, handleSort }) => {
   const params = useParams()
@@ -131,7 +126,7 @@ const ProductInfo = ({ settings, data, filters, handleSort }) => {
           />
           <SettingsTag
             hidden={isFreeTier}
-            icon={<FaLayerGroup />}
+            icon={<TbActivity />}
             isDisabled={!enableSupportLevel}
             label={`Component Support Analysis ${enableSupportLevel ? 'Enabled' : 'Disabled'}`}
           />

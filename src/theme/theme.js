@@ -1,5 +1,4 @@
 /* eslint-disable */
-import { StepsStyleConfig as Steps } from 'chakra-ui-steps'
 import { getItem } from 'utils/localStorageUtils'
 
 import { extendTheme } from '@chakra-ui/react'
@@ -142,12 +141,12 @@ const colors = {
     dark: '#1C4532' // green.900
   },
   secondaryRedBorder: {
-    light: '#FED7D7', // red.100
-    dark: '#1A202C' // gray.800
+    light: '#FEB2B2', // red.300
+    dark: '#822727' // red.800
   },
   secondaryGreenBorder: {
-    light: '#C6F6D5', //green.100
-    dark: '#1A202C' //gray.800
+    light: '#9AE6B4', //green.300
+    dark: '#22543D' //green.800
   },
   // Error Colors
   primaryErrorColor: {
@@ -170,14 +169,14 @@ const colorMode = getItem('chakra-ui-color-mode')
 
 export const config = {
   initialColorMode: colorMode ? colorMode : 'system',
-  useSystemColorMode: colorMode ? false : true
+  useSystemColorMode: colorMode ? false : true,
+  disableTransitionOnChange: false
 }
 
 export default extendTheme(
   {
     breakpoints,
     components: {
-      Steps,
       Heading: { baseStyle: { fontFamily: 'inherit', fontWeight: 'semibold' } },
       FormLabel: { baseStyle: { fontSize: 12, marginBottom: '4px' } },
       Input: { variants: { outline: { field: { fontSize: 'sm' } } } },

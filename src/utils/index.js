@@ -399,7 +399,8 @@ export const generateCsvFileName = ({
   product,
   version,
   vulnId,
-  projectGroupName
+  projectGroupName,
+  orgName
 }) => {
   const filterStatus = applyFilters ? 'Filtered' : 'Unfiltered'
   const rowCount = rowsToExport === '200' ? 'All' : rowsToExport
@@ -412,7 +413,8 @@ export const generateCsvFileName = ({
     'Vulnerability View': projectGroupName
       ? `${projectGroupName}-Vulnerabilities-${filterStatus}-${rowCount}.csv`
       : `Vulnerabilities-${filterStatus}-${rowCount}.csv`,
-    'SBOM Support View': `${product}-${version}-Support-${filterStatus}-${rowCount}.csv`
+    'Support Status View': `${product}-${version}-Support-${filterStatus}-${rowCount}.csv`,
+    Users: `${orgName}-Users.csv`
   }
 
   return fileNameTemplates[tableType] || ''
@@ -647,5 +649,26 @@ export const formatSupportLevel = (level) => {
 }
 
 export const fetchNodes = (res, selector) => {
-  return selector.split('.').reduce((acc, key) => acc?.[key], res.data)
+  return selector?.split('.')?.reduce((acc, key) => acc?.[key], res?.data)
+}
+
+export const calculateExpiryDate = (days) => {
+  const today = new Date()
+  today.setUTCDate(today.getUTCDate() + days)
+  return today.toLocaleDateString()
+}
+
+export const setIntensity = (level) => {
+  switch (level) {
+    case 'unspecified':
+      return 'cyan'
+    case 'actively_maintained':
+      return 'green'
+    case 'no_longer_maintained':
+      return 'orange'
+    case 'abandoned':
+      return 'red'
+    default:
+      return 'gray'
+  }
 }

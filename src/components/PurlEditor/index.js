@@ -58,7 +58,6 @@ const PurlEditor = ({ isOpen, onOpen, onClose }) => {
 
   const handleSave = () => {
     try {
-      console.log('PURL_STRING', PURL_STRING)
       const pkg = PackageURL.fromString(PURL_STRING)
       setTabData((prev) => ({
         ...prev,
@@ -101,7 +100,7 @@ const PurlEditor = ({ isOpen, onOpen, onClose }) => {
             : ''
         }))
       } catch (error) {
-        console.log('Error', error)
+        console.warn('Error', error)
       }
     }
   }, [identifiers?.purl])

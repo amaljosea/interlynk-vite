@@ -82,11 +82,7 @@ const License = ({ data, permission }) => {
   return (
     <>
       {license && license !== '' ? (
-        <Tag
-          variant='subtle'
-          colorScheme='green'
-          sx={{ w: 'fit-content', my: 2, h: 7 }}
-        >
+        <Tag variant='subtle' colorScheme='green'>
           <TagLabel>{parseLicenseString(license)}</TagLabel>
           <TagRightIcon
             as={FaPen}

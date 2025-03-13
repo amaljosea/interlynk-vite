@@ -103,13 +103,10 @@ const ProdFilterMenu = (props) => {
 
   const handleMenuClick = (event, value) => {
     if (event.shiftKey) {
-      console.log('Shift key was held down during selection!', value)
       setFilterMode('AND')
     } else {
-      console.log('No Shift key.', value)
       setFilterMode('OR')
     }
-    console.log('Selected value:', value)
     if (value !== 'All') {
       setSelectedTags((prevTags) =>
         prevTags.includes(value)

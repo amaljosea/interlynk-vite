@@ -105,7 +105,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
             }
           })
           .catch((error) => {
-            console.error('Error fetching licenses:', error)
+            console.warn('Error fetching licenses:', error)
             setLicenseList([])
           })
       } else {

@@ -43,7 +43,7 @@ const refreshToken = async () => {
 
     if (!response.ok) {
       const errorResponse = await response.json()
-      console.error('Server error:', errorResponse)
+      console.warn('Server error:', errorResponse)
       throw new Error('Failed to refresh token')
     }
 
@@ -64,7 +64,7 @@ const refreshToken = async () => {
     return access_token
   } catch (error) {
     logoutUser().then(() => (window.location.href = '/auth'))
-    console.error('Token refresh failed:', error)
+    console.warn('Token refresh failed:', error)
     toastCache({
       title: 'Session Expired',
       description: 'Please log in again.',

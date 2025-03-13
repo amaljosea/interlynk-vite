@@ -23,7 +23,7 @@ const Phases = ({ data, permission }) => {
             <Tag
               key={index}
               variant='subtle'
-              colorScheme='orange'
+              colorScheme='cyan'
               sx={{ w: 'fit-content', h: 7 }}
             >
               <TagLabel textTransform='capitalize'>{item}</TagLabel>

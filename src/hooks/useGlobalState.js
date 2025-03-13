@@ -85,7 +85,7 @@ const GlobalStateProvider = ({ children }) => {
     epss: '',
     minEpss: 0,
     maxEpss: 0,
-    direct: 'all',
+    direct: false,
     filters: null,
     selectedVulns: [],
     importSbom: [],
@@ -132,8 +132,9 @@ const GlobalStateProvider = ({ children }) => {
   // COMPONENT SUPPORT
   const [supportState, supportDispatch] = useReducer(supportReducer, {
     level: [],
-    field: 'COMPONENTS_UPDATED_AT',
-    direction: 'DESC',
+    include: [],
+    field: 'COMPONENT_SUPPORT_LEVELS_UPDATED_AT',
+    direction: 'ASC',
     searchInput: ''
   })
   // GLOBAL VULNERABILITIES

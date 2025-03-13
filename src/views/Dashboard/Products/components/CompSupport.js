@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getFullDate, timeSince } from 'utils'
+import { calculateExpiryDate, getFullDate, timeSince } from 'utils'
 
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import {
@@ -11,6 +11,7 @@ import {
   Select,
   SimpleGrid,
   Stack,
+  Tag,
   Text,
   Tooltip,
   useDisclosure
@@ -48,13 +49,27 @@ const CompSupport = ({ data, isOpen, onClose }) => {
 
   const { componentSupportLevel } = supports?.component || {}
 
+  const Header = () => {
+    if (!data) return null
+    return (
+      <Flex gap={2}>
+        <CompInfo data={data} />
+        {data?.internal && (
+          <Tag w={'fit-content'} colorScheme='blue'>
+            Internal
+          </Tag>
+        )}
+      </Flex>
+    )
+  }
+
   return (
     <LynkDrawer
       noFooter
       isOpen={isOpen}
       onClose={onClose}
+      subtitle={<Header />}
       title={'Edit Support Status'}
-      subtitle={data ? <CompInfo data={data} /> : null}
     >
       {loading ? (
         <CustomLoader />
@@ -134,7 +149,7 @@ const SupportCard = ({ setEdit, data }) => {
           <Text {...label}>Assessment Expires On</Text>
           <Text {...infoStyle} textTransform={'capitalize'}>
             {retainManualOverrideFor
-              ? `${retainManualOverrideFor} Days`
+              ? calculateExpiryDate(retainManualOverrideFor)
               : 'N/A'}
           </Text>
         </SimpleGrid>

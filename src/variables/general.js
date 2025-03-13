@@ -1,7 +1,7 @@
 import BSI from 'assets/img/bsi.jpg'
 import FDA from 'assets/img/fda.jpg'
 import NTIA from 'assets/img/ntia.jpg'
-import { getFullDate } from 'utils'
+import { capitalizeFirstLetter, getFullDate } from 'utils'
 
 import { Stack, Text } from '@chakra-ui/react'
 
@@ -62,18 +62,19 @@ export const vulnStatusTypes = [
 ]
 
 export const componentTypes = [
-  'application',
-  'container',
-  'data',
-  'device',
-  'device-driver',
-  'file',
-  'firmware',
-  'framework',
-  'library',
-  'machine-learning-model',
-  'operating-system',
-  'platform'
+  { value: '', label: '-- Select --' },
+  { value: 'application', label: 'Application' },
+  { value: 'container', label: 'Container' },
+  { value: 'data', label: 'Data' },
+  { value: 'device', label: 'Device' },
+  { value: 'device-driver', label: 'Device Driver' },
+  { value: 'file', label: 'File' },
+  { value: 'firmware', label: 'Firmware' },
+  { value: 'framework', label: 'Framework' },
+  { value: 'library', label: 'Library' },
+  { value: 'machine-learning-model', label: 'Machine Learning Model' },
+  { value: 'operating-system', label: 'Operating System' },
+  { value: 'platform', label: 'Platform' }
 ]
 
 export const namespaceOptions = {
@@ -824,7 +825,7 @@ export const infoData = [
     desc: `Creatat At is the date and time that the SBOM describing this version was produced. This can be different than when the SBOM was imported into the Interlynk system.`
   },
   {
-    title: `SBOM Phases`,
+    title: `Phases`,
     desc: `Phases identify the product lifecycle phase(s) that this SBOM represents.`
   },
   {
@@ -1400,7 +1401,7 @@ export const exportCsvTableConfig = {
       })
     }
   },
-  'SBOM Support View': {
+  'Support Status View': {
     defaultSelectedColumns: [
       'Name',
       'Version',
@@ -1408,17 +1409,28 @@ export const exportCsvTableConfig = {
       'Support Level',
       'End Of Support'
     ],
-    additionalColumns: ['Assessed Date', 'Last Assessed By', 'Explanation'],
-    mapDataForExport: (data) => {
+    additionalColumns: [
+      'Part',
+      'Assessed Date',
+      'Last Assessed By',
+      'Explanation'
+    ],
+    mapDataForExport: (data, filters) => {
       return data.map((row) => {
-        const { name, version, componentSupportLevel } = row || {}
+        const { name, version, sbom, componentSupportLevel } = row || {}
         const { level, endDate, user, notes, updatedAt } =
           componentSupportLevel || {}
+
+        const { projectVersion, project } = sbom || {}
+        const { projectGroup } = project || {}
+
         return {
           Name: name,
           Version: version,
-          Assessment: user?.id ? 'Manual' : 'Automatic',
-          'Support Level': level ? level?.replaceAll('_', ' ') : 'N/A',
+          Assessment: user?.name ? 'Manual' : 'Automatic',
+          'Support Level': level
+            ? capitalizeFirstLetter(level?.replaceAll('_', ' '))
+            : 'N/A',
           'End Of Support': endDate
             ? new Date(endDate).toLocaleDateString()
             : 'N/A',
@@ -1426,7 +1438,29 @@ export const exportCsvTableConfig = {
             ? new Date(updatedAt).toLocaleDateString()
             : 'N/A',
           'Last Assessed By': user?.name || 'N/A',
-          Explanation: notes || 'N/A'
+          Explanation: notes || 'N/A',
+          Part: filters?.includeParts
+            ? `${projectGroup?.name} ${projectVersion && `: ${projectVersion}`}`
+            : 'N/A'
+        }
+      })
+    }
+  },
+  Users: {
+    defaultSelectedColumns: ['Name', 'Email', 'Role', 'Joined', 'Status'],
+    additionalColumns: [],
+    mapDataForExport: (data) => {
+      return data?.map((row) => {
+        const { email, name, role, invitationAcceptedAt, invitationStatus } =
+          row || {}
+        return {
+          Name: name || 'N/A',
+          Email: email || 'N/A',
+          Role: role?.name || 'N/A',
+          Joined: invitationAcceptedAt
+            ? new Date(invitationAcceptedAt).toLocaleDateString()
+            : 'N/A',
+          Status: invitationStatus?.replace(/_/g, ' ') || 'N/A'
         }
       })
     }

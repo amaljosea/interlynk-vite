@@ -19,6 +19,7 @@ import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import LicenseField from 'components/Licenses/LicenseField'
 import LynkAlert from 'components/LynkAlert'
+import LynkSelect from 'components/LynkSelect'
 import LynkFormLabel from 'components/Misc/LynkLabel'
 import PrimaryWarning from 'components/Modal/PrimaryWarning'
 
@@ -48,7 +49,9 @@ const CompDetails = ({ data, primaryComp }) => {
     handleChange,
     saveChanges,
     alert,
-    setAlert
+    setAlert,
+    alertMessage,
+    alertMessageSetter
   } = useContext(TabContext)
   const { details } = tabData
 
@@ -119,7 +122,7 @@ const CompDetails = ({ data, primaryComp }) => {
       if (errors?.length > 0) {
         showToast({ description: errors[0], status: 'error' })
       } else {
-        saveChanges()
+        saveChanges('details')
         showToast({
           description: 'Details updated successfully',
           status: 'success'
@@ -132,6 +135,8 @@ const CompDetails = ({ data, primaryComp }) => {
   const checkData = () => {
     // eslint-disable-next-line no-unused-vars
     const { details, ...rest } = unsavedChanges
+
+    alertMessageSetter(rest)
     return Object.values(rest).some((value) => value === true)
   }
 
@@ -316,23 +321,23 @@ const CompDetails = ({ data, primaryComp }) => {
             htmlFor='componentType'
             info={onCheck(`Component Type`)}
           />
-          <Select
+          <LynkSelect
             name='kind'
-            value={details?.kind}
-            textTransform={'capitalize'}
-            onChange={(e) => handleChange('details', 'kind', e.target.value)}
-          >
-            <option value=''>-- Select --</option>
-            {componentTypes?.map((item, index) => (
-              <option
-                key={index}
-                value={item}
-                style={{ textTransform: 'capitalize' }}
-              >
-                {item}
-              </option>
-            ))}
-          </Select>
+            aria-label='kind'
+            value={
+              componentTypes.find((item) => item.value === details?.kind) || ''
+            }
+            isDisabled={isCustomerView}
+            onChange={(selectedOption) =>
+              handleChange('details', 'kind', selectedOption?.value)
+            }
+            options={componentTypes}
+            dropDown={true}
+            placeholder={
+              componentTypes.find((item) => item.value === details?.kind)
+                ?.label || '--Select--'
+            }
+          />
         </FormControl>
         {/* LICENSES */}
         <LicenseField
@@ -399,10 +404,7 @@ const CompDetails = ({ data, primaryComp }) => {
 
         {alert ? (
           <Stack spacing={4}>
-            <LynkAlert
-              status='warning'
-              msg='Saving will apply changes to this tab only. save other tabs separately to retain their data.'
-            />
+            <LynkAlert status='warning' msg={alertMessage} />
             <ActionButton
               title={'Save'}
               isDisabled={isInvalid}

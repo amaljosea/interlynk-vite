@@ -1,8 +1,8 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { TabContext } from 'context/TabContext'
-import { useContext, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { hasWhiteSpace, validateUrl } from 'utils/formValidationUtils'
+import { validateEmail } from 'utils/formValidationUtils'
 import { componentTypes, infoData, sbomPhases } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
@@ -43,8 +43,6 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
 
   const { nodes } = data?.sbom?.components || ''
 
-  const { saveChanges } = useContext(TabContext)
-
   const productId = params.productid
 
   const [phases, setPhases] = useState([])
@@ -56,11 +54,6 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
   const [compScope, setCompScope] = useState('')
   const [isInternal, setIsInternal] = useState(false)
   const [error, setError] = useState('')
-
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return emailRegex.test(email)
-  }
 
   const initialData = useMemo(
     () => ({
@@ -145,7 +138,6 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
       }
     }).then((res) => {
       if (res?.data) {
-        saveChanges()
         handleSave(id)
       }
     })
@@ -169,6 +161,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
       }
     }).then((res) => {
       if (res.data.sbomCreate.errors.length === 0) {
+        setCompVersion('')
         handleCreateComp(res?.data?.sbomCreate?.sbom?.id)
       } else {
         showToast({
@@ -324,25 +317,17 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
               htmlFor='componentType'
               info={onCheck(`Component Type`)}
             />
-            <Select
-              value={compKind}
+            <LynkSelect
               id='componentType'
               name='componentType'
+              value={
+                componentTypes.find((item) => item.value === compKind) || ''
+              }
               isDisabled={isCustomerView}
-              onChange={(e) => setCompKind(e.target.value)}
-              textTransform={'capitalize'}
-            >
-              <option value=''>-- Select --</option>
-              {componentTypes?.map((item, index) => (
-                <option
-                  key={index}
-                  value={item}
-                  style={{ textTransform: 'capitalize' }}
-                >
-                  {item}
-                </option>
-              ))}
-            </Select>
+              onChange={(selectedOption) => setCompKind(selectedOption?.value)}
+              options={componentTypes}
+              dropDown={true}
+            />
           </FormControl>
           {/* PHASES */}
           <FormControl hidden={isCustomerView}>

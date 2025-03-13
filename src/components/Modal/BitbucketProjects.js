@@ -97,7 +97,7 @@ const BitbucketProjects = ({ isOpen, onClose }) => {
       buttonText={'Save'}
       onSubmit={handleSubmit}
       isLoading={importLoading}
-      title={'Add BitBucket Projects'}
+      title={'Add Bitbucket Projects'}
     >
       {loading ? (
         <CustomLoader />
@@ -124,8 +124,12 @@ const BitbucketProjects = ({ isOpen, onClose }) => {
                   >
                     {item?.node?.name}
                   </Checkbox>
+                  <Text pl={6} fontSize='sm' color={secondaryTextColor}>
+                    {item?.node?.mainbranch}
+                  </Text>
                   <Checkbox
                     pl={6}
+                    hidden
                     size='sm'
                     isReadOnly
                     fontSize={'sm'}
@@ -135,9 +139,6 @@ const BitbucketProjects = ({ isOpen, onClose }) => {
                     Import SBOM
                   </Checkbox>
                 </Stack>
-                <Text fontSize='sm' color={secondaryTextColor}>
-                  {item?.node?.mainbranch}
-                </Text>
               </ListItem>
             ))}
           </List>

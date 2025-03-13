@@ -125,8 +125,7 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
   // GET SBOM PARTS
   const { data: deep } = useQuery(CheckDeepParts, {
     skip: selectedProd && selectedVersion ? false : true,
-    variables: { projectId: selectedProd, sbomId: selectedVersion },
-    onCompleted: (data) => console.log('Deep parts', data)
+    variables: { projectId: selectedProd, sbomId: selectedVersion }
   })
 
   const isExists = partsData?.sbom?.sbomParts?.some(

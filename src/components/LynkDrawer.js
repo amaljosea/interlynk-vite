@@ -43,7 +43,7 @@ const LynkDrawer = ({
     >
       <DrawerOverlay />
       <DrawerContent>
-        <DrawerCloseButton mt={'7px'} />
+        <DrawerCloseButton mt={'7px'} aria-label='comp_close' />
         <DrawerHeader
           fontWeight='500'
           borderBottomWidth='1px'
@@ -81,6 +81,7 @@ const LynkDrawer = ({
               {cancelButtonTitle}
             </Button>
             <Button
+              aria-label='drawer_submit'
               colorScheme='blue'
               isLoading={isLoading}
               isDisabled={isDisabled}

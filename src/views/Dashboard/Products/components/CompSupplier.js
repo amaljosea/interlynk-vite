@@ -56,9 +56,11 @@ const CompSupplier = ({ data }) => {
     unsavedChanges,
     alert,
     setAlert,
-    tab
+    tab,
+    alertMessageSetter,
+    alertMessage
   } = useContext(TabContext)
-  const { supplier } = tabData
+  const { suppliers: tabSuppiers } = tabData
 
   const [isValidUrl, setIsValidUrl] = useState('')
   const [nameError, setNameError] = useState('')
@@ -66,16 +68,16 @@ const CompSupplier = ({ data }) => {
   const [isDisabled, setIsDisabled] = useState(false)
 
   const { data: result } = useQuery(GetSupplier, {
-    skip: tab === 'supplier' ? false : true,
+    skip: tab === 'suppliers' ? false : true,
     variables: { id, sbomId }
   })
   const { suppliers } = result?.component || ''
 
-  const containsSpace = hasWhiteSpace(supplier?.url)
+  const containsSpace = hasWhiteSpace(tabSuppiers?.url)
 
   const onSupplierChange = (e) => {
     const { value } = e.target
-    handleChange('supplier', 'contactName', value)
+    handleChange('suppliers', 'contactName', value)
     if ((value.length > 0 && value.length < 4) || value.length > 256) {
       setNameError('Input must be between 4 and 256 characters')
     } else {
@@ -91,10 +93,10 @@ const CompSupplier = ({ data }) => {
     disableButtonTemporarily(setIsDisabled, 4000)
     deleteSupplier({ variables: { id: suppliers[0]?.id } }).then((res) => {
       if (res?.data) {
-        saveChanges()
+        saveChanges('suppliers')
         setTabData((prev) => ({
           ...prev,
-          supplier: {
+          suppliers: {
             name: '',
             url: '',
             contactName: '',
@@ -114,14 +116,14 @@ const CompSupplier = ({ data }) => {
     createSupplier({
       variables: {
         componentId: id,
-        url: supplier?.url,
-        name: supplier?.name,
-        contactName: supplier?.contactName,
-        contactEmail: supplier?.contactEmail
+        url: tabSuppiers?.url,
+        name: tabSuppiers?.name,
+        contactName: tabSuppiers?.contactName,
+        contactEmail: tabSuppiers?.contactEmail
       }
     }).then((res) => {
       if (res?.data) {
-        saveChanges()
+        saveChanges('suppliers')
         showToast({
           description: 'Supplier added successfully',
           status: 'success'
@@ -134,14 +136,14 @@ const CompSupplier = ({ data }) => {
     updateSupplier({
       variables: {
         id: suppliers[0].id,
-        url: supplier?.url,
-        name: supplier?.name,
-        contactName: supplier?.contactName,
-        contactEmail: supplier?.contactEmail
+        url: tabSuppiers?.url,
+        name: tabSuppiers?.name,
+        contactName: tabSuppiers?.contactName,
+        contactEmail: tabSuppiers?.contactEmail
       }
     }).then((res) => {
       if (res?.data) {
-        saveChanges()
+        saveChanges('suppliers')
         showToast({
           description: 'Supplier updated successfully',
           status: 'success'
@@ -152,7 +154,8 @@ const CompSupplier = ({ data }) => {
 
   const checkData = () => {
     // eslint-disable-next-line no-unused-vars
-    const { supplier, ...rest } = unsavedChanges
+    const { suppliers, ...rest } = unsavedChanges
+    alertMessageSetter(rest)
     return Object.values(rest).some((value) => value === true)
   }
 
@@ -165,35 +168,36 @@ const CompSupplier = ({ data }) => {
   }
 
   const handleCheckEmail = () => {
-    if (!validateEmail(supplier?.contactEmail)) {
+    if (!validateEmail(tabSuppiers?.contactEmail)) {
       setEmailError('Email is invalid')
     }
   }
 
   const handleCheckUrl = () => {
-    if (!validateUrl(supplier?.url)) {
+    if (!validateUrl(tabSuppiers?.url)) {
       setIsValidUrl('Please enter a valid URL')
     }
   }
 
   const onUrlChange = (e) => {
-    handleChange('supplier', 'url', e.target.value)
+    handleChange('suppliers', 'url', e.target.value)
     setIsValidUrl('')
   }
 
   const isInvalid =
     isDisabled ||
-    supplier?.name === '' ||
+    tabSuppiers?.name === '' ||
     nameError !== '' ||
-    (supplier?.contactEmail !== '' && !validateEmail(supplier?.contactEmail)) ||
-    (supplier?.url !== '' && !validateUrl(supplier?.url))
+    (tabSuppiers?.contactEmail !== '' &&
+      !validateEmail(tabSuppiers?.contactEmail)) ||
+    (tabSuppiers?.url !== '' && !validateUrl(tabSuppiers?.url))
 
   useEffect(() => {
     if (data && data?.suppliers?.length > 0) {
       const { suppliers } = data
       setTabData((prev) => ({
         ...prev,
-        supplier: {
+        suppliers: {
           name: suppliers[0].name || '',
           url: suppliers[0].url || '',
           contactName: suppliers[0].contactName || '',
@@ -210,21 +214,22 @@ const CompSupplier = ({ data }) => {
         <FormLabel>Organization Name</FormLabel>
         <Input
           fontSize={'sm'}
-          value={supplier?.name}
+          value={tabSuppiers?.name}
           placeholder='Enter organization name'
-          onChange={(e) => handleChange('supplier', 'name', e.target.value)}
+          onChange={(e) => handleChange('suppliers', 'name', e.target.value)}
         />
       </FormControl>
       {/* ORG URL */}
       <FormControl
         isInvalid={
-          (supplier?.url !== '' && !validateUrl(supplier?.url)) || containsSpace
+          (tabSuppiers?.url !== '' && !validateUrl(tabSuppiers?.url)) ||
+          containsSpace
         }
       >
         <FormLabel>URL</FormLabel>
         <Input
           fontSize={'sm'}
-          value={supplier?.url}
+          value={tabSuppiers?.url}
           placeholder='Enter URL'
           onBlur={handleCheckUrl}
           onChange={onUrlChange}
@@ -232,12 +237,14 @@ const CompSupplier = ({ data }) => {
         <FormErrorMessage>{isValidUrl}</FormErrorMessage>
       </FormControl>
       {/* SUPPLIER NAME */}
-      <FormControl isInvalid={supplier?.contactName !== '' && nameError !== ''}>
+      <FormControl
+        isInvalid={tabSuppiers?.contactName !== '' && nameError !== ''}
+      >
         <FormLabel>Contact Name</FormLabel>
         <Input
           fontSize={'sm'}
           onChange={onSupplierChange}
-          value={supplier.contactName}
+          value={tabSuppiers?.contactName}
           placeholder='Enter supplier name'
         />
         <FormErrorMessage>{nameError}</FormErrorMessage>
@@ -245,18 +252,18 @@ const CompSupplier = ({ data }) => {
       {/* SUPPLIER EMAIL */}
       <FormControl
         isInvalid={
-          supplier?.contactEmail !== '' &&
-          !validateEmail(supplier?.contactEmail)
+          tabSuppiers?.contactEmail !== '' &&
+          !validateEmail(tabSuppiers?.contactEmail)
         }
       >
         <FormLabel>Contact Email</FormLabel>
         <Input
           fontSize={'sm'}
           onBlur={handleCheckEmail}
-          value={supplier?.contactEmail}
+          value={tabSuppiers?.contactEmail}
           placeholder='Enter supplier email'
           onChange={(e) => {
-            handleChange('supplier', 'contactEmail', e.target.value)
+            handleChange('suppliers', 'contactEmail', e.target.value)
             setEmailError('')
           }}
         />
@@ -265,10 +272,7 @@ const CompSupplier = ({ data }) => {
 
       {alert ? (
         <Stack spacing={4}>
-          <LynkAlert
-            status='warning'
-            msg='Saving will apply changes to this tab only. save other tabs separately to retain their data.'
-          />
+          <LynkAlert status='warning' msg={alertMessage} />
           <ActionButton
             isDisabled={isInvalid}
             title={suppliers?.length > 0 ? 'Update' : 'Save'}

@@ -1,4 +1,5 @@
-import { Box, useStyleConfig } from '@chakra-ui/react'
+import { Box } from '@chakra-ui/react'
+import { useStyleConfig } from '@chakra-ui/system'
 
 function CardBody(props) {
   const { variant, children, ...rest } = props

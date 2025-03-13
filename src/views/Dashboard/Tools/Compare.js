@@ -1,20 +1,23 @@
-import { useLazyQuery, useQuery } from '@apollo/client'
+import { useLazyQuery } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
 import { sortByUpdatedAt } from 'utils'
 
 import { Flex, Grid, HStack, Icon, Stack, Text } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
+import CustomDropdownIndicator from 'components/Misc/CustomDropdownIndicator'
 import DiffTable from 'components/Tables/DiffTable'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useLazyDropDown } from 'hooks/useLazyDropDown'
+import { useSelect } from 'hooks/useSelect'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
   GetProductData,
-  GetProductsForSbomDrift,
   GetProject,
+  GetProjectGroups,
   GetSbomDrift
 } from 'graphQL/Queries'
 
@@ -27,7 +30,7 @@ const Compare = ({ selectedSboms }) => {
   const { prodState, dispatch } = useGlobalState()
   const { field, direction } = prodState
   const { toolsDispatch } = dispatch
-
+  const { style } = useSelect('lynkSelect')
   const { primaryTextColor, secondaryBlueText } = useThemeColor([
     'primaryTextColor',
     'secondaryBlueText'
@@ -44,22 +47,10 @@ const Compare = ({ selectedSboms }) => {
   const [getDrift, { data: driftData }] = useLazyQuery(GetSbomDrift, {
     fetchPolicy: 'network-only'
   })
-  const { data, loading: projectGrpLoading } = useQuery(
-    GetProductsForSbomDrift,
-    {
-      fetchPolicy: 'network-only',
-      variables: {
-        first: 200,
-        enabled: true,
-        field: field,
-        direction: direction
-      }
-    }
-  )
 
   // -------------- SBOM 1 --------------
   const [selectedGroupOne, setSelectedGroupOne] = useState('')
-  const [selectedProdOne, setSelectedProdOne] = useState('')
+  const [selectedProdOne, setSelectedProdOne] = useState({})
   const [selectedVersionOne, setSelectedVersionOne] = useState(null)
   const [uniqVersionsOne, setUniqVersionsOne] = useState([])
   const [productListOne, setProductListOne] = useState([])
@@ -67,16 +58,16 @@ const Compare = ({ selectedSboms }) => {
   const [disabled, setDisabled] = useState(false)
   const [isSbomOneLoading, setIsSbomOneLoading] = useState(false)
 
-  const onSelectGroupOne = (e) => {
-    setSelectedGroupOne(e.target.value)
+  const onSelectGroupOne = (group) => {
+    setSelectedGroupOne(group)
     setProductListOne([])
-    setSelectedProdOne('')
+    setSelectedProdOne(null)
     setUniqVersionsOne([])
     setSelectedVersionOne(null)
   }
 
-  const onSelectProductOne = (e) => {
-    setSelectedProdOne(e.target.value)
+  const onSelectProductOne = (env) => {
+    setSelectedProdOne(env)
     setUniqVersionsOne([])
     setSelectedVersionOne(null)
   }
@@ -85,12 +76,11 @@ const Compare = ({ selectedSboms }) => {
     if (selectedProdOne && selectedVersionOne) {
       getSbomData({
         variables: {
-          projectId: selectedProdOne,
+          projectId: selectedProdOne?.value,
           sbomId: selectedVersionOne?.value
         }
       }).then((res) => {
         if (res?.data) {
-          console.log(res.data)
           setFirstSbomInfo(res.data.sbom)
         }
       })
@@ -104,21 +94,19 @@ const Compare = ({ selectedSboms }) => {
 
   useEffect(() => {
     if (selectedGroupOne) {
-      const activeGroup = data?.organization?.projectGroups?.nodes.find(
-        (item) => item.id === selectedGroupOne
-      )
+      const activeGroup = nodes?.find((item) => item.id === selectedGroupOne.id)
       const result = activeGroup?.projects?.map((option) => ({
         value: option.id,
         label: option.name
       }))
       setProductListOne(result)
     }
-  }, [data, selectedGroupOne])
+  }, [selectedGroupOne, nodes])
 
   useEffect(() => {
-    if (selectedProdOne !== '' && selectedVersionOne === null) {
+    if (selectedProdOne?.value && selectedVersionOne === null) {
       setIsSbomOneLoading(true)
-      getProduct({ variables: { id: selectedProdOne } }).then((res) => {
+      getProduct({ variables: { id: selectedProdOne?.value } }).then((res) => {
         if (res.data) {
           const data = sortByUpdatedAt(res?.data?.project?.sboms)
           if (data?.length > 0) {
@@ -141,23 +129,23 @@ const Compare = ({ selectedSboms }) => {
 
   // ------------- SBOM 2 --------------
   const [selectedGroupTwo, setSelectedGroupTwo] = useState('')
-  const [selectedProdTwo, setSelectedProdTwo] = useState('')
+  const [selectedProdTwo, setSelectedProdTwo] = useState({})
   const [selectedVersionTwo, setSelectedVersionTwo] = useState(null)
   const [uniqVersionsTwo, setUniqVersionsTwo] = useState([])
   const [productListTwo, setProductListTwo] = useState([])
   const [secondSbomInfo, setSecondSbomInfo] = useState(null)
   const [isSbomTwoLoading, setIsSbomTwoLoading] = useState(false)
 
-  const onSelectGroupTwo = (e) => {
-    setSelectedGroupTwo(e.target.value)
+  const onSelectGroupTwo = (group) => {
+    setSelectedGroupTwo(group)
     setProductListTwo([])
-    setSelectedProdTwo('')
+    setSelectedProdTwo(null)
     setUniqVersionsTwo([])
     setSelectedVersionTwo(null)
   }
 
-  const onSelectProductTwo = (e) => {
-    setSelectedProdTwo(e.target.value)
+  const onSelectProductTwo = (env) => {
+    setSelectedProdTwo(env)
     setUniqVersionsTwo([])
     setSelectedVersionTwo(null)
   }
@@ -166,7 +154,7 @@ const Compare = ({ selectedSboms }) => {
     if (selectedProdTwo && selectedVersionTwo) {
       getSbomData({
         variables: {
-          projectId: selectedProdTwo,
+          projectId: selectedProdTwo?.value,
           sbomId: selectedVersionTwo?.value
         }
       }).then((res) => {
@@ -212,21 +200,19 @@ const Compare = ({ selectedSboms }) => {
 
   useEffect(() => {
     if (selectedGroupTwo) {
-      const activeGroup = data?.organization?.projectGroups?.nodes.find(
-        (item) => item.id === selectedGroupTwo
-      )
+      const activeGroup = nodes?.find((item) => item.id === selectedGroupTwo.id)
       const result = activeGroup?.projects?.map((option) => ({
         value: option.id,
         label: option.name
       }))
       setProductListTwo(result)
     }
-  }, [data, selectedGroupTwo])
+  }, [selectedGroupTwo, nodes])
 
   useEffect(() => {
-    if (selectedProdTwo !== '' && selectedVersionTwo === null) {
+    if (selectedProdTwo?.value && selectedVersionTwo === null) {
       setIsSbomTwoLoading(true)
-      getProduct({ variables: { id: selectedProdTwo } }).then((res) => {
+      getProduct({ variables: { id: selectedProdTwo?.value } }).then((res) => {
         if (res.data) {
           const data = sortByUpdatedAt(res?.data?.project?.sboms)
           if (data?.length > 0) {
@@ -251,7 +237,7 @@ const Compare = ({ selectedSboms }) => {
     if (firstSbomInfo && secondSbomInfo) {
       getDrift({
         variables: {
-          projectId: selectedProdOne,
+          projectId: selectedProdOne?.value,
           subjectSbomId: selectedVersionOne?.value,
           targetSbomId: selectedVersionTwo?.value
         }
@@ -290,6 +276,24 @@ const Compare = ({ selectedSboms }) => {
     disabled
   }
 
+  const { lazyDropDownProps } = useLazyDropDown(GetProjectGroups, {
+    selector: 'organization.projectGroups',
+    variables: {
+      field: field,
+      direction: direction,
+      first: 5
+    },
+    selectorForActualCount: 'organization.projectGroups',
+    styles: style,
+    components: {
+      IndicatorSeparator: () => null,
+      DropdownIndicator: CustomDropdownIndicator
+    },
+    optionLabel: 'name'
+  })
+
+  const { nodes, loading } = lazyDropDownProps
+
   return (
     <Flex flexDirection='column' gap={6}>
       {/* HEADER */}
@@ -324,9 +328,8 @@ const Compare = ({ selectedSboms }) => {
         {/* SBOM ONE */}
         <SbomCompare
           isSbomOne={true}
-          data={data}
           selectedVersion={selectedVersionOne}
-          projectGrpLoading={projectGrpLoading}
+          projectGrpLoading={loading}
           onVersionChange={onVersionOneChange}
           selectedSboms={selectedSboms}
           uniqueVersions={uniqVersionsOne}
@@ -338,13 +341,13 @@ const Compare = ({ selectedSboms }) => {
           loading={isSbomOneLoading}
           onSelectProduct={onSelectProductOne}
           productList={productListOne}
+          lazyDropDownProps={lazyDropDownProps}
         />
         {/* SBOM TWO */}
         <SbomCompare
           isSbomOne={false}
-          data={data}
           selectedVersion={selectedVersionTwo}
-          projectGrpLoading={projectGrpLoading}
+          projectGrpLoading={loading}
           onVersionChange={onVersionTwoChange}
           selectedSboms={selectedSboms}
           uniqueVersions={uniqVersionsTwo}
@@ -357,6 +360,7 @@ const Compare = ({ selectedSboms }) => {
           onSelectProduct={onSelectProductTwo}
           productList={productListTwo}
           compareButtonProps={compareButtonProps}
+          lazyDropDownProps={lazyDropDownProps}
         />
       </Grid>
       {/* SBOM DIFFERENCE */}

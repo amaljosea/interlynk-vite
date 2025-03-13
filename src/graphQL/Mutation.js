@@ -2781,67 +2781,21 @@ export const ReRunSbomSupportLevel = gql`
 `
 
 export const CreateBitbucketConnection = gql`
-  mutation CreateBitbucketConnection(
-    $username: String!
-    $apiToken: String!
-    $workspace: String!
-    $enabled: Boolean
-  ) {
+  mutation CreateBitbucketConnection($username: String!, $apiToken: String!) {
     bitbucketConnectionCreate(
-      input: {
-        enabled: $enabled
-        apiToken: $apiToken
-        userName: $username
-        workspace: $workspace
-      }
+      input: { userName: $username, apiToken: $apiToken }
     ) {
-      errors
       organizationConnection {
+        id
+        enabled
         connection {
           ... on BitbucketConnection {
-            apiToken
-            createdAt
-            id
-            organizationId
-            updatedAt
             userName
+            organizationId
           }
         }
       }
-    }
-  }
-`
-
-export const UpdateBitbucketConnection = gql`
-  mutation UpdateBitbucketConnection(
-    $id: ID!
-    $username: String!
-    $apiToken: String!
-    $workspace: String!
-    $enabled: Boolean
-  ) {
-    bitbucketConnectionUpdate(
-      input: {
-        enabled: $enabled
-        userName: $username
-        apiToken: $apiToken
-        workspace: $workspace
-        organizationConnectionId: $id
-      }
-    ) {
       errors
-      organizationConnection {
-        connection {
-          ... on BitbucketConnection {
-            apiToken
-            createdAt
-            id
-            organizationId
-            updatedAt
-            userName
-          }
-        }
-      }
     }
   }
 `
@@ -2860,18 +2814,29 @@ export const BitbucketRepositoryBulkImport = gql`
   ) {
     bitbucketRepositoryBulkImport(input: $input) {
       repositories {
-        id
         uuid
         name
         fullName
-        slug
-        workspace
-        mainbranch
-        importStatus
-        importError
-        lastImportedAt
-        createdAt
-        updatedAt
+      }
+      errors
+    }
+  }
+`
+
+export const UpdateBitbucketWorkspace = gql`
+  mutation UpdateBitbucketWorkspace(
+    $organizationConnectionId: ID!
+    $workspace: String!
+  ) {
+    bitbucketConnectionUpdate(
+      input: {
+        organizationConnectionId: $organizationConnectionId
+        workspace: $workspace
+      }
+    ) {
+      organizationConnection {
+        id
+        enabled
       }
       errors
     }

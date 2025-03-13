@@ -47,7 +47,7 @@ const AuthorModal = ({ isOpen, onClose, ruleExists, recheck }) => {
   const [createRule, { loading: ruleLoading }] =
     useMutation(AutomationRuleCreate)
   const [createAuthor, { loading }] = useMutation(authorCreate, {
-    onCompleted: () => recheck()
+    onCompleted: () => (activeTab === 'checks' ? recheck() : null)
   })
 
   const { nodes } = usePaginatedQuery(GetCheckResults, {
@@ -192,7 +192,6 @@ const AuthorModal = ({ isOpen, onClose, ruleExists, recheck }) => {
           })
         }
       } catch (error) {
-        console.error('Error during rule creation:', error)
         showToast({
           description: 'An unexpected error occurred while creating the rule.',
           status: 'error'

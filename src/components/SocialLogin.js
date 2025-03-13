@@ -25,11 +25,11 @@ const SocialLogin = () => {
 
       const data = await response.json()
       if (data.redirect_uri) {
-        console.log('Redirecting to:', data.redirect_uri)
+        console.warn('Redirecting to:', data.redirect_uri)
         window.location.href = data.redirect_uri
       }
     } catch (error) {
-      console.log('Sign In', error)
+      console.warn('Sign In', error)
     }
   }
 
@@ -48,7 +48,7 @@ const SocialLogin = () => {
         await signIn(provider, token)
       }
     } catch (error) {
-      console.log('Auth', error)
+      console.warn('Auth', error)
     }
   }
 

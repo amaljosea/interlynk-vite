@@ -226,7 +226,7 @@ export default class VulnsSection {
 
                 await this.page.waitForTimeout(4000)
                 await this.page
-                  .locator("//button[@aria-label='save_vuln_links']")
+                  .locator("//button[@aria-label='drawer_submit']")
                   .click()
 
                 await this.page.waitForTimeout(2000)

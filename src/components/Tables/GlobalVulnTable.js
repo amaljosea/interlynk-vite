@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useParams } from 'react-router-dom'
 import { getFullDate, linkURl, timeSince } from 'utils'
@@ -5,10 +6,11 @@ import { customStyles } from 'utils/styleUtils'
 import SubHeader from 'views/Dashboard/Vulnerabilities/components/SubHeader'
 
 import { Badge, Flex, Stack, Text } from '@chakra-ui/react'
-import { Tooltip } from '@chakra-ui/react'
+import { IconButton, Tooltip, useDisclosure } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import VulnProductsDrawer from 'components/Drawer/VulnProductsDrawer'
 import ExternalNavIcon from 'components/Icons/ExternalNavIcon'
 import CvssTag from 'components/Misc/CvssTag'
 import EpssTag from 'components/Misc/EpssTag'
@@ -19,10 +21,13 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
+import { FaEye } from 'react-icons/fa6'
+
 import Pagination from '../Pagination'
 
 const GlobalVulnTable = (props) => {
   const { vulns, reset, filters, loading, paginationProps } = props
+  const { isOpen, onClose, onOpen } = useDisclosure()
 
   const { globalVulnState, dispatch } = useGlobalState()
   const { globalVulnDispatch } = dispatch
@@ -36,6 +41,8 @@ const GlobalVulnTable = (props) => {
 
   const params = useParams()
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
+
+  const [activeRow, setActiveRow] = useState({})
 
   // COLUMNS
   const columns = [
@@ -81,7 +88,7 @@ const GlobalVulnTable = (props) => {
           </Stack>
         )
       },
-      width: '18%',
+      width: '12%',
       sortable: true
     },
     // SEVERITY
@@ -220,9 +227,31 @@ const GlobalVulnTable = (props) => {
         const dateB = new Date(b?.lastModifiedAt)
         return dateA - dateB // Sort in descending order
       },
-      width: '12%',
+      width: '9%',
       wrap: true,
       right: 'true'
+    },
+    {
+      id: 'PRODUCT_LIST',
+      name: 'ACTION',
+      selector: (row) => {
+        return (
+          <Tooltip label={'View affected products'} placement={'left'}>
+            <IconButton
+              size='sm'
+              variant={'solid'}
+              colorScheme={'blue'}
+              icon={<FaEye />}
+              onClick={() => {
+                onOpen()
+                setActiveRow(row)
+              }}
+            />
+          </Tooltip>
+        )
+      },
+      right: 'true',
+      omit: params?.productgroupid
     }
   ]
 
@@ -259,6 +288,13 @@ const GlobalVulnTable = (props) => {
         defaultSortAsc={globalVulnState?.direction === 'ASC' ? true : false}
       />
       <Pagination {...paginationProps} />
+      {isOpen && (
+        <VulnProductsDrawer
+          isOpen={isOpen}
+          onClose={onClose}
+          data={activeRow}
+        />
+      )}
     </Flex>
   )
 }

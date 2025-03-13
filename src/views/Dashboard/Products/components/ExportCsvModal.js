@@ -15,6 +15,7 @@ import LynkModal from 'components/LynkModal'
 import useCustomToast from 'hooks/useCustomToast'
 import useExportCsvQueryInfo from 'hooks/useExportCsvQueryInfo'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useProjectGroup } from 'hooks/useProjectGroup'
 import useQueryParam from 'hooks/useQueryParam'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
@@ -27,7 +28,7 @@ import { FaFileCsv } from 'react-icons/fa6'
 const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
   const params = useParams()
   const { showToast } = useCustomToast()
-
+  const { organization } = useGlobalState()
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
   const vulnId = useQueryParam('vulnId') || params.vulnerabilityid
@@ -59,6 +60,7 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
   const [selectedColumns, setSelectedColumns] = useState([])
   const [availableColumns, setAvailableColumns] = useState([])
   const [applyFilters, setApplyFilters] = useState(true)
+  const [partsFilter, setPartsFilter] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   const searchFilters = applyFilters ? filters : {}
@@ -66,7 +68,8 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
   const queryInfo = useExportCsvQueryInfo(
     tableType,
     rowsToExport,
-    searchFilters
+    searchFilters,
+    partsFilter
   )
 
   const { sbomHookData } = useGlobalQueryContext()
@@ -95,8 +98,10 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
 
   const mapDataForExport = (fetchedNodes) => {
     const config = exportCsvTableConfig[tableType]
-    return config ? config.mapDataForExport(fetchedNodes) : []
+    return config ? config.mapDataForExport(fetchedNodes, filters) : []
   }
+
+  const orgName = organization?.name?.replaceAll(' ', '-') || 'test-interlynk'
 
   const fileName = generateCsvFileName({
     tableType,
@@ -105,7 +110,8 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
     product: sbomHookData.projectGroupName,
     version: sbomHookData.versionName,
     vulnId,
-    projectGroupName
+    projectGroupName,
+    orgName
   })
 
   const handleExport = async () => {
@@ -170,7 +176,7 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
         }
       }
     } catch (error) {
-      console.error('Export Error:', error)
+      console.warn('Export Error:', error)
       showToast({
         description:
           'Internal error during data download. Please try again in a few minutes.',
@@ -208,20 +214,33 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
             <Tag colorScheme='cyan'>{tableType}</Tag>
           </Box>
         )}
-        {filters && (
-          <Checkbox
-            mt={1}
-            size='md'
-            colorScheme='blue'
-            isChecked={applyFilters}
-            onChange={() => setApplyFilters(!applyFilters)}
-          >
-            <Text fontSize='14px' fontWeight='500' color={primaryTextColor}>
-              Apply search and filters
-            </Text>
-          </Checkbox>
-        )}
-        {tableType === 'SBOM Support View' && shouldShowDemoFeatures && (
+        <Flex gap={6} mt={1} alignItems={'center'}>
+          {filters && (
+            <Checkbox
+              size='md'
+              colorScheme='blue'
+              isChecked={applyFilters}
+              onChange={() => setApplyFilters(!applyFilters)}
+            >
+              <Text fontSize='14px' fontWeight='500' color={primaryTextColor}>
+                Apply search and filters
+              </Text>
+            </Checkbox>
+          )}
+          {tableType === 'Support Status View' && filters?.includeParts && (
+            <Checkbox
+              size='md'
+              colorScheme='blue'
+              isChecked={partsFilter}
+              onChange={() => setPartsFilter(!partsFilter)}
+            >
+              <Text fontSize='14px' fontWeight='500' color={primaryTextColor}>
+                Part
+              </Text>
+            </Checkbox>
+          )}
+        </Flex>
+        {tableType === 'Support Status View' && shouldShowDemoFeatures && (
           <Checkbox mt={1} size='md' colorScheme='blue'>
             <Text fontSize='14px' fontWeight='500' color={primaryTextColor}>
               Include Actively Supported Components

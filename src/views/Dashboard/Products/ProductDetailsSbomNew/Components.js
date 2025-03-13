@@ -79,13 +79,13 @@ const Components = ({ sbomData }) => {
 
   const compData = useMemo(() => {
     return {
+      direct: direct ? true : undefined,
       ecosystem: getUndefinedIfEmptyOrAll(ecosystems),
       kind: getUndefinedIfEmptyOrAll(kinds),
       licenses: getUndefinedIfEmptyOrAll(licenses),
       supplierName: getUndefinedIfEmptyOrAll(suppliers),
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
-      direct: direct === true ? true : undefined,
       supportLevel: getUndefinedIfEmptyOrAll(supportLevel),
       includeParts: include?.includes('parts') ? true : undefined
     }
@@ -207,13 +207,15 @@ const Components = ({ sbomData }) => {
   }
 
   const handleSort = async (column, sortDirection) => {
-    prodCompDispatch({
-      type: 'SET_SORT_ORDER',
-      payload: {
-        field: column.id,
-        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-      }
-    })
+    if (column && column.id && sortDirection) {
+      prodCompDispatch({
+        type: 'SET_SORT_ORDER',
+        payload: {
+          field: column.id,
+          direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+        }
+      })
+    }
   }
 
   const handleRowClick = (row) => {
@@ -329,7 +331,6 @@ const Components = ({ sbomData }) => {
 
   useEffect(() => {
     if (selectedComp) {
-      console.log('selectedComp', selectedComp)
       handleGraphView(selectedComp)
     }
   }, [handleGraphView, selectedComp])
@@ -355,6 +356,7 @@ const Components = ({ sbomData }) => {
           expandOnRowClicked
           onSort={handleSort}
           defaultSortAsc={false}
+          defaultSortFieldId={field}
           progressPending={loading}
           onRowClicked={handleRowClick}
           subHeaderComponent={subHeader}

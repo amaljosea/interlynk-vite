@@ -75,7 +75,6 @@ const CustomVulnTable = () => {
   )
 
   const handleWarning = (row) => {
-    console.log('row', row)
     setActiveRow(row)
     DELETE.onOpen()
   }

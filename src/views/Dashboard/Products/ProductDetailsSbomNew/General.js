@@ -1,8 +1,8 @@
 import { getFullDate } from 'utils'
 import { infoData } from 'variables/general'
 
-import { Flex, Skeleton, Text } from '@chakra-ui/react'
-import { Table, Tbody, Td, Tr } from '@chakra-ui/react'
+import { Flex, Skeleton, Stack, Text } from '@chakra-ui/react'
+import { Grid, GridItem } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -18,11 +18,7 @@ import Supplier from './SbomDetails/Supplier'
 import Tools from './SbomDetails/Tools'
 
 const General = ({ data, loading, error }) => {
-  const { inverseSecondaryBgColor, grayBorderColor } = useThemeColor([
-    'inverseSecondaryBgColor',
-    'sameSecondaryText',
-    'grayBorderColor'
-  ])
+  const { grayBorderColor } = useThemeColor(['grayBorderColor'])
 
   const isArchived = data?.lifecycle === 'archived'
 
@@ -41,6 +37,57 @@ const General = ({ data, loading, error }) => {
     spec: data?.spec,
     license: data?.licensesExp
   }
+
+  const container = {
+    pb: 3,
+    gap: 5,
+    w: '100%',
+    fontSize: 'sm',
+    alignItems: 'center',
+    templateColumns: `repeat(12, 1fr)`,
+    borderBottom: `1px solid ${grayBorderColor}`
+  }
+
+  const sbomData = [
+    {
+      label: 'Created At',
+      value: <Text>{getFullDate(data?.creationAt)}</Text>
+    },
+    {
+      label: 'Phases',
+      value: <Phases data={data?.phases || []} permission={isArchived} />
+    },
+    {
+      label: 'Creation Tool',
+      value: (
+        <Tools data={data?.tools || []} permission={isArchived || !editSboms} />
+      )
+    },
+    {
+      label: 'Authors',
+      value: (
+        <Authors
+          data={data?.authors || []}
+          permission={isArchived || !editSboms}
+        />
+      )
+    },
+    {
+      label: 'Supplier',
+      value: (
+        <Supplier
+          data={data?.suppliers || []}
+          permission={isArchived || !editSboms}
+        />
+      )
+    },
+    {
+      label: 'Data License',
+      value: (
+        <License data={licenseData} permission={isArchived || !editSboms} />
+      )
+    }
+  ]
 
   if (loading) {
     return (
@@ -61,131 +108,18 @@ const General = ({ data, loading, error }) => {
   }
 
   return (
-    <>
-      <CardBody>
-        <Table
-          __css={{ tableLayout: 'fixed', width: 'full' }}
-          variant='simple'
-          color={inverseSecondaryBgColor}
-        >
-          <Tbody w={'100%'}>
-            {/* CREATED AT */}
-            <Tr minH={'64px'}>
-              <Td
-                pl={0}
-                w={'15%'}
-                fontSize={'sm'}
-                fontWeight={'medium'}
-                borderColor={grayBorderColor}
-              >
-                <InfoLabel
-                  title={`Created At`}
-                  onCheck={onCheck('Created At')}
-                />
-              </Td>
-              <Td
-                py={0}
-                w={'85%'}
-                fontSize={'sm'}
-                borderColor={grayBorderColor}
-              >
-                {data?.creationAt ? getFullDate(data?.creationAt) : ''}
-              </Td>
-            </Tr>
-            {/* PHASES */}
-            <Tr minH={'64px'}>
-              <Td
-                pl={0}
-                w={'15%'}
-                fontSize={'sm'}
-                fontWeight={'medium'}
-                borderColor={grayBorderColor}
-              >
-                <InfoLabel title={`Phases`} onCheck={onCheck('SBOM Phases')} />
-              </Td>
-              <Td w={'85%'} py={0} borderColor={grayBorderColor}>
-                <Phases data={data?.phases || []} permission={isArchived} />
-              </Td>
-            </Tr>
-            {/* CREATION TOOLS */}
-            <Tr minH={'64px'}>
-              <Td
-                pl={0}
-                w={'15%'}
-                fontSize={'sm'}
-                fontWeight={'medium'}
-                borderColor={grayBorderColor}
-              >
-                <InfoLabel
-                  title={`Creation Tool`}
-                  onCheck={onCheck('Creation Tool')}
-                />
-              </Td>
-              <Td w={'85%'} py={0} borderColor={grayBorderColor}>
-                <Tools
-                  data={data?.tools || []}
-                  permission={isArchived || !editSboms}
-                />
-              </Td>
-            </Tr>
-            {/* AUTHORS */}
-            <Tr minH={'64px'}>
-              <Td
-                pl={0}
-                w={'15%'}
-                fontSize={'sm'}
-                fontWeight={'medium'}
-                borderColor={grayBorderColor}
-              >
-                <InfoLabel title={`Authors`} onCheck={onCheck('Authors')} />
-              </Td>
-              <Td w={'85%'} py={0} borderColor={grayBorderColor}>
-                <Authors
-                  data={data?.authors || []}
-                  permission={isArchived || !editSboms}
-                />
-              </Td>
-            </Tr>
-            {/* SUPPLIERS */}
-            <Tr minH={'64px'}>
-              <Td
-                pl={0}
-                w={'15%'}
-                fontSize={'sm'}
-                fontWeight={'medium'}
-                borderColor={grayBorderColor}
-              >
-                <InfoLabel title={`Supplier`} onCheck={onCheck('Supplier')} />
-              </Td>
-              <Td w={'85%'} py={0} borderColor={grayBorderColor}>
-                <Supplier
-                  data={data?.suppliers || []}
-                  permission={isArchived || !editSboms}
-                />
-              </Td>
-            </Tr>
-            {/* LICENSES */}
-            <Tr minH={'64px'}>
-              <Td
-                pl={0}
-                w={'15%'}
-                fontSize={'sm'}
-                fontWeight={'medium'}
-                borderColor={grayBorderColor}
-              >
-                Data License
-              </Td>
-              <Td w={'85%'} py={0} borderColor={grayBorderColor}>
-                <License
-                  data={licenseData}
-                  permission={isArchived || !editSboms}
-                />
-              </Td>
-            </Tr>
-          </Tbody>
-        </Table>
-      </CardBody>
-    </>
+    <CardBody>
+      <Stack w={'100%'} spacing={3} mt={2}>
+        {sbomData?.map((item, index) => (
+          <Grid key={index} {...container}>
+            <GridItem colSpan={3}>
+              <InfoLabel title={item?.label} onCheck={onCheck(item?.label)} />
+            </GridItem>
+            <GridItem colSpan={9}>{item?.value}</GridItem>
+          </Grid>
+        ))}
+      </Stack>
+    </CardBody>
   )
 }
 

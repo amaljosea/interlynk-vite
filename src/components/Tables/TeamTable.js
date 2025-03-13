@@ -4,6 +4,7 @@ import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
 import { customStyles } from 'utils/styleUtils'
 import { FREE_TIER_USER_LIMIT } from 'variables/general'
+import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
 import RoleModal from 'views/Dashboard/Profile/components/RoleModal'
 import TeamModal from 'views/Dashboard/Profile/components/TeamModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -30,11 +31,14 @@ import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import LynkModal from 'components/LynkModal'
 import LynkAction from 'components/Misc/LynkAction'
+import Pagination from 'components/Pagination'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { InviteUser, deleteOrgUser } from 'graphQL/Mutation'
@@ -54,6 +58,7 @@ function userTimeStart(row) {
 
 const TeamTable = () => {
   const activetab = useQueryParam('tab')
+  const { isCustomerView } = useRouteFlags()
   const { showToast } = useCustomToast()
   const { organization } = useGlobalState()
   const SERVER_URL = process.env.REACT_APP_SERVER
@@ -76,18 +81,17 @@ const TeamTable = () => {
   const [activeRow, setActiveRow] = useState(null)
   const [searchInput, setSearchInput] = useState('')
   const [filterText, setFilterText] = useState('')
-  const [deleteUser] = useMutation(deleteOrgUser)
+  const [deleteUser, { loading: deleteLoading }] = useMutation(deleteOrgUser)
 
   const [inviteUsers] = useMutation(InviteUser)
 
-  const { data: userData, loading } = useQuery(GetUsers, {
+  const { nodes, loading, paginationProps } = usePaginatedQuery(GetUsers, {
+    selector: 'organization.users',
     skip: !organization ? true : activetab === 'users' ? false : true,
     variables: { search: filterText === '' ? undefined : filterText }
   })
 
-  const numberOfUsers = userData?.organization?.users.length
-
-  const { users } = userData?.organization || ''
+  const numberOfUsers = nodes?.length
 
   const inviteUser = useHasPermission({
     parentKey: 'view_users',
@@ -299,13 +303,7 @@ const TeamTable = () => {
   // HEADER SECTION
   const subHeaderComponent = useMemo(() => {
     return (
-      <Flex
-        sx={{
-          w: '100%',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}
-      >
+      <Flex w={'100%'} alignItems={'center'} justifyContent={'space-between'}>
         {/* SEARCH COMPONENTS */}
         <SearchFilter
           id='team'
@@ -316,6 +314,15 @@ const TeamTable = () => {
         />
 
         <Flex sx={{ gap: 2, justifyContent: 'flex-end' }}>
+          {/* EXPORT CSV */}
+          {!isCustomerView && (
+            <ExportCsv
+              tableType='Users'
+              filters={{
+                search: searchInput !== '' ? searchInput : undefined
+              }}
+            />
+          )}
           {/* INVITE USER */}
           <Box position='relative'>
             <Tooltip
@@ -329,6 +336,7 @@ const TeamTable = () => {
             >
               <Box>
                 <AddButton
+                  aria-label='add_user'
                   onClick={TEAM.onOpen}
                   isDisabled={
                     !inviteUser ||
@@ -343,14 +351,15 @@ const TeamTable = () => {
       </Flex>
     )
   }, [
+    handleClear,
+    handleSearch,
     searchInput,
     onSearchInputChange,
-    handleSearch,
-    handleClear,
-    TEAM,
-    inviteUser,
     isFreeTier,
-    numberOfUsers
+    numberOfUsers,
+    TEAM.onOpen,
+    inviteUser,
+    isCustomerView
   ])
 
   const handleRemove = async () => {
@@ -390,7 +399,7 @@ const TeamTable = () => {
         subHeader
         responsive={true}
         columns={columns}
-        data={users || []}
+        data={nodes || []}
         defaultSortAsc={false}
         progressPending={loading}
         defaultSortFieldId={'joinedDate'}
@@ -403,6 +412,8 @@ const TeamTable = () => {
         )}
         subHeaderComponent={subHeaderComponent}
       />
+
+      <Pagination {...paginationProps} />
 
       {/* ADD / UPDATE User */}
       {TEAM.isOpen && (
@@ -426,13 +437,14 @@ const TeamTable = () => {
       {/* REMOVE User */}
       {USER.isOpen && activeRow && (
         <LynkModal
+          Icon={BiTrash}
+          buttonColor='red'
+          buttonText='Remove'
           isOpen={USER.isOpen}
+          title={'Remove User'}
           onClose={USER.onClose}
           onSubmit={handleRemove}
-          title={'Remove User'}
-          Icon={BiTrash}
-          buttonText='Remove'
-          buttonColor='red'
+          isLoading={deleteLoading}
         >
           <Stack
             spacing={2}
