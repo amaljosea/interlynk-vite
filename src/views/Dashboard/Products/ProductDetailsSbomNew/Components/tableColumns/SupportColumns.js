@@ -65,6 +65,7 @@ const SupportColumns = ({ handleSupport }) => {
       {
         id: 'COMPONENT_SUPPORT_LEVELS_LEVEL',
         name: 'SUPPORT LEVEL',
+        sortable: true,
         wrap: true,
         selector: (row) => {
           const { level } = row?.componentSupportLevel || {}
@@ -82,12 +83,12 @@ const SupportColumns = ({ handleSupport }) => {
               <TagLabel mx={'auto'}>N/A</TagLabel>
             </Tag>
           )
-        },
-        sortable: true
+        }
       },
       {
         id: 'COMPONENT_SUPPORT_LEVELS_END_DATE',
         name: 'END OF SUPPORT',
+        sortable: true,
         wrap: true,
         selector: (row) => {
           const { endDate } = row?.componentSupportLevel || {}
@@ -100,11 +101,10 @@ const SupportColumns = ({ handleSupport }) => {
           }
           return <Text color={primaryTextColor}>N/A</Text>
         },
-        sortable: true,
         sortFunction: (a, b) => {
           const dateA = new Date(a?.componentSupportLevel?.endDate)
           const dateB = new Date(b?.componentSupportLevel?.endDate)
-          return dateB - dateA
+          return dateA - dateB
         }
       },
       {
@@ -131,7 +131,7 @@ const SupportColumns = ({ handleSupport }) => {
         sortFunction: (a, b) => {
           const dateA = new Date(a?.componentSupportLevel?.updatedAt)
           const dateB = new Date(b?.componentSupportLevel?.updatedAt)
-          return dateB - dateA
+          return dateA - dateB
         },
         right: 'true',
         wrap: true

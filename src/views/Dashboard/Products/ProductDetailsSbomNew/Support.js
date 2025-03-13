@@ -157,7 +157,7 @@ const Support = () => {
           data={nodes || []}
           expandOnRowClicked
           onSort={handleSort}
-          defaultSortAsc={false}
+          defaultSortAsc={true}
           progressPending={loading}
           defaultSortFieldId={field}
           subHeaderComponent={subHeader}
