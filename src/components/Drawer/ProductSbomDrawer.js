@@ -7,7 +7,7 @@ import { componentTypes, infoData, sbomPhases } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import { Button, Flex, Stack, Text, Tooltip } from '@chakra-ui/react'
-import { Checkbox, Divider, Input, Select, Textarea } from '@chakra-ui/react'
+import { Checkbox, Divider, Input, Textarea } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import LicenseField from 'components/Licenses/LicenseField'
@@ -234,6 +234,13 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
     }
   }, [nodes])
 
+  const scopeOptions = [
+    { label: '-- Select --', value: '' },
+    { label: 'Excluded', value: 'excluded' },
+    { label: 'Optional', value: 'optional' },
+    { label: 'Required', value: 'required' }
+  ]
+
   return (
     <>
       <LynkDrawer
@@ -345,6 +352,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
               options={sbomPhases}
               onChange={onPhaseChange}
               placeholder={'Add phase'}
+              dropDown={phases.length === 0}
             />
           </FormControl>
           {/* LICENSES */}
@@ -360,21 +368,15 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
               htmlFor='compScope'
               info={onCheck(`Component Scope`)}
             />
-            <Select
-              size='md'
+            <LynkSelect
               id='compScope'
               name='compScope'
-              value={compScope}
+              value={scopeOptions.find((opt) => opt.value === compScope)}
               isDisabled={isCustomerView}
-              onChange={(e) => setCompScope(e.target.value)}
-            >
-              <option value='' style={{ background: 'lightgray' }}>
-                -- Select --
-              </option>
-              <option value='excluded'>Excluded</option>
-              <option value='optional'>Optional</option>
-              <option value='required'>Required</option>
-            </Select>
+              onChange={(selected) => setCompScope(selected?.value || '')}
+              options={scopeOptions}
+              dropDown
+            />
           </FormControl>
           {/* SUPPLIER */}
           <Stack>
