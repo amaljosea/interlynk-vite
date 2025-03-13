@@ -1404,12 +1404,13 @@ export const exportCsvTableConfig = {
   'Support Status View': {
     defaultSelectedColumns: [
       'Name',
-      'Version',
       'Assessment',
       'Support Level',
-      'End Of Support'
+      'End Of Support',
+      'Updated'
     ],
     additionalColumns: [
+      'Version',
       'Part',
       'Assessed Date',
       'Last Assessed By',
@@ -1426,7 +1427,10 @@ export const exportCsvTableConfig = {
 
         return {
           Name: name,
-          Version: version,
+          Version: version || 'N/A',
+          Part: filters?.includeParts
+            ? `${projectGroup?.name} ${projectVersion && `: ${projectVersion}`}`
+            : 'N/A',
           Assessment: user?.name ? 'Manual' : 'Automatic',
           'Support Level': level
             ? capitalizeFirstLetter(level?.replaceAll('_', ' '))
@@ -1439,9 +1443,7 @@ export const exportCsvTableConfig = {
             : 'N/A',
           'Last Assessed By': user?.name || 'N/A',
           Explanation: notes || 'N/A',
-          Part: filters?.includeParts
-            ? `${projectGroup?.name} ${projectVersion && `: ${projectVersion}`}`
-            : 'N/A'
+          Updated: updatedAt ? new Date(updatedAt).toLocaleDateString() : 'N/A'
         }
       })
     }
