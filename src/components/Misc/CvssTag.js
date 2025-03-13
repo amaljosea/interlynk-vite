@@ -1,6 +1,6 @@
 import { cvssColor } from 'utils/styleUtils'
 
-import { Tag, TagLabel, Text } from '@chakra-ui/react'
+import { Tag, TagLabel } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -21,9 +21,9 @@ const CvssTag = ({ value }) => {
   }
 
   return (
-    <Text w={'50px'} textAlign={'center'} color={primaryTextColor}>
-      N/A
-    </Text>
+    <Tag w={'50px'} color={primaryTextColor}>
+      <TagLabel mx={'auto'}>N/A</TagLabel>
+    </Tag>
   )
 }
 
