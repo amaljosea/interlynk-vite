@@ -167,6 +167,7 @@ const Support = () => {
           progressComponent={<CustomLoader />}
           expandableRowsComponent={SupportExpand}
           customStyles={customStyles(headingTextColor)}
+          selectableRowDisabled={(row) => row?.sbom?.id !== sbomId}
         />
 
         {/* PAGINATION */}
