@@ -4,7 +4,7 @@
   "private": true,
   "homepage": "https://app.interlynk.io",
   "dependencies": {
-    "@apollo/client": "^3.13.1",
+    "@apollo/client": "^3.13.4",
     "@chakra-ui/icons": "^1.1.7",
     "@chakra-ui/react": "2.10.6",
     "@chakra-ui/system": "^1.12.1",
@@ -12,7 +12,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@reactour/tour": "^3.7.0",
-    "@sentry/cli": "^2.42.2",
+    "@sentry/cli": "^2.42.3",
     "@sentry/react": "^7.120.3",
     "apollo-upload-client": "^17.0.0",
     "axios": "^1.7.9",
@@ -26,11 +26,11 @@
     "jwt-decode": "^4.0.0",
     "kbar": "^0.1.0-beta.46",
     "lodash": "^4.17.21",
-    "next-themes": "^0.4.4",
+    "next-themes": "^0.4.6",
     "npm-check-updates": "^17.1.15",
     "packageurl-js": "^2.0.1",
     "react": "^18.2.0",
-    "react-d3-tree": "^3.6.5",
+    "react-d3-tree": "^3.6.6",
     "react-data-table-component": "^7.6.2",
     "react-datetime": "^3.3.1",
     "react-dom": "^18.2.0",
@@ -38,7 +38,7 @@
     "react-icons": "^5.5.0",
     "react-router-dom": "^6.29.0",
     "react-scripts": "^5.0.1",
-    "react-select": "^5.10.0",
+    "react-select": "^5.10.1",
     "react-syntax-highlighter": "^15.6.1",
     "react-window": "^1.8.11",
     "recharts": "^2.15.1",
@@ -65,7 +65,7 @@
     "sentry:sourcemaps": "sentry-cli sourcemaps inject --org interlync --project javascript-react ./build && sentry-cli sourcemaps upload --org interlync --project javascript-react ./build"
   },
   "optionalDependencies": {
-    "@babel/core": "7.26.9"
+    "@babel/core": "7.26.10"
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
@@ -75,7 +75,7 @@
     "@testing-library/react": "^16.2.0",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/js-cookie": "^3.0.6",
-    "@types/node": "^22.13.5",
+    "@types/node": "^22.13.10",
     "@types/uuid": "^10.0.0",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "9.1.0",
@@ -87,7 +87,7 @@
     "gulp-append-prepend": "1.0.9",
     "husky": "^9.1.7",
     "patch-package": "^8.0.0",
-    "prettier": "^3.5.2",
+    "prettier": "^3.5.3",
     "pretty-quick": "^4.0.0",
     "react-error-overlay": "^6.1.0"
   },
