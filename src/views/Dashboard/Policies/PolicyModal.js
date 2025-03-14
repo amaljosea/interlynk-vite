@@ -2,6 +2,7 @@ import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
 import {
+  Box,
   Button,
   Checkbox,
   Divider,
@@ -428,7 +429,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
           </Button>
           <Divider />
           {/* APPLY CONDITION */}
-          <FormControl>
+          <Box>
             <FormLabel htmlFor='doesNptapplyTo'>Does not apply to</FormLabel>
             <Stack spacing={5} mt={3}>
               <Checkbox
@@ -446,7 +447,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                 <Text fontSize={12}>Internal Components</Text>
               </Checkbox>
             </Stack>
-          </FormControl>
+          </Box>
           {/* ERROR HANDLING */}
           {error !== '' && <LynkAlert msg={error} />}
         </Flex>
