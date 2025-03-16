@@ -5697,6 +5697,15 @@ export const getProductsByStage = gql`
   }
 `
 
+// GET VERSION LIFESTAGES
+export const getVersionLifestage = gql`
+  query getVersionLifestage($env: String) {
+    organizationMetric(envName: $env) {
+      versionLifecycleStage
+    }
+  }
+`
+
 // GET ALL VULNERABILITIES BY SEVERITY
 export const getVulnsBySeverity = gql`
   query getVulnsBySeverity(
