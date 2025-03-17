@@ -55,7 +55,7 @@ const SupportExpand = (props) => {
             value={assessmentExpiresOn}
           />
         </Grid>
-        <Divider />
+        <Divider hidden={!duplicates} />
         {duplicates?.length > 0 &&
           duplicates?.map((item, index) => {
             const { sbom, componentSupportLevel } = item || {}
