@@ -280,10 +280,8 @@ const ChecksColumns = (
               {fixedByDefault && (
                 <Button
                   size='sm'
-                  variant='solid'
                   fontSize={'xs'}
-                  fontWeight='normal'
-                  colorScheme='whatsapp'
+                  colorScheme='green'
                   leftIcon={<CheckIcon />}
                   title={isPrimary ? 'Fixed' : 'View'}
                   onClick={() => (isPrimary ? null : FIXED.onOpen())}
@@ -297,8 +295,7 @@ const ChecksColumns = (
                 <Button
                   size='sm'
                   fontSize={'xs'}
-                  variant='solid'
-                  colorScheme='whatsapp'
+                  colorScheme='green'
                   isDisabled={isArchived}
                   leftIcon={<CheckIcon />}
                   title={isPrimary ? 'Fixed' : 'View'}
@@ -324,7 +321,6 @@ const ChecksColumns = (
             </>
           )
         },
-        width: '12%',
         right: 'true'
       }
     ]
