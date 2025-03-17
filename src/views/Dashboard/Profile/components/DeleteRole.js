@@ -45,8 +45,12 @@ const DeleteRole = ({ isOpen, onClose, activeRole }) => {
   const users = userData?.organization?.users?.nodes || []
   const filterUsers = users.filter((user) => user?.role?.id === id)
 
-  const [updateUserRole] = useMutation(OrganizationRoleBulkApply)
-  const [deleteRole] = useMutation(OrganizationRoleDelete)
+  const [updateUserRole, { loading: updateLoading }] = useMutation(
+    OrganizationRoleBulkApply
+  )
+  const [deleteRole, { loading: deleteLoading }] = useMutation(
+    OrganizationRoleDelete
+  )
 
   const { data } = useQuery(GetRoles, { skip: isOpen ? false : true })
   const { organizationRoles } = data?.organization || ''
@@ -96,14 +100,15 @@ const DeleteRole = ({ isOpen, onClose, activeRole }) => {
 
   return (
     <LynkModal
+      Icon={BiTrash}
       isOpen={isOpen}
       onClose={onClose}
+      buttonColor='red'
       onSubmit={onDelete}
       title={'Delete Role'}
-      Icon={BiTrash}
       disabled={isDisabled}
       buttonText='Reassign Users and Delete'
-      buttonColor='red'
+      isLoading={deleteLoading || updateLoading}
     >
       {/* ERROR HANDLING */}
       <Flex flexDirection='column' gap={3}>
