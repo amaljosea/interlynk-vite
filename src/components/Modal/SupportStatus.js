@@ -10,16 +10,41 @@ import { SupportIcon } from 'components/Icons/Icons'
 import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useRouteFlags } from 'hooks/useRouteFlags'
 
-import { componentSupportLevelCreate } from 'graphQL/Mutation'
+import {
+  componentSupportLevelCreate,
+  componentSupportLevelUpdate
+} from 'graphQL/Mutation'
 
 const SupportStatus = ({ isOpen, selectedItems, handleClear }) => {
   const { isCustomerView } = useRouteFlags()
+  const { showToast } = useCustomToast()
 
   const inputStyle = { size: 'md' }
 
-  const [createSupport, { loading }] = useMutation(componentSupportLevelCreate)
+  const [createSupport, { loading: createLoading }] = useMutation(
+    componentSupportLevelCreate
+  )
+  const [updateSupport, { loading: updateLoading }] = useMutation(
+    componentSupportLevelUpdate
+  )
+
+  console.warn('selectedItems', selectedItems)
+
+  const componentIds = selectedItems?.flatMap((item) => [
+    item?.id,
+    ...(item.duplicates?.map((dup) => dup?.id) || [])
+  ])
+  const supportIds = selectedItems
+    ?.filter((sup) => sup?.componentSupportLevel !== null)
+    ?.flatMap((item) => [
+      item?.componentSupportLevel?.id,
+      ...(item?.duplicates
+        ?.filter((level) => level?.componentSupportLevel !== null)
+        ?.map((dup) => dup?.componentSupportLevel?.id) || [])
+    ])
 
   const [formData, setFormData] = useState({
     supportLevel: '',
@@ -58,27 +83,71 @@ const SupportStatus = ({ isOpen, selectedItems, handleClear }) => {
     }))
   }
 
-  const handleSubmit = () => {
-    if (selectedItems?.length > 0) {
-      selectedItems?.map((item) => {
-        createSupport({
-          variables: {
-            id: item?.id,
-            level: formData?.supportLevel || undefined,
-            notes: formData?.explanation || undefined,
-            retainManualOverrideFor:
-              Number(formData?.assessmentExpiresOn) || undefined,
-            endDate: formData?.endOfSupport
-              ? new Date(formData?.endOfSupport).toISOString()
-              : undefined
-          }
-        })
-          .then((res) => {
-            const { errors } = res?.data?.componentSupportLevelCreate || {}
-            console.warn('Something went wrong', errors)
+  const handleUpdate = (data) => {
+    data?.map((item) => {
+      updateSupport({
+        variables: {
+          id: item,
+          level: formData?.supportLevel || undefined,
+          notes: formData?.explanation || undefined,
+          retainManualOverrideFor:
+            Number(formData?.assessmentExpiresOn) || undefined,
+          endDate: formData?.endOfSupport
+            ? new Date(formData?.endOfSupport).toISOString()
+            : undefined
+        }
+      }).then((res) => {
+        const { errors } = res?.data?.componentSupportLevelCreate || {}
+        if (errors?.length > 0) {
+          showToast({
+            description: errors[0],
+            status: 'error'
           })
-          .finally(() => handleClear())
+        } else {
+          handleClear()
+        }
       })
+    })
+  }
+
+  const handleCreate = (data) => {
+    data?.map((item) => {
+      createSupport({
+        variables: {
+          id: item,
+          level: formData?.supportLevel || undefined,
+          notes: formData?.explanation || undefined,
+          retainManualOverrideFor:
+            Number(formData?.assessmentExpiresOn) || undefined,
+          endDate: formData?.endOfSupport
+            ? new Date(formData?.endOfSupport).toISOString()
+            : undefined
+        }
+      }).then((res) => {
+        const { errors } = res?.data?.componentSupportLevelCreate || {}
+        if (errors?.length > 0) {
+          showToast({
+            description: errors[0],
+            status: 'error'
+          })
+        } else {
+          handleClear()
+        }
+      })
+    })
+  }
+
+  const handleSubmit = async () => {
+    if (componentIds?.length > 0 && supportIds?.length > 0) {
+      handleUpdate(supportIds)
+    }
+
+    if (componentIds?.length > 0 && supportIds?.length === 0) {
+      handleCreate(componentIds)
+    }
+
+    if (componentIds?.length === 0 && supportIds?.length > 0) {
+      handleUpdate(supportIds)
     }
   }
 
@@ -87,11 +156,11 @@ const SupportStatus = ({ isOpen, selectedItems, handleClear }) => {
       isOpen={isOpen}
       Icon={SupportIcon}
       buttonText={'Save'}
-      isLoading={loading}
       title={'Add Status'}
       disabled={isDisabled}
       onClose={handleClear}
       onSubmit={handleSubmit}
+      isLoading={createLoading || updateLoading}
     >
       <Stack spacing={4}>
         {/* SUPPRT LEVEL */}

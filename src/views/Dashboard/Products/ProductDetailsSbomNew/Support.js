@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getUndefinedIfEmptyOrAll } from 'utils'
@@ -40,6 +40,7 @@ const Support = () => {
   const EDIT = useDisclosure()
   const STATUS = useDisclosure()
 
+  const [data, setData] = useState([])
   const [activeRow, setActiveRow] = useState(null)
   const [toggleClear, setToggleClear] = useState(false)
   const [selectedItems, setSelectedItems] = useState([])
@@ -144,6 +145,59 @@ const Support = () => {
   // COLUMNS
   const columns = SupportColumns({ handleSupport })
 
+  useEffect(() => {
+    if (nodes?.length > 0) {
+      const sortByUpdatedAt = (data) => {
+        return data?.sort(
+          (a, b) =>
+            new Date(b?.componentSupportLevel?.updatedAt) -
+            new Date(a?.componentSupportLevel?.updatedAt)
+        )
+      }
+
+      const mergeDuplicates = (data, id) => {
+        const mergedData = []
+        const duplicatesMap = new Map()
+
+        const sortedData = sortByUpdatedAt(data)
+
+        sortedData?.forEach((item) => {
+          const key = `${item.name}-${item.version}`
+          if (!duplicatesMap.has(key)) {
+            duplicatesMap.set(key, [item])
+          } else {
+            duplicatesMap.get(key).push(item)
+          }
+        })
+
+        duplicatesMap.forEach((value) => {
+          if (value.length > 1) {
+            const originalItem = value.find((item) => item?.sbom?.id === id)
+            const duplicates = value.filter((item) => item?.sbom?.id !== id)
+
+            if (originalItem) {
+              mergedData.push({
+                ...originalItem,
+                duplicates: duplicates
+              })
+            } else {
+              mergedData.push({
+                ...value[0],
+                duplicates: value.slice(1)
+              })
+            }
+          } else {
+            mergedData.push(value[0])
+          }
+        })
+
+        return mergedData
+      }
+
+      setData(mergeDuplicates(nodes, sbomId))
+    }
+  }, [nodes, sbomId])
+
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
@@ -154,10 +208,10 @@ const Support = () => {
           persistTableHead
           responsive={true}
           columns={columns}
-          data={nodes || []}
           expandOnRowClicked
           onSort={handleSort}
           defaultSortAsc={true}
+          data={data || []}
           progressPending={loading}
           defaultSortFieldId={field}
           subHeaderComponent={subHeader}
@@ -167,7 +221,6 @@ const Support = () => {
           progressComponent={<CustomLoader />}
           expandableRowsComponent={SupportExpand}
           customStyles={customStyles(headingTextColor)}
-          selectableRowDisabled={(row) => row?.sbom?.id !== sbomId}
         />
 
         {/* PAGINATION */}

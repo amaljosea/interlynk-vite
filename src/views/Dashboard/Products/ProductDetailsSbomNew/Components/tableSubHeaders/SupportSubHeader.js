@@ -24,6 +24,18 @@ const SupportSubHeader = ({
 }) => {
   const { isCustomerView } = useRouteFlags()
 
+  const withSupport = selectedItems?.filter(
+    (component) => component?.componentSupportLevel !== null
+  )
+  const withoutSupport = selectedItems?.filter(
+    (component) => component?.componentSupportLevel === null
+  )
+
+  const notAllowed = withSupport?.length > 0 && withoutSupport?.length > 0
+  const info = notAllowed
+    ? 'Create and update at the same time is not allowed'
+    : 'Set Status'
+
   const subHeader = useMemo(() => {
     return (
       <Flex w={'100%'} alignItems={'center'} justifyContent={'space-between'}>
@@ -39,11 +51,12 @@ const SupportSubHeader = ({
         </Flex>
         <Stack spacing={2} alignItems={'center'} direction={'row'}>
           {!isCustomerView && selectedItems?.length > 0 && (
-            <Tooltip label={'Set Status'}>
+            <Tooltip placement='left' label={info}>
               <IconButton
                 icon={<FaPen />}
                 colorScheme='blue'
                 onClick={handleStatus}
+                isDisabled={notAllowed}
               />
             </Tooltip>
           )}
@@ -65,7 +78,9 @@ const SupportSubHeader = ({
     reset,
     isCustomerView,
     selectedItems?.length,
+    info,
     handleStatus,
+    notAllowed,
     supportData
   ])
 
