@@ -185,19 +185,15 @@ const LegalTable = () => {
           >
             {organizationContacts?.map((item, index) => (
               <Flex key={index} alignItems={'center'} gap={4}>
-                {item?.email ? (
+                {item?.email && (
                   <Tooltip placement='top' label={item?.email}>
                     <EmailIcon color={primaryBlueText} boxSize={4} />
                   </Tooltip>
-                ) : (
-                  <EmailIcon color={headingTextColor} boxSize={4} />
                 )}
-                {item?.phone ? (
+                {item?.phone && (
                   <Tooltip placement='top' label={item?.phone}>
                     <PhoneIcon color={primaryBlueText} boxSize={3} />
                   </Tooltip>
-                ) : (
-                  <PhoneIcon color={headingTextColor} boxSize={3} />
                 )}
                 <Text color={primaryTextColor}>{item?.name || ''}</Text>
               </Flex>
