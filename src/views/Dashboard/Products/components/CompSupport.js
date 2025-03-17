@@ -44,8 +44,6 @@ const CompSupport = ({ data, isOpen, onClose }) => {
     variables: { id: data?.id, sbomId: data?.sbom?.id }
   })
 
-  console.warn('data', data)
-
   const { componentSupportLevel } = supports?.component || {}
 
   const Header = () => {

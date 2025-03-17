@@ -31,8 +31,6 @@ const SupportStatus = ({ isOpen, selectedItems, handleClear }) => {
     componentSupportLevelUpdate
   )
 
-  console.warn('selectedItems', selectedItems)
-
   const componentIds = selectedItems?.flatMap((item) => [
     item?.id,
     ...(item.duplicates?.map((dup) => dup?.id) || [])
