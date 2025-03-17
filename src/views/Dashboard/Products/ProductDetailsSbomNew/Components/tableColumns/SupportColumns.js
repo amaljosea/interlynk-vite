@@ -1,8 +1,7 @@
 import { useMemo } from 'react'
-import { useParams } from 'react-router-dom'
 import { getFullDate, setIntensity, timeSince } from 'utils'
 
-import { Badge, IconButton, Portal, Text, Tooltip } from '@chakra-ui/react'
+import { IconButton, Portal, Text, Tooltip } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
@@ -13,7 +12,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { FaEllipsisV } from 'react-icons/fa'
 
 const SupportColumns = ({ handleSupport }) => {
-  const params = useParams()
   const { isFreeTier } = useGlobalQueryContext()
 
   const { primaryTextColor, secondaryTextColor } = useThemeColor([
@@ -35,17 +33,10 @@ const SupportColumns = ({ handleSupport }) => {
         wrap: true,
         width: '22%',
         selector: (row) => {
-          const { name, sbom } = row || {}
+          const { name } = row || {}
           return (
             <Text my={3} color={primaryTextColor} data-tag='allowRowEvents'>
-              {name}{' '}
-              {sbom?.id !== params?.sbomid && (
-                <span>
-                  <Badge ml={1} colorScheme='blue'>
-                    P
-                  </Badge>
-                </span>
-              )}
+              {name}
             </Text>
           )
         }
@@ -189,7 +180,6 @@ const SupportColumns = ({ handleSupport }) => {
   }, [
     handleSupport,
     isFreeTier,
-    params?.sbomid,
     primaryTextColor,
     secondaryTextColor,
     updateComponent
