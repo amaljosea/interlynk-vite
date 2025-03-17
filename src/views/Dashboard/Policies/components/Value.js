@@ -1,3 +1,4 @@
+import { formatString } from 'utils'
 import {
   componentTypes,
   licenseStatusTypes,
@@ -5,7 +6,7 @@ import {
   vulnStatusTypes
 } from 'variables/general'
 
-import { Flex, FormControl, Select, Stack, Text } from '@chakra-ui/react'
+import { Flex, FormControl, Stack, Text } from '@chakra-ui/react'
 import { Icon, IconButton } from '@chakra-ui/react'
 import {
   Input,
@@ -70,118 +71,122 @@ const Value = (props) => {
   const blockInvalidChar = (e) =>
     ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()
 
+  const severityOptions = [
+    { label: '-- Select --', value: '' },
+    ...severityList.map((item) => ({
+      value: item,
+      label: formatString(item)
+    }))
+  ]
+
+  const kevOptions = [
+    { label: '-- Select --', value: '' },
+    { label: 'True', value: 'true' },
+    { label: 'False', value: 'false' }
+  ]
+
+  const vulnStatusOptions = [
+    { label: '-- Select --', value: '' },
+    ...vulnStatusTypes.map((status) => ({
+      label: status,
+      value: status
+    }))
+  ]
+
+  const statusCompletenessOptions = [
+    { label: '-- Select --', value: '' },
+    { label: 'Complete', value: 'complete' },
+    { label: 'Incomplete', value: 'incomplete' }
+  ]
+
+  const licenseOptions = [
+    { label: '-- Select --', value: '' },
+    ...licenseStatusTypes.map((item) => ({
+      value: String(item),
+      label: String(item)
+    }))
+  ]
+
+  const selectStyles = {
+    container: (baseStyles) => ({
+      ...baseStyles,
+      minWidth: '150px'
+    })
+  }
+
   return (
     <Flex alignItems={'center'} gap={4}>
       {subject === 'VULNERABILITY_SEV' && (
-        <FormControl isRequired minWidth={140}>
-          <Select
+        <FormControl isRequired>
+          <LynkSelect
             id='operator'
             name='operator'
-            value={value}
-            onChange={(e) => onChange(e.target.value, id, 'value')}
-            textTransform={'capitalize'}
-            hidden={operator === 'EXISTS' || operator === 'NOT_EXISTS'}
-          >
-            <option value=''>-- select --</option>
-            {severityList.map((item, index) => (
-              <option
-                key={index}
-                value={item}
-                style={{ textTransform: 'capitalize' }}
-              >
-                {item}
-              </option>
-            ))}
-          </Select>
+            value={severityOptions.find((opt) => opt.value === value)}
+            onChange={(option) => onChange(option?.value || '', id, 'value')}
+            options={severityOptions}
+            dropDown
+            placeholder={'-- Select --'}
+            isDisabled={operator === 'EXISTS' || operator === 'NOT_EXISTS'}
+            styles={selectStyles}
+          />
         </FormControl>
       )}
       {subject === 'VULNERABILITY_KEV' && (
         <FormControl isRequired minWidth={140}>
-          <Select
+          <LynkSelect
             id='operator'
             name='operator'
-            value={value}
-            onChange={(e) => onChange(e.target.value, id, 'value')}
-            textTransform={'capitalize'}
-          >
-            <option value=''>-- select --</option>
-            {[true, false].map((item, index) => (
-              <option
-                key={index}
-                value={item}
-                style={{ textTransform: 'capitalize' }}
-              >
-                {JSON.stringify(item)}
-              </option>
-            ))}
-          </Select>
+            value={kevOptions.find((opt) => opt.value === value)}
+            onChange={(option) => onChange(option?.value || '', id, 'value')}
+            options={kevOptions}
+            dropDown
+            placeholder={'-- Select --'}
+            styles={selectStyles}
+          />
         </FormControl>
       )}
       {subject === 'VULNERABILITY_STATUS' && (
         <FormControl isRequired minWidth={140}>
-          <Select
+          <LynkSelect
             id='vulnStatus'
             name='vulnStatus'
-            value={value}
-            onChange={(e) => onChange(e.target.value, id, 'value')}
-            textTransform={'capitalize'}
+            value={vulnStatusOptions.find((opt) => opt.value === value)}
+            onChange={(option) => onChange(option?.value || '', id, 'value')}
+            options={vulnStatusOptions}
             hidden={operator === 'EXISTS' || operator === 'NOT_EXISTS'}
-          >
-            <option value=''>-- select --</option>
-            {vulnStatusTypes.map((item, index) => (
-              <option
-                key={index}
-                value={item}
-                style={{ textTransform: 'capitalize' }}
-              >
-                {item}
-              </option>
-            ))}
-          </Select>
+            dropDown
+            placeholder={'-- Select --'}
+            styles={selectStyles}
+          />
         </FormControl>
       )}
       {subject === 'VULNERABILITY_STATUS_COMPLETENESS' && operator === 'IS' && (
         <FormControl isRequired minWidth={140}>
-          <Select
+          <LynkSelect
             id='statusCompleteness'
             name='statusCompleteness'
-            value={value}
-            onChange={(e) => onChange(e.target.value, id, 'value')}
-            textTransform={'capitalize'}
-          >
-            <option value=''>-- select --</option>
-            {['complete', 'incomplete'].map((item, index) => (
-              <option
-                key={index}
-                value={item}
-                style={{
-                  textTransform: 'capitalize'
-                }}
-              >
-                {item}
-              </option>
-            ))}
-          </Select>
+            value={statusCompletenessOptions.find((opt) => opt.value === value)}
+            onChange={(option) => onChange(option?.value || '', id, 'value')}
+            options={statusCompletenessOptions}
+            dropDown
+            placeholder={'-- Select --'}
+            styles={selectStyles}
+          />
         </FormControl>
       )}
       {subject === 'COMPONENT_LICENSE_STATUS' &&
         (operator === 'IS' || operator === 'IS_NOT') && (
           <FormControl isRequired>
-            <Select
+            <LynkSelect
               id='compLicenseStatus'
               name='compLicenseStatus'
-              value={value}
-              onChange={(e) => onChange(e.target.value, id, 'value')}
-              textTransform={'capitalize'}
-              minWidth={140}
-            >
-              <option value=''>-- select --</option>
-              {licenseStatusTypes.map((item, index) => (
-                <option key={index} value={item}>
-                  {item}
-                </option>
-              ))}
-            </Select>
+              value={licenseOptions.find((opt) => opt.value === String(value))}
+              onChange={(option) => onChange(option?.value || '', id, 'value')}
+              options={licenseOptions}
+              placeholder={'-- Select --'}
+              dropDown
+              styles={selectStyles}
+            />
           </FormControl>
         )}
       {subject === 'COMPONENT_TYPE' &&
@@ -195,8 +200,10 @@ const Value = (props) => {
                 onChange(selectedOption?.value, id, 'value')
               }
               options={componentTypes}
+              placeholder={'-- Select --'}
               dropDown={true}
-              minWidth={140}
+              width={'100%'}
+              styles={selectStyles}
             />
           </FormControl>
         )}

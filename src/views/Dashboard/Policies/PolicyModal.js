@@ -10,7 +10,6 @@ import {
   FormControl,
   FormLabel,
   Input,
-  Select,
   Stack,
   Text,
   Textarea
@@ -18,6 +17,7 @@ import {
 
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
+import LynkSelect from 'components/LynkSelect'
 
 import { PolicyCreate, PolicyUpdate } from 'graphQL/Mutation'
 
@@ -62,6 +62,15 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
     setFormData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
+    }))
+    setError('')
+  }
+
+  const handleSelectChange = (selectedItem, type) => {
+    const { value } = selectedItem
+    setFormData((prev) => ({
+      ...prev,
+      [type]: value
     }))
     setError('')
   }
@@ -114,6 +123,14 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
   }
 
   const handleCreate = () => {
+    if (
+      formData?.name === '' ||
+      formData?.resultType === '' ||
+      formData?.operator === ''
+    ) {
+      setError('Please enter all required fields')
+      return
+    }
     const rules = []
     if (conditions?.length > 0) {
       conditions?.map((item) =>
@@ -212,6 +229,14 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
   }
 
   const handleUpdate = () => {
+    if (
+      formData?.name === '' ||
+      formData?.resultType === '' ||
+      formData?.operator === ''
+    ) {
+      setError('Please enter all required fields')
+      return
+    }
     if (prevRules?.length > 0) {
       updatePolicy({ variables: inputData(prevRules) }).then((res) => {
         const errors = res?.data?.policyUpdate?.errors
@@ -321,6 +346,19 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
     }
   }, [data, plSubjects])
 
+  const resultTypeOptions = [
+    { label: '-- Select --', value: '' },
+    { label: 'INFORM', value: 'INFORM' },
+    { label: 'WARN', value: 'WARN' },
+    { label: 'FAIL', value: 'FAIL' }
+  ]
+
+  const operatorOptions = [
+    { label: '-- Select --', value: '' },
+    { label: 'ANY', value: 'ANY' },
+    { label: 'ALL', value: 'ALL' }
+  ]
+
   return (
     <>
       <LynkModal
@@ -364,43 +402,34 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
           {/* POLICY RESULT AND TYPE */}
           <FormControl isRequired>
             <FormLabel htmlFor='resultType'>Policy Result</FormLabel>
-            <Select
+            <LynkSelect
               name='resultType'
-              onChange={handleChange}
-              value={formData?.resultType}
-              placeholder={'-- select --'}
+              value={resultTypeOptions.find(
+                (opt) => opt.value === formData?.resultType
+              )}
+              onChange={(selectedItem) =>
+                handleSelectChange(selectedItem, 'resultType')
+              }
+              options={resultTypeOptions}
               data-testid='policy_result_type'
-            >
-              {['INFORM', 'WARN', 'FAIL'].map((item, index) => (
-                <option
-                  key={index}
-                  value={item}
-                  style={{ textTransform: 'capitalize' }}
-                >
-                  {item}
-                </option>
-              ))}
-            </Select>
+              dropDown
+            />
           </FormControl>
           <FormControl isRequired>
             <FormLabel htmlFor='operator'>On Conditions</FormLabel>
-            <Select
+            <LynkSelect
               name='operator'
-              onChange={handleChange}
-              value={formData?.operator}
-              placeholder={'-- select --'}
+              value={operatorOptions.find(
+                (opt) => opt.value === formData?.operator
+              )}
+              onChange={(selectedItem) =>
+                handleSelectChange(selectedItem, 'operator')
+              }
+              options={operatorOptions}
+              /* placeholder='-- Select --' */
               data-testid='policy_result_condition'
-            >
-              {['ANY', 'ALL'].map((item, index) => (
-                <option
-                  key={index}
-                  value={item}
-                  style={{ textTransform: 'capitalize' }}
-                >
-                  {item}
-                </option>
-              ))}
-            </Select>
+              dropDown
+            />
           </FormControl>
           <Divider />
           {/* CONDITIONS */}
