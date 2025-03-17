@@ -430,7 +430,9 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
           <Divider />
           {/* APPLY CONDITION */}
           <Box>
-            <FormLabel htmlFor='doesNotApplyTo'>Does not apply to</FormLabel>
+            <Text fontSize={12} fontWeight={500} htmlFor='doesNotApplyTo'>
+              Does not apply to
+            </Text>
             <Stack spacing={3} mt={3}>
               <FormControl>
                 <Checkbox
