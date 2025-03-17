@@ -53,9 +53,9 @@ export default class ComponentSection {
       if (createModal) {
         await this.page.getByPlaceholder('Enter name').fill('Kernel')
         await this.page.getByPlaceholder('Enter version').fill('1.2.3')
-        await this.page
-          .getByRole('combobox', { name: 'kind' })
-          .selectOption('application')
+        await this.page.getByRole('combobox', { name: 'kind' }).click()
+        await this.page.keyboard.type('application')
+        await this.page.keyboard.press('Enter')
         const submitBtn = await this.page.isEnabled("button[type='submit']")
         if (submitBtn) {
           await this.page.locator("button[type='submit']").click()
