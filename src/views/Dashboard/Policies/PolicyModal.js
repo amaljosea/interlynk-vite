@@ -430,22 +430,27 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
           <Divider />
           {/* APPLY CONDITION */}
           <Box>
-            <FormLabel htmlFor='doesNptapplyTo'>Does not apply to</FormLabel>
-            <Stack spacing={5} mt={3}>
-              <Checkbox
-                name={'isPrimary'}
-                isChecked={formData?.isPrimary}
-                onChange={handleChange}
-              >
-                <Text fontSize={12}>Primary Component</Text>
-              </Checkbox>
-              <Checkbox
-                name={'isInternal'}
-                onChange={handleChange}
-                isChecked={formData?.isInternal}
-              >
-                <Text fontSize={12}>Internal Components</Text>
-              </Checkbox>
+            <FormLabel htmlFor='doesNotApplyTo'>Does not apply to</FormLabel>
+            <Stack spacing={3} mt={3}>
+              <FormControl>
+                <Checkbox
+                  name='isPrimary'
+                  isChecked={formData?.isPrimary}
+                  onChange={handleChange}
+                >
+                  <Text fontSize={12}>Primary Component</Text>
+                </Checkbox>
+              </FormControl>
+
+              <FormControl>
+                <Checkbox
+                  name='isInternal'
+                  isChecked={formData?.isInternal}
+                  onChange={handleChange}
+                >
+                  <Text fontSize={12}>Internal Components</Text>
+                </Checkbox>
+              </FormControl>
             </Stack>
           </Box>
           {/* ERROR HANDLING */}
