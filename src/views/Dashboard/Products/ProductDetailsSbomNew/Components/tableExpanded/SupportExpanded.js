@@ -56,8 +56,8 @@ const SupportExpand = (props) => {
           />
         </Grid>
         <Divider hidden={!duplicates} />
-        {duplicates?.length > 0 &&
-          duplicates?.map((item, index) => {
+        {duplicates.length > 0 &&
+          duplicates.map((item, index) => {
             const { sbom, componentSupportLevel } = item || {}
             const { project, projectVersion } = sbom || {}
             const { notes, user, updatedAt, retainManualOverrideFor, level } =
@@ -67,7 +67,7 @@ const SupportExpand = (props) => {
               ? `${project?.projectGroup?.name} ${projectVersion && `: ${projectVersion}`}`
               : `N/A`
             const partLevel = level ? level?.replaceAll('_', ' ') : 'N/A'
-            const partAssement = user?.name ? 'Manual' : 'Automatic'
+            const partAssessment = user?.name ? 'Manual' : 'Automatic'
             const partInternalNotes = notes || 'N/A'
             const partLastAssessedBy =
               componentSupportLevel?.user?.name || 'N/A'
@@ -83,7 +83,7 @@ const SupportExpand = (props) => {
                 {/* PART */}
                 <DetailItem label='Source' value={part} />
                 {/* ASSESSMENT */}
-                <DetailItem label='Assessment' value={partAssement} />
+                <DetailItem label='Assessment' value={partAssessment} />
                 {/* LEVEL */}
                 <DetailItem
                   label='Level'

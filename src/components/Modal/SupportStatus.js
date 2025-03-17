@@ -94,17 +94,17 @@ const SupportStatus = ({ isOpen, selectedItems, handleClear }) => {
             ? new Date(formData?.endOfSupport).toISOString()
             : undefined
         }
-      }).then((res) => {
-        const { errors } = res?.data?.componentSupportLevelCreate || {}
-        if (errors?.length > 0) {
-          showToast({
-            description: errors[0],
-            status: 'error'
-          })
-        } else {
-          handleClear()
-        }
       })
+        .then((res) => {
+          const { errors } = res?.data?.componentSupportLevelCreate || {}
+          if (errors?.length > 0) {
+            showToast({
+              description: errors[0],
+              status: 'error'
+            })
+          }
+        })
+        .finally(() => handleClear())
     })
   }
 
@@ -121,17 +121,17 @@ const SupportStatus = ({ isOpen, selectedItems, handleClear }) => {
             ? new Date(formData?.endOfSupport).toISOString()
             : undefined
         }
-      }).then((res) => {
-        const { errors } = res?.data?.componentSupportLevelCreate || {}
-        if (errors?.length > 0) {
-          showToast({
-            description: errors[0],
-            status: 'error'
-          })
-        } else {
-          handleClear()
-        }
       })
+        .then((res) => {
+          const { errors } = res?.data?.componentSupportLevelCreate || {}
+          if (errors?.length > 0) {
+            showToast({
+              description: errors[0],
+              status: 'error'
+            })
+          }
+        })
+        .finally(() => handleClear())
     })
   }
 
