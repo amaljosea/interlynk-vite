@@ -6,7 +6,6 @@ import { getSignedUrlParams, truncatedValue } from 'utils'
 
 import { DownloadIcon } from '@chakra-ui/icons'
 import {
-  Box,
   Button,
   Divider,
   Flex,
@@ -351,7 +350,7 @@ const DownloadModal = (props) => {
           )}
 
           <SimpleGrid columns={2}>
-            <Box>
+            <FormControl>
               <FormLabel>Content</FormLabel>
               <VStack align='start'>
                 {downloadType === 'pdf' && (
@@ -404,7 +403,7 @@ const DownloadModal = (props) => {
                 )}
                 {/* <Checkbox>Redact Internal Components</Checkbox> */}
               </VStack>
-            </Box>
+            </FormControl>
             <FormControl>
               <FormLabel>Output</FormLabel>
               <HStack justify='space-between'>
