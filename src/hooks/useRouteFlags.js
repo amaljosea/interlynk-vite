@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 
 function vendorRootCheck(pathname) {
   const match = pathname.match(/^\/vendor(\/*)$/)
@@ -8,6 +8,8 @@ function vendorRootCheck(pathname) {
 export const useRouteFlags = () => {
   const { pathname, search } = useLocation()
   const searchParams = new URLSearchParams(search)
+
+  const params = useParams()
 
   return {
     isCustomerView: pathname.startsWith('/customer'),
@@ -42,6 +44,9 @@ export const useRouteFlags = () => {
       !!searchParams.get('vulnId'),
 
     isSingleVulnerabilityPage:
-      pathname === '/vendor/vulnerabilities' && !!searchParams.get('vulnId')
+      pathname === '/vendor/vulnerabilities' && !!searchParams.get('vulnId'),
+
+    isPolicyDetailsPage:
+      pathname.startsWith('/vendor/policies/') && !!params.policyid
   }
 }
