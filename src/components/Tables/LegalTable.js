@@ -9,15 +9,13 @@ import LegalModal from 'views/Dashboard/Profile/components/LegalModal'
 import { EmailIcon, InfoIcon, PhoneIcon } from '@chakra-ui/icons'
 import {
   Flex,
-  Menu,
-  MenuItem,
-  MenuList,
   Portal,
   Stack,
   Text,
   Tooltip,
   useDisclosure
 } from '@chakra-ui/react'
+import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
@@ -147,22 +145,24 @@ const LegalTable = () => {
     {
       id: 'URL',
       name: 'URL',
-      selector: (row) => (
-        <Flex
-          direction='row'
-          alignItems={'center'}
-          gap={2}
-          my={3}
-          hidden={!row?.url}
-        >
-          <ExternalNavIcon
-            href={row?.url.startsWith('http') ? row.url : `https://${row.url}`}
-          />
-          <Text color={primaryTextColor}>
-            {row?.url.startsWith('http') ? row.url : `https://${row.url}`}
-          </Text>
-        </Flex>
-      ),
+      selector: (row) => {
+        if (!row?.url) {
+          return <Text color={primaryTextColor}>N/A</Text>
+        }
+
+        return (
+          <Flex direction='row' alignItems={'center'} gap={2} my={3}>
+            <ExternalNavIcon
+              href={
+                row?.url.startsWith('http') ? row.url : `https://${row.url}`
+              }
+            />
+            <Text color={primaryTextColor}>
+              {row?.url.startsWith('http') ? row.url : `https://${row.url}`}
+            </Text>
+          </Flex>
+        )
+      },
       wrap: true
     },
     // CONTACTS
@@ -171,6 +171,11 @@ const LegalTable = () => {
       name: 'CONTACTS',
       selector: (row) => {
         const { organizationContacts } = row
+
+        if (organizationContacts?.length === 0) {
+          return <Text color={primaryTextColor}>N/A</Text>
+        }
+
         return (
           <Flex
             flexDirection={'column'}
