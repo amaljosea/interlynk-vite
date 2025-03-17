@@ -56,7 +56,7 @@ const SupportExpand = (props) => {
           />
         </Grid>
         <Divider hidden={!duplicates} />
-        {duplicates.length > 0 &&
+        {duplicates?.length > 0 &&
           duplicates.map((item, index) => {
             const { sbom, componentSupportLevel } = item || {}
             const { project, projectVersion } = sbom || {}
