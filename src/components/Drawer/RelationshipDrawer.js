@@ -2,18 +2,7 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { ArrowDownIcon } from '@chakra-ui/icons'
-import {
-  Box,
-  Button,
-  Flex,
-  Select,
-  Stack,
-  Text,
-  Tooltip
-} from '@chakra-ui/react'
-import { Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
-import { Tag, TagLabel } from '@chakra-ui/react'
+import { Button, Divider, Select, Stack, Text } from '@chakra-ui/react'
 import {
   FormControl,
   FormErrorIcon,
@@ -23,11 +12,12 @@ import {
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
-import CardHeader from 'components/Card/CardHeader'
+import CompRelationTypes from 'components/CompRelationTypes'
 import LoadingSpinner from 'components/LoadingSpinner'
 import LynkAlert from 'components/LynkAlert'
 import LynkDrawer from 'components/LynkDrawer'
 import CompInfo from 'components/Misc/CompInfo'
+import RelationTreeView from 'components/RelationTreeView'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
@@ -41,32 +31,13 @@ import {
   GetTotalComponents
 } from 'graphQL/Queries'
 
-const findShortestPath = (pathArray, currentShortestPath = []) => {
-  if (!pathArray || pathArray.length === 0) {
-    return currentShortestPath
-  }
-  const shortestPath = pathArray.reduce((minPath, currentPath) => {
-    if (currentPath.depth < minPath.depth) {
-      return currentPath
-    }
-    return minPath
-  }, pathArray[0])
-  return findShortestPath(shortestPath.path, [
-    ...currentShortestPath,
-    shortestPath
-  ])
-}
-
 const RelationshipDrawer = (props) => {
   const { isOpen, onClose, activeRow, recheck } = props
 
   const params = useParams()
   const activeTab = useQueryParam('tab')
   const { prodCompState } = useGlobalState()
-  const { primaryBlueText, headingTextColor } = useThemeColor([
-    'primaryBlueText',
-    'headingTextColor'
-  ])
+  const { headingTextColor } = useThemeColor(['headingTextColor'])
 
   const sbomId = params.sbomid
   const productId = params.productid
@@ -122,8 +93,6 @@ const RelationshipDrawer = (props) => {
   })
 
   const isLoading = props?.comPathLoading || !allComponents
-  const shortestPath =
-    pathToPrimary?.length > 0 && findShortestPath(pathToPrimary)[0]
 
   const [addRelation, { loading: createLoading }] = useMutation(
     CreateCompRelation,
@@ -178,11 +147,12 @@ const RelationshipDrawer = (props) => {
 
   return (
     <LynkDrawer
-      title={'Relationships'}
-      size='lg'
+      size='md'
+      noFooter
       isOpen={isOpen}
       onClose={onClose}
-      noFooter
+      title={'Relationships'}
+      subtitle={compInfo && <CompInfo data={compInfo} />}
     >
       {isLoading || comPathLoading ? (
         <LoadingSpinner />
@@ -198,16 +168,8 @@ const RelationshipDrawer = (props) => {
             'scrollbar-width': 'none'
           }}
         >
-          <CardHeader>
-            <CompInfo data={compInfo} />
-          </CardHeader>
           <CardBody>
-            <Flex
-              flexDir={'column'}
-              alignItems={'flex-start'}
-              width={'100%'}
-              gap={4}
-            >
+            <Stack spacing={6} width={'100%'}>
               {/* CREATE RELATIONSHIP */}
               <Stack mt={6} width={'100%'} spacing={4} hidden={resolved}>
                 <FormControl>
@@ -276,126 +238,28 @@ const RelationshipDrawer = (props) => {
                 </Button>
               </Stack>
 
-              {/* COMONENT RELATIONSIP DATA */}
-              <Table mt={6} width={'100%'}>
-                <Thead>
-                  <Tr>
-                    {['Type', 'Component'].map((item, index) => (
-                      <Th key={index} pl={0} width={'100px'}>
-                        <Box>{item}</Box>
-                      </Th>
-                    ))}
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {/* Dependency Of */}
-                  <Tr>
-                    <Td pl={0} width={'120px'}>
-                      <Text fontSize='xs' fontWeight={'medium'}>
-                        Dependency Of
-                      </Text>
-                    </Td>
-                    <Td pl={0} width={'300px'}>
-                      <Flex flexDirection={'row'} flexWrap={'wrap'} gap={2}>
-                        {dependencyOfList.map((comp, index) => (
-                          <Tag size={'sm'} key={index} width={'fit-content'}>
-                            <TagLabel>
-                              {comp.fromComp.name}-{comp.fromComp.version}
-                            </TagLabel>
-                          </Tag>
-                        ))}
-                      </Flex>
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td pl={0} width={'120px'}>
-                      <Text fontSize='xs' fontWeight={'medium'}>
-                        Depends On
-                      </Text>
-                    </Td>
-                    <Td pl={0} width={'300px'}>
-                      <Flex flexDirection={'row'} flexWrap={'wrap'} gap={2}>
-                        {[...dependsOnList]
-                          .sort(
-                            (a, b) =>
-                              new Date(b?.updatedAt) - new Date(a?.updatedAt)
-                          )
-                          .map((comp, index) => (
-                            <Tooltip
-                              key={index}
-                              label={comp?.toComp?.name}
-                              placement='top'
-                            >
-                              <Tag size={'sm'} width={'fit-content'}>
-                                <TagLabel>
-                                  {comp?.toComp?.name?.substring(0, 50)}-
-                                  {comp?.toComp?.version}
-                                </TagLabel>
-                              </Tag>
-                            </Tooltip>
-                          ))}
-                      </Flex>
-                    </Td>
-                  </Tr>
-                </Tbody>
-              </Table>
-
+              {/* RELATION TYPES */}
+              <CompRelationTypes
+                loading={false}
+                isAdded={false}
+                isEditable={false}
+                handleDelete={null}
+                dependsOnList={dependsOnList}
+                dependencyOfList={dependencyOfList}
+              />
+              <Divider />
               {/* PATHS */}
-              <Text fontSize={'lg'} fontWeight={'medium'} mt={6}>
-                Tree View
-              </Text>
-              {pathToPrimary?.length > 0 ? (
-                <Stack
-                  width={'100%'}
-                  mt={10}
-                  dir='column'
-                  spacing={2}
-                  alignItems={'center'}
-                  justifyContent={'center'}
-                >
-                  {shortestPath.path?.length > 0 ? (
-                    shortestPath.path.map((item, index) => (
-                      <>
-                        <Tag
-                          key={item.id}
-                          size='sm'
-                          colorScheme={
-                            index === 0 ||
-                            index === shortestPath.path.length - 1
-                              ? 'blue'
-                              : 'green'
-                          }
-                        >
-                          {item.name} - {item.version}
-                        </Tag>
-                        {index !== shortestPath.path.length - 1 && (
-                          <ArrowDownIcon
-                            width={4}
-                            height={4}
-                            color={primaryBlueText}
-                          />
-                        )}
-                      </>
-                    ))
-                  ) : (
-                    <Text fontSize={'sm'}>
-                      Component is not connected to Primary component
-                    </Text>
-                  )}
-                </Stack>
-              ) : (
-                <Stack
-                  width={'100%'}
-                  alignItems={'center'}
-                  justifyContent={'center'}
-                >
-                  <Tag size='sm' colorScheme='green'>
-                    {activeRow?.name || compName} -{' '}
-                    {activeRow?.version || compVersion}
-                  </Tag>
-                </Stack>
-              )}
-            </Flex>
+              <Stack spacing={4}>
+                <Text fontWeight={'medium'}>Tree View</Text>
+                <RelationTreeView
+                  compPath={pathToPrimary}
+                  data={{
+                    name: activeRow?.name || compName,
+                    version: activeRow?.version || compVersion
+                  }}
+                />
+              </Stack>
+            </Stack>
           </CardBody>
         </Card>
       )}
