@@ -115,10 +115,7 @@ export default class GeneralSection {
           await this.page.locator("button[type='submit']").click()
           await this.page.waitForTimeout(3000)
 
-          await this.page
-            .getByRole('row', { name: 'Authors Abhisek Paul -' })
-            .getByLabel('close')
-            .click()
+          await this.page.getByLabel('close').nth(1).click()
           await this.page.locator("button[type='submit']").click()
           await this.page.waitForTimeout(3000)
         } else {

@@ -9,7 +9,6 @@ import {
   Flex,
   IconButton,
   Input,
-  Select,
   Stack,
   Tag,
   Text,
@@ -20,6 +19,7 @@ import { FormControl, FormLabel } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
+import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
 import useQueryParam from 'hooks/useQueryParam'
@@ -174,9 +174,9 @@ const VexModal = ({
     ]
   )
 
-  const handleStatusChange = (e) => {
-    const { value } = e.target
-    const status = e.target.options[e.target.selectedIndex].text
+  const handleStatusChange = (selectedItem) => {
+    const { value, label } = selectedItem
+    const status = label
     status === 'Not Affected' && !id ? setUpstream(true) : setUpstream(false)
     setStatusTitle(value)
     setStatusName(status)
@@ -190,15 +190,15 @@ const VexModal = ({
     setImpactData('')
   }
 
-  const handleResponseChange = (e) => {
-    const { value } = e.target
-    const title = e.target.options[e.target.selectedIndex].text
+  const handleResponseChange = (selectedItem) => {
+    const { value, label } = selectedItem
+    const title = label
     setResponse(value)
     setResponseTitle(title)
   }
 
-  const handleJustifyChange = (e) => {
-    const { value } = e.target
+  const handleJustifyChange = (selectedItem) => {
+    const { value } = selectedItem
     setJustification(value)
   }
 
@@ -286,6 +286,59 @@ const VexModal = ({
     }
   }, [componentVulnCustomFields, nodes])
 
+  const statusOptions = allVexStatus
+    ? [
+        { label: '-- Select Status --', value: '' },
+        ...allVexStatus.vexStatuses.map((st) => ({
+          value: st.id,
+          label: st.name
+        }))
+      ]
+    : [{ label: 'No data', value: '' }]
+
+  const justificationOptions = allVexJustify
+    ? [
+        { label: '-- Select --', value: '' },
+        ...allVexJustify.vexJustifications.map((justify) => ({
+          value: justify.id,
+          label: justify.name
+        }))
+      ]
+    : [{ label: 'No data', value: '' }]
+
+  const responseOptions = allCdx?.cdxResponses?.length
+    ? [
+        { label: '-- Select --', value: '' },
+        ...allCdx.cdxResponses.map((item) => ({
+          value: item.id,
+          label: item.name
+        }))
+      ]
+    : [{ label: 'No data', value: '' }]
+
+  const fixedVersionOptions = fixedVersions?.length
+    ? [
+        { label: '-- Select --', value: '' },
+        ...fixedVersions.map((item) => ({
+          value: item,
+          label: item
+        }))
+      ]
+    : [{ label: 'No data', value: '' }]
+
+  const fieldOneOptions = fieldOne
+    ? [
+        { label: '-- Select --', value: '' },
+        ...Array.from(
+          { length: fieldOne.maxValue - fieldOne.minValue + 1 },
+          (_, i) => ({
+            value: String(fieldOne.minValue + i),
+            label: String(fieldOne.minValue + i)
+          })
+        )
+      ]
+    : [{ label: 'No data', value: '' }]
+
   return (
     <LynkModal
       isOpen={isOpen}
@@ -348,45 +401,32 @@ const VexModal = ({
           {/* STATUS */}
           <FormControl isRequired={nodes?.length === 0}>
             <FormLabel htmlFor='vexType'>Status</FormLabel>
-            <Select
+            <LynkSelect
               id='vexType'
               name='vexType'
-              value={statusTitle}
-              onChange={handleStatusChange}
-            >
-              <option value=''>-- Select Status --</option>
-              {allVexStatus ? (
-                allVexStatus.vexStatuses.map((st, idx) => (
-                  <option key={idx} value={st.id}>
-                    {st.name}
-                  </option>
-                ))
-              ) : (
-                <option value={''}>No data found</option>
+              value={statusOptions.find(
+                (option) => option.value === statusTitle
               )}
-            </Select>
+              onChange={handleStatusChange}
+              options={statusOptions}
+              placeholder={'--Select Status--'}
+              dropDown
+            />
           </FormControl>
           {/* JUSTIFICATION */}
           {statusName === 'Not Affected' && (
             <FormControl>
               <FormLabel htmlFor='justification'>Justification</FormLabel>
-              <Select
+              <LynkSelect
                 id='justification'
                 name='justification'
-                value={justification}
-                onChange={handleJustifyChange}
-              >
-                <option value=''>-- Select --</option>
-                {allVexJustify ? (
-                  allVexJustify.vexJustifications.map((justify, idx) => (
-                    <option key={idx} value={justify.id}>
-                      {justify.name}
-                    </option>
-                  ))
-                ) : (
-                  <option value={''}>No data found</option>
+                value={justificationOptions.find(
+                  (option) => option.value === justification
                 )}
-              </Select>
+                onChange={handleJustifyChange}
+                options={justificationOptions}
+                dropDown
+              />
             </FormControl>
           )}
           <Text
@@ -440,20 +480,16 @@ const VexModal = ({
             <FormControl>
               <FormLabel htmlFor='response'>Response</FormLabel>
               {allCdx && (
-                <Select
+                <LynkSelect
                   id='response'
                   name='response'
-                  value={response}
+                  value={responseOptions.find(
+                    (option) => option.value === response
+                  )}
                   onChange={handleResponseChange}
-                >
-                  <option value=''>-- Select --</option>
-                  {allCdx?.cdxResponses.length > 0 &&
-                    allCdx?.cdxResponses.map((item, idx) => (
-                      <option key={idx} value={item.id}>
-                        {item.name}
-                      </option>
-                    ))}
-                </Select>
+                  options={responseOptions}
+                  dropDown
+                />
               )}
             </FormControl>
           )}
@@ -461,24 +497,16 @@ const VexModal = ({
           {responseTitle === 'Update' && (
             <FormControl width={'100%'} isRequired>
               <FormLabel htmlFor='fixedVersion'>Fixed Version</FormLabel>
-              <Select
+              <LynkSelect
                 id='fixedVersion'
                 name='fixedVersion'
-                value={selectedTag}
-                onChange={(e) => setSelectedTag(e.target.value)}
-                textTransform={'capitalize'}
-              >
-                <option value=''>-- Select --</option>
-                {fixedVersions?.length > 0 ? (
-                  fixedVersions?.map((item, index) => (
-                    <option key={index} value={item} name={item}>
-                      {item}
-                    </option>
-                  ))
-                ) : (
-                  <option value=''>-- --</option>
+                value={fixedVersionOptions.find(
+                  (option) => option.value === selectedTag
                 )}
-              </Select>
+                onChange={(option) => setSelectedTag(option?.value || '')}
+                options={fixedVersionOptions}
+                dropDown
+              />
             </FormControl>
           )}
           {/* DETAILS */}
@@ -512,20 +540,16 @@ const VexModal = ({
             <Stack spacing={4}>
               <FormControl>
                 <FormLabel>{fieldOne?.displayName}</FormLabel>
-                <Select
-                  value={formValues ? formValues[fieldOne?.id] : ''}
-                  onChange={(e) => handleChange(fieldOne?.id, e.target.value)}
-                >
-                  <option value={''}>-- Select --</option>
-                  {Array.from(
-                    { length: fieldOne?.maxValue - fieldOne?.minValue + 1 },
-                    (_, i) => (
-                      <option key={i} value={fieldOne?.minValue + i}>
-                        {fieldOne?.minValue + i}
-                      </option>
-                    )
+                <LynkSelect
+                  value={fieldOneOptions.find(
+                    (opt) => opt.value === String(formValues?.[fieldOne?.id])
                   )}
-                </Select>
+                  onChange={(option) =>
+                    handleChange(fieldOne?.id, option?.value || '')
+                  }
+                  options={fieldOneOptions}
+                  dropDown
+                />
               </FormControl>
               <FormControl>
                 <FormLabel>{fieldTwo?.displayName}</FormLabel>

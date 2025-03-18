@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { gql, useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 
 import { Flex, FormControl, Select, Text } from '@chakra-ui/react'
@@ -13,9 +13,25 @@ import {
   OrganizationRoleBulkApply,
   OrganizationRoleDelete
 } from 'graphQL/Mutation'
-import { GetRoles, GetUsers } from 'graphQL/Queries'
+import { GetRoles } from 'graphQL/Queries'
 
 import { BiTrash } from 'react-icons/bi'
+
+const GetUsers = gql`
+  query Organization {
+    organization {
+      users {
+        totalCount
+        nodes {
+          id
+          role {
+            id
+          }
+        }
+      }
+    }
+  }
+`
 
 const DeleteRole = ({ isOpen, onClose, activeRole }) => {
   const { showToast } = useCustomToast()
@@ -26,11 +42,15 @@ const DeleteRole = ({ isOpen, onClose, activeRole }) => {
   const [error, setError] = useState('')
 
   const { data: userData } = useQuery(GetUsers, { skip: !orgView })
-  const { users } = userData?.organization || ''
-  const filterUsers = users?.filter((user) => user?.role?.id === id)
+  const users = userData?.organization?.users?.nodes || []
+  const filterUsers = users.filter((user) => user?.role?.id === id)
 
-  const [updateUserRole] = useMutation(OrganizationRoleBulkApply)
-  const [deleteRole] = useMutation(OrganizationRoleDelete)
+  const [updateUserRole, { loading: updateLoading }] = useMutation(
+    OrganizationRoleBulkApply
+  )
+  const [deleteRole, { loading: deleteLoading }] = useMutation(
+    OrganizationRoleDelete
+  )
 
   const { data } = useQuery(GetRoles, { skip: isOpen ? false : true })
   const { organizationRoles } = data?.organization || ''
@@ -80,14 +100,15 @@ const DeleteRole = ({ isOpen, onClose, activeRole }) => {
 
   return (
     <LynkModal
+      Icon={BiTrash}
       isOpen={isOpen}
       onClose={onClose}
+      buttonColor='red'
       onSubmit={onDelete}
       title={'Delete Role'}
-      Icon={BiTrash}
       disabled={isDisabled}
       buttonText='Reassign Users and Delete'
-      buttonColor='red'
+      isLoading={deleteLoading || updateLoading}
     >
       {/* ERROR HANDLING */}
       <Flex flexDirection='column' gap={3}>

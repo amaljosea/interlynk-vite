@@ -2,6 +2,7 @@ import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
 import {
+  Box,
   Button,
   Checkbox,
   Divider,
@@ -428,25 +429,32 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
           </Button>
           <Divider />
           {/* APPLY CONDITION */}
-          <FormControl>
-            <FormLabel htmlFor='doesNptapplyTo'>Does not apply to</FormLabel>
-            <Stack spacing={5} mt={3}>
-              <Checkbox
-                name={'isPrimary'}
-                isChecked={formData?.isPrimary}
-                onChange={handleChange}
-              >
-                <Text fontSize={12}>Primary Component</Text>
-              </Checkbox>
-              <Checkbox
-                name={'isInternal'}
-                onChange={handleChange}
-                isChecked={formData?.isInternal}
-              >
-                <Text fontSize={12}>Internal Components</Text>
-              </Checkbox>
+          <Box>
+            <Text fontSize={12} fontWeight={500} htmlFor='doesNotApplyTo'>
+              Does not apply to
+            </Text>
+            <Stack spacing={3} mt={3}>
+              <FormControl>
+                <Checkbox
+                  name='isPrimary'
+                  isChecked={formData?.isPrimary}
+                  onChange={handleChange}
+                >
+                  <Text fontSize={12}>Primary Component</Text>
+                </Checkbox>
+              </FormControl>
+
+              <FormControl>
+                <Checkbox
+                  name='isInternal'
+                  isChecked={formData?.isInternal}
+                  onChange={handleChange}
+                >
+                  <Text fontSize={12}>Internal Components</Text>
+                </Checkbox>
+              </FormControl>
             </Stack>
-          </FormControl>
+          </Box>
           {/* ERROR HANDLING */}
           {error !== '' && <LynkAlert msg={error} />}
         </Flex>
