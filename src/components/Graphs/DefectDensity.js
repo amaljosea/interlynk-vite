@@ -108,7 +108,7 @@ const DefectDensity = ({ filters }) => {
       )
     : dates?.map((date) => ({
         date: date ? formatDate(date) : 'N/A',
-        defectDensityRate: 0
+        fixedVulnerabiltyRatio: 0
       })) || []
 
   const lines = [
@@ -118,6 +118,8 @@ const DefectDensity = ({ filters }) => {
       stroke: theme.colors.blue[500]
     }
   ]
+
+  console.warn('defectMetrics', defectMetrics)
 
   if (loading) return <LynkLoader />
 
