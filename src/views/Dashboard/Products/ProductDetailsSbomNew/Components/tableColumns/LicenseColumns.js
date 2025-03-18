@@ -16,7 +16,7 @@ const LicenseColumns = () => {
       {
         id: 'LICENSE_EXPRESSION',
         name: 'LICENSE EXPRESSION',
-        width: isCustomerView ? '' : '20%',
+        width: isCustomerView ? '' : '50%',
         wrap: true,
         selector: ({ licenseExpression }) => {
           return (
@@ -32,7 +32,6 @@ const LicenseColumns = () => {
       {
         id: 'COMPONENTS',
         name: 'COMPONENTS',
-        width: isCustomerView ? '' : '50%',
         wrap: true,
         selector: ({ components }) => {
           let sortedComponents = [...components]
