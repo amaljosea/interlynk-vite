@@ -240,6 +240,9 @@ const Kbar = () => {
       } else if (isProductsRelatedPage) {
         const link = '/vendor/products'
         navigate(link)
+      } else if (isPolicyDetailsPage) {
+        const link = '/vendor/policies'
+        navigate(link)
       } else {
         return
       }
