@@ -23,11 +23,12 @@ import {
 } from 'react-icons/lu'
 
 const VersionLifestages = () => {
-  const { organization, envName } = useGlobalState()
+  const { envName } = useGlobalState()
   const { grayBorderColor } = useThemeColor(['grayBorderColor'])
 
   const { data, loading } = useQuery(getVersionLifestage, {
-    skip: !organization,
+    // skip: !organization,
+    skip: true,
     variables: { env: envName }
   })
   const { versionLifecycleStage } = data?.organizationMetric || {}
