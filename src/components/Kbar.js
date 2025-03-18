@@ -43,7 +43,8 @@ const Kbar = () => {
     isProductsPage,
     isProductsRelatedPage,
     isGlobalVulnerabilitiesPage,
-    isSingleVulnerabilityPage
+    isSingleVulnerabilityPage,
+    isPolicyDetailsPage
   } = useRouteFlags()
 
   const {
@@ -216,6 +217,9 @@ const Kbar = () => {
         navigate(link)
       } else if (isSingleVulnerabilityPage) {
         navigate(-1)
+      } else if (isPolicyDetailsPage) {
+        const link = '/vendor/policies'
+        navigate(link)
       } else {
         return
       }
