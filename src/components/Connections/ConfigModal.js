@@ -10,17 +10,25 @@ import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useHasPermission } from 'hooks/useHasPermission'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaPlus } from 'react-icons/fa6'
+import { IoSettingsOutline } from 'react-icons/io5'
 import { MdDeleteOutline } from 'react-icons/md'
+
+const options = [
+  { value: 'All', label: 'All' },
+  { value: 'Alert', label: 'Alert' },
+  { value: 'Warning', label: 'Warning' },
+  { value: 'Info', label: 'Info' }
+]
 
 const ConfigModal = ({
   isOpen,
   onClose,
   data,
   setGreenCheck,
-  updateCon,
   org,
   hostId,
   createConnection,
@@ -28,8 +36,6 @@ const ConfigModal = ({
   deleteConnection,
   title,
   addressPlaceholder,
-  icon,
-  options,
   greenCheckKey
 }) => {
   const { showToast } = useCustomToast()
@@ -53,6 +59,11 @@ const ConfigModal = ({
     'grayBorderColor',
     'primaryErrorColor'
   ])
+
+  const updateCon = useHasPermission({
+    parentKey: 'view_connections',
+    childKey: 'create_update_connection'
+  })
 
   const handleCheckEmail = (e) => {
     const { value } = e.target
@@ -288,9 +299,8 @@ const ConfigModal = ({
 
   return (
     <LynkModal
-      Icon={icon}
+      Icon={IoSettingsOutline}
       title={title}
-      type='default'
       isOpen={isOpen}
       onClose={onClose}
       buttonText='Save'
