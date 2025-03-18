@@ -52,7 +52,8 @@ const CompRelations = ({ data, compPath }) => {
   const { headingTextColor } = useThemeColor(['headingTextColor'])
 
   const [addRelation] = useMutation(CreateCompRelation)
-  const [removeRelation] = useMutation(DeleteCompRelation)
+  const [removeRelation, { loading: deleteLoading }] =
+    useMutation(DeleteCompRelation)
   const { data: compDependency, loading } = useQuery(GetCompDependency, {
     skip: tab === 'relationships' ? false : true,
     variables: { compId: id, sbomId: sbomId }
@@ -250,6 +251,7 @@ const CompRelations = ({ data, compPath }) => {
         <RelDeleteModal
           isOpen={isDelOpen}
           onClose={onDelClose}
+          loading={deleteLoading}
           activeComp={activeComp}
           handleRemove={handleRemove}
         />
