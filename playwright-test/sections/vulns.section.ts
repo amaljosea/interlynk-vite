@@ -83,9 +83,9 @@ export default class VulnsSection {
           if (vulnOne.isVisible()) {
             await vulnOne.click()
             await this.page.waitForTimeout(1000)
-            await this.page
-              .locator('//select[@aria-label="vex_status"]')
-              .selectOption({ index: 1 })
+            await this.page.locator('#vexType').click()
+            await this.page.keyboard.type('in triage')
+            await this.page.keyboard.press('Enter')
             await this.page.waitForTimeout(2000)
 
             await this.page
@@ -114,9 +114,9 @@ export default class VulnsSection {
           if (vulnTwo.isVisible()) {
             await vulnTwo.click()
             await this.page.waitForTimeout(1000)
-            await this.page
-              .locator('//select[@aria-label="vex_status"]')
-              .selectOption({ index: 4 })
+            await this.page.locator('#vexType').click()
+            await this.page.keyboard.type('fixed')
+            await this.page.keyboard.press('Enter')
             await this.page.waitForTimeout(1000)
 
             await this.page
