@@ -18,6 +18,34 @@ export const formatDate = (date, timeZone = 'UTC') => {
   })
 }
 
+const initialValue = {
+  componentsCount: 0,
+  licensesCount: 0,
+  policiesCount: 0,
+  policyResultDetectedCount: 0,
+  policyResultErrorCount: 0,
+  policyResultNotDetectedCount: 0,
+  policyResultPassedCount: 0,
+  policyRuleViolationFailCount: 0,
+  policyRuleViolationInformCount: 0,
+  policyRuleViolationPassCount: 0,
+  policyRuleViolationWarnCount: 0,
+  policyViolationsCount: 0,
+  vulnerabilityAffectedCount: 0,
+  vulnerabilityCount: 0,
+  vulnerabilityCriticalCount: 0,
+  vulnerabilityFixedCount: 0,
+  vulnerabilityHighCount: 0,
+  vulnerabilityInTriageCount: 0,
+  vulnerabilityLowCount: 0,
+  vulnerabilityMediumCount: 0,
+  vulnerabilityNotAffectedCount: 0,
+  vulnerabilityUnknownSevCount: 0,
+  vulnerabilityUnspecifiedCount: 0,
+  averageVulnerabilityDuration: 0,
+  policyResultSkippedCount: 0
+}
+
 export const formatForGraph = ({ nodes, dates }) => {
   const dataForGraph = dates?.map((date) => {
     // Filter nodes matching the current date
@@ -28,7 +56,10 @@ export const formatForGraph = ({ nodes, dates }) => {
       const aggregatedData = nodesForDate.reduce(
         (acc, node) => {
           return {
-            componentsCount: acc.componentsCount + node.componentsCount,
+            componentsCount:
+              node.componentsCount > 0
+                ? acc.componentsCount + node.componentsCount
+                : 0,
             licensesCount: acc.licensesCount + node.licensesCount,
             policiesCount: acc.policiesCount + node.policiesCount,
             policyResultDetectedCount:
@@ -87,39 +118,13 @@ export const formatForGraph = ({ nodes, dates }) => {
           }
         },
         // Initialize all fields to 0 for aggregation
-        {
-          componentsCount: 0,
-          licensesCount: 0,
-          policiesCount: 0,
-          policyResultDetectedCount: 0,
-          policyResultErrorCount: 0,
-          policyResultNotDetectedCount: 0,
-          policyResultPassedCount: 0,
-          policyRuleViolationFailCount: 0,
-          policyRuleViolationInformCount: 0,
-          policyRuleViolationPassCount: 0,
-          policyRuleViolationWarnCount: 0,
-          policyViolationsCount: 0,
-          vulnerabilityAffectedCount: 0,
-          vulnerabilityCount: 0,
-          vulnerabilityCriticalCount: 0,
-          vulnerabilityFixedCount: 0,
-          vulnerabilityHighCount: 0,
-          vulnerabilityInTriageCount: 0,
-          vulnerabilityLowCount: 0,
-          vulnerabilityMediumCount: 0,
-          vulnerabilityNotAffectedCount: 0,
-          vulnerabilityUnknownSevCount: 0,
-          vulnerabilityUnspecifiedCount: 0,
-          averageVulnerabilityDuration: 0,
-          policyResultSkippedCount: 0
-        }
+        { ...initialValue }
       )
 
       return { date, ...aggregatedData }
     } else {
       // If no matching nodes, return just the date
-      return { date }
+      return { date, ...initialValue }
     }
   })
 
