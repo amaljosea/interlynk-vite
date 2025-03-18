@@ -3,7 +3,7 @@ import Datetime from 'react-datetime'
 import 'react-datetime/css/react-datetime.css'
 
 // import { useParams } from 'react-router-dom'
-import { useColorMode } from '@chakra-ui/system'
+import { useColorMode } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
