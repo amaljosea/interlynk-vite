@@ -1,8 +1,7 @@
 import { useMemo } from 'react'
-import { useParams } from 'react-router-dom'
 import { getFullDate, setIntensity, timeSince } from 'utils'
 
-import { Badge, IconButton, Portal, Text, Tooltip } from '@chakra-ui/react'
+import { Flex, IconButton, Portal, Text, Tooltip } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
@@ -13,8 +12,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { FaEllipsisV } from 'react-icons/fa'
 
 const SupportColumns = ({ handleSupport }) => {
-  const params = useParams()
-  const sbomId = params.sbomid
   const { isFreeTier } = useGlobalQueryContext()
 
   const { primaryTextColor, secondaryTextColor } = useThemeColor([
@@ -34,17 +31,26 @@ const SupportColumns = ({ handleSupport }) => {
         name: 'NAME',
         sortable: true,
         wrap: true,
-        width: '24%',
+        width: '22%',
         selector: (row) => {
           const { name } = row || {}
           return (
             <Text my={3} color={primaryTextColor} data-tag='allowRowEvents'>
-              {name}{' '}
-              {row?.sbom?.id !== sbomId && (
-                <span>
-                  <Badge colorScheme='blue'>P</Badge>
-                </span>
-              )}
+              {name}
+            </Text>
+          )
+        }
+      },
+      {
+        id: 'COMPONENTS_VERSION',
+        name: 'VERSION',
+        sortable: true,
+        wrap: true,
+        selector: (row) => {
+          const { version } = row || {}
+          return (
+            <Text my={3} color={primaryTextColor}>
+              {version}
             </Text>
           )
         }
@@ -54,10 +60,12 @@ const SupportColumns = ({ handleSupport }) => {
         name: 'ASSESSMENT',
         wrap: true,
         selector: (row) => {
+          const { duplicates } = row || {}
           const { user } = row?.componentSupportLevel || {}
           return (
             <Text color={primaryTextColor}>
-              {user?.name ? 'Manual' : 'Automatic'}
+              {user?.name ? 'Manual' : 'Automatic'}{' '}
+              {duplicates?.length > 0 && `+${duplicates?.length}`}
             </Text>
           )
         }
@@ -66,16 +74,22 @@ const SupportColumns = ({ handleSupport }) => {
         id: 'COMPONENT_SUPPORT_LEVELS_LEVEL',
         name: 'SUPPORT LEVEL',
         sortable: true,
-        wrap: true,
+        width: '15%',
         selector: (row) => {
+          const { duplicates } = row || {}
           const { level } = row?.componentSupportLevel || {}
           if (level) {
             return (
-              <Tag w={'184px'} colorScheme={setIntensity(level)}>
-                <TagLabel mx={'auto'} textTransform={'capitalize'}>
-                  {level?.replaceAll('_', ' ')}
-                </TagLabel>
-              </Tag>
+              <Flex gap={2} alignItems={'center'}>
+                <Tag w={'184px'} colorScheme={setIntensity(level)}>
+                  <TagLabel mx={'auto'} textTransform={'capitalize'}>
+                    {level?.replaceAll('_', ' ')}{' '}
+                  </TagLabel>
+                </Tag>
+                {duplicates?.length > 0 && (
+                  <Text color={primaryTextColor}>+{duplicates?.length}</Text>
+                )}
+              </Flex>
             )
           }
           return (
@@ -90,6 +104,7 @@ const SupportColumns = ({ handleSupport }) => {
         name: 'END OF SUPPORT',
         sortable: true,
         wrap: true,
+        right: 'true',
         selector: (row) => {
           const { endDate } = row?.componentSupportLevel || {}
           if (endDate) {
@@ -131,7 +146,7 @@ const SupportColumns = ({ handleSupport }) => {
         sortFunction: (a, b) => {
           const dateA = new Date(a?.componentSupportLevel?.updatedAt)
           const dateB = new Date(b?.componentSupportLevel?.updatedAt)
-          return dateA - dateB
+          return dateB - dateA
         },
         right: 'true',
         wrap: true
@@ -141,8 +156,6 @@ const SupportColumns = ({ handleSupport }) => {
         id: 'ACTION',
         name: 'ACTION',
         selector: (row) => {
-          const { sbom } = row || {}
-          const isPart = sbomId !== sbom?.id
           return (
             <Menu>
               <MenuButton
@@ -156,9 +169,9 @@ const SupportColumns = ({ handleSupport }) => {
                 <MenuList fontSize={'sm'}>
                   <MenuItem
                     hidden={isFreeTier}
+                    isDisabled={!updateComponent}
                     onClick={() => handleSupport(row)}
                     data-testid='edit_component_support'
-                    isDisabled={!updateComponent || isPart}
                   >
                     Edit Support Status
                   </MenuItem>
@@ -176,7 +189,6 @@ const SupportColumns = ({ handleSupport }) => {
     handleSupport,
     isFreeTier,
     primaryTextColor,
-    sbomId,
     secondaryTextColor,
     updateComponent
   ])

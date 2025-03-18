@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
 import { calculateExpiryDate, getFullDate, timeSince } from 'utils'
 
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
@@ -38,13 +37,11 @@ import {
 import { GetComponentSupportLevels } from 'graphQL/Queries'
 
 const CompSupport = ({ data, isOpen, onClose }) => {
-  const params = useParams()
-
   const [edit, setEdit] = useState(false)
 
   const { data: supports, loading } = useQuery(GetComponentSupportLevels, {
     skip: isOpen ? false : true,
-    variables: { id: data?.id, sbomId: params?.sbomid }
+    variables: { id: data?.id, sbomId: data?.sbom?.id }
   })
 
   const { componentSupportLevel } = supports?.component || {}
@@ -78,7 +75,7 @@ const CompSupport = ({ data, isOpen, onClose }) => {
           {edit ? (
             <SupportForm
               setEdit={setEdit}
-              data={componentSupportLevel}
+              data={data}
               component={{
                 id: data?.id,
                 name: data?.name,
@@ -184,6 +181,8 @@ const SupportForm = ({ component, data, setEdit }) => {
   const { isCustomerView } = useRouteFlags()
   const { showToast } = useCustomToast()
 
+  const { componentSupportLevel } = data || {}
+
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const [formData, setFormData] = useState({
@@ -235,99 +234,114 @@ const SupportForm = ({ component, data, setEdit }) => {
   }
 
   const handleUpdate = () => {
-    updateSupport({
-      variables: {
-        id: data?.id,
-        level: formData?.supportLevel || undefined,
-        notes: formData?.explanation || undefined,
-        retainManualOverrideFor:
-          Number(formData?.assessmentExpiresOn) || undefined,
-        endDate: formData?.endOfSupport
-          ? new Date(formData?.endOfSupport).toISOString()
-          : undefined
-      }
-    })
-      .then((res) => {
-        const { errors } = res?.data?.componentSupportLevelUpdate || {}
-        if (errors?.length > 0) {
-          showToast({
-            description: errors[0],
-            status: 'error'
+    const parts = data?.duplicates?.map(
+      (item) => item?.componentSupportLevel?.id
+    )
+    const supports =
+      parts?.length > 0
+        ? [componentSupportLevel?.id, ...parts]
+        : [componentSupportLevel?.id]
+
+    supports?.length > 0 &&
+      supports?.map((item) =>
+        updateSupport({
+          variables: {
+            id: item,
+            level: formData?.supportLevel || undefined,
+            notes: formData?.explanation || undefined,
+            retainManualOverrideFor:
+              Number(formData?.assessmentExpiresOn) || undefined,
+            endDate: formData?.endOfSupport
+              ? new Date(formData?.endOfSupport).toISOString()
+              : undefined
+          }
+        })
+          .then((res) => {
+            const { errors } = res?.data?.componentSupportLevelUpdate || {}
+            if (errors?.length > 0) {
+              showToast({
+                description: errors[0],
+                status: 'error'
+              })
+            }
           })
-        } else {
-          showToast({
-            description: 'Support level updated successfully',
-            status: 'success'
-          })
-        }
-      })
-      .finally(() => setEdit(false))
+          .finally(() => setEdit(false))
+      )
   }
 
   const handleSubmit = () => {
-    createSupport({
-      variables: {
-        id: component?.id,
-        level: formData?.supportLevel || undefined,
-        notes: formData?.explanation || undefined,
-        retainManualOverrideFor:
-          Number(formData?.assessmentExpiresOn) || undefined,
-        endDate: formData?.endOfSupport
-          ? new Date(formData?.endOfSupport).toISOString()
-          : undefined
-      }
-    })
-      .then((res) => {
-        const { errors } = res?.data?.componentSupportLevelCreate || {}
-        if (errors?.length > 0) {
-          showToast({
-            description: errors[0],
-            status: 'error'
+    const parts = data?.duplicates?.map((item) => item?.id)
+    const components = parts?.length > 0 ? [data?.id, ...parts] : [data?.id]
+
+    components?.length > 0 &&
+      components?.map((item) =>
+        createSupport({
+          variables: {
+            id: item,
+            level: formData?.supportLevel || undefined,
+            notes: formData?.explanation || undefined,
+            retainManualOverrideFor:
+              Number(formData?.assessmentExpiresOn) || undefined,
+            endDate: formData?.endOfSupport
+              ? new Date(formData?.endOfSupport).toISOString()
+              : undefined
+          }
+        })
+          .then((res) => {
+            const { errors } = res?.data?.componentSupportLevelCreate || {}
+            if (errors?.length > 0) {
+              showToast({
+                description: errors[0],
+                status: 'error'
+              })
+            }
           })
-        } else {
-          showToast({
-            description: 'Support level added successfully',
-            status: 'success'
-          })
-        }
-      })
-      .finally(() => setEdit(false))
+          .finally(() => setEdit(false))
+      )
   }
 
   const handleRemove = () => {
-    deleteSupport({
-      variables: { id: data?.id }
-    })
-      .then((res) => {
-        const { errors } = res?.data?.componentSupportLevelDelete || {}
-        if (errors?.length > 0) {
-          showToast({
-            description: errors[0],
-            status: 'error'
+    const parts = data?.duplicates?.map(
+      (item) => item?.componentSupportLevel?.id
+    )
+    const supports =
+      parts?.length > 0
+        ? [componentSupportLevel?.id, ...parts]
+        : [componentSupportLevel?.id]
+
+    supports?.length > 0 &&
+      supports?.map((item) =>
+        deleteSupport({
+          variables: { id: item }
+        })
+          .then((res) => {
+            const { errors } = res?.data?.componentSupportLevelDelete || {}
+            if (errors?.length > 0) {
+              showToast({
+                description: errors[0],
+                status: 'error'
+              })
+            } else {
+              setFormData((prev) => ({
+                ...prev,
+                explanation: '',
+                assessedBy: '',
+                supportLevel: '',
+                endOfSupport: new Date(),
+                assessmentExpiresOn: 0
+              }))
+            }
           })
-        } else {
-          setFormData((prev) => ({
-            ...prev,
-            explanation: '',
-            assessedBy: '',
-            supportLevel: '',
-            endOfSupport: new Date(),
-            assessmentExpiresOn: 0
-          }))
-          showToast({
-            description: 'Support level removed successfully',
-            status: 'success'
-          })
-        }
-      })
-      .finally(() => setEdit(false))
+          .finally(() => setEdit(false))
+      )
   }
 
   const inputStyle = { size: 'md' }
 
   useEffect(() => {
-    if (data) {
-      const { level, endDate, notes, retainManualOverrideFor } = data || {}
+    if (componentSupportLevel) {
+      const { level, endDate, notes, retainManualOverrideFor } =
+        componentSupportLevel || {}
       setFormData((prev) => ({
         ...prev,
         explanation: notes || '',
@@ -338,7 +352,7 @@ const SupportForm = ({ component, data, setEdit }) => {
           : undefined
       }))
     }
-  }, [data])
+  }, [componentSupportLevel])
 
   if (isOpen)
     return (
@@ -438,12 +452,12 @@ const SupportForm = ({ component, data, setEdit }) => {
             isDisabled={isDisabled}
             loadingText='Saving...'
             isLoading={createLoading || updateLoading}
-            onClick={data ? handleUpdate : handleSubmit}
+            onClick={componentSupportLevel ? handleUpdate : handleSubmit}
           >
-            {data ? 'Update' : 'Save'}
+            {componentSupportLevel ? 'Update' : 'Save'}
           </Button>
         </ButtonGroup>
-        {data && (
+        {componentSupportLevel && (
           <IconButton
             onClick={onOpen}
             colorScheme='red'
