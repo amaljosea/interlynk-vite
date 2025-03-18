@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { getFullDate, setIntensity, timeSince } from 'utils'
 
-import { IconButton, Portal, Text, Tooltip } from '@chakra-ui/react'
+import { Flex, IconButton, Portal, Text, Tooltip } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
@@ -60,10 +60,12 @@ const SupportColumns = ({ handleSupport }) => {
         name: 'ASSESSMENT',
         wrap: true,
         selector: (row) => {
+          const { duplicates } = row || {}
           const { user } = row?.componentSupportLevel || {}
           return (
             <Text color={primaryTextColor}>
-              {user?.name ? 'Manual' : 'Automatic'}
+              {user?.name ? 'Manual' : 'Automatic'}{' '}
+              {duplicates?.length > 0 && `+${duplicates?.length}`}
             </Text>
           )
         }
@@ -72,16 +74,22 @@ const SupportColumns = ({ handleSupport }) => {
         id: 'COMPONENT_SUPPORT_LEVELS_LEVEL',
         name: 'SUPPORT LEVEL',
         sortable: true,
-        wrap: true,
+        width: '15%',
         selector: (row) => {
+          const { duplicates } = row || {}
           const { level } = row?.componentSupportLevel || {}
           if (level) {
             return (
-              <Tag w={'184px'} colorScheme={setIntensity(level)}>
-                <TagLabel mx={'auto'} textTransform={'capitalize'}>
-                  {level?.replaceAll('_', ' ')}
-                </TagLabel>
-              </Tag>
+              <Flex gap={2} alignItems={'center'}>
+                <Tag w={'184px'} colorScheme={setIntensity(level)}>
+                  <TagLabel mx={'auto'} textTransform={'capitalize'}>
+                    {level?.replaceAll('_', ' ')}{' '}
+                  </TagLabel>
+                </Tag>
+                {duplicates?.length > 0 && (
+                  <Text color={primaryTextColor}>+{duplicates?.length}</Text>
+                )}
+              </Flex>
             )
           }
           return (
