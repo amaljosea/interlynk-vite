@@ -358,7 +358,7 @@ const ConfigModal = ({
                 <option value='Instant'>Instant</option>
               </Select>
 
-              {updateCon && (
+              {updateCon && configs?.length > 1 && (
                 <IconButton
                   border='1px solid'
                   borderColor={grayBorderColor}
