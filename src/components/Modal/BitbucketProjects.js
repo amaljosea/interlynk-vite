@@ -1,150 +1,129 @@
-import { useMutation, useQuery } from '@apollo/client'
-import { useEffect, useState } from 'react'
+import { useMutation } from '@apollo/client'
+import { useState } from 'react'
+import DataTable from 'react-data-table-component'
+import { customStyles } from 'utils/styleUtils'
 
-import { Checkbox, List, ListItem, Stack, Text } from '@chakra-ui/react'
+import { Stack, Text } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
-import LynkModal from 'components/LynkModal'
+import LynkDrawer from 'components/LynkDrawer'
+import Pagination from 'components/Pagination'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { BitbucketRepositoryBulkImport } from 'graphQL/Mutation'
 import { BitbucketRepositories } from 'graphQL/Queries'
 
-import { FaBitbucket } from 'react-icons/fa6'
-
 const BitbucketProjects = ({ isOpen, onClose }) => {
   const { showToast } = useCustomToast()
-  const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
+  const { primaryTextColor, headingTextColor, secondaryTextColor } =
+    useThemeColor([
+      'primaryTextColor',
+      'headingTextColor',
+      'secondaryTextColor'
+    ])
 
   const [importProject, { loading: importLoading }] = useMutation(
     BitbucketRepositoryBulkImport
   )
-  const { data, loading } = useQuery(BitbucketRepositories, {
-    skip: isOpen ? false : true
-  })
-
-  const { edges } = data?.bitbucketApiRepositories || {}
-
-  const [selected, setSelected] = useState([])
-  const [isAllSelected, setIsAllSelected] = useState(false)
-
-  const handleSelect = (id) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    )
-  }
-
-  const handleSelectAll = () => {
-    if (isAllSelected) {
-      setSelected([])
-    } else {
-      setSelected(edges?.map((item) => item?.node?.uuid))
+  const { nodes, loading, paginationProps } = usePaginatedQuery(
+    BitbucketRepositories,
+    {
+      skip: isOpen ? false : true,
+      selector: 'bitbucketApiRepositories'
     }
-    setIsAllSelected(!isAllSelected)
+  )
+
+  const [toggleClear, setToggleClear] = useState(false)
+  const [selectedRepo, setSelectedRepo] = useState([])
+
+  const handleSelect = (state) => {
+    setSelectedRepo(state?.selectedRows?.map((item) => item?.uuid))
   }
 
-  const selectedRepositories = edges
-    ?.filter((repo) => selected?.includes(repo?.node?.uuid))
+  const repositories = nodes
+    ?.filter((repo) => selectedRepo?.includes(repo?.uuid))
     ?.map((item) => ({
-      uuid: item?.node?.uuid,
-      name: item?.node?.name,
-      fullName: item?.node?.fullName,
-      slug: item?.node?.slug,
-      workspace: item?.node?.workspace,
-      mainbranch: item?.node?.mainbranch
+      uuid: item?.uuid,
+      name: item?.name,
+      fullName: item?.fullName,
+      slug: item?.slug,
+      workspace: item?.workspace,
+      mainbranch: item?.mainbranch
     }))
 
   const handleSubmit = () => {
-    if (selectedRepositories?.length > 0) {
-      importProject({
-        variables: { input: { repositories: selectedRepositories } }
+    importProject({ variables: { input: { repositories: repositories } } })
+      .then((res) => {
+        if (res?.data?.bitbucketRepositoryBulkImport?.errors?.length > 0) {
+          showToast({
+            description: res?.data?.bitbucketRepositoryBulkImport?.errors[0],
+            status: 'error'
+          })
+        } else {
+          showToast({
+            title: 'Data imported successfully',
+            description:
+              'Projects will be available shortly. Please refresh to update the products.',
+            status: 'success'
+          })
+        }
       })
-        .then((res) => {
-          if (res?.data?.bitbucketRepositoryBulkImport?.errors?.length > 0) {
-            showToast({
-              description: res?.data?.bitbucketRepositoryBulkImport?.errors[0],
-              status: 'error'
-            })
-          } else {
-            showToast({
-              title: 'Data imported successfully',
-              description:
-                'Projects will be available shortly. Please refresh to update the products.',
-              status: 'success'
-            })
-          }
-        })
-        .finally(() => onClose())
-    } else {
-      showToast({
-        description: 'Please select atleast 1 project',
-        status: 'error'
+      .finally(() => {
+        setToggleClear(true)
+        onClose()
       })
-    }
   }
 
-  useEffect(() => {
-    setIsAllSelected(selected.length === edges?.length && edges?.length > 0)
-  }, [edges?.length, selected])
+  const columns = [
+    {
+      id: 'REPOSITORIES',
+      name: 'REPOSITORIES',
+      compact: true,
+      selector: (row) => {
+        const { mainbranch, name } = row || ''
+        return (
+          <Stack my={3} spacing={1}>
+            <Text color={primaryTextColor}>{name}</Text>
+            <Text fontSize='sm' color={secondaryTextColor}>
+              {mainbranch}
+            </Text>
+          </Stack>
+        )
+      },
+      wrap: true
+    }
+  ]
 
   return (
-    <LynkModal
+    <LynkDrawer
       isOpen={isOpen}
       onClose={onClose}
-      Icon={FaBitbucket}
-      buttonText={'Save'}
+      buttonLabel={'Import'}
       onSubmit={handleSubmit}
       isLoading={importLoading}
-      title={'Add Bitbucket Projects'}
+      title={'Import Bitbucket Projects'}
+      isDisabled={repositories?.length === 0}
     >
-      {loading ? (
-        <CustomLoader />
-      ) : (
-        <Stack>
-          <Checkbox isChecked={isAllSelected} onChange={handleSelectAll}>
-            Select All
-          </Checkbox>
-          <List spacing={2}>
-            {edges.map((item) => (
-              <ListItem
-                p={3}
-                display='flex'
-                borderWidth={1}
-                borderRadius='md'
-                alignItems='center'
-                key={item?.node?.uuid}
-                justifyContent='space-between'
-              >
-                <Stack spacing={0}>
-                  <Checkbox
-                    isChecked={selected.includes(item?.node?.uuid)}
-                    onChange={() => handleSelect(item?.node?.uuid)}
-                  >
-                    {item?.node?.name}
-                  </Checkbox>
-                  <Text pl={6} fontSize='sm' color={secondaryTextColor}>
-                    {item?.node?.mainbranch}
-                  </Text>
-                  <Checkbox
-                    pl={6}
-                    hidden
-                    size='sm'
-                    isReadOnly
-                    fontSize={'sm'}
-                    color={secondaryTextColor}
-                    defaultChecked={item?.node?.isImported}
-                  >
-                    Import SBOM
-                  </Checkbox>
-                </Stack>
-              </ListItem>
-            ))}
-          </List>
-        </Stack>
-      )}
-    </LynkModal>
+      <Stack spacing={4} overflowY={'scroll'}>
+        <DataTable
+          responsive
+          selectableRows
+          persistTableHead
+          columns={columns}
+          data={nodes || []}
+          progressPending={loading}
+          clearSelectedRows={toggleClear}
+          className='data-table-container'
+          onSelectedRowsChange={handleSelect}
+          progressComponent={<CustomLoader />}
+          customStyles={customStyles(headingTextColor)}
+        />
+        <Pagination {...paginationProps} />
+      </Stack>
+    </LynkDrawer>
   )
 }
 

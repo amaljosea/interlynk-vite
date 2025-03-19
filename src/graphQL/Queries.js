@@ -6251,26 +6251,34 @@ export const BitbucketWorkspace = gql`
 `
 
 export const BitbucketRepositories = gql`
-  query BitbucketRepositories {
-    bitbucketApiRepositories(first: 10) {
-      edges {
-        node {
-          uuid
-          name
-          fullName
-          slug
-          workspace
-          mainbranch
-          isImported
-        }
-        cursor
-      }
+  query BitbucketRepositories(
+    $after: String
+    $before: String
+    $first: Int
+    $last: Int
+  ) {
+    bitbucketApiRepositories(
+      first: $first
+      after: $after
+      before: $before
+      last: $last
+    ) {
       pageInfo {
         hasNextPage
         hasPreviousPage
         startCursor
         endCursor
       }
+      nodes {
+        fullName
+        isImported
+        mainbranch
+        name
+        slug
+        uuid
+        workspace
+      }
+      totalCount
     }
   }
 `
