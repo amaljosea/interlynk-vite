@@ -15,6 +15,13 @@ const Operator = ({ index, data, onChange }) => {
     }))
   ]
 
+  const selectStyles = {
+    container: (baseStyles) => ({
+      ...baseStyles,
+      minWidth: '100px'
+    })
+  }
+
   const selectedOption =
     operatorOptions.find((opt) => opt.value === operator) || operatorOptions[0]
 
@@ -29,6 +36,7 @@ const Operator = ({ index, data, onChange }) => {
         onChange={(option) => onChange(option?.value || '', id, 'operator')}
         data-testid={`condition_operator_${index}`}
         dropDown
+        styles={selectStyles}
       />
       <FormErrorMessage>{opError}</FormErrorMessage>
     </FormControl>

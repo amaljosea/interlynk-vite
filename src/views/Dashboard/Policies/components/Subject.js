@@ -59,6 +59,13 @@ const Subject = ({ index, data, onChange }) => {
     }))
   ]
 
+  const selectStyles = {
+    container: (baseStyles) => ({
+      ...baseStyles,
+      minWidth: '100px'
+    })
+  }
+
   return (
     <FormControl isInvalid={subError}>
       <LynkSelect
@@ -71,6 +78,7 @@ const Subject = ({ index, data, onChange }) => {
         dropDown
         components={{ SingleValue }}
         data-testid={`condition_subject_${index}`}
+        styles={selectStyles}
       />
 
       <FormErrorMessage>{subError}</FormErrorMessage>

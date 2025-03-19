@@ -426,7 +426,6 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                 handleSelectChange(selectedItem, 'operator')
               }
               options={operatorOptions}
-              /* placeholder='-- Select --' */
               data-testid='policy_result_condition'
               dropDown
             />

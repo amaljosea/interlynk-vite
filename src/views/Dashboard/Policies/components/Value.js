@@ -110,7 +110,7 @@ const Value = (props) => {
   const selectStyles = {
     container: (baseStyles) => ({
       ...baseStyles,
-      minWidth: '150px'
+      minWidth: '100px'
     })
   }
 
