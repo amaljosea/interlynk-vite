@@ -1,7 +1,16 @@
 import { useMemo } from 'react'
+import { useParams } from 'react-router-dom'
 import { getFullDate, setIntensity, timeSince } from 'utils'
 
-import { Flex, IconButton, Portal, Text, Tooltip } from '@chakra-ui/react'
+import {
+  Badge,
+  Flex,
+  IconButton,
+  Portal,
+  Text,
+  Tooltip,
+  chakra
+} from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
@@ -12,6 +21,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { FaEllipsisV } from 'react-icons/fa'
 
 const SupportColumns = ({ handleSupport }) => {
+  const params = useParams()
   const { isFreeTier } = useGlobalQueryContext()
 
   const { primaryTextColor, secondaryTextColor } = useThemeColor([
@@ -33,24 +43,15 @@ const SupportColumns = ({ handleSupport }) => {
         wrap: true,
         width: '22%',
         selector: (row) => {
-          const { name } = row || {}
+          const { name, sbom } = row || {}
           return (
             <Text my={3} color={primaryTextColor} data-tag='allowRowEvents'>
-              {name}
-            </Text>
-          )
-        }
-      },
-      {
-        id: 'COMPONENTS_VERSION',
-        name: 'VERSION',
-        sortable: true,
-        wrap: true,
-        selector: (row) => {
-          const { version } = row || {}
-          return (
-            <Text my={3} color={primaryTextColor}>
-              {version}
+              {name}{' '}
+              <chakra.span>
+                {sbom?.id !== params?.sbomid && (
+                  <Badge colorScheme='blue'>P</Badge>
+                )}
+              </chakra.span>
             </Text>
           )
         }
@@ -74,7 +75,7 @@ const SupportColumns = ({ handleSupport }) => {
         id: 'COMPONENT_SUPPORT_LEVELS_LEVEL',
         name: 'SUPPORT LEVEL',
         sortable: true,
-        width: '15%',
+        width: '18%',
         selector: (row) => {
           const { duplicates } = row || {}
           const { level } = row?.componentSupportLevel || {}
@@ -105,6 +106,7 @@ const SupportColumns = ({ handleSupport }) => {
         sortable: true,
         wrap: true,
         right: 'true',
+        width: '14%',
         selector: (row) => {
           const { endDate } = row?.componentSupportLevel || {}
           if (endDate) {
@@ -156,6 +158,8 @@ const SupportColumns = ({ handleSupport }) => {
         id: 'ACTION',
         name: 'ACTION',
         selector: (row) => {
+          const { sbom } = row || {}
+          const isPart = params?.sbomid !== sbom?.id
           return (
             <Menu>
               <MenuButton
@@ -169,9 +173,9 @@ const SupportColumns = ({ handleSupport }) => {
                 <MenuList fontSize={'sm'}>
                   <MenuItem
                     hidden={isFreeTier}
-                    isDisabled={!updateComponent}
                     onClick={() => handleSupport(row)}
                     data-testid='edit_component_support'
+                    isDisabled={!updateComponent || isPart}
                   >
                     Edit Support Status
                   </MenuItem>
@@ -188,6 +192,7 @@ const SupportColumns = ({ handleSupport }) => {
   }, [
     handleSupport,
     isFreeTier,
+    params?.sbomid,
     primaryTextColor,
     secondaryTextColor,
     updateComponent

@@ -75,6 +75,7 @@ const CompSupport = ({ data, isOpen, onClose }) => {
           {edit ? (
             <SupportForm
               setEdit={setEdit}
+              handleClose={onClose}
               data={data}
               component={{
                 id: data?.id,
@@ -142,7 +143,7 @@ const SupportCard = ({ setEdit, data }) => {
             {endDate ? new Date(endDate).toLocaleDateString() : 'N/A'}
           </Text>
         </SimpleGrid>
-        <SimpleGrid {...container}>
+        <SimpleGrid {...container} hidden={level === 'no_longer_maintained'}>
           <Text {...label}>Assessment Expires On</Text>
           <Text {...infoStyle} textTransform={'capitalize'}>
             {retainManualOverrideFor
@@ -177,7 +178,7 @@ const SupportCard = ({ setEdit, data }) => {
   )
 }
 
-const SupportForm = ({ component, data, setEdit }) => {
+const SupportForm = ({ component, data, setEdit, handleClose }) => {
   const { isCustomerView } = useRouteFlags()
   const { showToast } = useCustomToast()
 
@@ -197,9 +198,12 @@ const SupportForm = ({ component, data, setEdit }) => {
     (!component?.internal && formData?.assessmentExpiresOn < 1) ||
     (!component?.internal && formData?.assessmentExpiresOn > 365)
 
+  const noLongerMaintained = formData?.supportLevel === 'no_longer_maintained'
+
   const handleChange = (e) => {
     const { name, value } = e.target
-    const isUnspecified = name === 'supportLevel' && value === 'unspecified'
+    const isUnspecified =
+      name === 'supportLevel' && (value === 'unspecified' || noLongerMaintained)
     if (isUnspecified) {
       setFormData((prev) => ({
         ...prev,
@@ -265,7 +269,7 @@ const SupportForm = ({ component, data, setEdit }) => {
               })
             }
           })
-          .finally(() => setEdit(false))
+          .finally(() => handleClose(false))
       )
   }
 
@@ -280,8 +284,9 @@ const SupportForm = ({ component, data, setEdit }) => {
             id: item,
             level: formData?.supportLevel || undefined,
             notes: formData?.explanation || undefined,
-            retainManualOverrideFor:
-              Number(formData?.assessmentExpiresOn) || undefined,
+            retainManualOverrideFor: noLongerMaintained
+              ? undefined
+              : Number(formData?.assessmentExpiresOn),
             endDate: formData?.endOfSupport
               ? new Date(formData?.endOfSupport).toISOString()
               : undefined
@@ -296,7 +301,7 @@ const SupportForm = ({ component, data, setEdit }) => {
               })
             }
           })
-          .finally(() => setEdit(false))
+          .finally(() => handleClose(false))
       )
   }
 
@@ -311,9 +316,7 @@ const SupportForm = ({ component, data, setEdit }) => {
 
     supports?.length > 0 &&
       supports?.map((item) =>
-        deleteSupport({
-          variables: { id: item }
-        })
+        deleteSupport({ variables: { id: item } })
           .then((res) => {
             const { errors } = res?.data?.componentSupportLevelDelete || {}
             if (errors?.length > 0) {
@@ -322,8 +325,8 @@ const SupportForm = ({ component, data, setEdit }) => {
                 status: 'error'
               })
             } else {
-              setFormData((prev) => ({
-                ...prev,
+              setEdit(false)
+              setFormData(() => ({
                 explanation: '',
                 assessedBy: '',
                 supportLevel: '',
@@ -332,7 +335,7 @@ const SupportForm = ({ component, data, setEdit }) => {
               }))
             }
           })
-          .finally(() => setEdit(false))
+          .finally(() => handleClose())
       )
   }
 
@@ -405,8 +408,9 @@ const SupportForm = ({ component, data, setEdit }) => {
       </FormControl>
       {/* RETAIN MANNUAL OVERRIDE */}
       <FormControl
-        isInvalid={formData?.assessmentExpiresOn > 365}
+        hidden={noLongerMaintained}
         isRequired={!component?.internal}
+        isInvalid={formData?.assessmentExpiresOn > 365}
       >
         <FormLabel htmlFor='assessmentExpiresOn'>
           Assessment Expires On

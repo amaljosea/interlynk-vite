@@ -1793,6 +1793,7 @@ export const GetComponentData = gql`
           id
           sbomId
           sbom {
+            id
             projectVersion
             project {
               id
@@ -1837,6 +1838,7 @@ export const GetComponentData = gql`
             security
           }
           componentSupportLevel {
+            id
             level
             endDate
             notes
