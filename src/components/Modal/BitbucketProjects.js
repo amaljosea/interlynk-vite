@@ -1,11 +1,13 @@
 import { useMutation } from '@apollo/client'
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { customStyles } from 'utils/styleUtils'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { Stack, Text } from '@chakra-ui/react'
+import { Flex, Stack, Text } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import RefreshBtn from 'components/Icons/RefreshBtn'
 import LynkDrawer from 'components/LynkDrawer'
 import Pagination from 'components/Pagination'
 
@@ -25,6 +27,11 @@ const BitbucketProjects = ({ isOpen, onClose }) => {
       'secondaryTextColor'
     ])
 
+  const [searchInput, setSearchInput] = useState('')
+  const [filterText, setFilterText] = useState('')
+  const [toggleClear, setToggleClear] = useState(false)
+  const [selectedRepo, setSelectedRepo] = useState([])
+
   const [importProject, { loading: importLoading }] = useMutation(
     BitbucketRepositoryBulkImport
   )
@@ -32,12 +39,10 @@ const BitbucketProjects = ({ isOpen, onClose }) => {
     BitbucketRepositories,
     {
       skip: isOpen ? false : true,
-      selector: 'bitbucketApiRepositories'
+      selector: 'bitbucketApiRepositories',
+      variables: { search: filterText === '' ? undefined : filterText }
     }
   )
-
-  const [toggleClear, setToggleClear] = useState(false)
-  const [selectedRepo, setSelectedRepo] = useState([])
 
   const handleSelect = (state) => {
     setSelectedRepo(state?.selectedRows?.map((item) => item?.uuid))
@@ -77,6 +82,49 @@ const BitbucketProjects = ({ isOpen, onClose }) => {
       })
   }
 
+  // CLEAR SEARCH
+  const handleClear = useCallback(async () => {
+    setSearchInput('')
+    setFilterText('')
+  }, [])
+
+  // ON SEARCH INPUT CHANGE
+  const onSearchInputChange = useCallback(
+    (e) => {
+      const { value } = e.target
+      if (value === '') {
+        handleClear()
+      } else {
+        setSearchInput(value)
+      }
+    },
+    [handleClear]
+  )
+
+  // SEARCH COMPONENT
+  const handleSearch = useCallback(async (event) => {
+    const { value } = event.target
+    if (event.key === 'Enter') {
+      setFilterText(value)
+    }
+  }, [])
+
+  // HEADER SECTION
+  const subHeaderComponent = useMemo(() => {
+    return (
+      <Flex w={'100%'} alignItems={'center'} justifyContent={'space-between'}>
+        <SearchFilter
+          id='bitbucket_repo'
+          onClear={handleClear}
+          onFilter={handleSearch}
+          filterText={searchInput}
+          onChange={onSearchInputChange}
+        />
+        <RefreshBtn />
+      </Flex>
+    )
+  }, [handleClear, handleSearch, searchInput, onSearchInputChange])
+
   const columns = [
     {
       id: 'REPOSITORIES',
@@ -110,6 +158,7 @@ const BitbucketProjects = ({ isOpen, onClose }) => {
       <Stack spacing={4} overflowY={'scroll'}>
         <DataTable
           responsive
+          subHeader
           selectableRows
           persistTableHead
           columns={columns}
@@ -119,6 +168,7 @@ const BitbucketProjects = ({ isOpen, onClose }) => {
           className='data-table-container'
           onSelectedRowsChange={handleSelect}
           progressComponent={<CustomLoader />}
+          subHeaderComponent={subHeaderComponent}
           customStyles={customStyles(headingTextColor)}
         />
         <Pagination {...paginationProps} />

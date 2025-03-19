@@ -6256,12 +6256,14 @@ export const BitbucketRepositories = gql`
     $before: String
     $first: Int
     $last: Int
+    $search: String
   ) {
     bitbucketApiRepositories(
       first: $first
       after: $after
       before: $before
       last: $last
+      search: $search
     ) {
       pageInfo {
         hasNextPage
