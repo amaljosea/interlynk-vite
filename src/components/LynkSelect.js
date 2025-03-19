@@ -1,4 +1,5 @@
 import ReactSelect, { components } from 'react-select'
+import { mergeStyles } from 'react-select'
 import CreatableSelect from 'react-select/creatable'
 
 import CustomDropdownIndicator from 'components/Misc/CustomDropdownIndicator'
@@ -14,6 +15,7 @@ const LynkSelect = (props) => {
   const { primaryTextColor } = useThemeColor(['primaryTextColor'])
   const activeTab = useQueryParam('tab')
   const isGeneral = activeTab === 'general'
+  const mergedStyles = props.styles ? mergeStyles(style, props.styles) : style
 
   const ClearIndicator = (props) => {
     if (isGeneral) return null
@@ -32,7 +34,7 @@ const LynkSelect = (props) => {
   return props.isCreatable ? (
     <CreatableSelect
       {...props}
-      styles={style}
+      styles={mergedStyles}
       className='react-select'
       components={{
         ClearIndicator,
@@ -45,7 +47,7 @@ const LynkSelect = (props) => {
   ) : (
     <ReactSelect
       {...props}
-      styles={style}
+      styles={mergedStyles}
       className='react-select'
       components={{
         ClearIndicator,

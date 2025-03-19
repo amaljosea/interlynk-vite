@@ -1,9 +1,11 @@
 import { useQuery } from '@apollo/client'
+import { components } from 'react-select'
 import { getIcon } from 'utils/styleUtils'
 
-import { Icon, Select } from '@chakra-ui/react'
+import { Flex, Icon } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage } from '@chakra-ui/react'
-import { InputGroup, InputLeftElement } from '@chakra-ui/react'
+
+import LynkSelect from 'components/LynkSelect'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -26,42 +28,59 @@ const Subject = ({ index, data, onChange }) => {
 
   const categories = [...new Set(sortedData?.map((item) => item.category))]
 
-  const optionsByCategory = categories.reduce((acc, category) => {
-    const options = policySubjectOperatorMapping
-      ?.filter((item) => item.category === category)
-      ?.map((item, index) => (
-        <option
-          key={index}
-          value={item.subject}
-          style={{ textTransform: 'capitalize' }}
-        >
-          {item.name}
-        </option>
-      ))
-    acc[category] = options
-    return acc
-  }, {})
+  const SingleValue = ({ data, ...props }) => (
+    <components.SingleValue {...props}>
+      <Flex display='flex' alignItems='center'>
+        <Icon
+          color={primaryBlueText}
+          as={getIcon(data.value)}
+          style={{
+            marginRight: '6px'
+          }}
+        />
+        {data.label}
+      </Flex>
+    </components.SingleValue>
+  )
+
+  const options = [
+    {
+      label: '',
+      options: [{ value: '', label: '-- Select --' }]
+    },
+    ...categories.flatMap((category) => ({
+      label: category,
+      options: policySubjectOperatorMapping
+        .filter((item) => item.category === category)
+        .map((item) => ({
+          value: item.subject,
+          label: item.name
+        }))
+    }))
+  ]
+
+  const selectStyles = {
+    container: (baseStyles) => ({
+      ...baseStyles,
+      minWidth: '100px'
+    })
+  }
 
   return (
     <FormControl isInvalid={subError}>
-      <InputGroup>
-        <InputLeftElement pointerEvents='none'>
-          <Icon color={primaryBlueText} as={getIcon(subject)} />
-        </InputLeftElement>
-        <Select
-          value={subject}
-          sx={{ paddingLeft: '34px' }}
-          placeholder={loading ? 'Loading...' : '-- select --'}
-          data-testid={`condition_subject_${index}`}
-          onChange={(e) => onChange(e.target.value, id, 'subject')}
-        >
-          {categories.map((category) => (
-            <optgroup key={category} label={category}>
-              {optionsByCategory[category]}
-            </optgroup>
-          ))}
-        </Select>
-      </InputGroup>
+      <LynkSelect
+        value={options
+          .flatMap((group) => group.options)
+          .find((opt) => opt.value === subject)}
+        onChange={(option) => onChange(option?.value || '', id, 'subject')}
+        options={options}
+        placeholder={loading ? 'Loading...' : '-- Select --'}
+        dropDown
+        components={{ SingleValue }}
+        data-testid={`condition_subject_${index}`}
+        styles={selectStyles}
+      />
+
       <FormErrorMessage>{subError}</FormErrorMessage>
     </FormControl>
   )

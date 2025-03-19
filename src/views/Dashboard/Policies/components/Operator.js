@@ -1,30 +1,43 @@
 import { updatedValue } from 'utils'
 
-import { FormControl, FormErrorMessage, Select } from '@chakra-ui/react'
+import { FormControl, FormErrorMessage } from '@chakra-ui/react'
+
+import LynkSelect from 'components/LynkSelect'
 
 const Operator = ({ index, data, onChange }) => {
   const { id, list, operator, opError } = data || {}
+
+  const operatorOptions = [
+    { value: '', label: '-- operator --' },
+    ...list.map((option) => ({
+      value: option,
+      label: updatedValue(option).toLowerCase()
+    }))
+  ]
+
+  const selectStyles = {
+    container: (baseStyles) => ({
+      ...baseStyles,
+      minWidth: '100px'
+    })
+  }
+
+  const selectedOption =
+    operatorOptions.find((opt) => opt.value === operator) || operatorOptions[0]
+
   return (
     <FormControl isInvalid={opError}>
-      <Select
+      <LynkSelect
         id='operator'
         name='operator'
-        value={operator}
-        textTransform={'lowercase'}
-        placeholder='-- operator -- '
+        value={selectedOption}
+        placeholder='-- operator --'
+        options={operatorOptions}
+        onChange={(option) => onChange(option?.value || '', id, 'operator')}
         data-testid={`condition_operator_${index}`}
-        onChange={(e) => onChange(e.target.value, id, 'operator')}
-      >
-        {list?.map((option, idx) => (
-          <option
-            key={idx}
-            value={option}
-            style={{ textTransform: 'lowercase' }}
-          >
-            {updatedValue(option)}
-          </option>
-        ))}
-      </Select>
+        dropDown
+        styles={selectStyles}
+      />
       <FormErrorMessage>{opError}</FormErrorMessage>
     </FormControl>
   )
