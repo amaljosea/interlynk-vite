@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { useParams } from 'react-router-dom'
 import { isValidPurl, parseLicenseString, truncatedValue } from 'utils'
 import { getFullDate, timeSince } from 'utils'
 import { GetIcon } from 'utils/styleUtils'
@@ -13,7 +14,8 @@ import {
   Portal,
   Stack,
   Text,
-  Tooltip
+  Tooltip,
+  useColorMode
 } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
@@ -21,6 +23,8 @@ import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 import { HealthScore } from 'components/HealthScore'
 import ExternalLink from 'components/Misc/ExternalLink'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useHasPermission } from 'hooks/useHasPermission'
 import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -46,11 +50,7 @@ const StatusIcon = ({ icon, label, color, onClick }) => {
 
 const ComponentsColumns = ({
   onOpen = () => {},
-  colorMode,
-  isFreeTier,
-  sbomId,
   onEditOpen,
-  updateComponent,
   handleGraphView,
   totalComp,
   handleAnalysis,
@@ -79,6 +79,15 @@ const ComponentsColumns = ({
   ])
 
   const { isCustomerView } = useRouteFlags()
+  const { colorMode } = useColorMode()
+  const { isFreeTier } = useGlobalQueryContext()
+  const params = useParams()
+  const sbomId = params.sbomid
+
+  const updateComponent = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'update_sbom_components'
+  })
 
   return useMemo(() => {
     const columns = [
