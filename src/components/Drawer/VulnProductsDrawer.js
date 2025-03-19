@@ -141,7 +141,7 @@ const VulnProductsDrawer = ({ isOpen, onClose, data }) => {
         className='data-table-container'
         customStyles={customStyles(headingTextColor)}
       />
-      <Pagination {...paginationProps} />
+      <Pagination {...paginationProps} totalCount={statusResults?.length} />
     </LynkDrawer>
   )
 }
