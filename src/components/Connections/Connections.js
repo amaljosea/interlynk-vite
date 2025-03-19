@@ -259,7 +259,6 @@ const Connections = ({ org }) => {
           org={org}
           data={slackData}
           isOpen={SLACK.isOpen}
-          updateCon={updateCon}
           onClose={SLACK.onClose}
           setGreenCheck={setGreenCheck}
           hostId={hostId}
@@ -271,7 +270,6 @@ const Connections = ({ org }) => {
           org={org}
           data={teamsData}
           isOpen={TEAM.isOpen}
-          updateCon={updateCon}
           onClose={TEAM.onClose}
           setGreenCheck={setGreenCheck}
           hostId={hostId}
@@ -283,7 +281,6 @@ const Connections = ({ org }) => {
           org={org}
           data={emailData}
           isOpen={EMAIL.isOpen}
-          updateCon={updateCon}
           onClose={EMAIL.onClose}
           setGreenCheck={setGreenCheck}
           hostId={hostId}

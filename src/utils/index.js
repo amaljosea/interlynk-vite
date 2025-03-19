@@ -688,3 +688,24 @@ export const findShortestPath = (pathArray, currentShortestPath = []) => {
     shortestPath
   ])
 }
+
+export const isValidWebhookURL = (url) => {
+  try {
+    // Check if the URL is valid and uses HTTPS
+    const parsedUrl = new URL(url)
+    if (parsedUrl.protocol !== 'https:') {
+      return false
+    }
+
+    // Patterns for Microsoft Teams and Slack webhooks
+    const teamsWebhookPattern =
+      /https:\/\/outlook\.office\.com\/webhook\/.*\/IncomingWebhook\/.*\/.*$/
+    const slackWebhookPattern =
+      /https:\/\/hooks\.slack\.com\/services\/.*\/.*\/.*$/
+
+    // Check if the URL matches either pattern
+    return teamsWebhookPattern.test(url) || slackWebhookPattern.test(url)
+  } catch (e) {
+    return false
+  }
+}

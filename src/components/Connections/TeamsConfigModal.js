@@ -1,5 +1,3 @@
-import { IoSettingsOutline } from 'react-icons/io5'
-
 import {
   CreateTeamsConnection,
   DeleteTeamsConnection,
@@ -12,24 +10,15 @@ const TeamsConfigModal = ({
   onClose,
   data,
   setGreenCheck,
-  updateCon,
   org,
   hostId
 }) => {
-  const notificationOptions = [
-    { value: 'All', label: 'All' },
-    { value: 'Alert', label: 'Alert' },
-    { value: 'Warning', label: 'Warning' },
-    { value: 'Info', label: 'Info' }
-  ]
-
   return (
     <ConfigModal
       isOpen={isOpen}
       onClose={onClose}
       data={data}
       setGreenCheck={setGreenCheck}
-      updateCon={updateCon}
       org={org}
       hostId={hostId}
       createConnection={CreateTeamsConnection}
@@ -37,8 +26,6 @@ const TeamsConfigModal = ({
       deleteConnection={DeleteTeamsConnection}
       title='Teams Configuration'
       addressPlaceholder='Enter Teams webhook URL'
-      icon={IoSettingsOutline}
-      options={notificationOptions}
       greenCheckKey={'teams'}
     />
   )
