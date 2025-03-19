@@ -194,9 +194,9 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
   })
 
   const isDisabled =
-    formData?.supportLevel === '' && formData?.endOfSupport === ''
-  // (!component?.internal && formData?.assessmentExpiresOn < 1) ||
-  // (!component?.internal && formData?.assessmentExpiresOn > 365)
+    (formData?.supportLevel === '' && formData?.endOfSupport === '') ||
+    (!component?.internal && formData?.assessmentExpiresOn < 1) ||
+    (!component?.internal && formData?.assessmentExpiresOn > 365)
 
   const noLongerMaintained = formData?.supportLevel === 'no_longer_maintained'
 
