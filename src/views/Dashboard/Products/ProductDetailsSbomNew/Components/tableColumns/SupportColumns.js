@@ -31,7 +31,7 @@ const SupportColumns = ({ handleSupport }) => {
         name: 'NAME',
         sortable: true,
         wrap: true,
-        width: '22%',
+        width: '18%',
         selector: (row) => {
           const { name } = row || {}
           return (
@@ -74,7 +74,7 @@ const SupportColumns = ({ handleSupport }) => {
         id: 'COMPONENT_SUPPORT_LEVELS_LEVEL',
         name: 'SUPPORT LEVEL',
         sortable: true,
-        width: '15%',
+        width: '18%',
         selector: (row) => {
           const { duplicates } = row || {}
           const { level } = row?.componentSupportLevel || {}
@@ -105,6 +105,7 @@ const SupportColumns = ({ handleSupport }) => {
         sortable: true,
         wrap: true,
         right: 'true',
+        width:'14%',
         selector: (row) => {
           const { endDate } = row?.componentSupportLevel || {}
           if (endDate) {

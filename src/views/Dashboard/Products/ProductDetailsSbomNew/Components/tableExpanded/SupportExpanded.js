@@ -50,10 +50,12 @@ const SupportExpand = (props) => {
           {/* INTERNAL NOTES */}
           <DetailItem label='Support Explanation' value={internalNotes} />
           {/* ASSESSMENT EXPIERS ON */}
-          <DetailItem
-            label='Assessment Expires On'
-            value={assessmentExpiresOn}
-          />
+          {level !== 'no_longer_maintained' && (
+            <DetailItem
+              label='Assessment Expires On'
+              value={assessmentExpiresOn}
+            />
+          )}
         </Grid>
         <Divider hidden={!duplicates} />
         {duplicates?.length > 0 &&
@@ -103,10 +105,12 @@ const SupportExpand = (props) => {
                   value={partInternalNotes}
                 />
                 {/* ASSESSMENT EXPIERS ON */}
-                <DetailItem
-                  label='Assessment Expires On'
-                  value={partAssessmentExpiresOn}
-                />
+                {level !== 'no_longer_maintained' && (
+                  <DetailItem
+                    label='Assessment Expires On'
+                    value={partAssessmentExpiresOn}
+                  />
+                )}
               </Grid>
             )
           })}
