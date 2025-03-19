@@ -1,18 +1,8 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useState } from 'react'
-import { findShortestPath, truncatedValue } from 'utils'
 
-import { ArrowDownIcon } from '@chakra-ui/icons'
-import {
-  Divider,
-  Flex,
-  Select,
-  Stack,
-  Text,
-  useDisclosure
-} from '@chakra-ui/react'
-import { Tag } from '@chakra-ui/react'
+import { Divider, Select, Stack, Text, useDisclosure } from '@chakra-ui/react'
 import {
   FormControl,
   FormErrorIcon,
@@ -24,6 +14,7 @@ import CompRelationTypes from 'components/CompRelationTypes'
 import ComponentList from 'components/ComponentList'
 import LynkAlert from 'components/LynkAlert'
 import RelDeleteModal from 'components/RelDeleteModal'
+import RelationTreeView from 'components/RelationTreeView'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -36,7 +27,7 @@ import ActionButton from './ActionButton'
 const CompRelations = ({ data, compPath }) => {
   const { showToast } = useCustomToast()
 
-  const { id, name, version, sbomId } = data || ''
+  const { id, name, sbomId } = data || ''
 
   const {
     tab,
@@ -58,19 +49,15 @@ const CompRelations = ({ data, compPath }) => {
   const [isAdded, setIsAdded] = useState(false)
   const [component, setComponent] = useState(null)
 
-  const { primaryBlueText, headingTextColor } = useThemeColor([
-    'primaryBlueText',
-    'headingTextColor'
-  ])
+  const { headingTextColor } = useThemeColor(['headingTextColor'])
 
   const [addRelation] = useMutation(CreateCompRelation)
-  const [removeRelation] = useMutation(DeleteCompRelation)
+  const [removeRelation, { loading: deleteLoading }] =
+    useMutation(DeleteCompRelation)
   const { data: compDependency, loading } = useQuery(GetCompDependency, {
     skip: tab === 'relationships' ? false : true,
     variables: { compId: id, sbomId: sbomId }
   })
-
-  const shortestPath = findShortestPath(compPath)[0]
 
   const {
     isOpen: isDelOpen,
@@ -166,12 +153,9 @@ const CompRelations = ({ data, compPath }) => {
 
   return (
     <>
-      <Flex
-        pb={20}
-        gap={4}
+      <Stack
         h={'80vh'}
-        flexDir={'column'}
-        alignItems={'flex-start'}
+        spacing={6}
         overflow={'auto'}
         sx={{
           '&::-webkit-scrollbar': {
@@ -182,54 +166,46 @@ const CompRelations = ({ data, compPath }) => {
         }}
       >
         {/* CREATE RELATIONSHIP */}
-        <Stack
-          gap={4}
-          width={'100%'}
-          direction={'column'}
-          alignItems={'flex-start'}
-          mb={2}
-        >
-          <Stack w={'100%'}>
-            {/* RELATION TYPE */}
-            <FormControl>
-              <FormLabel htmlFor='relType' color={headingTextColor}>
-                Type
-              </FormLabel>
-              <Select
-                name='relationType'
-                value={relationships?.relType}
-                onChange={(e) =>
-                  handleChange('relationships', 'relType', e.target.value)
-                }
-              >
-                <option value=''>-- Select --</option>
-                {[
-                  { value: 'depends_on', label: 'Depends On' },
-                  { value: 'dependency_of', label: 'Dependency Of' }
-                ].map((item, idx) => (
-                  <option key={idx} value={item.value}>
-                    {item.label}
-                  </option>
-                ))}
-              </Select>
-            </FormControl>
-            {/* RELATION TO */}
-            <FormControl isInvalid={list?.length > 0}>
-              <FormLabel htmlFor='relationTo' color={headingTextColor}>
-                Component
-              </FormLabel>
-              <ComponentList
-                name={name}
-                id='relationTo'
-                value={component}
-                setValue={setComponent}
-              />
-              <FormErrorMessage>
-                <FormErrorIcon />
-                Component dependency already exists
-              </FormErrorMessage>
-            </FormControl>
-          </Stack>
+        <Stack spacing={4} width={'100%'}>
+          {/* RELATION TYPE */}
+          <FormControl>
+            <FormLabel htmlFor='relType' color={headingTextColor}>
+              Type
+            </FormLabel>
+            <Select
+              name='relationType'
+              value={relationships?.relType}
+              onChange={(e) =>
+                handleChange('relationships', 'relType', e.target.value)
+              }
+            >
+              <option value=''>-- Select --</option>
+              {[
+                { value: 'depends_on', label: 'Depends On' },
+                { value: 'dependency_of', label: 'Dependency Of' }
+              ].map((item, idx) => (
+                <option key={idx} value={item.value}>
+                  {item.label}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+          {/* RELATION TO */}
+          <FormControl isInvalid={list?.length > 0}>
+            <FormLabel htmlFor='relationTo' color={headingTextColor}>
+              Component
+            </FormLabel>
+            <ComponentList
+              name={name}
+              id='relationTo'
+              value={component}
+              setValue={setComponent}
+            />
+            <FormErrorMessage>
+              <FormErrorIcon />
+              Component dependency already exists
+            </FormErrorMessage>
+          </FormControl>
           {/* ACTION */}
           {alert ? (
             <Stack spacing={4}>
@@ -253,66 +229,29 @@ const CompRelations = ({ data, compPath }) => {
         <CompRelationTypes
           loading={loading}
           isAdded={isAdded}
+          isEditable={true}
           handleDelete={handleDelete}
           dependsOnList={dependsOnList}
           dependencyOfList={dependencyOfList}
         />
         <Divider />
         {/* PATHS */}
-        <Text fontSize={'lg'} fontWeight={'medium'} mt={2}>
-          Tree View
-        </Text>
-        {compPath?.length > 0 ? (
-          <Stack
-            width={'100%'}
-            mt={10}
-            dir='column'
-            spacing={2}
-            alignItems={'center'}
-            justifyContent={'center'}
-          >
-            {shortestPath?.path?.length > 0 ? (
-              shortestPath?.path?.map((item, index) => (
-                <>
-                  <Tag
-                    key={item.id}
-                    size='sm'
-                    colorScheme={
-                      index === 0 || index === shortestPath.path.length - 1
-                        ? 'blue'
-                        : 'green'
-                    }
-                  >
-                    {item?.name} - {truncatedValue(item?.version, 20)}
-                  </Tag>
-                  {index !== shortestPath.path.length - 1 && (
-                    <ArrowDownIcon
-                      width={4}
-                      height={4}
-                      color={primaryBlueText}
-                    />
-                  )}
-                </>
-              ))
-            ) : (
-              <Text fontSize={'sm'}>
-                Component is not connected to Primary component
-              </Text>
-            )}
-          </Stack>
-        ) : (
-          <Stack width={'100%'} alignItems={'center'} justifyContent={'center'}>
-            <Tag size='sm' colorScheme='green'>
-              {name} - {version}
-            </Tag>
-          </Stack>
-        )}
-      </Flex>
+        <Stack>
+          <Text fontWeight={'medium'} mt={2}>
+            Tree View
+          </Text>
+          <RelationTreeView
+            compPath={compPath}
+            data={{ name: data?.name, version: data?.version }}
+          />
+        </Stack>
+      </Stack>
 
       {isDelOpen && activeComp && (
         <RelDeleteModal
           isOpen={isDelOpen}
           onClose={onDelClose}
+          loading={deleteLoading}
           activeComp={activeComp}
           handleRemove={handleRemove}
         />

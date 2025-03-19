@@ -1,17 +1,19 @@
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 
-const RelDeleteModal = ({ isOpen, onClose, activeComp, handleRemove }) => {
+const RelDeleteModal = (props) => {
+  const { isOpen, onClose, loading, activeComp, handleRemove } = props
   const { name, version } = activeComp.toComp || activeComp.fromComp
 
   const componentName = `${name || ''}${version ? ` - ${version}` : ''}`
 
   return (
     <ConfirmationModal
+      title='Remove'
       isOpen={isOpen}
       onClose={onClose}
-      onConfirm={handleRemove}
+      isLoading={loading}
       name={componentName}
-      title='Remove'
+      onConfirm={handleRemove}
       description='This will remove the relationship of this component with other components and change the dependency order of this version.'
     />
   )

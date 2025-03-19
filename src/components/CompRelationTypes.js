@@ -8,8 +8,14 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import CustomLoader from './CustomLoader'
 
 const CompRelationTypes = (props) => {
-  const { loading, isAdded, dependencyOfList, dependsOnList, handleDelete } =
-    props
+  const {
+    loading,
+    isAdded,
+    isEditable,
+    dependencyOfList,
+    dependsOnList,
+    handleDelete
+  } = props
 
   const { secondaryTextInverse } = useThemeColor(['secondaryTextInverse'])
 
@@ -39,10 +45,12 @@ const CompRelationTypes = (props) => {
                   {truncatedValue(comp?.fromComp?.name, 20)}-
                   {truncatedValue(comp?.fromComp?.version, 20)}
                 </TagLabel>
-                <TagCloseButton
-                  data-testid='delete_depends_on'
-                  onClick={() => handleDelete(comp)}
-                />
+                {isEditable && (
+                  <TagCloseButton
+                    data-testid='delete_depends_on'
+                    onClick={() => handleDelete(comp)}
+                  />
+                )}
               </Tag>
             ))}
           </Flex>
@@ -76,10 +84,12 @@ const CompRelationTypes = (props) => {
                       {truncatedValue(comp?.toComp?.name, 20)}-
                       {truncatedValue(comp?.toComp?.version, 20)}
                     </TagLabel>
-                    <TagCloseButton
-                      data-testid='delete_depends_on'
-                      onClick={() => handleDelete(comp)}
-                    />
+                    {isEditable && (
+                      <TagCloseButton
+                        data-testid='delete_depends_on'
+                        onClick={() => handleDelete(comp)}
+                      />
+                    )}
                   </Tag>
                 </Tooltip>
               ))}
