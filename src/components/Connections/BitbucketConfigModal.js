@@ -1,13 +1,13 @@
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { Button, IconButton, Select, Stack, Text } from '@chakra-ui/react'
+import { Button, Select, Stack, Text } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
 import { Input, InputGroup, InputRightElement } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
+import ToggleVisibilityButton from 'components/Misc/ToggleVisibilityButton'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -203,17 +203,12 @@ const BitbucketConfigModal = (props) => {
               placeholder='Enter API Token'
               type={showApiToken ? 'text' : 'password'}
             />
-            <InputRightElement width='4.5rem' hidden={data}>
-              <IconButton
-                right='2'
-                size='sm'
-                h='1.75rem'
-                position='absolute'
+            <InputRightElement hidden={data}>
+              <ToggleVisibilityButton
                 isDisabled={!updateCon}
+                showPassword={showApiToken}
                 onClick={handleToggleVisibility}
-              >
-                {showApiToken ? <ViewOffIcon /> : <ViewIcon />}
-              </IconButton>
+              />
             </InputRightElement>
           </InputGroup>
         </FormControl>

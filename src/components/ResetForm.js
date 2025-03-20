@@ -3,16 +3,7 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { validPassword } from 'utils/formValidationUtils'
 
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import {
-  Box,
-  Button,
-  Flex,
-  IconButton,
-  Stack,
-  Text,
-  chakra
-} from '@chakra-ui/react'
+import { Box, Button, Flex, Stack, Text, chakra } from '@chakra-ui/react'
 import { Input, InputGroup, InputRightElement } from '@chakra-ui/react'
 import {
   FormControl,
@@ -26,6 +17,7 @@ import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import LynkAlert from './LynkAlert'
+import ToggleVisibilityButton from './Misc/ToggleVisibilityButton'
 
 const ResetForm = () => {
   const navigate = useNavigate()
@@ -214,12 +206,10 @@ const ResetForm = () => {
                   onBlur={handleCheckPassword}
                 />
                 <InputRightElement width='3.1rem'>
-                  <IconButton
-                    h='1.75rem'
-                    size='sm'
+                  <ToggleVisibilityButton
                     bg={'transparent'}
+                    showPassword={showPassword}
                     onClick={handleTogglePassword}
-                    icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
                   />
                 </InputRightElement>
               </InputGroup>
@@ -249,12 +239,10 @@ const ResetForm = () => {
                   placeholder='*******'
                 />
                 <InputRightElement width='3.1rem'>
-                  <IconButton
-                    h='1.75rem'
-                    size='sm'
+                  <ToggleVisibilityButton
                     bg={'transparent'}
+                    showPassword={showConfPassword}
                     onClick={handleToggleConfirm}
-                    icon={showConfPassword ? <ViewOffIcon /> : <ViewIcon />}
                   />
                 </InputRightElement>
               </InputGroup>

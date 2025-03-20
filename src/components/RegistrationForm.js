@@ -8,7 +8,7 @@ import {
   validateEmail
 } from 'utils/formValidationUtils'
 
-import { CheckCircleIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
+import { CheckCircleIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -18,7 +18,6 @@ import {
   FormHelperText,
   FormLabel,
   Icon,
-  IconButton,
   Input,
   InputGroup,
   InputRightElement,
@@ -35,6 +34,7 @@ import { RegisterUser } from 'graphQL/Mutation'
 
 import DividerWithText from './DividerWithText'
 import LynkAlert from './LynkAlert'
+import ToggleVisibilityButton from './Misc/ToggleVisibilityButton'
 import PolicyTerms from './PolicyTerms'
 import SocialLogin from './SocialLogin'
 
@@ -285,12 +285,10 @@ const RegistrationForm = () => {
               onBlur={handleCheckPassword}
             />
             <InputRightElement width='3.1rem'>
-              <IconButton
-                h='1.75rem'
-                size='sm'
+              <ToggleVisibilityButton
                 bg={'transparent'}
+                showPassword={showPassword}
                 onClick={handleTogglePassword}
-                icon={showPassword ? <ViewIcon /> : <ViewOffIcon />}
               />
             </InputRightElement>
           </InputGroup>
@@ -316,12 +314,10 @@ const RegistrationForm = () => {
               placeholder='*******'
             />
             <InputRightElement width='3.1rem'>
-              <IconButton
-                h='1.75rem'
-                size='sm'
+              <ToggleVisibilityButton
                 bg={'transparent'}
+                showPassword={showConfPassword}
                 onClick={handleToggleConfirm}
-                icon={showConfPassword ? <ViewIcon /> : <ViewOffIcon />}
               />
             </InputRightElement>
           </InputGroup>
