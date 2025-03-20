@@ -198,7 +198,7 @@ const Support = () => {
         />
       )}
 
-      {STATUS.isOpen && selectedItems?.length > 0 && (
+      {STATUS.isOpen && (
         <SupportStatus
           isOpen={STATUS.isOpen}
           onClose={STATUS.onClose}

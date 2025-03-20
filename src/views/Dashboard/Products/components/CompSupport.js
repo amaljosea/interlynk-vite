@@ -238,105 +238,77 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
   }
 
   const handleUpdate = () => {
-    const parts = data?.duplicates?.map(
-      (item) => item?.componentSupportLevel?.id
-    )
-    const supports =
-      parts?.length > 0
-        ? [componentSupportLevel?.id, ...parts]
-        : [componentSupportLevel?.id]
-
-    supports?.length > 0 &&
-      supports?.map((item) =>
-        updateSupport({
-          variables: {
-            id: item,
-            level: formData?.supportLevel || undefined,
-            notes: formData?.explanation || undefined,
-            retainManualOverrideFor:
-              Number(formData?.assessmentExpiresOn) || undefined,
-            endDate: formData?.endOfSupport
-              ? new Date(formData?.endOfSupport).toISOString()
-              : undefined
-          }
-        })
-          .then((res) => {
-            const { errors } = res?.data?.componentSupportLevelUpdate || {}
-            if (errors?.length > 0) {
-              showToast({
-                description: errors[0],
-                status: 'error'
-              })
-            }
+    updateSupport({
+      variables: {
+        id: componentSupportLevel?.id,
+        level: formData?.supportLevel || undefined,
+        notes: formData?.explanation || undefined,
+        retainManualOverrideFor:
+          Number(formData?.assessmentExpiresOn) || undefined,
+        endDate: formData?.endOfSupport
+          ? new Date(formData?.endOfSupport).toISOString()
+          : undefined
+      }
+    })
+      .then((res) => {
+        const { errors } = res?.data?.componentSupportLevelUpdate || {}
+        if (errors?.length > 0) {
+          showToast({
+            description: errors[0],
+            status: 'error'
           })
-          .finally(() => handleClose(false))
-      )
+        }
+      })
+      .finally(() => handleClose(false))
   }
 
   const handleSubmit = () => {
-    const parts = data?.duplicates?.map((item) => item?.id)
-    const components = parts?.length > 0 ? [data?.id, ...parts] : [data?.id]
-
-    components?.length > 0 &&
-      components?.map((item) =>
-        createSupport({
-          variables: {
-            id: item,
-            level: formData?.supportLevel || undefined,
-            notes: formData?.explanation || undefined,
-            retainManualOverrideFor: noLongerMaintained
-              ? undefined
-              : Number(formData?.assessmentExpiresOn),
-            endDate: formData?.endOfSupport
-              ? new Date(formData?.endOfSupport).toISOString()
-              : undefined
-          }
-        })
-          .then((res) => {
-            const { errors } = res?.data?.componentSupportLevelCreate || {}
-            if (errors?.length > 0) {
-              showToast({
-                description: errors[0],
-                status: 'error'
-              })
-            }
+    createSupport({
+      variables: {
+        id: data?.id,
+        level: formData?.supportLevel || undefined,
+        notes: formData?.explanation || undefined,
+        retainManualOverrideFor: noLongerMaintained
+          ? undefined
+          : Number(formData?.assessmentExpiresOn),
+        endDate: formData?.endOfSupport
+          ? new Date(formData?.endOfSupport).toISOString()
+          : undefined
+      }
+    })
+      .then((res) => {
+        const { errors } = res?.data?.componentSupportLevelCreate || {}
+        if (errors?.length > 0) {
+          showToast({
+            description: errors[0],
+            status: 'error'
           })
-          .finally(() => handleClose(false))
-      )
+        }
+      })
+      .finally(() => handleClose(false))
   }
 
   const handleRemove = () => {
-    const parts = data?.duplicates?.map(
-      (item) => item?.componentSupportLevel?.id
-    )
-    const supports =
-      parts?.length > 0
-        ? [componentSupportLevel?.id, ...parts]
-        : [componentSupportLevel?.id]
-
-    supports?.length > 0 &&
-      supports?.map((item) =>
-        deleteSupport({ variables: { id: item } })
-          .then((res) => {
-            const { errors } = res?.data?.componentSupportLevelDelete || {}
-            if (errors?.length > 0) {
-              showToast({
-                description: errors[0],
-                status: 'error'
-              })
-            } else {
-              setEdit(false)
-              setFormData(() => ({
-                explanation: '',
-                assessedBy: '',
-                supportLevel: '',
-                endOfSupport: new Date(),
-                assessmentExpiresOn: 0
-              }))
-            }
+    deleteSupport({ variables: { id: componentSupportLevel?.id } })
+      .then((res) => {
+        const { errors } = res?.data?.componentSupportLevelDelete || {}
+        if (errors?.length > 0) {
+          showToast({
+            description: errors[0],
+            status: 'error'
           })
-          .finally(() => handleClose())
-      )
+        } else {
+          setEdit(false)
+          setFormData(() => ({
+            explanation: '',
+            assessedBy: '',
+            supportLevel: '',
+            endOfSupport: new Date(),
+            assessmentExpiresOn: 0
+          }))
+        }
+      })
+      .finally(() => handleClose())
   }
 
   const inputStyle = { size: 'md' }
