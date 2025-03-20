@@ -31,18 +31,12 @@ const SupportStatus = ({ isOpen, selectedItems, handleClear }) => {
     componentSupportLevelUpdate
   )
 
-  const componentIds = selectedItems?.flatMap((item) => [
-    item?.id,
-    ...(item.duplicates?.map((dup) => dup?.id) || [])
-  ])
+  const componentIds = selectedItems
+    ?.filter((item) => item?.componentSupportLevel === null)
+    ?.map((comp) => comp?.id)
   const supportIds = selectedItems
-    ?.filter((sup) => sup?.componentSupportLevel !== null)
-    ?.flatMap((item) => [
-      item?.componentSupportLevel?.id,
-      ...(item?.duplicates
-        ?.filter((level) => level?.componentSupportLevel !== null)
-        ?.map((dup) => dup?.componentSupportLevel?.id) || [])
-    ])
+    ?.filter((item) => item?.componentSupportLevel !== null)
+    ?.map((sup) => sup?.componentSupportLevel?.id)
 
   const [formData, setFormData] = useState({
     supportLevel: '',
@@ -55,9 +49,12 @@ const SupportStatus = ({ isOpen, selectedItems, handleClear }) => {
     (formData?.supportLevel === '' && formData?.endOfSupport === '') ||
     formData?.assessmentExpiresOn > 365
 
+  const noLongerMaintained = formData?.supportLevel === 'no_longer_maintained'
+
   const handleChange = (e) => {
     const { name, value } = e.target
-    const isUnspecified = name === 'supportLevel' && value === 'unspecified'
+    const isUnspecified =
+      name === 'supportLevel' && (value === 'unspecified' || noLongerMaintained)
     if (isUnspecified) {
       setFormData((prev) => ({
         ...prev,
@@ -94,18 +91,17 @@ const SupportStatus = ({ isOpen, selectedItems, handleClear }) => {
             ? new Date(formData?.endOfSupport).toISOString()
             : undefined
         }
+      }).then((res) => {
+        const { errors } = res?.data?.componentSupportLevelCreate || {}
+        if (errors?.length > 0) {
+          showToast({
+            description: errors[0],
+            status: 'error'
+          })
+        }
       })
-        .then((res) => {
-          const { errors } = res?.data?.componentSupportLevelCreate || {}
-          if (errors?.length > 0) {
-            showToast({
-              description: errors[0],
-              status: 'error'
-            })
-          }
-        })
-        .finally(() => handleClear())
     })
+    handleClear()
   }
 
   const handleCreate = (data) => {
@@ -121,31 +117,24 @@ const SupportStatus = ({ isOpen, selectedItems, handleClear }) => {
             ? new Date(formData?.endOfSupport).toISOString()
             : undefined
         }
+      }).then((res) => {
+        const { errors } = res?.data?.componentSupportLevelCreate || {}
+        if (errors?.length > 0) {
+          showToast({
+            description: errors[0],
+            status: 'error'
+          })
+        }
       })
-        .then((res) => {
-          const { errors } = res?.data?.componentSupportLevelCreate || {}
-          if (errors?.length > 0) {
-            showToast({
-              description: errors[0],
-              status: 'error'
-            })
-          }
-        })
-        .finally(() => handleClear())
     })
+    handleClear()
   }
 
-  const handleSubmit = async () => {
-    if (componentIds?.length > 0 && supportIds?.length > 0) {
+  const handleSubmit = () => {
+    if (supportIds?.length > 0) {
       handleUpdate(supportIds)
-    }
-
-    if (componentIds?.length > 0 && supportIds?.length === 0) {
+    } else {
       handleCreate(componentIds)
-    }
-
-    if (componentIds?.length === 0 && supportIds?.length > 0) {
-      handleUpdate(supportIds)
     }
   }
 
@@ -153,12 +142,12 @@ const SupportStatus = ({ isOpen, selectedItems, handleClear }) => {
     <LynkModal
       isOpen={isOpen}
       Icon={SupportIcon}
-      buttonText={'Save'}
       title={'Add Status'}
       disabled={isDisabled}
       onClose={handleClear}
       onSubmit={handleSubmit}
       isLoading={createLoading || updateLoading}
+      buttonText={supportIds?.length > 0 ? 'Update' : 'Save'}
     >
       <Stack spacing={4}>
         {/* SUPPRT LEVEL */}
@@ -190,7 +179,11 @@ const SupportStatus = ({ isOpen, selectedItems, handleClear }) => {
           />
         </FormControl>
         {/* RETAIN MANNUAL OVERRIDE */}
-        <FormControl isRequired isInvalid={formData?.assessmentExpiresOn > 365}>
+        <FormControl
+          isRequired
+          hidden={noLongerMaintained}
+          isInvalid={formData?.assessmentExpiresOn > 365}
+        >
           <FormLabel htmlFor='assessmentExpiresOn'>
             Assessment Expires On
           </FormLabel>
