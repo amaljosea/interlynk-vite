@@ -397,7 +397,7 @@ const ComponentsColumns = ({
         id: 'action',
         name: 'ACTION',
         selector: (row) => {
-          const { status, primary, externalUrls } = row
+          const { sbom, status, primary, externalUrls } = row
           const website = externalUrls?.find((item) => item.name === 'website')
           const distribution = externalUrls?.find(
             (item) => item.name === 'distribution'
@@ -407,6 +407,8 @@ const ComponentsColumns = ({
           )
           const vcs = externalUrls?.find((item) => item.name === 'vcs')
           const onCheck = (item) => (item ? primaryBlueText : primaryTextColor)
+
+          const isPart = sbomId !== sbom?.id
 
           return (
             <Stack direction={'row'} alignItems={'center'}>
@@ -450,6 +452,7 @@ const ComponentsColumns = ({
                   <Portal>
                     <MenuList fontSize={'sm'}>
                       <MenuItem
+                        hidden={isPart}
                         data-testid='edit_component'
                         onClick={() => onEditOpen(row)}
                         isDisabled={status === 'signed' || !updateComponent}
@@ -457,7 +460,7 @@ const ComponentsColumns = ({
                         Edit Component
                       </MenuItem>
                       <MenuItem
-                        hidden={isFreeTier}
+                        hidden={isFreeTier || isPart}
                         onClick={() => handleSupport(row)}
                         data-testid='edit_component_support'
                         isDisabled={status === 'signed' || !updateComponent}
@@ -465,7 +468,7 @@ const ComponentsColumns = ({
                         Edit Support Status
                       </MenuItem>
                       <MenuItem
-                        hidden={isFreeTier}
+                        hidden={isFreeTier || isPart}
                         data-testid='view_license_status'
                         onClick={() => handleLicenseStatus(row)}
                         isDisabled={status === 'signed' || !updateComponent}
@@ -473,8 +476,8 @@ const ComponentsColumns = ({
                         Edit License Status
                       </MenuItem>
                       <MenuItem
-                        hidden={isFreeTier}
                         data-testid='view_notes'
+                        hidden={isFreeTier || isPart}
                         onClick={() => handleNotes(row)}
                         isDisabled={status === 'signed' || !updateComponent}
                       >
@@ -507,9 +510,10 @@ const ComponentsColumns = ({
                       >
                         View Relationships
                       </MenuItem>
-                      <Divider />
+                      <Divider hidden={isPart} />
                       {primary === false && (
                         <MenuItem
+                          hidden={isPart}
                           color={primaryErrorColor}
                           onClick={() => {
                             setActiveRow(row)

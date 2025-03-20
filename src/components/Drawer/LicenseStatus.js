@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
 import { timeSince } from 'utils'
 import { licenseStatusTypes } from 'variables/general'
 
@@ -22,7 +21,6 @@ import { ComponentLicenseStatusUpdate } from 'graphQL/Mutation'
 import { GetLicenseStatusHistory } from 'graphQL/Queries'
 
 const LicenseStatus = ({ data, isOpen, onClose }) => {
-  const params = useParams()
   const { showToast } = useCustomToast()
   const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
 
@@ -61,7 +59,7 @@ const LicenseStatus = ({ data, isOpen, onClose }) => {
     updateStatus({
       variables: {
         id: data?.id,
-        sbomId: params?.sbomid,
+        sbomId: data?.sbomId,
         licenseStatus: formData?.licenseStatus,
         licenseNotes: formData?.licenseNotes
       }
