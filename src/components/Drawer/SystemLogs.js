@@ -70,7 +70,8 @@ const SystemLogs = ({ isOpen, onClose }) => {
 
   const { data, loading, startPolling, stopPolling } = useQuery(GetActivities, {
     skip: isOpen ? false : true,
-    variables: { projectId: params?.productid, sbomId: params?.sbomid }
+    variables: { projectId: params?.productid, sbomId: params?.sbomid },
+    errorPolicy: 'all'
   })
   const { sbomActivities } = data?.sbom || {}
 
