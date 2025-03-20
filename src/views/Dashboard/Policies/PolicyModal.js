@@ -410,7 +410,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                 handleSelectChange(selectedItem, 'resultType')
               }
               options={resultTypeOptions}
-              data-testid='policy_result_type'
+              id='policy_result_type'
               dropDown
             />
           </FormControl>
@@ -425,7 +425,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
                 handleSelectChange(selectedItem, 'operator')
               }
               options={operatorOptions}
-              data-testid='policy_result_condition'
+              id='policy_result_condition'
               dropDown
             />
           </FormControl>
