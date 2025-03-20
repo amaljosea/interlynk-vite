@@ -1,5 +1,4 @@
 import { useQuery } from '@apollo/client'
-import { useParams } from 'react-router-dom'
 import { getFullDateTime, timeSince } from 'utils'
 import { pkgData, pkgVersionData, repositoryData } from 'variables/general'
 
@@ -45,7 +44,6 @@ const DateField = ({ value }) => {
 const CompInsights = ({ isOpen, onClose, data }) => {
   const { id, scores } = data || ''
   const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
-  const params = useParams()
   const { secondaryBgColor } = useThemeColor(['secondaryBgColor'])
 
   const { age, community, security } = scores || ''
@@ -55,7 +53,7 @@ const CompInsights = ({ isOpen, onClose, data }) => {
 
   const { data: insights, loading } = useQuery(GetEnrichedData, {
     skip: isOpen ? false : true,
-    variables: { id: id, sbomId: params?.sbomid }
+    variables: { id: id, sbomId: data?.sbomId }
   })
 
   const { enrichedContent } = insights?.component || ''

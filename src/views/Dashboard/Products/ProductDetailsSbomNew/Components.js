@@ -459,7 +459,11 @@ const Components = ({ sbomData }) => {
         <CompInsights
           isOpen={INSIGHTS.isOpen}
           onClose={INSIGHTS.onClose}
-          data={{ id: activeRow?.id, scores: activeRow?.scoreBreakdown }}
+          data={{
+            id: activeRow?.id,
+            sbomId: activeRow?.sbomId,
+            scores: activeRow?.scoreBreakdown
+          }}
         />
       )}
 

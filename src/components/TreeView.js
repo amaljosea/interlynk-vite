@@ -1,7 +1,6 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { useCallback, useEffect, useState } from 'react'
 import Tree from 'react-d3-tree'
-import { useParams } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -155,11 +154,10 @@ const buildTree = (path, leafNode) => {
 }
 
 const TreeView = ({ isOpen, onClose, component, isPrimary }) => {
-  const params = useParams()
   const { dispatch } = useGlobalState()
   const { prodCompDispatch } = dispatch
 
-  const { id: compId } = component || ''
+  const { id: compId, sbomId } = component || ''
 
   const { grayBorderColor, primaryBlueText } = useThemeColor([
     'grayBorderColor',
@@ -171,7 +169,7 @@ const TreeView = ({ isOpen, onClose, component, isPrimary }) => {
 
   const { data, loading: pathLoading } = useQuery(GetComponentPath, {
     skip: isOpen ? false : true,
-    variables: { compId: compId, sbomId: params?.sbomid }
+    variables: { compId: compId, sbomId: sbomId }
   })
 
   const { pathToPrimary } = data?.component || ''
@@ -192,12 +190,7 @@ const TreeView = ({ isOpen, onClose, component, isPrimary }) => {
   const handleZoomOut = () => setZoom(zoom - Number(0.1))
 
   const getRelations = useCallback(() => {
-    getData({
-      variables: {
-        compId: compId,
-        sbomId: params?.sbomid
-      }
-    }).then((res) => {
+    getData({ variables: { compId: compId, sbomId: sbomId } }).then((res) => {
       const { dependsOn, id, name, version } = res?.data?.component || ''
       const dependsOnNodes = dependsOn?.map((relation) => {
         return {
@@ -224,34 +217,31 @@ const TreeView = ({ isOpen, onClose, component, isPrimary }) => {
         setTree(defaultValue)
       }
     })
-  }, [compId, getData, params?.sbomid, path])
+  }, [compId, getData, sbomId, path])
 
   const handleNodeClick = (datum) => {
-    getData({
-      variables: {
-        compId: datum?.compId,
-        sbomId: params?.sbomid
+    getData({ variables: { compId: datum?.compId, sbomId: sbomId } }).then(
+      (res) => {
+        const { dependsOn } = res?.data?.component || ''
+        if (datum?.children?.length === 0 && dependsOn?.length > 0) {
+          const newData = dependsOn?.map((relation) => {
+            return {
+              id: uuidv4(),
+              compId: relation?.toComp?.id,
+              name: relation?.toComp?.name,
+              version: relation?.toComp?.version,
+              count: relation?.toComp?.dependsOnCount,
+              children: []
+            }
+          })
+          const updatedTree = updateTreeData(tree, datum.id, newData)
+          setTree(updatedTree)
+        } else {
+          const updatedTree = updateTreeData(tree, datum.id, [])
+          setTree(updatedTree)
+        }
       }
-    }).then((res) => {
-      const { dependsOn } = res?.data?.component || ''
-      if (datum?.children?.length === 0 && dependsOn?.length > 0) {
-        const newData = dependsOn?.map((relation) => {
-          return {
-            id: uuidv4(),
-            compId: relation?.toComp?.id,
-            name: relation?.toComp?.name,
-            version: relation?.toComp?.version,
-            count: relation?.toComp?.dependsOnCount,
-            children: []
-          }
-        })
-        const updatedTree = updateTreeData(tree, datum.id, newData)
-        setTree(updatedTree)
-      } else {
-        const updatedTree = updateTreeData(tree, datum.id, [])
-        setTree(updatedTree)
-      }
-    })
+    )
   }
 
   // CLEAR SERACH
@@ -311,7 +301,7 @@ const TreeView = ({ isOpen, onClose, component, isPrimary }) => {
     if (isOpen && compId) {
       getRelations()
     }
-  }, [compId, getRelations, isOpen, params])
+  }, [compId, getRelations, isOpen, sbomId])
 
   return (
     <LynkDrawer

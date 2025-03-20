@@ -39,7 +39,6 @@ const RelationshipDrawer = (props) => {
   const { prodCompState } = useGlobalState()
   const { headingTextColor } = useThemeColor(['headingTextColor'])
 
-  const sbomId = params.sbomid
   const productId = params.productid
   const { field, direction } = prodCompState
 
@@ -56,7 +55,7 @@ const RelationshipDrawer = (props) => {
 
   const compState = {
     projectId: productId,
-    sbomId: sbomId,
+    sbomId: activeRow?.sbomId,
     field: field,
     direction: direction
   }
@@ -65,7 +64,7 @@ const RelationshipDrawer = (props) => {
     GetComponentPath,
     {
       skip: isOpen ? false : true,
-      variables: { compId: comp?.id, sbomId: sbomId }
+      variables: { compId: comp?.id, sbomId: activeRow?.sbomId }
     }
   )
   const { pathToPrimary } = compRelation?.component || ''
@@ -101,7 +100,7 @@ const RelationshipDrawer = (props) => {
 
   const { data: compDependency } = useQuery(GetCompDependency, {
     skip: isOpen ? false : true,
-    variables: { compId: compId || activeRow?.id, sbomId: sbomId }
+    variables: { compId: compId || activeRow?.id, sbomId: activeRow?.sbomId }
   })
 
   const list = dependsOnList?.filter((item) => item?.toComp?.id === component)
