@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react'
+import { getSignedUrlParams } from 'utils'
 import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -8,6 +9,7 @@ import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 
 import { useRouteFlags } from 'hooks/useRouteFlags'
+import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { RiFundsBoxFill } from 'react-icons/ri'
 
@@ -19,10 +21,8 @@ const ComponentsSubHeader = ({
   handleClear,
   onSearchInputChange,
   MAP,
-  shouldShowDemoFeatures,
   onCreateComponent,
   restricted,
-  signedUrlParams,
   isArchived,
   compData,
   searchInput,
@@ -31,6 +31,9 @@ const ComponentsSubHeader = ({
   reset
 }) => {
   const { isCustomerView } = useRouteFlags()
+  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
+  const signedUrlParams = getSignedUrlParams()
+
   // Use useMemo to memoize the component's JSX
   return useMemo(() => {
     return (

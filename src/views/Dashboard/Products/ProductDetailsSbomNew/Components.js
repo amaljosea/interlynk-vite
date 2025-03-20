@@ -3,13 +3,12 @@ import { debounce } from 'lodash'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
-import { getSignedUrlParams } from 'utils'
 import { getUndefinedIfEmptyOrAll } from 'utils'
 import { customStyles } from 'utils/styleUtils'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
 
 import { Flex, Text } from '@chakra-ui/react'
-import { useColorMode, useDisclosure } from '@chakra-ui/react'
+import { useDisclosure } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
@@ -23,11 +22,9 @@ import ComponentAddModal from 'components/Modal/ComponentAddModal'
 import Pagination from 'components/Pagination'
 import TreeView from 'components/TreeView'
 
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
-import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { deleteComSupplier } from 'graphQL/Mutation'
@@ -46,10 +43,6 @@ const Components = ({ sbomData }) => {
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
-  const { colorMode } = useColorMode()
-  const signedUrlParams = getSignedUrlParams()
-  const { isFreeTier } = useGlobalQueryContext()
-  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
   const isArchived = sbomData?.lifecycle === 'archived'
 
@@ -232,13 +225,9 @@ const Components = ({ sbomData }) => {
 
   // COLUMNS
   const columns = ComponentsColumns({
-    colorMode,
-    isFreeTier,
     onCheckCpe,
-    sbomId,
     onCheckPurl,
     onEditOpen,
-    updateComponent,
     onRelOpen,
     handleGraphView,
     totalComp,
@@ -317,10 +306,8 @@ const Components = ({ sbomData }) => {
     handleClear,
     onSearchInputChange,
     MAP,
-    shouldShowDemoFeatures,
     onCreateComponent,
     restricted,
-    signedUrlParams,
     isArchived,
     compData,
     searchInput,
