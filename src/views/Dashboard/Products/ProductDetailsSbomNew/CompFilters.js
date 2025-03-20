@@ -18,7 +18,9 @@ import LynkMenuList from 'components/Misc/LynkMenuList'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 import MenuHeading from 'components/Misc/MenuHeading'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 
 const GetEcosystems = gql`
   query GetEcosystems($productId: Uuid!, $sbomId: Uuid!) {
@@ -68,6 +70,9 @@ const CompFilters = ({ reset }) => {
   const [getEcosystems, { loading: ecoLoading }] = useLazyQuery(GetEcosystems)
   const [getKinds, { loading: kindLoading }] = useLazyQuery(GetKinds)
   const [getLicenses, { loading: licLoading }] = useLazyQuery(GetLicenses)
+
+  const { isFreeTier } = useGlobalQueryContext()
+  const { isCustomerView } = useRouteFlags()
 
   const variables = {
     productId,
@@ -198,47 +203,49 @@ const CompFilters = ({ reset }) => {
         />
       </Menu>
       {/* SUPPORT LEVEL */}
-      <Menu closeOnSelect={false} isLazy>
-        <MenuHeading
-          title={'Support'}
-          active={supportLevel?.length !== 0 && !supportLevel.includes('all')}
-        />
-        <MenuList
-          minH='auto'
-          maxH={'350px'}
-          minW={'300px'}
-          fontSize={'sm'}
-          overflowY={'scroll'}
-        >
-          <MenuOptionGroup
-            type={'checkbox'}
-            value={supportLevel}
-            onChange={onFilterSupport}
+      {!isFreeTier && !isCustomerView && (
+        <Menu closeOnSelect={false} isLazy>
+          <MenuHeading
+            title={'Support'}
+            active={supportLevel?.length !== 0 && !supportLevel.includes('all')}
+          />
+          <MenuList
+            minH='auto'
+            maxH={'350px'}
+            minW={'300px'}
+            fontSize={'sm'}
+            overflowY={'scroll'}
           >
-            {supportLevels?.map((item) => (
-              <MenuItemOption
-                key={item?.id}
-                fontSize={'sm'}
-                value={item?.value}
-              >
-                {item?.label}
-              </MenuItemOption>
-            ))}
-          </MenuOptionGroup>
-          <MenuDivider hidden />
-          <Flex hidden flexDirection={'column'} alignItems={'flex-start'}>
-            <Stack pl={8}>
-              <Text>Start Date</Text>
-              <LynkDate />
-              <Text>End Date</Text>
-              <LynkDate />
-            </Stack>
-            <Button ml={8} my={3} size='sm'>
-              Submit
-            </Button>
-          </Flex>
-        </MenuList>
-      </Menu>
+            <MenuOptionGroup
+              type={'checkbox'}
+              value={supportLevel}
+              onChange={onFilterSupport}
+            >
+              {supportLevels?.map((item) => (
+                <MenuItemOption
+                  key={item?.id}
+                  fontSize={'sm'}
+                  value={item?.value}
+                >
+                  {item?.label}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+            <MenuDivider hidden />
+            <Flex hidden flexDirection={'column'} alignItems={'flex-start'}>
+              <Stack pl={8}>
+                <Text>Start Date</Text>
+                <LynkDate />
+                <Text>End Date</Text>
+                <LynkDate />
+              </Stack>
+              <Button ml={8} my={3} size='sm'>
+                Submit
+              </Button>
+            </Flex>
+          </MenuList>
+        </Menu>
+      )}
       {/* TYPE */}
       <Menu closeOnSelect={false}>
         <MenuHeading
