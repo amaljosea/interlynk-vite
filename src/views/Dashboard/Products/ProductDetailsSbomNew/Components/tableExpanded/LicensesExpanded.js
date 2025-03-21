@@ -2,8 +2,6 @@ import { useMemo } from 'react'
 
 import { Box, Flex, Tag } from '@chakra-ui/react'
 
-import RowComponent from 'components/RowComponent'
-
 const ExpandedRow = ({ data: { components } }) => {
   const sortedComponents = useMemo(() => {
     let sorted = [...components]
@@ -20,9 +18,7 @@ const ExpandedRow = ({ data: { components } }) => {
       >
         <Flex direction='row' py={5} alignItems={'center'} wrap='wrap' gap={2}>
           {sortedComponents?.map((component, index) => (
-            <Tag key={index}>
-              <RowComponent content={component} />
-            </Tag>
+            <Tag key={index}>{component?.name}</Tag>
           ))}
         </Flex>
       </Box>
