@@ -1,6 +1,6 @@
 import { truncatedValue } from 'utils'
 
-import { Tag, TagLabel, Text, useDisclosure } from '@chakra-ui/react'
+import { Tag, Text, useDisclosure } from '@chakra-ui/react'
 
 import useQueryParam from 'hooks/useQueryParam'
 import { useRouteFlags } from 'hooks/useRouteFlags'

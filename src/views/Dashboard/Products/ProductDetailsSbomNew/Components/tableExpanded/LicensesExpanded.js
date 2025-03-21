@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 
-import { Box, Flex, Tag } from '@chakra-ui/react'
+import { Box, Flex } from '@chakra-ui/react'
 
 import RowComponent from 'components/RowComponent'
 
