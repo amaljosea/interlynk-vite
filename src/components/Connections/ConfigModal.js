@@ -2,12 +2,13 @@ import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { validateEmail } from 'utils/formValidationUtils'
 
-import { Box, Button, HStack, Input, Select, Stack } from '@chakra-ui/react'
+import { Box, Button, HStack, Input, Stack } from '@chakra-ui/react'
 import { Icon, IconButton } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
+import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -297,6 +298,13 @@ const ConfigModal = ({
     setConfigs(newConfigs)
   }
 
+  const selectStyles = {
+    container: (baseStyles) => ({
+      ...baseStyles,
+      minWidth: '140px'
+    })
+  }
+
   return (
     <LynkModal
       Icon={IoSettingsOutline}
@@ -317,7 +325,6 @@ const ConfigModal = ({
               <FormControl isInvalid={error}>
                 <Box position='relative'>
                   <Input
-                    w='270px'
                     value={address}
                     isDisabled={!updateCon}
                     placeholder={addressPlaceholder}
@@ -333,30 +340,26 @@ const ConfigModal = ({
                   <FormErrorMessage>{config?.error}</FormErrorMessage>
                 </Box>
               </FormControl>
-
-              <Select
+              <LynkSelect
                 isDisabled={!updateCon}
-                value={notificationType}
-                onChange={(e) =>
-                  handleChange(index, 'notificationType', e.target.value)
+                value={options.find((opt) => opt.value === notificationType)}
+                onChange={(item) =>
+                  handleChange(index, 'notificationType', item.value)
                 }
-              >
-                {options.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </Select>
-
-              <Select
-                value={frequency}
+                options={options}
+                dropDown
+                styles={selectStyles}
+              />
+              <LynkSelect
                 isDisabled={!updateCon}
-                onChange={(e) =>
-                  handleChange(index, 'frequency', e.target.value)
+                value={{ value: frequency, label: frequency }}
+                onChange={(item) =>
+                  handleChange(index, 'frequency', item.value)
                 }
-              >
-                <option value='Instant'>Instant</option>
-              </Select>
+                options={[{ value: 'Instant', label: 'Instant' }]}
+                dropDown
+                styles={selectStyles}
+              />
 
               {updateCon && configs?.length > 1 && (
                 <IconButton
