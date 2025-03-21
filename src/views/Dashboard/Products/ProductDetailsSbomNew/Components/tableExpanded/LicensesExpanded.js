@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 
-import { Box, Flex, Tag } from '@chakra-ui/react'
+import { Box, Flex } from '@chakra-ui/react'
 
 import RowComponent from 'components/RowComponent'
 
@@ -20,9 +20,7 @@ const ExpandedRow = ({ data: { components } }) => {
       >
         <Flex direction='row' py={5} alignItems={'center'} wrap='wrap' gap={2}>
           {sortedComponents?.map((component, index) => (
-            <Tag key={index}>
-              <RowComponent content={component} />
-            </Tag>
+            <RowComponent key={index} content={component} />
           ))}
         </Flex>
       </Box>

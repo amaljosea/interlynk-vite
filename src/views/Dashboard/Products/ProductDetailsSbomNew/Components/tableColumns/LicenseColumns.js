@@ -39,20 +39,15 @@ const LicenseColumns = () => {
 
           return (
             <Flex
-              direction='row'
-              py={5}
-              alignItems={'center'}
-              wrap='wrap'
+              my={4}
               gap={2}
+              wrap='wrap'
+              alignItems={'center'}
               onClick={(e) => {
                 e.currentTarget.parentElement.click()
               }}
             >
-              <Tag variant='subtle'>
-                <TagLabel my={1} style={{ whiteSpace: 'normal' }}>
-                  {sortedComponents[0]?.name}
-                </TagLabel>
-              </Tag>
+              <Tag py={2} w={'fit-content'}>{sortedComponents[0]?.name}</Tag>
               <Text color={primaryTextColor}>
                 {sortedComponents.length > 1
                   ? `+${sortedComponents.length - 1} more`
