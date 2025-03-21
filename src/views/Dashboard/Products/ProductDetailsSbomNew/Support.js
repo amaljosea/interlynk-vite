@@ -123,12 +123,6 @@ const Support = () => {
     STATUS.onOpen()
   }
 
-  const clearSelection = () => {
-    setSelectedItems([])
-    setToggleClear(true)
-    STATUS.onClose()
-  }
-
   // SUB HEADER
   const subHeader = SupportSubHeader({
     reset,
@@ -198,12 +192,13 @@ const Support = () => {
         />
       )}
 
-      {STATUS.isOpen && (
+      {STATUS.isOpen && selectedItems?.length > 0 && (
         <SupportStatus
           isOpen={STATUS.isOpen}
           onClose={STATUS.onClose}
-          handleClear={clearSelection}
           selectedItems={selectedItems}
+          setToggleClear={setToggleClear}
+          setSelectedItems={setSelectedItems}
         />
       )}
     </>
