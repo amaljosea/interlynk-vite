@@ -20,7 +20,6 @@ import Pagination from 'components/Pagination'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -28,7 +27,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { ManualVulnScan } from 'graphQL/Mutation'
 import {
   FirstDegreePartVulns,
-  GetOrgConnections,
   GetVulnData,
   GetVulnFilterData,
   ShareVulnFilters
@@ -55,10 +53,6 @@ const Vulnerabilities = ({ sbomData }) => {
 
   const isArchived = sbomData?.lifecycle === 'archived'
 
-  const { data: configs } = useQuery(GetOrgConnections, {
-    fetchPolicy: 'network-only'
-  })
-
   const { data: projectSettings, loading: projectSettingsLoad } = useQuery(
     GetProjectSettings,
     {
@@ -68,10 +62,6 @@ const Vulnerabilities = ({ sbomData }) => {
 
   const isVulnScanEnabled =
     projectSettings?.project?.projectSetting?.vulnScanningEnabled
-
-  const jiraConnection = configs?.organization?.connections?.nodes?.find(
-    (item) => item?.connection?.__typename === 'JiraConnection'
-  )
 
   const { showToast } = useCustomToast()
   const sbomId = params.sbomid
@@ -184,11 +174,6 @@ const Vulnerabilities = ({ sbomData }) => {
 
   const [onVulnScan] = useMutation(ManualVulnScan)
 
-  const editVulns = useHasPermission({
-    parentKey: 'view_sbom',
-    childKey: 'edit_vulnerabilities'
-  })
-
   const handleChange = (state) => {
     setSelectedVulns(state?.selectedRows)
     setSelectedGroup(
@@ -274,7 +259,6 @@ const Vulnerabilities = ({ sbomData }) => {
   const onCreateCustomVuln = () => CUSTOM_VULNS.onOpen()
 
   const subHeader = VulnerabilitySubHeader({
-    editVulns,
     handleClear,
     handleScan,
     handleSearch,
@@ -285,7 +269,6 @@ const Vulnerabilities = ({ sbomData }) => {
     prodVulnDispatch,
     reset,
     selectedVulns,
-    signedUrlParams,
     vulnSearch,
     onCreateCustomVuln,
     projectSettingsLoad
@@ -306,10 +289,8 @@ const Vulnerabilities = ({ sbomData }) => {
 
   // COLUMNS
   const columns = VulnerabilityColumns(
-    editVulns,
     isArchived,
     setActiveRow,
-    jiraConnection,
     LINK,
     JIRA,
     VULN,
