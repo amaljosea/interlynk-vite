@@ -1,6 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { isSbomArchived } from 'utils'
 import { complianceList } from 'variables/general'
 import ComplianceChecks from 'views/Sbom/components/ComplianceChecks'
 
@@ -35,7 +36,7 @@ const Compliance = ({ sbomData }) => {
     'headingTextColor'
   ])
 
-  const isArchived = sbomData?.lifecycle === 'archived'
+  const isArchived = isSbomArchived(sbomData)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
