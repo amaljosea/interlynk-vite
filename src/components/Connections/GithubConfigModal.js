@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react'
 import { capitalizeFirstLetter } from 'utils'
 
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import {
   Box,
   FormControl,
   FormLabel,
-  IconButton,
   Input,
   InputGroup,
   InputRightElement,
@@ -14,6 +12,7 @@ import {
 } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
+import ToggleVisibilityButton from 'components/Misc/ToggleVisibilityButton'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -137,15 +136,10 @@ const GithubConfigModal = ({ isOpen, onClose, setGreenCheck, data }) => {
             }}
           />
           <InputRightElement width='4.5rem'>
-            <IconButton
-              size='sm'
-              h='1.75rem'
+            <ToggleVisibilityButton
+              showPassword={showApiToken}
               onClick={handleToggleVisibility}
-              position='absolute'
-              right='2'
-            >
-              {showApiToken ? <ViewOffIcon /> : <ViewIcon />}
-            </IconButton>
+            />
           </InputRightElement>
         </InputGroup>
       </FormControl>

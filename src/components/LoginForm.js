@@ -4,8 +4,7 @@ import Cookies from 'js-cookie'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { Button, Flex, IconButton, Stack, Text } from '@chakra-ui/react'
+import { Button, Flex, Stack, Text } from '@chakra-ui/react'
 import { Alert, AlertDescription, AlertIcon } from '@chakra-ui/react'
 import { FormControl, FormHelperText, FormLabel } from '@chakra-ui/react'
 import { Input, InputGroup, InputRightElement } from '@chakra-ui/react'
@@ -17,6 +16,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { UserResendConfirmationEmail } from 'graphQL/Mutation'
 
 import DividerWithText from './DividerWithText'
+import ToggleVisibilityButton from './Misc/ToggleVisibilityButton'
 import PolicyTerms from './PolicyTerms'
 import SocialLogin from './SocialLogin'
 
@@ -164,12 +164,10 @@ const LoginForm = () => {
                 type={showPassword ? 'text' : 'password'}
               />
               <InputRightElement width='3.1rem'>
-                <IconButton
-                  h='1.75rem'
-                  size='sm'
+                <ToggleVisibilityButton
                   bg={'transparent'}
+                  showPassword={showPassword}
                   onClick={handleTogglePassword}
-                  icon={showPassword ? <ViewIcon /> : <ViewOffIcon />}
                 />
               </InputRightElement>
             </InputGroup>

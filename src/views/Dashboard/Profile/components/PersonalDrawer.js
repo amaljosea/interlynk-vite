@@ -4,12 +4,13 @@ import Cookies from 'js-cookie'
 import { useEffect, useState } from 'react'
 import { nameValidation, validPassword } from 'utils/formValidationUtils'
 
-import { EditIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
+import { EditIcon } from '@chakra-ui/icons'
 import { Avatar, Box, Flex, IconButton, Text, Tooltip } from '@chakra-ui/react'
 import { Input, InputGroup, InputRightElement } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import LynkDrawer from 'components/LynkDrawer'
+import ToggleVisibilityButton from 'components/Misc/ToggleVisibilityButton'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -309,11 +310,10 @@ const PersonalDrawer = ({ isOpen, onClose, inputRef }) => {
                   placeholder='*******'
                 />
                 <InputRightElement width='3.1rem'>
-                  <IconButton
-                    size='sm'
+                  <ToggleVisibilityButton
+                    bg={'transparent'}
+                    showPassword={showOldPass}
                     onClick={onToggleOldPass}
-                    sx={{ h: '1.75rem', bg: 'transparent' }}
-                    icon={showOldPass ? <ViewOffIcon /> : <ViewIcon />}
                   />
                 </InputRightElement>
               </InputGroup>
@@ -337,11 +337,10 @@ const PersonalDrawer = ({ isOpen, onClose, inputRef }) => {
                   onBlur={handleCheckPassword}
                 />
                 <InputRightElement width='3.1rem'>
-                  <IconButton
-                    size='sm'
+                  <ToggleVisibilityButton
+                    bg={'transparent'}
+                    showPassword={showNewPass}
                     onClick={onToggleNewPass}
-                    sx={{ h: '1.75rem', bg: 'transparent' }}
-                    icon={showNewPass ? <ViewOffIcon /> : <ViewIcon />}
                   />
                 </InputRightElement>
               </InputGroup>
@@ -380,11 +379,10 @@ const PersonalDrawer = ({ isOpen, onClose, inputRef }) => {
                   placeholder='*******'
                 />
                 <InputRightElement width='3.1rem'>
-                  <IconButton
-                    size='sm'
+                  <ToggleVisibilityButton
+                    bg={'transparent'}
+                    showPassword={showConfPass}
                     onClick={onToggleConfirmPass}
-                    sx={{ h: '1.75rem', bg: 'transparent' }}
-                    icon={showConfPass ? <ViewOffIcon /> : <ViewIcon />}
                   />
                 </InputRightElement>
               </InputGroup>
