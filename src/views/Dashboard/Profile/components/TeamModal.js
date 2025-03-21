@@ -1,12 +1,14 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
+import { formatString } from 'utils'
 import { validateEmail } from 'utils/formValidationUtils'
 
-import { Input, Select, Stack } from '@chakra-ui/react'
+import { Input, Stack } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
+import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
 
@@ -54,6 +56,14 @@ const TeamModal = ({ isOpen, onClose, data, changeRole }) => {
     }
   }
 
+  const roleOptions = [
+    { value: '', label: '-- Select --' },
+    ...(roles?.organization?.organizationRoles?.map((item) => ({
+      value: item.id,
+      label: formatString(item.name)
+    })) || [])
+  ]
+
   return (
     <LynkModal
       isOpen={isOpen}
@@ -87,18 +97,12 @@ const TeamModal = ({ isOpen, onClose, data, changeRole }) => {
         {roles && (
           <FormControl isDisabled={!changeRole}>
             <FormLabel>Role</FormLabel>
-            <Select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              textTransform='capitalize'
-            >
-              <option value=''>-- Select --</option>
-              {roles?.organization?.organizationRoles.map((item, index) => (
-                <option key={index} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
-            </Select>
+            <LynkSelect
+              value={roleOptions.find((option) => option.value === role)}
+              onChange={(e) => setRole(e.value)}
+              options={roleOptions}
+              dropDown
+            />
           </FormControl>
         )}
       </Stack>
