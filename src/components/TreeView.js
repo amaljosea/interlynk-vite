@@ -1,6 +1,7 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { useCallback, useEffect, useState } from 'react'
 import Tree from 'react-d3-tree'
+import { useParams } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -155,9 +156,11 @@ const buildTree = (path, leafNode) => {
 
 const TreeView = ({ isOpen, onClose, component, isPrimary }) => {
   const { dispatch } = useGlobalState()
+  const params = useParams()
   const { prodCompDispatch } = dispatch
 
-  const { id: compId, sbomId } = component || ''
+  const { id: compId } = component || ''
+  const sbomId = component?.sbomId || params?.sbomid
 
   const { grayBorderColor, primaryBlueText } = useThemeColor([
     'grayBorderColor',
