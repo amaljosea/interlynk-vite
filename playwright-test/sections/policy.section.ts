@@ -26,17 +26,21 @@ export default class PolicySection {
         .getByPlaceholder('Enter name')
         .fill(`${uniqueId} - Component version cehck`)
       await this.page.getByPlaceholder('Enter description').fill('for testing')
-      await this.page.getByTestId(`policy_result_type`).selectOption('WARN')
+      await this.page.locator('#policy_result_type').click()
+      await this.page.keyboard.type('WARN')
+      await this.page.keyboard.press('Enter')
       await this.page.waitForTimeout(1000)
-      await this.page.getByTestId(`policy_result_condition`).selectOption('ANY')
+      await this.page.locator('#policy_result_condition').click()
+      await this.page.keyboard.type('ANY')
+      await this.page.keyboard.press('Enter')
       await this.page.waitForTimeout(1000)
-      await this.page
-        .getByTestId(`condition_subject_0`)
-        .selectOption('COMPONENT_VERSION')
+      await this.page.locator('#condition_subject_0').click()
+      await this.page.keyboard.type('COMPONENT_VERSION')
+      await this.page.keyboard.press('Enter')
       await this.page.waitForTimeout(1000)
-      await this.page
-        .getByTestId(`condition_operator_0`)
-        .selectOption('NOT_EXISTS')
+      await this.page.locator('#condition_operator_0').click()
+      await this.page.keyboard.type('NOT_EXISTS')
+      await this.page.keyboard.press('Enter')
       await this.page.waitForTimeout(1000)
 
       await this.page.locator("button[type='submit']").click()
@@ -74,13 +78,14 @@ export default class PolicySection {
         await this.page.getByTestId(`add_policy_condition`).click()
         await this.page.waitForTimeout(1000)
 
-        await this.page
-          .getByTestId(`condition_subject_1`)
-          .selectOption('COMPONENT_TYPE')
+        await this.page.locator('#condition_subject_1').click()
+        await this.page.keyboard.type('COMPONENT_TYPE')
+        await this.page.keyboard.press('Enter')
         await this.page.waitForTimeout(1000)
-        await this.page
-          .getByTestId(`condition_operator_1`)
-          .selectOption('NOT_EXISTS')
+
+        await this.page.locator('#condition_operator_1').click()
+        await this.page.keyboard.type('NOT_EXISTS')
+        await this.page.keyboard.press('Enter')
         await this.page.waitForTimeout(1000)
 
         await this.page.locator("button[type='submit']").click()

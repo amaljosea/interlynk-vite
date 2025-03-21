@@ -28,13 +28,12 @@ const Operator = ({ index, data, onChange }) => {
   return (
     <FormControl isInvalid={opError}>
       <LynkSelect
-        id='operator'
         name='operator'
         value={selectedOption}
         placeholder='-- operator --'
         options={operatorOptions}
         onChange={(option) => onChange(option?.value || '', id, 'operator')}
-        data-testid={`condition_operator_${index}`}
+        id={`condition_operator_${index}`}
         dropDown
         styles={selectStyles}
       />

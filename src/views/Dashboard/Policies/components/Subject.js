@@ -77,7 +77,7 @@ const Subject = ({ index, data, onChange }) => {
         placeholder={loading ? 'Loading...' : '-- Select --'}
         dropDown
         components={{ SingleValue }}
-        data-testid={`condition_subject_${index}`}
+        id={`condition_subject_${index}`}
         styles={selectStyles}
       />
 
