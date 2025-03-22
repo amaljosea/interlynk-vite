@@ -123,7 +123,7 @@ const WeightControl = () => {
     !validScore(communityWeight) ||
     !validScore(securityWeight) ||
     !threshold ||
-    threshold > 365 ||
+    threshold > 3650 ||
     isInvalidArray(communityScore)
 
   useEffect(() => {
@@ -244,7 +244,7 @@ const WeightControl = () => {
               <FormControl
                 w={'400px'}
                 isRequired
-                isInvalid={!threshold || threshold > 365}
+                isInvalid={!threshold || threshold > 3650}
               >
                 <FormLabel>
                   Consider Repository Abandoned After Inactive {`(in days)`}
@@ -255,7 +255,7 @@ const WeightControl = () => {
                   onChange={(e) => setThreshold(e.target.value)}
                 />
                 <FormErrorMessage>
-                  Value must be between 1 and 365
+                  Value must be between 1 and 3650
                 </FormErrorMessage>
               </FormControl>
               <FormControl w={'400px'}>
