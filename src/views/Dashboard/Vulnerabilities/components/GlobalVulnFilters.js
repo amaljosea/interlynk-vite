@@ -154,10 +154,13 @@ const GlobalVulnsFilters = ({ reset }) => {
   return (
     <Stack direction={'row'} alignItems={'center'} spacing={2}>
       {/* LABELS */}
-      <GlobalLabelFilter
-        value={projectGroupLabelIds}
-        setValue={onFilterLabel}
-      />
+      {!params?.productgroupid && (
+        <GlobalLabelFilter
+          value={projectGroupLabelIds}
+          setValue={onFilterLabel}
+        />
+      )}
+
       {/* PRODUCTS */}
       {!params?.productgroupid && (
         <Menu closeOnSelect={false}>
