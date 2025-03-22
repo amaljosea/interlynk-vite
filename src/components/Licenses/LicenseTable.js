@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { truncatedValue } from 'utils'
-import { parseLicenseString } from 'utils'
+import { parseLicenseString, truncatedValue } from 'utils'
 import { customStyles } from 'utils/styleUtils'
 
 import {
@@ -26,7 +25,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { FaScaleBalanced } from 'react-icons/fa6'
 
 import Pagination from '../Pagination'
-import LicenseDrawer from './LicenseDrawer'
+import LicenseModal from './LicenseModal'
 import { SubHeaderComponent } from './SubHeaderComponent'
 
 const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
@@ -280,7 +279,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
       {/* PAGINATION */}
       <Pagination {...paginationProps} />
       {isOpen && (
-        <LicenseDrawer
+        <LicenseModal
           isOpen={isOpen}
           data={activeRow}
           onClose={onClose}
