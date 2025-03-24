@@ -1,12 +1,18 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { useState } from 'react'
-import { truncatedValue } from 'utils'
+import AsyncSelect from 'react-select/async'
+import { formatString, truncatedValue } from 'utils'
 
-import { Flex, FormControl, FormLabel, Select } from '@chakra-ui/react'
+import { Flex, FormControl, FormLabel } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
+import LynkSelect from 'components/LynkSelect'
+import CustomDropdownIndicator from 'components/Misc/CustomDropdownIndicator'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useGlobalState } from 'hooks/useGlobalState'
+import { useLazyDropDown } from 'hooks/useLazyDropDown'
+import { useSelect } from 'hooks/useSelect'
 
 import { RequestAccept } from 'graphQL/Mutation'
 import { GetProductNamesForRequest } from 'graphQL/Queries'
@@ -15,14 +21,30 @@ import { FaCheckToSlot } from 'react-icons/fa6'
 
 const RequestAcceptModal = ({ data, isOpen, onClose }) => {
   const { showToast } = useCustomToast()
-
+  const { style } = useSelect('lynkSelect')
   const [acceptRequest, { loading }] = useMutation(RequestAccept)
-
-  const { data: productNames } = useQuery(GetProductNamesForRequest)
+  const { prodState } = useGlobalState()
+  const { field, direction } = prodState
 
   const [projectId, setProjectId] = useState('')
   const [productName, setProductName] = useState('')
   const [projectIds, setProjectIds] = useState([])
+
+  const { lazyDropDownProps } = useLazyDropDown(GetProductNamesForRequest, {
+    selector: 'organization.projectGroups',
+    variables: {
+      field: field,
+      direction: direction,
+      first: 5
+    },
+    selectorForActualCount: 'organization.projectGroups',
+    styles: style,
+    components: {
+      IndicatorSeparator: () => null,
+      DropdownIndicator: CustomDropdownIndicator
+    },
+    optionLabel: 'name'
+  })
 
   const handleAccept = async () => {
     await acceptRequest({
@@ -46,13 +68,10 @@ const RequestAcceptModal = ({ data, isOpen, onClose }) => {
     })
   }
 
-  const handleProductChange = (e) => {
-    const projectGroupId = e.target.value
-    setProductName(e.target.options[e.target.selectedIndex].text)
+  const handleProductChange1 = (value) => {
+    setProductName(value?.name)
 
-    const projectGroup = productNames?.organization?.projectGroups?.nodes?.find(
-      (group) => group.id === projectGroupId
-    )
+    const projectGroup = value
 
     if (projectGroup) {
       setProjectIds(
@@ -66,6 +85,16 @@ const RequestAcceptModal = ({ data, isOpen, onClose }) => {
     }
   }
 
+  const envOptions = [
+    { value: '', label: '-- Select Environment --' },
+    ...(Array.isArray(projectIds) ? projectIds : [])
+      .sort((a, b) => a?.name?.localeCompare(b?.name))
+      .map((item) => ({
+        value: item.id,
+        label: truncatedValue(formatString(item.name), 24)
+      }))
+  ]
+
   return (
     <LynkModal
       isOpen={isOpen}
@@ -75,39 +104,29 @@ const RequestAcceptModal = ({ data, isOpen, onClose }) => {
       isLoading={loading}
       onSubmit={handleAccept}
       Icon={FaCheckToSlot}
+      disabled={projectId === ''}
     >
       <Flex width={'100%'} direction={'column'} gap={4}>
         <FormControl isRequired>
           <FormLabel>Product</FormLabel>
-          <Select onChange={handleProductChange}>
-            <option value=''>-- Select --</option>
-            {productNames?.organization?.projectGroups?.nodes?.map(
-              (item, index) => (
-                <option key={index} value={item.id}>
-                  {truncatedValue(item.name, 24)}
-                </option>
-              )
-            )}
-          </Select>
+          <AsyncSelect
+            {...{
+              ...lazyDropDownProps,
+              onChange: handleProductChange1,
+              value: null,
+
+              placeholder: productName || '--Select--'
+            }}
+          />
         </FormControl>
         <FormControl isRequired>
           <FormLabel>Environment</FormLabel>
-          <Select
-            onChange={(e) => {
-              setProjectId(e.target.value)
-            }}
-            value={projectId}
-            textTransform={'capitalize'}
-          >
-            <option value=''>Select Environment</option>
-            {projectIds
-              ?.sort((a, b) => a?.name?.localeCompare(b?.name))
-              ?.map((item, index) => (
-                <option key={index} value={item.id}>
-                  {truncatedValue(item.name, 24)}
-                </option>
-              ))}
-          </Select>
+          <LynkSelect
+            options={envOptions}
+            onChange={(selected) => setProjectId(selected?.value || '')}
+            placeholder='-- Select Environment --'
+            dropDown
+          />
         </FormControl>
       </Flex>
     </LynkModal>
