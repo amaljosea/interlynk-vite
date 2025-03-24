@@ -40,7 +40,7 @@ const ConnectionCard = ({
             <img
               src={iconSrc}
               alt={`${name} icon`}
-              width='40px'
+              width={'40px'}
               height='40px'
             />
           ) : (
