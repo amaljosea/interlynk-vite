@@ -192,7 +192,7 @@ function ComponentAddModal(props) {
         } else {
           prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
           showToast({
-            description: `Data added successfully`,
+            description: `Component added successfully`,
             status: 'success'
           })
           if (relationships && component) {
@@ -249,25 +249,29 @@ function ComponentAddModal(props) {
     }
   }
 
+  const handleSubmit = () => {
+    if (showPurl) {
+      handlePurlExpand()
+    } else if (showCpe) {
+      handleCpeExpand()
+    } else {
+      handleCreateCom()
+    }
+  }
+
   return (
     <>
       <LynkModal
-        isOpen={isOpen}
-        onClose={onModalClose}
-        onSubmit={
-          showPurl
-            ? handlePurlExpand
-            : showCpe
-              ? handleCpeExpand
-              : handleCreateCom
-        }
-        isLoading={loading}
-        disabled={showPurl || showCpe ? false : isInvalid}
-        hidden={signedUrlParams}
-        title='Add Component'
         Icon={BiLayer}
-        buttonText={showPurl || showCpe ? 'Back' : 'Save'}
+        isOpen={isOpen}
+        isLoading={loading}
+        title='Add Component'
+        onClose={onModalClose}
+        onSubmit={handleSubmit}
+        hidden={signedUrlParams}
         noFooter={showPurl || showCpe}
+        buttonText={showPurl || showCpe ? 'Back' : 'Save'}
+        disabled={showPurl || showCpe ? false : isInvalid}
       >
         <Stack direction={'column'} spacing={4} pb={4}>
           {/* Name */}
