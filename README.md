@@ -99,7 +99,7 @@ Playwright is used for end-to-end (E2E) testing of the Interlynk Dashboard to en
 2. **Environment Variables:** Ensure you have the correct environment variables configured in your .env
 
 ```cmd
-PLAYWRIGHT_TEST_URL=https://staging.interlynk.io/auth
+PLAYWRIGHT_TEST_URL=https://staging.interlynk.io
 PLAYWRIGHT_USER_EMAIL=youremail@example.com
 PLAYWRIGHT_USER_PASSWORD=YourSecurePassword
 ```
