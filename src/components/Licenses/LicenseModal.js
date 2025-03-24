@@ -24,7 +24,26 @@ import { FaScaleBalanced } from 'react-icons/fa6'
 
 import { CreateLicense, UpdateLicense } from '../../graphQL/Mutation'
 
-const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
+const attributionOptions = [
+  { value: 'UNKNOWN', label: 'Unknown' },
+  { value: 'YES', label: 'Yes' },
+  { value: 'NO', label: 'No' }
+]
+
+const copyLeftOptions = [
+  { value: 'UNKNOWN', label: 'Unknown' },
+  { value: 'PERMISSIVE', label: 'Permissive' },
+  { value: 'COPYLEFT', label: 'Copyleft' },
+  { value: 'WEAK', label: 'Weak' }
+]
+
+const statusOptions = [
+  { value: 'APPROVED', label: 'Approved' },
+  { value: 'REJECTED', label: 'Rejected' },
+  { value: 'UNSPECIFIED', label: 'Unspecified' }
+]
+
+const LicenseModal = ({ isOpen, onClose, data, updateLic }) => {
   const { showToast } = useCustomToast()
 
   const [name, setName] = useState('')
@@ -49,7 +68,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
   const [createLicense, { loading: createLoading }] = useMutation(CreateLicense)
   const [updateLicense, { loading: updateLoading }] = useMutation(UpdateLicense)
 
-  const [drawerSize, setDrawerSize] = useState('md')
+  const [isExpanded, setIsExpanded] = useState(false)
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   const handleCreateLicense = async () => {
@@ -126,32 +145,9 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
     }
   }, [data])
 
-  const handleExpand = () => {
-    if (drawerSize === 'md') {
-      setDrawerSize('full')
-    } else {
-      setDrawerSize('md')
-    }
+  const toggleExpand = () => {
+    setIsExpanded((prev) => !prev)
   }
-
-  const attributionOptions = [
-    { value: 'UNKNOWN', label: 'Unknown' },
-    { value: 'YES', label: 'Yes' },
-    { value: 'NO', label: 'No' }
-  ]
-
-  const copyLeftOptions = [
-    { value: 'UNKNOWN', label: 'Unknown' },
-    { value: 'PERMISSIVE', label: 'Permissive' },
-    { value: 'COPYLEFT', label: 'Copyleft' },
-    { value: 'WEAK', label: 'Weak' }
-  ]
-
-  const statusOptions = [
-    { value: 'APPROVED', label: 'Approved' },
-    { value: 'REJECTED', label: 'Rejected' },
-    { value: 'UNSPECIFIED', label: 'Unspecified' }
-  ]
   const handleSubmit = () =>
     data ? handleUpdateLicense() : handleCreateLicense()
 
@@ -162,13 +158,13 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
       hidden={!updateLic}
       Icon={FaScaleBalanced}
       isLoading={createLoading || updateLoading}
-      disabled={drawerSize === 'md' ? name === '' : false}
-      onSubmit={drawerSize === 'md' ? handleSubmit : handleExpand}
+      disabled={!isExpanded ? name === '' : false}
+      onSubmit={!isExpanded ? handleSubmit : toggleExpand}
       title={`${!updateLic ? 'View' : data ? 'Edit' : 'Add'} License`}
-      buttonText={drawerSize === 'md' ? (data ? 'Update' : 'Save') : 'Back'}
+      buttonText={!isExpanded ? (data ? 'Update' : 'Save') : 'Back'}
     >
       <Stack direction={'column'} spacing={4} alignItems={'flex-start'}>
-        <FormControl isRequired isDisabled={!updateLic}>
+        <FormControl isRequired={!isExpanded} isDisabled={!updateLic}>
           <FormLabel htmlFor='name'>Name</FormLabel>
           <Input
             name='name'
@@ -191,13 +187,13 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
               _hover={{ textDecoration: 'underline' }}
               fontWeight={'medium'}
               fontSize={'11px'}
-              onClick={handleExpand}
+              onClick={toggleExpand}
             >
-              {drawerSize === 'md' ? '(Expand)' : '(Collapse)'}
+              {!isExpanded ? '(Expand)' : '(Collapse)'}
             </Link>
           </FormLabel>
           <Textarea
-            height={drawerSize === 'md' ? '80px' : '600px'}
+            height={!isExpanded ? '80px' : '600px'}
             name='text'
             id='text'
             value={text}
@@ -210,7 +206,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
             resize={'none'}
           />
         </FormControl>
-        {drawerSize === 'md' && (
+        {!isExpanded && (
           <>
             <FormControl isDisabled={!updateLic}>
               <FormLabel htmlFor='url'>URL</FormLabel>
@@ -407,4 +403,4 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
   )
 }
 
-export default LicenseDrawer
+export default LicenseModal
