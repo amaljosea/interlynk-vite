@@ -272,22 +272,25 @@ const GlobalVulnTable = (props) => {
   const data = vulns?.map((row, index) => ({ ...row, key: index }))
 
   return (
-    <Flex flexDir={'column'} width={'100%'}>
-      <DataTable
-        subHeader
-        responsive
-        data={data}
-        persistTableHead
-        columns={columns}
-        onSort={handleSort}
-        progressPending={loading}
-        progressComponent={<CustomLoader />}
-        subHeaderComponent={subHeaderComponent}
-        defaultSortFieldId={globalVulnState?.field}
-        customStyles={customStyles(headingTextColor)}
-        defaultSortAsc={globalVulnState?.direction === 'ASC' ? true : false}
-      />
-      <Pagination {...paginationProps} />
+    <>
+      <Flex flexDir={'column'} width={'100%'}>
+        <DataTable
+          subHeader
+          responsive
+          data={data}
+          persistTableHead
+          columns={columns}
+          onSort={handleSort}
+          progressPending={loading}
+          progressComponent={<CustomLoader />}
+          subHeaderComponent={subHeaderComponent}
+          defaultSortFieldId={globalVulnState?.field}
+          customStyles={customStyles(headingTextColor)}
+          defaultSortAsc={globalVulnState?.direction === 'ASC' ? true : false}
+        />
+        <Pagination {...paginationProps} />
+      </Flex>
+
       {isOpen && (
         <VulnProductsDrawer
           isOpen={isOpen}
@@ -295,7 +298,7 @@ const GlobalVulnTable = (props) => {
           data={activeRow}
         />
       )}
-    </Flex>
+    </>
   )
 }
 
