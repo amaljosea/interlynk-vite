@@ -126,15 +126,6 @@ export const timeSince = (inputDate) => {
   return formatTime(timeDifference)
 }
 
-export const getDateFormat = (date) => {
-  const currentDate = new Date(date)
-  const year = currentDate.getFullYear()
-  const month = String(currentDate.getMonth() + 1).padStart(2, '0')
-  const day = String(currentDate.getDate()).padStart(2, '0')
-  const formatted = `${year}-${month}-${day}`
-  return formatted
-}
-
 export const getActiveRoute = (routes) => {
   let activeRoute = 'Default Brand Text'
   for (let i = 0; i < routes.length; i++) {
@@ -185,13 +176,6 @@ export const disableButtonTemporarily = (setDisabled, delay = 3000) => {
   setTimeout(() => {
     setDisabled(false)
   }, delay)
-}
-
-export const convertDateFormat = (inputDate) => {
-  const date = new Date(inputDate)
-  const month = date.toLocaleString('default', { month: 'short' })
-  const day = date.getDate()
-  return `${month} ${day}`
 }
 
 export const getFullDate = (dateString, timeZone = userTimezone) => {
@@ -597,9 +581,6 @@ export const valueToText = (action, event, orig, updated) => {
     return `${updated?.substring(0, 100)}...`
   }
 }
-
-//Validate name for registration and profile edit
-export const nameRegex = /^[a-zA-Z0-9 _-]+$/
 
 export const isValidHexCode = (hex) => {
   const hexPattern = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/
