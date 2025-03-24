@@ -12,11 +12,11 @@ import {
   IconButton,
   Input,
   Select,
+  SimpleGrid,
   Stack,
   Text,
   Tooltip
 } from '@chakra-ui/react'
-import { Table, Tbody, Td, Tr } from '@chakra-ui/react'
 import { Button, ButtonGroup } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
@@ -70,12 +70,17 @@ const CompLinks = ({ data }) => {
     url: item?.url || ''
   }))
 
-  const { secondaryTextInverse, sameSecondaryText, primaryErrorColor } =
-    useThemeColor([
-      'secondaryTextInverse',
-      'sameSecondaryText',
-      'primaryErrorColor'
-    ])
+  const {
+    secondaryTextInverse,
+    sameSecondaryText,
+    primaryErrorColor,
+    grayBorderColor
+  } = useThemeColor([
+    'secondaryTextInverse',
+    'sameSecondaryText',
+    'primaryErrorColor',
+    'grayBorderColor'
+  ])
 
   const [error, setError] = useState('')
   const [activeLink, setActiveLink] = useState(null)
@@ -129,7 +134,7 @@ const CompLinks = ({ data }) => {
       if (res?.data) {
         saveChanges('links')
         showToast({
-          description: 'Links updated successfully',
+          description: 'Link added successfully',
           status: 'success'
         })
       }
@@ -171,6 +176,15 @@ const CompLinks = ({ data }) => {
     error !== '' ||
     linkError !== '' ||
     loading
+
+  const container = {
+    pb: 2,
+    gap: 5,
+    w: '100%',
+    columns: 2,
+    justifyContent: 'space-between',
+    borderBottom: `1px solid ${grayBorderColor}`
+  }
 
   return (
     <>
@@ -232,65 +246,62 @@ const CompLinks = ({ data }) => {
             Existing Links
           </Text>
           {externalUrls?.length > 0 ? (
-            <Table variant='simple' size='sm' mt={4}>
-              <Tbody>
-                {externalUrls?.map((item, index) => (
-                  <Tr key={index}>
-                    <Td pl={0} wordBreak={'break-all'}>
-                      <Text>
-                        {item?.url ? (
-                          <Tooltip label={item.url}>
-                            {truncatedValue(item.url, 45)}
-                          </Tooltip>
-                        ) : (
-                          'N:A'
-                        )}
-                      </Text>
-                      <Text mt={2} color={sameSecondaryText}>
-                        {item?.name}
-                      </Text>
-                    </Td>
-                    <Td px={0} isNumeric>
-                      {activeLink?.name === item?.name ? (
-                        <ButtonGroup>
-                          <Button
-                            size='sm'
-                            title='No'
-                            fontSize={'sm'}
-                            variant='outline'
-                            onClick={() => setActiveLink(null)}
-                          >
-                            No
-                          </Button>
-                          <Button
-                            size='sm'
-                            title='Yes'
-                            fontSize={'sm'}
-                            variant='outline'
-                            colorScheme='red'
-                            isLoading={loading}
-                            onClick={handleLinkRemove}
-                            data-testid='confirm_delete_comp_link'
-                          >
-                            Yes
-                          </Button>
-                        </ButtonGroup>
-                      ) : (
-                        <IconButton
+            <Stack w={'100%'} spacing={3} mt={4}>
+              {externalUrls?.map((item, index) => (
+                <SimpleGrid {...container} key={index}>
+                  <Stack spacing={0}>
+                    {item?.url ? (
+                      <Tooltip label={item.url}>
+                        <Text fontSize={'sm'} wordBreak={'break-all'}></Text>
+                        {truncatedValue(item.url, 45)}
+                      </Tooltip>
+                    ) : (
+                      <Text>N/A</Text>
+                    )}
+                    <Text fontSize={'sm'} color={sameSecondaryText}>
+                      {item?.name}
+                    </Text>
+                  </Stack>
+                  <Flex alignItems={'center'} justifyContent={'flex-end'}>
+                    {activeLink?.name === item?.name ? (
+                      <ButtonGroup>
+                        <Button
                           size='sm'
-                          color={primaryErrorColor}
+                          title='No'
+                          fontSize={'sm'}
                           variant='outline'
-                          cursor={'pointer'}
-                          icon={<DeleteIcon />}
-                          data-testid='delete_comp_link'
-                          onClick={() => setActiveLink(item)}
-                        />
-                      )}
-                    </Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
+                          onClick={() => setActiveLink(null)}
+                        >
+                          No
+                        </Button>
+                        <Button
+                          size='sm'
+                          title='Yes'
+                          fontSize={'sm'}
+                          variant='outline'
+                          colorScheme='red'
+                          isLoading={loading}
+                          onClick={handleLinkRemove}
+                          data-testid='confirm_delete_comp_link'
+                        >
+                          Yes
+                        </Button>
+                      </ButtonGroup>
+                    ) : (
+                      <IconButton
+                        size='sm'
+                        color={primaryErrorColor}
+                        variant='outline'
+                        cursor={'pointer'}
+                        icon={<DeleteIcon />}
+                        data-testid='delete_comp_link'
+                        onClick={() => setActiveLink(item)}
+                      />
+                    )}
+                  </Flex>
+                </SimpleGrid>
+              ))}
+            </Stack>
           ) : (
             <Text mt={4} color={secondaryTextInverse}>
               No record to display
