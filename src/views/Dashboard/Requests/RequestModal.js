@@ -71,6 +71,7 @@ const RequestModal = ({ isOpen, onClose }) => {
           <Input
             type='email'
             value={email}
+            placeholder='Enter email address'
             onChange={(e) => setEmail(e.target.value)}
           />
         </FormControl>
@@ -79,6 +80,7 @@ const RequestModal = ({ isOpen, onClose }) => {
           <Input
             type='text'
             value={productName}
+            placeholder='Enter product name'
             onChange={(e) => setProductName(e.target.value)}
           />
         </FormControl>
@@ -87,6 +89,7 @@ const RequestModal = ({ isOpen, onClose }) => {
           <Input
             type='text'
             value={productVersion}
+            placeholder='Enter product version'
             onChange={(e) => setProductVersion(e.target.value)}
           />
         </FormControl>
@@ -95,6 +98,7 @@ const RequestModal = ({ isOpen, onClose }) => {
           <Textarea
             type='text'
             value={notes}
+            placeholder='Add notes'
             onChange={(e) => setNotes(e.target.value)}
           />
         </FormControl>
