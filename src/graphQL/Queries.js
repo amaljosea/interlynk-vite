@@ -953,7 +953,6 @@ export const getVexJustifications = gql`
   }
 `
 
-
 // ----------------------- PRODUCT DETAILS PAGE ---------------------------
 
 // GET PRODUCT VERSION
@@ -2910,7 +2909,6 @@ export const ShareLynkProjectGroups = gql`
     }
   }
 `
-
 
 // CPE AUTOCOMPLETE
 export const CpeAutoComplete = gql`

@@ -9,7 +9,6 @@ import {
   Link,
   Radio,
   RadioGroup,
-  Select,
   Stack,
   Text,
   Textarea
@@ -47,8 +46,8 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
   const [permitsModifications, setPermitsModifications] = useState('UNKNOWN')
   const [state, setState] = useState('UNSPECIFIED')
 
-  const [createLicense,{loading: createLoading}] = useMutation(CreateLicense)
-  const [updateLicense,{loading: updateLoading}] = useMutation(UpdateLicense)
+  const [createLicense, { loading: createLoading }] = useMutation(CreateLicense)
+  const [updateLicense, { loading: updateLoading }] = useMutation(UpdateLicense)
 
   const [drawerSize, setDrawerSize] = useState('md')
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
@@ -135,6 +134,24 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
     }
   }
 
+  const attributionOptions = [
+    { value: 'UNKNOWN', label: 'Unknown' },
+    { value: 'YES', label: 'Yes' },
+    { value: 'NO', label: 'No' }
+  ]
+
+  const copyLeftOptions = [
+    { value: 'UNKNOWN', label: 'Unknown' },
+    { value: 'PERMISSIVE', label: 'Permissive' },
+    { value: 'COPYLEFT', label: 'Copyleft' },
+    { value: 'WEAK', label: 'Weak' }
+  ]
+
+  const statusOptions = [
+    { value: 'APPROVED', label: 'Approved' },
+    { value: 'REJECTED', label: 'Rejected' },
+    { value: 'UNSPECIFIED', label: 'Unspecified' }
+  ]
   const handleSubmit = () =>
     data ? handleUpdateLicense() : handleCreateLicense()
 
@@ -268,29 +285,28 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
             {/* Attribution */}
             <FormControl isDisabled={!updateLic}>
               <FormLabel htmlFor='attribution'>Attribution</FormLabel>
-              <Select
-                value={attribution}
+              <LynkSelect
+                value={attributionOptions.find(
+                  (option) => option.value === attribution
+                )}
                 aria-label='license_attr'
-                onChange={(e) => setAttribution(e.target.value)}
-              >
-                <option value='UNKNOWN'>Unknown</option>
-                <option value='YES'>Yes</option>
-                <option value='NO'>No</option>
-              </Select>
+                onChange={(e) => setAttribution(e.value)}
+                options={attributionOptions}
+                dropDown
+              />
             </FormControl>
 
             {/* CopyLeft */}
             <FormControl isDisabled={!updateLic}>
               <FormLabel htmlFor='CopyLeft'>CopyLeft</FormLabel>
-              <Select
-                value={copyLeft}
-                onChange={(e) => setCopyLeft(e.target.value)}
-              >
-                <option value='UNKNOWN'>Unknown</option>
-                <option value='PERMISSIVE'>Permissive</option>
-                <option value='COPYLEFT'>Copyleft</option>
-                <option value='WEAK'>Weak</option>
-              </Select>
+              <LynkSelect
+                value={copyLeftOptions.find(
+                  (option) => option.value === copyLeft
+                )}
+                onChange={(e) => setCopyLeft(e.value)}
+                options={copyLeftOptions}
+                dropDown
+              />
             </FormControl>
 
             {/* Radios */}
@@ -375,16 +391,14 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
 
             <FormControl isDisabled={!updateLic}>
               <FormLabel htmlFor='state'>Status</FormLabel>
-              <Select
+              <LynkSelect
                 name='state'
-                value={state}
+                value={statusOptions.find((option) => option.value === state)}
                 aria-label='license_status'
-                onChange={(e) => setState(e.target.value)}
-              >
-                <option value='APPROVED'>Approved</option>
-                <option value='REJECTED'>Rejected</option>
-                <option value='UNSPECIFIED'>Unspecified</option>
-              </Select>
+                onChange={(e) => setState(e.value)}
+                options={statusOptions}
+                dropDown
+              />
             </FormControl>
           </>
         )}

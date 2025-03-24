@@ -47,7 +47,9 @@ const LicenseColumns = () => {
                 e.currentTarget.parentElement.click()
               }}
             >
-              <Tag py={2} w={'fit-content'}>{sortedComponents[0]?.name}</Tag>
+              <Tag py={2} w={'fit-content'}>
+                {sortedComponents[0]?.name}
+              </Tag>
               <Text color={primaryTextColor}>
                 {sortedComponents.length > 1
                   ? `+${sortedComponents.length - 1} more`
