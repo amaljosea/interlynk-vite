@@ -3,6 +3,7 @@ import { useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getSignedUrlParams } from 'utils'
+import { isSbomArchived } from 'utils'
 import { ProductGeneralTabs } from 'utils/TabsObjects'
 import { customStyles } from 'utils/styleUtils'
 
@@ -39,7 +40,7 @@ const Parts = ({ data }) => {
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
 
-  const isArchived = data?.lifecycle === 'archived'
+  const isArchived = isSbomArchived(data)
 
   const { dispatch } = useGlobalState()
 

@@ -1,5 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useState } from 'react'
+import { isSbomArchived } from 'utils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -9,10 +10,10 @@ import { sbomUpdate } from 'graphQL/Mutation'
 
 const ArchiveSbom = ({ isOpen, onClose, data, projectGroup }) => {
   const { showToast } = useCustomToast()
-  const { id, spec, lifecycle, projectVersion } = data || ''
+  const { id, spec, projectVersion } = data || ''
   const { setClearSelect } = useGlobalState()
 
-  const isArchived = lifecycle === 'archived'
+  const isArchived = isSbomArchived(data)
 
   const [updateSbom] = useMutation(sbomUpdate)
 

@@ -1,4 +1,5 @@
 import { getFullDate } from 'utils'
+import { isSbomArchived } from 'utils'
 import { infoData } from 'variables/general'
 
 import { Flex, Skeleton, Stack, Text } from '@chakra-ui/react'
@@ -20,7 +21,7 @@ import Tools from './SbomDetails/Tools'
 const General = ({ data, loading, error }) => {
   const { grayBorderColor } = useThemeColor(['grayBorderColor'])
 
-  const isArchived = data?.lifecycle === 'archived'
+  const isArchived = isSbomArchived(data)
 
   const editSboms = useHasPermission({
     parentKey: 'view_sbom',

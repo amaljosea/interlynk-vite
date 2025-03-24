@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import { getFullDate, timeSince, truncatedValue } from 'utils'
 import { getSignedUrlParams } from 'utils'
+import { isSbomArchived } from 'utils'
 import SbomActions from 'views/Sbom/components/SbomActions'
 
 import { DownloadIcon, Search2Icon } from '@chakra-ui/icons'
@@ -69,7 +70,8 @@ const SbomDetails = ({ sbomData }) => {
     endOfSupportDate: sbomData?.endOfSupportDate
   }
 
-  const isArchived = sbomData?.lifecycle === 'archived'
+  const isArchived = isSbomArchived(sbomData)
+
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const signedUrlParams = getSignedUrlParams()
@@ -243,7 +245,7 @@ const SbomDetails = ({ sbomData }) => {
                 {description}
               </Text>
             </GridItem>
-            <GridItem colSpan={4} hidden={lifecycle === 'archived'}>
+            <GridItem colSpan={4} hidden={isArchived}>
               <SbomActions sbom={sbomData} />
             </GridItem>
           </Grid>
