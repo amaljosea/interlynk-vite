@@ -88,6 +88,7 @@ const ComponentCard = ({ value, isOpen, onClose }) => {
   const label = { fontSize: 12, color: sameSecondaryText }
   const infoStyle = {
     fontSize: 14,
+    lineHeight: 5,
     fontWeight: 600,
     color: infoTextColor
   }
@@ -147,7 +148,13 @@ const ComponentCard = ({ value, isOpen, onClose }) => {
         <Stack spacing={6}>
           <Flex alignItems={'center'} gap={3}>
             <IconButton size='sm' colorScheme='blue' icon={<FaCube />} />
-            <Text fontSize={17} color={primaryBlueText} fontWeight={600}>
+            <Text
+              fontSize={17}
+              lineHeight={'5'}
+              fontWeight={600}
+              wordBreak={'break-all'}
+              color={primaryBlueText}
+            >
               {name}
             </Text>
           </Flex>

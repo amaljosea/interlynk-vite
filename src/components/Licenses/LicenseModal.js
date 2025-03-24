@@ -46,8 +46,8 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
   const [permitsModifications, setPermitsModifications] = useState('UNKNOWN')
   const [state, setState] = useState('UNSPECIFIED')
 
-  const [createLicense] = useMutation(CreateLicense)
-  const [updateLicense] = useMutation(UpdateLicense)
+  const [createLicense, { loading: createLoading }] = useMutation(CreateLicense)
+  const [updateLicense, { loading: updateLoading }] = useMutation(UpdateLicense)
 
   const [drawerSize, setDrawerSize] = useState('md')
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
@@ -152,22 +152,19 @@ const LicenseDrawer = ({ isOpen, onClose, data, updateLic }) => {
     { value: 'REJECTED', label: 'Rejected' },
     { value: 'UNSPECIFIED', label: 'Unspecified' }
   ]
+  const handleSubmit = () =>
+    data ? handleUpdateLicense() : handleCreateLicense()
 
   return (
     <LynkModal
       isOpen={isOpen}
       onClose={onClose}
-      onSubmit={
-        drawerSize === 'md'
-          ? data
-            ? handleUpdateLicense
-            : handleCreateLicense
-          : handleExpand
-      }
-      title={`${!updateLic ? 'View' : data ? 'Edit' : 'Add'} License`}
-      Icon={FaScaleBalanced}
-      disabled={drawerSize === 'md' ? name === '' : false}
       hidden={!updateLic}
+      Icon={FaScaleBalanced}
+      isLoading={createLoading || updateLoading}
+      disabled={drawerSize === 'md' ? name === '' : false}
+      onSubmit={drawerSize === 'md' ? handleSubmit : handleExpand}
+      title={`${!updateLic ? 'View' : data ? 'Edit' : 'Add'} License`}
       buttonText={drawerSize === 'md' ? (data ? 'Update' : 'Save') : 'Back'}
     >
       <Stack direction={'column'} spacing={4} alignItems={'flex-start'}>

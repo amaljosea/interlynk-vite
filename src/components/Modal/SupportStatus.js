@@ -18,17 +18,31 @@ import {
   componentSupportLevelUpdate
 } from 'graphQL/Mutation'
 
-const SupportStatus = ({ isOpen, selectedItems, handleClear }) => {
+const SupportStatus = ({
+  isOpen,
+  onClose,
+  selectedItems,
+  setSelectedItems,
+  setToggleClear
+}) => {
   const { isCustomerView } = useRouteFlags()
   const { showToast } = useCustomToast()
 
   const inputStyle = { size: 'md' }
 
+  const handleClear = () => {
+    setSelectedItems([])
+    setToggleClear(true)
+    onClose()
+  }
+
   const [createSupport, { loading: createLoading }] = useMutation(
-    componentSupportLevelCreate
+    componentSupportLevelCreate,
+    { onCompleted: () => handleClear() }
   )
   const [updateSupport, { loading: updateLoading }] = useMutation(
-    componentSupportLevelUpdate
+    componentSupportLevelUpdate,
+    { onCompleted: () => handleClear() }
   )
 
   const componentIds = selectedItems
@@ -46,8 +60,7 @@ const SupportStatus = ({ isOpen, selectedItems, handleClear }) => {
   })
 
   const isDisabled =
-    (formData?.supportLevel === '' && formData?.endOfSupport === '') ||
-    formData?.assessmentExpiresOn > 365
+    formData?.supportLevel === '' || formData?.assessmentExpiresOn > 365
 
   const noLongerMaintained = formData?.supportLevel === 'no_longer_maintained'
 
@@ -79,6 +92,7 @@ const SupportStatus = ({ isOpen, selectedItems, handleClear }) => {
   }
 
   const handleUpdate = (data) => {
+    setToggleClear(false)
     data?.map((item) => {
       updateSupport({
         variables: {
@@ -101,10 +115,10 @@ const SupportStatus = ({ isOpen, selectedItems, handleClear }) => {
         }
       })
     })
-    handleClear()
   }
 
   const handleCreate = (data) => {
+    setToggleClear(false)
     data?.map((item) => {
       createSupport({
         variables: {
@@ -127,7 +141,6 @@ const SupportStatus = ({ isOpen, selectedItems, handleClear }) => {
         }
       })
     })
-    handleClear()
   }
 
   const handleSubmit = () => {
@@ -141,10 +154,10 @@ const SupportStatus = ({ isOpen, selectedItems, handleClear }) => {
   return (
     <LynkModal
       isOpen={isOpen}
+      onClose={onClose}
       Icon={SupportIcon}
       title={'Add Status'}
       disabled={isDisabled}
-      onClose={handleClear}
       onSubmit={handleSubmit}
       isLoading={createLoading || updateLoading}
       buttonText={supportIds?.length > 0 ? 'Update' : 'Save'}
@@ -170,14 +183,17 @@ const SupportStatus = ({ isOpen, selectedItems, handleClear }) => {
           </Select>
         </FormControl>
         {/* END-OF-SUPPORT DATE */}
-        <FormControl>
-          <FormLabel htmlFor='endOfSupport'>End-Of-Support Date</FormLabel>
-          <LynkDate
-            name='endOfSupport'
-            value={formData?.endOfSupport}
-            onChange={(value) => handleDateChange(value, 'endOfSupport')}
-          />
-        </FormControl>
+        {(formData?.supportLevel === 'actively_maintained' ||
+          formData?.supportLevel === 'no_longer_maintained') && (
+          <FormControl>
+            <FormLabel htmlFor='endOfSupport'>End-Of-Support Date</FormLabel>
+            <LynkDate
+              name='endOfSupport'
+              value={formData?.endOfSupport}
+              onChange={(value) => handleDateChange(value, 'endOfSupport')}
+            />
+          </FormControl>
+        )}
         {/* RETAIN MANNUAL OVERRIDE */}
         <FormControl
           isRequired

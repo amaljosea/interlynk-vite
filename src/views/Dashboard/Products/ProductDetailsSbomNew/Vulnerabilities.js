@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getSignedUrlParams, parseEpssRange, setKEV } from 'utils'
+import { isSbomArchived } from 'utils'
 import { customStyles } from 'utils/styleUtils'
 import VexModal from 'views/Dashboard/Vulnerabilities/components/VexModal'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
@@ -51,7 +52,7 @@ const Vulnerabilities = ({ sbomData }) => {
   const productId = params.productid
   const { headingTextColor } = useThemeColor(['headingTextColor'])
 
-  const isArchived = sbomData?.lifecycle === 'archived'
+  const isArchived = isSbomArchived(sbomData)
 
   const { data: projectSettings, loading: projectSettingsLoad } = useQuery(
     GetProjectSettings,

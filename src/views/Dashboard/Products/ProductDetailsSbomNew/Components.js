@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getUndefinedIfEmptyOrAll } from 'utils'
+import { isSbomArchived } from 'utils'
 import { customStyles } from 'utils/styleUtils'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
 
@@ -44,7 +45,7 @@ const Components = ({ sbomData }) => {
   const productId = params.productid
   const sbomId = params.sbomid
 
-  const isArchived = sbomData?.lifecycle === 'archived'
+  const isArchived = isSbomArchived(sbomData)
 
   const { headingTextColor } = useThemeColor(['headingTextColor'])
 

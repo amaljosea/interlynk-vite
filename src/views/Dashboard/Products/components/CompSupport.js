@@ -194,7 +194,7 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
   })
 
   const isDisabled =
-    (formData?.supportLevel === '' && formData?.endOfSupport === '') ||
+    formData?.supportLevel === '' ||
     (!component?.internal && formData?.assessmentExpiresOn < 1) ||
     (!component?.internal && formData?.assessmentExpiresOn > 365)
 
@@ -370,14 +370,17 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
         </Select>
       </FormControl>
       {/* END-OF-SUPPORT DATE */}
-      <FormControl>
-        <FormLabel htmlFor='endOfSupport'>End-Of-Support Date</FormLabel>
-        <LynkDate
-          name='endOfSupport'
-          value={formData?.endOfSupport}
-          onChange={(value) => handleDateChange(value, 'endOfSupport')}
-        />
-      </FormControl>
+      {(formData?.supportLevel === 'actively_maintained' ||
+        formData?.supportLevel === 'no_longer_maintained') && (
+        <FormControl>
+          <FormLabel htmlFor='endOfSupport'>End-Of-Support Date</FormLabel>
+          <LynkDate
+            name='endOfSupport'
+            value={formData?.endOfSupport}
+            onChange={(value) => handleDateChange(value, 'endOfSupport')}
+          />
+        </FormControl>
+      )}
       {/* RETAIN MANNUAL OVERRIDE */}
       <FormControl
         hidden={noLongerMaintained}

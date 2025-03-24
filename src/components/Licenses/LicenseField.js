@@ -2,7 +2,7 @@ import { useLazyQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { components } from 'react-select'
-import { getSignedUrlParams, parseLicenseString } from 'utils'
+import { parseLicenseString } from 'utils'
 import { infoData } from 'variables/general'
 
 import { Flex, Stack, Text, VStack } from '@chakra-ui/react'
@@ -14,13 +14,14 @@ import LynkFormLabel from 'components/Misc/LynkLabel'
 
 import { useDebounce } from 'hooks/useDebounce'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useSelect } from 'hooks/useSelect'
 
 import { LicenseAutoComplete } from 'graphQL/Queries'
 
 const LicenseField = ({ resolved, sbomView, license }) => {
   const { style } = useSelect('field')
-  const signedUrlParams = getSignedUrlParams()
+  const { isCustomerView } = useRouteFlags()
   const { tabData, setTabData, handleChange } = useContext(TabContext)
   const { details } = tabData
   const { dispatch, sbomState } = useGlobalState()
@@ -77,39 +78,41 @@ const LicenseField = ({ resolved, sbomView, license }) => {
           }))
         }
         const formattedValue = formatLicenseString(value)
-        getLicense({
-          variables: {
-            search: formattedValue
-          }
-        })
-          .then((res) => {
-            if (res.data?.licenseAutoComplete?.result) {
-              const licenses = res.data.licenseAutoComplete.result.map(
-                (license) => ({
-                  value: license.value,
-                  label: license.label,
-                  type: license.type
-                })
-              )
-
-              //Remove duplicates values if any. Doing this since filtering over 25 entries is not expensive
-              const uniqueLicenses = licenses.filter(
-                (v, i, a) => a.findIndex((t) => t.value === v.value) === i
-              )
-              setLicenseList(uniqueLicenses)
-            } else {
-              setLicenseList([])
+        if (!isCustomerView) {
+          getLicense({
+            variables: {
+              search: formattedValue
             }
           })
-          .catch((error) => {
-            console.warn('Error fetching licenses:', error)
-            setLicenseList([])
-          })
+            .then((res) => {
+              if (res.data?.licenseAutoComplete?.result) {
+                const licenses = res.data.licenseAutoComplete.result.map(
+                  (license) => ({
+                    value: license.value,
+                    label: license.label,
+                    type: license.type
+                  })
+                )
+
+                //Remove duplicates values if any. Doing this since filtering over 25 entries is not expensive
+                const uniqueLicenses = licenses.filter(
+                  (v, i, a) => a.findIndex((t) => t.value === v.value) === i
+                )
+                setLicenseList(uniqueLicenses)
+              } else {
+                setLicenseList([])
+              }
+            })
+            .catch((error) => {
+              console.warn('Error fetching licenses:', error)
+              setLicenseList([])
+            })
+        }
       } else {
         setLicenseList([])
       }
     },
-    [getLicense, sbomDispatch, sbomView, setTabData]
+    [getLicense, isCustomerView, sbomDispatch, sbomView, setTabData]
   )
 
   useEffect(() => {
@@ -199,7 +202,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
   return (
     <>
       <VStack spacing={4} alignItems={'flex-start'}>
-        <FormControl isDisabled={signedUrlParams}>
+        <FormControl isDisabled={isCustomerView}>
           <LynkFormLabel
             label='License'
             htmlFor={licenseType}
@@ -212,10 +215,10 @@ const LicenseField = ({ resolved, sbomView, license }) => {
             className='react-select'
             isClearable={!resolved}
             isSearchable={!resolved}
-            isDisabled={signedUrlParams}
+            isDisabled={isCustomerView}
             isLoading={loading}
             noOptionsMessage={() =>
-              resolved || signedUrlParams ? null : `Please search...`
+              resolved || isCustomerView ? null : `Please search...`
             }
             components={{
               Menu,

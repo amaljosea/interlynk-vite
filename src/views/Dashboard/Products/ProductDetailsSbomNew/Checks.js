@@ -3,6 +3,7 @@ import React, { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getUndefinedIfEmptyOrAll } from 'utils'
+import { isSbomArchived } from 'utils'
 import { customStyles } from 'utils/styleUtils'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
@@ -37,7 +38,7 @@ const Checks = ({ sbomData }) => {
   const sbomId = params.sbomid
   const activeTab = useQueryParam('tab')
 
-  const isArchived = sbomData?.lifecycle === 'archived'
+  const isArchived = isSbomArchived(sbomData)
 
   const { headingTextColor } = useThemeColor(['headingTextColor'])
 

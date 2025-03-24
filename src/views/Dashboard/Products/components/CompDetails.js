@@ -1,4 +1,4 @@
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect } from 'react'
 import { transformLicenseString } from 'utils'
@@ -69,9 +69,7 @@ const CompDetails = ({ data, primaryComp }) => {
   const { data: allSboms } = useQuery(GetAllSboms, {
     fetchPolicy: 'network-only',
     skip: tab === 'details' && !isCustomerView ? false : true,
-    variables: {
-      id: productId
-    }
+    variables: { id: productId }
   })
 
   if (allSboms) {
@@ -148,13 +146,21 @@ const CompDetails = ({ data, primaryComp }) => {
     }
   }
 
-  const [getLicense, { loading: licenseLoading }] = useLazyQuery(
+  const { data: license, loading: licenseLoading } = useQuery(
     LicenseAutoComplete,
     {
-      skip: data?.licensesExp ? false : true,
-      fetchPolicy: 'network-only'
+      fetchPolicy: 'network-only',
+      variables: { search: data?.licensesExp },
+      skip: data?.licensesExp && !isCustomerView ? false : true
     }
   )
+
+  const filteredResults = license
+    ? license?.licenseAutoComplete?.result?.slice(0, -1)
+    : []
+  const matchedLicense = filteredResults
+    ? filteredResults?.find((license) => license.value === data?.licensesExp)
+    : null
 
   const isInvalid =
     details?.kind === '' ||
@@ -166,72 +172,49 @@ const CompDetails = ({ data, primaryComp }) => {
   useEffect(() => {
     if (data) {
       const { supportLevel, licensesExp } = data || {}
-
-      if (licensesExp) {
-        getLicense({ variables: { search: licensesExp } }).then((res) => {
-          const filteredResults =
-            res.data?.licenseAutoComplete?.result?.slice(0, -1) || []
-          const matchedLicense = filteredResults.find(
-            (license) => license.value === licensesExp
-          )
-
-          setTabData((prev) => ({
-            ...prev,
-            details: {
-              ...prev.details,
-              name: data?.name || '',
-              kind: data?.kind || '',
-              scope: data?.scope || '',
-              group: data?.group || '',
-              primary: data?.primary,
-              version: data?.version || '',
-              internal: data?.internal,
-              description: data?.description || '',
-              copyright: data?.copyright || '',
-              supportLevel:
-                supportLevel?.replaceAll(' ', '_').toUpperCase() || '',
-              licenses: licensesExp
-                ? [
-                    {
-                      value: licensesExp,
-                      label: licensesExp,
-                      type: matchedLicense?.type
-                    }
-                  ]
-                : [],
-              endOfSupport: data?.endOfSupport
-                ? new Date(data?.endOfSupport)
-                : ''
-            }
-          }))
-        })
-      } else {
-        setTabData((prev) => ({
-          ...prev,
-          details: {
-            ...prev.details,
-            name: data?.name || '',
-            kind: data?.kind || '',
-            scope: data?.scope || '',
-            group: data?.group || '',
-            primary: data?.primary,
-            version: data?.version || '',
-            internal: data?.internal,
-            description: data?.description || '',
-            copyright: data?.copyright || '',
-            supportLevel:
-              supportLevel?.replaceAll(' ', '_').toUpperCase() || '',
-            licenses: [],
-            endOfSupport: data?.endOfSupport ? new Date(data?.endOfSupport) : ''
-          }
-        }))
-      }
+      setTabData((prev) => ({
+        ...prev,
+        details: {
+          ...prev.details,
+          primary: data?.primary,
+          name: data?.name || '',
+          kind: data?.kind || '',
+          scope: data?.scope || '',
+          group: data?.group || '',
+          internal: data?.internal,
+          version: data?.version || '',
+          copyright: data?.copyright || '',
+          description: data?.description || '',
+          licenses: licensesExp
+            ? [
+                {
+                  value: licensesExp,
+                  label: licensesExp,
+                  type: matchedLicense?.type
+                }
+              ]
+            : [],
+          supportLevel: supportLevel?.replaceAll(' ', '_').toUpperCase() || '',
+          endOfSupport: data?.endOfSupport ? new Date(data?.endOfSupport) : ''
+        }
+      }))
     }
-  }, [data, setTabData, getLicense])
+  }, [data, matchedLicense?.type, setTabData])
 
   return (
     <>
-      <Stack direction={'column'} spacing={4}>
+      <Stack
+        spacing={4}
+        overflow={'auto'}
+        direction={'column'}
+        sx={{
+          '&::-webkit-scrollbar': {
+            display: 'none'
+          },
+          '-ms-overflow-style': 'none',
+          'scrollbar-width': 'none'
+        }}
+      >
         {/* Name */}
         <FormControl isDisabled={isCustomerView} isRequired>
           <LynkFormLabel

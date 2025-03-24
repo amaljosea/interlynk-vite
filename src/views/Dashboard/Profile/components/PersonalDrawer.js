@@ -5,7 +5,15 @@ import { useEffect, useState } from 'react'
 import { nameValidation, validPassword } from 'utils/formValidationUtils'
 
 import { EditIcon } from '@chakra-ui/icons'
-import { Avatar, Box, Flex, IconButton, Text, Tooltip } from '@chakra-ui/react'
+import {
+  Avatar,
+  Box,
+  Flex,
+  IconButton,
+  Stack,
+  Text,
+  Tooltip
+} from '@chakra-ui/react'
 import { Input, InputGroup, InputRightElement } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
@@ -247,7 +255,7 @@ const PersonalDrawer = ({ isOpen, onClose, inputRef }) => {
           />
           {/* Only show Avatar when there's an image */}
           <Flex ml='auto' gap={2}>
-            <Tooltip label='Upload Profile Picture'>
+            <Tooltip placement='left' label='Upload Profile Picture'>
               <IconButton
                 icon={<EditIcon />}
                 aria-label='Edit Profile Picture'
@@ -346,20 +354,25 @@ const PersonalDrawer = ({ isOpen, onClose, inputRef }) => {
               </InputGroup>
 
               {newPassword !== '' && invalidPassword && (
-                <Text color={primaryErrorColor}>
-                  <Text mb={1}>
+                <Stack
+                  mt={2}
+                  spacing={0}
+                  fontSize='sm'
+                  color={primaryErrorColor}
+                >
+                  <Text>
                     Your password must be 8-16 characters and contain:
                   </Text>
                   <Text>1. Lower case letters {`(a-z)`}</Text>
                   <Text>2. Upper case letters {`(A-Z)`}</Text>
                   <Text>3. Special characters {`(ex. !@#&$%*.)`}</Text>
                   <Text>4. Numbers {`(0-9)`}</Text>
-                </Text>
+                </Stack>
               )}
               {oldPassword !== '' &&
                 newPassword !== '' &&
                 oldPassword === newPassword && (
-                  <Text fontSize='sm' color={primaryErrorColor}>
+                  <Text mt={2} fontSize='sm' color={primaryErrorColor}>
                     Old password and new password cannot be the same
                   </Text>
                 )}
@@ -387,7 +400,7 @@ const PersonalDrawer = ({ isOpen, onClose, inputRef }) => {
                 </InputRightElement>
               </InputGroup>
               {passError !== '' && (
-                <Text fontSize='sm' color={primaryErrorColor}>
+                <Text mt={2} fontSize='sm' color={primaryErrorColor}>
                   {passError}
                 </Text>
               )}

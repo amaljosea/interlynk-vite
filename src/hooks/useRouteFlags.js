@@ -36,7 +36,8 @@ export const useRouteFlags = () => {
 
     isVulnerabilitiesPage: pathname === '/vendor/vulnerabilities',
 
-    isVendorRootPage: pathname === '/vendor' || vendorRootCheck(pathname),
+    isVendorRootPage:
+      pathname?.startsWith('/vendor') || vendorRootCheck(pathname),
 
     isGlobalVulnerabilitiesPage:
       pathname.startsWith('/vendor/vulnerabilities') &&
