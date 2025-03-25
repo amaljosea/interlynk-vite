@@ -20,7 +20,6 @@ export default class RequestSection {
       await this.page.locator("//a[@aria-label='requests']").click()
 
       await this.page.locator(`//button[@aria-label='request_sbom']`).click()
-      await this.page.waitForTimeout(2000)
 
       const email = generateRandomEmail()
       const name = randomProductName()
@@ -29,7 +28,6 @@ export default class RequestSection {
       await this.page.getByLabel('Product Version').fill('1.0.2')
 
       await this.page.locator("button[type='submit']").click()
-      await this.page.waitForTimeout(2000)
 
       const request = this.page.getByTestId('request_id').nth(0)
 
@@ -40,7 +38,6 @@ export default class RequestSection {
         await this.page
           .locator(`//button[@aria-label='resend req ${email}']`)
           .click()
-        await this.page.waitForTimeout(2000)
 
         await this.page
           .locator(`//button[@aria-label='req action for ${email}']`)
@@ -48,10 +45,8 @@ export default class RequestSection {
         await this.page
           .locator(`//button[@aria-label='cancel req ${email}']`)
           .click()
-        await this.page.waitForTimeout(2000)
 
         await this.page.locator("button[type='submit']").click()
-        await this.page.waitForTimeout(2000)
       }
 
       expect(errors.length).toBe(0)
