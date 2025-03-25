@@ -1287,6 +1287,7 @@ export const exportCsvTableConfig = {
       'CVSS Vector',
       'NVD Alias ID',
       'EPSS Percentile',
+      'KEV',
       'Links'
     ],
     mapDataForExport: (data) =>
@@ -1313,6 +1314,7 @@ export const exportCsvTableConfig = {
         'EPSS Percentile': row?.vuln?.vulnInfo?.epssPercentile
           ? `${(row?.vuln?.vulnInfo?.epssPercentile * 100).toFixed()} %`
           : '0 %',
+        KEV: row?.vuln?.vulnInfo?.kev ? 'True' : 'False',
         Links: (() => {
           const advisories = row?.isPart
             ? row?.currentExternalUrls?.find(
