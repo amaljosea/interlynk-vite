@@ -20,7 +20,6 @@ import CustomLoader from 'components/CustomLoader'
 import LynkAction from 'components/Misc/LynkAction'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
-import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -52,11 +51,6 @@ const TokenInfo = () => {
   const tokenRef = useRef(null)
 
   const [activeRow, setActiveRow] = useState(null)
-
-  const canAddToken = useHasPermission({
-    parentKey: 'view_organization',
-    childKey: 'update_organization'
-  })
 
   const [deleteToken] = useMutation(deleteApiToken)
   const [updateToken] = useMutation(updateApiToken)
@@ -121,12 +115,11 @@ const TokenInfo = () => {
             variant='solid'
             fontWeight='normal'
             fontSize={'sm'}
-            isDisabled={!canAddToken}
           />
         </Tooltip>
       </Flex>
     )
-  }, [primaryTextColor, canAddToken, onOpen])
+  }, [primaryTextColor, onOpen])
 
   // COLUMNS
   const columns = [
