@@ -19,7 +19,6 @@ export default class PolicySection {
       await this.page.locator("//a[@aria-label='policies']").click()
 
       await this.page.locator(`//button[@aria-label='add_policy']`).click()
-      await this.page.waitForTimeout(2000)
 
       const uniqueId = generateUniqueId()
       await this.page
@@ -29,34 +28,28 @@ export default class PolicySection {
       await this.page.locator('#policy_result_type').click()
       await this.page.keyboard.type('WARN')
       await this.page.keyboard.press('Enter')
-      await this.page.waitForTimeout(1000)
+
       await this.page.locator('#policy_result_condition').click()
       await this.page.keyboard.type('ANY')
       await this.page.keyboard.press('Enter')
-      await this.page.waitForTimeout(1000)
+
       await this.page.locator('#condition_subject_0').click()
       await this.page.keyboard.type('COMPONENT_VERSION')
       await this.page.keyboard.press('Enter')
-      await this.page.waitForTimeout(1000)
+
       await this.page.locator('#condition_operator_0').click()
       await this.page.keyboard.type('NOT_EXISTS')
       await this.page.keyboard.press('Enter')
-      await this.page.waitForTimeout(1000)
 
       await this.page.locator("button[type='submit']").click()
-      await this.page.waitForTimeout(3000)
 
       await this.page.locator('.chakra-switch__thumb').nth(0).click()
-      await this.page.waitForTimeout(2000)
 
       await this.page.locator("button[type='submit']").click()
-      await this.page.waitForTimeout(3000)
 
       await this.page.locator('.chakra-switch__thumb').nth(0).click()
-      await this.page.waitForTimeout(2000)
 
       await this.page.locator("button[type='submit']").click()
-      await this.page.waitForTimeout(3000)
 
       expect(errors.length).toBe(0)
     } catch (error) {
@@ -73,23 +66,18 @@ export default class PolicySection {
       if (policy.isVisible()) {
         await this.page.getByTestId(`policy_actions_0`).click()
         await this.page.getByTestId(`policy_edit_0`).click()
-        await this.page.waitForTimeout(3000)
 
         await this.page.getByTestId(`add_policy_condition`).click()
-        await this.page.waitForTimeout(1000)
 
         await this.page.locator('#condition_subject_1').click()
         await this.page.keyboard.type('COMPONENT_TYPE')
         await this.page.keyboard.press('Enter')
-        await this.page.waitForTimeout(1000)
 
         await this.page.locator('#condition_operator_1').click()
         await this.page.keyboard.type('NOT_EXISTS')
         await this.page.keyboard.press('Enter')
-        await this.page.waitForTimeout(1000)
 
         await this.page.locator("button[type='submit']").click()
-        await this.page.waitForTimeout(3000)
       }
     } catch (error) {
       throw error
@@ -106,10 +94,8 @@ export default class PolicySection {
       if (policy.isVisible()) {
         await this.page.getByTestId(`policy_actions_0`).click()
         await this.page.getByTestId(`policy_delete_0`).click()
-        await this.page.waitForTimeout(3000)
 
         await this.page.locator("button[type='submit']").click()
-        await this.page.waitForTimeout(5000)
       }
     } catch (error) {
       throw error

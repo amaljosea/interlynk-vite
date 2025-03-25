@@ -5,8 +5,13 @@ import PolicyPage from '../pages/policy.page'
 
 dotenv.config({ path: '../.env' })
 
+const url: any = process.env.PLAYWRIGHT_TEST_URL
+
+test.beforeEach(async ({ page }) => {
+  await page.goto(url)
+})
+
 test('Policy create functionality', async ({ page }) => {
-  test.setTimeout(120000)
   const pp = new PolicyPage(page)
   try {
     await pp.addPolicy()
@@ -17,7 +22,6 @@ test('Policy create functionality', async ({ page }) => {
 })
 
 test('Policy edit functionality', async ({ page }) => {
-  test.setTimeout(120000)
   const pp = new PolicyPage(page)
   try {
     await pp.editPolicy()
@@ -28,7 +32,6 @@ test('Policy edit functionality', async ({ page }) => {
 })
 
 test('Policy delete functionality', async ({ page }) => {
-  test.setTimeout(120000)
   const pp = new PolicyPage(page)
   try {
     await pp.deletePolicy()
