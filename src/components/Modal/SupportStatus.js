@@ -208,7 +208,9 @@ const SupportStatus = ({
             value={formData?.assessmentExpiresOn}
             onChange={(value) => handleDateChange(value, 'assessmentExpiresOn')}
           />
-          <FormErrorMessage>Value must be between 1 and 365</FormErrorMessage>
+          <FormErrorMessage>
+            Value must be between 1 and 365 days
+          </FormErrorMessage>
         </FormControl>
         {/* EXPLANATION */}
         <FormControl>
