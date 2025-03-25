@@ -5,7 +5,7 @@ import { truncatedValue } from 'utils'
 import { hasWhiteSpace, validateUrl } from 'utils/formValidationUtils'
 import { componentLinkTypes } from 'variables/general'
 
-import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
+import { DeleteIcon } from '@chakra-ui/icons'
 import {
   Divider,
   Flex,
@@ -95,7 +95,7 @@ const CompLinks = ({ data }) => {
     handleChange('links', 'name', value)
     const isExists =
       externalUrls?.length > 0 &&
-      externalUrls?.find((item) => item.name === value)
+      externalUrls?.some((item) => item.name === value)
     if (isExists) {
       setError('Link type already exists!')
     } else {
@@ -222,23 +222,14 @@ const CompLinks = ({ data }) => {
           />
           <FormErrorMessage>{linkError}</FormErrorMessage>
         </FormControl>
-        {alert ? (
-          <Stack spacing={4}>
-            <LynkAlert status='warning' msg={alertMessage} />
-            <ActionButton
-              title={'Save'}
-              isDisabled={isInvalid}
-              onClick={handleLinkAdd}
-            />
-          </Stack>
-        ) : (
+        <Stack spacing={alert ? 4 : 0}>
+          {alert && <LynkAlert status='warning' msg={alertMessage} />}
           <ActionButton
             title={'Save'}
-            leftIcon={<AddIcon />}
             isDisabled={isInvalid}
-            onClick={handleSubmit}
+            onClick={alert ? handleLinkAdd : handleSubmit}
           />
-        )}
+        </Stack>
         <Divider />
         {/* TABLE */}
         <Flex mb={4} width={'100%'} flexDir={'column'}>
