@@ -12,7 +12,7 @@ jobs:
 
     # Define environment variables (use secrets for sensitive info)
     env:
-      PLAYWRIGHT_TEST_URL: https://staging.interlynk.io/auth
+      PLAYWRIGHT_TEST_URL: https://staging.interlynk.io
       PLAYWRIGHT_USER_EMAIL: amaljoseami@gmail.com
       PLAYWRIGHT_USER_PASSWORD: LynkRisk@1.0
 

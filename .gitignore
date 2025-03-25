@@ -11,3 +11,4 @@ build
 # Playwright reports
 test-results/
 playwright-report/
+.auth
