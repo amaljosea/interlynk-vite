@@ -1,10 +1,9 @@
 import { useMutation } from '@apollo/client'
 import { useState } from 'react'
+import { getTotalDays } from 'utils'
 
-import { FormErrorMessage, Select, Stack } from '@chakra-ui/react'
-import { Input, InputGroup, InputRightAddon } from '@chakra-ui/react'
+import { FormErrorMessage, Input, Select, Stack } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
-import { NumberInput, NumberInputField } from '@chakra-ui/react'
 
 import { SupportIcon } from 'components/Icons/Icons'
 import LynkDate from 'components/LynkDate'
@@ -52,15 +51,18 @@ const SupportStatus = ({
     ?.filter((item) => item?.componentSupportLevel !== null)
     ?.map((sup) => sup?.componentSupportLevel?.id)
 
+  const defaultDate = new Date()
+  defaultDate.setDate(defaultDate.getDate() + 365)
   const [formData, setFormData] = useState({
     supportLevel: '',
     endOfSupport: '',
     explanation: '',
-    assessmentExpiresOn: 365
+    assessmentExpiresOn: defaultDate
   })
 
-  const isDisabled =
-    formData?.supportLevel === '' || formData?.assessmentExpiresOn > 365
+  const totalDays = Number(getTotalDays(formData?.assessmentExpiresOn))
+
+  const isDisabled = formData?.supportLevel === '' || totalDays > 365
 
   const noLongerMaintained = formData?.supportLevel === 'no_longer_maintained'
 
@@ -74,7 +76,7 @@ const SupportStatus = ({
         [name]: value,
         endOfSupport: '',
         explanation: '',
-        assessmentExpiresOn: 0
+        assessmentExpiresOn: ''
       }))
     } else {
       setFormData((prev) => ({
@@ -99,8 +101,7 @@ const SupportStatus = ({
           id: item,
           level: formData?.supportLevel || undefined,
           notes: formData?.explanation || undefined,
-          retainManualOverrideFor:
-            Number(formData?.assessmentExpiresOn) || undefined,
+          retainManualOverrideFor: totalDays > 0 ? totalDays : undefined,
           endDate: formData?.endOfSupport
             ? new Date(formData?.endOfSupport).toISOString()
             : undefined
@@ -125,8 +126,7 @@ const SupportStatus = ({
           id: item,
           level: formData?.supportLevel || undefined,
           notes: formData?.explanation || undefined,
-          retainManualOverrideFor:
-            Number(formData?.assessmentExpiresOn) || undefined,
+          retainManualOverrideFor: totalDays > 0 ? totalDays : undefined,
           endDate: formData?.endOfSupport
             ? new Date(formData?.endOfSupport).toISOString()
             : undefined
@@ -198,27 +198,16 @@ const SupportStatus = ({
         <FormControl
           isRequired
           hidden={noLongerMaintained}
-          isInvalid={formData?.assessmentExpiresOn > 365}
+          isInvalid={totalDays > 365}
         >
           <FormLabel htmlFor='assessmentExpiresOn'>
             Assessment Expires On
           </FormLabel>
-          <InputGroup>
-            <NumberInput
-              w={'100%'}
-              name='assessmentExpiresOn'
-              value={formData?.assessmentExpiresOn}
-              onChange={(valueString) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  assessmentExpiresOn: valueString
-                }))
-              }
-            >
-              <NumberInputField fontSize={'sm'} borderRightRadius={0} />
-            </NumberInput>
-            <InputRightAddon>Days</InputRightAddon>
-          </InputGroup>
+          <LynkDate
+            name='assessmentExpiresOn'
+            value={formData?.assessmentExpiresOn}
+            onChange={(value) => handleDateChange(value, 'assessmentExpiresOn')}
+          />
           <FormErrorMessage>Value must be between 1 and 365</FormErrorMessage>
         </FormControl>
         {/* EXPLANATION */}
