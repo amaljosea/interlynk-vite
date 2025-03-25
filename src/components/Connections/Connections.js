@@ -15,8 +15,8 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { GetOrgConnections, GetPersonalConnections } from 'graphQL/Queries'
 
 import { FaGithub } from 'react-icons/fa'
-import { FaBitbucket } from 'react-icons/fa6'
 
+import bitbucketPng from '../../assets/img/BitBucket.png'
 import jiraPng from '../../assets/img/Jira.png'
 import mailPng from '../../assets/img/Mail.png'
 import slackPng from '../../assets/img/Slack.png'
@@ -176,7 +176,7 @@ const Connections = ({ org }) => {
             {!isFreeTier && (
               <ConnectionCard
                 name='Bitbucket'
-                icon={FaBitbucket}
+                iconSrc={bitbucketPng}
                 color={primaryBlueText}
                 onConfigure={BITBUCKET.onOpen}
                 isConnected={greenCheck.bitbucket}
