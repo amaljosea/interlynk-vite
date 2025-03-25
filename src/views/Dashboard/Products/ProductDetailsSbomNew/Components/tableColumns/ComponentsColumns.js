@@ -510,7 +510,7 @@ const ComponentsColumns = ({
                       >
                         View Relationships
                       </MenuItem>
-                      <Divider hidden={isPart} />
+                      <Divider hidden={isPart || primary} />
                       {primary === false && (
                         <MenuItem
                           hidden={isPart}
