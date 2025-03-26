@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useParams } from 'react-router-dom'
 
-import { Button, Stack, Tooltip } from '@chakra-ui/react'
+import { Button, Flex, Tooltip } from '@chakra-ui/react'
 
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -51,9 +51,8 @@ const EnvironmentButtons = ({
   ]
 
   return (
-    <Stack
-      direction='row'
-      spacing={resolvedProductId ? 0 : 2}
+    <Flex
+      gap={resolvedProductId ? 0 : 2}
       sx={{ borderRadius: resolvedProductId ? '6px' : 0, alignItems: 'center' }}
       border={resolvedProductId ? `1px solid ${secondaryBlueBorder}` : 'none'}
     >
@@ -67,8 +66,8 @@ const EnvironmentButtons = ({
             title={`${label} environment`}
             variant={variant(name)}
             colorScheme={colorScheme(name)}
-            sx={{ minWidth: '60px', fontWeight: 400 }}
             onClick={onClick ? () => onClick(name) : ''}
+            sx={{ minWidth: '60px', maxW: 'fit-content', fontWeight: 400 }}
           >
             {count}
           </Button>
@@ -91,7 +90,7 @@ const EnvironmentButtons = ({
           </Tooltip>
         )
       })}
-    </Stack>
+    </Flex>
   )
 }
 
