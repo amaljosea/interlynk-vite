@@ -1,10 +1,11 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 
-import { Flex, FormControl, Select, Text } from '@chakra-ui/react'
+import { Flex, FormControl, Text } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
+import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -56,6 +57,14 @@ const DeleteRole = ({ isOpen, onClose, activeRole }) => {
   const { organizationRoles } = data?.organization || ''
 
   const filterRoles = organizationRoles?.filter((item) => item?.name !== name)
+
+  const roleOptions = [
+    { value: '', label: '-- Select --' },
+    ...(filterRoles?.map((item) => ({
+      value: item.id,
+      label: item.name
+    })) || [])
+  ]
 
   const onSuccess = () => {
     showToast({
@@ -119,18 +128,12 @@ const DeleteRole = ({ isOpen, onClose, activeRole }) => {
         </Text>
         <Text>Select the role you wish to move the users to</Text>
         <FormControl display={data ? 'block' : 'none'}>
-          <Select
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            textTransform={'capitalize'}
-          >
-            <option value=''>-- Select --</option>
-            {filterRoles?.map((item, index) => (
-              <option key={index} value={item.id}>
-                {item.name}
-              </option>
-            ))}
-          </Select>
+          <LynkSelect
+            value={roleOptions?.find((opt) => opt.value === role) || null}
+            onChange={(selected) => setRole(selected?.value)}
+            dropDown
+            options={roleOptions}
+          />
         </FormControl>
       </Flex>
     </LynkModal>
