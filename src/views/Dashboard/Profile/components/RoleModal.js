@@ -1,11 +1,13 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
+import { formatString } from 'utils'
 
-import { FormControl, FormLabel, Input, Select, Stack } from '@chakra-ui/react'
+import { FormControl, FormLabel, Input, Stack } from '@chakra-ui/react'
 
 import { ChangeRoleIcon } from 'components/Icons/Icons'
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
+import LynkSelect from 'components/LynkSelect'
 
 import { UpdateOrganizationUserRole } from 'graphQL/Mutation'
 import { GetRoles } from 'graphQL/Queries'
@@ -39,6 +41,12 @@ const RoleModal = ({ isOpen, onClose, data }) => {
     }
   }, [data])
 
+  const roleOptions =
+    roles?.organization?.organizationRoles?.map((item) => ({
+      value: item.id,
+      label: formatString(item.name)
+    })) || []
+
   return (
     <LynkModal
       isOpen={isOpen}
@@ -61,18 +69,18 @@ const RoleModal = ({ isOpen, onClose, data }) => {
         {roles && (
           <FormControl>
             <FormLabel>Role</FormLabel>
-            <Select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              textTransform={'capitalize'}
-            >
-              <option value=''>-- Select --</option>
-              {roles?.organization?.organizationRoles.map((item, index) => (
-                <option key={index} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
-            </Select>
+            <LynkSelect
+              name='role'
+              value={
+                roleOptions.find((option) => option.value === role) || null
+              }
+              onChange={(selectedOption) =>
+                setRole(selectedOption?.value || '')
+              }
+              options={roleOptions}
+              placeholder='-- Select --'
+              dropDown
+            />
           </FormControl>
         )}
       </Stack>
