@@ -154,10 +154,12 @@ const buildTree = (path, leafNode) => {
   }
 }
 
-const TreeView = ({ isOpen, onClose, component, isPrimary }) => {
-  const { dispatch } = useGlobalState()
+const TreeView = ({ isOpen, onClose, component }) => {
   const params = useParams()
+  const { dispatch } = useGlobalState()
   const { prodCompDispatch } = dispatch
+
+  const isPrimary = component?.primary ? true : false
 
   const { id: compId } = component || ''
   const sbomId = component?.sbomId || params?.sbomid

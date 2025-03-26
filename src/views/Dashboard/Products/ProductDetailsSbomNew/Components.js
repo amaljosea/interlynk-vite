@@ -1,4 +1,4 @@
-import { useLazyQuery, useMutation } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { debounce } from 'lodash'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -29,7 +29,7 @@ import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { deleteComSupplier } from 'graphQL/Mutation'
-import { GetComponentData, GetComponentPath } from 'graphQL/Queries'
+import { GetComponentData } from 'graphQL/Queries'
 
 import CompDrawer from '../components/CompDrawer'
 import CompInsights from '../components/CompInsights'
@@ -126,9 +126,6 @@ const Components = ({ sbomData }) => {
     childKey: 'update_sbom_components'
   })
 
-  const [getComPath, { data: comPath, loading: comPathLoading }] =
-    useLazyQuery(GetComponentPath)
-
   const MAP = useDisclosure()
   const CPE = useDisclosure()
   const EDIT = useDisclosure()
@@ -136,7 +133,6 @@ const Components = ({ sbomData }) => {
   const GRAPH = useDisclosure()
   const NOTES = useDisclosure()
   const DELETE = useDisclosure()
-  const RELATION = useDisclosure()
   const COMPONENT = useDisclosure()
   const INSIGHTS = useDisclosure()
   const VULNS = useDisclosure()
@@ -144,60 +140,36 @@ const Components = ({ sbomData }) => {
   const DELETE_SUPPLIER = useDisclosure()
   const LICENSE_STATUS = useDisclosure()
 
-  const onCreateComponent = useCallback(() => {
-    setActiveRow(null)
-    COMPONENT.onOpen()
-  }, [COMPONENT])
-
-  const onEditOpen = (row) => {
-    setActiveRow(row)
-    EDIT.onOpen()
-  }
-
-  const onDeleteSup = (item) => {
-    setActiveRow(item)
-    DELETE_SUPPLIER?.onOpen()
-  }
-
-  const onRelOpen = (row) => {
-    setActiveRow(row)
-    getComPath({ variables: { compId: row.id, sbomId: sbomId } })
-    RELATION.onOpen()
-  }
-
-  const onCheckPurl = (data) => {
+  const action = (type, data) => {
     setActiveRow(data)
-    PURL.onOpen()
-  }
-
-  const onCheckCpe = (data) => {
-    setActiveRow(data)
-    CPE.onOpen()
-  }
-
-  const handleAnalysis = (data) => {
-    setActiveRow(data)
-    INSIGHTS.onOpen()
-  }
-
-  const handleLicenseStatus = (data) => {
-    setActiveRow(data)
-    LICENSE_STATUS.onOpen()
-  }
-
-  const handleNotes = (data) => {
-    setActiveRow(data)
-    NOTES.onOpen()
-  }
-
-  const handleVuln = (row) => {
-    setActiveRow(row)
-    VULNS.onOpen()
-  }
-
-  const handleSupport = (row) => {
-    setActiveRow(row)
-    SUPPORT.onOpen()
+    switch (type) {
+      case 'create_component':
+        return COMPONENT.onOpen()
+      case 'edit_component':
+        return EDIT.onOpen()
+      case 'delete_component':
+        return DELETE.onOpen()
+      case 'delete_component_supplier':
+        return DELETE_SUPPLIER.onOpen()
+      case 'view_component_relation':
+        return GRAPH.onOpen()
+      case 'view_purl':
+        return PURL.onOpen()
+      case 'view_cpe':
+        return CPE.onOpen()
+      case 'view_insights':
+        return INSIGHTS.onOpen()
+      case 'edit_license_status':
+        return LICENSE_STATUS.onOpen()
+      case 'edit_notes':
+        return NOTES.onOpen()
+      case 'view_component_vulnerabilities':
+        return VULNS.onOpen()
+      case 'edit_component_support':
+        return SUPPORT.onOpen()
+      default:
+        return EDIT.onOpen()
+    }
   }
 
   const handleSort = async (column, sortDirection) => {
@@ -225,27 +197,7 @@ const Components = ({ sbomData }) => {
   )
 
   // COLUMNS
-  const columns = ComponentsColumns({
-    onCheckCpe,
-    onCheckPurl,
-    onEditOpen,
-    onRelOpen,
-    handleGraphView,
-    totalComp,
-    handleAnalysis,
-    handleLicenseStatus,
-    handleNotes,
-    handleSupport,
-    setActiveRow,
-    DELETE,
-    COMPONENT,
-    GRAPH,
-    PURL,
-    CPE,
-    isArchived,
-    setActiveComp,
-    handleVuln
-  })
+  const columns = ComponentsColumns({ totalComp, isArchived, action })
 
   const [deleteSupplier, { loading: supLoading }] =
     useMutation(deleteComSupplier)
@@ -307,7 +259,7 @@ const Components = ({ sbomData }) => {
     handleClear,
     onSearchInputChange,
     MAP,
-    onCreateComponent,
+    action,
     restricted,
     isArchived,
     compData,
@@ -344,21 +296,15 @@ const Components = ({ sbomData }) => {
           expandOnRowClicked
           onSort={handleSort}
           defaultSortAsc={false}
-          defaultSortFieldId={field}
           progressPending={loading}
+          defaultSortFieldId={field}
           onRowClicked={handleRowClick}
           subHeaderComponent={subHeader}
           progressComponent={<CustomLoader />}
-          customStyles={customStyles(headingTextColor)}
           expandableRowsComponent={ExpandedComponent}
+          customStyles={customStyles(headingTextColor)}
+          expandableRowsComponentProps={{ isArchived, action }}
           expandableRowExpanded={(row) => expandedRows?.includes(row?.name)}
-          expandableRowsComponentProps={{
-            isArchived,
-            onDeleteSup,
-            onCheckPurl,
-            onCheckCpe,
-            handleGraphView
-          }}
         />
       </Flex>
 
@@ -368,9 +314,8 @@ const Components = ({ sbomData }) => {
       {GRAPH.isOpen && (
         <TreeView
           isOpen={GRAPH.isOpen}
-          component={activeComp}
+          component={activeRow}
           onClose={GRAPH.onClose}
-          isPrimary={activeComp?.primary ? true : false}
         />
       )}
 
@@ -390,16 +335,6 @@ const Components = ({ sbomData }) => {
           activeRow={activeRow}
           isOpen={DELETE.isOpen}
           onClose={DELETE.onClose}
-        />
-      )}
-
-      {RELATION.isOpen && (
-        <RelationshipDrawer
-          activeRow={activeRow}
-          isOpen={RELATION.isOpen}
-          onClose={RELATION.onClose}
-          comPathLoading={comPathLoading}
-          compPath={comPath?.component?.pathToPrimary}
         />
       )}
 

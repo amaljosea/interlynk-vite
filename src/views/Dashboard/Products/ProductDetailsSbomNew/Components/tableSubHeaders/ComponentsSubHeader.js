@@ -21,7 +21,7 @@ const ComponentsSubHeader = ({
   handleClear,
   onSearchInputChange,
   MAP,
-  onCreateComponent,
+  action,
   restricted,
   isArchived,
   compData,
@@ -69,10 +69,10 @@ const ComponentsSubHeader = ({
           {!isCustomerView && (
             <AddButton
               label='Add Component'
-              onClick={onCreateComponent}
               name='add_component'
               isDisabled={restricted}
               hidden={signedUrlParams || isArchived}
+              onClick={() => action('create_component', null)}
             />
           )}
 
@@ -98,9 +98,10 @@ const ComponentsSubHeader = ({
     handleSearch,
     handleClear,
     onSearchInputChange,
-    MAP,
+    reset,
     shouldShowDemoFeatures,
-    onCreateComponent,
+    MAP.onOpen,
+    isCustomerView,
     restricted,
     signedUrlParams,
     isArchived,
@@ -108,8 +109,7 @@ const ComponentsSubHeader = ({
     searchInput,
     field,
     direction,
-    reset,
-    isCustomerView
+    action
   ])
 }
 
