@@ -20,7 +20,6 @@ const ComponentsSubHeader = ({
   handleSearch,
   handleClear,
   onSearchInputChange,
-  MAP,
   action,
   restricted,
   isArchived,
@@ -59,9 +58,9 @@ const ComponentsSubHeader = ({
             <Tooltip label='View Health Map'>
               <IconButton
                 colorScheme='blue'
-                onClick={MAP.onOpen}
                 icon={<RiFundsBoxFill />}
                 hidden={!shouldShowDemoFeatures}
+                onClick={() => action('view_health_map', null)}
               />
             </Tooltip>
           )}
@@ -100,7 +99,6 @@ const ComponentsSubHeader = ({
     onSearchInputChange,
     reset,
     shouldShowDemoFeatures,
-    MAP.onOpen,
     isCustomerView,
     restricted,
     signedUrlParams,

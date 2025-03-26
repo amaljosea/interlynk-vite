@@ -1,13 +1,14 @@
 import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
+import { getUndefinedIfEmptyOrAll } from 'utils'
 import { customStyles } from 'utils/styleUtils'
 import ComponentsColumns from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableColumns/ComponentsColumns'
 import ExpandedComponent from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableExpanded/ComponentsExpanded'
 import ComponentsSubHeader from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableSubHeaders/ComponentsSubHeader'
 import CompDrawer from 'views/Dashboard/Products/components/CompDrawer'
 
-import { Flex, Text, useColorMode, useDisclosure } from '@chakra-ui/react'
+import { Flex, Text, useDisclosure } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
@@ -21,12 +22,10 @@ import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ShareComponentData } from 'graphQL/Queries'
-import { getUndefinedIfEmptyOrAll } from 'utils'
 
 const Components = ({ sbomData }) => {
   const params = useParams()
   const activeTab = useQueryParam('tab')
-  const { colorMode } = useColorMode()
 
   const sbomId = params.sbomid
 
@@ -86,38 +85,24 @@ const Components = ({ sbomData }) => {
   const [activeRow, setActiveRow] = useState(null)
   const [compSearch, setCompSearch] = useState('')
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
-
+  const DETAILS = useDisclosure()
   const PURL = useDisclosure()
   const CPE = useDisclosure()
 
-  const onCheckPurl = (data) => {
+  const action = (type, data) => {
     setActiveRow(data)
-    PURL.onOpen()
-  }
-
-  const onCheckCpe = (data) => {
-    setActiveRow(data)
-    CPE.onOpen()
-  }
-
-  const onEditOpen = (row) => {
-    setActiveRow(row)
-    onOpen()
+    switch (type) {
+      case 'view_component_details':
+        return DETAILS.onOpen()
+      case 'view_purl':
+        return PURL.onOpen()
+      case 'view_cpe':
+        return CPE.onOpen()
+    }
   }
 
   // COLUMNS
-  const columns = ComponentsColumns({
-    onOpen,
-    colorMode,
-    onCheckCpe,
-    sbomId,
-    onEditOpen,
-    onCheckPurl,
-    setActiveRow,
-    PURL,
-    CPE
-  })
+  const columns = ComponentsColumns({ action })
 
   // CLEAR SERACH
   const handleClear = useCallback(async () => {
@@ -157,6 +142,7 @@ const Components = ({ sbomData }) => {
     handleSearch,
     handleClear,
     onSearchInputChange,
+    action,
     compData,
     searchInput,
     field,
@@ -207,11 +193,11 @@ const Components = ({ sbomData }) => {
       {/* PAGINATION */}
       <Pagination {...paginationProps} />
 
-      {isOpen && (
+      {DETAILS.isOpen && (
         <CompDrawer
           data={activeRow}
-          isOpen={isOpen}
-          onClose={onClose}
+          isOpen={DETAILS.isOpen}
+          onClose={DETAILS.onClose}
           primaryComp={primaryComponent}
         />
       )}

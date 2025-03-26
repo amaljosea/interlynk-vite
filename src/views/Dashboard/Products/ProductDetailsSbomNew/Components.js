@@ -167,6 +167,8 @@ const Components = ({ sbomData }) => {
         return VULNS.onOpen()
       case 'edit_component_support':
         return SUPPORT.onOpen()
+      case 'view_health_map':
+        return MAP.onOpen()
       default:
         return EDIT.onOpen()
     }
@@ -258,7 +260,6 @@ const Components = ({ sbomData }) => {
     handleSearch,
     handleClear,
     onSearchInputChange,
-    MAP,
     action,
     restricted,
     isArchived,
