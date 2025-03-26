@@ -56,11 +56,12 @@ const WeightControl = () => {
   })
   const { scoreSetting } = data?.organization || ''
 
-  const [threshold, setThreshold] = useState(365)
-  const [communityScore, setCommunityScore] = useState([5, 20])
   const [ageWeight, setAgeWeight] = useState(30)
-  const [communityWeight, setCommunityWeight] = useState(30)
   const [securityWeight, setSecurityWeight] = useState(40)
+  const [communityWeight, setCommunityWeight] = useState(30)
+  const [pkgAgeThreshold, setPkgAgeThreshold] = useState(365)
+  const [repoAgeThreshold, setRepoAgeThreshold] = useState(365)
+  const [communityScore, setCommunityScore] = useState([5, 20])
 
   const [showTooltip, setShowTooltip] = useState(false)
 
@@ -98,7 +99,8 @@ const WeightControl = () => {
           ageWeight: Number(ageWeight),
           communityWeight: Number(communityWeight),
           securityWeight: Number(securityWeight),
-          componentAbandonedThreshold: Number(threshold),
+          pkgAgeThreshold: Number(pkgAgeThreshold),
+          repoAgeThreshold: Number(repoAgeThreshold),
           contributorThresholdMin: communityScore[0],
           contributorThresholdMax: communityScore[1]
         }
@@ -122,8 +124,10 @@ const WeightControl = () => {
     !validScore(ageWeight) ||
     !validScore(communityWeight) ||
     !validScore(securityWeight) ||
-    !threshold ||
-    threshold > 3650 ||
+    !repoAgeThreshold ||
+    repoAgeThreshold > 3650 ||
+    !pkgAgeThreshold ||
+    pkgAgeThreshold > 3650 ||
     isInvalidArray(communityScore)
 
   useEffect(() => {
@@ -131,7 +135,8 @@ const WeightControl = () => {
       setAgeWeight(scoreSetting?.ageWeight * 100 || 0)
       setCommunityWeight(scoreSetting?.communityWeight * 100 || 0)
       setSecurityWeight(scoreSetting?.securityWeight * 100 || 0)
-      setThreshold(scoreSetting?.componentAbandonedThreshold || '')
+      setPkgAgeThreshold(scoreSetting?.pkgAgeThreshold || 0)
+      setRepoAgeThreshold(scoreSetting?.repoAgeThreshold || 0)
       setCommunityScore([
         scoreSetting?.contributorThresholdMin,
         scoreSetting?.contributorThresholdMax
@@ -243,26 +248,32 @@ const WeightControl = () => {
             <Stack spacing={5}>
               <FormControl
                 w={'400px'}
-                isRequired
-                isInvalid={!threshold || threshold > 3650}
+                isInvalid={!repoAgeThreshold || repoAgeThreshold > 3650}
               >
                 <FormLabel>
                   Consider Repository Abandoned After Inactive {`(in days)`}
                 </FormLabel>
                 <Input
                   type='number'
-                  value={threshold}
-                  onChange={(e) => setThreshold(e.target.value)}
+                  value={repoAgeThreshold}
+                  onChange={(e) => setRepoAgeThreshold(e.target.value)}
                 />
                 <FormErrorMessage>
                   Value must be between 1 and 3650
                 </FormErrorMessage>
               </FormControl>
-              <FormControl w={'400px'}>
+              <FormControl
+                w={'400px'}
+                isInvalid={!pkgAgeThreshold || pkgAgeThreshold > 3650}
+              >
                 <FormLabel>
                   Consider Package Abandoned After Inactive {`(in days)`}
                 </FormLabel>
-                <Input defaultValue={'365'} />
+                <Input
+                  type='number'
+                  value={pkgAgeThreshold}
+                  onChange={(e) => setPkgAgeThreshold(e.target.value)}
+                />
                 <FormErrorMessage>
                   Value must be between 1 and 365
                 </FormErrorMessage>
