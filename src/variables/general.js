@@ -53,6 +53,15 @@ export const licenseStatusTypes = [
 
 export const severityList = ['critical', 'high', 'low', 'medium', 'unknown']
 
+export const severityListSelect = [
+  { value: '', label: '-- Select --' },
+  { value: 'critical', label: 'Critical' },
+  { value: 'high', label: 'High' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'low', label: 'Low' },
+  { value: 'unknown', label: 'Unknown' }
+]
+
 export const vulnStatusTypes = [
   'Unspecified',
   'In Triage',
