@@ -58,7 +58,6 @@ const SbomDetails = ({ sbomData }) => {
     primaryComponent,
     vulnRunStatus,
     updatedAt,
-    lifecycle,
     healthScore
   } = sbomData || ''
   const { name, version, description } = primaryComponent || ''
