@@ -17,7 +17,6 @@ export default class SupportSection {
       await this.page.locator("//a[@aria-label='support']").click()
 
       await this.page.locator(`//button[@aria-label='add_support']`).click()
-      await this.page.waitForTimeout(2000)
 
       const name = 'Test'
       await this.page.getByPlaceholder('Enter Product Name').fill(name)
@@ -26,7 +25,6 @@ export default class SupportSection {
         .getByPlaceholder('Enter PURL / CPE')
         .fill('pkg:npm/example-package@1.0.0?platform=linux#src')
       await this.page.locator("button[type='submit']").click()
-      await this.page.waitForTimeout(3000)
 
       const supportActions = this.page.locator(
         `//button[@aria-label='support action ${name}']`
@@ -37,33 +35,25 @@ export default class SupportSection {
         this.page
           .locator(`//button[@aria-label='support edit ${name}']`)
           .click()
-        await this.page.waitForTimeout(2000)
 
         await this.page.getByText('Deprecated', { exact: true }).click()
 
         await this.page.locator("button[type='submit']").click()
-        await this.page.waitForTimeout(2000)
 
         await this.page.locator('.chakra-switch__thumb').nth(0).click()
-        await this.page.waitForTimeout(2000)
 
         await this.page.locator("button[type='submit']").click()
-        await this.page.waitForTimeout(3000)
 
         await this.page.locator('.chakra-switch__thumb').nth(0).click()
-        await this.page.waitForTimeout(2000)
 
         await this.page.locator("button[type='submit']").click()
-        await this.page.waitForTimeout(3000)
 
         await supportActions.click()
         this.page
           .locator(`//button[@aria-label='support delete ${name}']`)
           .click()
-        await this.page.waitForTimeout(2000)
 
         await this.page.locator("button[type='submit']").click()
-        await this.page.waitForTimeout(3000)
       } else {
         errors.push('License not found')
       }
