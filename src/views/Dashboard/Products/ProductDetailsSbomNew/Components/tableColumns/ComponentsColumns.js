@@ -48,22 +48,7 @@ const StatusIcon = ({ icon, label, color, onClick }) => {
   )
 }
 
-const ComponentsColumns = ({
-  onOpen = () => {},
-  onEditOpen,
-  handleGraphView,
-  totalComp,
-  handleAnalysis,
-  handleLicenseStatus,
-  handleNotes,
-  handleSupport,
-  setActiveRow,
-  onCheckCpe,
-  onCheckPurl,
-  DELETE,
-  isArchived,
-  handleVuln
-}) => {
+const ComponentsColumns = ({ totalComp, isArchived, action }) => {
   const {
     primaryTextColor,
     inverseSecondaryBgColor,
@@ -88,6 +73,18 @@ const ComponentsColumns = ({
     parentKey: 'view_sbom',
     childKey: 'update_sbom_components'
   })
+
+  const editComponent = 'edit_component'
+  const deleteComponent = 'delete_component'
+  const viewCompDetails = 'view_component_details'
+  const viewCompRelation = 'view_component_relation'
+  const viewPurl = 'view_purl'
+  const viewCpe = 'view_cpe'
+  const viewInsights = 'view_insights'
+  const editLicenseStatus = 'edit_license_status'
+  const editNotes = 'edit_notes'
+  const viewCompVulnerabilities = 'view_component_vulnerabilities'
+  const editCompSupport = 'edit_component_support'
 
   return useMemo(() => {
     const columns = [
@@ -156,7 +153,7 @@ const ComponentsColumns = ({
                       color='red'
                       label={'Vulnerable'}
                       icon={<LuBug size={14} />}
-                      onClick={() => handleVuln(row)}
+                      onClick={() => action(viewCompVulnerabilities, row)}
                     />
                   )}
                   {packageVersion?.isDeprecated === true && (
@@ -164,14 +161,14 @@ const ComponentsColumns = ({
                       color='orange'
                       label={'Deprecated'}
                       icon={<FaTextSlash size={14} />}
-                      onClick={() => handleAnalysis(row)}
+                      onClick={() => action(viewInsights, row)}
                     />
                   )}
                   {isOutdated && (
                     <StatusIcon
                       color='yellow'
                       label={'Outdated'}
-                      onClick={() => handleAnalysis(row)}
+                      onClick={() => action(viewInsights, row)}
                       icon={<MdOutlineHourglassBottom size={14} />}
                     />
                   )}
@@ -179,7 +176,7 @@ const ComponentsColumns = ({
                     <StatusIcon
                       color='green'
                       label={'Primary'}
-                      onClick={() => onEditOpen(row)}
+                      onClick={() => action(editComponent, row)}
                       icon={<FaStar size={14} />}
                     />
                   )}
@@ -187,7 +184,7 @@ const ComponentsColumns = ({
                     <StatusIcon
                       color='blue'
                       label={'Internal'}
-                      onClick={() => onEditOpen(row)}
+                      onClick={() => action(editComponent, row)}
                       icon={<FaBuilding size={14} />}
                     />
                   )}
@@ -243,7 +240,7 @@ const ComponentsColumns = ({
                   <Button
                     size='xs'
                     color={primaryTextColor}
-                    onClick={() => onCheckCpe(row)}
+                    onClick={() => action(viewCpe, row)}
                   >
                     CPE
                   </Button>
@@ -254,7 +251,7 @@ const ComponentsColumns = ({
                   <Button
                     size='xs'
                     color={primaryTextColor}
-                    onClick={() => onCheckPurl(row)}
+                    onClick={() => action(viewPurl, row)}
                   >
                     PURL
                   </Button>
@@ -454,14 +451,14 @@ const ComponentsColumns = ({
                       <MenuItem
                         hidden={isPart}
                         data-testid='edit_component'
-                        onClick={() => onEditOpen(row)}
+                        onClick={() => action(editComponent, row)}
                         isDisabled={status === 'signed' || !updateComponent}
                       >
                         Edit Component
                       </MenuItem>
                       <MenuItem
                         hidden={isFreeTier || isPart}
-                        onClick={() => handleSupport(row)}
+                        onClick={() => action(editCompSupport, row)}
                         data-testid='edit_component_support'
                         isDisabled={status === 'signed' || !updateComponent}
                       >
@@ -470,7 +467,7 @@ const ComponentsColumns = ({
                       <MenuItem
                         hidden={isFreeTier || isPart}
                         data-testid='view_license_status'
-                        onClick={() => handleLicenseStatus(row)}
+                        onClick={() => action(editLicenseStatus, row)}
                         isDisabled={status === 'signed' || !updateComponent}
                       >
                         Edit License Status
@@ -478,14 +475,14 @@ const ComponentsColumns = ({
                       <MenuItem
                         data-testid='view_notes'
                         hidden={isFreeTier || isPart}
-                        onClick={() => handleNotes(row)}
+                        onClick={() => action(editNotes, row)}
                         isDisabled={status === 'signed' || !updateComponent}
                       >
                         Edit Notes
                       </MenuItem>
                       <MenuItem
                         data-testid='view_component_vulns'
-                        onClick={() => handleVuln(row)}
+                        onClick={() => action(viewCompVulnerabilities, row)}
                         isDisabled={status === 'signed'}
                         hidden={isFreeTier}
                       >
@@ -493,7 +490,7 @@ const ComponentsColumns = ({
                       </MenuItem>
                       <MenuItem
                         data-testid='view_insights'
-                        onClick={() => handleAnalysis(row)}
+                        onClick={() => action(viewInsights, row)}
                         isDisabled={status === 'signed'}
                         hidden={isFreeTier}
                       >
@@ -501,7 +498,7 @@ const ComponentsColumns = ({
                       </MenuItem>
                       <MenuItem
                         data-testid='view_relation'
-                        onClick={() => handleGraphView(row)}
+                        onClick={() => action(viewCompRelation, row)}
                         isDisabled={
                           status === 'signed' ||
                           !updateComponent ||
@@ -515,10 +512,7 @@ const ComponentsColumns = ({
                         <MenuItem
                           hidden={isPart}
                           color={primaryErrorColor}
-                          onClick={() => {
-                            setActiveRow(row)
-                            DELETE.onOpen()
-                          }}
+                          onClick={() => action(deleteComponent, row)}
                           isDisabled={
                             status === 'signed' ||
                             !updateComponent ||
@@ -537,10 +531,7 @@ const ComponentsColumns = ({
                   size='sm'
                   sx={{ ml: 2, color: primaryTextColor }}
                   icon={<ViewIcon />}
-                  onClick={() => {
-                    setActiveRow(row)
-                    onOpen()
-                  }}
+                  onClick={() => action(viewCompDetails, row)}
                 />
               )}
             </Stack>
@@ -561,23 +552,12 @@ const ComponentsColumns = ({
     colorMode,
     inverseSecondaryBgColor,
     primaryTextColor,
-    handleVuln,
-    handleAnalysis,
-    onEditOpen,
-    onCheckCpe,
-    onCheckPurl,
+    action,
     secondaryTextColor,
     updateComponent,
     totalComp?.length,
     primaryErrorColor,
-    primaryBlueText,
-    handleSupport,
-    handleLicenseStatus,
-    handleNotes,
-    handleGraphView,
-    setActiveRow,
-    DELETE,
-    onOpen
+    primaryBlueText
   ])
 }
 

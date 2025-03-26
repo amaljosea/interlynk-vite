@@ -13,14 +13,7 @@ import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const ExpandedComponent = (props) => {
-  const {
-    data,
-    isArchived,
-    onDeleteSup,
-    onCheckPurl,
-    onCheckCpe,
-    handleGraphView
-  } = props
+  const { data, isArchived, action } = props
   const { componentSupportLevel } = data || {}
   const { level, retainManualOverrideFor, notes, user } =
     componentSupportLevel || {}
@@ -94,7 +87,7 @@ const ExpandedComponent = (props) => {
                       item={item}
                       editable={false}
                       premission={isArchived}
-                      onDelete={() => onDeleteSup(item)}
+                      onDelete={() => action('delete_component_supplier', item)}
                     />
                   ))}
                 </>
@@ -132,7 +125,8 @@ const ExpandedComponent = (props) => {
                       sx={{ p: 1, workBreak: 'break-all' }}
                       cursor={isCustomerView ? 'inherit' : 'pointer'}
                       onClick={() =>
-                        !isCustomerView && handleGraphView(comp?.toComp)
+                        !isCustomerView &&
+                        action('view_component_relation', comp?.toComp)
                       }
                     >
                       <Text wordBreak={'break-all'}>
@@ -158,7 +152,8 @@ const ExpandedComponent = (props) => {
                     colorScheme={'blue'}
                     cursor={isCustomerView ? 'inherit' : 'pointer'}
                     onClick={() =>
-                      !isCustomerView && handleGraphView(comp?.fromComp)
+                      !isCustomerView &&
+                      action('view_component_relation', comp?.fromComp)
                     }
                   >
                     <Text wordBreak={'break-all'}>
@@ -171,7 +166,7 @@ const ExpandedComponent = (props) => {
           {/* PURL */}
           <DetailItem
             cursor='pointer'
-            onClick={() => (isCustomerView ? null : onCheckPurl(data))}
+            onClick={() => (isCustomerView ? null : action('view_purl', data))}
             value={purl ? purlForDisplay : 'N/A'}
             label='PURL'
             valueStyle={purl && { color: purlColor }}
@@ -181,7 +176,7 @@ const ExpandedComponent = (props) => {
             cursor={cpes?.length > 0 ? 'pointer' : 'default'}
             label='CPES'
             value={cpes?.length > 0 ? cpes[0] : 'N/A'}
-            onClick={() => (isCustomerView ? null : onCheckCpe(data))}
+            onClick={() => (isCustomerView ? null : action('view_cpe', data))}
             valueStyle={cpes?.length > 0 && { color: cpesColor }}
           />
           {/* Scope */}
@@ -228,17 +223,7 @@ const ExpandedComponent = (props) => {
       </Box>
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    data,
-    isCustomerView,
-    signedUrlParams,
-    openSSF?.score,
-    handleGraphView,
-    isArchived,
-    onDeleteSup,
-    onCheckPurl,
-    onCheckCpe
-  ])
+  }, [data, isCustomerView, signedUrlParams, openSSF?.score, isArchived])
 }
 
 export default ExpandedComponent
