@@ -694,3 +694,22 @@ export const isValidWebhookURL = (url) => {
     return false
   }
 }
+
+export const getDate = (totalDays) => {
+  const today = new Date()
+  today?.setDate(today.getDate() + totalDays)
+  return today
+}
+
+export const getTotalDays = (dateString) => {
+  if (!dateString) return 0
+
+  const givenDate = new Date(dateString)
+  const today = new Date()
+
+  givenDate.setHours(0, 0, 0, 0)
+  today.setHours(0, 0, 0, 0)
+
+  const diffInMs = givenDate - today
+  return Math.floor(diffInMs / (1000 * 60 * 60 * 24))
+}
