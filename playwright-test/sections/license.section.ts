@@ -19,13 +19,11 @@ export default class LicenseSection {
       await this.page.locator("//a[@aria-label='licenses']").click()
 
       await this.page.locator(`//button[@aria-label='add_license']`).click()
-      await this.page.waitForTimeout(2000)
 
       const name = randomLicenseName()
       await this.page.locator(`//input[@aria-label='license_name']`).fill(name)
 
       await this.page.locator("button[type='submit']").click()
-      await this.page.waitForTimeout(2000)
 
       const license = this.page.getByTestId(`license_${name}`)
 
@@ -33,19 +31,19 @@ export default class LicenseSection {
         await this.page
           .locator(`//button[@aria-label='license action ${name}']`)
           .click()
-        this.page
+        await this.page
           .locator(`//button[@aria-label='license edit ${name}']`)
           .click()
-        await this.page.waitForTimeout(2000)
-        await this.page
-          .locator(`//select[@aria-label='license_attr']`)
-          .selectOption('YES')
-        await this.page
-          .locator(`//select[@aria-label='license_status']`)
-          .selectOption('APPROVED')
+
+        await this.page.locator('#license_attr').click()
+        await this.page.keyboard.type('YES')
+        await this.page.keyboard.press('Enter')
+
+        await this.page.locator('#license_status').click()
+        await this.page.keyboard.type('APPROVED')
+        await this.page.keyboard.press('Enter')
 
         await this.page.locator("button[type='submit']").click()
-        await this.page.waitForTimeout(3000)
       } else {
         errors.push('License not found')
       }

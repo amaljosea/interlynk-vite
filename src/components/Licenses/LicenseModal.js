@@ -285,7 +285,7 @@ const LicenseModal = ({ isOpen, onClose, data, updateLic }) => {
                 value={attributionOptions.find(
                   (option) => option.value === attribution
                 )}
-                aria-label='license_attr'
+                id='license_attr'
                 onChange={(e) => setAttribution(e.value)}
                 options={attributionOptions}
                 dropDown
@@ -390,7 +390,7 @@ const LicenseModal = ({ isOpen, onClose, data, updateLic }) => {
               <LynkSelect
                 name='state'
                 value={statusOptions.find((option) => option.value === state)}
-                aria-label='license_status'
+                id='license_status'
                 onChange={(e) => setState(e.value)}
                 options={statusOptions}
                 dropDown
