@@ -155,15 +155,8 @@ const SbomCompare = ({
         {sbomInfo ? (
           <SbomInfo data={sbomInfo} />
         ) : (
-          <Stack
-            spacing={4}
-            direction={'column'}
-            gap={2}
-            mt={6}
-            height={'285px'}
-          >
+          <Stack spacing={5} mt={6} height={'285px'}>
             {/* PROJECT GROUPS */}
-
             <FormControl fontSize={'sm'}>
               <FormLabel htmlFor='groupOne'>Product</FormLabel>
               <AsyncSelect
@@ -177,7 +170,6 @@ const SbomCompare = ({
                 }}
               />
             </FormControl>
-
             {/* ENVIRONMENT */}
             <FormControl fontSize={'sm'}>
               <FormLabel htmlFor='productOne'>Environment</FormLabel>

@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
