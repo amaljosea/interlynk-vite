@@ -257,7 +257,7 @@ const WeightControl = () => {
                 isInvalid={repoAgeThreshold < 1 || repoAgeThreshold > 3650}
               >
                 <FormLabel>
-                  Consider Repository Abandoned After Inactive {`(in days)`}
+                  Mark Repository Unmaintained After Inactivity {`(in days)`}
                 </FormLabel>
                 <Input
                   type='number'
@@ -273,7 +273,7 @@ const WeightControl = () => {
                 isInvalid={pkgAgeThreshold < 1 || pkgAgeThreshold > 3650}
               >
                 <FormLabel>
-                  Consider Package Abandoned After Inactive {`(in days)`}
+                  Mark Package Unmaintained After Inactivity {`(in days)`}
                 </FormLabel>
                 <Input
                   type='number'
