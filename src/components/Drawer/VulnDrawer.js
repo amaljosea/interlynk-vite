@@ -1,12 +1,11 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { severityList } from 'variables/general'
+import { severityListSelect } from 'variables/general'
 
 import {
   Center,
   Input,
-  Select,
   Spinner,
   Stack,
   Tag,
@@ -18,6 +17,7 @@ import { FormControl, FormLabel } from '@chakra-ui/react'
 import LynkAlert from 'components/LynkAlert'
 import LynkDate from 'components/LynkDate'
 import LynkDrawer from 'components/LynkDrawer'
+import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -85,6 +85,14 @@ const VulnDrawer = ({ data, isOpen, onClose }) => {
   const { components } = allComponents?.sbom || ''
   const { nodes } = components || ''
 
+  const formattedNodes =
+    nodes
+      ?.sort((a, b) => a?.name?.localeCompare(b?.name))
+      .map((item) => ({
+        value: item?.id,
+        label: `${item?.name}-${item?.version}${item?.primary ? ' [Primary Component]' : ''}`
+      })) || []
+
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData((prev) => ({
@@ -94,8 +102,12 @@ const VulnDrawer = ({ data, isOpen, onClose }) => {
     setError('')
   }
 
-  const onChangeComponent = (e) => {
-    setCompId(e.target.value)
+  const handleSelectChange = (selectedItem, name) => {
+    const { value } = selectedItem
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value === '' ? null : value
+    }))
     setError('')
   }
 
@@ -197,23 +209,18 @@ const VulnDrawer = ({ data, isOpen, onClose }) => {
           </FormControl>
           <FormControl>
             <FormLabel htmlFor='sev'>Severity</FormLabel>
-            <Select
+            <LynkSelect
               name='sev'
-              value={formData?.sev}
-              onChange={handleChange}
-              textTransform={'capitalize'}
-            >
-              <option value=''>-- Select --</option>
-              {severityList?.map((item, index) => (
-                <option
-                  key={index}
-                  value={item}
-                  style={{ textTransform: 'capitalize' }}
-                >
-                  {item}
-                </option>
-              ))}
-            </Select>
+              value={
+                severityListSelect.find(
+                  (option) => option.value === formData?.sev
+                ) || null
+              }
+              onChange={(item) => handleSelectChange(item, 'sev')}
+              options={severityListSelect}
+              placeholder='-- Select --'
+              dropDown
+            />
           </FormControl>
           <FormControl>
             <FormLabel htmlFor='publishedAt'>Published At</FormLabel>
@@ -254,21 +261,21 @@ const VulnDrawer = ({ data, isOpen, onClose }) => {
           {!compLoading && nodes ? (
             <FormControl>
               <FormLabel htmlFor='componentId'>Component</FormLabel>
-              <Select
-                value={compId}
+              <LynkSelect
                 name='componentId'
-                onChange={onChangeComponent}
-              >
-                <option value=''>-- Select --</option>
-                {[...nodes]
-                  .sort((a, b) => a?.name?.localeCompare(b?.name))
-                  .map((item, idx) => (
-                    <option key={idx} value={item?.id}>
-                      {item?.name}-{item?.version}
-                      {item?.primary ? ` [Primary Component]` : ''}
-                    </option>
-                  ))}
-              </Select>
+                value={
+                  formattedNodes.find((option) => option.value === compId) ||
+                  null
+                }
+                onChange={(selectedOption) => {
+                  setCompId(selectedOption?.value || '')
+                  setError('')
+                }}
+                options={formattedNodes}
+                placeholder='-- Select --'
+                dropDown
+                menuPlacement='top'
+              />
             </FormControl>
           ) : (
             <Text>Loading components...</Text>
