@@ -16,7 +16,6 @@ import CustomLoader from 'components/CustomLoader'
 import ComponentNotes from 'components/Drawer/ComponentNotes'
 import ComponentVulns from 'components/Drawer/ComponentVulns'
 import LicenseStatus from 'components/Drawer/LicenseStatus'
-import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
 import ComponentAddModal from 'components/Modal/ComponentAddModal'
@@ -119,8 +118,6 @@ const Components = ({ sbomData }) => {
 
   const { lifecycle, primaryComponent } = sbomData || ''
 
-  const [activeComp, setActiveComp] = useState(null)
-
   const updateComponent = useHasPermission({
     parentKey: 'view_sbom',
     childKey: 'update_sbom_components'
@@ -192,7 +189,7 @@ const Components = ({ sbomData }) => {
 
   const handleGraphView = useMemo(
     () => (row) => {
-      setActiveComp(row)
+      setActiveRow(row)
       GRAPH.onOpen()
     },
     [GRAPH]
