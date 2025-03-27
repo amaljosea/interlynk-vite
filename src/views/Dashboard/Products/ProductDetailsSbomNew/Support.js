@@ -13,6 +13,7 @@ import SupportStatus from 'components/Modal/SupportStatus'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -29,6 +30,11 @@ const Support = () => {
   const projectId = params.productid
   const sbomId = params.sbomid
   const activeTab = useQueryParam('tab')
+
+  const editComponent = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'update_sbom_components'
+  })
 
   const { supportState, dispatch } = useGlobalState()
   const { level, include, field, direction, searchInput } = supportState
@@ -143,7 +149,6 @@ const Support = () => {
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           subHeader
-          selectableRows
           expandableRows
           persistTableHead
           responsive={true}
@@ -155,6 +160,7 @@ const Support = () => {
           progressPending={loading}
           defaultSortFieldId={field}
           subHeaderComponent={subHeader}
+          selectableRows={editComponent}
           clearSelectedRows={toggleClear}
           className='data-table-container'
           onSelectedRowsChange={handleChange}

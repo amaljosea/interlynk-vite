@@ -157,7 +157,7 @@ const VersionsTable = (props) => {
 
   useGradualPolling({ shouldPoll, startPolling, stopPolling })
 
-  const createSbom = useHasPermission({
+  const updateSbom = useHasPermission({
     parentKey: 'view_sbom',
     childKey: 'update_sbom'
   })
@@ -519,6 +519,7 @@ const VersionsTable = (props) => {
                   Rerun Support Analysis
                 </MenuItem>
                 <MenuItem
+                  isDisabled={!updateSbom}
                   hidden={signedUrlParams}
                   onClick={() => handleTransfer(row)}
                   aria-label={`sbom-${row?.projectVersion}-transfer`}
@@ -670,7 +671,7 @@ const VersionsTable = (props) => {
           {/* BUILD SBOM */}
           <Tooltip label='Build Version'>
             <IconButton
-              isDisabled={!enabled || !createSbom}
+              isDisabled={!enabled || !updateSbom}
               hidden={signedUrlParams}
               colorScheme='blue'
               onClick={onBuildSbom}
@@ -693,7 +694,7 @@ const VersionsTable = (props) => {
     enabled,
     signedUrlParams,
     ARC_VERSIONS.onOpen,
-    createSbom,
+    updateSbom,
     onBuildSbom
   ])
 

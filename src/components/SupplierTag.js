@@ -1,6 +1,7 @@
 import { Link, Stack, Text, Tooltip } from '@chakra-ui/react'
 import { Tag, TagCloseButton, TagLabel, TagRightIcon } from '@chakra-ui/react'
 
+import { useHasPermission } from 'hooks/useHasPermission'
 import { useRouteFlags } from 'hooks/useRouteFlags'
 
 import { FaPen } from 'react-icons/fa6'
@@ -9,6 +10,11 @@ const SupplierTag = ({ item, premission, onEdit, onDelete, editable }) => {
   const { isCustomerView } = useRouteFlags()
   const { contactName, contactEmail, url, name } = item || {}
   const supplierURL = url?.startsWith('http') ? item.url : `http://${url}`
+
+  const updateSbom = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'update_sbom'
+  })
 
   const supplierInfo = () => {
     return (
@@ -40,7 +46,7 @@ const SupplierTag = ({ item, premission, onEdit, onDelete, editable }) => {
           sx={{ fontSize: 12, opacity: 0.5, cursor: 'pointer' }}
         />
       )}
-      {editable && !isCustomerView && (
+      {editable && !isCustomerView && updateSbom && (
         <TagCloseButton
           aria-label='supplier_delete'
           onClick={() => onDelete(item)}

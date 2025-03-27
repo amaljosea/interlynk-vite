@@ -25,6 +25,7 @@ import { GetArchivedVersions, GetVersions } from 'graphQL/Queries'
 
 import { FaEye } from 'react-icons/fa6'
 import { MdOutlineUnarchive } from 'react-icons/md'
+import { useHasPermission } from 'hooks/useHasPermission'
 
 const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
   const navigate = useNavigate()
@@ -35,6 +36,11 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
   const productId = params?.productid
   const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
   const [activeRow, setActiveRow] = useState(null)
+
+  const updateSbom = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'update_sbom'
+  })
 
   const { data: versions } = useQuery(GetVersions, {
     skip: !isOpen,
@@ -135,9 +141,10 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
                 <IconButton
                   size='sm'
                   colorScheme='blue'
-                  aria-label={`sbom-${item?.projectVersion}-restore`}
+                  isDisabled={!updateSbom}
                   onClick={() => handleRestore(item)}
                   icon={<MdOutlineUnarchive size={20} />}
+                  aria-label={`sbom-${item?.projectVersion}-restore`}
                 />
               </Tooltip>
             </ButtonGroup>
