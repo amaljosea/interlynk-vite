@@ -4975,6 +4975,8 @@ export const GetScoreSetting = gql`
         contributorThresholdMax
         contributorThresholdMin
         componentAbandonedThreshold
+        pkgAgeThreshold
+        repoAgeThreshold
         organization {
           id
         }

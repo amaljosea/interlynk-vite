@@ -2631,18 +2631,20 @@ export const UpdateScoreSetting = gql`
     $ageWeight: Float!
     $communityWeight: Float!
     $securityWeight: Float!
-    $componentAbandonedThreshold: Int!
     $contributorThresholdMin: Int!
     $contributorThresholdMax: Int!
+    $pkgAgeThreshold: Int
+    $repoAgeThreshold: Int
   ) {
     scoreSettingUpdate(
       input: {
         ageWeight: $ageWeight
         communityWeight: $communityWeight
         securityWeight: $securityWeight
-        componentAbandonedThreshold: $componentAbandonedThreshold
         contributorThresholdMax: $contributorThresholdMax
         contributorThresholdMin: $contributorThresholdMin
+        pkgAgeThreshold: $pkgAgeThreshold
+        repoAgeThreshold: $repoAgeThreshold
       }
     ) {
       scoreSetting {
@@ -2652,6 +2654,8 @@ export const UpdateScoreSetting = gql`
         contributorThresholdMax
         contributorThresholdMin
         componentAbandonedThreshold
+        repoAgeThreshold
+        pkgAgeThreshold
       }
       errors
     }
