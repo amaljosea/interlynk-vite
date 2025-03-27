@@ -2631,7 +2631,6 @@ export const UpdateScoreSetting = gql`
     $ageWeight: Float!
     $communityWeight: Float!
     $securityWeight: Float!
-    $componentAbandonedThreshold: Int!
     $contributorThresholdMin: Int!
     $contributorThresholdMax: Int!
     $pkgAgeThreshold: Int
@@ -2642,7 +2641,6 @@ export const UpdateScoreSetting = gql`
         ageWeight: $ageWeight
         communityWeight: $communityWeight
         securityWeight: $securityWeight
-        componentAbandonedThreshold: $componentAbandonedThreshold
         contributorThresholdMax: $contributorThresholdMax
         contributorThresholdMin: $contributorThresholdMin
         pkgAgeThreshold: $pkgAgeThreshold

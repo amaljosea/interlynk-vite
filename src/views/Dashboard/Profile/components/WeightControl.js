@@ -28,6 +28,7 @@ import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -47,6 +48,11 @@ const WeightControl = () => {
   const tab = useQueryParam('tab')
   const { showToast } = useCustomToast()
   const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
+
+  const canEditOrg = useHasPermission({
+    parentKey: 'view_organization',
+    childKey: 'update_organization'
+  })
 
   const [updateScore, { loading: updateLoading }] =
     useMutation(UpdateScoreSetting)
@@ -124,9 +130,9 @@ const WeightControl = () => {
     !validScore(ageWeight) ||
     !validScore(communityWeight) ||
     !validScore(securityWeight) ||
-    !repoAgeThreshold ||
+    repoAgeThreshold < 1 ||
     repoAgeThreshold > 3650 ||
-    !pkgAgeThreshold ||
+    pkgAgeThreshold < 1 ||
     pkgAgeThreshold > 3650 ||
     isInvalidArray(communityScore)
 
@@ -248,7 +254,7 @@ const WeightControl = () => {
             <Stack spacing={5}>
               <FormControl
                 w={'400px'}
-                isInvalid={!repoAgeThreshold || repoAgeThreshold > 3650}
+                isInvalid={repoAgeThreshold < 1 || repoAgeThreshold > 3650}
               >
                 <FormLabel>
                   Consider Repository Abandoned After Inactive {`(in days)`}
@@ -264,7 +270,7 @@ const WeightControl = () => {
               </FormControl>
               <FormControl
                 w={'400px'}
-                isInvalid={!pkgAgeThreshold || pkgAgeThreshold > 3650}
+                isInvalid={pkgAgeThreshold < 1 || pkgAgeThreshold > 3650}
               >
                 <FormLabel>
                   Consider Package Abandoned After Inactive {`(in days)`}
@@ -348,9 +354,9 @@ const WeightControl = () => {
         fontSize={'sm'}
         w={'fit-content'}
         colorScheme='blue'
-        isDisabled={disabled}
         onClick={handleSubmit}
         isLoading={updateLoading}
+        isDisabled={disabled || !canEditOrg}
       >
         Update
       </Button>
