@@ -1,11 +1,12 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
-import { FormControl, FormLabel, Input, Select } from '@chakra-ui/react'
+import { FormControl, FormLabel, Input } from '@chakra-ui/react'
 import { SimpleGrid, Stack } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
+import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
 
@@ -102,6 +103,14 @@ const FieldModal = ({ data, isOpen, onClose }) => {
     }))
   }
 
+  const handleSelect = (selectedItem) => {
+    const { value } = selectedItem
+    setFormData((prev) => ({
+      ...prev,
+      fieldType: value
+    }))
+  }
+
   const { displayName, internalName, fieldType } = formData || ''
 
   const variables = {
@@ -148,7 +157,8 @@ const FieldModal = ({ data, isOpen, onClose }) => {
 
   const isInvalid =
     formData?.minValue === formData?.maxValue ||
-    Number(formData?.minValue) > Number(formData?.maxValue)
+    Number(formData?.minValue) > Number(formData?.maxValue) ||
+    formData?.fieldType === ''
 
   useEffect(() => {
     if (data) {
@@ -161,6 +171,19 @@ const FieldModal = ({ data, isOpen, onClose }) => {
       }))
     }
   }, [data])
+
+  const baseOptions = [
+    { value: '', label: '-- Select --' },
+    { value: 'TEXT', label: 'Text' },
+    { value: 'RANGE', label: 'Range' }
+  ]
+
+  const fieldTypeOptions = baseOptions.filter(
+    (option) =>
+      option.value === '' ||
+      (!(isCustomTextPresent && option.value === 'TEXT') &&
+        !(isCustomRangePresent && option.value === 'RANGE'))
+  )
 
   return (
     <LynkModal
@@ -196,22 +219,24 @@ const FieldModal = ({ data, isOpen, onClose }) => {
           />
         </FormControl>
         {/* FIELD TYPE */}
-        <FormControl isRequired>
-          <FormLabel htmlFor='fieldType'>Field Type</FormLabel>
-          <Select
-            name={'fieldType'}
-            value={formData?.fieldType}
-            onChange={handleChange}
-          >
-            <option value=''>-- Select --</option>
-            <option disabled={isCustomTextPresent} value='TEXT'>
-              Text
-            </option>
-            <option disabled={isCustomRangePresent} value='RANGE'>
-              Range
-            </option>
-          </Select>
-        </FormControl>
+        {!data?.id && (
+          <FormControl isRequired isDisabled={data?.id}>
+            <FormLabel htmlFor='fieldType'>Field Type</FormLabel>
+
+            <LynkSelect
+              name='fieldType'
+              value={
+                fieldTypeOptions.find(
+                  (option) => option.value === formData?.fieldType
+                ) || null
+              }
+              onChange={(selectedOption) => handleSelect(selectedOption)}
+              options={fieldTypeOptions}
+              placeholder='-- Select --'
+              dropDown
+            />
+          </FormControl>
+        )}
         {/* VALUE */}
         {formData?.fieldType === 'RANGE' && (
           <SimpleGrid columns={2} spacing={4} pt={1}>
