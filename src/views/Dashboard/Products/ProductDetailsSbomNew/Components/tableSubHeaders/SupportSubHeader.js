@@ -6,6 +6,7 @@ import { Flex, IconButton, Stack, Tooltip } from '@chakra-ui/react'
 
 import RefreshBtn from 'components/Icons/RefreshBtn'
 
+import { useHasPermission } from 'hooks/useHasPermission'
 import { useRouteFlags } from 'hooks/useRouteFlags'
 
 import { FaPen } from 'react-icons/fa6'
@@ -23,6 +24,11 @@ const SupportSubHeader = ({
   supportData
 }) => {
   const { isCustomerView } = useRouteFlags()
+
+  const editComponent = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'update_sbom_components'
+  })
 
   const withSupport = selectedItems?.filter(
     (component) => component?.componentSupportLevel !== null
@@ -56,7 +62,7 @@ const SupportSubHeader = ({
                 icon={<FaPen />}
                 colorScheme='blue'
                 onClick={handleStatus}
-                isDisabled={notAllowed}
+                isDisabled={notAllowed || !editComponent}
               />
             </Tooltip>
           )}
@@ -81,6 +87,7 @@ const SupportSubHeader = ({
     info,
     handleStatus,
     notAllowed,
+    editComponent,
     supportData
   ])
 

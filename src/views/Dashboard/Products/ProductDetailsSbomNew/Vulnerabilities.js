@@ -36,6 +36,7 @@ import {
 import VulnerabilityColumns from './Components/tableColumns/VulnerabilityColumns'
 import ExpandedComponent from './Components/tableExpanded/VulnerabilityExpanded'
 import VulnerabilitySubHeader from './Components/tableSubHeaders/VulnerabilitySubHeader'
+import { useHasPermission } from 'hooks/useHasPermission'
 
 export const GetProjectSettings = gql`
   query GetProjectSettings($id: Uuid!) {
@@ -53,6 +54,11 @@ const Vulnerabilities = ({ sbomData }) => {
   const { headingTextColor } = useThemeColor(['headingTextColor'])
 
   const isArchived = isSbomArchived(sbomData)
+
+  const editVulns = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'edit_vulnerabilities'
+  })
 
   const { data: projectSettings, loading: projectSettingsLoad } = useQuery(
     GetProjectSettings,
@@ -331,10 +337,10 @@ const Vulnerabilities = ({ sbomData }) => {
             setActiveRow,
             onCvssOpen
           }}
-          selectableRows={!signedUrlParams}
           clearSelectedRows={toggleClear}
           onSelectedRowsChange={handleChange}
-        />
+          selectableRows={!signedUrlParams && editVulns}
+          />
       </Flex>
 
       {/* PAGINATION */}
