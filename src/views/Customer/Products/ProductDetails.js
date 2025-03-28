@@ -54,7 +54,8 @@ const ProductDetails = () => {
 
   const [versionFilters, setVersionFilters] = useState({
     field: 'SBOMS_CREATED_AT',
-    direction: 'DESC'
+    direction: 'DESC',
+    lifestage: []
   })
 
   useEffect(() => {

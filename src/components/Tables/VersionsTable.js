@@ -4,15 +4,26 @@ import { addDays, differenceInDays, parseISO } from 'date-fns'
 import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { getFormat, getFullDate } from 'utils'
-import { getLink, getSignedUrlParams, timeSince } from 'utils'
+import {
+  getFormat,
+  getFullDate,
+  getLink,
+  getSignedUrlParams,
+  timeSince
+} from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import { customStyles, getType } from 'utils/styleUtils'
+import { stages } from 'variables/general'
 import LifecycleModal from 'views/Dashboard/Products/components/LifecycleModal'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { Badge, Flex, useDisclosure } from '@chakra-ui/react'
+import {
+  Flex,
+  MenuItemOption,
+  MenuOptionGroup,
+  useDisclosure
+} from '@chakra-ui/react'
 import { Link as Olink, Portal, Stack } from '@chakra-ui/react'
 import { Divider, Grid, GridItem, Icon, IconButton } from '@chakra-ui/react'
 import { Box, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
@@ -24,6 +35,7 @@ import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import ToolsDrawer from 'components/Drawer/ToolsDrawer'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import LynkAction from 'components/Misc/LynkAction'
+import MenuHeading from 'components/Misc/MenuHeading'
 import VulnBadge from 'components/Misc/VulnBadge'
 import ArchiveSbom from 'components/Modal/ArchiveSbom'
 import AutomationWarning from 'components/Modal/AutomationWarning'
@@ -75,6 +87,7 @@ const GetProjectGroup = gql`
 
 const VersionsTable = (props) => {
   const { handleSort, retentionTime, filters, setFilters } = props
+  const { lifestage } = filters || {}
 
   const navigate = useNavigate()
   const params = useParams()
@@ -142,7 +155,7 @@ const VersionsTable = (props) => {
     : data?.projectGroup
   const { name, enabled } = result || ''
 
-  const { nodes, paginationProps, loading, startPolling, stopPolling } =
+  const { nodes, paginationProps, loading, startPolling, stopPolling, reset } =
     usePaginatedQuery(signedUrlParams ? ShareVersionTable : GetVersionsTable, {
       skip: (tab === VERSIONS || tab === null) && !TOOL.isOpen ? false : true,
       selector: signedUrlParams
@@ -501,7 +514,7 @@ const VersionsTable = (props) => {
           </Tooltip>
         )
       },
-      width:'12%',
+      width: '12%',
       wrap: true,
       right: 'true',
       sortable: true
@@ -521,7 +534,7 @@ const VersionsTable = (props) => {
         )
       },
       wrap: true,
-      width:'12%',
+      width: '12%',
       sortable: true,
       right: 'true'
     },
@@ -674,6 +687,14 @@ const VersionsTable = (props) => {
   )
 
   const subHeaderComponent = useMemo(() => {
+    const onFilterLifestage = (value) => {
+      setFilters((prev) => ({
+        ...prev,
+        lifestage: value?.includes('all') ? [] : value
+      }))
+      reset()
+    }
+
     return (
       <Flex
         sx={{ w: '100%', alignItems: 'center' }}
@@ -687,6 +708,36 @@ const VersionsTable = (props) => {
             onClear={handleClear}
             onFilter={handleSearch}
           />
+          {/* LIFE STAGE */}
+          <Menu closeOnSelect={false}>
+            <MenuHeading title={'Lifestage'} active={lifestage?.length > 0} />
+            <MenuList
+              minW={'280px'}
+              maxW={'400px'}
+              minH='auto'
+              maxH={'320px'}
+              fontSize={'sm'}
+              overflowY={'scroll'}
+            >
+              <MenuOptionGroup
+                type={'checkbox'}
+                value={lifestage}
+                onChange={onFilterLifestage}
+              >
+                <MenuItemOption value='all'>All</MenuItemOption>
+                {stages?.map((item, index) => (
+                  <MenuItemOption
+                    key={index}
+                    fontSize={'sm'}
+                    value={item?.value}
+                    textTransform={'capitalize'}
+                  >
+                    {item.label}
+                  </MenuItemOption>
+                ))}
+              </MenuOptionGroup>
+            </MenuList>
+          </Menu>
           {selectedSbom?.length === 1 && (
             <Text color={primaryBlueText}>
               ** Select one more version to enable comparison
@@ -740,6 +791,7 @@ const VersionsTable = (props) => {
     onSearchInputChange,
     handleClear,
     handleSearch,
+    lifestage,
     selectedSbom?.length,
     primaryBlueText,
     TOOL.onOpen,
@@ -747,7 +799,9 @@ const VersionsTable = (props) => {
     signedUrlParams,
     ARC_VERSIONS.onOpen,
     updateSbom,
-    onBuildSbom
+    onBuildSbom,
+    setFilters,
+    reset
   ])
 
   const disableRowCheckBox = (row) => {
