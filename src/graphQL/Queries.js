@@ -988,6 +988,7 @@ export const GetVersionsTable = gql`
           id
           spec
           phases
+          
           creationAt
           createdAt
           updatedAt
@@ -996,6 +997,7 @@ export const GetVersionsTable = gql`
           licensesExp
           projectVersion
           vulnRunStatus
+          productLifeCycleStage
           alternatives {
             id
           }

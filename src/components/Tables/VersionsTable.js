@@ -8,10 +8,11 @@ import { getFormat, getFullDate } from 'utils'
 import { getLink, getSignedUrlParams, timeSince } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import { customStyles, getType } from 'utils/styleUtils'
+import LifecycleModal from 'views/Dashboard/Products/components/LifecycleModal'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { Flex, useDisclosure } from '@chakra-ui/react'
+import { Badge, Flex, useDisclosure } from '@chakra-ui/react'
 import { Link as Olink, Portal, Stack } from '@chakra-ui/react'
 import { Divider, Grid, GridItem, Icon, IconButton } from '@chakra-ui/react'
 import { Box, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
@@ -120,6 +121,7 @@ const VersionsTable = (props) => {
   const ARCHIVE_SBOM = useDisclosure()
   const AUTOMATION = useDisclosure()
   const SUPPORT = useDisclosure()
+  const LIFECYCLE = useDisclosure()
 
   const tab = useQueryParam('tab')
 
@@ -195,6 +197,11 @@ const VersionsTable = (props) => {
     REPROCESS.onOpen()
   }
 
+  const handleLifecycle = (row) => {
+    setActiveRow(row)
+    LIFECYCLE.onOpen()
+  }
+
   const handleAutomation = (row) => {
     setActiveRow(row)
     AUTOMATION.onOpen()
@@ -231,6 +238,18 @@ const VersionsTable = (props) => {
     setClearSelect(!clearSelect)
   }, [clearSelect, setClearSelect, setSelectedSbom])
 
+  const StatusInfo = ({ data }) => {
+    return (
+      <Stack w={'100%'} spacing={1} p={2}>
+        <Text>Unspecified: {data?.unspecifiedCount}</Text>
+        <Text>In Triage: {data?.inTriageCount}</Text>
+        <Text>Affected: {data?.affectedCount}</Text>
+        <Text>Not Afftected: {data?.notAffectedCount}</Text>
+        <Text>Fixed: {data?.fixedCount}</Text>
+      </Stack>
+    )
+  }
+
   // COLUMNS
   const columns = [
     // VERSION
@@ -238,7 +257,13 @@ const VersionsTable = (props) => {
       id: 'SBOMS_PROJECT_VERSION',
       name: 'VERSION',
       selector: (row, index) => {
-        const { projectVersion, createdAt, alternatives, isReprocess } = row
+        const {
+          projectVersion,
+          createdAt,
+          alternatives,
+          isReprocess,
+          productLifeCycleStage
+        } = row
         const parsedCreatedDate = parseISO(createdAt)
         const endDate = addDays(parsedCreatedDate, retention)
         const diff = differenceInDays(endDate, currentDate)
@@ -277,41 +302,61 @@ const VersionsTable = (props) => {
                 </Tooltip>
               </GridItem>
             )}
-            <GridItem
-              display={'flex'}
-              colSpan={shouldShowDemoFeatures ? 6 : 7}
-              sx={{ gap: 2, flexDirection: 'row', alignItems: 'center' }}
-            >
-              <Link to={link} onClick={onStartTour} data-testid={`version`}>
-                <Text color={primaryBlueText} fontSize={14}>
-                  {projectVersion}
-                </Text>
-              </Link>
-              {!isReprocess && showIcon && (
-                <Tooltip label={ignoreMsg}>
-                  <Box>
-                    <Icon
-                      as={HiOutlineDuplicate}
-                      sx={{ mt: 1, fontSize: 18, color: primaryTextColor }}
+            <GridItem w={'100%'} colSpan={shouldShowDemoFeatures ? 6 : 7}>
+              <Flex
+                sx={{
+                  mb: 1,
+                  gap: 2,
+                  flexDirection: 'row',
+                  alignItems: 'center'
+                }}
+              >
+                <Link to={link} onClick={onStartTour} data-testid={`version`}>
+                  <Text color={primaryBlueText} fontSize={14}>
+                    {projectVersion}
+                  </Text>
+                </Link>
+                {!isReprocess && showIcon && (
+                  <Tooltip label={ignoreMsg}>
+                    <Box>
+                      <Icon
+                        as={HiOutlineDuplicate}
+                        sx={{ mt: 1, fontSize: 18, color: primaryTextColor }}
+                      />
+                    </Box>
+                  </Tooltip>
+                )}
+                {daysUntilDeletion && !signedUrlParams && (
+                  <Tooltip
+                    label={`Marked for deletion on ${endDate ? new Date(endDate).toLocaleDateString() : ''}`}
+                  >
+                    <IconButton
+                      size='xs'
+                      icon={<IoMdWarning size={16} />}
+                      sx={{ color: primaryErrorColor, bg: 'transparent' }}
                     />
-                  </Box>
-                </Tooltip>
-              )}
-              {daysUntilDeletion && !signedUrlParams && (
-                <Tooltip
-                  label={`Marked for deletion on ${endDate ? new Date(endDate).toLocaleDateString() : ''}`}
-                >
-                  <IconButton
-                    size='xs'
-                    icon={<IoMdWarning size={16} />}
-                    sx={{ color: primaryErrorColor, bg: 'transparent' }}
-                  />
-                </Tooltip>
-              )}
+                  </Tooltip>
+                )}
+              </Flex>
+              <Tag
+                hidden={!productLifeCycleStage}
+                size={'sm'}
+                variant='solid'
+                colorScheme='blue'
+                w={'fit-content'}
+                cursor={'pointer'}
+              >
+                <TagLabel textTransform={'capitalize'}>
+                  {productLifeCycleStage
+                    ? String(productLifeCycleStage).replace(/_/g, ' ')
+                    : ''}
+                </TagLabel>
+              </Tag>
             </GridItem>
           </Grid>
         )
       },
+      width: '14%',
       wrap: true,
       sortable: true
     },
@@ -335,7 +380,8 @@ const VersionsTable = (props) => {
             </Tag>
           </Link>
         )
-      }
+      },
+      width: '10%'
     },
     // LICENSES
     {
@@ -354,7 +400,8 @@ const VersionsTable = (props) => {
             <TagLabel mx={'auto'}>{stats?.compLicenseCount}</TagLabel>
           </Tag>
         )
-      }
+      },
+      width: '10%'
     },
     // VULNERABILITIES
     {
@@ -420,27 +467,22 @@ const VersionsTable = (props) => {
     {
       id: 'STATUSES',
       name: 'STATUSES',
-      width: '20%',
+      width: '8%',
       selector: (row) => {
         const { vulnerabilityMetrics } = row
+        const total = Number(
+          vulnerabilityMetrics?.unspecifiedCount +
+            vulnerabilityMetrics?.inTriageCount +
+            vulnerabilityMetrics?.affectedCount +
+            vulnerabilityMetrics?.fixedCount +
+            vulnerabilityMetrics?.notAffectedCount
+        )
         return (
-          <Flex gap={1} flexWrap={'wrap'} my={4}>
-            <VulnBadge color='gray' label='Unspecified'>
-              {vulnerabilityMetrics?.unspecifiedCount}
-            </VulnBadge>
-            <VulnBadge color='cyan' label='In Triage'>
-              {vulnerabilityMetrics?.inTriageCount}
-            </VulnBadge>
-            <VulnBadge color='red' label='Affected'>
-              {vulnerabilityMetrics?.affectedCount}
-            </VulnBadge>
-            <VulnBadge color='blue' label='Fixed'>
-              {vulnerabilityMetrics?.fixedCount}
-            </VulnBadge>
-            <VulnBadge color='green' label='Not Affected'>
-              {vulnerabilityMetrics?.notAffectedCount}
-            </VulnBadge>
-          </Flex>
+          <Tooltip label={<StatusInfo data={vulnerabilityMetrics} />}>
+            <Tag w={'80px'} cursor={'pointer'} colorScheme='blue'>
+              <TagLabel mx={'auto'}>{total}</TagLabel>
+            </Tag>
+          </Tooltip>
         )
       },
       omit: signedUrlParams
@@ -459,6 +501,7 @@ const VersionsTable = (props) => {
           </Tooltip>
         )
       },
+      width:'12%',
       wrap: true,
       right: 'true',
       sortable: true
@@ -478,6 +521,7 @@ const VersionsTable = (props) => {
         )
       },
       wrap: true,
+      width:'12%',
       sortable: true,
       right: 'true'
     },
@@ -494,6 +538,14 @@ const VersionsTable = (props) => {
             />
             <Portal>
               <MenuList fontSize={'sm'}>
+                <MenuItem
+                  hidden={signedUrlParams}
+                  isDisabled={!updateSbom}
+                  onClick={() => handleLifecycle(row)}
+                  aria-label={`sbom-${row?.projectVersion}-lifecycle`}
+                >
+                  Set Lifecycle
+                </MenuItem>
                 <MenuItem
                   aria-label={`sbom-${row?.projectVersion}-reprocess`}
                   onClick={() => handleRepSbom(row)}
@@ -732,6 +784,14 @@ const VersionsTable = (props) => {
         <DataTable {...dataTableProps} className='data-table-container' />
         <Pagination {...paginationProps} />
       </Flex>
+      {/* VERSION LIFECYCLE */}
+      {LIFECYCLE.isOpen && (
+        <LifecycleModal
+          isOpen={LIFECYCLE.isOpen}
+          onClose={LIFECYCLE.onClose}
+          data={{ projectId: productId, sbomId: activeRow?.id }}
+        />
+      )}
       {/* DELETE VERSION */}
       {DELETE_SBOM.isOpen && (
         <DeleteSbom

@@ -1,6 +1,5 @@
-import { gql, useMutation } from '@apollo/client'
+import { gql, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
 import { stages } from 'variables/general'
 
 import { FormControl, FormLabel, Select, Stack } from '@chakra-ui/react'
@@ -38,16 +37,32 @@ const UpdateLifecycle = gql`
   }
 `
 
+const GetLifecycleData = gql`
+  query GetLifecycleData($projectId: Uuid!, $sbomId: Uuid!) {
+    sbom(sbomId: $sbomId, projectId: $projectId) {
+      productLifeCycleStage
+      releaseDate
+      endOfLifeDate
+      endOfSupportDate
+    }
+  }
+`
+
 const LifecycleModal = ({ data, isOpen, onClose }) => {
-  const params = useParams()
   const { showToast } = useCustomToast()
   const [updateStage, { loading }] = useMutation(UpdateLifecycle)
 
+  const { data: sbomData } = useQuery(GetLifecycleData, {
+    skip: isOpen ? false : true,
+    variables: { ...data }
+  })
+  const { sbom } = sbomData || {}
+
   const [formData, setFormData] = useState({
     stage: undefined,
-    releaseDate: new Date(),
-    endOfLifeDate: new Date(),
-    endOfSupportDate: new Date()
+    releaseDate: undefined,
+    endOfLifeDate: undefined,
+    endOfSupportDate: undefined
   })
   const [error, setError] = useState('')
 
@@ -55,7 +70,10 @@ const LifecycleModal = ({ data, isOpen, onClose }) => {
     const { name, value } = e.target
     setFormData((prev) => ({
       ...prev,
-      [name]: value === '' ? undefined : value
+      [name]: value === '' ? undefined : value,
+      releaseDate: value === 'released' ? new Date() : undefined,
+      endOfLifeDate: value === 'end_of_life' ? new Date() : undefined,
+      endOfSupportDate: value === 'end_of_support' ? new Date() : undefined
     }))
     setError('')
   }
@@ -79,7 +97,7 @@ const LifecycleModal = ({ data, isOpen, onClose }) => {
       formData || ''
     updateStage({
       variables: {
-        id: params?.sbomid,
+        id: data?.sbomId,
         stage: stage || undefined,
         releaseDate: stage === 'released' ? releaseDate : undefined,
         endOfLifeDate: stage === 'end_of_life' ? endOfLifeDate : undefined,
@@ -100,10 +118,10 @@ const LifecycleModal = ({ data, isOpen, onClose }) => {
   }
 
   useEffect(() => {
-    if (data) {
-      const { stage, releaseDate, endOfLifeDate, endOfSupportDate } = data || ''
+    if (sbom) {
+      const { releaseDate, endOfLifeDate, endOfSupportDate } = sbom || ''
       setFormData(() => ({
-        stage: stage || undefined,
+        stage: sbom?.productLifeCycleStage || undefined,
         releaseDate: releaseDate ? new Date(releaseDate) : undefined,
         endOfLifeDate: endOfLifeDate ? new Date(endOfLifeDate) : undefined,
         endOfSupportDate: endOfSupportDate
@@ -111,7 +129,7 @@ const LifecycleModal = ({ data, isOpen, onClose }) => {
           : undefined
       }))
     }
-  }, [data])
+  }, [sbom])
 
   return (
     <LynkModal
