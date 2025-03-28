@@ -13,8 +13,8 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useRouteFlags } from 'hooks/useRouteFlags'
 
 import {
-  componentSupportLevelCreate,
-  componentSupportLevelUpdate
+  ComponentSupportLevelBulkUpdate,
+  componentSupportLevelBulkCreate
 } from 'graphQL/Mutation'
 
 const SupportStatus = ({
@@ -36,11 +36,11 @@ const SupportStatus = ({
   }
 
   const [createSupport, { loading: createLoading }] = useMutation(
-    componentSupportLevelCreate,
+    componentSupportLevelBulkCreate,
     { onCompleted: () => handleClear() }
   )
   const [updateSupport, { loading: updateLoading }] = useMutation(
-    componentSupportLevelUpdate,
+    ComponentSupportLevelBulkUpdate,
     { onCompleted: () => handleClear() }
   )
 
@@ -95,51 +95,59 @@ const SupportStatus = ({
 
   const handleUpdate = (data) => {
     setToggleClear(false)
-    data?.map((item) => {
-      updateSupport({
-        variables: {
-          id: item,
-          level: formData?.supportLevel || undefined,
-          notes: formData?.explanation || undefined,
-          retainManualOverrideFor: totalDays > 0 ? totalDays : undefined,
-          endDate: formData?.endOfSupport
-            ? new Date(formData?.endOfSupport).toISOString()
-            : undefined
-        }
-      }).then((res) => {
-        const { errors } = res?.data?.componentSupportLevelCreate || {}
-        if (errors?.length > 0) {
-          showToast({
-            description: errors[0],
-            status: 'error'
-          })
-        }
-      })
+    const ids = data?.length > 0 ? data?.map((item) => item) : []
+    updateSupport({
+      variables: {
+        ids: ids,
+        level: formData?.supportLevel || undefined,
+        notes: formData?.explanation || undefined,
+        retainManualOverrideFor: totalDays > 0 ? totalDays : undefined,
+        endDate: formData?.endOfSupport
+          ? new Date(formData?.endOfSupport).toISOString()
+          : undefined
+      }
+    }).then((res) => {
+      const { errors } = res?.data?.componentSupportLevelBulkUpdate || {}
+      if (errors?.length > 0) {
+        showToast({
+          description: errors[0],
+          status: 'error'
+        })
+      } else {
+        showToast({
+          description: 'Status updated successfully',
+          status: 'success'
+        })
+      }
     })
   }
 
   const handleCreate = (data) => {
     setToggleClear(false)
-    data?.map((item) => {
-      createSupport({
-        variables: {
-          id: item,
-          level: formData?.supportLevel || undefined,
-          notes: formData?.explanation || undefined,
-          retainManualOverrideFor: totalDays > 0 ? totalDays : undefined,
-          endDate: formData?.endOfSupport
-            ? new Date(formData?.endOfSupport).toISOString()
-            : undefined
-        }
-      }).then((res) => {
-        const { errors } = res?.data?.componentSupportLevelCreate || {}
-        if (errors?.length > 0) {
-          showToast({
-            description: errors[0],
-            status: 'error'
-          })
-        }
-      })
+    const ids = data?.length > 0 ? data?.map((item) => item) : []
+    createSupport({
+      variables: {
+        ids: ids,
+        level: formData?.supportLevel || undefined,
+        notes: formData?.explanation || undefined,
+        retainManualOverrideFor: totalDays > 0 ? totalDays : undefined,
+        endDate: formData?.endOfSupport
+          ? new Date(formData?.endOfSupport).toISOString()
+          : undefined
+      }
+    }).then((res) => {
+      const { errors } = res?.data?.componentSupportLevelBulkCreate || {}
+      if (errors?.length > 0) {
+        showToast({
+          description: errors[0],
+          status: 'error'
+        })
+      } else {
+        showToast({
+          description: 'Status updated successfully',
+          status: 'success'
+        })
+      }
     })
   }
 

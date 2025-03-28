@@ -259,6 +259,11 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
             description: errors[0],
             status: 'error'
           })
+        } else {
+          showToast({
+            description: 'Status updated successfully',
+            status: 'success'
+          })
         }
       })
       .finally(() => handleClose(false))
@@ -282,6 +287,11 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
           showToast({
             description: errors[0],
             status: 'error'
+          })
+        } else {
+          showToast({
+            description: 'Status updated successfully',
+            status: 'success'
           })
         }
       })
@@ -395,7 +405,9 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
           value={formData?.assessmentExpiresOn}
           onChange={(value) => handleDateChange(value, 'assessmentExpiresOn')}
         />
-        <FormErrorMessage>Value must be between 1 and 365 days</FormErrorMessage>
+        <FormErrorMessage>
+          Value must be between 1 and 365 days
+        </FormErrorMessage>
       </FormControl>
       {/* EXPLANATION */}
       <FormControl>
