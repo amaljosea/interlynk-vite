@@ -11,7 +11,6 @@ import {
   Flex,
   IconButton,
   Input,
-  Select,
   SimpleGrid,
   Stack,
   Text,
@@ -21,6 +20,7 @@ import { Button, ButtonGroup } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
+import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -90,12 +90,11 @@ const CompLinks = ({ data }) => {
 
   const containsSpace = hasWhiteSpace(links?.url)
 
-  const handleTypeChange = (e) => {
-    const { value } = e.target
-    handleChange('links', 'name', value)
+  const handleTypeChange = (selectedItem) => {
+    handleChange('links', 'name', selectedItem)
     const isExists =
       externalUrls?.length > 0 &&
-      externalUrls?.some((item) => item.name === value)
+      externalUrls?.some((item) => item.name === selectedItem)
     if (isExists) {
       setError('Link type already exists!')
     } else {
@@ -186,20 +185,38 @@ const CompLinks = ({ data }) => {
     borderBottom: `1px solid ${grayBorderColor}`
   }
 
+  const typeOptions = [
+    { label: '-- Select --', value: '' },
+    ...componentLinkTypes.map((item) => ({
+      value: item,
+      label: item
+    }))
+  ]
+
+  const selectStyles = {
+    menuList: (base) => ({
+      ...base,
+      maxHeight: '320px'
+    })
+  }
+
   return (
     <>
       <Flex w={'100%'} gap={4} direction={'column'} alignItems={'flex-start'}>
         {/* NAME */}
         <FormControl isRequired isInvalid={error}>
           <FormLabel>Type</FormLabel>
-          <Select value={links?.name} onChange={handleTypeChange}>
-            <option value=''>-- Select --</option>
-            {componentLinkTypes?.map((item, index) => (
-              <option key={index} value={item}>
-                {item}
-              </option>
-            ))}
-          </Select>
+          <LynkSelect
+            onChange={(selectedOption) =>
+              handleTypeChange(selectedOption?.value)
+            }
+            value={typeOptions.find((option) => option.value === links?.name)}
+            options={typeOptions}
+            placeholder='-- Select --'
+            dropDown
+            styles={selectStyles}
+          />
+
           <FormErrorMessage data-testid='link_type_error'>
             {error}
           </FormErrorMessage>
