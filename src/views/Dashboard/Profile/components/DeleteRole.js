@@ -1,5 +1,6 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
+import { formatString } from 'utils'
 
 import { Flex, FormControl, Text } from '@chakra-ui/react'
 
@@ -62,7 +63,7 @@ const DeleteRole = ({ isOpen, onClose, activeRole }) => {
     { value: '', label: '-- Select --' },
     ...(filterRoles?.map((item) => ({
       value: item.id,
-      label: item.name
+      label: formatString(item.name)
     })) || [])
   ]
 
