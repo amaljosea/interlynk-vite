@@ -8,7 +8,6 @@ import {
   FormErrorMessage,
   IconButton,
   Input,
-  Select,
   SimpleGrid,
   Stack,
   Tag,
@@ -22,6 +21,7 @@ import { FormControl, FormLabel } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import LynkDate from 'components/LynkDate'
 import LynkDrawer from 'components/LynkDrawer'
+import LynkSelect from 'components/LynkSelect'
 import CompInfo from 'components/Misc/CompInfo'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -205,6 +205,14 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleSelect = (selectedItem, name) => {
+    const { value } = selectedItem
     const isUnspecified =
       name === 'supportLevel' && (value === 'unspecified' || noLongerMaintained)
     if (isUnspecified) {
@@ -348,26 +356,31 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
       </Stack>
     )
 
+  const supportLevelOptions = [
+    { value: '', label: '-- Select --' },
+    { value: 'unspecified', label: 'Unspecified' },
+    { value: 'actively_maintained', label: 'Actively Maintained' },
+    { value: 'no_longer_maintained', label: 'No Longer Maintained' },
+    { value: 'abandoned', label: 'Abandoned' }
+  ]
+
   return (
     <Stack spacing={4} mt={2}>
       {/* SUPPRT LEVEL */}
       <FormControl>
         <FormLabel htmlFor='supportLevel'>Support Level</FormLabel>
-        <Select
-          sx={inputStyle}
+        <LynkSelect
           name='supportLevel'
-          value={formData?.supportLevel}
+          value={
+            supportLevelOptions.find(
+              (opt) => opt.value === formData?.supportLevel
+            ) || null
+          }
+          onChange={(selected) => handleSelect(selected, 'supportLevel')}
+          options={supportLevelOptions}
           isDisabled={isCustomerView}
-          onChange={handleChange}
-        >
-          <option value='' style={{ background: 'lightgray' }}>
-            -- Select --
-          </option>
-          <option value='unspecified'>Unspecified</option>
-          <option value='actively_maintained'>Actively Maintained</option>
-          <option value='no_longer_maintained'>No Longer Maintained</option>
-          <option value='abandoned'>Abandoned</option>
-        </Select>
+          dropDown
+        />
       </FormControl>
       {/* END-OF-SUPPORT DATE */}
       {(formData?.supportLevel === 'actively_maintained' ||
@@ -395,7 +408,9 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
           value={formData?.assessmentExpiresOn}
           onChange={(value) => handleDateChange(value, 'assessmentExpiresOn')}
         />
-        <FormErrorMessage>Value must be between 1 and 365 days</FormErrorMessage>
+        <FormErrorMessage>
+          Value must be between 1 and 365 days
+        </FormErrorMessage>
       </FormControl>
       {/* EXPLANATION */}
       <FormControl>
