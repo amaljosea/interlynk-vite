@@ -2,7 +2,7 @@ import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { PackageURL } from 'packageurl-js'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getSignedUrlParams } from 'utils'
+import { formatString, getSignedUrlParams } from 'utils'
 import { validateCPEString } from 'utils/cpeUtils'
 import { severityList } from 'variables/general'
 
@@ -11,7 +11,6 @@ import {
   Flex,
   IconButton,
   Input,
-  Select,
   Stack,
   Text,
   Textarea
@@ -22,6 +21,7 @@ import DividerWithText from 'components/DividerWithText'
 import LynkAlert from 'components/LynkAlert'
 import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
+import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -154,8 +154,8 @@ const CustomVuln = ({ isOpen, onClose }) => {
     }
   }
 
-  const onChangeComponent = (e) => {
-    setCompId(e.target.value)
+  const onChangeComponent = (selectedItem) => {
+    setCompId(selectedItem.value)
     setError('')
   }
 
@@ -192,6 +192,32 @@ const CustomVuln = ({ isOpen, onClose }) => {
       setCompId(component?.id)
     }
   }, [components])
+
+  const sevOptions = [
+    { label: '-- Select --', value: '' },
+    ...severityList.map((item) => ({
+      label: formatString(item),
+      value: item
+    }))
+  ]
+  const compOptions = [
+    { label: '-- Select --', value: '' },
+    ...(nodes ?? []) // Ensures nodes is always an array
+      .sort((a, b) => (a?.name || '').localeCompare(b?.name || ''))
+      .map((item) => ({
+        label: `${item?.name}-${item?.version}${item?.primary ? ' [Primary Component]' : ''}`,
+        value: item?.id
+      }))
+  ]
+
+  const CompValue = nodes?.find((item) => item.id === compId)
+    ? {
+        label: `${nodes?.find((item) => item.id === compId).name}-${
+          nodes?.find((item) => item.id === compId).version
+        }${nodes?.find((item) => item.id === compId).primary ? ' [Primary Component]' : ''}`,
+        value: compId
+      }
+    : null
 
   return (
     <LynkModal
@@ -249,23 +275,23 @@ const CustomVuln = ({ isOpen, onClose }) => {
         </FormControl>
         <FormControl>
           <FormLabel htmlFor='sev'>Severity</FormLabel>
-          <Select
+          <LynkSelect
             name='sev'
-            value={formData?.sev}
-            onChange={handleChange}
-            textTransform={'capitalize'}
-          >
-            <option value=''>-- Select --</option>
-            {severityList?.map((item, index) => (
-              <option
-                key={index}
-                value={item}
-                style={{ textTransform: 'capitalize' }}
-              >
-                {item}
-              </option>
-            ))}
-          </Select>
+            value={
+              severityList?.find((item) => item === formData?.sev)
+                ? {
+                    label: formatString(formData.sev),
+                    value: formData.sev
+                  }
+                : null
+            }
+            onChange={(selected) =>
+              handleChange({ target: { name: 'sev', value: selected.value } })
+            }
+            options={sevOptions}
+            placeholder={'-- Select --'}
+            dropDown
+          />
         </FormControl>
         <FormControl>
           <FormLabel htmlFor='reportedAt'>Reported At</FormLabel>
@@ -315,21 +341,15 @@ const CustomVuln = ({ isOpen, onClose }) => {
         {!compLoading && nodes && (
           <FormControl>
             <FormLabel htmlFor='componentId'>Component</FormLabel>
-            <Select
-              value={compId}
+            <LynkSelect
               name='componentId'
-              onChange={onChangeComponent}
-            >
-              <option value=''>-- Select --</option>
-              {[...nodes]
-                .sort((a, b) => a?.name?.localeCompare(b?.name))
-                .map((item, idx) => (
-                  <option key={idx} value={item?.id}>
-                    {item?.name}-{item?.version}
-                    {item?.primary ? ` [Primary Component]` : ''}
-                  </option>
-                ))}
-            </Select>
+              value={CompValue}
+              onChange={(selected) => onChangeComponent(selected)}
+              options={compOptions}
+              dropDown
+              menuPlacement='top'
+              placeholder={'-- Select --'}
+            />
           </FormControl>
         )}
       </Stack>
