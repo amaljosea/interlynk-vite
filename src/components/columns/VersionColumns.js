@@ -42,14 +42,8 @@ import { HiOutlineDuplicate } from 'react-icons/hi'
 import { IoMdWarning } from 'react-icons/io'
 
 const VersionColumns = (props) => {
-  const {
-    action,
-    retentionTime,
-    onFilterSev,
-    onClear,
-    onSelectLicenses,
-    onStartTour
-  } = props
+  const { action, retentionTime, onFilterSev, onSelectLicenses, onStartTour } =
+    props
 
   const signedUrlParams = getSignedUrlParams()
   const { isFreeTier } = useGlobalQueryContext()
@@ -335,10 +329,7 @@ const VersionColumns = (props) => {
         selector: (row) => {
           return (
             <Menu>
-              <LynkAction
-                onClick={onClear}
-                aria-label={`sbom-${row?.projectVersion}-actions`}
-              />
+              <LynkAction aria-label={`sbom-${row?.projectVersion}-actions`} />
               <Portal>
                 <MenuList fontSize={'sm'}>
                   <MenuItem
@@ -414,7 +405,6 @@ const VersionColumns = (props) => {
     generateProductVersionDetailPageUrlFromCurrentUrl,
     ignoreMsg,
     isFreeTier,
-    onClear,
     onFilterSev,
     onSelectLicenses,
     onStartTour,

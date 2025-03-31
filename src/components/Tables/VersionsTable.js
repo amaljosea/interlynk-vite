@@ -70,7 +70,8 @@ const VersionsTable = (props) => {
     versionState,
     dispatch,
     selectedSbom,
-    setSelectedSbom
+    setSelectedSbom,
+    onClearSelection
   } = useGlobalState()
   const { searchInput } = versionState
   const { prodVulnDispatch, prodCompDispatch } = dispatch
@@ -162,17 +163,6 @@ const VersionsTable = (props) => {
     prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
   }
 
-  const onClear = useCallback(() => {
-    setSelectedSbom([])
-    setClearSelect(!clearSelect)
-  }, [clearSelect, setClearSelect, setSelectedSbom])
-
-  const onBuildSbom = useCallback(() => {
-    onClear()
-    prodCompDispatch({ type: 'CLEAR_LICENSES' })
-    SBOM.onOpen()
-  }, [SBOM, onClear, prodCompDispatch])
-
   const handleChange = (state) => {
     setSelectedSbom(state?.selectedRows)
   }
@@ -227,7 +217,7 @@ const VersionsTable = (props) => {
     setActiveRow(data)
     switch (type) {
       case 'build_sbom':
-        onClear()
+        onClearSelection()
         prodCompDispatch({ type: 'CLEAR_LICENSES' })
         return SBOM.onOpen()
       case 'archive_sbom':
@@ -258,7 +248,6 @@ const VersionsTable = (props) => {
     action,
     retentionTime,
     onFilterSev,
-    onClear,
     onSelectLicenses,
     onStartTour
   })
@@ -273,7 +262,6 @@ const VersionsTable = (props) => {
     enabled,
     signedUrlParams,
     updateSbom,
-    onBuildSbom,
     action
   })
 
