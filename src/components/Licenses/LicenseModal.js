@@ -234,7 +234,7 @@ const LicenseModal = ({ isOpen, onClose, data, updateLic }) => {
               />
             </FormControl>
 
-            <FormControl>
+            <FormControl isDisabled={!updateLic}>
               <FormLabel htmlFor='attributionKeys'>Attribution Keys</FormLabel>
               <LynkSelect
                 isCreatable
@@ -286,6 +286,7 @@ const LicenseModal = ({ isOpen, onClose, data, updateLic }) => {
                   (option) => option.value === attribution
                 )}
                 id='license_attr'
+                isDisabled={!updateLic}
                 onChange={(e) => setAttribution(e.value)}
                 options={attributionOptions}
                 dropDown
@@ -299,6 +300,7 @@ const LicenseModal = ({ isOpen, onClose, data, updateLic }) => {
                 value={copyLeftOptions.find(
                   (option) => option.value === copyLeft
                 )}
+                isDisabled={!updateLic}
                 onChange={(e) => setCopyLeft(e.value)}
                 options={copyLeftOptions}
                 dropDown
@@ -391,6 +393,7 @@ const LicenseModal = ({ isOpen, onClose, data, updateLic }) => {
                 name='state'
                 value={statusOptions.find((option) => option.value === state)}
                 id='license_status'
+                isDisabled={!updateLic}
                 onChange={(e) => setState(e.value)}
                 options={statusOptions}
                 dropDown
