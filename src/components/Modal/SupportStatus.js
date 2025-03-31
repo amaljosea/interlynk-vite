@@ -196,9 +196,9 @@ const SupportStatus = ({
         )}
         {/* RETAIN MANNUAL OVERRIDE */}
         <FormControl
-          isRequired
           hidden={noLongerMaintained}
           isInvalid={totalDays > 365}
+          isRequired={formData?.supportLevel !== 'abandoned'}
         >
           <FormLabel htmlFor='assessmentExpiresOn'>
             Assessment Expires On
