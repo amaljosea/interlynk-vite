@@ -1,6 +1,8 @@
 import React from 'react'
 
-import { Box, Button, Flex, Select, Stack, Text } from '@chakra-ui/react'
+import { Box, Button, Flex, Stack, Text } from '@chakra-ui/react'
+
+import LynkSelect from 'components/LynkSelect'
 
 const Pagination = ({
   paginationSizes = [25, 50, 100],
@@ -42,6 +44,13 @@ const Pagination = ({
 
   const totalPages = Math.ceil(totalCount / totalRows) || 1
 
+  const selectStyles = {
+    container: (baseStyles) => ({
+      ...baseStyles,
+      minWidth: '76px'
+    })
+  }
+
   return (
     <Flex
       width={'100%'}
@@ -78,20 +87,20 @@ const Pagination = ({
 
       <Stack alignItems={'center'} direction={'row'} spacing={4}>
         <Text>Show</Text>
-        <Select
-          width='auto'
-          value={totalRows}
-          onChange={onSetRow}
-          disabled={loading}
+        <LynkSelect
+          value={{ label: totalRows, value: totalRows }}
+          onChange={(selected) => onSetRow(selected.value)}
+          isDisabled={loading}
           id='rowlimit'
           name='rowlimit'
-        >
-          {paginationSizes.map((size) => (
-            <option key={size} value={size}>
-              {size}
-            </option>
-          ))}
-        </Select>
+          options={paginationSizes.map((size) => ({
+            label: size,
+            value: size
+          }))}
+          styles={selectStyles}
+          dropDown
+          menuPlacement='top'
+        />
       </Stack>
     </Flex>
   )
