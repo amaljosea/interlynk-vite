@@ -1,28 +1,19 @@
 import { gql, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getSignedUrlParams } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import { customStyles } from 'utils/styleUtils'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import {
-  Flex,
-  IconButton,
-  Stack,
-  Text,
-  Tooltip,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Flex, useDisclosure } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import ArchivedVersions from 'components/Drawer/ArchivedVersions'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import ToolsDrawer from 'components/Drawer/ToolsDrawer'
-import RefreshBtn from 'components/Icons/RefreshBtn'
 import ArchiveSbom from 'components/Modal/ArchiveSbom'
 import AutomationWarning from 'components/Modal/AutomationWarning'
 import DeleteSbom from 'components/Modal/DeleteSbom'
@@ -31,6 +22,7 @@ import SbomTransfer from 'components/Modal/SbomTransfer'
 import SupportAnalysis from 'components/Modal/SupportAnalysis'
 import Pagination from 'components/Pagination'
 import VersionColumns from 'components/columns/VersionColumns'
+import VersionHeader from 'components/headers/VersionHeader'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useGradualPolling } from 'hooks/useGradualPolling'
@@ -41,9 +33,6 @@ import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetVersionsTable, ShareVersionTable } from 'graphQL/Queries'
-
-import { FaPlus } from 'react-icons/fa6'
-import { LuArchive, LuGitCompare } from 'react-icons/lu'
 
 // GET ACTIVCE PROJECT GROUP FOR PUBLIC VIEW
 export const GetShareProjectGroup = gql`
@@ -90,11 +79,10 @@ const VersionsTable = (props) => {
   const [filterText, setFilterText] = useState(searchInput)
   const [activeRow, setActiveRow] = useState(null)
 
-  const {
-    headingTextColor,
-
-    primaryBlueText
-  } = useThemeColor(['headingTextColor', 'primaryBlueText'])
+  const { headingTextColor, primaryBlueText } = useThemeColor([
+    'headingTextColor',
+    'primaryBlueText'
+  ])
 
   const LIST = useDisclosure()
   const TOOL = useDisclosure()
@@ -157,28 +145,6 @@ const VersionsTable = (props) => {
     navigate(link)
   }
 
-  const action = (type, data) => {
-    setActiveRow(data)
-    switch (type) {
-      case 'archive_sbom':
-        return ARCHIVE_SBOM.onOpen()
-      case 'delete_sbom':
-        return DELETE_SBOM.onOpen()
-      case 'view_alternates':
-        return LIST.onOpen()
-      case 'switch_environment':
-        return TRANSFER.onOpen()
-      case 'rerun_import':
-        return REPROCESS.onOpen()
-      case 'rerun_automation':
-        return AUTOMATION.onOpen()
-      case 'rerun_support_analysis':
-        return SUPPORT.onOpen()
-      default:
-        break
-    }
-  }
-
   const onSelectLicenses = (row) => {
     const { id } = row
     navigate(
@@ -200,16 +166,6 @@ const VersionsTable = (props) => {
     setSelectedSbom([])
     setClearSelect(!clearSelect)
   }, [clearSelect, setClearSelect, setSelectedSbom])
-
-  // COLUMNS
-  const columns = VersionColumns({
-    action,
-    retentionTime,
-    onFilterSev,
-    onClear,
-    onSelectLicenses,
-    onStartTour
-  })
 
   const onBuildSbom = useCallback(() => {
     onClear()
@@ -267,82 +223,59 @@ const VersionsTable = (props) => {
     [setSearchFilter]
   )
 
-  const subHeaderComponent = useMemo(() => {
-    return (
-      <Flex
-        sx={{ w: '100%', alignItems: 'center' }}
-        justifyContent={'space-between'}
-      >
-        <Stack direction={'row'} alignItems={'center'} spacing={3}>
-          <SearchFilter
-            id='versions'
-            filterText={filterText}
-            onChange={onSearchInputChange}
-            onClear={handleClear}
-            onFilter={handleSearch}
-          />
-          {selectedSbom?.length === 1 && (
-            <Text color={primaryBlueText}>
-              ** Select one more version to enable comparison
-            </Text>
-          )}
-          {selectedSbom?.length > 2 && (
-            <Text color={primaryBlueText}>
-              ** Comparison is permitted with only two versions
-            </Text>
-          )}
-        </Stack>
-        <Stack direction={'row'} spacing={2} alignItems={'center'}>
-          {/* COMPARE VERSION */}
-          {selectedSbom?.length === 2 && (
-            <Tooltip label='Compare Version'>
-              <IconButton
-                onClick={TOOL.onOpen}
-                colorScheme='blue'
-                icon={<LuGitCompare size={20} />}
-              />
-            </Tooltip>
-          )}
-          {/* SHOW ARCHIVED VERSION */}
-          <Tooltip label='Show Archived Versions'>
-            <IconButton
-              isDisabled={!enabled}
-              hidden={signedUrlParams}
-              colorScheme='blue'
-              aria-label='show_archive_sboms'
-              onClick={ARC_VERSIONS.onOpen}
-              icon={<LuArchive size={20} />}
-            />
-          </Tooltip>
-          {/* BUILD SBOM */}
-          <Tooltip label='Build Version'>
-            <IconButton
-              isDisabled={!enabled || !updateSbom}
-              hidden={signedUrlParams}
-              colorScheme='blue'
-              onClick={onBuildSbom}
-              aria-label='build_sbom'
-              icon={<FaPlus />}
-            />
-          </Tooltip>
-          <RefreshBtn />
-        </Stack>
-      </Flex>
-    )
-  }, [
+  const action = (type, data) => {
+    setActiveRow(data)
+    switch (type) {
+      case 'build_sbom':
+        onClear()
+        prodCompDispatch({ type: 'CLEAR_LICENSES' })
+        return SBOM.onOpen()
+      case 'archive_sbom':
+        return ARCHIVE_SBOM.onOpen()
+      case 'compare_version':
+        return TOOL.onOpen()
+      case 'show_archive_versions':
+        return ARC_VERSIONS.onOpen()
+      case 'delete_sbom':
+        return DELETE_SBOM.onOpen()
+      case 'view_alternates':
+        return LIST.onOpen()
+      case 'switch_environment':
+        return TRANSFER.onOpen()
+      case 'rerun_import':
+        return REPROCESS.onOpen()
+      case 'rerun_automation':
+        return AUTOMATION.onOpen()
+      case 'rerun_support_analysis':
+        return SUPPORT.onOpen()
+      default:
+        return LIST.onOpen()
+    }
+  }
+
+  // COLUMNS
+  const columns = VersionColumns({
+    action,
+    retentionTime,
+    onFilterSev,
+    onClear,
+    onSelectLicenses,
+    onStartTour
+  })
+
+  const subHeader = VersionHeader({
     filterText,
     onSearchInputChange,
     handleClear,
     handleSearch,
-    selectedSbom?.length,
+    selectedSbom,
     primaryBlueText,
-    TOOL.onOpen,
     enabled,
     signedUrlParams,
-    ARC_VERSIONS.onOpen,
     updateSbom,
-    onBuildSbom
-  ])
+    onBuildSbom,
+    action
+  })
 
   const disableRowCheckBox = (row) => {
     if (selectedSbom.length >= 2) {
@@ -359,7 +292,7 @@ const VersionsTable = (props) => {
     defaultSortFieldId: filters?.field,
     defaultSortAsc: filters?.direction === 'ASC' ? true : false,
     subHeader: true,
-    subHeaderComponent: subHeaderComponent,
+    subHeaderComponent: subHeader,
     progressPending: loading,
     progressComponent: <CustomLoader />,
     responsive: true,
