@@ -29,7 +29,10 @@ test('should add organization, check string, and delete entry', async ({
   await page.getByRole('menuitem', { name: 'Change Role' }).click()
   await page.locator('[role=presentation]:has-text("Admin") button')
 
-  await page.getByLabel('Role', { exact: true }).selectOption('Viewer')
+  await page.locator('#role').click()
+  await page.keyboard.type('Viewer')
+  await page.keyboard.press('Enter')
+
   await page.getByRole('button', { name: 'Update' }).click()
   await page
     .locator(
