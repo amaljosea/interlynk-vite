@@ -267,7 +267,6 @@ const RequestTable = (props) => {
                 <MenuItem
                   isDisabled={!row.blob || !addReq}
                   onClick={() => handleAccept(row)}
-                  hidden={row?.status === 'Accepted'}
                 >
                   Accept
                 </MenuItem>
