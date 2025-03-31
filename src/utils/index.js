@@ -359,9 +359,17 @@ export const convertToCSV = (data, columns) => {
 
   // Rows
   data.forEach((row) => {
-    const values = columns.map((column) =>
-      row[column] !== undefined && row[column] !== null ? row[column] : 'NA'
-    )
+    const values = columns.map((column) => {
+      let value =
+        row[column] !== undefined && row[column] !== null ? row[column] : 'NA'
+
+      if (typeof value === 'string' && value.includes(',')) {
+        //remove quotes if it is already present
+        const removeQuotes = (str) => str.replace(/^["“”']|["“”']$/g, '')
+        value = `"${removeQuotes(value)}"`
+      }
+      return value
+    })
     csvRows.push(values.join(','))
   })
 
