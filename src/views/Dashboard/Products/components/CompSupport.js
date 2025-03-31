@@ -195,11 +195,12 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
   })
 
   const totalDays = Number(getTotalDays(formData?.assessmentExpiresOn))
-
+  const isAbandoned = formData?.supportLevel !== 'abandoned'
+  
   const isDisabled =
     formData?.supportLevel === '' ||
-    (!component?.internal && totalDays < 1) ||
-    (!component?.internal && totalDays > 365)
+    (isAbandoned && !component?.internal && totalDays < 1) ||
+    (isAbandoned && !component?.internal && totalDays > 365)
 
   const noLongerMaintained = formData?.supportLevel === 'no_longer_maintained'
 
@@ -397,7 +398,9 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
       {/* RETAIN MANNUAL OVERRIDE */}
       <FormControl
         hidden={noLongerMaintained}
-        isRequired={!component?.internal}
+        isRequired={
+          !component?.internal && formData?.supportLevel !== 'abandoned'
+        }
         isInvalid={totalDays > 365}
       >
         <FormLabel htmlFor='assessmentExpiresOn'>
