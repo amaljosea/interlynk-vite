@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useState } from 'react'
 
-import { Divider, Select, Stack, Text, useDisclosure } from '@chakra-ui/react'
+import { Divider, Stack, Text, useDisclosure } from '@chakra-ui/react'
 import {
   FormControl,
   FormErrorIcon,
@@ -13,6 +13,7 @@ import {
 import CompRelationTypes from 'components/CompRelationTypes'
 import ComponentList from 'components/ComponentList'
 import LynkAlert from 'components/LynkAlert'
+import LynkSelect from 'components/LynkSelect'
 import RelDeleteModal from 'components/RelDeleteModal'
 import RelationTreeView from 'components/RelationTreeView'
 
@@ -151,6 +152,12 @@ const CompRelations = ({ data, compPath }) => {
     }
   }, [compDependency])
 
+  const typeOptions = [
+    { value: '', label: '-- Select --' },
+    { value: 'depends_on', label: 'Depends On' },
+    { value: 'dependency_of', label: 'Dependency Of' }
+  ]
+
   return (
     <>
       <Stack
@@ -172,23 +179,15 @@ const CompRelations = ({ data, compPath }) => {
             <FormLabel htmlFor='relType' color={headingTextColor}>
               Type
             </FormLabel>
-            <Select
+            <LynkSelect
               name='relationType'
-              value={relationships?.relType}
-              onChange={(e) =>
-                handleChange('relationships', 'relType', e.target.value)
+              onChange={(selectedOption) =>
+                handleChange('relationships', 'relType', selectedOption?.value)
               }
-            >
-              <option value=''>-- Select --</option>
-              {[
-                { value: 'depends_on', label: 'Depends On' },
-                { value: 'dependency_of', label: 'Dependency Of' }
-              ].map((item, idx) => (
-                <option key={idx} value={item.value}>
-                  {item.label}
-                </option>
-              ))}
-            </Select>
+              options={typeOptions}
+              placeholder='-- Select --'
+              dropDown
+            />
           </FormControl>
           {/* RELATION TO */}
           <FormControl isInvalid={list?.length > 0}>
