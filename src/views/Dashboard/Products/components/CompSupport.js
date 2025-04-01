@@ -196,7 +196,7 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
 
   const totalDays = Number(getTotalDays(formData?.assessmentExpiresOn))
   const isAbandoned = formData?.supportLevel !== 'abandoned'
-  
+
   const isDisabled =
     formData?.supportLevel === '' ||
     (isAbandoned && !component?.internal && totalDays < 1) ||
