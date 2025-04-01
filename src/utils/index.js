@@ -352,28 +352,39 @@ export const detectOS = () => {
 
 export const convertToCSV = (data, columns) => {
   const csvRows = []
-
   // Headers
-  const headers = columns.join(',')
+  const headers = columns.map((column) => escapeCSVField(column)).join(',')
   csvRows.push(headers)
-
   // Rows
   data.forEach((row) => {
     const values = columns.map((column) => {
-      let value =
+      const value =
         row[column] !== undefined && row[column] !== null ? row[column] : 'NA'
-
-      if (typeof value === 'string' && value.includes(',')) {
-        //remove quotes if it is already present
-        const removeQuotes = (str) => str.replace(/^["“”']|["“”']$/g, '')
-        value = `"${removeQuotes(value)}"`
-      }
-      return value
+      return escapeCSVField(value)
     })
     csvRows.push(values.join(','))
   })
-
   return csvRows.join('\n')
+}
+
+// Helper function to properly escape CSV fields
+const escapeCSVField = (field) => {
+  field = String(field)
+  // If the field contains commas, quotes, or newlines, it needs to be quoted
+  if (field.includes(',') || field.includes('"') || field.includes('\n')) {
+    const removeOuterQuotes = (str) => {
+      return str.replace(/^"(.*)"$/, '$1')
+    }
+    console.log(field)
+    field = removeOuterQuotes(field)
+    console.log(field)
+    field = field.replace(/"/g, '""')
+    console.log(field)
+    // Wrap the field in quotes
+    console.log(`"${field}"`)
+    return `"${field}"`
+  }
+  return field
 }
 
 export const downloadCSV = (csvContent, filename) => {
