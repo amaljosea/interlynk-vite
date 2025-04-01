@@ -1,22 +1,31 @@
-import { FormControl, FormLabel, Select } from '@chakra-ui/react'
+import { FormControl, FormLabel } from '@chakra-ui/react'
+
+import LynkSelect from 'components/LynkSelect'
 
 const Part = ({ disabled, part, onChange }) => {
   const inputProps = { size: 'md', name: 'part' }
 
+  const options = [
+    { value: '', label: '-- Select --' },
+    { value: 'a', label: 'Application' },
+    { value: 'o', label: 'Operating System' },
+    { value: 'h', label: 'Hardware' }
+  ]
+
   return (
     <FormControl isRequired isDisabled={disabled}>
       <FormLabel htmlFor='parts'>Part</FormLabel>
-      <Select
+      <LynkSelect
         {...inputProps}
-        value={part}
         data-testid='cpe_part'
-        onChange={(e) => onChange('part', e.target.value, 2)}
-      >
-        <option value=''>-- Select --</option>
-        <option value='a'>Application</option>
-        <option value='o'>Operating System</option>
-        <option value='h'>Hardware</option>
-      </Select>
+        onChange={(selectedOption) =>
+          onChange('part', selectedOption?.value, 2)
+        }
+        options={options}
+        value={options.find((option) => option.value === part)}
+        placeholder='-- Select --'
+        dropDown
+      />
     </FormControl>
   )
 }
