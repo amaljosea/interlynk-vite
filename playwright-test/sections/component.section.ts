@@ -321,9 +321,9 @@ export default class ComponentSection {
 
           await this.page.waitForTimeout(5000)
 
-          await this.page
-            .locator('[name="relationType"]')
-            .selectOption({ index: 1 })
+          await this.page.locator('#relationType').click()
+          await this.page.keyboard.press('ArrowDown')
+          await this.page.keyboard.press('Enter')
           await this.page.waitForTimeout(2000)
 
           this.page.locator('input#relationTo').fill('antlr')

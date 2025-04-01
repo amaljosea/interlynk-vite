@@ -180,7 +180,7 @@ const CompRelations = ({ data, compPath }) => {
               Type
             </FormLabel>
             <LynkSelect
-              name='relationType'
+              id='relationType'
               onChange={(selectedOption) =>
                 handleChange('relationships', 'relType', selectedOption?.value)
               }
