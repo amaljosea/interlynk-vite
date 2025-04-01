@@ -3,12 +3,13 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { capitalizeFirstLetter } from 'utils'
 
-import { Flex, Select, Stack, Tag, Text } from '@chakra-ui/react'
+import { Flex, Stack, Tag, Text } from '@chakra-ui/react'
 import { FormControl, FormHelperText, FormLabel } from '@chakra-ui/react'
 
 import FileUpload from 'components/FileUpload'
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
+import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -85,6 +86,14 @@ const UploadModal = ({ isOpen, onClose, group }) => {
     }
   }, [defaultENV])
 
+  const projectOptions =
+    projects
+      ?.sort((a, b) => a?.name?.localeCompare(b?.name))
+      ?.map((item) => ({
+        value: item?.id,
+        label: capitalizeFirstLetter(item?.name)
+      })) || []
+
   return (
     <>
       <LynkModal
@@ -108,20 +117,16 @@ const UploadModal = ({ isOpen, onClose, group }) => {
           <Stack spacing={6} minHeight='290px'>
             <FormControl>
               <FormLabel>Environment</FormLabel>
-              <Select
+              <LynkSelect
                 id='dataRetention'
-                value={selectedEnv}
-                textTransform={'capitalize'}
-                onChange={(e) => setSelectedEnv(e.target.value)}
-              >
-                {projects
-                  ?.sort((a, b) => a?.name?.localeCompare(b?.name))
-                  ?.map((item) => (
-                    <option key={item?.id} value={item?.id}>
-                      {capitalizeFirstLetter(item?.name)}
-                    </option>
-                  ))}
-              </Select>
+                value={
+                  projectOptions.find((opt) => opt.value === selectedEnv) ||
+                  null
+                }
+                onChange={(selected) => setSelectedEnv(selected?.value)}
+                options={projectOptions}
+                dropDown
+              />
               <FormHelperText color={secondaryTextColor} fontSize={12}>
                 Interlynk supports importing CycloneDX versions 1.2-1.5 in JSON
                 and XML formats and SPDX 2.2 and 2.3 in JSON format.

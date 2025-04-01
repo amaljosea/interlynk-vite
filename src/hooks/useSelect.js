@@ -77,6 +77,7 @@ export const useSelect = (type) => {
     }),
     option: (provided, state) => ({
       ...provided,
+      fontSize: isLynkSelect && '14px',
       color: isBreadcrumb ? primaryTextColor : secondaryTextInverse,
       backgroundColor: state?.isFocused
         ? 'rgba(0, 0, 0, 0.04)'

@@ -2,8 +2,12 @@ import { gql, useMutation, useQuery } from '@apollo/client'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
-import { getSignedUrlParams, parseEpssRange, setKEV } from 'utils'
-import { isSbomArchived } from 'utils'
+import {
+  getSignedUrlParams,
+  isSbomArchived,
+  parseEpssRange,
+  setKEV
+} from 'utils'
 import { customStyles } from 'utils/styleUtils'
 import VexModal from 'views/Dashboard/Vulnerabilities/components/VexModal'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
@@ -161,7 +165,29 @@ const Vulnerabilities = ({ sbomData }) => {
   const CUSTOM_VULNS = useDisclosure()
   const DELETE = useDisclosure()
 
-  const onVexOpen = () => VEX.onOpen()
+  const action = (type, data) => {
+    setActiveRow(data)
+    switch (type) {
+      case 'vuln_status':
+        return VEX.onOpen()
+      case 'vuln_links':
+        return LINK.onOpen()
+      case 'create_jira_ticket':
+        return JIRA.onOpen()
+      case 'view_cvss':
+        return CVSS.onOpen()
+      case 'vuln_import':
+        return IMPORT.onOpen()
+      case 'edit_vuln':
+        return VULN.onOpen()
+      case 'custom_vuln':
+        return CUSTOM_VULNS.onOpen()
+      case 'delete_vuln':
+        return DELETE.onOpen()
+      default:
+        return VEX.onOpen()
+    }
+  }
 
   // GET VULN FILTER HEADS
   useQuery(signedUrlParams ? ShareVulnFilters : GetVulnFilterData, {
@@ -258,26 +284,17 @@ const Vulnerabilities = ({ sbomData }) => {
     isVulnScanEnabled
   ])
 
-  const handleWarning = (row) => {
-    setActiveRow(row)
-    DELETE.onOpen()
-  }
-
-  const onCreateCustomVuln = () => CUSTOM_VULNS.onOpen()
-
   const subHeader = VulnerabilitySubHeader({
     handleClear,
     handleScan,
     handleSearch,
-    onVexOpen,
+    action,
     isArchived,
     onSearchInputChange,
-    IMPORT,
     prodVulnDispatch,
     reset,
     selectedVulns,
     vulnSearch,
-    onCreateCustomVuln,
     projectSettingsLoad
   })
 
@@ -292,17 +309,10 @@ const Vulnerabilities = ({ sbomData }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const onCvssOpen = () => CVSS.onOpen()
+  const onCvssOpen = () => action('view_cvss', null)
 
   // COLUMNS
-  const columns = VulnerabilityColumns(
-    isArchived,
-    setActiveRow,
-    LINK,
-    JIRA,
-    VULN,
-    handleWarning
-  )
+  const columns = VulnerabilityColumns({ isArchived, action })
 
   useEffect(() => {
     if (searchInput !== '') {

@@ -2,11 +2,12 @@ import { gql, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { stages } from 'variables/general'
 
-import { FormControl, FormLabel, Select, Stack } from '@chakra-ui/react'
+import { FormControl, FormLabel, Stack } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
+import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
 
@@ -66,8 +67,8 @@ const LifecycleModal = ({ data, isOpen, onClose }) => {
   })
   const [error, setError] = useState('')
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
+  const handleSelect = (selectedItem, name) => {
+    const { value } = selectedItem
     setFormData((prev) => ({
       ...prev,
       [name]: value === '' ? undefined : value,
@@ -131,6 +132,8 @@ const LifecycleModal = ({ data, isOpen, onClose }) => {
     }
   }, [sbom])
 
+  const stageOptions = [{ value: '', label: '-- Select --' }, ...(stages || [])]
+
   return (
     <LynkModal
       isOpen={isOpen}
@@ -146,18 +149,16 @@ const LifecycleModal = ({ data, isOpen, onClose }) => {
         {error && <LynkAlert msg={error} />}
         <FormControl isRequired>
           <FormLabel htmlFor='stage'>Stage</FormLabel>
-          <Select
+          <LynkSelect
             name='stage'
-            value={formData?.stage}
-            onChange={handleChange}
+            value={
+              stageOptions.find((opt) => opt.value === formData?.stage) || null
+            }
+            onChange={(selected) => handleSelect(selected, 'stage')}
+            options={stageOptions}
             placeholder='-- Select --'
-          >
-            {stages?.map((item, index) => (
-              <option key={index} value={item?.value}>
-                {item?.label}
-              </option>
-            ))}
-          </Select>
+            dropDown
+          />
         </FormControl>
         <FormControl
           hidden={formData?.stage !== 'released'}

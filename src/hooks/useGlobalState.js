@@ -158,6 +158,11 @@ const GlobalStateProvider = ({ children }) => {
     setEnvName(env)
   }
 
+  const onClearSelection = () => {
+    setSelectedSbom([])
+    setClearSelect(!clearSelect)
+  }
+
   return (
     <GlobalStateContext.Provider
       value={{
@@ -176,6 +181,7 @@ const GlobalStateProvider = ({ children }) => {
         versionState,
         toolsState,
         onChangeEnv,
+        onClearSelection,
         sbomCheckState,
         globalVulnState,
         selectedSbom,

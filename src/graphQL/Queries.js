@@ -3544,9 +3544,30 @@ export const GetRequests = gql`
 `
 
 export const GetProductNamesForRequest = gql`
-  query GetProductNamesForRequest {
+  query GetProductNamesForRequest(
+    $field: ProjectGroupOrderByFields!
+    $direction: OrderByDirection!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
     organization {
-      projectGroups(first: 500, enabled: true) {
+      projectGroups(
+        first: $first
+        last: $last
+        after: $after
+        before: $before
+        enabled: true
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
         nodes {
           id
           name
