@@ -196,13 +196,19 @@ const CompLinks = ({ data }) => {
   const selectStyles = {
     menuList: (base) => ({
       ...base,
-      maxHeight: '320px'
+      minHeight: '300px'
     })
   }
 
   return (
     <>
-      <Flex w={'100%'} gap={4} direction={'column'} alignItems={'flex-start'}>
+      <Flex
+        w={'100%'}
+        gap={4}
+        direction={'column'}
+        alignItems={'flex-start'}
+        minHeight='400px'
+      >
         {/* NAME */}
         <FormControl isRequired isInvalid={error}>
           <FormLabel>Type</FormLabel>
