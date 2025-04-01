@@ -1,4 +1,6 @@
-import { FormControl, FormLabel, Select } from '@chakra-ui/react'
+import { FormControl, FormLabel } from '@chakra-ui/react'
+
+import LynkSelect from 'components/LynkSelect'
 
 const TargetHardware = ({ disabled, targetHardware, onChange }) => {
   const inputProps = { size: 'md', name: 'targetHardware' }
@@ -6,24 +8,34 @@ const TargetHardware = ({ disabled, targetHardware, onChange }) => {
   return (
     <FormControl isDisabled={disabled}>
       <FormLabel>Target Hardware</FormLabel>
-      <Select
+      <LynkSelect
         {...inputProps}
-        value={targetHardware}
-        onChange={(e) => onChange('targetHardware', e.target.value, 11)}
-      >
-        <option value=''>-- Select --</option>
-        <option value='x64'>x64</option>
-        <option value='x86'>x86</option>
-        <option value='x32'>x32</option>
-        <option value='arm64'>arm64</option>
-        <option value='amd64'>amd64</option>
-        <option value='itanium'>itanium</option>
-        <option value='arm'>arm</option>
-        <option value='rj45'>rj45</option>
-        <option value='iphone'>iphone</option>
-        <option value='android'>android</option>
-        <option value='*'>*</option>
-      </Select>
+        value={
+          targetHardware
+            ? { value: targetHardware, label: targetHardware }
+            : null
+        }
+        onChange={(selectedOption) =>
+          onChange('targetHardware', selectedOption?.value, 11)
+        }
+        options={[
+          { value: '', label: '-- Select --' },
+          { value: 'x64', label: 'x64' },
+          { value: 'x86', label: 'x86' },
+          { value: 'x32', label: 'x32' },
+          { value: 'arm64', label: 'arm64' },
+          { value: 'amd64', label: 'amd64' },
+          { value: 'itanium', label: 'itanium' },
+          { value: 'arm', label: 'arm' },
+          { value: 'rj45', label: 'rj45' },
+          { value: 'iphone', label: 'iphone' },
+          { value: 'android', label: 'android' },
+          { value: '*', label: '*' }
+        ]}
+        placeholder='-- Select --'
+        dropDown
+        menuPlacement='top'
+      />
     </FormControl>
   )
 }
