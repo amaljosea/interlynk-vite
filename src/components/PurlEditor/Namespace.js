@@ -2,7 +2,7 @@ import { useLazyQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { namespaceOptions } from 'variables/general'
 
-import { FormControl, FormLabel, Input, Select } from '@chakra-ui/react'
+import { FormControl, FormLabel, Input } from '@chakra-ui/react'
 
 import LynkSelect from 'components/LynkSelect'
 
@@ -87,18 +87,16 @@ const Namespace = ({ disabled, namespace, type, onChange, onBlur }) => {
           onBlur={handleBlur}
         />
       ) : isSelectable ? (
-        <Select
+        <LynkSelect
           {...inputProps}
-          value={namespace}
-          onBlur={(e) => onBlur('namespace', e.target.value)}
-          onChange={(e) => onChange('namespace', e.target.value)}
-        >
-          {namespaceOptions[type]?.map((item, index) => (
-            <option key={index} value={item.value}>
-              {item.label}
-            </option>
-          ))}
-        </Select>
+          value={
+            namespaceOptions[type]?.find((opt) => opt.value === namespace) ||
+            null
+          }
+          onBlur={(selected) => onBlur('namespace', selected?.value || '')}
+          onChange={(selected) => onChange('namespace', selected.value)}
+          options={namespaceOptions[type] || []}
+        />
       ) : (
         <Input
           {...inputProps}
