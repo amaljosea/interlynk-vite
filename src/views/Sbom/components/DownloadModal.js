@@ -3,6 +3,7 @@ import { client } from 'context/ApolloWrapper'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getSignedUrlParams, truncatedValue } from 'utils'
+import { csvToJson } from 'utils'
 
 import { DownloadIcon } from '@chakra-ui/icons'
 import {
@@ -245,25 +246,29 @@ const DownloadModal = (props) => {
           includeVulns,
           sbomId: sbomId,
           package: encoded,
+          supportLevelOnly: includeSupport,
           lite: spec === 'SPDX-Lite' ? true : false,
+          spec: spec === 'SPDX-Lite' ? 'SPDX' : spec,
           projectId: signedUrlParams ? undefined : productId,
-          excludeParts: signedUrlParams ? undefined : !includeParts,
-          spec: spec === 'SPDX-Lite' ? 'SPDX' : spec
+          excludeParts: signedUrlParams ? undefined : !includeParts
         }
       }).then((res) => {
-        const { called, variables } = res || ''
+        const { called, variables, data } = res || ''
         if (called) {
           setIsLoading(false)
           if (variables?.package === true) {
             const parsedJson = signedUrlParams
-              ? JSON.parse(res?.data?.shareLynkQuery?.sbom?.download?.content)
-              : JSON.parse(res?.data?.sbom?.download?.content)
+              ? JSON.parse(data?.shareLynkQuery?.sbom?.download?.content)
+              : JSON.parse(data?.sbom?.download?.content)
 
             downloadJsonFile(parsedJson)
+          } else if (data?.sbom?.download?.contentType === 'text/csv') {
+            const decodedData = csvToJson(data?.sbom?.download?.content)
+            downloadJsonFile(decodedData)
           } else {
             const decodedData = signedUrlParams
-              ? window.atob(res?.data?.shareLynkQuery?.sbom?.download?.content)
-              : window.atob(res?.data?.sbom?.download?.content)
+              ? window.atob(data?.shareLynkQuery?.sbom?.download?.content)
+              : window.atob(data?.sbom?.download?.content)
             const parsedJson = JSON.parse(decodedData)
 
             downloadJsonFile(parsedJson)
@@ -271,6 +276,7 @@ const DownloadModal = (props) => {
         }
       })
     } catch (error) {
+      console.warn('error', error)
       showToast({
         description: `Internal error during SBOM download. Please try again in a few minutes.`,
         status: 'error'
@@ -362,7 +368,6 @@ const DownloadModal = (props) => {
                     Components
                   </Checkbox>
                 )}
-
                 <Checkbox
                   hidden={signedUrlParams || isFreeTier}
                   isChecked={includeParts}
@@ -378,13 +383,16 @@ const DownloadModal = (props) => {
                 >
                   Vulnerabilities
                 </Checkbox>
-                <Checkbox
-                  isChecked={includeSupport}
-                  isDisabled={spec === 'SPDX'}
-                  onChange={() => setIncludeSupport(!includeSupport)}
-                >
-                  Support Status
-                </Checkbox>
+                {downloadType !== 'pdf' && (
+                  <Checkbox
+                    hidden={signedUrlParams || isFreeTier}
+                    isChecked={includeSupport}
+                    isDisabled={spec === 'SPDX'}
+                    onChange={() => setIncludeSupport(!includeSupport)}
+                  >
+                    Support Level Only
+                  </Checkbox>
+                )}
                 {downloadType === 'pdf' && (
                   <Checkbox
                     isDisabled={!includeVulns}

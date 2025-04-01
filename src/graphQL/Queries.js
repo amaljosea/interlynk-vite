@@ -2797,6 +2797,7 @@ export const DownloadSBOM = gql`
     $package: Boolean
     $lite: Boolean
     $excludeParts: Boolean
+    $supportLevelOnly: Boolean
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       download(
@@ -2807,6 +2808,7 @@ export const DownloadSBOM = gql`
         dontPackageSbom: $package
         lite: $lite
         excludeParts: $excludeParts
+        supportLevelOnly: $supportLevelOnly
       ) {
         content
         contentType
