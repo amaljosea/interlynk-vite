@@ -4,7 +4,7 @@ import { timeSince } from 'utils'
 import { licenseStatusTypes } from 'variables/general'
 
 import { AddIcon } from '@chakra-ui/icons'
-import { Divider, Select, Textarea } from '@chakra-ui/react'
+import { Divider, Textarea } from '@chakra-ui/react'
 import { Button, ButtonGroup } from '@chakra-ui/react'
 import { Flex, Stack, Text } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
@@ -12,6 +12,7 @@ import { FormControl, FormLabel } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import LynkAlert from 'components/LynkAlert'
 import LynkDrawer from 'components/LynkDrawer'
+import LynkSelect from 'components/LynkSelect'
 import CompInfo from 'components/Misc/CompInfo'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -86,6 +87,11 @@ const LicenseStatus = ({ data, isOpen, onClose }) => {
         })
       : []
 
+  const selectOptions = licenseStatusTypes?.map((item) => ({
+    value: item,
+    label: item
+  }))
+
   return (
     <LynkDrawer
       title={'Edit License Status'}
@@ -100,18 +106,23 @@ const LicenseStatus = ({ data, isOpen, onClose }) => {
             {/* STATUS */}
             <FormControl>
               <FormLabel htmlFor='licenseStatus'>Note</FormLabel>
-              <Select
+              <LynkSelect
                 name='licenseStatus'
-                onChange={handleChange}
-                value={formData?.licenseStatus}
-              >
-                <option value=''>-- Select --</option>
-                {licenseStatusTypes.map((item, index) => (
-                  <option key={index} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </Select>
+                onChange={(selectedOption) =>
+                  handleChange({
+                    target: {
+                      name: 'licenseStatus',
+                      value: selectedOption?.value
+                    }
+                  })
+                }
+                value={selectOptions?.find(
+                  (option) => option.value === formData.licenseStatus
+                )}
+                options={selectOptions}
+                placeholder='-- Select --'
+                dropDown
+              />
             </FormControl>
             {/* NOTE */}
             <FormControl>
