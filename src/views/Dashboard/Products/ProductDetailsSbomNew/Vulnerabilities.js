@@ -25,22 +25,25 @@ import Pagination from 'components/Pagination'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ManualVulnScan } from 'graphQL/Mutation'
+import { CustomVulnUpdate } from 'graphQL/Mutation'
 import {
   FirstDegreePartVulns,
   GetVulnData,
   GetVulnFilterData,
   ShareVulnFilters
 } from 'graphQL/Queries'
+import { verfifyCustomVuln } from 'graphQL/Queries'
 
+import ConfirmationModal from '../components/ConfirmationModal'
 import VulnerabilityColumns from './Components/tableColumns/VulnerabilityColumns'
 import ExpandedComponent from './Components/tableExpanded/VulnerabilityExpanded'
 import VulnerabilitySubHeader from './Components/tableSubHeaders/VulnerabilitySubHeader'
-import { useHasPermission } from 'hooks/useHasPermission'
 
 export const GetProjectSettings = gql`
   query GetProjectSettings($id: Uuid!) {
@@ -182,11 +185,48 @@ const Vulnerabilities = ({ sbomData }) => {
         return VULN.onOpen()
       case 'custom_vuln':
         return CUSTOM_VULNS.onOpen()
-      case 'delete_vuln':
+      case 'remove_vuln':
         return DELETE.onOpen()
       default:
         return VEX.onOpen()
     }
+  }
+
+  const [updateVuln, { loading: deleteLoading }] = useMutation(CustomVulnUpdate)
+  const { data: vulnData } = useQuery(verfifyCustomVuln, {
+    skip: DELETE.isOpen ? false : true,
+    variables: { vulnIdentifier: activeRow?.vuln?.vulnId }
+  })
+
+  const { customVuln } = vulnData || {}
+  const { customVulnSboms } = customVuln || ''
+
+  const handleRemove = () => {
+    const attribute = customVulnSboms?.map((item) => ({
+      id: item?.id,
+      sbomId: item?.sbomId,
+      componentId: item?.componentId || undefined,
+      _destroy: true
+    }))
+    updateVuln({
+      variables: {
+        id: customVuln?.id,
+        customVulnSbomsAttributes: attribute
+      }
+    }).then((res) => {
+      if (res?.data?.customVulnUpdate?.errors?.length > 0) {
+        showToast({
+          description: res?.data?.customVulnUpdate?.errors[0],
+          status: 'error'
+        })
+      } else {
+        showToast({
+          description: 'Vulnerability removed successfully',
+          status: 'success'
+        })
+        DELETE.onClose()
+      }
+    })
   }
 
   // GET VULN FILTER HEADS
@@ -350,7 +390,7 @@ const Vulnerabilities = ({ sbomData }) => {
           clearSelectedRows={toggleClear}
           onSelectedRowsChange={handleChange}
           selectableRows={!signedUrlParams && editVulns}
-          />
+        />
       </Flex>
 
       {/* PAGINATION */}
@@ -428,6 +468,19 @@ const Vulnerabilities = ({ sbomData }) => {
         <CustomVuln
           isOpen={CUSTOM_VULNS.isOpen}
           onClose={CUSTOM_VULNS.onClose}
+        />
+      )}
+
+      {/* REMOVE CUSTOM VULN */}
+      {DELETE.isOpen && (
+        <ConfirmationModal
+          isOpen={DELETE?.isOpen}
+          onConfirm={handleRemove}
+          onClose={DELETE?.onClose}
+          isLoading={deleteLoading}
+          title={'Remove Vulnerability'}
+          name={activeRow?.vuln?.vulnId}
+          description={`You are about to remove the custom vulnerability from this version`}
         />
       )}
     </>
