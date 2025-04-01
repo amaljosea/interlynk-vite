@@ -198,6 +198,7 @@ const WeightControl = () => {
               <FormControl
                 w={'400px'}
                 isRequired
+                isDisabled={!canEditOrg}
                 isInvalid={!validScore(ageWeight)}
               >
                 <FormLabel>Age Weight {`(%)`}</FormLabel>
@@ -210,6 +211,7 @@ const WeightControl = () => {
               <FormControl
                 w={'400px'}
                 isRequired
+                isDisabled={!canEditOrg}
                 isInvalid={!validScore(communityWeight)}
               >
                 <FormLabel>Community Weight {`(%)`}</FormLabel>
@@ -222,6 +224,7 @@ const WeightControl = () => {
               <FormControl
                 w={'400px'}
                 isRequired
+                isDisabled={!canEditOrg}
                 isInvalid={!validScore(securityWeight)}
               >
                 <FormLabel>Security Weight {`(%)`}</FormLabel>
@@ -254,6 +257,7 @@ const WeightControl = () => {
             <Stack spacing={5}>
               <FormControl
                 w={'400px'}
+                isDisabled={!canEditOrg}
                 isInvalid={repoAgeThreshold < 1 || repoAgeThreshold > 3650}
               >
                 <FormLabel>
@@ -270,6 +274,7 @@ const WeightControl = () => {
               </FormControl>
               <FormControl
                 w={'400px'}
+                isDisabled={!canEditOrg}
                 isInvalid={pkgAgeThreshold < 1 || pkgAgeThreshold > 3650}
               >
                 <FormLabel>
@@ -307,6 +312,7 @@ const WeightControl = () => {
             <FormControl
               w={'400px'}
               isRequired
+              isDisabled={!canEditOrg}
               isInvalid={isInvalidArray(communityScore)}
             >
               <FormLabel>Community Count Thresholds</FormLabel>
@@ -316,6 +322,7 @@ const WeightControl = () => {
                 step={5}
                 mb={4}
                 value={communityScore}
+                isDisabled={!canEditOrg}
                 onMouseEnter={() => setShowTooltip(true)}
                 onMouseLeave={() => setShowTooltip(false)}
                 onChange={(value) => setCommunityScore(value)}

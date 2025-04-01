@@ -1,7 +1,6 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useState } from 'react'
-import { truncatedValue } from 'utils'
 import { hasWhiteSpace, validateUrl } from 'utils/formValidationUtils'
 import { componentLinkTypes } from 'variables/general'
 
@@ -9,12 +8,12 @@ import { DeleteIcon } from '@chakra-ui/icons'
 import {
   Divider,
   Flex,
+  Grid,
+  GridItem,
   IconButton,
   Input,
-  SimpleGrid,
   Stack,
-  Text,
-  Tooltip
+  Text
 } from '@chakra-ui/react'
 import { Button, ButtonGroup } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
@@ -178,10 +177,8 @@ const CompLinks = ({ data }) => {
 
   const container = {
     pb: 2,
-    gap: 5,
     w: '100%',
-    columns: 2,
-    justifyContent: 'space-between',
+    templateColumns: 'repeat(12, 1fr)',
     borderBottom: `1px solid ${grayBorderColor}`
   }
 
@@ -262,58 +259,63 @@ const CompLinks = ({ data }) => {
           {externalUrls?.length > 0 ? (
             <Stack w={'100%'} spacing={3} mt={4}>
               {externalUrls?.map((item, index) => (
-                <SimpleGrid {...container} key={index}>
-                  <Stack spacing={0}>
+                <Grid {...container} key={index}>
+                  <GridItem colSpan={8}>
                     {item?.url ? (
-                      <Tooltip label={item.url}>
-                        <Text fontSize={'sm'} wordBreak={'break-all'}></Text>
-                        {truncatedValue(item.url, 45)}
-                      </Tooltip>
+                      <Text
+                        fontSize={'sm'}
+                        lineHeight={'5'}
+                        wordBreak={'break-all'}
+                      >
+                        {item.url}
+                      </Text>
                     ) : (
                       <Text>N/A</Text>
                     )}
                     <Text fontSize={'sm'} color={sameSecondaryText}>
                       {item?.name}
                     </Text>
-                  </Stack>
-                  <Flex alignItems={'center'} justifyContent={'flex-end'}>
-                    {activeLink?.name === item?.name ? (
-                      <ButtonGroup>
-                        <Button
+                  </GridItem>
+                  <GridItem colSpan={4} justifyContent={'flex-end'}>
+                    <Flex alignItems={'center'} justifyContent={'flex-end'}>
+                      {activeLink?.name === item?.name ? (
+                        <ButtonGroup>
+                          <Button
+                            size='sm'
+                            title='No'
+                            fontSize={'sm'}
+                            variant='outline'
+                            onClick={() => setActiveLink(null)}
+                          >
+                            No
+                          </Button>
+                          <Button
+                            size='sm'
+                            title='Yes'
+                            fontSize={'sm'}
+                            variant='outline'
+                            colorScheme='red'
+                            isLoading={loading}
+                            onClick={handleLinkRemove}
+                            data-testid='confirm_delete_comp_link'
+                          >
+                            Yes
+                          </Button>
+                        </ButtonGroup>
+                      ) : (
+                        <IconButton
                           size='sm'
-                          title='No'
-                          fontSize={'sm'}
+                          color={primaryErrorColor}
                           variant='outline'
-                          onClick={() => setActiveLink(null)}
-                        >
-                          No
-                        </Button>
-                        <Button
-                          size='sm'
-                          title='Yes'
-                          fontSize={'sm'}
-                          variant='outline'
-                          colorScheme='red'
-                          isLoading={loading}
-                          onClick={handleLinkRemove}
-                          data-testid='confirm_delete_comp_link'
-                        >
-                          Yes
-                        </Button>
-                      </ButtonGroup>
-                    ) : (
-                      <IconButton
-                        size='sm'
-                        color={primaryErrorColor}
-                        variant='outline'
-                        cursor={'pointer'}
-                        icon={<DeleteIcon />}
-                        data-testid='delete_comp_link'
-                        onClick={() => setActiveLink(item)}
-                      />
-                    )}
-                  </Flex>
-                </SimpleGrid>
+                          cursor={'pointer'}
+                          icon={<DeleteIcon />}
+                          data-testid='delete_comp_link'
+                          onClick={() => setActiveLink(item)}
+                        />
+                      )}
+                    </Flex>
+                  </GridItem>
+                </Grid>
               ))}
             </Stack>
           ) : (
