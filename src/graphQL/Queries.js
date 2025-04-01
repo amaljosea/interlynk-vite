@@ -2174,6 +2174,8 @@ export const GetVulnData = gql`
               epssScores
               epssPercentile
               kev
+              cwes
+              advisories
             }
           }
           componentVulnLogs {
