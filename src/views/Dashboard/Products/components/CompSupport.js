@@ -268,6 +268,11 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
             description: errors[0],
             status: 'error'
           })
+        } else {
+          showToast({
+            description: 'Status updated successfully',
+            status: 'success'
+          })
         }
       })
       .finally(() => handleClose(false))
@@ -291,6 +296,11 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
           showToast({
             description: errors[0],
             status: 'error'
+          })
+        } else {
+          showToast({
+            description: 'Status updated successfully',
+            status: 'success'
           })
         }
       })

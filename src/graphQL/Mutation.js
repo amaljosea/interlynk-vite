@@ -2846,3 +2846,54 @@ export const UpdateBitbucketWorkspace = gql`
     }
   }
 `
+
+export const componentSupportLevelBulkCreate = gql`
+  mutation componentSupportLevelBulkCreate(
+    $ids: [Uuid!]!
+    $level: ComponentSupportLevelValues
+    $endDate: ISO8601DateTime
+    $notes: String
+    $retainManualOverrideFor: Int
+  ) {
+    componentSupportLevelBulkCreate(
+      input: {
+        componentIds: $ids
+        level: $level
+        endDate: $endDate
+        notes: $notes
+        retainManualOverrideFor: $retainManualOverrideFor
+      }
+    ) {
+      errors
+      componentSupportLevels {
+        id
+      }
+    }
+  }
+`
+
+export const ComponentSupportLevelBulkUpdate = gql`
+  mutation ComponentSupportLevelBulkUpdate(
+    $ids: [Uuid!]!
+    $level: ComponentSupportLevelValues
+    $endDate: ISO8601DateTime
+    $notes: String
+    $retainManualOverrideFor: Int
+  ) {
+    componentSupportLevelBulkUpdate(
+      input: {
+        ids: $ids
+        level: $level
+        endDate: $endDate
+        notes: $notes
+        retainManualOverrideFor: $retainManualOverrideFor
+      }
+    ) {
+      clientMutationId
+      errors
+      componentSupportLevels {
+        id
+      }
+    }
+  }
+`
