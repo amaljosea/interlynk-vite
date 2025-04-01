@@ -2542,6 +2542,8 @@ export const CustomVulnCreate = gql`
     $customVulnSbomsAttributes: [CustomVulnSbomsAttributesInput!]
     $purl: String
     $cpe: String
+    $cvssScore: Float
+    $cvssVector: String
   ) {
     customVulnCreate(
       input: {
@@ -2554,6 +2556,8 @@ export const CustomVulnCreate = gql`
         cpe: $cpe
         purl: $purl
         customVulnSbomsAttributes: $customVulnSbomsAttributes
+        cvssScore: $cvssScore
+        cvssVector: $cvssVector
       }
     ) {
       errors
