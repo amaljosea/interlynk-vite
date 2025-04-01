@@ -5,7 +5,7 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import ProductLabels from '../ProductLabels'
 import ProductLifestages from '../ProductLifestages'
 
-// import VersionLifestages from '../VersionLifestage'
+import VersionLifestages from '../VersionLifestage'
 
 const ProductGraphs = () => {
   const { isFreeTier } = useGlobalQueryContext()
@@ -15,7 +15,7 @@ const ProductGraphs = () => {
       <Heading size={'md'}>Products</Heading>
       <SimpleGrid columns={{ sm: 1, md: 3 }} spacing={5}>
         <ProductLifestages />
-        {/* <VersionLifestages /> */}
+        <VersionLifestages />
         {!isFreeTier && <ProductLabels />}
       </SimpleGrid>
     </Stack>
