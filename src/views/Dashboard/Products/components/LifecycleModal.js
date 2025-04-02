@@ -46,9 +46,9 @@ const LifecycleModal = ({ data, isOpen, onClose }) => {
 
   const [formData, setFormData] = useState({
     stage: undefined,
-    releaseDate: new Date(),
-    endOfLifeDate: new Date(),
-    endOfSupportDate: new Date()
+    releaseDate: undefined,
+    endOfLifeDate: undefined,
+    endOfSupportDate: undefined
   })
   const [error, setError] = useState('')
 
@@ -56,7 +56,10 @@ const LifecycleModal = ({ data, isOpen, onClose }) => {
     const { value } = selectedItem
     setFormData((prev) => ({
       ...prev,
-      [name]: value === '' ? undefined : value
+      [name]: value === '' ? undefined : value,
+      releaseDate: value === 'released' ? new Date() : undefined,
+      endOfLifeDate: value === 'end_of_life' ? new Date() : undefined,
+      endOfSupportDate: value === 'end_of_support' ? new Date() : undefined
     }))
     setError('')
   }
