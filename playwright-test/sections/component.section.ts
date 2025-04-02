@@ -542,9 +542,14 @@ export default class ComponentSection {
           await this.page.getByTestId('purl_expand').first().click()
           await this.page.waitForTimeout(3000)
 
-          await this.page.getByTestId('purl_type').click()
-          await this.page.waitForTimeout(1000)
-          await this.page.getByTestId('purl_type').selectOption('npm')
+          await this.page
+            .getByLabel('Identifiers')
+            .locator('div')
+            .filter({ hasText: /^-- Select --$/ })
+            .nth(1)
+            .click()
+          await this.page.keyboard.type('npm')
+          await this.page.keyboard.press('Enter')
           await this.page.waitForTimeout(2000)
           await this.page.locator('#purl_namespace').click()
           await this.page.keyboard.type('react')
