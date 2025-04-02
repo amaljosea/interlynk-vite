@@ -15,7 +15,7 @@ test('Scores update functionality', async ({ page }) => {
   test.setTimeout(120000)
   const pp = new ScorePage(page)
   try {
-    await pp.securityToken()
+    await pp.scoreSettings()
   } catch (error) {
     console.error('Scores update test failed:', error)
     throw error

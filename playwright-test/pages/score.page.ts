@@ -11,7 +11,7 @@ export default class ScorePage {
     this.scoreSection = new ScoreSection(this.page)
   }
 
-  public async securityToken() {
+  public async scoreSettings() {
     await this.scoreSection.score()
   }
 }
