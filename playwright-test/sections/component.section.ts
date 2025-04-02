@@ -257,14 +257,29 @@ export default class ComponentSection {
 
           await this.page.getByRole('tab', { name: 'links' }).click()
 
-          await this.page.getByLabel('Type*').selectOption('issue-tracker')
+          await this.page
+            .getByLabel('Links')
+            .locator('div')
+            .filter({ hasText: /^-- Select --$/ })
+            .nth(2)
+            .click()
+          await this.page.keyboard.type('issue')
+          await this.page.keyboard.press('Enter')
+
           await this.page.getByPlaceholder('Add URL').fill('github.com')
           await this.page.waitForTimeout(2000)
 
           await this.page.getByRole('button', { name: 'Save' }).click()
           await this.page.waitForTimeout(4000)
 
-          await this.page.getByLabel('Type*').selectOption('issue-tracker')
+          await this.page
+            .getByLabel('Links')
+            .locator('div')
+            .filter({ hasText: /^-- Select --$/ })
+            .nth(2)
+            .click()
+          await this.page.keyboard.type('issue')
+          await this.page.keyboard.press('Enter')
           const errMsg = await this.page
             .getByTestId('link_type_error')
             .isVisible()
