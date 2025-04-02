@@ -36,18 +36,18 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
   const {
     primaryTextColor,
     secondaryBgColor,
-    sameSecondaryText,
     customLightBlue,
     customDarkBlue,
-    grayBorderColor
+    grayBorderColor,
+    primaryErrorColor
   } = useThemeColor([
     'primaryTextColor',
     'secondaryBgColor',
-    'sameSecondaryText',
     'lightBlueBg',
     'customLightBlue',
     'customDarkBlue',
-    'grayBorderColor'
+    'grayBorderColor',
+    'primaryErrorColor'
   ])
 
   const { data: customFieldsData } = useQuery(GetCustomFields, {
@@ -207,6 +207,7 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
       title='Export CSV'
       Icon={FaFileCsv}
       isLoading={isLoading}
+      disabled={selectedColumns.length < 1}
     >
       <Flex direction='column' gap={4}>
         {tableType && (
@@ -271,7 +272,7 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
             sx={{ mb: 4, p: '10px', borderRadius: '10px' }}
           >
             {selectedColumns.length === 0 && (
-              <Text color={sameSecondaryText} fontSize='sm'>
+              <Text color={primaryErrorColor} fontSize='sm'>
                 No columns selected
               </Text>
             )}
