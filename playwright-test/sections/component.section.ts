@@ -545,7 +545,7 @@ export default class ComponentSection {
           await this.page
             .getByLabel('Identifiers')
             .locator('div')
-            .filter({ hasText: /^-- Select --$/ })
+            .filter({ hasText: /^maven$/ })
             .nth(1)
             .click()
           await this.page.keyboard.type('npm')
