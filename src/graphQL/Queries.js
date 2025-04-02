@@ -4729,8 +4729,13 @@ export const CveLookup = gql`
       vulnId
       description
       lastModified
+      reportedAt
       published
+      cvssScore
+      cvssVector
       severity
+      advisories
+      cwes
     }
   }
 `

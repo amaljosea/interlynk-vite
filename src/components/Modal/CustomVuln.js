@@ -27,6 +27,7 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { CustomVulnCreate } from 'graphQL/Mutation'
+import { ComponentVulnUpdate } from 'graphQL/Mutation'
 import {
   CveLookup,
   GetAllComponents,
@@ -49,6 +50,7 @@ const CustomVuln = ({ isOpen, onClose }) => {
     direction: direction
   }
 
+  const [addUrls, { loading: urlLoading }] = useMutation(ComponentVulnUpdate)
   const [createVuln, { loading }] = useMutation(CustomVulnCreate)
   const [lookup, { loading: cveLoading }] = useLazyQuery(CveLookup)
   const { data: compData } = useQuery(GetTotalComponents, {
@@ -83,7 +85,10 @@ const CustomVuln = ({ isOpen, onClose }) => {
     cpe: undefined,
     reportedAt: undefined,
     publishedAt: undefined,
-    lastModifiedAt: undefined
+    lastModifiedAt: undefined,
+    cvssScore: undefined,
+    cvssVector: undefined,
+    advisories: []
   })
 
   const handleChange = (e) => {
@@ -126,14 +131,19 @@ const CustomVuln = ({ isOpen, onClose }) => {
     if (cve !== '') {
       lookup({ variables: { vulnId: cve } }).then((res) => {
         const { cveLookup } = res?.data || ''
+        const { vulnId, description, advisories } = cveLookup || {}
         if (cveLookup) {
           setFormData((prev) => ({
             ...prev,
-            desc: cveLookup?.description,
-            vulnIdentifier: cveLookup?.vulnId,
+            desc: description,
+            vulnIdentifier: vulnId,
+            cvssScore: cveLookup?.cvssScore,
+            cvssVector: cveLookup?.cvssVector,
             sev: cveLookup?.severity?.toLowerCase(),
+            reportedAt: new Date(cveLookup?.reportedAt),
             publishedAt: new Date(cveLookup?.published),
-            lastModifiedAt: new Date(cveLookup?.lastModified)
+            lastModifiedAt: new Date(cveLookup?.lastModified),
+            advisories: advisories?.length > 0 ? advisories : []
           }))
         } else {
           setError('Data not found')
@@ -159,6 +169,26 @@ const CustomVuln = ({ isOpen, onClose }) => {
     setError('')
   }
 
+  const addVulnLinks = (id) => {
+    const extUrls = []
+    formData?.advisories?.map((item) =>
+      extUrls.push({ name: 'advisories', url: item })
+    )
+    addUrls({
+      variables: {
+        componentVulnId: id,
+        externalUrls: extUrls
+      }
+    }).then((res) => {
+      const errors = res?.data?.componentVulnUpdate?.errors
+      if (errors?.length > 0) {
+        setError(errors[0])
+      } else {
+        setError('')
+      }
+    })
+  }
+
   const handleSubmit = async () => {
     const attribute = {
       sbomId: params?.sbomid,
@@ -173,6 +203,9 @@ const CustomVuln = ({ isOpen, onClose }) => {
       if (res?.data?.customVulnCreate?.errors?.length > 0) {
         setError(res?.data?.customVulnCreate?.errors[0])
       } else {
+        if (formData?.advisories?.length > 0) {
+          addVulnLinks(res?.data?.customVulnCreate?.customVuln?.id)
+        }
         showToast({
           description: 'Data added successfully',
           status: 'success'
@@ -225,11 +258,11 @@ const CustomVuln = ({ isOpen, onClose }) => {
       isOpen={isOpen}
       onClose={onClose}
       buttonText={'Save'}
-      isLoading={loading}
       disabled={isDisabled}
       onSubmit={handleSubmit}
       hidden={signedUrlParams}
       title='Add Custom Vulerability'
+      isLoading={loading || urlLoading}
     >
       <Stack spacing={4}>
         {error !== '' && <LynkAlert msg={error} />}
