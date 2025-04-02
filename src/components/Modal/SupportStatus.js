@@ -2,12 +2,13 @@ import { useMutation } from '@apollo/client'
 import { useState } from 'react'
 import { getTotalDays } from 'utils'
 
-import { FormErrorMessage, Input, Select, Stack } from '@chakra-ui/react'
+import { FormErrorMessage, Input, Stack } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
 
 import { SupportIcon } from 'components/Icons/Icons'
 import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
+import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useRouteFlags } from 'hooks/useRouteFlags'
@@ -68,12 +69,18 @@ const SupportStatus = ({
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    const isUnspecified =
-      name === 'supportLevel' && (value === 'unspecified' || noLongerMaintained)
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleSelectChange = (selectedItem) => {
+    const isUnspecified = selectedItem === 'unspecified' || noLongerMaintained
     if (isUnspecified) {
       setFormData((prev) => ({
         ...prev,
-        [name]: value,
+        supportLevel: selectedItem,
         endOfSupport: '',
         explanation: '',
         assessmentExpiresOn: ''
@@ -81,7 +88,7 @@ const SupportStatus = ({
     } else {
       setFormData((prev) => ({
         ...prev,
-        [name]: value
+        supportLevel: selectedItem
       }))
     }
   }
@@ -159,6 +166,14 @@ const SupportStatus = ({
     }
   }
 
+  const supportOptions = [
+    { label: '-- Select --', value: '' },
+    { label: 'Unspecified', value: 'unspecified' },
+    { label: 'Actively Maintained', value: 'actively_maintained' },
+    { label: 'No Longer Maintained', value: 'no_longer_maintained' },
+    { label: 'Abandoned', value: 'abandoned' }
+  ]
+
   return (
     <LynkModal
       isOpen={isOpen}
@@ -174,21 +189,21 @@ const SupportStatus = ({
         {/* SUPPRT LEVEL */}
         <FormControl>
           <FormLabel htmlFor='supportLevel'>Support Level</FormLabel>
-          <Select
-            sx={inputStyle}
+          <LynkSelect
+            styles={inputStyle}
             name='supportLevel'
-            value={formData?.supportLevel}
+            value={
+              supportOptions.find(
+                (option) => option.value === formData?.supportLevel
+              ) || null
+            }
+            onChange={(selected) => {
+              handleSelectChange(selected.value)
+            }}
             isDisabled={isCustomerView}
-            onChange={handleChange}
-          >
-            <option value='' style={{ background: 'lightgray' }}>
-              -- Select --
-            </option>
-            <option value='unspecified'>Unspecified</option>
-            <option value='actively_maintained'>Actively Maintained</option>
-            <option value='no_longer_maintained'>No Longer Maintained</option>
-            <option value='abandoned'>Abandoned</option>
-          </Select>
+            options={supportOptions}
+            dropDown
+          />
         </FormControl>
         {/* END-OF-SUPPORT DATE */}
         {(formData?.supportLevel === 'actively_maintained' ||
