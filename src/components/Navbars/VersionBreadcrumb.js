@@ -74,7 +74,7 @@ const VersionBreadcrumb = ({ selectStyles }) => {
         first: 5
       },
       selectorForActualCount: 'project.allSbomVersions',
-      selectedItem: selectedVersionName,
+      selectedItem: truncatedValue(selectedVersionName),
       styles: selectStyles,
       onChange: handleVersionClick,
       components: {
