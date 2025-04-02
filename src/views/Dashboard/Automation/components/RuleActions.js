@@ -72,7 +72,6 @@ const RuleActions = ({
           <Box key={index}>
             <Flex
               key={index}
-              justifyContent={'space-bewteen'}
               sx={{ w: '100%', gap: 2, mt: 1.5, alignItems: 'flex-start' }}
             >
               {/* ICON */}
