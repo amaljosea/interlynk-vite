@@ -614,9 +614,14 @@ export default class ComponentSection {
           await this.page.getByTestId('cpe_expand').first().click()
           await this.page.waitForTimeout(2000)
 
-          await this.page.getByTestId('cpe_part').click()
-          await this.page.waitForTimeout(1000)
-          await this.page.getByTestId('cpe_part').selectOption('a')
+          await this.page
+            .getByLabel('Identifiers')
+            .locator('div')
+            .filter({ hasText: /^-- Select --$/ })
+            .nth(1)
+            .click()
+          await this.page.keyboard.type('a')
+          await this.page.keyboard.press('Enter')
           await this.page.waitForTimeout(3000)
           await this.page.locator('#cpe_vendor').click()
           await this.page.keyboard.type('calibre-ebook')
