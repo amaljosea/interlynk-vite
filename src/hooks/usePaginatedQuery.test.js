@@ -105,7 +105,7 @@ describe('usePaginatedQuery', () => {
     )
 
     act(() => {
-      result.current.paginationProps.onSetRow({ target: { value: '50' } })
+      result.current.paginationProps.onSetRow(50)
     })
 
     expect(result.current.paginationProps.totalRows).toBe(50)
