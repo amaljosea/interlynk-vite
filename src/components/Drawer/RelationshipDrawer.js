@@ -204,7 +204,7 @@ const RelationshipDrawer = (props) => {
           <CardBody>
             <Stack spacing={6} width={'100%'}>
               {/* CREATE RELATIONSHIP */}
-              <Stack mt={6} width={'100%'} spacing={4} hidden={resolved}>
+              <Stack width={'100%'} spacing={4} hidden={resolved}>
                 <FormControl>
                   <FormLabel htmlFor='relation' color={headingTextColor}>
                     Type
