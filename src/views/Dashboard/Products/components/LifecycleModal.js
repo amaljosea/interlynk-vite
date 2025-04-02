@@ -57,9 +57,13 @@ const LifecycleModal = ({ data, isOpen, onClose }) => {
     setFormData((prev) => ({
       ...prev,
       [name]: value === '' ? undefined : value,
-      releaseDate: value === 'released' ? new Date() : undefined,
-      endOfLifeDate: value === 'end_of_life' ? new Date() : undefined,
-      endOfSupportDate: value === 'end_of_support' ? new Date() : undefined
+      releaseDate: data?.releaseDate ? new Date(data?.releaseDate) : new Date(),
+      endOfLifeDate: data?.endOfLifeDate
+        ? new Date(data?.endOfLifeDate)
+        : new Date(),
+      endOfSupportDate: data?.endOfSupportDate
+        ? new Date(data?.endOfSupportDate)
+        : new Date()
     }))
     setError('')
   }
