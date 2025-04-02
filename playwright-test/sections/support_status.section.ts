@@ -81,6 +81,17 @@ export default class SupportStatusSection {
           await this.page.getByRole('cell', { name: '10' }).click()
           await this.page.getByRole('button', { name: 'Save' }).click()
 
+          await this.page.waitForTimeout(2000)
+
+          await this.page.locator("//a[@aria-label='products']").click()
+          await this.page.getByTestId('product-actions').first().click()
+
+          await this.page.waitForTimeout(2000)
+
+          await this.page.getByTestId('delete_product').first().click()
+          await this.page.getByTestId(`delete-field`).fill('DELETE')
+          await this.page.locator("button[type='submit']").click()
+
           await this.page.waitForTimeout(3000)
         } else {
           errors.push('Version not found')
