@@ -41,6 +41,7 @@ const Vulnerabilities = () => {
   const epssRange = parseEpssRange(globalVulnState?.epss)
 
   const filters = {
+    env: envName,
     epss: epssRange,
     projectNames: [envName],
     field: globalVulnState?.field,
