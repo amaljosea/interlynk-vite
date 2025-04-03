@@ -358,9 +358,9 @@ const SbomDetails = ({ sbomData }) => {
           </Grid>
           {isOpen && (
             <LifecycleModal
-              data={lifecycleData}
               isOpen={isOpen}
               onClose={onClose}
+              data={{ projectId: projectId, sbomId: sbomId }}
             />
           )}
         </Flex>
