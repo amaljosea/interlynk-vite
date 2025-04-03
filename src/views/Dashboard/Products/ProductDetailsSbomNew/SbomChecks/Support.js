@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { getTotalDays } from 'utils'
 import { getDate } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
+import { assessmentExpiryWarning } from 'variables/general'
 
 import { Button, FormErrorMessage, Input, Stack } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
@@ -372,9 +373,7 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
             value={formData?.assessmentExpiresOn}
             onChange={(value) => handleDateChange(value, 'assessmentExpiresOn')}
           />
-          <FormErrorMessage>
-            Value must be between 1 and 365 days
-          </FormErrorMessage>
+          <FormErrorMessage>{assessmentExpiryWarning}</FormErrorMessage>
         </FormControl>
         {/* EXPLANATION */}
         <FormControl>
