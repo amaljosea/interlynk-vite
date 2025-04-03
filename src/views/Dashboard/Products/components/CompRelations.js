@@ -32,7 +32,6 @@ const CompRelations = ({ data, compPath }) => {
 
   const {
     tab,
-    tabData,
     setTabData,
     handleChange,
     saveChanges,
@@ -42,13 +41,13 @@ const CompRelations = ({ data, compPath }) => {
     alertMessage,
     alertMessageSetter
   } = useContext(TabContext)
-  const { relationships } = tabData
 
   const [dependencyOfList, setDependencyOfList] = useState([])
   const [dependsOnList, setDependsOnList] = useState([])
   const [activeComp, setActiveComp] = useState(null)
   const [isAdded, setIsAdded] = useState(false)
   const [component, setComponent] = useState(null)
+  const [type, setType] = useState(null)
 
   const { headingTextColor } = useThemeColor(['headingTextColor'])
 
@@ -67,22 +66,22 @@ const CompRelations = ({ data, compPath }) => {
   } = useDisclosure()
 
   const list = dependsOnList?.filter(
-    (item) => item?.toComp?.id === relationships?.to
+    (item) => item?.toComp?.id === component?.value
   )
 
   const handleAdd = () => {
-    const isDependsOn = relationships?.relType === 'depends_on'
+    const isDependsOn = type === 'depends_on'
     addRelation({
       variables: {
-        from: isDependsOn ? id : relationships?.to,
-        to: isDependsOn ? relationships?.to : id,
+        from: isDependsOn ? id : component?.value,
+        to: isDependsOn ? component?.value : id,
         relType: 'depends_on'
       }
     }).then((res) => {
       if (res?.data) {
         saveChanges('relationships')
         setIsAdded(true)
-        if (relationships?.relType === 'dependency_of') {
+        if (type === 'dependency_of') {
           setDependencyOfList((prev) => [
             ...prev,
             res?.data?.componentRelationCreate?.compRelation
@@ -100,6 +99,7 @@ const CompRelations = ({ data, compPath }) => {
       }
     })
     setComponent(null)
+    setType(null)
     setTabData((prev) => ({ ...prev, relationships: { to: '', relType: '' } }))
   }
 
@@ -142,8 +142,7 @@ const CompRelations = ({ data, compPath }) => {
     onDelOpen()
   }
 
-  const isInvalid =
-    relationships?.relType === '' || relationships?.to === '' || list.length > 0
+  const isInvalid = !type || list.length > 0 || !component
 
   useEffect(() => {
     if (compDependency) {
@@ -181,10 +180,14 @@ const CompRelations = ({ data, compPath }) => {
             </FormLabel>
             <LynkSelect
               id='relationType'
-              onChange={(selectedOption) =>
+              onChange={(selectedOption) => {
+                setType(selectedOption?.value)
                 handleChange('relationships', 'relType', selectedOption?.value)
-              }
+              }}
               options={typeOptions}
+              value={
+                typeOptions.find((option) => option.value === type) || null
+              }
               placeholder='-- Select --'
               dropDown
             />
