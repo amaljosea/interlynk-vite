@@ -117,9 +117,7 @@ const GlobalStateProvider = ({ children }) => {
     search: ''
   })
   const [sbomState, sbomDispatch] = useReducer(sbomReducer, {
-    licenseType: 'license_exp',
-    expLicense: '',
-    licenseString: null
+    license: []
   })
   // SBOM VERSIONS
   const [toolsState, toolsDispatch] = useReducer(toolsReducer, {

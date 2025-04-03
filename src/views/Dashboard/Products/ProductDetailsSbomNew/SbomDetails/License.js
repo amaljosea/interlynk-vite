@@ -40,7 +40,8 @@ const License = ({ data, permission }) => {
   }
 
   const onUpdateLicense = async () => {
-    const licenseObj = sbomState?.licenseString
+    const licenseObj =
+      sbomState?.license?.length > 0 ? sbomState?.license[0] : null
     const isCustomLicense = licenseObj && licenseObj?.type === 'Custom License'
 
     const license = isCustomLicense
@@ -61,7 +62,7 @@ const License = ({ data, permission }) => {
             status: 'error'
           })
         } else {
-          sbomDispatch({ type: 'CLEAR_LICENSES' })
+          sbomDispatch({ type: 'CLEAR_LICENSE' })
           showToast({
             description: 'Licenses updated successfully',
             status: 'success'
@@ -74,9 +75,34 @@ const License = ({ data, permission }) => {
           status: 'error'
         })
       })
-      .finally(() => {
-        DELETE_LICENSE?.isOpen ? DELETE_LICENSE?.onClose() : LICENSE?.onClose()
+      .finally(() => LICENSE?.onClose())
+  }
+
+  const onRemoveLicense = async () => {
+    await updateSbom({
+      variables: { id: id, spec: spec, licenses: { licensesExp: '' } }
+    })
+      .then((res) => {
+        if (res?.data?.sbomUpdate?.errors?.length > 0) {
+          showToast({
+            description: res.data.sbomUpdate.errors[0],
+            status: 'error'
+          })
+        } else {
+          sbomDispatch({ type: 'CLEAR_LICENSE' })
+          showToast({
+            description: 'License removed successfully',
+            status: 'success'
+          })
+        }
       })
+      .catch((error) => {
+        showToast({
+          description: error?.message || 'Failed to remove licenses',
+          status: 'error'
+        })
+      })
+      .finally(() => DELETE_LICENSE?.onClose())
   }
 
   return (
@@ -114,7 +140,7 @@ const License = ({ data, permission }) => {
           isOpen={LICENSE?.isOpen}
           onClose={LICENSE?.onClose}
           onSubmit={onUpdateLicense}
-          disabled={!sbomState?.licenseString}
+          disabled={sbomState?.license?.length === 0}
           buttonText={license !== '' ? 'Update' : 'Save'}
           title={`${license !== '' ? 'Update' : 'Add'} License`}
         >
@@ -132,7 +158,7 @@ const License = ({ data, permission }) => {
           name={license}
           isLoading={loading}
           title={'Remove License'}
-          onConfirm={onUpdateLicense}
+          onConfirm={onRemoveLicense}
           isOpen={DELETE_LICENSE?.isOpen}
           onClose={DELETE_LICENSE?.onClose}
           description={`You are about to delete the License : ${license} from this version.`}

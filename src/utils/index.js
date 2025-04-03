@@ -499,8 +499,8 @@ export const transformLicenseString = (licenseText) => {
 export const parseLicenseString = (licenseText) => {
   if (!licenseText) return ''
 
-  if (licenseText.startsWith('LicenseRef-interlynk-')) {
-    return licenseText.slice('LicenseRef-interlynk-'.length).replace(/-/g, ' ')
+  if (licenseText?.startsWith('LicenseRef-interlynk-')) {
+    return licenseText?.slice('LicenseRef-interlynk-'.length).replace(/-/g, ' ')
   }
 
   return licenseText
