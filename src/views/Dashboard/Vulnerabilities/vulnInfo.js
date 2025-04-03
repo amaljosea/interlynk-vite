@@ -186,13 +186,15 @@ const VulnInfo = () => {
                 {desc !== '' && (
                   <Text fontSize={'sm'} my={0.5}>
                     {expand ? desc : truncatedValue(desc, 300)}{' '}
-                    <chakra.span
-                      cursor={'pointer'}
-                      color={secondaryBlueText}
-                      onClick={() => setExpand(!expand)}
-                    >
-                      Read {expand ? 'less' : 'more'}
-                    </chakra.span>
+                    {desc?.length > 300 && (
+                      <chakra.span
+                        cursor={'pointer'}
+                        color={secondaryBlueText}
+                        onClick={() => setExpand(!expand)}
+                      >
+                        Read {expand ? 'less' : 'more'}
+                      </chakra.span>
+                    )}
                   </Text>
                 )}
                 <Flex
