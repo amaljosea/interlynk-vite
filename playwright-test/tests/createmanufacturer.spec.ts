@@ -14,7 +14,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('should add, update, and archive a manufacturer', async ({ page }) => {
-  test.setTimeout(120000)
+  test.setTimeout(30000)
 
   const settingsPage = new SettingsPage(page)
 

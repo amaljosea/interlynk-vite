@@ -12,6 +12,7 @@ test.beforeEach(async ({ page }) => {
 test('should add organization, check string, and delete entry', async ({
   page
 }) => {
+  test.setTimeout(30000)
   await page.getByLabel('settings').click()
   await page.locator(`//button[@aria-label='add_user']`).click()
   await page.getByLabel('Email*').click()

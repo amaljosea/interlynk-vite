@@ -12,7 +12,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('Scores update functionality', async ({ page }) => {
-  test.setTimeout(120000)
+  test.setTimeout(30000)
   const pp = new ScorePage(page)
   try {
     await pp.scoreSettings()

@@ -12,7 +12,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('Create and delete role', async ({ page }) => {
-  test.setTimeout(1200000)
+  test.setTimeout(30000)
   const rolesPage = new RolesPage(page)
   await rolesPage.navigateToSettings()
   await rolesPage.openRolesTab()

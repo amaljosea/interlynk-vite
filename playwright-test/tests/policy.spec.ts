@@ -12,7 +12,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('Policy create functionality', async ({ page }) => {
-  test.setTimeout(120000)
+  test.setTimeout(30000)
   const pp = new PolicyPage(page)
   try {
     await pp.addPolicy()
@@ -23,7 +23,7 @@ test('Policy create functionality', async ({ page }) => {
 })
 
 test('Policy edit functionality', async ({ page }) => {
-  test.setTimeout(120000)
+  test.setTimeout(30000)
   const pp = new PolicyPage(page)
   try {
     await pp.editPolicy()
@@ -34,7 +34,7 @@ test('Policy edit functionality', async ({ page }) => {
 })
 
 test('Policy delete functionality', async ({ page }) => {
-  test.setTimeout(120000)
+  test.setTimeout(30000)
   const pp = new PolicyPage(page)
   try {
     await pp.deletePolicy()

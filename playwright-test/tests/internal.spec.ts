@@ -10,7 +10,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('Check internal component CRUD feature', async ({ page }) => {
-  test.setTimeout(120000)
+  test.setTimeout(30000)
 
   try {
     await page.getByLabel('settings').click()

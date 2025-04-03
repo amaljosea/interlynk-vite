@@ -12,7 +12,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('Support CRUD functionality', async ({ page }) => {
-  test.setTimeout(120000)
+  test.setTimeout(30000)
   const pp = new SupportPage(page)
   try {
     await pp.support()

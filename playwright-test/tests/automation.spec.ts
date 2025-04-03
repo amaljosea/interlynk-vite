@@ -12,7 +12,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('Automation create functionality', async ({ page }) => {
-  test.setTimeout(120000)
+  test.setTimeout(60000)
   const pp = new AutomationPage(page)
   try {
     await pp.addRule()
@@ -23,7 +23,7 @@ test('Automation create functionality', async ({ page }) => {
 })
 
 test('Automation edit functionality', async ({ page }) => {
-  test.setTimeout(120000)
+  test.setTimeout(60000)
   const pp = new AutomationPage(page)
   try {
     await pp.editRule()
@@ -34,7 +34,7 @@ test('Automation edit functionality', async ({ page }) => {
 })
 
 test('Automation delete functionality', async ({ page }) => {
-  test.setTimeout(120000)
+  test.setTimeout(60000)
   const pp = new AutomationPage(page)
   try {
     await pp.deleteRule()
