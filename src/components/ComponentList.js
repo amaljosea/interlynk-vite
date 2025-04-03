@@ -81,7 +81,8 @@ const ComponentList = ({ id, name, value, setValue }) => {
       onChange={onChange}
       isLoading={loading}
       isDisabled={loading}
-      placeholder={'Select component'}
+      placeholder={' --Select Component-- '}
+      dropDown
     />
   )
 }
