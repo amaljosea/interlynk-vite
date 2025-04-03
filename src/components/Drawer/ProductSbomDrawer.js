@@ -360,7 +360,7 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
           <LicenseField
             sbomView={true}
             isDisabled={isCustomerView}
-            license={sbom ? sbom.licensesExp : null}
+            license={sbom ? sbom.license : null}
           />
           {/* SCOPE */}
           <FormControl>
