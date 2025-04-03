@@ -11,7 +11,7 @@ test.beforeEach(async ({ page }) => {
   await page.goto(url)
 })
 test('License CRUD functionality', async ({ page }) => {
-  test.setTimeout(120000)
+  test.setTimeout(30000)
   const pp = new LicensePage(page)
   try {
     await pp.license()

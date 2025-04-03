@@ -42,10 +42,12 @@ export default class PolicySection {
       await this.page.keyboard.press('Enter')
 
       await this.page.locator("button[type='submit']").click()
+      await this.page.waitForTimeout(1000)
 
       await this.page.locator('.chakra-switch__thumb').nth(0).click()
 
       await this.page.locator("button[type='submit']").click()
+      await this.page.waitForTimeout(1000)
 
       await this.page.locator('.chakra-switch__thumb').nth(0).click()
 

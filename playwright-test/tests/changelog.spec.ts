@@ -12,7 +12,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('SBOM changelog functionality', async ({ page }) => {
-  test.setTimeout(120000)
+  test.setTimeout(90000)
   const pp = new ChangelogPage(page)
   try {
     await pp.checkLogs()

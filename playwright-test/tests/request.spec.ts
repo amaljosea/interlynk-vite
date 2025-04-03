@@ -12,7 +12,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('SBOM request functionality', async ({ page }) => {
-  test.setTimeout(120000)
+  test.setTimeout(30000)
   const pp = new RequestPage(page)
   try {
     await pp.sbomRequest()
