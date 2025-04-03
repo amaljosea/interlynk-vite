@@ -7,6 +7,7 @@ import {
   Box,
   Checkbox,
   Flex,
+  FormErrorMessage,
   IconButton,
   Input,
   Stack,
@@ -264,7 +265,8 @@ const VexModal = ({
   }
 
   const disabled =
-    statusTitle === '' && formValues && formValues[fieldOne?.id] === ''
+    (statusTitle === '' && formValues && formValues[fieldOne?.id] === '') ||
+    responseTitle === 'Update'
 
   useEffect(() => {
     generateControl(statusName)
@@ -477,7 +479,7 @@ const VexModal = ({
           )}
           {/* RESPONSE */}
           {statusName === 'Affected' && (
-            <FormControl>
+            <FormControl isInvalid={responseTitle === 'Update'}>
               <FormLabel htmlFor='response'>Response</FormLabel>
               {allCdx && (
                 <LynkSelect
@@ -491,6 +493,7 @@ const VexModal = ({
                   dropDown
                 />
               )}
+              <FormErrorMessage>Bulk update not allowed</FormErrorMessage>
             </FormControl>
           )}
           {/* FIXED VERSION */}
