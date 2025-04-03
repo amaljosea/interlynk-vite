@@ -48,7 +48,7 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
     supportLevel: '',
     endOfSupport: '',
     explanation: '',
-    assessmentExpiresOn: defaultDate
+    assessmentExpiresOn: 0
   })
 
   const [createRule, { loading: ruleLoading }] =
@@ -64,12 +64,13 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
 
   const resolved = status === 'resolved'
 
+  const isAbandoned = formData?.supportLevel !== 'abandoned'
   const totalDays = Number(getTotalDays(formData?.assessmentExpiresOn))
 
   const disabled =
     formData?.supportLevel === '' ||
-    (!component?.internal && totalDays < 1) ||
-    (!component?.internal && totalDays > 365)
+    (isAbandoned && !component?.internal && totalDays < 1) ||
+    (isAbandoned && !component?.internal && totalDays > 365)
 
   const noLongerMaintained = formData?.supportLevel === 'no_longer_maintained'
 
@@ -90,12 +91,13 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
         [name]: value,
         endOfSupport: '',
         explanation: '',
-        assessmentExpiresOn: 0
+        assessmentExpiresOn: defaultDate
       }))
     } else {
       setFormData((prev) => ({
         ...prev,
-        [name]: value
+        [name]: value,
+        assessmentExpiresOn: defaultDate
       }))
     }
   }
