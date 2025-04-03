@@ -181,9 +181,11 @@ const VulnInfo = () => {
                     {vuln?.vulnId}
                   </Text>
                 </Link>
-                <Text hidden={desc === ''} fontSize={'sm'} my={0.5}>
-                  {truncatedValue(desc, 300)}
-                </Text>
+                {desc !== '' && (
+                  <Text fontSize={'sm'} my={0.5}>
+                    {truncatedValue(desc, 300)}
+                  </Text>
+                )}
                 <Flex
                   mt={6}
                   w={'100%'}
