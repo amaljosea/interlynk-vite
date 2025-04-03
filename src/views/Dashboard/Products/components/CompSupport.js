@@ -191,7 +191,7 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
     supportLevel: '',
     endOfSupport: '',
     explanation: '',
-    assessmentExpiresOn: defaultDate
+    assessmentExpiresOn: 0
   })
 
   const totalDays = Number(getTotalDays(formData?.assessmentExpiresOn))
@@ -222,12 +222,13 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
         [name]: value,
         endOfSupport: '',
         explanation: '',
-        assessmentExpiresOn: ''
+        assessmentExpiresOn: defaultDate
       }))
     } else {
       setFormData((prev) => ({
         ...prev,
-        [name]: value
+        [name]: value,
+        assessmentExpiresOn: defaultDate
       }))
     }
   }
