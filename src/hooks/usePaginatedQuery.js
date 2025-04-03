@@ -57,8 +57,8 @@ export const usePaginatedQuery = (
     })
   }
 
-  const onSetRow = (e) => {
-    const newPageSize = Number(e.target.value)
+  const onSetRow = (selectedItem) => {
+    const newPageSize = Number(selectedItem)
     setPageSize(newPageSize)
     setPage(1)
     setPaginationVariables({

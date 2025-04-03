@@ -43,7 +43,7 @@ const RequestTable = (props) => {
   const [resendRequest] = useMutation(RequestResend)
   const [cancelRequest] = useMutation(RequestCancel)
 
-  const { field, search } = filters
+  const { search } = filters
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const {
@@ -267,6 +267,7 @@ const RequestTable = (props) => {
                 <MenuItem
                   isDisabled={!row.blob || !addReq}
                   onClick={() => handleAccept(row)}
+                  hidden={row.status === 'Accepted'}
                 >
                   Accept
                 </MenuItem>

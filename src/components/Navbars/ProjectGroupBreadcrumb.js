@@ -64,7 +64,7 @@ const ProjectGroupBreadcrumb = ({
         enabled: true
       },
       selectorForActualCount: 'organization.allProjectGroups',
-      selectedItem: projectGroupName,
+      selectedItem: truncatedValue(projectGroupName),
       styles: selectStyles,
       onChange: handleProductClick,
       components: {

@@ -250,7 +250,7 @@ const CustomVulnTable = () => {
         )
       },
       right: 'true',
-      omit: true // isFreeTier
+      omit: true
     }
   ]
 

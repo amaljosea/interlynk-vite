@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { updatedValue } from 'utils'
+import { formatString, updatedValue } from 'utils'
 import { severityList } from 'variables/general'
 
 import { EditIcon } from '@chakra-ui/icons'
@@ -11,13 +11,13 @@ import {
   Grid,
   GridItem,
   Input,
-  Select,
   Tag,
   createIcon
 } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
+import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
 
@@ -55,13 +55,18 @@ const RuleModal = ({ activeRow, data, isOpen, onClose }) => {
     setError('')
   }
 
-  const onOperatorChange = (e) => {
-    setOperator(e.target.value)
+  const onSevChange = (item) => {
+    setValue(item.value)
     setError('')
   }
 
-  const onSubjectChange = (e) => {
-    setSubject(e.target.value)
+  const onOperatorChange = (item) => {
+    setOperator(item.value)
+    setError('')
+  }
+
+  const onSubjectChange = (item) => {
+    setSubject(item.value)
     setError('')
   }
 
@@ -133,6 +138,30 @@ const RuleModal = ({ activeRow, data, isOpen, onClose }) => {
     }
   }, [data])
 
+  const subjectOptions = [
+    { label: '-- Select --', value: '' },
+    ...(subOperators?.policySubjectOperatorMapping
+      ? subOperators.policySubjectOperatorMapping.map((rule) => ({
+          value: rule.subject,
+          label: `${formatString(rule.category)} ${rule.name}`
+        }))
+      : [])
+  ]
+  const operatorOptions = [
+    { label: '-- Select --', value: '' },
+    ...(filterOperators?.operators?.map((item) => ({
+      value: item,
+      label: updatedValue(item)
+    })) || [])
+  ]
+
+  const severityOptions = [
+    { label: '-- Select --', value: '' },
+    ...severityList.map((item) => {
+      return { label: formatString(item), value: item }
+    })
+  ]
+
   return (
     <LynkModal
       isOpen={isOpen}
@@ -150,65 +179,38 @@ const RuleModal = ({ activeRow, data, isOpen, onClose }) => {
         {error !== '' && <LynkAlert msg={error} />}
         <FormControl isRequired>
           <FormLabel>Subject</FormLabel>
-          <Select
-            value={subject}
-            onChange={onSubjectChange}
+          <LynkSelect
+            value={subjectOptions?.find((option) => option.value === subject)}
+            onChange={(selectedOption) => onSubjectChange(selectedOption)}
+            options={subjectOptions}
             placeholder='-- Select --'
-            textTransform={'capitalize'}
-          >
-            {subOperators?.policySubjectOperatorMapping?.map((rule, index) => (
-              <option
-                key={index}
-                value={rule.subject}
-                style={{ textTransform: 'capitalize' }}
-              >
-                {rule.category} {rule?.name}
-              </option>
-            ))}
-          </Select>
+            dropDown
+          />
         </FormControl>
         <FormControl isRequired>
           <FormLabel>Operator</FormLabel>
-          <Select
+          <LynkSelect
             id='operator'
             name='operator'
-            value={operator}
-            onChange={onOperatorChange}
-            textTransform={'capitalize'}
-          >
-            <option value=''>-- Select --</option>
-            {filterOperators?.operators?.map((item, index) => (
-              <option
-                key={index}
-                value={item}
-                style={{ textTransform: 'capitalize' }}
-              >
-                {updatedValue(item)}
-              </option>
-            ))}
-          </Select>
+            value={operatorOptions?.find((option) => option.value === operator)}
+            onChange={(selectedOption) => onOperatorChange(selectedOption)}
+            options={operatorOptions}
+            placeholder='-- Select --'
+            dropDown
+          />
         </FormControl>
         {subject === 'VULNERABILITY_SEV' && (
           <FormControl isRequired>
             <FormLabel>Value</FormLabel>
-            <Select
+            <LynkSelect
               id='operator'
               name='operator'
-              value={value}
-              onChange={onValueChange}
-              textTransform={'capitalize'}
-            >
-              <option value=''>-- Select --</option>
-              {severityList.map((item, index) => (
-                <option
-                  key={index}
-                  value={item}
-                  style={{ textTransform: 'capitalize' }}
-                >
-                  {item}
-                </option>
-              ))}
-            </Select>
+              value={severityOptions.find((option) => option.value === value)}
+              onChange={(selectedOption) => onSevChange(selectedOption)}
+              options={severityOptions}
+              placeholder='-- Select --'
+              dropDown
+            />
           </FormControl>
         )}
         {operator === 'RANGE' && (
