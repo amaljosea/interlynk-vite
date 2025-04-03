@@ -6,6 +6,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { getSignedUrlParams } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import { customStyles } from 'utils/styleUtils'
+import LifecycleModal from 'views/Dashboard/Products/components/LifecycleModal'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 
 import { Flex, useDisclosure } from '@chakra-ui/react'
@@ -95,6 +96,7 @@ const VersionsTable = (props) => {
   const ARCHIVE_SBOM = useDisclosure()
   const AUTOMATION = useDisclosure()
   const SUPPORT = useDisclosure()
+  const LIFECYCLE = useDisclosure()
 
   const tab = useQueryParam('tab')
 
@@ -115,7 +117,7 @@ const VersionsTable = (props) => {
     : data?.projectGroup
   const { name, enabled } = result || ''
 
-  const { nodes, paginationProps, loading, startPolling, stopPolling } =
+  const { nodes, paginationProps, loading, startPolling, stopPolling, reset } =
     usePaginatedQuery(signedUrlParams ? ShareVersionTable : GetVersionsTable, {
       skip: (tab === VERSIONS || tab === null) && !TOOL.isOpen ? false : true,
       selector: signedUrlParams
@@ -213,6 +215,14 @@ const VersionsTable = (props) => {
     [setSearchFilter]
   )
 
+  const onFilterLifestage = (value) => {
+    setFilters((prev) => ({
+      ...prev,
+      lifestage: value?.includes('all') ? [] : value
+    }))
+    reset()
+  }
+
   const action = (type, data) => {
     setActiveRow(data)
     switch (type) {
@@ -238,6 +248,8 @@ const VersionsTable = (props) => {
         return AUTOMATION.onOpen()
       case 'rerun_support_analysis':
         return SUPPORT.onOpen()
+      case 'set_lifecycle':
+        return LIFECYCLE.onOpen()
       default:
         return LIST.onOpen()
     }
@@ -253,6 +265,8 @@ const VersionsTable = (props) => {
   })
 
   const subHeader = VersionHeader({
+    filters,
+    onFilterLifestage,
     filterText,
     onSearchInputChange,
     handleClear,
@@ -299,6 +313,14 @@ const VersionsTable = (props) => {
         <DataTable {...dataTableProps} className='data-table-container' />
         <Pagination {...paginationProps} />
       </Flex>
+      {/* VERSION LIFECYCLE */}
+      {LIFECYCLE.isOpen && (
+        <LifecycleModal
+          isOpen={LIFECYCLE.isOpen}
+          onClose={LIFECYCLE.onClose}
+          data={{ projectId: productId, sbomId: activeRow?.id }}
+        />
+      )}
       {/* DELETE VERSION */}
       {DELETE_SBOM.isOpen && (
         <DeleteSbom

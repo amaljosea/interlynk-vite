@@ -2066,3 +2066,6 @@ export const supportLevels = [
   { id: 4, label: 'No Longer Maintained', value: 'no_longer_maintained' },
   { id: 5, label: 'Abandoned', value: 'abandoned' }
 ]
+
+export const assessmentExpiryWarning =
+  'Please select a date within the next 365 days. Past dates are allowed.'

@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { getDate, getFullDate, getTotalDays, timeSince } from 'utils'
+import { assessmentExpiryWarning } from 'variables/general'
 
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import {
@@ -191,7 +192,7 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
     supportLevel: '',
     endOfSupport: '',
     explanation: '',
-    assessmentExpiresOn: defaultDate
+    assessmentExpiresOn: 0
   })
 
   const totalDays = Number(getTotalDays(formData?.assessmentExpiresOn))
@@ -222,12 +223,13 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
         [name]: value,
         endOfSupport: '',
         explanation: '',
-        assessmentExpiresOn: ''
+        assessmentExpiresOn: defaultDate
       }))
     } else {
       setFormData((prev) => ({
         ...prev,
-        [name]: value
+        [name]: value,
+        assessmentExpiresOn: defaultDate
       }))
     }
   }
@@ -421,9 +423,7 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
           value={formData?.assessmentExpiresOn}
           onChange={(value) => handleDateChange(value, 'assessmentExpiresOn')}
         />
-        <FormErrorMessage>
-          Value must be between 1 and 365 days
-        </FormErrorMessage>
+        <FormErrorMessage>{assessmentExpiryWarning}</FormErrorMessage>
       </FormControl>
       {/* EXPLANATION */}
       <FormControl>

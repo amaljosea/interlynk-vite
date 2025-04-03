@@ -681,6 +681,7 @@ export const GetGlobalVulns = gql`
   query GetGlobalVulns(
     $first: Int
     $last: Int
+    $env: String
     $after: String
     $before: String
     $search: String
@@ -732,7 +733,7 @@ export const GetGlobalVulns = gql`
           source
           updatedAt
           vulnId
-          metrics {
+          metrics(projectName: $env) {
             affectedCount
             fixedCount
             inTriageCount
@@ -988,6 +989,7 @@ export const GetVersionsTable = gql`
           id
           spec
           phases
+
           creationAt
           createdAt
           updatedAt
@@ -996,6 +998,7 @@ export const GetVersionsTable = gql`
           licensesExp
           projectVersion
           vulnRunStatus
+          productLifeCycleStage
           alternatives {
             id
           }

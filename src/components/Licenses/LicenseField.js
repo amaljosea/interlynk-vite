@@ -59,7 +59,10 @@ const LicenseField = ({ resolved, sbomView, license }) => {
       type: selected?.type
     }
     if (sbomView) {
-      sbomDispatch({ type: 'SET_LICENSE_FIELD', payload: license })
+      sbomDispatch({
+        type: 'SET_LICENSE',
+        payload: selected ? [license] : []
+      })
     } else {
       handleChange('details', 'licenses', selected ? [license] : [])
     }
@@ -70,7 +73,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
     (value) => {
       if (value !== '') {
         if (sbomView) {
-          sbomDispatch({ type: 'SET_LICENSE_FIELD', payload: null })
+          sbomDispatch({ type: 'SET_LICENSE', payload: [] })
         } else {
           setTabData((prev) => ({
             ...prev,
@@ -131,18 +134,17 @@ const LicenseField = ({ resolved, sbomView, license }) => {
     'Custom License': 'orange'
   }
 
-  const licenseString = sbomView ? sbomState.licenseString : details?.licenses
+  const licenseString = sbomView ? sbomState?.license : details?.licenses
 
-  const normalizedLicenseString = sbomView
-    ? licenseString
-    : licenseString?.[0] || null
+  const normalizedLicenseString =
+    licenseString?.length > 0 ? licenseString[0] : null
 
   useEffect(() => {
     const payload = license ? [{ value: license, label: license }] : []
     if (sbomView) {
       sbomDispatch({
-        type: 'SET_LICENSE_FIELD',
-        payload: payload.length ? payload[0] : ''
+        type: 'SET_LICENSE',
+        payload: payload
       })
     } else {
       setTabData((prev) => ({
@@ -188,16 +190,9 @@ const LicenseField = ({ resolved, sbomView, license }) => {
     ...license,
     label:
       license.type === 'Custom License'
-        ? parseLicenseString(license.label)
+        ? parseLicenseString(license?.label)
         : license.label
   }))
-
-  const selectedValue = normalizedLicenseString
-    ? {
-        value: normalizedLicenseString.value,
-        label: parseLicenseString(normalizedLicenseString.label)
-      }
-    : null
 
   return (
     <>
@@ -225,7 +220,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
               MenuList,
               Option
             }}
-            value={selectedValue}
+            value={normalizedLicenseString}
             options={formattedOptions}
             onChange={onLicenseChange}
             onInputChange={setSearchText}

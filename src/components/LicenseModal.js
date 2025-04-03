@@ -20,17 +20,19 @@ const LicenseModal = ({ data, isOpen, onClose, activeRow, recheck }) => {
   const { status, sbom } = activeRow || ''
   const resolved = status === 'resolved'
   const { sbomState } = useGlobalState()
-  const { expLicense } = sbomState
+  const { license } = sbomState
 
-  const isInvalidLicense = expLicense === ''
+  const isInvalidLicense = license?.length === 0
 
-  const [updateSbom] = useMutation(sbomUpdate, { onCompleted: () => recheck() })
+  const [updateSbom, { loading }] = useMutation(sbomUpdate, {
+    onCompleted: () => recheck()
+  })
 
   const handleUpdateSBOM = () => {
-    const licenseObj = sbomState?.licenseString
+    const licenseObj = license?.length > 0 ? license[0] : null
     const isCustomLicense = licenseObj && licenseObj?.type === 'Custom License'
 
-    const license = isCustomLicense
+    const licenseString = isCustomLicense
       ? transformLicenseString(licenseObj?.value)
       : licenseObj?.value || ''
 
@@ -38,9 +40,7 @@ const LicenseModal = ({ data, isOpen, onClose, activeRow, recheck }) => {
       variables: {
         id: data?.id,
         spec: data?.spec,
-        licenses: {
-          licensesExp: license || ''
-        }
+        licenses: { licensesExp: licenseString || '' }
       }
     }).then((res) => {
       const { errors } = res?.data?.sbomUpdate || ''
@@ -62,6 +62,7 @@ const LicenseModal = ({ data, isOpen, onClose, activeRow, recheck }) => {
       disabled={isInvalidLicense}
       hidden={resolved}
       buttonText={'Save'}
+      isLoading={loading}
     >
       {error !== '' && (
         <Box mb={4}>
@@ -71,7 +72,7 @@ const LicenseModal = ({ data, isOpen, onClose, activeRow, recheck }) => {
       <LicenseField
         sbomView={true}
         resolved={resolved}
-        license={status === 'resolved' ? sbom?.licensesExp : ''}
+        license={sbom ? sbom?.licensesExp : null}
       />
     </LynkModal>
   )

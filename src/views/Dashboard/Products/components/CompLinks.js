@@ -228,7 +228,9 @@ const CompLinks = ({ data }) => {
         <FormControl
           isRequired
           isInvalid={
-            (links?.url !== '' && !validateUrl(links?.url?.trim())) ||
+            (linkError !== '' &&
+              links?.url !== '' &&
+              !validateUrl(links?.url?.trim())) ||
             containsSpace
           }
         >

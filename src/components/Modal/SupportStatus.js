@@ -1,6 +1,7 @@
 import { useMutation } from '@apollo/client'
 import { useState } from 'react'
 import { getTotalDays } from 'utils'
+import { assessmentExpiryWarning } from 'variables/general'
 
 import { FormErrorMessage, Input, Select, Stack } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
@@ -216,9 +217,7 @@ const SupportStatus = ({
             value={formData?.assessmentExpiresOn}
             onChange={(value) => handleDateChange(value, 'assessmentExpiresOn')}
           />
-          <FormErrorMessage>
-            Value must be between 1 and 365 days
-          </FormErrorMessage>
+          <FormErrorMessage>{assessmentExpiryWarning}</FormErrorMessage>
         </FormControl>
         {/* EXPLANATION */}
         <FormControl>

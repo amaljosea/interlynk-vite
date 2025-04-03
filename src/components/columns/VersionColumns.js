@@ -23,6 +23,7 @@ import {
   MenuList,
   Link as Olink,
   Portal,
+  Stack,
   Tag,
   TagLabel,
   Text,
@@ -40,6 +41,18 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { HiOutlineDuplicate } from 'react-icons/hi'
 import { IoMdWarning } from 'react-icons/io'
+
+const StatusInfo = ({ data }) => {
+  return (
+    <Stack w={'100%'} spacing={1} p={2}>
+      <Text>Unspecified: {data?.unspecifiedCount}</Text>
+      <Text>In Triage: {data?.inTriageCount}</Text>
+      <Text>Affected: {data?.affectedCount}</Text>
+      <Text>Not Afftected: {data?.notAffectedCount}</Text>
+      <Text>Fixed: {data?.fixedCount}</Text>
+    </Stack>
+  )
+}
 
 const VersionColumns = (props) => {
   const { action, retentionTime, onFilterSev, onSelectLicenses, onStartTour } =
@@ -76,8 +89,14 @@ const VersionColumns = (props) => {
         id: 'SBOMS_PROJECT_VERSION',
         name: 'VERSION',
         selector: (row, index) => {
+          const {
+            projectVersion,
+            createdAt,
+            alternatives,
+            isReprocess,
+            productLifeCycleStage
+          } = row
           const currentDate = new Date()
-          const { projectVersion, createdAt, alternatives, isReprocess } = row
           const parsedCreatedDate = parseISO(createdAt)
           const endDate = addDays(parsedCreatedDate, retention)
           const diff = differenceInDays(endDate, currentDate)
@@ -118,41 +137,61 @@ const VersionColumns = (props) => {
                   </Tooltip>
                 </GridItem>
               )}
-              <GridItem
-                display={'flex'}
-                colSpan={shouldShowDemoFeatures ? 6 : 7}
-                sx={{ gap: 2, flexDirection: 'row', alignItems: 'center' }}
-              >
-                <Link to={link} onClick={onStartTour} data-testid={`version`}>
-                  <Text color={primaryBlueText} fontSize={14}>
-                    {projectVersion}
-                  </Text>
-                </Link>
-                {!isReprocess && showIcon && (
-                  <Tooltip label={ignoreMsg}>
-                    <Box>
-                      <Icon
-                        as={HiOutlineDuplicate}
-                        sx={{ mt: 1, fontSize: 18, color: primaryTextColor }}
+              <GridItem w={'100%'} colSpan={shouldShowDemoFeatures ? 6 : 7}>
+                <Flex
+                  sx={{
+                    mb: 1,
+                    gap: 2,
+                    flexDirection: 'row',
+                    alignItems: 'center'
+                  }}
+                >
+                  <Link to={link} onClick={onStartTour} data-testid={`version`}>
+                    <Text color={primaryBlueText} fontSize={14}>
+                      {projectVersion}
+                    </Text>
+                  </Link>
+                  {!isReprocess && showIcon && (
+                    <Tooltip label={ignoreMsg}>
+                      <Box>
+                        <Icon
+                          as={HiOutlineDuplicate}
+                          sx={{ mt: 1, fontSize: 18, color: primaryTextColor }}
+                        />
+                      </Box>
+                    </Tooltip>
+                  )}
+                  {daysUntilDeletion && !signedUrlParams && (
+                    <Tooltip
+                      label={`Marked for deletion on ${endDate ? new Date(endDate).toLocaleDateString() : ''}`}
+                    >
+                      <IconButton
+                        size='xs'
+                        icon={<IoMdWarning size={16} />}
+                        sx={{ color: primaryErrorColor, bg: 'transparent' }}
                       />
-                    </Box>
-                  </Tooltip>
-                )}
-                {daysUntilDeletion && !signedUrlParams && (
-                  <Tooltip
-                    label={`Marked for deletion on ${endDate ? new Date(endDate).toLocaleDateString() : ''}`}
-                  >
-                    <IconButton
-                      size='xs'
-                      icon={<IoMdWarning size={16} />}
-                      sx={{ color: primaryErrorColor, bg: 'transparent' }}
-                    />
-                  </Tooltip>
-                )}
+                    </Tooltip>
+                  )}
+                </Flex>
+                <Tag
+                  hidden={!productLifeCycleStage}
+                  size={'sm'}
+                  variant='solid'
+                  colorScheme='blue'
+                  w={'fit-content'}
+                  cursor={'pointer'}
+                >
+                  <TagLabel textTransform={'capitalize'}>
+                    {productLifeCycleStage
+                      ? String(productLifeCycleStage).replace(/_/g, ' ')
+                      : ''}
+                  </TagLabel>
+                </Tag>
               </GridItem>
             </Grid>
           )
         },
+        width: '14%',
         wrap: true,
         sortable: true
       },
@@ -261,27 +300,22 @@ const VersionColumns = (props) => {
       {
         id: 'STATUSES',
         name: 'STATUSES',
-        width: '20%',
+        width: '8%',
         selector: (row) => {
           const { vulnerabilityMetrics } = row
+          const total = Number(
+            vulnerabilityMetrics?.unspecifiedCount +
+              vulnerabilityMetrics?.inTriageCount +
+              vulnerabilityMetrics?.affectedCount +
+              vulnerabilityMetrics?.fixedCount +
+              vulnerabilityMetrics?.notAffectedCount
+          )
           return (
-            <Flex gap={1} flexWrap={'wrap'} my={4}>
-              <VulnBadge color='gray' label='Unspecified'>
-                {vulnerabilityMetrics?.unspecifiedCount}
-              </VulnBadge>
-              <VulnBadge color='cyan' label='In Triage'>
-                {vulnerabilityMetrics?.inTriageCount}
-              </VulnBadge>
-              <VulnBadge color='red' label='Affected'>
-                {vulnerabilityMetrics?.affectedCount}
-              </VulnBadge>
-              <VulnBadge color='blue' label='Fixed'>
-                {vulnerabilityMetrics?.fixedCount}
-              </VulnBadge>
-              <VulnBadge color='green' label='Not Affected'>
-                {vulnerabilityMetrics?.notAffectedCount}
-              </VulnBadge>
-            </Flex>
+            <Tooltip label={<StatusInfo data={vulnerabilityMetrics} />}>
+              <Tag w={'80px'} cursor={'pointer'} colorScheme='blue'>
+                <TagLabel mx={'auto'}>{total}</TagLabel>
+              </Tag>
+            </Tooltip>
           )
         },
         omit: signedUrlParams
@@ -301,6 +335,7 @@ const VersionColumns = (props) => {
           )
         },
         wrap: true,
+        width: '12%',
         right: 'true',
         sortable: true
       },
@@ -319,6 +354,7 @@ const VersionColumns = (props) => {
           )
         },
         wrap: true,
+        width: '12%',
         sortable: true,
         right: 'true'
       },
@@ -332,6 +368,14 @@ const VersionColumns = (props) => {
               <LynkAction aria-label={`sbom-${row?.projectVersion}-actions`} />
               <Portal>
                 <MenuList fontSize={'sm'}>
+                  <MenuItem
+                    hidden={signedUrlParams}
+                    isDisabled={!updateSbom}
+                    onClick={() => action('set_lifecycle', row)}
+                    aria-label={`sbom-${row?.projectVersion}-lifecycle`}
+                  >
+                    Set Lifecycle
+                  </MenuItem>
                   <MenuItem
                     aria-label={`sbom-${row?.projectVersion}-reprocess`}
                     onClick={() => action('rerun_import', row)}

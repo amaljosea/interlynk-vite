@@ -1,15 +1,28 @@
 import React, { useMemo } from 'react'
+// import { stages } from 'variables/general'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { Flex, IconButton, Stack, Text, Tooltip } from '@chakra-ui/react'
+import {
+  Flex,
+  IconButton, // Menu,
+  // MenuItemOption,
+  // MenuList,
+  // MenuOptionGroup,
+  Stack,
+  Text,
+  Tooltip
+} from '@chakra-ui/react'
 
 import RefreshBtn from 'components/Icons/RefreshBtn'
 
+// import MenuHeading from 'components/Misc/MenuHeading'
 import { FaPlus } from 'react-icons/fa6'
 import { LuArchive, LuGitCompare } from 'react-icons/lu'
 
 const VersionHeader = (props) => {
   const {
+    // filters,
+    // onFilterLifestage,
     filterText,
     onSearchInputChange,
     handleClear,
@@ -21,6 +34,8 @@ const VersionHeader = (props) => {
     updateSbom,
     action
   } = props
+
+  // const { lifestage } = filters || {}
 
   return useMemo(() => {
     return (
@@ -36,6 +51,36 @@ const VersionHeader = (props) => {
             onClear={handleClear}
             onFilter={handleSearch}
           />
+          {/* LIFE STAGE */}
+          {/* <Menu closeOnSelect={false}>
+            <MenuHeading title={'Lifestage'} active={lifestage?.length > 0} />
+            <MenuList
+              minW={'280px'}
+              maxW={'400px'}
+              minH='auto'
+              maxH={'320px'}
+              fontSize={'sm'}
+              overflowY={'scroll'}
+            >
+              <MenuOptionGroup
+                type={'checkbox'}
+                value={lifestage}
+                onChange={onFilterLifestage}
+              >
+                <MenuItemOption value='all'>All</MenuItemOption>
+                {stages?.map((item, index) => (
+                  <MenuItemOption
+                    key={index}
+                    fontSize={'sm'}
+                    value={item?.value}
+                    textTransform={'capitalize'}
+                  >
+                    {item.label}
+                  </MenuItemOption>
+                ))}
+              </MenuOptionGroup>
+            </MenuList>
+          </Menu> */}
           {selectedSbom?.length === 1 && (
             <Text color={primaryBlueText}>
               ** Select one more version to enable comparison
