@@ -1,8 +1,9 @@
 import { gql, useQuery } from '@apollo/client'
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getFullDate, linkURl, truncatedValue } from 'utils'
 
-import { Link, SkeletonText } from '@chakra-ui/react'
+import { Link, SkeletonText, chakra } from '@chakra-ui/react'
 import { Grid, GridItem } from '@chakra-ui/react'
 import { Flex, Icon, Stack, Text, useDisclosure } from '@chakra-ui/react'
 import { Stat, StatLabel, StatNumber } from '@chakra-ui/react'
@@ -83,6 +84,7 @@ const VulnInfo = () => {
   const params = useParams()
   const id = useQueryParam('vulnId') || params.vulnerabilityid
 
+  const [expand, setExpand] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
   const { primaryBlueText, secondaryBlueText, primaryTextColor } =
     useThemeColor(['primaryBlueText', 'secondaryBlueText', 'primaryTextColor'])
@@ -183,7 +185,14 @@ const VulnInfo = () => {
                 </Link>
                 {desc !== '' && (
                   <Text fontSize={'sm'} my={0.5}>
-                    {truncatedValue(desc, 300)}
+                    {expand ? desc : truncatedValue(desc, 300)}{' '}
+                    <chakra.span
+                      cursor={'pointer'}
+                      color={secondaryBlueText}
+                      onClick={() => setExpand(!expand)}
+                    >
+                      Read {expand ? 'less' : 'more'}
+                    </chakra.span>
                   </Text>
                 )}
                 <Flex
