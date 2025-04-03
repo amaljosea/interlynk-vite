@@ -20,9 +20,9 @@ const LicenseModal = ({ data, isOpen, onClose, activeRow, recheck }) => {
   const { status, sbom } = activeRow || ''
   const resolved = status === 'resolved'
   const { sbomState } = useGlobalState()
-  const { expLicense } = sbomState
+  const { license } = sbomState
 
-  const isInvalidLicense = expLicense === ''
+  const isInvalidLicense = license?.length === 0
 
   const [updateSbom] = useMutation(sbomUpdate, { onCompleted: () => recheck() })
 

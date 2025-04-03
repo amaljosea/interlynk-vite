@@ -1,6 +1,4 @@
 /* eslint-disable */
-import { useColorModeValue } from '@chakra-ui/system'
-
 import { useThemeColor } from 'hooks/useThemeColors'
 
 export const useSelect = (type) => {
@@ -127,7 +125,7 @@ export const useSelect = (type) => {
     },
     placeholder: (provided) => ({
       ...provided,
-      color: primaryTextColor
+      color: secondaryTextInverse
     })
   }
 

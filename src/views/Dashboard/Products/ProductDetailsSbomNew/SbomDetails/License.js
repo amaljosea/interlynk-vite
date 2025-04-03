@@ -40,7 +40,8 @@ const License = ({ data, permission }) => {
   }
 
   const onUpdateLicense = async () => {
-    const licenseObj = sbomState?.licenseString
+    const licenseObj =
+      sbomState?.license?.length > 0 ? sbomState?.license[0] : null
     const isCustomLicense = licenseObj && licenseObj?.type === 'Custom License'
 
     const license = isCustomLicense
@@ -114,7 +115,7 @@ const License = ({ data, permission }) => {
           isOpen={LICENSE?.isOpen}
           onClose={LICENSE?.onClose}
           onSubmit={onUpdateLicense}
-          disabled={!sbomState?.licenseString}
+          disabled={sbomState?.license?.length === 0}
           buttonText={license !== '' ? 'Update' : 'Save'}
           title={`${license !== '' ? 'Update' : 'Add'} License`}
         >

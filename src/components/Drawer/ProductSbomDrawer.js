@@ -147,9 +147,10 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
     const lifecycles =
       phases?.length > 0 ? phases?.map((item) => ({ name: item?.value })) : []
 
-    const license = sbomState?.expLicense
-      ? { licensesExp: sbomState?.expLicense }
-      : undefined
+    const license =
+      sbomState?.license?.length > 0
+        ? { licensesExp: sbomState?.license[0].value }
+        : undefined
     createSbom({
       variables: {
         projectId: productId,
