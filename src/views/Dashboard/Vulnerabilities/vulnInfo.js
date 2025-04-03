@@ -1,6 +1,6 @@
 import { gql, useQuery } from '@apollo/client'
 import { useParams } from 'react-router-dom'
-import { getFullDate, linkURl } from 'utils'
+import { getFullDate, linkURl, truncatedValue } from 'utils'
 
 import { Link, SkeletonText } from '@chakra-ui/react'
 import { Grid, GridItem } from '@chakra-ui/react'
@@ -181,8 +181,8 @@ const VulnInfo = () => {
                     {vuln?.vulnId}
                   </Text>
                 </Link>
-                <Text fontSize={'sm'} my={0.5}>
-                  {desc || ''}
+                <Text hidden={desc === ''} fontSize={'sm'} my={0.5}>
+                  {truncatedValue(desc, 300)}
                 </Text>
                 <Flex
                   mt={6}
