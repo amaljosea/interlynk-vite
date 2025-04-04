@@ -1,7 +1,11 @@
 import { addDays, differenceInDays, parseISO } from 'date-fns'
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getSignedUrlParams, truncatedValue } from 'utils'
+import {
+  getSignedUrlParams,
+  getUndefinedIfEmptyOrAll,
+  truncatedValue
+} from 'utils'
 
 import { Search2Icon } from '@chakra-ui/icons'
 import { Flex, Icon, IconButton, Stack, Text, Tooltip } from '@chakra-ui/react'
@@ -20,11 +24,14 @@ import { FaBug, FaRobot, FaTag, FaWindowMaximize } from 'react-icons/fa6'
 import { IoMdWarning } from 'react-icons/io'
 import { TbActivity } from 'react-icons/tb'
 
-const ProductInfo = ({ settings, data, handleSort }) => {
+const ProductInfo = ({ settings, data }) => {
   const params = useParams()
-  const { versionState } = useGlobalState()
+  const { versionState, dispatch } = useGlobalState()
   const signedUrlParams = getSignedUrlParams()
   const { isFreeTier } = useGlobalQueryContext()
+
+  const { field, direction, searchInput, lifestage } = versionState
+  const { versionDispatch } = dispatch
 
   const { name, description } = data || ''
 
@@ -49,9 +56,12 @@ const ProductInfo = ({ settings, data, handleSort }) => {
   const variables = useMemo(
     () => ({
       id: params?.productid,
-      ...versionState
+      field: field,
+      direction: direction,
+      lifestage: getUndefinedIfEmptyOrAll(lifestage),
+      search: searchInput === '' ? undefined : searchInput
     }),
-    [params?.productid, versionState]
+    [direction, field, lifestage, params?.productid, searchInput]
   )
 
   const { data: versionDates } = useFetchAllNodes({
@@ -60,6 +70,16 @@ const ProductInfo = ({ settings, data, handleSort }) => {
     selector: 'project.sbomVersions',
     skip: signedUrlParams
   })
+
+  const handleSort = (column, sortDirection) => {
+    versionDispatch({
+      type: 'SET_SORT_ORDER',
+      payload: {
+        field: column?.id,
+        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      }
+    })
+  }
 
   useEffect(() => {
     if (versionDates && dataRetentionDays) {
