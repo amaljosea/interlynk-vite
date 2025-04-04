@@ -16,8 +16,8 @@ const UserCard = ({ name, isOpen, onClose }) => {
   const { data, loading } = useQuery(GetSelectedUser, {
     skip: isOpen ? false : true
   })
-  const { users } = data?.organization || ''
-  const currentUser = users?.find((item) => item?.name?.includes(name))
+  const { nodes } = data?.organization?.users || {}
+  const currentUser = nodes?.find((item) => item?.name?.includes(name))
   return (
     <LynkModal
       maxW={'500px'}
