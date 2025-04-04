@@ -1,6 +1,5 @@
 /* eslint-disable no-restricted-syntax */
 import { useQuery } from '@apollo/client'
-import { vulnStatusTypes } from 'variables/general'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
@@ -16,7 +15,6 @@ const AllVulnerabilitiesBySeverity = () => {
   const { data, loading } = useQuery(getVulnsBySeverity, {
     skip: !organization,
     variables: {
-      status: vulnStatusTypes,
       labelIds: labelIdsVar,
       envNames: [envName]
     }
