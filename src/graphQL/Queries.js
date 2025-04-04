@@ -967,6 +967,7 @@ export const GetVersionsTable = gql`
     $search: String
     $field: SbomOrderByFields!
     $direction: OrderByDirection!
+    $lifestage: [ProductLifecycleStageEnum!]
   ) {
     project(id: $id) {
       id
@@ -976,6 +977,7 @@ export const GetVersionsTable = gql`
         last: $last
         before: $before
         search: $search
+        lifestage: $lifestage
         orderBy: { direction: $direction, field: $field }
       ) {
         totalCount

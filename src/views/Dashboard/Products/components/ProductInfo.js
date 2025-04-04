@@ -10,6 +10,7 @@ import { SettingsTag } from 'components/Misc/SettingsTag'
 
 import useFetchAllNodes from 'hooks/useFetchAllNodes'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetVersionsDate } from 'graphQL/Queries'
@@ -19,8 +20,9 @@ import { FaBug, FaRobot, FaTag, FaWindowMaximize } from 'react-icons/fa6'
 import { IoMdWarning } from 'react-icons/io'
 import { TbActivity } from 'react-icons/tb'
 
-const ProductInfo = ({ settings, data, filters, handleSort }) => {
+const ProductInfo = ({ settings, data, handleSort }) => {
   const params = useParams()
+  const { versionState } = useGlobalState()
   const signedUrlParams = getSignedUrlParams()
   const { isFreeTier } = useGlobalQueryContext()
 
@@ -47,9 +49,9 @@ const ProductInfo = ({ settings, data, filters, handleSort }) => {
   const variables = useMemo(
     () => ({
       id: params?.productid,
-      ...filters
+      ...versionState
     }),
-    [params?.productid, filters]
+    [params?.productid, versionState]
   )
 
   const { data: versionDates } = useFetchAllNodes({
