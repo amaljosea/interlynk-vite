@@ -1,7 +1,7 @@
 import { Button } from '@chakra-ui/react'
 
 const ActionButton = (props) => {
-  const { title, onClick, isLoading = false, isDisabled, hidden } = props
+  const { title, onClick, isLoading = false, isDisabled, hidden, icon } = props
   return (
     <Button
       name={title}
@@ -13,6 +13,7 @@ const ActionButton = (props) => {
       isLoading={isLoading}
       loadingText='Saving...'
       isDisabled={isDisabled}
+      leftIcon={icon}
     >
       {title}
     </Button>

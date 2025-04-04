@@ -23,6 +23,8 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { CreateCompRelation, DeleteCompRelation } from 'graphQL/Mutation'
 import { GetCompDependency } from 'graphQL/Queries'
 
+import { FaPlus } from 'react-icons/fa6'
+
 import ActionButton from './ActionButton'
 
 const CompRelations = ({ data, compPath }) => {
@@ -213,16 +215,18 @@ const CompRelations = ({ data, compPath }) => {
             <Stack spacing={4}>
               <LynkAlert status='warning' msg={alertMessage} />
               <ActionButton
-                title={'Save'}
+                title={'Add Relationship'}
                 onClick={handleAdd}
                 isDisabled={isInvalid}
+                icon={<FaPlus />}
               />
             </Stack>
           ) : (
             <ActionButton
-              title={'Save'}
+              title={'Add Relationship'}
               isDisabled={isInvalid}
               onClick={handleSubmit}
+              icon={<FaPlus />}
             />
           )}
         </Stack>
