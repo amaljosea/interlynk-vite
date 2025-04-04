@@ -4241,10 +4241,12 @@ export const GetSelectedUser = gql`
   query GetSelectedUser {
     organization {
       users {
-        name
-        email
-        role {
+        nodes {
           name
+          email
+          role {
+            name
+          }
         }
       }
     }
