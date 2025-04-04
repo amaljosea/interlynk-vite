@@ -178,7 +178,7 @@ const RuleConditions = ({
                   }
                   onBlur={() => onSubjectBlur(item)}
                   placeholder='-- Subject --'
-                  data-testid={`auto_conditon_subject_${index}`}
+                  id={`auto_conditon_subject_${index}`}
                   options={
                     conditions.length > 1 &&
                     !(
@@ -201,7 +201,6 @@ const RuleConditions = ({
               {/* OPERATOR */}
               <FormControl isInvalid={item?.opError !== ''}>
                 <LynkSelect
-                  id='operator'
                   name='operator'
                   onChange={(selected) =>
                     onCondtionChange(selected?.value, item.id, 'operator')
@@ -218,7 +217,7 @@ const RuleConditions = ({
                   placeholder='-- Operator --'
                   onBlur={() => onOperatorBlur(item)}
                   isDisabled={isSystem}
-                  data-testid={`auto_conditon_operator_${index}`}
+                  id={`auto_conditon_operator_${index}`}
                   options={[
                     { label: '-- Operator --', value: '' },
                     ...(item?.list ?? []).map((option) => ({

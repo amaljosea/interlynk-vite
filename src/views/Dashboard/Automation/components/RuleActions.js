@@ -140,7 +140,7 @@ const RuleActions = ({
                     onActionChange(selected?.value, item?.id, 'field')
                   }
                   placeholder='-- Subject --'
-                  data-testid={`auto_action_subject_${index}`}
+                  id={`auto_action_subject_${index}`}
                   options={subjectOptions}
                   value={
                     subjectOptions[1]?.options.find(
