@@ -18,7 +18,7 @@ const Operator = ({ index, data, onChange }) => {
   const selectStyles = {
     container: (baseStyles) => ({
       ...baseStyles,
-      minWidth: '100px'
+      minWidth: '80px'
     })
   }
 
