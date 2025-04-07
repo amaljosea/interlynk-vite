@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getFullDate, timeSince, truncatedValue } from 'utils'
 
@@ -18,6 +18,8 @@ import LynkDrawer from 'components/LynkDrawer'
 import ArchiveSbom from 'components/Modal/ArchiveSbom'
 
 import useCustomToast from 'hooks/useCustomToast'
+import useFetchAllNodes from 'hooks/useFetchAllNodes'
+import { useHasPermission } from 'hooks/useHasPermission'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -25,7 +27,6 @@ import { GetArchivedVersions, GetVersions } from 'graphQL/Queries'
 
 import { FaEye } from 'react-icons/fa6'
 import { MdOutlineUnarchive } from 'react-icons/md'
-import { useHasPermission } from 'hooks/useHasPermission'
 
 const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
   const navigate = useNavigate()
@@ -42,21 +43,30 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
     childKey: 'update_sbom'
   })
 
-  const { data: versions } = useQuery(GetVersions, {
-    skip: !isOpen,
-    variables: {
-      id: productId,
-      first: 100,
-      direction: 'DESC',
-      field: 'SBOMS_CREATED_AT'
-    }
-  })
-
-  const { nodes } = versions?.project?.sbomVersions || { nodes: [] }
+  const shouldFetchData = isOpen && Boolean(productId)
 
   const { data, loading: archivedLoading } = useQuery(GetArchivedVersions, {
-    skip: !isOpen,
+    skip: !shouldFetchData,
     variables: { id: productId }
+  })
+
+  const shouldSkipFetchAllNodes =
+    !shouldFetchData || (data && data.project?.sbomArchived?.length === 0)
+
+  const versionVariables = useMemo(
+    () => ({
+      id: productId,
+      direction: 'DESC',
+      field: 'SBOMS_CREATED_AT'
+    }),
+    [productId]
+  )
+
+  const { data: nodes, loading } = useFetchAllNodes({
+    query: GetVersions,
+    variables: versionVariables,
+    selector: 'project.sbomVersions',
+    skip: !data ? true : shouldSkipFetchAllNodes
   })
 
   const { sbomArchived } = data?.project || { sbomArchived: [] }
@@ -94,6 +104,48 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
     navigate(link)
   }
 
+  const ArchivedVersionItem = ({
+    item,
+    handleView,
+    handleRestore,
+    updateSbom
+  }) => (
+    <Flex w='full' alignItems='center' justifyContent='space-between'>
+      <Stack spacing={0}>
+        <Text>
+          {truncatedValue(item?.project?.projectGroup?.name, 20)} :{' '}
+          {truncatedValue(item?.projectVersion, 20)}
+        </Text>
+        <Tooltip label={getFullDate(item?.createdAt)} placement='top'>
+          <Text color={sameSecondaryText} fontSize='sm'>
+            Last updated {timeSince(item?.createdAt)}
+          </Text>
+        </Tooltip>
+      </Stack>
+      <ButtonGroup>
+        <Tooltip label='View' placement='top'>
+          <IconButton
+            size='sm'
+            colorScheme='blue'
+            title='View archived version'
+            onClick={() => handleView(item)}
+            icon={<FaEye size={16} />}
+          />
+        </Tooltip>
+        <Tooltip label='Restore' placement='top'>
+          <IconButton
+            size='sm'
+            colorScheme='blue'
+            isDisabled={!updateSbom || loading}
+            onClick={() => handleRestore(item)}
+            icon={<MdOutlineUnarchive size={20} />}
+            aria-label={`sbom-${item?.projectVersion}-restore`}
+          />
+        </Tooltip>
+      </ButtonGroup>
+    </Flex>
+  )
+
   const renderArchivedVersions = () => {
     if (archivedLoading) {
       return <CustomLoader />
@@ -110,45 +162,13 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
     return (
       <Flex my={2} gap={5} flexDir={'column'} alignItems={'flex-center'}>
         {sbomArchived.map((item, index) => (
-          <Flex
-            w={'full'}
+          <ArchivedVersionItem
             key={index}
-            alignItems={'center'}
-            justifyContent={'space-between'}
-          >
-            <Stack spacing={0}>
-              <Text>
-                {truncatedValue(item?.project?.projectGroup?.name, 20)} :{' '}
-                {truncatedValue(item?.projectVersion, 20)}
-              </Text>
-              <Tooltip label={getFullDate(item?.createdAt)} placement='top'>
-                <Text color={sameSecondaryText} fontSize={'sm'}>
-                  Last updated {timeSince(item?.createdAt)}
-                </Text>
-              </Tooltip>
-            </Stack>
-            <ButtonGroup>
-              <Tooltip label='View' placement='top'>
-                <IconButton
-                  size='sm'
-                  colorScheme='blue'
-                  title='View archived version'
-                  onClick={() => handleView(item)}
-                  icon={<FaEye size={16} />}
-                />
-              </Tooltip>
-              <Tooltip label='Restore' placement='top'>
-                <IconButton
-                  size='sm'
-                  colorScheme='blue'
-                  isDisabled={!updateSbom}
-                  onClick={() => handleRestore(item)}
-                  icon={<MdOutlineUnarchive size={20} />}
-                  aria-label={`sbom-${item?.projectVersion}-restore`}
-                />
-              </Tooltip>
-            </ButtonGroup>
-          </Flex>
+            item={item}
+            handleView={handleView}
+            handleRestore={handleRestore}
+            updateSbom={updateSbom}
+          />
         ))}
       </Flex>
     )
