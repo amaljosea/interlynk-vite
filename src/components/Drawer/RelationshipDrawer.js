@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { Button, Divider, Select, Stack, Text } from '@chakra-ui/react'
+import { Button, Divider, Stack, Text } from '@chakra-ui/react'
 import {
   FormControl,
   FormErrorIcon,
@@ -16,6 +16,7 @@ import CompRelationTypes from 'components/CompRelationTypes'
 import LoadingSpinner from 'components/LoadingSpinner'
 import LynkAlert from 'components/LynkAlert'
 import LynkDrawer from 'components/LynkDrawer'
+import LynkSelect from 'components/LynkSelect'
 import CompInfo from 'components/Misc/CompInfo'
 import RelationTreeView from 'components/RelationTreeView'
 
@@ -144,6 +145,39 @@ const RelationshipDrawer = (props) => {
     }
   }, [compDependency])
 
+  const typeOptions = [
+    { label: '-- Select --', value: '' },
+    { label: 'Depends On', value: 'depends_on' }
+  ]
+
+  const componentOptions = [
+    { label: '-- Select --', value: '' },
+    ...(allComponents?.sbom?.components?.nodes
+      ?.filter((com) =>
+        shortDesc ? com?.name !== compName : com?.name !== name
+      )
+      ?.sort((a, b) => a?.name?.localeCompare(b?.name))
+      ?.map((item) => ({
+        label: `${item.name}-${item.version}${item.primary ? ' [Primary Component]' : ''}`,
+        value: item.id
+      })) || [])
+  ]
+
+  const componentValue = component
+    ? {
+        label: allComponents.sbom.components.nodes.find(
+          (com) => com.id === component
+        )
+          ? `${allComponents.sbom.components.nodes.find((com) => com.id === component).name}-${
+              allComponents.sbom.components.nodes.find(
+                (com) => com.id === component
+              ).version
+            }${allComponents.sbom.components.nodes.find((com) => com.id === component).primary ? ' [Primary Component]' : ''}`
+          : '-- Select --',
+        value: component
+      }
+    : { label: '-- Select --', value: '' }
+
   return (
     <LynkDrawer
       size='md'
@@ -170,51 +204,38 @@ const RelationshipDrawer = (props) => {
           <CardBody>
             <Stack spacing={6} width={'100%'}>
               {/* CREATE RELATIONSHIP */}
-              <Stack mt={6} width={'100%'} spacing={4} hidden={resolved}>
+              <Stack width={'100%'} spacing={4} hidden={resolved}>
                 <FormControl>
                   <FormLabel htmlFor='relation' color={headingTextColor}>
                     Type
                   </FormLabel>
-                  <Select
+                  <LynkSelect
                     id='relation'
-                    value={relation}
-                    onChange={(e) => setRelation(e.target.value)}
-                  >
-                    <option value=''>-- Select --</option>
-                    {[{ value: 'depends_on', label: 'Depends On' }].map(
-                      (item, idx) => (
-                        <option key={idx} value={item.value}>
-                          {item.label}
-                        </option>
-                      )
+                    value={typeOptions.find(
+                      (option) => option.value === relation
                     )}
-                  </Select>
+                    onChange={(selectedOption) =>
+                      setRelation(selectedOption.value)
+                    }
+                    options={typeOptions}
+                    dropDown
+                  />
                 </FormControl>
                 {allComponents && (
                   <FormControl isInvalid={list.length > 0}>
                     <FormLabel htmlFor='component' color={headingTextColor}>
                       Component
                     </FormLabel>
-                    <Select
+                    <LynkSelect
                       id='component'
-                      value={component}
-                      onChange={(e) => setComponent(e.target.value)}
-                    >
-                      <option value=''>-- Select --</option>
-                      {[...allComponents.sbom.components.nodes]
-                        .filter((com) =>
-                          shortDesc
-                            ? com?.name !== compName
-                            : com?.name !== name
-                        )
-                        .sort((a, b) => a?.name?.localeCompare(b?.name))
-                        .map((item, idx) => (
-                          <option key={idx} value={item.id}>
-                            {item.name}-{item.version}
-                            {item.primary ? ` [Primary Component]` : ''}
-                          </option>
-                        ))}
-                    </Select>
+                      value={componentValue}
+                      onChange={(selectedOption) =>
+                        setComponent(selectedOption.value)
+                      }
+                      options={componentOptions}
+                      dropDown
+                    />
+
                     {list.length !== 0 && (
                       <FormErrorMessage>
                         <FormErrorIcon />
