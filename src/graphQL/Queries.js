@@ -3389,6 +3389,10 @@ export const GetCompSupportData = gql`
               name
             }
           }
+          componentSupportLevelAutomatic {
+            level
+            notes
+          }
         }
       }
     }
@@ -5554,6 +5558,10 @@ export const GetComponentSupportLevels = gql`
         }
         updatedAt
         createdAt
+      }
+      componentSupportLevelAutomatic {
+        level
+        notes
       }
     }
   }
