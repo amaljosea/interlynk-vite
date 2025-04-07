@@ -16,12 +16,12 @@ import { Flex, useDisclosure } from '@chakra-ui/react'
 
 import JiraCreateIssueModal from 'components/Connections/JiraCreateIssueModal'
 import CustomLoader from 'components/CustomLoader'
+import VulnAdvisoriesDrawer from 'components/Drawer/VulnAdvisoriesDrawer'
 import VulnDrawer from 'components/Drawer/VulnDrawer'
 import VulnLinkDrawer from 'components/Drawer/VulnLinkDrawer'
 import LynkDrawer from 'components/LynkDrawer'
 import CvssCard from 'components/Misc/CvssCard'
 import CustomVuln from 'components/Modal/CustomVuln'
-import VulnAdvisoriesModal from 'components/Modal/VulnAdvisoriesModal'
 import Pagination from 'components/Pagination'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -490,7 +490,7 @@ const Vulnerabilities = ({ sbomData }) => {
 
       {/* VULN ADVISORIES */}
       {ADVISORIES.isOpen && (
-        <VulnAdvisoriesModal
+        <VulnAdvisoriesDrawer
           data={activeRow}
           isOpen={ADVISORIES.isOpen}
           onClose={ADVISORIES.onClose}

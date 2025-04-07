@@ -6,7 +6,7 @@ import LynkDrawer from 'components/LynkDrawer'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-const VulnAdvisoriesModal = ({ data, isOpen, onClose }) => {
+const VulnAdvisoriesDrawer = ({ data, isOpen, onClose }) => {
   const { vuln } = data
   const { vulnId, vulnInfo } = vuln || {}
   const advisories =
@@ -53,4 +53,4 @@ const VulnAdvisoriesModal = ({ data, isOpen, onClose }) => {
   )
 }
 
-export default VulnAdvisoriesModal
+export default VulnAdvisoriesDrawer
