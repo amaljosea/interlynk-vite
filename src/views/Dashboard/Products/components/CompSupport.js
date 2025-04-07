@@ -188,25 +188,31 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
   const { isCustomerView } = useRouteFlags()
   const { showToast } = useCustomToast()
 
+  const defaultDate = new Date()
+  defaultDate.setDate(defaultDate.getDate() + 365)
+
   const {
     componentSupportLevel: manual,
     componentSupportLevelAutomatic: automatic
   } = data || {}
 
-  const endOfSupport = manual?.endDate
-  const assessmentExpiresOn = manual?.retainManualOverrideFor
+  const { endDate, retainManualOverrideFor } = manual || {}
+
+  const endOfSupport = endDate
+  const assessmentExpiresOn =
+    retainManualOverrideFor > 0 ? getDate(retainManualOverrideFor) : defaultDate
   const explanation = automatic?.notes || manual?.notes
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const defaultDate = new Date()
-  defaultDate.setDate(defaultDate.getDate() + 365)
   const [formData, setFormData] = useState({
     supportLevel: '',
     endOfSupport: '',
     explanation: '',
-    assessmentExpiresOn: 0
+    assessmentExpiresOn: defaultDate
   })
+
+  console.warn('formData', formData)
 
   const totalDays = Number(getTotalDays(formData?.assessmentExpiresOn))
   const isAbandoned = formData?.supportLevel !== 'abandoned'
@@ -236,13 +242,13 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
         [name]: value,
         endOfSupport: endOfSupport || '',
         explanation: explanation || '',
-        assessmentExpiresOn: assessmentExpiresOn || 0
+        assessmentExpiresOn: assessmentExpiresOn
       }))
     } else {
       setFormData((prev) => ({
         ...prev,
         [name]: value,
-        assessmentExpiresOn: assessmentExpiresOn || 0
+        assessmentExpiresOn: assessmentExpiresOn
       }))
     }
   }
