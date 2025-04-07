@@ -6,7 +6,16 @@ import { convertToCSV, downloadCSV, generateCsvFileName } from 'utils'
 import { fetchNodes } from 'utils'
 import { exportCsvTableConfig } from 'variables/general'
 
-import { Box, Button, Divider, Flex, Stack, Text, Wrap } from '@chakra-ui/react'
+import {
+  Box,
+  Button,
+  Divider,
+  Flex,
+  HStack,
+  Stack,
+  Text,
+  Wrap
+} from '@chakra-ui/react'
 import { Checkbox, Radio, RadioGroup } from '@chakra-ui/react'
 import { Tag, TagCloseButton, TagLabel } from '@chakra-ui/react'
 
@@ -198,6 +207,15 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
     setSelectedColumns((prev) => [...prev, column])
   }
 
+  const addAll = () => {
+    setSelectedColumns([...selectedColumns, ...availableColumns])
+    setAvailableColumns([])
+  }
+  const removeAll = () => {
+    setSelectedColumns([])
+    setAvailableColumns([...selectedColumns, ...availableColumns])
+  }
+
   return (
     <LynkModal
       isOpen={isOpen}
@@ -305,6 +323,27 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
               </Button>
             ))}
           </Wrap>
+          {/* Select All / Remove All Buttons */}
+          <HStack spacing={3} justify='flex-start' mt={4}>
+            <Button
+              size='xs'
+              variant='outline'
+              colorScheme='blue'
+              onClick={() => addAll()}
+              isDisabled={availableColumns.length === 0}
+            >
+              + Add All
+            </Button>
+            <Button
+              size='xs'
+              variant='outline'
+              colorScheme='red'
+              onClick={() => removeAll()}
+              isDisabled={selectedColumns.length === 0}
+            >
+              - Remove All
+            </Button>
+          </HStack>
         </Box>
       </Flex>
     </LynkModal>
