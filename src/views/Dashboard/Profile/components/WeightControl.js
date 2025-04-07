@@ -80,8 +80,7 @@ const WeightControl = () => {
     return (
       Array.isArray(input) &&
       input.length === 2 &&
-      input[0] === 0 &&
-      input[1] === 0
+      (input[0] === 0 || input[1] === 0)
     )
   }
 
@@ -350,7 +349,7 @@ const WeightControl = () => {
                 ))}
               </RangeSlider>
               <FormErrorMessage>
-                Contributor threshold max must be greater than 0
+                Contributor threshold must be greater than 0
               </FormErrorMessage>
             </FormControl>
           </CardBody>
