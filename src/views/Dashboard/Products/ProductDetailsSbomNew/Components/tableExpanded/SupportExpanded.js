@@ -9,8 +9,7 @@ const SupportExpand = (props) => {
   const { data } = props
 
   return useMemo(() => {
-    const { sbom } = data || {}
-    const { projectVersion } = sbom || {}
+    const { version } = data || {}
     const {
       componentSupportLevel: manual,
       componentSupportLevelAutomatic: automatic
@@ -33,7 +32,7 @@ const SupportExpand = (props) => {
       >
         <Grid templateColumns='repeat(4, 1fr)' py={2} gap={6}>
           {/* PART */}
-          <DetailItem label='Version' value={projectVersion} />
+          <DetailItem label='Version' value={version} />
           {/* ASSESSMENT */}
           <DetailItem label='Assessment' value={assessment} />
           {/* LEVEL */}
