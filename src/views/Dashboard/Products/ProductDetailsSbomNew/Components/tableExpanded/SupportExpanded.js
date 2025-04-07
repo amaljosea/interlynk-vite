@@ -11,17 +11,20 @@ const SupportExpand = (props) => {
   return useMemo(() => {
     const { sbom } = data || {}
     const { projectVersion } = sbom || {}
-    const { notes, user, updatedAt, retainManualOverrideFor, level } =
-      data?.componentSupportLevel || {}
+    const {
+      componentSupportLevel: manual,
+      componentSupportLevelAutomatic: automatic
+    } = data || {}
+    const { user, retainManualOverrideFor, updatedAt } = manual || {}
 
-    const internalNotes = notes || 'N/A'
-    const assessment = user?.name ? 'Manual' : 'Automatic'
-    const supportLevel = level ? level?.replaceAll('_', ' ') : 'N/A'
-    const lastAssessedBy = user?.name || 'N/A'
-    const lastAssessedAt = updatedAt ? getFullDate(updatedAt) : 'N/A'
+    const assessment = automatic?.level ? 'Automatic' : 'Manual'
+    const supportLevel = automatic?.level || manual?.level
     const assessmentExpiresOn = retainManualOverrideFor
       ? calculateExpiryDate(retainManualOverrideFor)
       : 'N/A'
+    const explanation = automatic?.notes || manual?.notes
+    const assessedBy = user?.name || 'N/A'
+    const lastAssessed = updatedAt ? getFullDate(updatedAt) : 'N/A'
 
     return (
       <Stack
@@ -36,17 +39,20 @@ const SupportExpand = (props) => {
           {/* LEVEL */}
           <DetailItem
             label='Level'
-            value={supportLevel}
+            value={supportLevel?.replaceAll('_', ' ')}
             valueStyle={{ textTransform: 'capitalize' }}
           />
           {/* ASSESSED DATE */}
-          <DetailItem label='Last Assessed' value={lastAssessedAt} />
+          <DetailItem label='Last Assessed' value={lastAssessed} />
           {/* ASSESSED BY */}
-          <DetailItem label='Last Assessed By' value={lastAssessedBy} />
+          <DetailItem label='Last Assessed By' value={assessedBy} />
           {/* INTERNAL NOTES */}
-          <DetailItem label='Support Explanation' value={internalNotes} />
+          <DetailItem
+            label='Support Explanation'
+            value={explanation || 'N/A'}
+          />
           {/* ASSESSMENT EXPIERS ON */}
-          {level !== 'no_longer_maintained' && (
+          {supportLevel !== 'no_longer_maintained' && (
             <DetailItem
               label='Assessment Expires On'
               value={assessmentExpiresOn}
