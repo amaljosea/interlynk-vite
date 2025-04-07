@@ -276,7 +276,7 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
         id: manual?.id,
         level: formData?.supportLevel || undefined,
         notes: formData?.explanation || undefined,
-        retainManualOverrideFor: totalDays > 0 ? totalDays : undefined,
+        retainManualOverrideFor: totalDays > 0 ? totalDays : 0,
         endDate: formData?.endOfSupport
           ? new Date(formData?.endOfSupport).toISOString()
           : undefined
@@ -305,7 +305,7 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
         id: data?.id,
         level: formData?.supportLevel || undefined,
         notes: formData?.explanation || undefined,
-        retainManualOverrideFor: totalDays > 0 ? totalDays : undefined,
+        retainManualOverrideFor: totalDays > 0 ? totalDays : 0,
         endDate: formData?.endOfSupport
           ? new Date(formData?.endOfSupport).toISOString()
           : undefined
