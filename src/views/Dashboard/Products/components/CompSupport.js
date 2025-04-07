@@ -347,7 +347,7 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
 
   const inputStyle = { size: 'md' }
 
-  const isExists = manual?.level
+  const hasManualSupport = manual?.level
 
   useEffect(() => {
     if (automatic || manual) {
@@ -462,12 +462,12 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
             isDisabled={isDisabled}
             loadingText='Saving...'
             isLoading={createLoading || updateLoading}
-            onClick={isExists ? handleUpdate : handleSubmit}
+            onClick={hasManualSupport ? handleUpdate : handleSubmit}
           >
-            {isExists ? 'Update' : 'Save'}
+            {hasManualSupport ? 'Update' : 'Save'}
           </Button>
         </ButtonGroup>
-        {isExists && (
+        {hasManualSupport && (
           <IconButton
             onClick={onOpen}
             colorScheme='red'
