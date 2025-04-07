@@ -5,7 +5,7 @@ import { Grid, Stack } from '@chakra-ui/react'
 
 import DetailItem from 'components/Misc/DetailItem'
 
-const SupportExpand = (props) => {
+const SupportExpanded = (props) => {
   const { data } = props
 
   return useMemo(() => {
@@ -63,4 +63,4 @@ const SupportExpand = (props) => {
   }, [data])
 }
 
-export default SupportExpand
+export default SupportExpanded
