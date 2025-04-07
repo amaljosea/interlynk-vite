@@ -26,6 +26,8 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UpdateCompLinks } from 'graphQL/Mutation'
 
+import { FaPlus } from 'react-icons/fa6'
+
 import ActionButton from './ActionButton'
 
 const GetCompUrls = gql`
@@ -247,9 +249,10 @@ const CompLinks = ({ data }) => {
         <Stack spacing={alert ? 4 : 0}>
           {alert && <LynkAlert status='warning' msg={alertMessage} />}
           <ActionButton
-            title={'Save'}
+            title={'Add Link'}
             isDisabled={isInvalid}
             onClick={alert ? handleLinkAdd : handleSubmit}
+            icon={<FaPlus />}
           />
         </Stack>
         <Divider />
