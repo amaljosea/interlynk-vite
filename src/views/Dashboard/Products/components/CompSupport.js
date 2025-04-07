@@ -107,9 +107,8 @@ const SupportCard = ({ setEdit, data }) => {
   }
   const container = {
     pb: 2,
-    gap: 5,
     w: '100%',
-    columns: 2,
+    spacing: 0,
     borderBottom: `1px solid ${grayBorderColor}`
   }
 
@@ -135,46 +134,43 @@ const SupportCard = ({ setEdit, data }) => {
         />
       </Tooltip>
       <Stack spacing={3}>
-        <SimpleGrid {...container}>
+        <Stack {...container}>
           <Text {...label}>Assessment</Text>
           <Text {...infoStyle}>{assessment}</Text>
-        </SimpleGrid>
-        <SimpleGrid {...container}>
+        </Stack>
+        <Stack {...container}>
           <Text {...label}>Support Level</Text>
           <Text {...infoStyle} textTransform={'capitalize'}>
             {supportLevel?.replaceAll('_', ' ') || 'N/A'}
           </Text>
-        </SimpleGrid>
-        <SimpleGrid {...container}>
+        </Stack>
+        <Stack {...container}>
           <Text {...label}>End of Support</Text>
           <Text {...infoStyle} textTransform={'capitalize'}>
             {endOfSupport ? new Date(endOfSupport).toLocaleDateString() : 'N/A'}
           </Text>
-        </SimpleGrid>
-        <SimpleGrid
-          {...container}
-          hidden={supportLevel === 'no_longer_maintained'}
-        >
+        </Stack>
+        <Stack {...container} hidden={supportLevel === 'no_longer_maintained'}>
           <Text {...label}>Assessment Expires On</Text>
           <Text {...infoStyle} textTransform={'capitalize'}>
             {assessmentExpiresOn
               ? getDate(assessmentExpiresOn).toLocaleDateString()
               : 'N/A'}
           </Text>
-        </SimpleGrid>
-        <SimpleGrid {...container}>
+        </Stack>
+        <Stack {...container}>
           <Text {...label}>Explanation</Text>
           <Text {...infoStyle} textTransform={'capitalize'}>
             {explanation || 'N/A'}
           </Text>
-        </SimpleGrid>
-        <SimpleGrid {...container}>
+        </Stack>
+        <Stack {...container}>
           <Text {...label}>Last Assessed By</Text>
           <Text {...infoStyle} textTransform={'capitalize'}>
             {assessedBy || 'N/A'}
           </Text>
-        </SimpleGrid>
-        <SimpleGrid {...container}>
+        </Stack>
+        <Stack {...container}>
           <Text {...label}>Last Assessed</Text>
           {lastAssessed ? (
             <Tooltip label={getFullDate(lastAssessed)}>
@@ -183,7 +179,7 @@ const SupportCard = ({ setEdit, data }) => {
           ) : (
             <Text {...infoStyle}>{'N/A'}</Text>
           )}
-        </SimpleGrid>
+        </Stack>
       </Stack>
     </Stack>
   )
