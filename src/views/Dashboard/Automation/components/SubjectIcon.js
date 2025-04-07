@@ -10,7 +10,7 @@ const SubjectIcon = ({ subject, isSystem = { isSystem } }) => {
     'primaryBlueText'
   ])
   return (
-    <Box hidden={subject === ''} mt={2}>
+    <Box hidden={subject === ''} mt={1}>
       <Tooltip label={getLabel(subject)} placement='top'>
         <Box>
           <Icon

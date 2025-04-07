@@ -422,6 +422,9 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
             setDeleteAction={setDeleteAction}
             optionsByCategory={optionsByCategory}
             conditionErrorMessage={conditionErrorMessage}
+            automationConditionSubjectFieldMapping={
+              automationConditionSubjectFieldMapping
+            }
           />
         </FormControl>
         <Button
