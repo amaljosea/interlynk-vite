@@ -9,7 +9,6 @@ import {
   Flex,
   IconButton,
   Input,
-  Select,
   Tag,
   Text,
   Tooltip
@@ -18,6 +17,7 @@ import { Table, Tbody, Td, Tr } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import LynkDrawer from 'components/LynkDrawer'
+import LynkSelect from 'components/LynkSelect'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -45,8 +45,8 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
 
   const containsSpace = hasWhiteSpace(link)
 
-  const handleTypeChange = (e) => {
-    const { value } = e.target
+  const handleTypeChange = (selectedItem) => {
+    const { value } = selectedItem
     setType(value)
     const isExists =
       externalData?.length > 0 &&
@@ -185,6 +185,14 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
       setCurrentData(urls)
     }
   }, [currentExternalUrls])
+
+  const typeOptions = [
+    { label: '-- Select --', value: '' },
+    { label: 'Issue Tracker', value: 'issue-tracker' },
+    { label: 'Advisories', value: 'advisories' },
+    { label: 'Documentation', value: 'documentation' },
+    { label: 'Other', value: 'other' }
+  ]
   //
   return (
     <LynkDrawer
@@ -203,16 +211,13 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
           {/* NAME */}
           <FormControl isRequired isInvalid={error !== ''}>
             <FormLabel>Type</FormLabel>
-            <Select value={type} onChange={handleTypeChange}>
-              <option value=''>-- Select --</option>
-              {['issue-tracker', 'advisories', 'documentation', 'other'].map(
-                (item, index) => (
-                  <option key={index} value={item}>
-                    {item}
-                  </option>
-                )
-              )}
-            </Select>
+            <LynkSelect
+              value={typeOptions.find((option) => option.value === type)}
+              onChange={(selectedOption) => handleTypeChange(selectedOption)}
+              options={typeOptions}
+              dropDown
+            />
+
             <FormErrorMessage data-testid='vuln_link_error'>
               {error}
             </FormErrorMessage>

@@ -206,14 +206,27 @@ export default class VulnsSection {
               await edit.click()
               await this.page.waitForTimeout(2000)
 
-              await this.page.getByLabel('Type*').selectOption('issue-tracker')
+              await this.page
+                .locator('div')
+                .filter({ hasText: /^-- Select --$/ })
+                .nth(1)
+                .click()
+              await this.page.keyboard.type('issue-tracker')
+              await this.page.keyboard.press('Enter')
+
               await this.page.getByPlaceholder('Add URL').fill('google.com')
               await this.page.waitForTimeout(2000)
 
               await this.page.locator("button[type='submit']").click()
               await this.page.waitForTimeout(4000)
 
-              await this.page.getByLabel('Type*').selectOption('issue-tracker')
+              await this.page
+                .locator('div')
+                .filter({ hasText: /^-- Select --$/ })
+                .nth(1)
+                .click()
+              await this.page.keyboard.type('issue-tracker')
+              await this.page.keyboard.press('Enter')
               const errMsg = await this.page
                 .getByTestId('vuln_link_error')
                 .isVisible()
