@@ -21,6 +21,7 @@ import VulnLinkDrawer from 'components/Drawer/VulnLinkDrawer'
 import LynkDrawer from 'components/LynkDrawer'
 import CvssCard from 'components/Misc/CvssCard'
 import CustomVuln from 'components/Modal/CustomVuln'
+import VulnAdvisoriesModal from 'components/Modal/VulnAdvisoriesModal'
 import Pagination from 'components/Pagination'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -167,6 +168,7 @@ const Vulnerabilities = ({ sbomData }) => {
   const IMPORT = useDisclosure()
   const CUSTOM_VULNS = useDisclosure()
   const DELETE = useDisclosure()
+  const ADVISORIES = useDisclosure()
 
   const action = (type, data) => {
     setActiveRow(data)
@@ -187,6 +189,8 @@ const Vulnerabilities = ({ sbomData }) => {
         return CUSTOM_VULNS.onOpen()
       case 'remove_vuln':
         return DELETE.onOpen()
+      case 'view_advisories':
+        return ADVISORIES.onOpen()
       default:
         return VEX.onOpen()
     }
@@ -481,6 +485,15 @@ const Vulnerabilities = ({ sbomData }) => {
           title={'Remove Vulnerability'}
           name={activeRow?.vuln?.vulnId}
           description={`You are about to remove the custom vulnerability from this version`}
+        />
+      )}
+
+      {/* VULN ADVISORIES */}
+      {ADVISORIES.isOpen && (
+        <VulnAdvisoriesModal
+          data={activeRow}
+          isOpen={ADVISORIES.isOpen}
+          onClose={ADVISORIES.onClose}
         />
       )}
     </>
