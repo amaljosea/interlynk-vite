@@ -111,7 +111,7 @@ const SupportCard = ({ setEdit, data }) => {
     borderBottom: `1px solid ${grayBorderColor}`
   }
 
-  const assessment = automatic?.level ? 'Automatic' : 'Manual'
+  const assessment = manual?.level ? 'Manual' : 'Automatic'
   const supportLevel = manual?.level || automatic?.level
   const endOfSupport = manual?.endDate
   const assessmentExpiresOn = manual?.retainManualOverrideFor
