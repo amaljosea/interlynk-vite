@@ -126,6 +126,11 @@ const Vulnerabilities = ({ sbomData }) => {
     onClose: onCvssClose
   } = useDisclosure()
 
+  const handleCvssOpen = (data) => {
+    setActiveRow(data)
+    onCvssOpen()
+  }
+
   const isArchived = isSbomArchived(sbomData)
 
   // COLUMNS
@@ -209,7 +214,7 @@ const Vulnerabilities = ({ sbomData }) => {
           expandableRowsComponent={ExpandedComponent}
           expandableRowsComponentProps={{
             setActiveRow,
-            onCvssOpen
+            onCvssOpen: handleCvssOpen
           }}
         />
       </Flex>
