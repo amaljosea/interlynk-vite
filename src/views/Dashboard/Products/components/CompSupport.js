@@ -112,10 +112,10 @@ const SupportCard = ({ setEdit, data }) => {
   }
 
   const assessment = automatic?.level ? 'Automatic' : 'Manual'
-  const supportLevel = automatic?.level || manual?.level
+  const supportLevel = manual?.level || automatic?.level
   const endOfSupport = manual?.endDate
   const assessmentExpiresOn = manual?.retainManualOverrideFor
-  const explanation = automatic?.notes || manual?.notes
+  const explanation = manual?.notes || automatic?.notes
   const assessedBy = manual?.user?.name
   const lastAssessed = manual?.updatedAt
 
@@ -360,8 +360,8 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
       const { level, endDate, notes, retainManualOverrideFor } = manual || {}
       setFormData((prev) => ({
         ...prev,
-        explanation: automatic?.notes || notes,
-        supportLevel: automatic?.level || level,
+        explanation: notes || automatic?.notes,
+        supportLevel: level || automatic?.level,
         endOfSupport: endDate ? new Date(endDate) : '',
         assessmentExpiresOn: retainManualOverrideFor
           ? getDate(retainManualOverrideFor)
