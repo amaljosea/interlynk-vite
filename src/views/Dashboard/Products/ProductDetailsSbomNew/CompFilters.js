@@ -1,26 +1,21 @@
 import { gql, useLazyQuery } from '@apollo/client'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { supportLevels } from 'variables/general'
 
-import { Button, Flex, Stack, Text } from '@chakra-ui/react'
+import { Flex, Text } from '@chakra-ui/react'
 import {
   Menu,
-  MenuDivider,
   MenuItemOption,
   MenuList,
   MenuOptionGroup
 } from '@chakra-ui/react'
 
-import LynkDate from 'components/LynkDate'
 import CustomList from 'components/Misc/CustomList'
 import LynkMenuList from 'components/Misc/LynkMenuList'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 import MenuHeading from 'components/Misc/MenuHeading'
 
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useRouteFlags } from 'hooks/useRouteFlags'
 
 const GetEcosystems = gql`
   query GetEcosystems($productId: Uuid!, $sbomId: Uuid!) {
@@ -57,8 +52,7 @@ const CompFilters = ({ reset }) => {
   const productId = params?.productid
   const sbomId = params?.sbomid
   const { prodCompState, dispatch } = useGlobalState()
-  const { ecosystems, kinds, licenses, scope, direct, include, supportLevel } =
-    prodCompState
+  const { ecosystems, kinds, licenses, scope, direct, include } = prodCompState
   const { prodCompDispatch } = dispatch
 
   const [compEcosystems, setCompEcosystems] = useState(['All'])
@@ -71,17 +65,9 @@ const CompFilters = ({ reset }) => {
   const [getKinds, { loading: kindLoading }] = useLazyQuery(GetKinds)
   const [getLicenses, { loading: licLoading }] = useLazyQuery(GetLicenses)
 
-  const { isFreeTier } = useGlobalQueryContext()
-  const { isCustomerView } = useRouteFlags()
-
   const variables = {
     productId,
     sbomId
-  }
-
-  const onFilterSupport = (value) => {
-    prodCompDispatch({ type: 'FILTER_SUPPORT', payload: value })
-    reset()
   }
 
   const onFilterType = (value) => {
@@ -202,50 +188,6 @@ const CompFilters = ({ reset }) => {
           options={compLicenses}
         />
       </Menu>
-      {/* SUPPORT LEVEL */}
-      {!isFreeTier && !isCustomerView && (
-        <Menu closeOnSelect={false} isLazy>
-          <MenuHeading
-            title={'Support'}
-            active={supportLevel?.length !== 0 && !supportLevel.includes('all')}
-          />
-          <MenuList
-            minH='auto'
-            maxH={'350px'}
-            minW={'300px'}
-            fontSize={'sm'}
-            overflowY={'scroll'}
-          >
-            <MenuOptionGroup
-              type={'checkbox'}
-              value={supportLevel}
-              onChange={onFilterSupport}
-            >
-              {supportLevels?.map((item) => (
-                <MenuItemOption
-                  key={item?.id}
-                  fontSize={'sm'}
-                  value={item?.value}
-                >
-                  {item?.label}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-            <MenuDivider hidden />
-            <Flex hidden flexDirection={'column'} alignItems={'flex-start'}>
-              <Stack pl={8}>
-                <Text>Start Date</Text>
-                <LynkDate />
-                <Text>End Date</Text>
-                <LynkDate />
-              </Stack>
-              <Button ml={8} my={3} size='sm'>
-                Submit
-              </Button>
-            </Flex>
-          </MenuList>
-        </Menu>
-      )}
       {/* TYPE */}
       <Menu closeOnSelect={false}>
         <MenuHeading

@@ -84,7 +84,6 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
   const editLicenseStatus = 'edit_license_status'
   const editNotes = 'edit_notes'
   const viewCompVulnerabilities = 'view_component_vulnerabilities'
-  const editCompSupport = 'edit_component_support'
 
   return useMemo(() => {
     const columns = [
@@ -455,14 +454,6 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
                         isDisabled={status === 'signed' || !updateComponent}
                       >
                         Edit Component
-                      </MenuItem>
-                      <MenuItem
-                        hidden={isFreeTier || isPart}
-                        onClick={() => action(editCompSupport, row)}
-                        data-testid='edit_component_support'
-                        isDisabled={status === 'signed' || !updateComponent}
-                      >
-                        Edit Support Status
                       </MenuItem>
                       <MenuItem
                         hidden={isFreeTier || isPart}
