@@ -22,7 +22,7 @@ import { GetCompSupportData } from 'graphQL/Queries'
 
 import CompSupport from '../components/CompSupport'
 import SupportColumns from './Components/tableColumns/SupportColumns'
-import SupportExpand from './Components/tableExpanded/SupportExpanded'
+import SupportExpanded from './Components/tableExpanded/SupportExpanded'
 import SupportSubHeader from './Components/tableSubHeaders/SupportSubHeader'
 
 const Support = () => {
@@ -165,7 +165,7 @@ const Support = () => {
           className='data-table-container'
           onSelectedRowsChange={handleChange}
           progressComponent={<CustomLoader />}
-          expandableRowsComponent={SupportExpand}
+          expandableRowsComponent={SupportExpanded}
           customStyles={customStyles(headingTextColor)}
           selectableRowDisabled={(row) => row?.sbom?.id !== sbomId}
         />

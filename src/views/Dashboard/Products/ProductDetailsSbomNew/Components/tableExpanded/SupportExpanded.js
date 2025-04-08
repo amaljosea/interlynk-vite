@@ -5,12 +5,11 @@ import { Grid, Stack } from '@chakra-ui/react'
 
 import DetailItem from 'components/Misc/DetailItem'
 
-const SupportExpand = (props) => {
+const SupportExpanded = (props) => {
   const { data } = props
 
   return useMemo(() => {
-    const { sbom } = data || {}
-    const { projectVersion } = sbom || {}
+    const { version } = data || {}
     const {
       componentSupportLevel: manual,
       componentSupportLevelAutomatic: automatic
@@ -33,7 +32,7 @@ const SupportExpand = (props) => {
       >
         <Grid templateColumns='repeat(4, 1fr)' py={2} gap={6}>
           {/* PART */}
-          <DetailItem label='Version' value={projectVersion} />
+          <DetailItem label='Version' value={version} />
           {/* ASSESSMENT */}
           <DetailItem label='Assessment' value={assessment} />
           {/* LEVEL */}
@@ -64,4 +63,4 @@ const SupportExpand = (props) => {
   }, [data])
 }
 
-export default SupportExpand
+export default SupportExpanded
