@@ -1,14 +1,17 @@
-import { useQuery } from '@apollo/client'
 import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
-import { getFullDate, timeSince, truncatedValue } from 'utils'
-import { getSignedUrlParams } from 'utils'
-import { isSbomArchived } from 'utils'
+import {
+  getFullDate,
+  getSignedUrlParams,
+  isSbomArchived,
+  timeSince,
+  truncatedValue
+} from 'utils'
 import SbomActions from 'views/Sbom/components/SbomActions'
 
-import { DownloadIcon, Search2Icon } from '@chakra-ui/icons'
-import { Divider, Flex, Text, Tooltip } from '@chakra-ui/react'
+import { EditIcon } from '@chakra-ui/icons'
+import { Flex, TagRightIcon, Text, Tooltip } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { Icon } from '@chakra-ui/react'
 import { Grid, GridItem } from '@chakra-ui/react'
@@ -17,9 +20,8 @@ import { useDisclosure } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
-import ActiveBtn from 'components/Misc/ActiveBtn'
-import { SettingsTag } from 'components/Misc/SettingsTag'
 import { ProgressBar } from 'components/ProgressBar'
+import SbomProcess from 'components/SbomProcess'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -29,17 +31,7 @@ import { useSbomScores } from 'hooks/useSbomScores'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { GetProjectSettings } from 'graphQL/Queries'
-
-import {
-  FaArchive,
-  FaBug,
-  FaCubes,
-  FaLongArrowAltRight,
-  FaRobot
-} from 'react-icons/fa'
-import { FaCircleCheck, FaTag } from 'react-icons/fa6'
-import { TbActivity } from 'react-icons/tb'
+import { FaCubes, FaLongArrowAltRight } from 'react-icons/fa'
 
 import LifecycleModal from '../../components/LifecycleModal'
 
@@ -47,6 +39,7 @@ const SbomDetails = ({ sbomData }) => {
   const params = useParams()
   const navigate = useNavigate()
   const partsContext = usePartsContext()
+  const signedUrlParams = getSignedUrlParams()
   const { sbomHookData, isFreeTier } = useGlobalQueryContext()
   const projectId = params.productid
   const sbomId = params.sbomid
@@ -59,8 +52,10 @@ const SbomDetails = ({ sbomData }) => {
     vulnRunStatus,
     updatedAt,
     healthScore
-  } = sbomData || ''
-  const { name, version, description } = primaryComponent || ''
+  } = sbomData || {}
+  const { name, version, description } = primaryComponent || {}
+
+  const hasFinished = vulnRunStatus === 'FINISHED'
 
   const lifecycleData = {
     stage: sbomData?.productLifeCycleStage,
@@ -72,23 +67,6 @@ const SbomDetails = ({ sbomData }) => {
   const isArchived = isSbomArchived(sbomData)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
-
-  const signedUrlParams = getSignedUrlParams()
-
-  const { data: settings } = useQuery(GetProjectSettings, {
-    variables: { id: projectId }
-  })
-
-  const { projectSetting } = settings?.project || ''
-  const {
-    checksEnabled,
-    enableAutoArchive,
-    vulnScanningEnabled: vulnScan,
-    internalCompMatchingEnabled: internalComp,
-    automatedFixesEnabled,
-    enableSupportLevel
-  } = projectSetting || ''
-  const hasFinished = vulnRunStatus === 'FINISHED'
 
   const handlePart = () => {
     partsContext.pop()
@@ -109,17 +87,12 @@ const SbomDetails = ({ sbomData }) => {
     format: isUnspecified ? undefined : result?.complianceType?.toUpperCase()
   })
 
-  const {
-    primaryBlueText,
-    sameSecondaryText,
-    secondaryBlueText,
-    secondaryTextInverse
-  } = useThemeColor([
-    'primaryBlueText',
-    'sameSecondaryText',
-    'secondaryBlueText',
-    'secondaryTextInverse'
-  ])
+  const { primaryBlueText, secondaryBlueText, secondaryTextInverse } =
+    useThemeColor([
+      'primaryBlueText',
+      'secondaryBlueText',
+      'secondaryTextInverse'
+    ])
 
   const { name: projectGroupName, loading } = useProjectGroup({
     projectGroupId: params.productgroupid
@@ -131,16 +104,6 @@ const SbomDetails = ({ sbomData }) => {
       handlePart()
     }
   })
-
-  const isSbomPending =
-    [
-      checksEnabled,
-      internalComp,
-      automatedFixesEnabled,
-      enableAutoArchive,
-      vulnScan
-    ].includes(undefined) ||
-    (vulnScan && !hasFinished)
 
   return (
     <>
@@ -207,34 +170,26 @@ const SbomDetails = ({ sbomData }) => {
                 <Text mr={2} fontSize={22} wordBreak={'breal-all'}>
                   {truncatedValue(projectVersion, 40)}
                 </Text>
-                <Tooltip label='Lifecycle stage' fontSize='md'>
-                  <Tag
-                    hidden={!lifecycleData?.stage}
-                    size={'sm'}
-                    variant='solid'
-                    colorScheme='blue'
-                    w={'fit-content'}
-                    cursor={'pointer'}
-                  >
-                    <TagLabel textTransform={'capitalize'}>
-                      {lifecycleData?.stage
-                        ? String(lifecycleData?.stage).replace(/_/g, ' ')
-                        : ''}
-                    </TagLabel>
-                  </Tag>
-                </Tooltip>
-                <Flex paddingTop={1}>
-                  <ActiveBtn
-                    onClick={onOpen}
-                    hidden={isArchived}
-                    label={'add_lifecycle'}
-                    editable={lifecycleData?.stage ? true : false}
-                    title={lifecycleData?.stage ? 'Update' : 'Add Lifecycle'}
-                    color={
-                      lifecycleData?.stage ? sameSecondaryText : primaryBlueText
-                    }
-                  />
-                </Flex>
+                {lifecycleData?.stage && (
+                  <Tooltip label='Lifecycle stage'>
+                    <Tag
+                      variant='solid'
+                      colorScheme='blue'
+                      w={'fit-content'}
+                      cursor={'pointer'}
+                    >
+                      <TagLabel textTransform={'capitalize'}>
+                        {String(lifecycleData?.stage).replace(/_/g, ' ')}
+                      </TagLabel>
+                      <TagRightIcon
+                        as={EditIcon}
+                        onClick={onOpen}
+                        hidden={isArchived}
+                        label={'add_lifecycle'}
+                      />
+                    </Tag>
+                  </Tooltip>
+                )}
               </Flex>
               <Text
                 wordBreak={'break-all'}
@@ -267,73 +222,10 @@ const SbomDetails = ({ sbomData }) => {
                       Updated {timeSince(updatedAt)}
                     </Text>
                   </Tooltip>
-                  <Flex
-                    gap={1}
-                    mt={0.5}
-                    flexDir='row'
-                    alignItems={'center'}
-                    hidden={signedUrlParams}
-                  >
-                    <SettingsTag
-                      label={`Imported Successfully`}
-                      icon={<DownloadIcon />}
-                      rounded
-                    />
-                    <Divider width={3} borderColor={sameSecondaryText} />
-                    <SettingsTag
-                      label={`Checks ${checksEnabled ? 'Completed' : 'Skipped'}`}
-                      icon={<Search2Icon />}
-                      isDisabled={!checksEnabled}
-                      rounded
-                    />
-                    <Divider width={3} borderColor={sameSecondaryText} />
-                    <SettingsTag
-                      label={`Internal Labeling ${internalComp ? 'Completed' : 'Skipped'}`}
-                      icon={<FaTag />}
-                      isDisabled={!internalComp}
-                      rounded
-                    />
-                    <Divider width={3} borderColor={sameSecondaryText} />
-                    <SettingsTag
-                      label={`Auto Archive ${!enableAutoArchive ? 'Disabled' : hasFinished ? 'Completed' : 'Skipped'}`}
-                      icon={<FaArchive />}
-                      isDisabled={!enableAutoArchive}
-                      rounded
-                    />
-                    <Divider width={3} borderColor={sameSecondaryText} />
-                    <SettingsTag
-                      label={`Automation ${automatedFixesEnabled ? 'Completed' : 'Skipped'}`}
-                      icon={<FaRobot />}
-                      isDisabled={!automatedFixesEnabled}
-                      rounded
-                    />
-                    <Divider width={3} borderColor={sameSecondaryText} />
-                    <SettingsTag
-                      label={`Vulnerability Scan ${!vulnScan ? 'Disabled' : hasFinished ? 'Completed' : 'Pending'}`}
-                      icon={<FaBug />}
-                      isDisabled={!hasFinished || !vulnScan}
-                      rounded
-                    />
-                    <Divider
-                      width={3}
-                      hidden={isFreeTier}
-                      borderColor={sameSecondaryText}
-                    />
-                    <SettingsTag
-                      rounded
-                      hidden={isFreeTier}
-                      label={`Component Support Analysis ${!enableSupportLevel ? 'Disabled' : hasFinished ? 'Completed' : 'Skipped'}`}
-                      icon={<TbActivity />}
-                      isDisabled={!enableSupportLevel}
-                    />
-                    <Divider width={3} borderColor={sameSecondaryText} />
-                    <SettingsTag
-                      label={`SBOM ${!isSbomPending ? 'Ready' : 'not ready'}`}
-                      icon={<FaCircleCheck />}
-                      isDisabled={isSbomPending}
-                      rounded
-                    />
-                  </Flex>
+                  {/* PROCESS */}
+                  {!signedUrlParams && (
+                    <SbomProcess hasFinished={hasFinished} />
+                  )}
                 </CardBody>
               </Card>
             </GridItem>
