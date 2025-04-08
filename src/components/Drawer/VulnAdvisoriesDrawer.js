@@ -1,6 +1,6 @@
-import React from 'react'
+import { Link } from 'react-router-dom'
 
-import { Flex, Link, Stack, Tag, Text } from '@chakra-ui/react'
+import { Flex, Stack, Tag, Text } from '@chakra-ui/react'
 
 import LynkDrawer from 'components/LynkDrawer'
 
