@@ -82,8 +82,8 @@ const SupportColumns = ({ handleSupport }) => {
             componentSupportLevel: manual,
             componentSupportLevelAutomatic: automatic
           } = row || {}
-          const supportLevel = automatic?.level || manual?.level
-          
+          const supportLevel = manual ? manual?.level : automatic?.level
+
           if (supportLevel) {
             return (
               <Flex gap={2} alignItems={'center'}>

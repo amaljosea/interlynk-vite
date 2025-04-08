@@ -18,11 +18,11 @@ const SupportExpand = (props) => {
     const { user, retainManualOverrideFor, updatedAt } = manual || {}
 
     const assessment = automatic?.level ? 'Automatic' : 'Manual'
-    const supportLevel = automatic?.level || manual?.level
+    const supportLevel = manual?.level || automatic?.level
     const assessmentExpiresOn = retainManualOverrideFor
       ? calculateExpiryDate(retainManualOverrideFor)
       : 'N/A'
-    const explanation = automatic?.notes || manual?.notes
+    const explanation = manual?.notes || automatic?.notes
     const assessedBy = user?.name || 'N/A'
     const lastAssessed = updatedAt ? getFullDate(updatedAt) : 'N/A'
 
