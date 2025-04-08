@@ -166,7 +166,7 @@ const ExpandedComponent = (props) => {
           {/* PURL */}
           <DetailItem
             cursor='pointer'
-            onClick={() => (isCustomerView ? null : action('view_purl', data))}
+            onClick={() => action('view_purl', data)}
             value={purl ? purlForDisplay : 'N/A'}
             label='PURL'
             valueStyle={purl && { color: purlColor }}
@@ -176,7 +176,7 @@ const ExpandedComponent = (props) => {
             cursor={cpes?.length > 0 ? 'pointer' : 'default'}
             label='CPES'
             value={cpes?.length > 0 ? cpes[0] : 'N/A'}
-            onClick={() => (isCustomerView ? null : action('view_cpe', data))}
+            onClick={() => action('view_cpe', data)}
             valueStyle={cpes?.length > 0 && { color: cpesColor }}
           />
           {/* Scope */}
