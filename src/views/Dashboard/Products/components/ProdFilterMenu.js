@@ -8,7 +8,6 @@ import {
   MenuOptionGroup
 } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import ProdLabel from 'components/Label/ProdLabel'
 import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
@@ -115,6 +114,8 @@ const ProdFilterMenu = (props) => {
     }
   }
 
+  if (loading) return <Text pt={2}>Loading...</Text>
+
   return (
     <Flex gap={2}>
       {/* ACTIVE */}
@@ -134,10 +135,7 @@ const ProdFilterMenu = (props) => {
       {/* LABELS */}
       {!isFreeTier && prodLabels?.length > 1 && (
         <Menu closeOnSelect={false}>
-          <MenuHeading
-            title={'Labels'}
-            active={labelIds?.length !== 0}
-          />
+          <MenuHeading title={'Labels'} active={labelIds?.length !== 0} />
           <MenuList
             minW={'280px'}
             maxW={'400px'}
@@ -146,40 +144,31 @@ const ProdFilterMenu = (props) => {
             fontSize={'sm'}
             overflowY={'scroll'}
           >
-            {loading ? (
-              <Stack px={2}>
-                <CustomLoader />
-              </Stack>
-            ) : (
-              <MenuOptionGroup
-                type={'checkbox'}
-                value={labelIds}
-                onChange={onFilterLabel}
-              >
-                {prodLabels?.map((item, index) => (
-                  <MenuItemOption
-                    key={index}
-                    fontSize={'sm'}
-                    value={item?.id}
-                    wordBreak={'break-all'}
-                    aria-label={`label${index}`}
-                    onClick={(e) => handleMenuClick(e, item?.name)}
-                    icon={
-                      filterMode === 'AND' ? (
-                        <RxDotFilled
-                          size={16}
-                          color={inverseSecondaryBgColor}
-                        />
-                      ) : (
-                        <FaCheck size={14} color={inverseSecondaryBgColor} />
-                      )
-                    }
-                  >
-                    <ProdLabel item={item} />
-                  </MenuItemOption>
-                ))}
-              </MenuOptionGroup>
-            )}
+            <MenuOptionGroup
+              type={'checkbox'}
+              value={labelIds}
+              onChange={onFilterLabel}
+            >
+              {prodLabels?.map((item, index) => (
+                <MenuItemOption
+                  key={index}
+                  fontSize={'sm'}
+                  value={item?.id}
+                  wordBreak={'break-all'}
+                  aria-label={`label${index}`}
+                  onClick={(e) => handleMenuClick(e, item?.name)}
+                  icon={
+                    filterMode === 'AND' ? (
+                      <RxDotFilled size={16} color={inverseSecondaryBgColor} />
+                    ) : (
+                      <FaCheck size={14} color={inverseSecondaryBgColor} />
+                    )
+                  }
+                >
+                  <ProdLabel item={item} />
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
             <Stack
               px={3}
               py={2}
