@@ -1670,6 +1670,10 @@ export const GetComponentData = gql`
               name
             }
           }
+          componentSupportLevelAutomatic {
+            level
+            notes
+          }
           externalUrls {
             name
             url
