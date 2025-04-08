@@ -1,5 +1,4 @@
-import { useLazyQuery } from '@apollo/client'
-import { useState } from 'react'
+import { useQuery } from '@apollo/client'
 
 import { Flex, Kbd, Stack, Text } from '@chakra-ui/react'
 import {
@@ -16,6 +15,7 @@ import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useHasPermission } from 'hooks/useHasPermission'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetLabels } from 'graphQL/Queries'
@@ -55,10 +55,6 @@ const ProdFilterMenu = (props) => {
     'secondaryTextColor'
   ])
 
-  const [prodLabels, setProdLabels] = useState([
-    { id: 'all', name: 'All', color: secondaryTextColor }
-  ])
-
   const onFilterActive = (value) => {
     prodDispatch({
       type: 'FILTER_ACTIVE',
@@ -83,23 +79,24 @@ const ProdFilterMenu = (props) => {
     reset()
   }
 
-  const [getLabels, { loading }] = useLazyQuery(GetLabels)
+  const productPermissions = useHasPermission({
+    parentKey: 'view_product_group'
+  })
 
-  const onCheckLabels = async () => {
-    await getLabels({ variables: { first: 100 } }).then((res) => {
-      if (res?.data?.labels?.nodes?.length > 0) {
-        const labels = [{ id: 'all', name: 'All', color: secondaryTextColor }]
-        res?.data?.labels?.nodes?.map((item) =>
-          labels?.push({
-            id: item?.id,
-            name: item?.name,
-            color: item?.color
-          })
-        )
-        setProdLabels(labels)
-      }
+  const { data, loading } = useQuery(GetLabels, {
+    variables: { first: 100 },
+    skip: productPermissions === false
+  })
+  const { nodes } = data?.labels || {}
+
+  const prodLabels = [{ id: 'all', name: 'All', color: secondaryTextColor }]
+  nodes?.map((item) =>
+    prodLabels?.push({
+      id: item?.id,
+      name: item?.name,
+      color: item?.color
     })
-  }
+  )
 
   const handleMenuClick = (event, value) => {
     if (event.shiftKey) {
@@ -135,12 +132,11 @@ const ProdFilterMenu = (props) => {
         />
       </Menu>
       {/* LABELS */}
-      {!isFreeTier && (
+      {!isFreeTier && prodLabels?.length > 1 && (
         <Menu closeOnSelect={false}>
           <MenuHeading
             title={'Labels'}
             active={labelIds?.length !== 0}
-            onClick={onCheckLabels}
           />
           <MenuList
             minW={'280px'}
