@@ -114,8 +114,6 @@ const ProdFilterMenu = (props) => {
     }
   }
 
-  if (loading) return <Text pt={2}>Loading...</Text>
-
   return (
     <Flex gap={2}>
       {/* ACTIVE */}
@@ -133,7 +131,7 @@ const ProdFilterMenu = (props) => {
         />
       </Menu>
       {/* LABELS */}
-      {!isFreeTier && prodLabels?.length > 1 && (
+      {!isFreeTier && !loading && prodLabels?.length > 1 && (
         <Menu closeOnSelect={false}>
           <MenuHeading title={'Labels'} active={labelIds?.length !== 0} />
           <MenuList

@@ -62,10 +62,10 @@ const SupportColumns = ({ handleSupport }) => {
         wrap: true,
         selector: (row) => {
           const { duplicates } = row || {}
-          const { user } = row?.componentSupportLevel || {}
+          const { componentSupportLevel: manual } = row || {}
           return (
             <Text color={primaryTextColor}>
-              {user?.name ? 'Manual' : 'Automatic'}{' '}
+              {manual?.level ? 'Manual' : 'Automatic'}{' '}
               {duplicates?.length > 0 && `+${duplicates?.length}`}
             </Text>
           )
