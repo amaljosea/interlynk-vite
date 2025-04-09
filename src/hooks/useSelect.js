@@ -23,6 +23,10 @@ export const useSelect = (type) => {
   ])
 
   const selectStyles = {
+    container: (provided) => ({
+      ...provided,
+      width: '100%'
+    }),
     control: (baseStyles, state) => ({
       ...baseStyles,
       color: primaryTextColor,
@@ -56,7 +60,6 @@ export const useSelect = (type) => {
     }),
     menu: (provided) => ({
       ...provided,
-      zIndex: 1111,
       backgroundColor: primaryBgColor,
       width: '100%'
     }),
