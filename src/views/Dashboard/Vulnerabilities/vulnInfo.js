@@ -119,7 +119,7 @@ const VulnInfo = () => {
     cvssScore
   } = vuln || ''
 
-  const { kev, epssScore, epssPercentile } = vulnInfo || ''
+  const { kev, epssScore, epssPercentile, cwes } = vulnInfo || ''
 
   const productList =
     projectGroups?.nodes?.length > 0 ? projectGroups?.nodes : []
@@ -236,6 +236,11 @@ const VulnInfo = () => {
                   <Stack spacing={1} fontSize={'sm'}>
                     <CustomText>KEV :</CustomText>
                     <Text>{kev ? 'Yes' : 'No'}</Text>
+                  </Stack>
+                  {/* CEWS */}
+                  <Stack spacing={1} fontSize={'sm'} whiteSpace='break-words'>
+                    <CustomText>CWE :</CustomText>
+                    <Text>{cvssScore}</Text>
                   </Stack>
                   {/* cvssScore */}
                   <Stack spacing={1} fontSize={'sm'} whiteSpace='break-words'>
