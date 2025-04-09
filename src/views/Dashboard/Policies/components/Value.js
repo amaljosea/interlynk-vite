@@ -7,7 +7,6 @@ import {
 } from 'variables/general'
 
 import { Flex, FormControl, Stack, Text } from '@chakra-ui/react'
-import { Icon, IconButton } from '@chakra-ui/react'
 import {
   Input,
   InputGroup,
@@ -15,11 +14,10 @@ import {
   InputRightAddon
 } from '@chakra-ui/react'
 
+import DeleteButton from 'components/Icons/DeleteButton'
 import LynkSelect from 'components/LynkSelect'
 
 import { useThemeColor } from 'hooks/useThemeColors'
-
-import { MdDeleteOutline } from 'react-icons/md'
 
 const Value = (props) => {
   const {
@@ -32,10 +30,7 @@ const Value = (props) => {
   } = props
   const { id, value, min, max, valError, operator, subject } = data || {}
 
-  const { primaryErrorColor, grayBorderColor } = useThemeColor([
-    'primaryErrorColor',
-    'grayBorderColor'
-  ])
+  const { primaryErrorColor } = useThemeColor(['primaryErrorColor'])
 
   const handleBlur = (rule) => {
     const newData = conditions.map((item) => {
@@ -324,20 +319,10 @@ const Value = (props) => {
             w={'150px'}
           />
         )}
-
       {conditions?.length > 1 && (
-        <IconButton
-          border='1px solid'
-          colorScheme='white'
-          borderColor={grayBorderColor}
+        <DeleteButton
           aria-label='Remove condition'
           onClick={() => deleteRow(data)}
-          icon={
-            <Icon
-              sx={{ w: 6, h: 6, color: primaryErrorColor }}
-              as={MdDeleteOutline}
-            />
-          }
         />
       )}
     </Flex>

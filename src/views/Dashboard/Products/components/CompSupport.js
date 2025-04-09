@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { getDate, getFullDate, getTotalDays, timeSince } from 'utils'
 import { assessmentExpiryWarning } from 'variables/general'
 
-import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
+import { EditIcon } from '@chakra-ui/icons'
 import {
   Flex,
   FormErrorMessage,
@@ -19,6 +19,7 @@ import { Button, ButtonGroup } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import DeleteButton from 'components/Icons/DeleteButton'
 import LynkDate from 'components/LynkDate'
 import LynkDrawer from 'components/LynkDrawer'
 import LynkSelect from 'components/LynkSelect'
@@ -474,11 +475,10 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
           </Button>
         </ButtonGroup>
         {hasManualSupport && (
-          <IconButton
+          <DeleteButton
             onClick={onOpen}
-            colorScheme='red'
-            icon={<DeleteIcon />}
             title='Remove support'
+            variant={'solid'}
           />
         )}
       </Flex>

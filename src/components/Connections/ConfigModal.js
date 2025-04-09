@@ -3,20 +3,18 @@ import { useEffect, useState } from 'react'
 import { validateEmail } from 'utils/formValidationUtils'
 
 import { Box, Button, HStack, Input, Stack } from '@chakra-ui/react'
-import { Icon, IconButton } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage } from '@chakra-ui/react'
 
+import DeleteButton from 'components/Icons/DeleteButton'
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
-import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaPlus } from 'react-icons/fa6'
 import { IoSettingsOutline } from 'react-icons/io5'
-import { MdDeleteOutline } from 'react-icons/md'
 
 const options = [
   { value: 'All', label: 'All' },
@@ -54,11 +52,6 @@ const ConfigModal = ({
       frequency: 'Instant',
       isValid: true
     }
-  ])
-
-  const { grayBorderColor, primaryErrorColor } = useThemeColor([
-    'grayBorderColor',
-    'primaryErrorColor'
   ])
 
   const updateCon = useHasPermission({
@@ -360,23 +353,10 @@ const ConfigModal = ({
                 dropDown
                 styles={selectStyles}
               />
-
               {updateCon && configs?.length > 1 && (
-                <IconButton
-                  border='1px solid'
-                  borderColor={grayBorderColor}
-                  variant='ghost'
-                  isLoading={deleteLoading}
-                  aria-label='Delete configuration'
+                <DeleteButton
                   onClick={() => handleRemoveConfig(index)}
-                  icon={
-                    <Icon
-                      as={MdDeleteOutline}
-                      w={5}
-                      h={5}
-                      color={primaryErrorColor}
-                    />
-                  }
+                  isLoading={deleteLoading}
                 />
               )}
             </HStack>
