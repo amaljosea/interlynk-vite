@@ -3,6 +3,7 @@ import FDA from 'assets/img/fda.jpg'
 import NTIA from 'assets/img/ntia.jpg'
 import { capitalizeFirstLetter, getFullDate } from 'utils'
 import { parseLicenseString } from 'utils'
+import { calculateExpiryDate } from 'utils'
 
 import { Stack, Text } from '@chakra-ui/react'
 
@@ -1425,9 +1426,10 @@ export const exportCsvTableConfig = {
     additionalColumns: [
       'Version',
       'Part',
-      'Assessed Date',
+      'Last Assessed',
       'Last Assessed By',
-      'Explanation'
+      'Support Explanation',
+      'Assessment Expires On'
     ],
     mapDataForExport: (data, filters) => {
       return data.map((row) => {
@@ -1438,7 +1440,8 @@ export const exportCsvTableConfig = {
           componentSupportLevel: manual,
           componentSupportLevelAutomatic: automatic
         } = row || {}
-        const { endDate, user, notes, updatedAt } = manual || {}
+        const { endDate, user, notes, updatedAt, retainManualOverrideFor } =
+          manual || {}
 
         const { projectVersion, project } = sbom || {}
         const { projectGroup } = project || {}
@@ -1458,12 +1461,13 @@ export const exportCsvTableConfig = {
           'End Of Support': endDate
             ? new Date(endDate).toLocaleDateString()
             : 'N/A',
-          'Assessed Date': updatedAt
+          'Last Assessed': updatedAt
             ? new Date(updatedAt).toLocaleDateString()
             : 'N/A',
           'Last Assessed By': user?.name || 'N/A',
-          Explanation: notes || 'N/A',
-          Updated: updatedAt ? new Date(updatedAt).toLocaleDateString() : 'N/A'
+          'Support Explanation': notes || 'N/A',
+          Updated: updatedAt ? new Date(updatedAt).toLocaleDateString() : 'N/A',
+          'Assessment Expires On': calculateExpiryDate(retainManualOverrideFor)
         }
       })
     }
