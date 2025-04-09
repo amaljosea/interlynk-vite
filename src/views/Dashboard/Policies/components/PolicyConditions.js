@@ -42,7 +42,10 @@ const PolicyConditions = ({
           return {
             ...item,
             [field]: value,
-            opError: ''
+            opError: '',
+            value: '',
+            min: '0',
+            max: '0'
           }
         } else if (
           field === 'operator' &&
