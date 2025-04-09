@@ -2,6 +2,7 @@ import BSI from 'assets/img/bsi.jpg'
 import FDA from 'assets/img/fda.jpg'
 import NTIA from 'assets/img/ntia.jpg'
 import { capitalizeFirstLetter, getFullDate } from 'utils'
+import { parseLicenseString } from 'utils'
 
 import { Stack, Text } from '@chakra-ui/react'
 
@@ -1369,7 +1370,8 @@ export const exportCsvTableConfig = {
           : []
 
         return {
-          'License Expression': row?.licenseExpression || '',
+          'License Expression':
+            parseLicenseString(row?.licenseExpression) || 'Not Available',
           Components:
             sortedComponents.length > 0
               ? sortedComponents.map((item) => item?.name).join('; ')
