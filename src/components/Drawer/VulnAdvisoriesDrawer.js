@@ -36,6 +36,9 @@ const VulnAdvisoriesDrawer = ({ data, isOpen, onClose }) => {
           {advisories?.map((item, index) => {
             const match = item?.match(/https?:\/\/[^\s"]+/)
             const url = match ? match[0] : null
+
+            if (!url) return <Text key={index}>{index + 1}. N/A</Text>
+            
             return (
               <Flex fontSize={'sm'} key={index} {...container}>
                 <Text>{index + 1}. </Text>
