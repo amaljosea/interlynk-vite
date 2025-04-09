@@ -20,7 +20,7 @@ const CweList = ({ data }) => {
             style={{ color: primaryBlueText }}
             to={`https://cwe.mitre.org/data/definitions/${number}.html`}
           >
-            {item}
+            {number && item}
             {index + 1 !== data?.length && ', '}
           </Link>
         )
