@@ -4,12 +4,18 @@ import { useContext, useEffect, useState } from 'react'
 import { validateCPEString } from 'utils/cpeUtils'
 import IdentifierLabel from 'views/Dashboard/Products/components/IdentifierLabel'
 
-import { FormControl, FormErrorMessage } from '@chakra-ui/react'
+import {
+  FormControl,
+  FormErrorMessage,
+  InputGroup,
+  useClipboard
+} from '@chakra-ui/react'
 
 import { useRouteFlags } from 'hooks/useRouteFlags'
 
 import { CpeAutoComplete } from 'graphQL/Queries'
 
+import CopyButton from './Icons/CopyButton'
 import LynkSelect from './LynkSelect'
 
 const CpeField = ({ isOpen, onOpen, onClose }) => {
@@ -74,6 +80,8 @@ const CpeField = ({ isOpen, onOpen, onClose }) => {
     }
   }
 
+  const cpeString = useClipboard(identifiers?.cpe || '')
+
   useEffect(() => {
     if (identifiers?.cpe) {
       setValue({ label: identifiers?.cpe, value: identifiers?.cpe })
@@ -91,23 +99,31 @@ const CpeField = ({ isOpen, onOpen, onClose }) => {
         onOpen={onOpen}
         onClose={onClose}
       />
-      <LynkSelect
-        id='cpe'
-        name='cpe'
-        value={value}
-        onBlur={onBlur}
-        options={options}
-        placeholder={''}
-        isSearchable={true}
-        isLoading={loading}
-        onChange={onChange}
-        filterOption={null}
-        isDisabled={isCustomerView}
-        inputValue={searchInput}
-        noOptionsMessage={() => null}
-        onInputChange={onInputChange}
-        isClearable={isCustomerView ? false : true}
-      />
+      <InputGroup gap={1} zIndex={9999}>
+        <LynkSelect
+          id='cpe'
+          name='cpe'
+          value={value}
+          onBlur={onBlur}
+          options={options}
+          placeholder={''}
+          isSearchable={true}
+          isLoading={loading}
+          onChange={onChange}
+          filterOption={null}
+          isDisabled={isCustomerView}
+          inputValue={searchInput}
+          noOptionsMessage={() => null}
+          onInputChange={onInputChange}
+          isClearable={isCustomerView ? false : true}
+        />
+        <CopyButton
+          size={'md'}
+          hasCopied={cpeString?.hasCopied}
+          onCopy={() => cpeString.onCopy()}
+          colorScheme={{ copied: 'green', default: 'blue' }}
+        />
+      </InputGroup>
       <FormErrorMessage>{error || ''}</FormErrorMessage>
     </FormControl>
   )
