@@ -119,8 +119,6 @@ const DefectDensity = ({ filters }) => {
     }
   ]
 
-  console.warn('defectMetrics', defectMetrics)
-
   if (loading) return <LynkLoader />
 
   return (

@@ -46,7 +46,7 @@ const manager = createLocalStorageManager('chakra-ui-color-mode')
 
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true }}>
       <GlobalStateProvider>
         <ChakraProvider
           theme={theme}

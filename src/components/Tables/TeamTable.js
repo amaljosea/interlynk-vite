@@ -181,7 +181,7 @@ const TeamTable = () => {
           </Tooltip>
         )
       },
-      center: true,
+      center: 'true',
       sortable: true,
       sortFunction: (a, b) => {
         const aUserStart = userTimeStart(a)
