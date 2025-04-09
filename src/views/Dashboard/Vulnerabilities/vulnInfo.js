@@ -234,15 +234,15 @@ const VulnInfo = () => {
                     <CustomText>KEV :</CustomText>
                     <Text>{kev ? 'Yes' : 'No'}</Text>
                   </Stack>
-                  {/* CEWS */}
-                  <Stack spacing={1} fontSize={'sm'} whiteSpace='break-words'>
-                    <CustomText>CWE :</CustomText>
-                    <CweList data={cwes} />
-                  </Stack>
                   {/* cvssScore */}
                   <Stack spacing={1} fontSize={'sm'} whiteSpace='break-words'>
                     <CustomText>CVSS :</CustomText>
                     <Text>{cvssScore}</Text>
+                  </Stack>
+                  {/* CEWS */}
+                  <Stack spacing={1} fontSize={'sm'} whiteSpace='break-words'>
+                    <CustomText>CWE :</CustomText>
+                    <CweList data={cwes} />
                   </Stack>
                   {/* CVSS Vector */}
                   <Stack spacing={1} fontSize={'sm'} whiteSpace='break-words'>
