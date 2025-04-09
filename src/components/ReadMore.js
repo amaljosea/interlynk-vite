@@ -16,7 +16,7 @@ const ReadMore = ({ text, maxChars = 300 }) => {
   const toggle = () => setExpanded((prev) => !prev)
 
   return (
-    <Text fontSize={'sm'} my={0.5}>
+    <Text fontSize={'sm'} my={0.5} wordBreak={'break-all'}>
       {expanded ? text : truncatedValue(text, maxChars)}{' '}
       <chakra.span
         cursor={'pointer'}
