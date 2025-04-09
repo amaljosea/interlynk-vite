@@ -12,7 +12,7 @@ const CweList = ({ data }) => {
   return (
     <Flex gap={2} flexWrap={'wrap'}>
       {data?.map((item, index) => {
-        const number = item?.match(/\d+/)[0]
+        const number = item?.match(/\d+/)?.[0]
         return (
           <Link
             key={index}
