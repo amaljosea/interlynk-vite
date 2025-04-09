@@ -3,13 +3,15 @@ import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getFullDate, linkURl, truncatedValue } from 'utils'
 
-import { Link, SkeletonText, chakra } from '@chakra-ui/react'
+import { SkeletonText, chakra } from '@chakra-ui/react'
 import { Grid, GridItem } from '@chakra-ui/react'
 import { Flex, Icon, Stack, Text, useDisclosure } from '@chakra-ui/react'
 import { Stat, StatLabel, StatNumber } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
+import CweList from 'components/CweList'
+import ExternalNavIcon from 'components/Icons/ExternalNavIcon'
 import IconBox from 'components/Icons/IconBox'
 import { CustomText } from 'components/Misc/CustomText'
 import CvssCard from 'components/Misc/CvssCard'
@@ -169,20 +171,15 @@ const VulnInfo = () => {
                 color={secondaryBlueText}
               />
               <Flex width={'100%'} direction={'column'} gap={0.5}>
-                {/* PRODUCT TITLE */}
-                <Link
-                  isExternal
-                  w={'fit-content'}
-                  href={linkURl(source, vuln?.vulnId)}
-                >
-                  <Text
-                    fontSize={22}
-                    fontWeight={'semibold'}
-                    _hover={{ color: primaryBlueText }}
-                  >
+                <Flex gap={3} alignItems={'center'}>
+                  <Text fontSize={22} fontWeight={'semibold'}>
                     {vuln?.vulnId}
                   </Text>
-                </Link>
+                  <ExternalNavIcon
+                    size={6}
+                    href={linkURl(source, vuln.vulnId)}
+                  />
+                </Flex>
                 {desc !== '' && (
                   <Text fontSize={'sm'} my={0.5}>
                     {expand ? desc : truncatedValue(desc, 300)}{' '}
@@ -240,7 +237,7 @@ const VulnInfo = () => {
                   {/* CEWS */}
                   <Stack spacing={1} fontSize={'sm'} whiteSpace='break-words'>
                     <CustomText>CWE :</CustomText>
-                    <Text>{cvssScore}</Text>
+                    <CweList data={cwes} />
                   </Stack>
                   {/* cvssScore */}
                   <Stack spacing={1} fontSize={'sm'} whiteSpace='break-words'>
