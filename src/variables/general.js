@@ -1429,12 +1429,19 @@ export const exportCsvTableConfig = {
     ],
     mapDataForExport: (data, filters) => {
       return data.map((row) => {
-        const { name, version, sbom, componentSupportLevel } = row || {}
-        const { level, endDate, user, notes, updatedAt } =
-          componentSupportLevel || {}
+        const {
+          name,
+          version,
+          sbom,
+          componentSupportLevel: manual,
+          componentSupportLevelAutomatic: automatic
+        } = row || {}
+        const { endDate, user, notes, updatedAt } = manual || {}
 
         const { projectVersion, project } = sbom || {}
         const { projectGroup } = project || {}
+
+        const supportLevel = manual?.level || automatic?.level
 
         return {
           Name: name,
@@ -1443,9 +1450,9 @@ export const exportCsvTableConfig = {
             ? `${projectGroup?.name} ${projectVersion && `: ${projectVersion}`}`
             : 'N/A',
           Assessment: user?.name ? 'Manual' : 'Automatic',
-          'Support Level': level
-            ? capitalizeFirstLetter(level?.replaceAll('_', ' '))
-            : 'N/A',
+          'Support Level': capitalizeFirstLetter(
+            supportLevel?.replaceAll('_', ' ')
+          ),
           'End Of Support': endDate
             ? new Date(endDate).toLocaleDateString()
             : 'N/A',
