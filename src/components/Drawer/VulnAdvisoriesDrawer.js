@@ -33,18 +33,22 @@ const VulnAdvisoriesDrawer = ({ data, isOpen, onClose }) => {
     >
       {advisories?.length > 0 ? (
         <Stack spacing={2}>
-          {advisories?.map((item, index) => (
-            <Flex fontSize={'sm'} key={index} {...container}>
-              <Text>{index + 1}. </Text>
-              <Link
-                to={item}
-                target='_blank'
-                style={{ color: primaryBlueText }}
-              >
-                {item}
-              </Link>
-            </Flex>
-          ))}
+          {advisories?.map((item, index) => {
+            const match = item?.match(/https?:\/\/[^\s"]+/)
+            const url = match ? match[0] : null
+            return (
+              <Flex fontSize={'sm'} key={index} {...container}>
+                <Text>{index + 1}. </Text>
+                <Link
+                  to={url}
+                  target='_blank'
+                  style={{ color: primaryBlueText }}
+                >
+                  {url}
+                </Link>
+              </Flex>
+            )
+          })}
         </Stack>
       ) : (
         <Text color={secondaryTextColor}>Not available</Text>
