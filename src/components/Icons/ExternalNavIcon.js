@@ -5,6 +5,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 const ExternalNavIcon = ({
   href,
+  size = 4,
   icon = ExternalLinkIcon,
   onClick,
   styles = {},
@@ -17,14 +18,14 @@ const ExternalNavIcon = ({
     <Link href={href} target={target} {...props}>
       <Icon
         as={icon}
+        cursor='pointer'
         onClick={onClick}
         sx={{
-          w: '16px',
-          h: '16px',
+          w: size,
+          h: size,
           color: color || primaryBlueText,
           ...styles
         }}
-        cursor='pointer'
       />
     </Link>
   )
