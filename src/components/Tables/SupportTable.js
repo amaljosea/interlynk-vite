@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getFullDate, timeSince } from 'utils'
-import { customStyles, getSupportStatusColor } from 'utils/styleUtils'
+import { getSupportStatusColor } from 'utils/styleUtils'
 import DeleteModal from 'views/Dashboard/Support/DeleteModal'
 import StatusModal from 'views/Dashboard/Support/StatusModal'
 import SupportModal from 'views/Dashboard/Support/SupportModal'
@@ -32,6 +32,7 @@ import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
 
 import { useHasPermission } from 'hooks/useHasPermission'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const SupportTable = ({
@@ -42,6 +43,8 @@ const SupportTable = ({
   setFilters
 }) => {
   const params = useParams()
+  const customStyles = useDataTableStyles()
+
   const sbomId = params.sbomid
 
   const editSup = useHasPermission({
@@ -54,8 +57,10 @@ const SupportTable = ({
     childKey: 'remove_support'
   })
 
-  const { headingTextColor, primaryTextColor, primaryErrorColor } =
-    useThemeColor(['headingTextColor', 'primaryTextColor', 'primaryErrorColor'])
+  const { primaryTextColor, primaryErrorColor } = useThemeColor([
+    'primaryTextColor',
+    'primaryErrorColor'
+  ])
 
   const { search, field } = filters
 
@@ -363,7 +368,7 @@ const SupportTable = ({
         <DataTable
           columns={columns}
           data={data || []}
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
           onSort={handleSort}
           defaultSortFieldId={field}
           defaultSortAsc={false}

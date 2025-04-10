@@ -3,7 +3,6 @@ import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
-import { customStyles } from 'utils/styleUtils'
 
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
@@ -13,7 +12,7 @@ import Pagination from 'components/Pagination'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
-import { useThemeColor } from 'hooks/useThemeColors'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 
 import {
   AutomationConditionSubjectFieldMapping,
@@ -30,9 +29,9 @@ import { useAutomationColumns } from './components/automationColumns'
 
 const Automation = ({ projects }) => {
   const params = useParams()
-  const productId = params.productid
+  const customStyles = useDataTableStyles()
 
-  const { headingTextColor } = useThemeColor(['headingTextColor'])
+  const productId = params.productid
 
   const [activeRow, setActiveRow] = useState(null)
   const [activeEnv, setActiveEnv] = useState(null)
@@ -100,7 +99,7 @@ const Automation = ({ projects }) => {
             persistTableHead
             responsive={true}
             columns={columns}
-            customStyles={customStyles(headingTextColor)}
+            customStyles={customStyles}
             progressPending={loading}
             progressComponent={<CustomLoader />}
             subHeaderComponent={subHeaderComponent}

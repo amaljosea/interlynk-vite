@@ -1,6 +1,5 @@
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
-import { customStyles } from 'utils/styleUtils'
 
 import { Flex } from '@chakra-ui/react'
 
@@ -9,7 +8,7 @@ import Pagination from 'components/Pagination'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
-import { useThemeColor } from 'hooks/useThemeColors'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 
 import { GetSbomLicensesTable } from 'graphQL/Queries'
 
@@ -22,8 +21,7 @@ const Licenses = () => {
   const productId = params.productid
   const sbomId = params.sbomid
   const activeTab = useQueryParam('tab')
-
-  const { headingTextColor } = useThemeColor(['headingTextColor'])
+  const customStyles = useDataTableStyles()
 
   const { nodes, paginationProps, loading } = usePaginatedQuery(
     GetSbomLicensesTable,
@@ -49,7 +47,7 @@ const Licenses = () => {
         <DataTable
           columns={columns}
           data={nodes}
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
           defaultSortAsc={false}
           defaultSortFieldId={'UPDATED_AT'}
           progressPending={loading}

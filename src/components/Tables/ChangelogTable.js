@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
-import { customStyles, getChangelogColor } from 'utils/styleUtils'
+import { getChangelogColor } from 'utils/styleUtils'
 import ChangelogFilterMenu from 'views/Sbom/components/ChangelogFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -14,6 +14,7 @@ import UserCard from 'components/Misc/UserCard'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetProjectLogs } from 'graphQL/Queries'
@@ -21,10 +22,8 @@ import { GetProjectLogs } from 'graphQL/Queries'
 import Pagination from '../Pagination'
 
 const ChangelogTable = ({ activeEnv }) => {
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
+  const customStyles = useDataTableStyles()
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const [prodLogState, setProdLogState] = useState({
     field: 'ACTIVITY_LOGS_CREATED_AT',
@@ -258,7 +257,7 @@ const ChangelogTable = ({ activeEnv }) => {
           onSort={handleSort}
           defaultSortAsc={false}
           progressPending={loading}
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
           subHeaderComponent={subHeader}
           progressComponent={<CustomLoader />}
           defaultSortFieldId={prodLogState?.field}

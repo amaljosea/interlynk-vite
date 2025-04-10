@@ -2,7 +2,6 @@ import { useQuery } from '@apollo/client'
 import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 import CreateRole from 'views/Dashboard/Profile/components/CreateRole'
 import DeleteRole from 'views/Dashboard/Profile/components/DeleteRole'
 
@@ -25,12 +24,14 @@ import LynkAction from 'components/Misc/LynkAction'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetRoles } from 'graphQL/Queries'
 
 const RoleTable = () => {
   const activetab = useQueryParam('tab')
+  const customStyles = useDataTableStyles()
   const { orgView } = useGlobalQueryContext()
 
   const updateOrgs = useHasPermission({
@@ -61,10 +62,10 @@ const RoleTable = () => {
     onOpen: onRoleOpen,
     onClose: onRoleClose
   } = useDisclosure()
-  const { headingTextColor, primaryTextColor, primaryErrorColor } =
-    useThemeColor(['headingTextColor', 'primaryTextColor', 'primaryErrorColor'])
-  const paddingCell = 0
-  const paddingHeadCell = 0
+  const { primaryTextColor, primaryErrorColor } = useThemeColor([
+    'primaryTextColor',
+    'primaryErrorColor'
+  ])
 
   const columns = [
     // NAME
@@ -180,12 +181,7 @@ const RoleTable = () => {
           data={organizationRoles || []}
           subHeaderComponent={subHeader}
           progressComponent={<CustomLoader />}
-          customStyles={customStyles(
-            headingTextColor,
-            null,
-            paddingCell,
-            paddingHeadCell
-          )}
+          customStyles={customStyles}
         />
       </Flex>
 

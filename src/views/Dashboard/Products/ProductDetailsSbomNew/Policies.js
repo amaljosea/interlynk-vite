@@ -3,7 +3,6 @@ import { useCallback, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { isSbomArchived } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
@@ -16,7 +15,7 @@ import { useGradualPolling } from 'hooks/useGradualPolling'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
-import { useThemeColor } from 'hooks/useThemeColors'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 
 import { SbomPolicyScan } from 'graphQL/Mutation'
 import { PolicyResults } from 'graphQL/Queries'
@@ -30,10 +29,9 @@ const Policies = ({ sbomData }) => {
   const params = useParams()
   const sbomId = params.sbomid
   const activeTab = useQueryParam('tab')
+  const customStyles = useDataTableStyles()
 
   const isArchived = isSbomArchived(sbomData)
-
-  const { headingTextColor } = useThemeColor(['headingTextColor'])
 
   const policyRun = useHasPermission({
     parentKey: 'view_policy',
@@ -100,7 +98,7 @@ const Policies = ({ sbomData }) => {
         <DataTable
           columns={columns}
           data={nodes || []}
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
           progressPending={loading}
           progressComponent={<CustomLoader />}
           subHeader

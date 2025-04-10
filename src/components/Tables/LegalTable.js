@@ -2,7 +2,6 @@ import { useMutation, useQuery } from '@apollo/client'
 import React, { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import LegalModal from 'views/Dashboard/Profile/components/LegalModal'
 
@@ -26,6 +25,7 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { OrganizationManufacturerDelete } from 'graphQL/Mutation'
@@ -34,18 +34,10 @@ import { GetOrgManufacturers } from 'graphQL/Queries'
 const LegalTable = () => {
   const { showToast } = useCustomToast()
   const activetab = useQueryParam('tab')
+  const customStyles = useDataTableStyles()
   const { orgView } = useGlobalQueryContext()
-  const {
-    headingTextColor,
-    primaryTextColor,
-    primaryErrorColor,
-    primaryBlueText
-  } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor',
-    'primaryErrorColor',
-    'primaryBlueText'
-  ])
+  const { primaryTextColor, primaryErrorColor, primaryBlueText } =
+    useThemeColor(['primaryTextColor', 'primaryErrorColor', 'primaryBlueText'])
 
   const updateOrg = useHasPermission({
     parentKey: 'view_organization',
@@ -53,9 +45,6 @@ const LegalTable = () => {
   })
 
   const [activeRow, setActiveRow] = useState(null)
-
-  const paddingCell = 0
-  const paddingHeadCell = 0
 
   const { data, loading } = useQuery(GetOrgManufacturers, {
     skip: !orgView ? true : activetab === 'legal' ? false : true
@@ -294,12 +283,7 @@ const LegalTable = () => {
           data={nodes || []}
           progressPending={loading}
           subHeaderComponent={subHeader}
-          customStyles={customStyles(
-            headingTextColor,
-            null,
-            paddingCell,
-            paddingHeadCell
-          )}
+          customStyles={customStyles}
           progressComponent={<CustomLoader />}
         />
       </Flex>

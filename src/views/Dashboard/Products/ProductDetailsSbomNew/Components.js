@@ -5,7 +5,6 @@ import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getUndefinedIfEmptyOrAll } from 'utils'
 import { isSbomArchived } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
 
 import { Flex, Text } from '@chakra-ui/react'
@@ -25,7 +24,7 @@ import TreeView from 'components/TreeView'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
-import { useThemeColor } from 'hooks/useThemeColors'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 
 import { deleteComSupplier } from 'graphQL/Mutation'
 import { GetComponentData } from 'graphQL/Queries'
@@ -40,12 +39,12 @@ import ComponentsSubHeader from './Components/tableSubHeaders/ComponentsSubHeade
 
 const Components = ({ sbomData }) => {
   const params = useParams()
+  const customStyles = useDataTableStyles()
+
   const productId = params.productid
   const sbomId = params.sbomid
 
   const isArchived = isSbomArchived(sbomData)
-
-  const { headingTextColor } = useThemeColor(['headingTextColor'])
 
   const { prodCompState, dispatch } = useGlobalState()
   const {
@@ -296,7 +295,7 @@ const Components = ({ sbomData }) => {
           subHeaderComponent={subHeader}
           progressComponent={<CustomLoader />}
           expandableRowsComponent={ExpandedComponent}
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
           expandableRowsComponentProps={{ isArchived, action }}
           expandableRowExpanded={(row) => expandedRows?.includes(row?.name)}
         />

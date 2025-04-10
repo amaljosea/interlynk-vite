@@ -3,7 +3,6 @@ import { useTour } from '@reactour/tour'
 import { useCallback, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useNavigate } from 'react-router-dom'
-import { customStyles } from 'utils/styleUtils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import GithubAddModal from 'views/Dashboard/Products/components/GithubAddModal'
 import ProductModal from 'views/Dashboard/Products/components/ProductModal'
@@ -23,7 +22,7 @@ import ProductHeader from 'components/headers/ProductHeader'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
-import { useThemeColor } from 'hooks/useThemeColors'
+// import { useThemeColor } from 'hooks/useThemeColors'
 
 import { DeleteProjectGroup } from 'graphQL/Mutation'
 import {
@@ -33,10 +32,12 @@ import {
 } from 'graphQL/Queries'
 
 import Pagination from '../Pagination'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 
 const ProductTable = (props) => {
   const navigate = useNavigate()
   const { setIsOpen } = useTour()
+  const customStyles = useDataTableStyles();
   const { orgView, isFreeTier } = useGlobalQueryContext()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
@@ -56,10 +57,10 @@ const ProductTable = (props) => {
   })
   const { totalCount } = prodData?.organization?.projectGroups || ''
 
-  const { headingTextColor, semiTransparentBorder } = useThemeColor([
-    'headingTextColor',
-    'semiTransparentBorder'
-  ])
+  // const { headingTextColor, semiTransparentBorder } = useThemeColor([
+  //   'headingTextColor',
+  //   'semiTransparentBorder'
+  // ])
 
   const { prodState, setEnvName, setClearSelect, dispatch, envName } =
     useGlobalState()
@@ -235,7 +236,7 @@ const ProductTable = (props) => {
     columns: columns,
     data: filterMode === 'AND' ? filteredNodes : data,
     onSort: handleSort,
-    customStyles: customStyles(headingTextColor, semiTransparentBorder),
+    customStyles: customStyles,
     defaultSortFieldId: field,
     defaultSortAsc: direction === 'ASC' ? true : false,
     subHeader: true,

@@ -5,7 +5,6 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { getSignedUrlParams } from 'utils'
 import { isSbomArchived } from 'utils'
 import { ProductGeneralTabs } from 'utils/TabsObjects'
-import { customStyles } from 'utils/styleUtils'
 
 import { Flex, Text } from '@chakra-ui/react'
 import { useColorMode, useDisclosure } from '@chakra-ui/react'
@@ -20,7 +19,7 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import useQueryParam from 'hooks/useQueryParam'
-import { useThemeColor } from 'hooks/useThemeColors'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 
 import { SbomPartDelete } from 'graphQL/Mutation'
 import { GetSbomParts } from 'graphQL/Queries'
@@ -34,6 +33,8 @@ const Parts = ({ data }) => {
   const navigate = useNavigate()
   const { colorMode } = useColorMode()
   const partsContext = usePartsContext()
+  const customStyles = useDataTableStyles()
+
   const sbomId = params.sbomid
   const prodId = params.productid
   const activeTab = useQueryParam('tab')
@@ -43,8 +44,6 @@ const Parts = ({ data }) => {
   const isArchived = isSbomArchived(data)
 
   const { dispatch } = useGlobalState()
-
-  const { headingTextColor } = useThemeColor(['headingTextColor'])
 
   const { prodVulnDispatch } = dispatch
 
@@ -138,7 +137,7 @@ const Parts = ({ data }) => {
           columns={columns}
           responsive={true}
           progressComponent={<CustomLoader />}
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
           subHeaderComponent={subHeader}
           progressPending={sbomParts ? false : true}
         />

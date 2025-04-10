@@ -1,7 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import DataTable from 'react-data-table-component'
 import { sevColor } from 'utils/styleUtils'
-import { customStyles } from 'utils/styleUtils'
 
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import {
@@ -24,22 +23,19 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { orgRuleUpdate } from 'graphQL/Mutation'
 import { GetOrgRules } from 'graphQL/Queries'
 
 const Checks = () => {
+  const showToast = useCustomToast()
   const activetab = useQueryParam('tab')
+  const customStyles = useDataTableStyles()
   const { orgView } = useGlobalQueryContext()
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
-  const showToast = useCustomToast()
-  const paddingCell = 0
-  const paddingHeadCell = 0
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const canEdit = useHasPermission({
     parentKey: 'view_organization',
@@ -216,12 +212,7 @@ const Checks = () => {
             data={data && data.organization.organizationRules}
             defaultSortAsc={true}
             defaultSortFieldId={'RULES_FRIENDLY_ID'}
-            customStyles={customStyles(
-              headingTextColor,
-              null,
-              paddingCell,
-              paddingHeadCell
-            )}
+            customStyles={customStyles}
             progressPending={loading}
             progressComponent={<CustomLoader />}
             responsive={true}

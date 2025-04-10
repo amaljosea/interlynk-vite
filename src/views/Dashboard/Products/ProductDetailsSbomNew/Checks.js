@@ -4,7 +4,6 @@ import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getUndefinedIfEmptyOrAll } from 'utils'
 import { isSbomArchived } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CheckModal from 'views/Sbom/components/CheckModal'
@@ -21,7 +20,7 @@ import Pagination from 'components/Pagination'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
-import { useThemeColor } from 'hooks/useThemeColors'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 
 import { recheckHealth } from 'graphQL/Mutation'
 import { GetCheckResults, GetProductData } from 'graphQL/Queries'
@@ -37,10 +36,9 @@ const Checks = ({ sbomData }) => {
   const productId = params.productid
   const sbomId = params.sbomid
   const activeTab = useQueryParam('tab')
+  const customStyles = useDataTableStyles()
 
   const isArchived = isSbomArchived(sbomData)
-
-  const { headingTextColor } = useThemeColor(['headingTextColor'])
 
   const { sbomCheckState, dispatch } = useGlobalState()
   const { prodCompDispatch, sbomDispatch, sbomCheckDispatch } = dispatch
@@ -239,7 +237,7 @@ const Checks = ({ sbomData }) => {
           defaultSortFieldId={field}
           subHeaderComponent={subHeader}
           progressComponent={<CustomLoader />}
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
         />
         {/* PAGINATION */}
         <Pagination {...paginationProps} />

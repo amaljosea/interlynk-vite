@@ -2,7 +2,6 @@ import { useQuery } from '@apollo/client'
 import React, { useCallback, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
-import { customStyles } from 'utils/styleUtils'
 
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
@@ -15,6 +14,7 @@ import Pagination from 'components/Pagination'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetChangeLogs, GetSbomLogFilters } from 'graphQL/Queries'
@@ -27,11 +27,9 @@ const Changelog = () => {
   const productId = params.productid
   const sbomId = params.sbomid
   const activeTab = useQueryParam('tab')
+  const customStyles = useDataTableStyles()
 
-  const { headingTextColor, secondaryBgColor } = useThemeColor([
-    'headingTextColor',
-    'secondaryBgColor'
-  ])
+  const { secondaryBgColor } = useThemeColor(['secondaryBgColor'])
 
   const PURL = useDisclosure()
   const USER = useDisclosure()
@@ -184,7 +182,7 @@ const Changelog = () => {
           onSort={handleSort}
           defaultSortAsc={false}
           defaultSortFieldId='ACTIVITY_LOGS_CREATED_AT'
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
           progressPending={loading}
           progressComponent={<CustomLoader />}
           subHeader

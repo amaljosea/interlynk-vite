@@ -2,7 +2,7 @@ import { useMutation } from '@apollo/client'
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
-import { customStyles, getStatusColor } from 'utils/styleUtils'
+import { getStatusColor } from 'utils/styleUtils'
 
 import { Flex, Menu, Portal, Stack, Text } from '@chakra-ui/react'
 import { Tooltip, useDisclosure } from '@chakra-ui/react'
@@ -17,6 +17,7 @@ import LynkAction from 'components/Misc/LynkAction'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { RequestCancel, RequestResend } from 'graphQL/Mutation'
@@ -31,14 +32,17 @@ const RequestTable = (props) => {
   const { data, loading, filters, setFilters, paginationProps } = props
 
   const { showToast } = useCustomToast()
+  const customStyles = useDataTableStyles()
 
   const addReq = useHasPermission({
     parentKey: 'view_requests',
     childKey: 'create_request'
   })
 
-  const { headingTextColor, primaryTextColor, primaryErrorColor } =
-    useThemeColor(['headingTextColor', 'primaryTextColor', 'primaryErrorColor'])
+  const { primaryTextColor, primaryErrorColor } = useThemeColor([
+    'primaryTextColor',
+    'primaryErrorColor'
+  ])
 
   const [resendRequest] = useMutation(RequestResend)
   const [cancelRequest] = useMutation(RequestCancel)
@@ -309,7 +313,7 @@ const RequestTable = (props) => {
         <DataTable
           columns={columns}
           data={data}
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
           onSort={handleSort}
           defaultSortFieldId='REQUESTS_REQUESTED_AT'
           defaultSortAsc={false}

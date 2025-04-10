@@ -2,7 +2,6 @@ import { useMutation } from '@apollo/client'
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 import { FREE_TIER_USER_LIMIT } from 'variables/general'
 import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
 import RoleModal from 'views/Dashboard/Profile/components/RoleModal'
@@ -39,6 +38,7 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
 import { useRouteFlags } from 'hooks/useRouteFlags'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { InviteUser, deleteOrgUser } from 'graphQL/Mutation'
@@ -58,17 +58,13 @@ function userTimeStart(row) {
 
 const TeamTable = () => {
   const activetab = useQueryParam('tab')
+  const customStyles = useDataTableStyles()
   const { isCustomerView } = useRouteFlags()
   const { showToast } = useCustomToast()
   const { organization } = useGlobalState()
   const SERVER_URL = process.env.REACT_APP_SERVER
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
-  const paddingCell = 0
-  const paddingHeadCell = 0
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const { tier, currentUser } = organization || ''
   const { email } = currentUser || ''
@@ -404,12 +400,7 @@ const TeamTable = () => {
         progressPending={loading}
         defaultSortFieldId={'joinedDate'}
         progressComponent={<CustomLoader />}
-        customStyles={customStyles(
-          headingTextColor,
-          null,
-          paddingCell,
-          paddingHeadCell
-        )}
+        customStyles={customStyles}
         subHeaderComponent={subHeaderComponent}
       />
 

@@ -8,7 +8,6 @@ import {
   parseEpssRange,
   setKEV
 } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 import VexModal from 'views/Dashboard/Vulnerabilities/components/VexModal'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
 
@@ -29,7 +28,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
-import { useThemeColor } from 'hooks/useThemeColors'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 
 import { ManualVulnScan } from 'graphQL/Mutation'
 import { CustomVulnUpdate } from 'graphQL/Mutation'
@@ -59,7 +58,7 @@ export const GetProjectSettings = gql`
 const Vulnerabilities = ({ sbomData }) => {
   const params = useParams()
   const productId = params.productid
-  const { headingTextColor } = useThemeColor(['headingTextColor'])
+  const customStyles = useDataTableStyles()
 
   const isArchived = isSbomArchived(sbomData)
 
@@ -374,7 +373,7 @@ const Vulnerabilities = ({ sbomData }) => {
           className='data-table-container'
           columns={columns}
           data={nodes}
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
           onSort={handleSort}
           defaultSortAsc={false}
           defaultSortFieldId={field}

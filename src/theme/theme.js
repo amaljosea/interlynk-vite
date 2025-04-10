@@ -162,6 +162,10 @@ const colors = {
   infoTextColor: {
     light: '#034E78', // dark blue
     dark: 'gray.300' // white
+  },
+  hoverBgColor: {
+    light: '#EDF2F7',
+    dark: '#1A202C'
   }
 }
 

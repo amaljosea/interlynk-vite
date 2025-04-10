@@ -2,7 +2,6 @@ import { useMutation } from '@apollo/client'
 import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince, truncatedValue } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 
 import {
@@ -30,6 +29,7 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CustomVulnDelete } from 'graphQL/Mutation'
@@ -41,6 +41,7 @@ const CustomVulnTable = () => {
   const tab = useQueryParam('tab')
   const { showToast } = useCustomToast()
   const { isFreeTier } = useGlobalQueryContext()
+  const customStyles = useDataTableStyles()
 
   const editVulns = useHasPermission({
     parentKey: 'view_sbom',
@@ -51,17 +52,12 @@ const CustomVulnTable = () => {
   const DELETE = useDisclosure()
   const [activeRow, setActiveRow] = useState(null)
 
-  const {
-    headingTextColor,
-    primaryTextColor,
-    secondaryTextColor,
-    primaryErrorColor
-  } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor',
-    'secondaryTextColor',
-    'primaryErrorColor'
-  ])
+  const { primaryTextColor, secondaryTextColor, primaryErrorColor } =
+    useThemeColor([
+      'primaryTextColor',
+      'secondaryTextColor',
+      'primaryErrorColor'
+    ])
 
   const [deleteVuln, { loading: deleteLoading }] = useMutation(CustomVulnDelete)
   const { nodes, paginationProps, loading } = usePaginatedQuery(
@@ -268,7 +264,7 @@ const CustomVulnTable = () => {
           progressPending={loading}
           subHeaderComponent={SubHeader}
           progressComponent={<CustomLoader />}
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
         />
         <Pagination {...paginationProps} />
       </Flex>

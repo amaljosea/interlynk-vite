@@ -2,7 +2,6 @@ import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getUndefinedIfEmptyOrAll } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
@@ -16,7 +15,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
-import { useThemeColor } from 'hooks/useThemeColors'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 
 import { GetCompSupportData } from 'graphQL/Queries'
 
@@ -30,6 +29,7 @@ const Support = () => {
   const projectId = params.productid
   const sbomId = params.sbomid
   const activeTab = useQueryParam('tab')
+  const customStyles = useDataTableStyles()
 
   const editComponent = useHasPermission({
     parentKey: 'view_sbom',
@@ -39,8 +39,6 @@ const Support = () => {
   const { supportState, dispatch } = useGlobalState()
   const { level, include, field, direction, searchInput } = supportState
   const { supportDispatch } = dispatch
-
-  const { headingTextColor } = useThemeColor(['headingTextColor'])
 
   const CARD = useDisclosure()
   const EDIT = useDisclosure()
@@ -166,7 +164,7 @@ const Support = () => {
           onSelectedRowsChange={handleChange}
           progressComponent={<CustomLoader />}
           expandableRowsComponent={SupportExpanded}
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
           selectableRowDisabled={(row) => row?.sbom?.id !== sbomId}
         />
 

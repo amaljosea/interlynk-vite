@@ -2,7 +2,6 @@ import { useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { Link, useParams } from 'react-router-dom'
 import { getFullDate, linkURl, timeSince } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 import SubHeader from 'views/Dashboard/Vulnerabilities/components/SubHeader'
 
 import { Badge, Flex, Stack, Text } from '@chakra-ui/react'
@@ -19,6 +18,7 @@ import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaEye } from 'react-icons/fa6'
@@ -26,6 +26,8 @@ import { FaEye } from 'react-icons/fa6'
 import Pagination from '../Pagination'
 
 const GlobalVulnTable = (props) => {
+  const customStyles = useDataTableStyles()
+
   const { vulns, reset, filters, loading, paginationProps } = props
   const { isOpen, onClose, onOpen } = useDisclosure()
 
@@ -35,9 +37,10 @@ const GlobalVulnTable = (props) => {
   const { generateProductVulnerabilityDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
 
-  const { headingTextColor, primaryTextColor, primaryBlueText } = useThemeColor(
-    ['headingTextColor', 'primaryTextColor', 'primaryBlueText']
-  )
+  const { primaryTextColor, primaryBlueText } = useThemeColor([
+    'primaryTextColor',
+    'primaryBlueText'
+  ])
 
   const params = useParams()
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
@@ -285,7 +288,7 @@ const GlobalVulnTable = (props) => {
           progressComponent={<CustomLoader />}
           subHeaderComponent={subHeaderComponent}
           defaultSortFieldId={globalVulnState?.field}
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
           defaultSortAsc={globalVulnState?.direction === 'ASC' ? true : false}
         />
         <Pagination {...paginationProps} />

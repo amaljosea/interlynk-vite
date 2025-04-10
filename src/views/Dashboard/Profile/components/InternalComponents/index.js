@@ -2,7 +2,6 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 
 import { Flex, Text, Tooltip } from '@chakra-ui/react'
 
@@ -15,6 +14,7 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { updateOrgComp } from 'graphQL/Mutation'
@@ -25,6 +25,7 @@ import { UpdateInternalComponent } from './MutateInternalComponent'
 
 export const InternalComponents = () => {
   const activetab = useQueryParam('tab')
+  const customStyles = useDataTableStyles()
   const { orgView } = useGlobalQueryContext()
   const [isOpen, setIsOpen] = useState(false)
   const [editingRow, setEditingRow] = useState(null)
@@ -58,12 +59,7 @@ export const InternalComponents = () => {
     })
   }
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
-  const paddingCell = 0
-  const paddingHeadCell = 0
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const columns = [
     {
@@ -190,12 +186,7 @@ export const InternalComponents = () => {
         columns={columns}
         data={data?.organization?.organizationComponents}
         subHeaderComponent={subHeader}
-        customStyles={customStyles(
-          headingTextColor,
-          null,
-          paddingCell,
-          paddingHeadCell
-        )}
+        customStyles={customStyles}
         progressPending={loading}
         progressComponent={<CustomLoader />}
         persistTableHead

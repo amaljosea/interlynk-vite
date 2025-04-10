@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { areArraysEqual, getFullDate, timeSince } from 'utils'
-import { customStyles, statusColor } from 'utils/styleUtils'
+import { statusColor } from 'utils/styleUtils'
 import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -24,6 +24,7 @@ import Pagination from 'components/Pagination'
 
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetCompVulnData, GetConnectedSbom } from 'graphQL/Queries'
@@ -37,11 +38,9 @@ import VulnFilters from './VulnsFilter'
 
 const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
   const params = useParams()
+  const customStyles = useDataTableStyles()
   const productGroupId = params?.productgroupid
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const { id, vulnId } = vuln || ''
 
@@ -364,7 +363,7 @@ const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
           onSelectedRowsChange={handleChange}
           progressComponent={<CustomLoader />}
           className='data-table-container'
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
           subHeaderComponent={subHeaderComponent}
         />
         <Pagination {...paginationProps} />

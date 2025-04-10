@@ -2,7 +2,6 @@ import { useQuery } from '@apollo/client'
 import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 
 import { Flex, Portal, Tag, Text, Tooltip } from '@chakra-ui/react'
 import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
@@ -15,6 +14,7 @@ import LynkAction from 'components/Misc/LynkAction'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetCustomFields } from 'graphQL/Queries'
@@ -25,6 +25,7 @@ import FieldWarning from './FieldWarning'
 const CustomFields = () => {
   const activetab = useQueryParam('tab')
   const { organization } = useGlobalState()
+  const customStyles = useDataTableStyles()
   const { isFreeTier } = useGlobalQueryContext()
 
   const { data, loading } = useQuery(GetCustomFields, {
@@ -35,8 +36,10 @@ const CustomFields = () => {
   const { componentVulnCustomFieldDefinitions } = data || ''
   const { nodes } = componentVulnCustomFieldDefinitions || ''
 
-  const { headingTextColor, primaryTextColor, primaryErrorColor } =
-    useThemeColor(['headingTextColor', 'primaryTextColor', 'primaryErrorColor'])
+  const { primaryTextColor, primaryErrorColor } = useThemeColor([
+    'primaryTextColor',
+    'primaryErrorColor'
+  ])
 
   const [activeRow, setActiveRow] = useState(null)
 
@@ -179,7 +182,7 @@ const CustomFields = () => {
           data={nodes || []}
           progressPending={loading}
           subHeaderComponent={subHeader}
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
           progressComponent={<CustomLoader />}
         />
       </Flex>

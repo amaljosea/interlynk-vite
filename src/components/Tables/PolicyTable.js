@@ -6,7 +6,6 @@ import { getFullDate, timeSince, updatedValue } from 'utils'
 import { formatConditionValue } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import { getIcon } from 'utils/styleUtils'
-import { customStyles } from 'utils/styleUtils'
 import DeleteModal from 'views/Dashboard/Policies/DeleteModal'
 import PolicyModal from 'views/Dashboard/Policies/PolicyModal'
 import RuleModal from 'views/Dashboard/Policies/RuleModal'
@@ -41,6 +40,7 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { DeletePolicyExclusion, PolicyExclusionCreate } from 'graphQL/Mutation'
@@ -48,6 +48,8 @@ import { GetPolicies, PolicySubjectOperators } from 'graphQL/Queries'
 
 const PolicyTable = () => {
   const { showToast } = useCustomToast()
+  const customStyles = useDataTableStyles()
+
   const location = useLocation()
   const params = useParams()
   const productId = params.productid
@@ -70,13 +72,11 @@ const PolicyTable = () => {
 
   const {
     primaryBlueText,
-    headingTextColor,
     primaryTextColor,
     secondaryTextInverse,
     primaryErrorColor
   } = useThemeColor([
     'primaryBlueText',
-    'headingTextColor',
     'primaryTextColor',
     'secondaryTextInverse',
     'primaryErrorColor'
@@ -549,7 +549,7 @@ const PolicyTable = () => {
           <DataTable
             columns={columns}
             data={nodes || []}
-            customStyles={customStyles(headingTextColor)}
+            customStyles={customStyles}
             progressPending={loading}
             progressComponent={<CustomLoader />}
             subHeader

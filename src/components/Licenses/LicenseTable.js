@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { parseLicenseString, truncatedValue } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 
 import {
   Flex,
@@ -20,6 +19,7 @@ import ExternalNavIcon from 'components/Icons/ExternalNavIcon'
 import LynkAction from 'components/Misc/LynkAction'
 
 import { useHasPermission } from 'hooks/useHasPermission'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaScaleBalanced } from 'react-icons/fa6'
@@ -29,11 +29,10 @@ import LicenseModal from './LicenseModal'
 import { SubHeaderComponent } from './SubHeaderComponent'
 
 const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
+  const customStyles = useDataTableStyles()
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
+
   const [activeRow, setActiveRow] = useState(null)
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
 
   const updateLic = useHasPermission({
     parentKey: 'view_license',
@@ -266,7 +265,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
           subHeaderComponent={subHeaderComponent}
           columns={columns}
           data={licenses}
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
           defaultSortAsc={false}
           defaultSortFieldId='ORGANIZATION_LICENSES_UPDATED_AT'
           progressComponent={<CustomLoader />}

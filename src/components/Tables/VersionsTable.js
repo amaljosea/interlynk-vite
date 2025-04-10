@@ -5,7 +5,6 @@ import DataTable from 'react-data-table-component'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getSignedUrlParams } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
-import { customStyles } from 'utils/styleUtils'
 import LifecycleModal from 'views/Dashboard/Products/components/LifecycleModal'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 
@@ -31,6 +30,7 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import useQueryParam from 'hooks/useQueryParam'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetVersionsTable, ShareVersionTable } from 'graphQL/Queries'
@@ -64,6 +64,7 @@ const VersionsTable = (props) => {
   const navigate = useNavigate()
   const params = useParams()
   const productId = params.productid
+  const customStyles = useDataTableStyles()
   const signedUrlParams = getSignedUrlParams()
   const {
     clearSelect,
@@ -81,10 +82,7 @@ const VersionsTable = (props) => {
   const [filterText, setFilterText] = useState(searchInput)
   const [activeRow, setActiveRow] = useState(null)
 
-  const { headingTextColor, primaryBlueText } = useThemeColor([
-    'headingTextColor',
-    'primaryBlueText'
-  ])
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   const LIST = useDisclosure()
   const TOOL = useDisclosure()
@@ -289,7 +287,7 @@ const VersionsTable = (props) => {
   const dataTableProps = {
     columns: columns,
     data: nodes || [],
-    customStyles: customStyles(headingTextColor),
+    customStyles: customStyles,
     onSort: handleSort,
     defaultSortFieldId: filters?.field,
     defaultSortAsc: filters?.direction === 'ASC' ? true : false,

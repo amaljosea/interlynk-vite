@@ -32,6 +32,8 @@ import SwiftIcon from 'assets/svg/swift.png'
 import { toLower } from 'lodash'
 import { sbomOrigin } from 'variables/general'
 
+import { useColorModeValue } from '@chakra-ui/system'
+
 import { BsBack } from 'react-icons/bs'
 import {
   FaBalanceScale,
@@ -67,6 +69,7 @@ import { VscDebugRerun } from 'react-icons/vsc'
 
 export const customStyles = (
   headColor,
+  hoverBgColor,
   dividerColor,
   paddingCell,
   paddingHeadCell
@@ -101,7 +104,12 @@ export const customStyles = (
           borderBottomStyle: 'solid',
           borderBottomWidth: '1px',
           borderBottomColor: dividerColor
-        }
+        },
+        '&:hover': {
+          backgroundColor: hoverBgColor,
+          cursor: 'pointer'
+        },
+        transition: 'background-color 0.2s ease'
       },
       stripedStyle: {
         backgroundColor: 'transparent' // striped row background color

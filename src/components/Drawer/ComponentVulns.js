@@ -2,7 +2,7 @@ import React from 'react'
 import DataTable from 'react-data-table-component'
 import { useNavigate } from 'react-router-dom'
 import { linkURl } from 'utils'
-import { customStyles, statusColor } from 'utils/styleUtils'
+import { statusColor } from 'utils/styleUtils'
 
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { Flex, Stack, Text } from '@chakra-ui/react'
@@ -17,21 +17,20 @@ import Pagination from 'components/Pagination'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetComponentVulns } from 'graphQL/Queries'
 
 const ComponentVulns = ({ data, isOpen, onClose }) => {
   const navigate = useNavigate()
+  const { dispatch } = useGlobalState()
+  const customStyles = useDataTableStyles()
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
-  const { dispatch } = useGlobalState()
-  const { prodVulnDispatch } = dispatch
 
-  const { primaryBlueText, headingTextColor } = useThemeColor([
-    'primaryBlueText',
-    'headingTextColor'
-  ])
+  const { prodVulnDispatch } = dispatch
 
   const { nodes, paginationProps, loading } = usePaginatedQuery(
     GetComponentVulns,
@@ -120,7 +119,7 @@ const ComponentVulns = ({ data, isOpen, onClose }) => {
           responsive
           columns={columns}
           data={nodes || []}
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
           progressPending={loading}
           progressComponent={<CustomLoader />}
           persistTableHead
