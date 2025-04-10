@@ -1,6 +1,5 @@
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
-import { customStyles } from 'utils/styleUtils'
 import LicenseColumns from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableColumns/LicenseColumns'
 import ExpandedRow from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableExpanded/LicensesExpanded'
 import LicensesSubHeader from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableSubHeaders/LicensesSubHeader'
@@ -13,6 +12,7 @@ import Pagination from 'components/Pagination'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetShareLicensesTable } from 'graphQL/Queries'
@@ -21,11 +21,9 @@ const Licenses = () => {
   const params = useParams()
   const sbomId = params.sbomid
   const activeTab = useQueryParam('tab')
+  const customStyles = useDataTableStyles()
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const { nodes, loading, error, paginationProps } = usePaginatedQuery(
     GetShareLicensesTable,
@@ -56,7 +54,7 @@ const Licenses = () => {
         <DataTable
           columns={columns}
           data={nodes || []}
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
           defaultSortAsc={false}
           defaultSortFieldId={'UPDATED_AT'}
           progressPending={loading}

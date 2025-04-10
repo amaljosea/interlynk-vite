@@ -2,7 +2,6 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince, truncatedValue } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 import { getShareLinklUrl } from 'utils/url'
 
 import { DeleteIcon } from '@chakra-ui/icons'
@@ -18,6 +17,7 @@ import LynkDate from 'components/LynkDate'
 import LynkDrawer from 'components/LynkDrawer'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CreateShareLynk, DeleteSharelynk } from 'graphQL/Mutation'
@@ -27,14 +27,13 @@ import { PiFileSvgDuotone } from 'react-icons/pi'
 
 const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
   const { showToast } = useCustomToast()
+  const customStyles = useDataTableStyles()
+
   const BACKEND_URL = process.env.REACT_APP_SERVER
 
   const { name, id: groupId } = prodData || {}
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const defaultDate = new Date()
   defaultDate.setDate(defaultDate.getDate() + 90)
@@ -299,7 +298,7 @@ const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
         subHeaderComponent={subHeader}
         defaultSortFieldId={'UPDATED_AT'}
         progressComponent={<CustomLoader />}
-        customStyles={customStyles(headingTextColor)}
+        customStyles={customStyles}
       />
     </LynkDrawer>
   )

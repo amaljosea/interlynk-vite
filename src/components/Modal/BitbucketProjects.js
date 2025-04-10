@@ -1,7 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { customStyles } from 'utils/styleUtils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { Flex, Stack, Text } from '@chakra-ui/react'
@@ -17,15 +16,16 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { BitbucketRepositoryBulkImport } from 'graphQL/Mutation'
 import { BitbucketRepositories } from 'graphQL/Queries'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 
 const BitbucketProjects = ({ isOpen, onClose }) => {
   const { showToast } = useCustomToast()
-  const { primaryTextColor, headingTextColor, secondaryTextColor } =
-    useThemeColor([
-      'primaryTextColor',
-      'headingTextColor',
-      'secondaryTextColor'
-    ])
+  const customStyles = useDataTableStyles()
+
+  const { primaryTextColor, secondaryTextColor } = useThemeColor([
+    'primaryTextColor',
+    'secondaryTextColor'
+  ])
 
   const [searchInput, setSearchInput] = useState('')
   const [filterText, setFilterText] = useState('')
@@ -169,7 +169,7 @@ const BitbucketProjects = ({ isOpen, onClose }) => {
           onSelectedRowsChange={handleSelect}
           progressComponent={<CustomLoader />}
           subHeaderComponent={subHeaderComponent}
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
         />
         <Pagination {...paginationProps} />
       </Stack>

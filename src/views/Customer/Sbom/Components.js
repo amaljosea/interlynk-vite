@@ -2,7 +2,6 @@ import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getUndefinedIfEmptyOrAll } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 import ComponentsColumns from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableColumns/ComponentsColumns'
 import ExpandedComponent from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableExpanded/ComponentsExpanded'
 import ComponentsSubHeader from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableSubHeaders/ComponentsSubHeader'
@@ -19,6 +18,7 @@ import Pagination from 'components/Pagination'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ShareComponentData } from 'graphQL/Queries'
@@ -26,13 +26,11 @@ import { ShareComponentData } from 'graphQL/Queries'
 const Components = ({ sbomData }) => {
   const params = useParams()
   const activeTab = useQueryParam('tab')
+  const customStyles = useDataTableStyles()
 
   const sbomId = params.sbomid
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const { prodCompState, dispatch } = useGlobalState()
   const {
@@ -175,7 +173,7 @@ const Components = ({ sbomData }) => {
           columns={columns}
           data={components}
           onSort={handleSort}
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
           defaultSortAsc={false}
           defaultSortFieldId={field}
           progressPending={loading}

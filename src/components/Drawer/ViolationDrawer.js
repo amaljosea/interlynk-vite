@@ -1,7 +1,6 @@
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { truncatedValue } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 
 import { Box, Stack, Text, Tooltip } from '@chakra-ui/react'
 
@@ -11,19 +10,20 @@ import Pagination from 'components/Pagination'
 import RowComponent from 'components/RowComponent'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { PolicyRuleViolations } from 'graphQL/Queries'
 
 const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
   const params = useParams()
+  const customStyles = useDataTableStyles()
+
   const { subject, category, name, operatorWording, value } = activeRow || {}
-  const { headingTextColor, primaryTextColor, secondaryTextColor } =
-    useThemeColor([
-      'headingTextColor',
-      'primaryTextColor',
-      'secondaryTextColor'
-    ])
+  const { primaryTextColor, secondaryTextColor } = useThemeColor([
+    'primaryTextColor',
+    'secondaryTextColor'
+  ])
 
   const { nodes, paginationProps, loading } = usePaginatedQuery(
     PolicyRuleViolations,
@@ -181,7 +181,7 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
           responsive
           columns={columns}
           data={nodes || []}
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
           progressPending={loading}
           progressComponent={<CustomLoader />}
           persistTableHead

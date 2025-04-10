@@ -22,8 +22,9 @@ import ProductHeader from 'components/headers/ProductHeader'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
-// import { useThemeColor } from 'hooks/useThemeColors'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 
+// import { useThemeColor } from 'hooks/useThemeColors'
 import { DeleteProjectGroup } from 'graphQL/Mutation'
 import {
   GetBitbucketConnection,
@@ -32,12 +33,11 @@ import {
 } from 'graphQL/Queries'
 
 import Pagination from '../Pagination'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 
 const ProductTable = (props) => {
   const navigate = useNavigate()
   const { setIsOpen } = useTour()
-  const customStyles = useDataTableStyles();
+  const customStyles = useDataTableStyles()
   const { orgView, isFreeTier } = useGlobalQueryContext()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 

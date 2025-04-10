@@ -1,7 +1,6 @@
 import DataTable from 'react-data-table-component'
 import { Link, useNavigate } from 'react-router-dom'
 import { getFullDate, normalizeSBOMVersion, timeSince } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 
 import { Flex, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 
@@ -13,27 +12,24 @@ import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const ProductsOverview = ({ loading, title, data }) => {
   const navigate = useNavigate()
+  const customStyles = useDataTableStyles()
   const { dispatch } = useGlobalState()
   const { prodDispatch, prodVulnDispatch } = dispatch
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
 
-  const {
-    headingTextColor,
-    primaryTextColor,
-    primaryBlueText,
-    secondaryTextInverse
-  } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor',
-    'primaryBlueText',
-    'secondaryTextInverse'
-  ])
+  const { primaryTextColor, primaryBlueText, secondaryTextInverse } =
+    useThemeColor([
+      'primaryTextColor',
+      'primaryBlueText',
+      'secondaryTextInverse'
+    ])
 
   const handleClick = (prod) => {
     const { id, projectId } = prod
@@ -276,7 +272,7 @@ const ProductsOverview = ({ loading, title, data }) => {
           persistTableHead
           columns={columns}
           data={data || []}
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
           progressPending={loading}
           progressComponent={<CustomLoader />}
         />

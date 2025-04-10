@@ -2,7 +2,6 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { getFullDate, truncatedValue } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 
 import { AddIcon } from '@chakra-ui/icons'
 import {
@@ -21,6 +20,7 @@ import LynkAction from 'components/Misc/LynkAction'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import useQueryParam from 'hooks/useQueryParam'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { deleteApiToken, updateApiToken } from 'graphQL/Mutation'
@@ -30,17 +30,12 @@ import TokenModal from './TokenModal'
 
 const TokenInfo = () => {
   const activetab = useQueryParam('tab')
+  const customStyles = useDataTableStyles()
   const { orgView } = useGlobalQueryContext()
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
-
-  const paddingCell = 0
-  const paddingHeadCell = 0
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const { data, loading } = useQuery(GetApiKeys, {
     skip: !orgView || activetab !== 'security tokens'
@@ -286,12 +281,7 @@ const TokenInfo = () => {
           progressPending={loading}
           defaultSortFieldId={'updated'}
           progressComponent={<CustomLoader />}
-          customStyles={customStyles(
-            headingTextColor,
-            null,
-            paddingCell,
-            paddingHeadCell
-          )}
+          customStyles={customStyles}
           subHeaderComponent={subHeaderComponent}
         />
       </Flex>

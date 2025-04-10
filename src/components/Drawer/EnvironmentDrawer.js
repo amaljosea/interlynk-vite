@@ -2,7 +2,6 @@ import { useMutation } from '@apollo/client'
 import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { filterEnvList, getFullDate, isDefaultEnv, timeSince } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import EnvModal from 'views/Dashboard/Products/components/EnvModal'
 
@@ -19,6 +18,7 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import LynkDrawer from 'components/LynkDrawer'
 
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { EnvDelete } from 'graphQL/Mutation'
@@ -30,6 +30,8 @@ const EnvironmentDrawer = ({
   activeEnv,
   setActiveEnv
 }) => {
+  const customStyles = useDataTableStyles()
+
   const {
     isOpen: isProdOpen,
     onOpen: onProdOpen,

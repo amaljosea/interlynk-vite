@@ -2,7 +2,6 @@ import { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getFullDate, timeSince } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 import Filters from 'views/Dashboard/Policies/components/Filters'
 import ExpandedComponent from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableExpanded/PolicyExpanded'
 
@@ -21,18 +20,18 @@ import RefreshBtn from 'components/Icons/RefreshBtn'
 import Pagination from 'components/Pagination'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetPolicyResults } from 'graphQL/Queries'
 
 const PolicyResultsTable = () => {
   const params = useParams()
+  const customStyles = useDataTableStyles()
+
   const policyId = params.policyid
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const [filters, setFilters] = useState({
     result: [],
@@ -176,7 +175,7 @@ const PolicyResultsTable = () => {
           progressPending={loading}
           subHeaderComponent={subHeader}
           progressComponent={<CustomLoader />}
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
           expandableRowsComponent={ExpandedComponent}
           expandableRowsComponentProps={{
             onCheckViolations

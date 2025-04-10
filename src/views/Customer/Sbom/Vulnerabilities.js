@@ -5,7 +5,6 @@ import { useParams } from 'react-router-dom'
 import { getSignedUrlParams } from 'utils'
 import { parseEpssRange } from 'utils'
 import { isSbomArchived } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 import VulnerabilityColumns from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableColumns/VulnerabilityColumns'
 import ExpandedComponent from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableExpanded/VulnerabilityExpanded'
 import VulnerabilitySubHeader from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableSubHeaders/VulnerabilitySubHeader'
@@ -19,7 +18,7 @@ import Pagination from 'components/Pagination'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
-import { useThemeColor } from 'hooks/useThemeColors'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 
 import {
   FirstDegreePartVulns,
@@ -29,6 +28,7 @@ import {
 
 const Vulnerabilities = ({ sbomData }) => {
   const params = useParams()
+  const customStyles = useDataTableStyles()
   const sbomId = params.sbomid
   const activeTab = useQueryParam('tab')
 
@@ -49,7 +49,6 @@ const Vulnerabilities = ({ sbomData }) => {
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
-  const { headingTextColor } = useThemeColor(['headingTextColor'])
   const [activeRow, setActiveRow] = useState(null)
   const [vulnSearch, setVulnSearch] = useState(searchInput)
 
@@ -199,7 +198,7 @@ const Vulnerabilities = ({ sbomData }) => {
           className='data-table-container'
           columns={columns}
           data={nodes}
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
           onSort={handleSort}
           defaultSortAsc={false}
           defaultSortFieldId={field}
