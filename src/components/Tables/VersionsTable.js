@@ -40,7 +40,6 @@ export const GetShareProjectGroup = gql`
   query GetShareProjectGroup($id: Uuid!) {
     shareLynkQuery {
       projectGroup(id: $id) {
-        description
         enabled
         name
       }
@@ -48,12 +47,21 @@ export const GetShareProjectGroup = gql`
   }
 `
 
-const GetProjectGroup = gql`
-  query GetProjectGroup($id: Uuid!) {
-    projectGroup(id: $id) {
-      description
-      enabled
-      name
+export const GetProjectDetails = gql`
+  query GetProjectDetails($id: Uuid!) {
+    project(id: $id) {
+      projectGroup {
+        name
+        enabled
+      }
+      sboms {
+        id
+        projectVersion
+      }
+      projectSetting {
+        id
+        enableSupportLevel
+      }
     }
   }
 `
@@ -106,15 +114,16 @@ const VersionsTable = (props) => {
 
   // GET PROJECT DATA
   const { data } = useQuery(
-    signedUrlParams ? GetShareProjectGroup : GetProjectGroup,
+    signedUrlParams ? GetShareProjectGroup : GetProjectDetails,
     {
-      variables: { id: params?.productgroupid }
+      variables: { id: params?.productid }
     }
   )
+  const { projectGroup, projectSetting } = data?.project || {}
 
   const result = signedUrlParams
     ? data?.shareLynkQuery?.projectGroup
-    : data?.projectGroup
+    : data?.project?.projectGroup
   const { name, enabled } = result || ''
 
   const { nodes, paginationProps, loading, startPolling, stopPolling, reset } =
@@ -401,10 +410,14 @@ const VersionsTable = (props) => {
       {/* SUPPORT ANALYSIS RUN WARNING */}
       {SUPPORT.isOpen && (
         <SupportAnalysis
-          sbom={activeRow}
-          productGroup={{ name }}
+          sbomId={activeRow?.id}
           isOpen={SUPPORT.isOpen}
           onClose={SUPPORT.onClose}
+          data={{
+            id: projectSetting?.id,
+            group: projectGroup,
+            sbom: activeRow
+          }}
         />
       )}
     </>

@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import { getDate, getFullDate, getTotalDays, timeSince } from 'utils'
 import { assessmentExpiryWarning } from 'variables/general'
 
@@ -35,7 +35,7 @@ import {
 } from 'graphQL/Mutation'
 import { GetComponentSupportLevels } from 'graphQL/Queries'
 
-const CompSupport = ({ data, isOpen, onClose }) => {
+const CompSupport = ({ data, isOpen, onClose, enableSupportLevel }) => {
   const [edit, setEdit] = useState(false)
 
   const { data: supports, loading } = useQuery(GetComponentSupportLevels, {
@@ -81,7 +81,11 @@ const CompSupport = ({ data, isOpen, onClose }) => {
               }}
             />
           ) : (
-            <SupportCard setEdit={setEdit} data={supports?.component} />
+            <SupportCard
+              setEdit={setEdit}
+              data={supports?.component}
+              enableSupportLevel={enableSupportLevel}
+            />
           )}
         </Stack>
       )}
@@ -89,16 +93,14 @@ const CompSupport = ({ data, isOpen, onClose }) => {
   )
 }
 
-const SupportCard = ({ setEdit, data }) => {
+const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
   const {
     componentSupportLevel: manual,
     componentSupportLevelAutomatic: automatic
   } = data || {}
 
-  const { sameSecondaryText, grayBorderColor } = useThemeColor([
-    'sameSecondaryText',
-    'grayBorderColor'
-  ])
+  const { sameSecondaryText, grayBorderColor, primaryErrorColor } =
+    useThemeColor(['sameSecondaryText', 'grayBorderColor', 'primaryErrorColor'])
 
   const label = { fontSize: 12, color: sameSecondaryText }
   const infoStyle = {
@@ -121,17 +123,25 @@ const SupportCard = ({ setEdit, data }) => {
 
   return (
     <Stack spacing={4} mt={3}>
-      <Tooltip label='Edit'>
-        <IconButton
-          aria-label='Edit'
-          icon={<EditIcon />}
-          colorScheme='blue'
-          variant='solid'
-          fontSize={'sm'}
-          alignSelf='end'
-          onClick={() => setEdit(true)}
-        />
-      </Tooltip>
+      <Flex gap={2} alignItems={'center'}>
+        {!enableSupportLevel && (
+          <Text fontSize={'sm'} color={primaryErrorColor}>
+            Component support level analysis is not enabled for this product
+          </Text>
+        )}
+        <Tooltip label='Edit'>
+          <IconButton
+            aria-label='Edit'
+            icon={<EditIcon />}
+            colorScheme='blue'
+            variant='solid'
+            fontSize={'sm'}
+            alignSelf='end'
+            onClick={() => setEdit(true)}
+          />
+        </Tooltip>
+      </Flex>
+
       <Stack spacing={3}>
         <Stack {...container}>
           <Text {...label}>Assessment</Text>

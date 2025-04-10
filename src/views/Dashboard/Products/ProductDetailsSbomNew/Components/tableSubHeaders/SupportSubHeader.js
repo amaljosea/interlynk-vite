@@ -9,19 +9,21 @@ import RefreshBtn from 'components/Icons/RefreshBtn'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useRouteFlags } from 'hooks/useRouteFlags'
 
+import { BiScan } from 'react-icons/bi'
 import { FaPen } from 'react-icons/fa6'
 
 import SupportFilters from '../../SupportFilters'
 
 const SupportSubHeader = ({
   reset,
+  action,
   filterText,
   handleSearch,
   handleClear,
   onSearchInputChange,
-  handleStatus,
   selectedItems,
-  supportData
+  supportData,
+  enableSupportLevel
 }) => {
   const { isCustomerView } = useRouteFlags()
 
@@ -56,13 +58,23 @@ const SupportSubHeader = ({
           <SupportFilters reset={reset} />
         </Flex>
         <Stack spacing={2} alignItems={'center'} direction={'row'}>
+          {!isCustomerView && !enableSupportLevel && (
+            <Tooltip placement='left' label={'Rerun Support Analysis'}>
+              <IconButton
+                icon={<BiScan />}
+                colorScheme='blue'
+                isDisabled={!editComponent}
+                onClick={() => action('rerun_support_analysis', null)}
+              />
+            </Tooltip>
+          )}
           {!isCustomerView && selectedItems?.length > 0 && (
             <Tooltip placement='left' label={info}>
               <IconButton
                 icon={<FaPen />}
                 colorScheme='blue'
-                onClick={handleStatus}
                 isDisabled={notAllowed || !editComponent}
+                onClick={() => action('view_support_modal', null)}
               />
             </Tooltip>
           )}
@@ -83,12 +95,13 @@ const SupportSubHeader = ({
     handleSearch,
     reset,
     isCustomerView,
+    enableSupportLevel,
+    editComponent,
     selectedItems?.length,
     info,
-    handleStatus,
     notAllowed,
-    editComponent,
-    supportData
+    supportData,
+    action
   ])
 
   return subHeader

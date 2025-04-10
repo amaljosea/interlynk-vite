@@ -20,7 +20,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaEllipsisV } from 'react-icons/fa'
 
-const SupportColumns = ({ handleSupport }) => {
+const SupportColumns = ({ action }) => {
   const params = useParams()
   const { isFreeTier } = useGlobalQueryContext()
 
@@ -176,9 +176,9 @@ const SupportColumns = ({ handleSupport }) => {
                 <MenuList fontSize={'sm'}>
                   <MenuItem
                     hidden={isFreeTier}
-                    onClick={() => handleSupport(row)}
                     data-testid='edit_component_support'
                     isDisabled={!updateComponent || isPart}
+                    onClick={() => action('view_support_drawer', row)}
                   >
                     Edit Support Status
                   </MenuItem>
@@ -193,7 +193,7 @@ const SupportColumns = ({ handleSupport }) => {
 
     return columns
   }, [
-    handleSupport,
+    action,
     isFreeTier,
     params?.sbomid,
     primaryTextColor,
