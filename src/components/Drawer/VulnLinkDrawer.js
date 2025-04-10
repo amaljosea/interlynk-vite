@@ -156,7 +156,7 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
   )
 
   const isDisabled =
-    !validateUrl(link.trim()) || linkError !== '' || error !== ''
+    !validateUrl(link.trim()) || linkError !== '' || error !== '' || !type
 
   useEffect(() => {
     if (externalUrls?.length > 0) {
