@@ -23,10 +23,11 @@ import { MdDeleteOutline } from 'react-icons/md'
 
 const Value = (props) => {
   const {
+    data,
+    index,
     setError,
     setConditions,
     setDeletedRules,
-    data,
     conditions,
     onChange
   } = props
@@ -325,7 +326,7 @@ const Value = (props) => {
           />
         )}
 
-      {conditions?.length > 1 && (
+      {index !== 0 && (
         <IconButton
           border='1px solid'
           colorScheme='white'
