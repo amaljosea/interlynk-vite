@@ -169,8 +169,7 @@ const Support = () => {
     handleClear,
     onSearchInputChange,
     selectedItems,
-    supportData,
-    enableSupportLevel
+    supportData
   })
 
   // COLUMNS

@@ -22,8 +22,7 @@ const SupportSubHeader = ({
   handleClear,
   onSearchInputChange,
   selectedItems,
-  supportData,
-  enableSupportLevel
+  supportData
 }) => {
   const { isCustomerView } = useRouteFlags()
 
@@ -58,10 +57,10 @@ const SupportSubHeader = ({
           <SupportFilters reset={reset} />
         </Flex>
         <Stack spacing={2} alignItems={'center'} direction={'row'}>
-          {!isCustomerView && !enableSupportLevel && (
+          {!isCustomerView && (
             <Tooltip placement='left' label={'Rerun Support Analysis'}>
               <IconButton
-                icon={<BiScan />}
+                icon={<BiScan size={20} />}
                 colorScheme='blue'
                 isDisabled={!editComponent}
                 onClick={() => action('rerun_support_analysis', null)}
@@ -95,7 +94,6 @@ const SupportSubHeader = ({
     handleSearch,
     reset,
     isCustomerView,
-    enableSupportLevel,
     editComponent,
     selectedItems?.length,
     info,

@@ -410,7 +410,6 @@ const VersionsTable = (props) => {
       {/* SUPPORT ANALYSIS RUN WARNING */}
       {SUPPORT.isOpen && (
         <SupportAnalysis
-          sbomId={activeRow?.id}
           isOpen={SUPPORT.isOpen}
           onClose={SUPPORT.onClose}
           data={{
