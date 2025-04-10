@@ -192,13 +192,13 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
         </Stack>
         <Stack {...container}>
           <Text {...label}>{`Notes (Auto Suggested)`}</Text>
-          <Text {...infoStyle} textTransform={'capitalize'}>
+          <Text {...infoStyle}>
             {systemNotes}
           </Text>
         </Stack>
         <Stack {...container}>
           <Text {...label}>{`Notes (Manual Override)`}</Text>
-          <Text {...infoStyle} textTransform={'capitalize'}>
+          <Text {...infoStyle}>
             {manualNotes}
           </Text>
         </Stack>
