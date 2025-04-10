@@ -355,6 +355,8 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
 
   useEffect(() => {
     if (automatic || manual) {
+      const defaultDate = new Date()
+      defaultDate.setDate(defaultDate.getDate() + 365)
       const { level, endDate, notes, retainManualOverrideFor } = manual || {}
       setFormData((prev) => ({
         ...prev,
@@ -363,7 +365,7 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
         endOfSupport: endDate ? new Date(endDate) : '',
         assessmentExpiresOn: retainManualOverrideFor
           ? getDate(retainManualOverrideFor)
-          : undefined
+          : defaultDate
       }))
     }
   }, [automatic, manual])

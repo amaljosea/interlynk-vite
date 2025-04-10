@@ -77,17 +77,15 @@ const SupportColumns = ({ handleSupport }) => {
         sortable: true,
         width: '18%',
         selector: (row) => {
-          const {
-            duplicates,
-            componentSupportLevel: manual,
-            componentSupportLevelAutomatic: automatic
-          } = row || {}
-          const supportLevel = manual ? manual?.level : automatic?.level
+          const { duplicates, componentSupportLevelAutomatic: automatic } =
+            row || {}
+          const { level } = automatic || {}
+          const supportLevel = level ? level?.replaceAll('_', ' ') : 'N/A'
 
           if (supportLevel) {
             return (
               <Flex gap={2} alignItems={'center'}>
-                <Tag w={'184px'} colorScheme={setIntensity(supportLevel)}>
+                <Tag w={'184px'} colorScheme={setIntensity(level)}>
                   <TagLabel mx={'auto'} textTransform={'capitalize'}>
                     {supportLevel?.replaceAll('_', ' ')}{' '}
                   </TagLabel>
