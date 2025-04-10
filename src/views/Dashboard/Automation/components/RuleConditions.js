@@ -260,7 +260,7 @@ const RuleConditions = ({
                 />
               )}
               <Flex gap={4} justifyContent={'space-between'}>
-                {conditions?.length > 1 && (
+                {index !== 0 && (
                   <IconButton
                     border='1px solid'
                     colorScheme='white'
