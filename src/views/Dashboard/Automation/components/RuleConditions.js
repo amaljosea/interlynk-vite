@@ -251,7 +251,7 @@ const RuleConditions = ({
                 />
               )}
               <Flex gap={4} justifyContent={'space-between'}>
-                {conditions?.length > 1 && (
+                {index !== 0 && (
                   <DeleteButton
                     aria-label='Remove condition'
                     onClick={() => onDeleteCondtion(item)}

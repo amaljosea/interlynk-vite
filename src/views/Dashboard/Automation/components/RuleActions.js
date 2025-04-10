@@ -209,7 +209,7 @@ const RuleActions = ({
                     sx={{ minW: 140, fontSize: 'sm' }}
                   />
                   <Flex gap={4} justifyContent={'space-between'}>
-                    {actions?.length > 1 && (
+                    {index !== 0 && (
                       <DeleteButton
                         onClick={() => onDeleteAction(item)}
                         aria-label={'Remove action'}

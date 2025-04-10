@@ -213,8 +213,6 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
     assessmentExpiresOn: defaultDate
   })
 
-  console.warn('formData', formData)
-
   const totalDays = Number(getTotalDays(formData?.assessmentExpiresOn))
   const isAbandoned = formData?.supportLevel !== 'abandoned'
 

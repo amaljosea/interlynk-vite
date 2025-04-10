@@ -21,10 +21,11 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 const Value = (props) => {
   const {
+    data,
+    index,
     setError,
     setConditions,
     setDeletedRules,
-    data,
     conditions,
     onChange
   } = props
@@ -319,7 +320,7 @@ const Value = (props) => {
             w={'150px'}
           />
         )}
-      {conditions?.length > 1 && (
+      {index !== 0 && (
         <DeleteButton
           aria-label='Remove condition'
           onClick={() => deleteRow(data)}

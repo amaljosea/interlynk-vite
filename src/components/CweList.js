@@ -12,7 +12,7 @@ const CweList = ({ data }) => {
   return (
     <Flex gap={2} flexWrap={'wrap'}>
       {data?.map((item, index) => {
-        const number = item?.match(/\d+/)[0]
+        const number = item?.match(/\d+/)?.[0]
         return (
           <Link
             key={index}
@@ -20,7 +20,7 @@ const CweList = ({ data }) => {
             style={{ color: primaryBlueText }}
             to={`https://cwe.mitre.org/data/definitions/${number}.html`}
           >
-            {item}
+            {number && item}
             {index + 1 !== data?.length && ', '}
           </Link>
         )
