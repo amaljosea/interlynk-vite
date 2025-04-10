@@ -226,7 +226,8 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
           <FormControl
             isRequired
             isInvalid={
-              (link !== '' && !validateUrl(link.trim())) || containsSpace
+              (linkError !== '' && link !== '' && !validateUrl(link.trim())) ||
+              containsSpace
             }
           >
             <FormLabel>Link</FormLabel>
