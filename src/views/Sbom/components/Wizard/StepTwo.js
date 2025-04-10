@@ -2,7 +2,7 @@ import { useQuery } from '@apollo/client'
 import { useMemo } from 'react'
 import DataTable from 'react-data-table-component'
 import { linkURl } from 'utils'
-import { customStyles, statusColor } from 'utils/styleUtils'
+import { statusColor } from 'utils/styleUtils'
 
 import {
   Box,
@@ -20,6 +20,7 @@ import ExternalNavIcon from 'components/Icons/ExternalNavIcon'
 import SeverityTag from 'components/Misc/SeverityTag'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { IntersectingVulns } from 'graphQL/Queries'
@@ -27,8 +28,13 @@ import { IntersectingVulns } from 'graphQL/Queries'
 import { BsCircleHalf } from 'react-icons/bs'
 
 const StepTwo = ({ sbomId, currentSbomId }) => {
-  const { headingTextColor, primaryTextColor, primaryErrorColor } =
-    useThemeColor(['headingTextColor', 'primaryTextColor', 'primaryErrorColor'])
+  const customStyles = useDataTableStyles()
+
+  const { primaryTextColor, primaryErrorColor } = useThemeColor([
+    'primaryTextColor',
+    'primaryErrorColor'
+  ])
+
   const { colorMode } = useColorMode()
   const { prodVulnState, dispatch } = useGlobalState()
   const { selectedVulns } = prodVulnState
@@ -198,7 +204,7 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
           columns={columns}
           className={tableClassName + 'data-table-container'}
           data={data?.intersectingVulns || []}
-          customStyles={customStyles(headingTextColor)}
+          customStyles={customStyles}
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
           subHeaderComponent={subHeaderComponentMemo}
