@@ -162,7 +162,7 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
           <Text {...infoStyle}>{assessment}</Text>
         </Stack>
         <Stack {...container}>
-          <Text {...label}>{`Level (Auto Sgugested)`}</Text>
+          <Text {...label}>{`Level (Auto Suggested)`}</Text>
           <Text {...infoStyle} textTransform={'capitalize'}>
             {systemSupportLevel}
           </Text>

@@ -19,11 +19,15 @@ const SupportExpanded = (props) => {
     const assessment = manual?.level ? 'Manual' : 'Automatic'
 
     // AUTOMATIC SUPPORT LEVEL
-    const systemSupportLevel = automatic?.level || 'N/A'
+    const systemSupportLevel = automatic?.level
+      ? automatic?.level?.replaceAll('_', ' ')
+      : 'N/A'
     const systemNotes = automatic?.notes || 'N/A'
 
     // MANNUAL SUPPORT LEVEL
-    const manualSupportLevel = manual?.level || 'N/A'
+    const manualSupportLevel = manual?.level
+      ? manual?.level?.replaceAll('_', ' ')
+      : 'N/A'
     const manualNotes = manual?.notes || 'N/A'
     const assessmentExpiresOn = calculateExpiryDate(retainManualOverrideFor)
     const assessedBy = user?.name || 'N/A'
@@ -41,14 +45,14 @@ const SupportExpanded = (props) => {
           <DetailItem label='Assessment' value={assessment} />
           {/* SYSTEM LEVEL */}
           <DetailItem
-            label='Level (Auto Sgugested)'
-            value={systemSupportLevel?.replaceAll('_', ' ')}
+            label='Level (Auto Suggested)'
+            value={systemSupportLevel}
             valueStyle={{ textTransform: 'capitalize' }}
           />
           {/* SYSTEM LEVEL */}
           <DetailItem
             label='Level (Manual Override)'
-            value={manualSupportLevel?.replaceAll('_', ' ')}
+            value={manualSupportLevel}
             valueStyle={{ textTransform: 'capitalize' }}
           />
           {/* ASSESSED DATE */}
