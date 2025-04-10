@@ -357,6 +357,7 @@ const ConfigModal = ({
                 <DeleteButton
                   onClick={() => handleRemoveConfig(index)}
                   isLoading={deleteLoading}
+                  aria-label={'Delete configuration'}
                 />
               )}
             </HStack>

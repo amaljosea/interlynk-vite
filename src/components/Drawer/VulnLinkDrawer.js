@@ -138,6 +138,7 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
       variant={'solid'}
       data-testid='delete_vuln_link'
       onClick={() => handleLinkRemove(id)}
+      hidden={isPart}
     />
   )
 

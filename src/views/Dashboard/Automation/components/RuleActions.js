@@ -210,7 +210,15 @@ const RuleActions = ({
                   />
                   <Flex gap={4} justifyContent={'space-between'}>
                     {actions?.length > 1 && (
-                      <DeleteButton onClick={() => onDeleteAction(item)} />
+                      <DeleteButton
+                        onClick={() => onDeleteAction(item)}
+                        aria-label={'Remove action'}
+                        display={
+                          conditionErrorMessage || conditions?.length === 0
+                            ? 'none'
+                            : 'flex'
+                        }
+                      />
                     )}
                   </Flex>
                 </FormControl>

@@ -12,7 +12,6 @@ const DeleteButton = ({
   isLoading = false,
   size = 'md',
   iconSize = 5,
-  ariaLabel = 'Delete',
   hidden,
   tooltip,
   ...props
@@ -32,7 +31,6 @@ const DeleteButton = ({
         colorScheme={variant === 'solid' && 'red'}
         variant={variant}
         isLoading={isLoading}
-        aria-label={ariaLabel}
         onClick={onClick}
         hidden={hidden}
         {...props}
