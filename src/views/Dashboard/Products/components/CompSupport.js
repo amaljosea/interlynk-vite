@@ -123,7 +123,11 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
 
   return (
     <Stack spacing={4} mt={3}>
-      <Flex gap={2} alignItems={'center'}>
+      <Flex
+        gap={2}
+        alignItems={'center'}
+        justifyContent={!enableSupportLevel ? 'space-between' : 'flex-end'}
+      >
         {!enableSupportLevel && (
           <Text fontSize={'sm'} color={primaryErrorColor}>
             Component support level analysis is not enabled for this product
