@@ -2,6 +2,7 @@ import { useMutation } from '@apollo/client'
 import { formatDistanceToNow } from 'date-fns'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { truncatedValue } from 'utils'
 
 import { ChevronDownIcon, EditIcon } from '@chakra-ui/icons'
 import {
@@ -149,6 +150,8 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
 
   const isOrg = selectedTab === 'ORGANIZATION'
   const isPersonal = selectedTab === 'PERSONAL'
+
+  const userName = isPersonal ? orgData?.currentUser?.name : orgData?.name
 
   useEffect(() => {
     if (dp) {
@@ -308,7 +311,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                     color: primaryTextColor
                   }}
                 >
-                  {isPersonal ? orgData?.currentUser?.name : orgData?.name}
+                  {truncatedValue(userName, 30)}
                 </Text>
                 {isPersonal && (
                   <Tag
