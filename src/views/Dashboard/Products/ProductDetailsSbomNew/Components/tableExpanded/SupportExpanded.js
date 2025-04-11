@@ -17,9 +17,19 @@ const SupportExpanded = (props) => {
     const { user, retainManualOverrideFor, updatedAt } = manual || {}
 
     const assessment = manual?.level ? 'Manual' : 'Automatic'
-    const supportLevel = manual?.level || automatic?.level
+
+    // AUTOMATIC SUPPORT LEVEL
+    const systemSupportLevel = automatic?.level
+      ? automatic?.level?.replaceAll('_', ' ')
+      : 'N/A'
+    const systemNotes = automatic?.notes || 'N/A'
+
+    // MANNUAL SUPPORT LEVEL
+    const manualSupportLevel = manual?.level
+      ? manual?.level?.replaceAll('_', ' ')
+      : 'N/A'
+    const manualNotes = manual?.notes || 'N/A'
     const assessmentExpiresOn = calculateExpiryDate(retainManualOverrideFor)
-    const explanation = manual?.notes || automatic?.notes
     const assessedBy = user?.name || 'N/A'
     const lastAssessed = updatedAt ? getFullDate(updatedAt) : 'N/A'
 
@@ -33,10 +43,16 @@ const SupportExpanded = (props) => {
           <DetailItem label='Version' value={version} />
           {/* ASSESSMENT */}
           <DetailItem label='Assessment' value={assessment} />
-          {/* LEVEL */}
+          {/* SYSTEM LEVEL */}
           <DetailItem
-            label='Level'
-            value={supportLevel?.replaceAll('_', ' ')}
+            label='Level (Auto Suggested)'
+            value={systemSupportLevel}
+            valueStyle={{ textTransform: 'capitalize' }}
+          />
+          {/* SYSTEM LEVEL */}
+          <DetailItem
+            label='Level (Manual Override)'
+            value={manualSupportLevel}
             valueStyle={{ textTransform: 'capitalize' }}
           />
           {/* ASSESSED DATE */}
@@ -44,12 +60,11 @@ const SupportExpanded = (props) => {
           {/* ASSESSED BY */}
           <DetailItem label='Last Assessed By' value={assessedBy} />
           {/* INTERNAL NOTES */}
-          <DetailItem
-            label='Support Explanation'
-            value={explanation || 'N/A'}
-          />
+          <DetailItem label='Notes (Auto Suggested)' value={systemNotes} />
+          {/* SYSTEM NOTES */}
+          <DetailItem label='Notes (Manual Override)' value={manualNotes} />
           {/* ASSESSMENT EXPIERS ON */}
-          {supportLevel !== 'no_longer_maintained' && (
+          {manualSupportLevel !== 'no_longer_maintained' && (
             <DetailItem
               label='Assessment Expires On'
               value={assessmentExpiresOn}

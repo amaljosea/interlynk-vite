@@ -3,18 +3,28 @@ import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationM
 
 import useCustomToast from 'hooks/useCustomToast'
 
-import { ReRunSbomSupportLevel } from 'graphQL/Mutation'
+import { ProjectSettingUpdate, ReRunSbomSupportLevel } from 'graphQL/Mutation'
 
-const SupportAnalysis = ({ isOpen, onClose, sbom, productGroup }) => {
+const SupportAnalysis = ({ isOpen, onClose, data }) => {
   const { showToast } = useCustomToast()
 
+  const { id, group, sbom } = data || {}
+
+  const [updateSettings] = useMutation(ProjectSettingUpdate)
   const [reRunSupport, { loading }] = useMutation(ReRunSbomSupportLevel)
+
+  const updateSupportSetting = () => {
+    updateSettings({
+      variables: { id: id, enableSupportLevel: true }
+    })
+  }
 
   const handleSubmit = () => {
     reRunSupport({ variables: { sbomId: sbom?.id } })
       .then((res) => {
         const { errors } = res?.data?.componentSupportLevelRun || {}
         if (!errors) {
+          updateSupportSetting()
           showToast({
             description: 'Support analysis run successfully',
             status: 'success'
@@ -29,11 +39,14 @@ const SupportAnalysis = ({ isOpen, onClose, sbom, productGroup }) => {
       .finally(() => onClose())
   }
 
+  const title = `${group?.name} - ${sbom?.projectVersion}`
+
   const modalProps = {
     isOpen,
     onClose,
+    name: title,
+
     onConfirm: handleSubmit,
-    name: `${productGroup?.name} - ${sbom?.projectVersion}`,
     title: `Rerun Support Analysis`,
     description: `Re-running support analysis on this version will:`,
     items: [

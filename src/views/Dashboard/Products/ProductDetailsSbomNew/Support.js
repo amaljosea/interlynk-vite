@@ -1,11 +1,11 @@
+import { gql, useQuery } from '@apollo/client'
 import { useCallback, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getUndefinedIfEmptyOrAll } from 'utils'
 
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
-import CpeCard from 'components/Misc/CpeCard'
-import PurlCard from 'components/Misc/PurlCard'
+import SupportAnalysis from 'components/Modal/SupportAnalysis'
 import SupportStatus from 'components/Modal/SupportStatus'
 import Pagination from 'components/Pagination'
 
@@ -22,6 +22,24 @@ import SupportExpanded from './Components/tableExpanded/SupportExpanded'
 import SupportSubHeader from './Components/tableSubHeaders/SupportSubHeader'
 import LynkTable from 'components/LynkTable'
 
+export const GetSupportSettings = gql`
+  query GetSupportSettings($id: Uuid!) {
+    project(id: $id) {
+      projectGroup {
+        name
+      }
+      sboms {
+        id
+        projectVersion
+      }
+      projectSetting {
+        id
+        enableSupportLevel
+      }
+    }
+  }
+`
+
 const Support = () => {
   const params = useParams()
   const projectId = params.productid
@@ -37,14 +55,28 @@ const Support = () => {
   const { level, include, field, direction, searchInput } = supportState
   const { supportDispatch } = dispatch
 
-  const CARD = useDisclosure()
-  const EDIT = useDisclosure()
-  const STATUS = useDisclosure()
-
   const [activeRow, setActiveRow] = useState(null)
   const [toggleClear, setToggleClear] = useState(false)
   const [selectedItems, setSelectedItems] = useState([])
   const [filterText, setFilterText] = useState(searchInput || '')
+
+  const UPDATE_STATUS = useDisclosure()
+  const BULK_UPDATE = useDisclosure()
+  const ANALYSIS = useDisclosure()
+
+  const action = (type, data) => {
+    setActiveRow(data)
+    switch (type) {
+      case 'rerun_support_analysis':
+        return ANALYSIS.onOpen()
+      case 'view_support_modal':
+        return BULK_UPDATE.onOpen()
+      case 'view_support_drawer':
+        return UPDATE_STATUS.onOpen()
+      default:
+        return UPDATE_STATUS.onOpen()
+    }
+  }
 
   const isSortable = field !== '' && direction !== ''
 
@@ -69,6 +101,15 @@ const Support = () => {
       }
     }
   )
+
+  const { data: settings } = useQuery(GetSupportSettings, {
+    variables: { id: params?.productid },
+    skip: activeTab === 'support' ? false : true
+  })
+  const { projectGroup, sboms, projectSetting } = settings?.project || {}
+  const { enableSupportLevel } = projectSetting || {}
+
+  const activeSbom = sboms?.find((sbom) => sbom?.id === sbomId)
 
   // CLEAR SERACH
   const handleClear = useCallback(async () => {
@@ -114,30 +155,20 @@ const Support = () => {
 
   const handleChange = (state) => setSelectedItems(state?.selectedRows)
 
-  const handleSupport = (row) => {
-    setActiveRow(row)
-    EDIT.onOpen()
-  }
-
-  const handleStatus = (row) => {
-    setActiveRow(row)
-    STATUS.onOpen()
-  }
-
   // SUB HEADER
   const subHeader = SupportSubHeader({
     reset,
+    action,
     filterText,
     handleSearch,
     handleClear,
     onSearchInputChange,
-    handleStatus,
     selectedItems,
     supportData
   })
 
   // COLUMNS
-  const columns = SupportColumns({ handleSupport })
+  const columns = SupportColumns({ action })
 
   return (
     <>
@@ -164,37 +195,35 @@ const Support = () => {
         <Pagination {...paginationProps} />
       </Flex>
 
-      {CARD.isOpen && activeRow?.idUri?.startsWith('pkg') && (
-        <PurlCard
-          isOpen={CARD.isOpen}
-          onClose={CARD.onClose}
-          value={activeRow?.idUri}
-        />
-      )}
-
-      {CARD.isOpen && activeRow?.idUri?.startsWith('cpe') && (
-        <CpeCard
-          isOpen={CARD.isOpen}
-          onClose={CARD.onClose}
-          value={activeRow?.idUri}
-        />
-      )}
-
-      {EDIT.isOpen && (
+      {UPDATE_STATUS.isOpen && (
         <CompSupport
           data={activeRow}
-          isOpen={EDIT.isOpen}
-          onClose={EDIT.onClose}
+          isOpen={UPDATE_STATUS.isOpen}
+          onClose={UPDATE_STATUS.onClose}
+          enableSupportLevel={enableSupportLevel}
         />
       )}
 
-      {STATUS.isOpen && selectedItems?.length > 0 && (
+      {BULK_UPDATE.isOpen && selectedItems?.length > 0 && (
         <SupportStatus
-          isOpen={STATUS.isOpen}
-          onClose={STATUS.onClose}
+          isOpen={BULK_UPDATE.isOpen}
+          onClose={BULK_UPDATE.onClose}
           selectedItems={selectedItems}
           setToggleClear={setToggleClear}
           setSelectedItems={setSelectedItems}
+        />
+      )}
+
+      {/* SUPPORT ANALYSIS RUN WARNING */}
+      {ANALYSIS.isOpen && (
+        <SupportAnalysis
+          isOpen={ANALYSIS.isOpen}
+          onClose={ANALYSIS.onClose}
+          data={{
+            id: projectSetting?.id,
+            group: projectGroup,
+            sbom: activeSbom
+          }}
         />
       )}
     </>

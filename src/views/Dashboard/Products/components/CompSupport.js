@@ -36,7 +36,7 @@ import {
 } from 'graphQL/Mutation'
 import { GetComponentSupportLevels } from 'graphQL/Queries'
 
-const CompSupport = ({ data, isOpen, onClose }) => {
+const CompSupport = ({ data, isOpen, onClose, enableSupportLevel }) => {
   const [edit, setEdit] = useState(false)
 
   const { data: supports, loading } = useQuery(GetComponentSupportLevels, {
@@ -82,7 +82,11 @@ const CompSupport = ({ data, isOpen, onClose }) => {
               }}
             />
           ) : (
-            <SupportCard setEdit={setEdit} data={supports?.component} />
+            <SupportCard
+              setEdit={setEdit}
+              data={supports?.component}
+              enableSupportLevel={enableSupportLevel}
+            />
           )}
         </Stack>
       )}
@@ -90,16 +94,14 @@ const CompSupport = ({ data, isOpen, onClose }) => {
   )
 }
 
-const SupportCard = ({ setEdit, data }) => {
+const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
   const {
     componentSupportLevel: manual,
     componentSupportLevelAutomatic: automatic
   } = data || {}
 
-  const { sameSecondaryText, grayBorderColor } = useThemeColor([
-    'sameSecondaryText',
-    'grayBorderColor'
-  ])
+  const { sameSecondaryText, grayBorderColor, primaryErrorColor } =
+    useThemeColor(['sameSecondaryText', 'grayBorderColor', 'primaryErrorColor'])
 
   const label = { fontSize: 12, color: sameSecondaryText }
   const infoStyle = {
@@ -113,35 +115,63 @@ const SupportCard = ({ setEdit, data }) => {
   }
 
   const assessment = manual?.level ? 'Manual' : 'Automatic'
-  const supportLevel = manual?.level || automatic?.level
+
+  // AUTOMATIC SUPPORT LEVEL
+  const systemSupportLevel = automatic?.level
+    ? automatic?.level?.replaceAll('_', ' ')
+    : 'N/A'
+  const systemNotes = automatic?.notes || 'N/A'
+
+  // MANNUAL SUPPORT LEVEL
+  const manualSupportLevel = manual?.level
+    ? manual?.level?.replaceAll('_', ' ')
+    : 'N/A'
   const endOfSupport = manual?.endDate
   const assessmentExpiresOn = manual?.retainManualOverrideFor
-  const explanation = manual?.notes || automatic?.notes
+  const manualNotes = manual?.notes || 'N/A'
   const assessedBy = manual?.user?.name
   const lastAssessed = manual?.updatedAt
 
   return (
     <Stack spacing={4} mt={3}>
-      <Tooltip label='Edit'>
-        <IconButton
-          aria-label='Edit'
-          icon={<EditIcon />}
-          colorScheme='blue'
-          variant='solid'
-          fontSize={'sm'}
-          alignSelf='end'
-          onClick={() => setEdit(true)}
-        />
-      </Tooltip>
+      <Flex
+        gap={2}
+        alignItems={'center'}
+        justifyContent={!enableSupportLevel ? 'space-between' : 'flex-end'}
+      >
+        {!enableSupportLevel && (
+          <Text fontSize={'sm'} color={primaryErrorColor}>
+            Component support level analysis is not enabled for this product
+          </Text>
+        )}
+        <Tooltip label='Edit'>
+          <IconButton
+            aria-label='Edit'
+            icon={<EditIcon />}
+            colorScheme='blue'
+            variant='solid'
+            fontSize={'sm'}
+            alignSelf='end'
+            onClick={() => setEdit(true)}
+          />
+        </Tooltip>
+      </Flex>
+
       <Stack spacing={3}>
         <Stack {...container}>
           <Text {...label}>Assessment</Text>
           <Text {...infoStyle}>{assessment}</Text>
         </Stack>
         <Stack {...container}>
-          <Text {...label}>Support Level</Text>
+          <Text {...label}>{`Level (Auto Suggested)`}</Text>
           <Text {...infoStyle} textTransform={'capitalize'}>
-            {supportLevel?.replaceAll('_', ' ') || 'N/A'}
+            {systemSupportLevel}
+          </Text>
+        </Stack>
+        <Stack {...container}>
+          <Text {...label}>{`Level (Manual Override)`}</Text>
+          <Text {...infoStyle} textTransform={'capitalize'}>
+            {manualSupportLevel}
           </Text>
         </Stack>
         <Stack {...container}>
@@ -150,7 +180,10 @@ const SupportCard = ({ setEdit, data }) => {
             {endOfSupport ? new Date(endOfSupport).toLocaleDateString() : 'N/A'}
           </Text>
         </Stack>
-        <Stack {...container} hidden={supportLevel === 'no_longer_maintained'}>
+        <Stack
+          {...container}
+          hidden={manualSupportLevel === 'no_longer_maintained'}
+        >
           <Text {...label}>Assessment Expires On</Text>
           <Text {...infoStyle} textTransform={'capitalize'}>
             {assessmentExpiresOn
@@ -159,9 +192,15 @@ const SupportCard = ({ setEdit, data }) => {
           </Text>
         </Stack>
         <Stack {...container}>
-          <Text {...label}>Explanation</Text>
-          <Text {...infoStyle} textTransform={'capitalize'}>
-            {explanation || 'N/A'}
+          <Text {...label}>{`Notes (Auto Suggested)`}</Text>
+          <Text {...infoStyle}>
+            {systemNotes}
+          </Text>
+        </Stack>
+        <Stack {...container}>
+          <Text {...label}>{`Notes (Manual Override)`}</Text>
+          <Text {...infoStyle}>
+            {manualNotes}
           </Text>
         </Stack>
         <Stack {...container}>
@@ -356,6 +395,8 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
 
   useEffect(() => {
     if (automatic || manual) {
+      const defaultDate = new Date()
+      defaultDate.setDate(defaultDate.getDate() + 365)
       const { level, endDate, notes, retainManualOverrideFor } = manual || {}
       setFormData((prev) => ({
         ...prev,
@@ -364,7 +405,7 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
         endOfSupport: endDate ? new Date(endDate) : '',
         assessmentExpiresOn: retainManualOverrideFor
           ? getDate(retainManualOverrideFor)
-          : undefined
+          : defaultDate
       }))
     }
   }, [automatic, manual])

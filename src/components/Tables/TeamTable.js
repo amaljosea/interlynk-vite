@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import React, { useCallback, useMemo, useState } from 'react'
-import { getFullDate, timeSince } from 'utils'
+import { getFullDate, timeSince, truncatedValue } from 'utils'
 import { FREE_TIER_USER_LIMIT } from 'variables/general'
 import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
 import RoleModal from 'views/Dashboard/Profile/components/RoleModal'
@@ -27,6 +27,7 @@ import {
 import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import LynkModal from 'components/LynkModal'
+import LynkTable from 'components/LynkTable'
 import LynkAction from 'components/Misc/LynkAction'
 import Pagination from 'components/Pagination'
 
@@ -42,7 +43,6 @@ import { InviteUser, deleteOrgUser } from 'graphQL/Mutation'
 import { GetUsers } from 'graphQL/Queries'
 
 import { BiTrash } from 'react-icons/bi'
-import LynkTable from 'components/LynkTable'
 
 function userTimeStart(row) {
   let timeStart
@@ -114,7 +114,8 @@ const TeamTable = () => {
             sx={{ w: '100%', px: 0, py: '.8rem', gap: 2, alignItems: 'center' }}
           >
             <Avatar
-              sx={{ w: '30px', h: '30px' }}
+              size={'sm'}
+              name={row?.name || 'User'}
               src={profileImage && `${SERVER_URL}/${profileImage?.url}`}
             />
             <Text color={primaryTextColor} my={2}>
@@ -135,7 +136,7 @@ const TeamTable = () => {
             color={primaryTextColor}
             sx={{ fontSize: '14px', w: 'fit-content' }}
           >
-            {row.name}
+            {row.name ? truncatedValue(row.name, 20) : 'N/A'}
           </Text>
           {row.email === email && (
             <Badge
