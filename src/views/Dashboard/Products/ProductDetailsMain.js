@@ -48,13 +48,13 @@ const ProductDetailsMain = () => {
   const productGroupId = params.productgroupid
   const sbomId = params.sbomid
 
-  const { dispatch, envName, versionState } = useGlobalState()
+  const { dispatch, envName } = useGlobalState()
   const { setIsOpen, setCurrentStep } = useTour()
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
   const activeTour = localStorage.getItem('activeTour')
 
-  const { prodVulnDispatch, versionDispatch } = dispatch
+  const { prodVulnDispatch } = dispatch
   const [activeEnv, setActiveEnv] = useState(productId || '')
 
   // GET PROJECT DATA
@@ -63,12 +63,6 @@ const ProductDetailsMain = () => {
   })
 
   const { name, description, projects } = data?.projectGroup || ''
-
-  const [versionFilters, setVersionFilters] = useState({
-    field: versionState?.field,
-    direction: versionState?.direction,
-    search: versionFilters?.search
-  })
 
   const ENV = useDisclosure()
 
@@ -99,21 +93,6 @@ const ProductDetailsMain = () => {
       }
     }
   }, [data, activeTour, setCurrentStep, setIsOpen, shouldShowDemoFeatures])
-
-  const handleSort = (column, sortDirection) => {
-    setVersionFilters((oldFilters) => ({
-      ...oldFilters,
-      field: column?.id,
-      direction: sortDirection.toUpperCase()
-    }))
-    versionDispatch({
-      type: 'SET_SORT_ORDER',
-      payload: {
-        field: column.id,
-        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-      }
-    })
-  }
 
   const { data: settings, loading: settingsLoading } = useQuery(
     GetProjectSettings,
@@ -162,8 +141,6 @@ const ProductDetailsMain = () => {
               {/* PRODUCT INFORMATIONS */}
               <GridItem colSpan={8}>
                 <ProductInfo
-                  handleSort={handleSort}
-                  filters={versionFilters}
                   settings={projectSetting}
                   data={{ name, description }}
                 />
@@ -182,11 +159,8 @@ const ProductDetailsMain = () => {
           <CardBody>
             <ProductTabs
               activeEnv={activeEnv}
-              handleSort={handleSort}
-              filters={versionFilters}
               data={data?.projectGroup}
               settings={projectSetting}
-              setFilters={setVersionFilters}
               settingsLoading={settingsLoading}
             />
           </CardBody>

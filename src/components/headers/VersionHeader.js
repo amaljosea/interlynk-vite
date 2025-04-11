@@ -1,29 +1,31 @@
 import React, { useMemo } from 'react'
-// import { stages } from 'variables/general'
+import { stages } from 'variables/general'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import {
   Flex,
-  IconButton, // Menu,
-  // MenuItemOption,
-  // MenuList,
-  // MenuOptionGroup,
+  IconButton,
+  Menu,
+  MenuItemOption,
+  MenuList,
+  MenuOptionGroup,
   Stack,
   Text,
   Tooltip
 } from '@chakra-ui/react'
 
 import RefreshBtn from 'components/Icons/RefreshBtn'
+import MenuHeading from 'components/Misc/MenuHeading'
 
-// import MenuHeading from 'components/Misc/MenuHeading'
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import { FaPlus } from 'react-icons/fa6'
 import { LuArchive, LuGitCompare } from 'react-icons/lu'
 
 const VersionHeader = (props) => {
   const {
-    // filters,
-    // onFilterLifestage,
     filterText,
+    onFilterLifestage,
     onSearchInputChange,
     handleClear,
     handleSearch,
@@ -35,7 +37,9 @@ const VersionHeader = (props) => {
     action
   } = props
 
-  // const { lifestage } = filters || {}
+  const { versionState } = useGlobalState()
+
+  const { lifestage } = versionState || {}
 
   return useMemo(() => {
     return (
@@ -52,8 +56,11 @@ const VersionHeader = (props) => {
             onFilter={handleSearch}
           />
           {/* LIFE STAGE */}
-          {/* <Menu closeOnSelect={false}>
-            <MenuHeading title={'Lifestage'} active={lifestage?.length > 0} />
+          <Menu closeOnSelect={false}>
+            <MenuHeading
+              title={'Lifestage'}
+              active={lifestage?.length !== 0 && !lifestage.includes('all')}
+            />
             <MenuList
               minW={'280px'}
               maxW={'400px'}
@@ -80,7 +87,7 @@ const VersionHeader = (props) => {
                 ))}
               </MenuOptionGroup>
             </MenuList>
-          </Menu> */}
+          </Menu>
           {selectedSbom?.length === 1 && (
             <Text color={primaryBlueText}>
               ** Select one more version to enable comparison
@@ -135,6 +142,8 @@ const VersionHeader = (props) => {
     filterText,
     handleClear,
     handleSearch,
+    lifestage,
+    onFilterLifestage,
     onSearchInputChange,
     primaryBlueText,
     selectedSbom?.length,

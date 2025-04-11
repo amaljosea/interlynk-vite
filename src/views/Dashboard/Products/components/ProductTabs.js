@@ -41,7 +41,7 @@ const ProductTabs = (props) => {
   const tab = queryParams[0].get('tab')
   const activeTabNumber = Math.max(tabs.indexOf(tab), 0)
 
-  const { data, settings, filters, setFilters, handleSort, activeEnv } = props
+  const { data, settings, activeEnv } = props
 
   const { enabled, projects } = data || ''
 
@@ -138,12 +138,7 @@ const ProductTabs = (props) => {
       <TabPanels>
         {/* VERSIONS */}
         <TabPanel px={0}>
-          <VersionsTable
-            handleSort={handleSort}
-            filters={filters}
-            setFilters={setFilters}
-            retentionTime={settings?.dataRetentionDays}
-          />
+          <VersionsTable retentionTime={settings?.dataRetentionDays} />
         </TabPanel>
         {/* VULNERABILITIES */}
         <TabPanel px={0}>
