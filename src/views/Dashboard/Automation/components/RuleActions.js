@@ -1,14 +1,10 @@
 import { components } from 'react-select'
 
 import { Box, Flex, FormControl, Input, Tag, Text } from '@chakra-ui/react'
-import { Icon, IconButton } from '@chakra-ui/react'
 
+import DeleteButton from 'components/Icons/DeleteButton'
 import LynkDate from 'components/LynkDate'
 import LynkSelect from 'components/LynkSelect'
-
-import { useThemeColor } from 'hooks/useThemeColors'
-
-import { MdDeleteOutline } from 'react-icons/md'
 
 import SubjectIcon from './SubjectIcon'
 
@@ -24,10 +20,6 @@ const RuleActions = ({
   setDeleteAction,
   automationConditionSubjectFieldMapping
 }) => {
-  const { grayBorderColor, primaryErrorColor } = useThemeColor([
-    'grayBorderColor',
-    'primaryErrorColor'
-  ])
   const isComponent = conditions?.some((item) => item?.category === 'component')
 
   const onActionChange = (value, id, field) => {
@@ -218,22 +210,13 @@ const RuleActions = ({
                   />
                   <Flex gap={4} justifyContent={'space-between'}>
                     {index !== 0 && (
-                      <IconButton
-                        border='1px solid'
-                        colorScheme='white'
-                        borderColor={grayBorderColor}
-                        aria-label='Remove action'
+                      <DeleteButton
                         onClick={() => onDeleteAction(item)}
+                        aria-label={'Remove action'}
                         display={
                           conditionErrorMessage || conditions?.length === 0
                             ? 'none'
                             : 'flex'
-                        }
-                        icon={
-                          <Icon
-                            as={MdDeleteOutline}
-                            sx={{ w: 6, h: 6, color: primaryErrorColor }}
-                          />
                         }
                       />
                     )}

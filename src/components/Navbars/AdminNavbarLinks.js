@@ -1,6 +1,6 @@
 import { useTour } from '@reactour/tour'
 import PropTypes from 'prop-types'
-import {  useState } from 'react'
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { customerRoutes } from 'routes'
 import { dashRoutes } from 'routes.js'

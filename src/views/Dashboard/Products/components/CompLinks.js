@@ -4,13 +4,11 @@ import { useContext, useState } from 'react'
 import { hasWhiteSpace, validateUrl } from 'utils/formValidationUtils'
 import { componentLinkTypes } from 'variables/general'
 
-import { DeleteIcon } from '@chakra-ui/icons'
 import {
   Divider,
   Flex,
   Grid,
   GridItem,
-  IconButton,
   Input,
   Stack,
   Text
@@ -18,6 +16,7 @@ import {
 import { Button, ButtonGroup } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
+import DeleteButton from 'components/Icons/DeleteButton'
 import LynkAlert from 'components/LynkAlert'
 import LynkSelect from 'components/LynkSelect'
 
@@ -71,17 +70,12 @@ const CompLinks = ({ data }) => {
     url: item?.url || ''
   }))
 
-  const {
-    secondaryTextInverse,
-    sameSecondaryText,
-    primaryErrorColor,
-    grayBorderColor
-  } = useThemeColor([
-    'secondaryTextInverse',
-    'sameSecondaryText',
-    'primaryErrorColor',
-    'grayBorderColor'
-  ])
+  const { secondaryTextInverse, sameSecondaryText, grayBorderColor } =
+    useThemeColor([
+      'secondaryTextInverse',
+      'sameSecondaryText',
+      'grayBorderColor'
+    ])
 
   const [error, setError] = useState('')
   const [activeLink, setActiveLink] = useState(null)
@@ -289,7 +283,7 @@ const CompLinks = ({ data }) => {
                             size='sm'
                             title='No'
                             fontSize={'sm'}
-                            variant='outline'
+                            variant='solid'
                             onClick={() => setActiveLink(null)}
                           >
                             No
@@ -298,7 +292,7 @@ const CompLinks = ({ data }) => {
                             size='sm'
                             title='Yes'
                             fontSize={'sm'}
-                            variant='outline'
+                            variant='solid'
                             colorScheme='red'
                             isLoading={loading}
                             onClick={handleLinkRemove}
@@ -308,12 +302,9 @@ const CompLinks = ({ data }) => {
                           </Button>
                         </ButtonGroup>
                       ) : (
-                        <IconButton
+                        <DeleteButton
                           size='sm'
-                          color={primaryErrorColor}
-                          variant='outline'
-                          cursor={'pointer'}
-                          icon={<DeleteIcon />}
+                          variant={'solid'}
                           data-testid='delete_comp_link'
                           onClick={() => setActiveLink(item)}
                         />
