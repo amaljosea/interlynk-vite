@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
-import { capitalizeFirstLetter, getSignedUrlParams } from 'utils'
-import { calculateExpiryDate } from 'utils'
+import { calculateExpiryDate, getSignedUrlParams } from 'utils'
 import { openSsf } from 'variables/general'
 
 import { Box, Flex, Grid, Tag, Text, VStack } from '@chakra-ui/react'
@@ -14,9 +13,11 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 const ExpandedComponent = (props) => {
   const { data, isArchived, action } = props
-  const { componentSupportLevel } = data || {}
-  const { level, retainManualOverrideFor, notes, user } =
-    componentSupportLevel || {}
+  const {
+    componentSupportLevel: manual,
+    componentSupportLevelAutomatic: automatic
+  } = data || {}
+  const { endDate, retainManualOverrideFor, notes, user } = manual || {}
   const openSSF = openSsf?.find((item) => item?.name === data?.purl)
 
   const { isCustomerView } = useRouteFlags()
@@ -24,6 +25,14 @@ const ExpandedComponent = (props) => {
   const { isFreeTier } = useGlobalQueryContext()
 
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+
+  const getDate = (value) =>
+    value ? `${new Date(value).toLocaleDateString()}` : `N/A`
+
+  const getSupportLevel = (value) => {
+    if (!value || value === '') return 'N/A'
+    return value?.replaceAll('_', ' ')
+  }
 
   return useMemo(() => {
     const name = data?.name
@@ -38,21 +47,15 @@ const ExpandedComponent = (props) => {
     const scope = data?.scope
     const licensesExp = data?.licensesExp
     const openSsfScore = openSSF?.score
-    const supportLevel = level
-      ? capitalizeFirstLetter(level?.replaceAll('_', ' '))
-      : ''
-    const endOfSupportDate = componentSupportLevel?.endDate
-    const assessmentExpiresOn = retainManualOverrideFor
-      ? calculateExpiryDate(retainManualOverrideFor)
-      : 'N/A'
-    const supportExplanation = notes
-    const lastAssessedBy = user?.name
+    const level = manual?.level || automatic?.level
+    const supportLevel = getSupportLevel(level)
+    const endOfSupportDate = getDate(endDate)
+    const assessmentExpiresOn = calculateExpiryDate(retainManualOverrideFor)
+    const explanation = notes || automatic?.notes || 'N/A'
+    const assessedBy = user?.name || 'N/A'
 
     const purlColor = purl && primaryBlueText
     const cpesColor = cpes?.length > 0 && primaryBlueText
-
-    const getDate = (value) =>
-      value ? `${new Date(value).toLocaleDateString()}` : `N/A`
 
     const showSupplierForEnterprise =
       !isCustomerView && !signedUrlParams && suppliers?.length === 0
@@ -166,7 +169,7 @@ const ExpandedComponent = (props) => {
           {/* PURL */}
           <DetailItem
             cursor='pointer'
-            onClick={() => (isCustomerView ? null : action('view_purl', data))}
+            onClick={() => action('view_purl', data)}
             value={purl ? purlForDisplay : 'N/A'}
             label='PURL'
             valueStyle={purl && { color: purlColor }}
@@ -176,7 +179,7 @@ const ExpandedComponent = (props) => {
             cursor={cpes?.length > 0 ? 'pointer' : 'default'}
             label='CPES'
             value={cpes?.length > 0 ? cpes[0] : 'N/A'}
-            onClick={() => (isCustomerView ? null : action('view_cpe', data))}
+            onClick={() => action('view_cpe', data)}
             valueStyle={cpes?.length > 0 && { color: cpesColor }}
           />
           {/* Scope */}
@@ -192,14 +195,15 @@ const ExpandedComponent = (props) => {
           {/* Support Level */}
           <DetailItem
             label='Support Level'
-            value={supportLevel || 'N/A'}
+            value={supportLevel}
             hidden={isCustomerView || isFreeTier}
+            valueStyle={{ textTransform: 'capitalize' }}
           />
           {/* End-of-Support Date */}
           <DetailItem
             label='End-of-Support Date'
             hidden={isCustomerView || isFreeTier}
-            value={getDate(endOfSupportDate) || 'N/A'}
+            value={endOfSupportDate}
           />
           {/* ASSESSMENT EXPIERS ON */}
           <DetailItem
@@ -211,12 +215,12 @@ const ExpandedComponent = (props) => {
           <DetailItem
             label='Support Explanation'
             hidden={isCustomerView || isFreeTier}
-            value={supportExplanation || 'N/A'}
+            value={explanation}
           />
           {/* LAST ASSESSED BY */}
           <DetailItem
             label='Last Assessed By'
-            value={lastAssessedBy || 'N/A'}
+            value={assessedBy}
             hidden={isCustomerView || isFreeTier}
           />
         </Grid>

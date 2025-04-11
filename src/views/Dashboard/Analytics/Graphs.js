@@ -26,7 +26,7 @@ export const Graphs = ({ filters }) => {
       <SimpleGrid w={'100%'} columns={[2, 3]} gap={6}>
         {[1, 2, 3, 4, 5, 6].map((item) => (
           <Card key={item}>
-            <CardBody py={16} alignItem='center' justifyContent='center'>
+            <CardBody py={16} alignItems='center' justifyContent='center'>
               <Icon
                 boxSize={32}
                 as={FaChartArea}

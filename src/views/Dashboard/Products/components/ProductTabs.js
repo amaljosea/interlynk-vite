@@ -5,7 +5,7 @@ import { ProductDetailsTabs } from 'utils/TabsObjects'
 import Automation from 'views/Dashboard/Automation'
 import Settings from 'views/Dashboard/ProductSettings'
 
-import { Tab, TabList, TabPanel, TabPanels, Tabs, Tag } from '@chakra-ui/react'
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 
 import ChangelogTable from 'components/Tables/ChangelogTable'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
@@ -41,7 +41,7 @@ const ProductTabs = (props) => {
   const tab = queryParams[0].get('tab')
   const activeTabNumber = Math.max(tabs.indexOf(tab), 0)
 
-  const { data, settings, settingsLoading, activeEnv } = props
+  const { data, settings, activeEnv } = props
 
   const { enabled, projects } = data || ''
 
@@ -142,16 +142,6 @@ const ProductTabs = (props) => {
         </TabPanel>
         {/* VULNERABILITIES */}
         <TabPanel px={0}>
-          {!settingsLoading && (
-            <Tag
-              size='sm'
-              mb={4}
-              colorScheme='orange'
-              hidden={settings?.vulnScanningEnabled}
-            >
-              Automatic vulnerabilty scan is disabled under Product Settings
-            </Tag>
-          )}
           <GlobalVulnTable
             vulns={nodes}
             reset={reset}
@@ -162,15 +152,7 @@ const ProductTabs = (props) => {
         </TabPanel>
         {/* AUTOMATIONS */}
         <TabPanel px={0}>
-          <Tag
-            size='sm'
-            colorScheme='orange'
-            hidden={settings?.automatedFixesEnabled}
-            mb={4}
-          >
-            Automation is disabled under Product Settings
-          </Tag>
-          {<Automation projects={projects} />}
+          <Automation projects={projects} />
         </TabPanel>
         {/* SETTINGS */}
         <TabPanel px={0}>

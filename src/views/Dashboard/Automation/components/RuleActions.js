@@ -1,12 +1,10 @@
-import { Box, Flex, FormControl, Select, Tag, Text } from '@chakra-ui/react'
-import { Input, InputGroup, InputLeftElement } from '@chakra-ui/react'
-import { Icon, IconButton } from '@chakra-ui/react'
+import { components } from 'react-select'
 
+import { Box, Flex, FormControl, Input, Tag, Text } from '@chakra-ui/react'
+
+import DeleteButton from 'components/Icons/DeleteButton'
 import LynkDate from 'components/LynkDate'
-
-import { useThemeColor } from 'hooks/useThemeColors'
-
-import { MdDeleteOutline } from 'react-icons/md'
+import LynkSelect from 'components/LynkSelect'
 
 import SubjectIcon from './SubjectIcon'
 
@@ -19,12 +17,9 @@ const RuleActions = ({
   conditionErrorMessage,
   categories,
   optionsByCategory,
-  setDeleteAction
+  setDeleteAction,
+  automationConditionSubjectFieldMapping
 }) => {
-  const { grayBorderColor, primaryErrorColor } = useThemeColor([
-    'grayBorderColor',
-    'primaryErrorColor'
-  ])
   const isComponent = conditions?.some((item) => item?.category === 'component')
 
   const onActionChange = (value, id, field) => {
@@ -65,6 +60,57 @@ const RuleActions = ({
     }
   }
 
+  const SingleValue = ({ data, ...props }) => {
+    return (
+      <components.SingleValue {...props}>
+        <Flex display='flex' alignItems='center' gap={'7px'}>
+          <SubjectIcon subject={data?.value} isSystem={isSystem} />
+          <Text>{data.label}</Text>
+        </Flex>
+      </components.SingleValue>
+    )
+  }
+
+  const subjectOptions = [
+    {
+      label: '',
+      options: [{ value: '', label: '-- Subject --' }]
+    },
+    ...categories
+      .filter((category) => category === conditions[0]?.category)
+      .map((category) => ({
+        label: category,
+        options: automationConditionSubjectFieldMapping
+          .filter((item) => item.subject === category)
+          .map((item) => ({
+            value: optionsByCategory[category]?.find(
+              (opt) => opt.props.children === item.name
+            ).props.value,
+            label: item.name
+          }))
+      }))
+  ]
+
+  const internalOptions = [
+    { label: '-- Select --', value: '' },
+    { label: 'Yes', value: 'true' },
+    { label: 'No', value: 'false' }
+  ]
+
+  const supportOptions = [
+    { label: '-- Select --', value: '' },
+    { label: 'Unspecified', value: 'UNSPECIFIED' },
+    {
+      label: 'Actively Maintained',
+      value: 'ACTIVELY_MAINTAINED'
+    },
+    {
+      label: 'No Longer Maintained',
+      value: 'NO_LONGER_MAINTAINED'
+    },
+    { label: 'Abandoned', value: 'ABANDONED' }
+  ]
+
   return (
     <>
       {actions?.length > 0 &&
@@ -74,46 +120,29 @@ const RuleActions = ({
               key={index}
               sx={{ w: '100%', gap: 2, mt: 1.5, alignItems: 'flex-start' }}
             >
-              {/* ICON */}
-              <InputGroup>
-                <InputLeftElement pointerEvents='none'>
-                  <SubjectIcon subject={item?.subject} isSystem={isSystem} />
-                </InputLeftElement>
-                {/* SUBJECT */}
-                <FormControl as={Flex} alignItems='center'>
-                  <Select
-                    value={item?.field}
-                    onChange={(e) =>
-                      onActionChange(e.target.value, item.id, 'field')
-                    }
-                    placeholder='-- Subject --'
-                    textTransform={'capitalize'}
-                    isDisabled={
-                      conditionErrorMessage ||
-                      conditions?.length === 0 ||
-                      isSystem
-                    }
-                    sx={{ paddingLeft: '34px' }}
-                    data-testid={`auto_action_subject_${index}`}
-                  >
-                    {conditions?.some((item) => item?.category === 'component')
-                      ? [...categories]
-                          ?.filter((item) => item !== 'version')
-                          .map((category) => (
-                            <optgroup key={category} label={category}>
-                              {optionsByCategory[category]}
-                            </optgroup>
-                          ))
-                      : [...categories]
-                          ?.filter((item) => item !== 'component')
-                          .map((category) => (
-                            <optgroup key={category} label={category}>
-                              {optionsByCategory[category]}
-                            </optgroup>
-                          ))}
-                  </Select>
-                </FormControl>
-              </InputGroup>
+              {/* SUBJECT */}
+              <FormControl>
+                <LynkSelect
+                  isDisabled={
+                    conditionErrorMessage ||
+                    conditions?.length === 0 ||
+                    isSystem
+                  }
+                  onChange={(selected) =>
+                    onActionChange(selected?.value, item?.id, 'field')
+                  }
+                  placeholder='-- Subject --'
+                  id={`auto_action_subject_${index}`}
+                  options={subjectOptions}
+                  value={
+                    subjectOptions[1]?.options.find(
+                      (option) => option.value === item?.field
+                    ) || null
+                  }
+                  components={{ SingleValue }}
+                  dropDown
+                />
+              </FormControl>
               {/* OPERATOR */}
               <Input
                 textTransform={'capitalize'}
@@ -121,41 +150,42 @@ const RuleActions = ({
                 isDisabled={
                   conditionErrorMessage || conditions?.length === 0 || isSystem
                 }
-                sx={{ w: '130px', fontSize: 'sm', pointerEvents: 'none' }}
+                sx={{ fontSize: 'sm', pointerEvents: 'none', w: 170 }}
               />
               {/* VALUE */}
               {item?.field === 'component_internal' ? (
-                <Select
-                  type={'text'}
-                  value={item?.value}
-                  onChange={(e) =>
-                    onActionChange(e.target.value, item.id, 'value')
+                <LynkSelect
+                  type='text'
+                  onChange={(selected) =>
+                    onActionChange(selected?.value, item.id, 'value')
                   }
-                  sx={{ minW: 140 }}
-                >
-                  <option value=''>-- Select --</option>
-                  <option value={'true'}>Yes</option>
-                  <option value={'false'}>No</option>
-                </Select>
+                  placeholder='-- Select --'
+                  options={internalOptions}
+                  value={
+                    internalOptions.find(
+                      (option) => option.value === item?.value
+                    ) || null
+                  }
+                  dropDown
+                  styles={{
+                    container: (base) => ({ ...base, width: 170 })
+                  }}
+                />
               ) : item?.field === 'component_support_level' ? (
-                <Select
-                  type={'text'}
-                  value={item?.value}
-                  onChange={(e) =>
-                    onActionChange(e.target.value, item.id, 'value')
+                <LynkSelect
+                  type='text'
+                  onChange={(selected) =>
+                    onActionChange(selected?.value, item.id, 'value')
                   }
-                  sx={{ minW: 140 }}
-                >
-                  <option value=''>-- Select --</option>
-                  <option value='UNSPECIFIED'>Unspecified</option>
-                  <option value='ACTIVELY_MAINTAINED'>
-                    Actively Maintained
-                  </option>
-                  <option value='NO_LONGER_MAINTAINED'>
-                    No Longer Maintained
-                  </option>
-                  <option value='ABANDONED'>Abandoned</option>
-                </Select>
+                  placeholder='-- Select --'
+                  options={supportOptions}
+                  value={
+                    supportOptions.find(
+                      (option) => option.value === item?.value
+                    ) || null
+                  }
+                  dropDown
+                />
               ) : item?.field === 'component_end_of_support' ? (
                 <LynkDate
                   name='endOfSupport'
@@ -179,23 +209,14 @@ const RuleActions = ({
                     sx={{ minW: 140, fontSize: 'sm' }}
                   />
                   <Flex gap={4} justifyContent={'space-between'}>
-                    {actions?.length > 1 && (
-                      <IconButton
-                        border='1px solid'
-                        colorScheme='white'
-                        borderColor={grayBorderColor}
-                        aria-label='Remove action'
+                    {index !== 0 && (
+                      <DeleteButton
                         onClick={() => onDeleteAction(item)}
+                        aria-label={'Remove action'}
                         display={
                           conditionErrorMessage || conditions?.length === 0
                             ? 'none'
                             : 'flex'
-                        }
-                        icon={
-                          <Icon
-                            as={MdDeleteOutline}
-                            sx={{ w: 6, h: 6, color: primaryErrorColor }}
-                          />
                         }
                       />
                     )}

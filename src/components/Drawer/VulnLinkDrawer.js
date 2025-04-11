@@ -3,21 +3,13 @@ import { useEffect, useState } from 'react'
 import { truncatedValue } from 'utils'
 import { hasWhiteSpace, validateUrl } from 'utils/formValidationUtils'
 
-import { DeleteIcon } from '@chakra-ui/icons'
-import {
-  Button,
-  Flex,
-  IconButton,
-  Input,
-  Select,
-  Tag,
-  Text,
-  Tooltip
-} from '@chakra-ui/react'
+import { Button, Flex, Input, Tag, Text, Tooltip } from '@chakra-ui/react'
 import { Table, Tbody, Td, Tr } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
+import DeleteButton from 'components/Icons/DeleteButton'
 import LynkDrawer from 'components/LynkDrawer'
+import LynkSelect from 'components/LynkSelect'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -36,17 +28,15 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
   const [addUrls, { loading }] = useMutation(ComponentVulnUpdate)
   const [addPartsUrls] = useMutation(DispositionByParentUpdate)
 
-  const { primaryErrorColor, secondaryTextInverse, sameSecondaryText } =
-    useThemeColor([
-      'primaryErrorColor',
-      'secondaryTextInverse',
-      'sameSecondaryText'
-    ])
+  const { secondaryTextInverse, sameSecondaryText } = useThemeColor([
+    'secondaryTextInverse',
+    'sameSecondaryText'
+  ])
 
   const containsSpace = hasWhiteSpace(link)
 
-  const handleTypeChange = (e) => {
-    const { value } = e.target
+  const handleTypeChange = (selectedItem) => {
+    const { value } = selectedItem
     setType(value)
     const isExists =
       externalData?.length > 0 &&
@@ -143,20 +133,17 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
   }
 
   const DeleteAction = ({ id }) => (
-    <IconButton
+    <DeleteButton
       size='sm'
-      hidden={isPart}
-      variant='outline'
-      cursor={'pointer'}
-      icon={<DeleteIcon />}
-      color={primaryErrorColor}
+      variant={'solid'}
       data-testid='delete_vuln_link'
       onClick={() => handleLinkRemove(id)}
+      hidden={isPart}
     />
   )
 
   const isDisabled =
-    !validateUrl(link.trim()) || linkError !== '' || error !== ''
+    !validateUrl(link.trim()) || linkError !== '' || error !== '' || !type
 
   useEffect(() => {
     if (externalUrls?.length > 0) {
@@ -185,6 +172,14 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
       setCurrentData(urls)
     }
   }, [currentExternalUrls])
+
+  const typeOptions = [
+    { label: '-- Select --', value: '' },
+    { label: 'Issue Tracker', value: 'issue-tracker' },
+    { label: 'Advisories', value: 'advisories' },
+    { label: 'Documentation', value: 'documentation' },
+    { label: 'Other', value: 'other' }
+  ]
   //
   return (
     <LynkDrawer
@@ -203,16 +198,13 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
           {/* NAME */}
           <FormControl isRequired isInvalid={error !== ''}>
             <FormLabel>Type</FormLabel>
-            <Select value={type} onChange={handleTypeChange}>
-              <option value=''>-- Select --</option>
-              {['issue-tracker', 'advisories', 'documentation', 'other'].map(
-                (item, index) => (
-                  <option key={index} value={item}>
-                    {item}
-                  </option>
-                )
-              )}
-            </Select>
+            <LynkSelect
+              value={typeOptions.find((option) => option.value === type)}
+              onChange={(selectedOption) => handleTypeChange(selectedOption)}
+              options={typeOptions}
+              dropDown
+            />
+
             <FormErrorMessage data-testid='vuln_link_error'>
               {error}
             </FormErrorMessage>
@@ -221,7 +213,8 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
           <FormControl
             isRequired
             isInvalid={
-              (link !== '' && !validateUrl(link.trim())) || containsSpace
+              (linkError !== '' && link !== '' && !validateUrl(link.trim())) ||
+              containsSpace
             }
           >
             <FormLabel>Link</FormLabel>

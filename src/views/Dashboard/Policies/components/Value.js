@@ -7,7 +7,6 @@ import {
 } from 'variables/general'
 
 import { Flex, FormControl, Stack, Text } from '@chakra-ui/react'
-import { Icon, IconButton } from '@chakra-ui/react'
 import {
   Input,
   InputGroup,
@@ -15,27 +14,24 @@ import {
   InputRightAddon
 } from '@chakra-ui/react'
 
+import DeleteButton from 'components/Icons/DeleteButton'
 import LynkSelect from 'components/LynkSelect'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { MdDeleteOutline } from 'react-icons/md'
-
 const Value = (props) => {
   const {
+    data,
+    index,
     setError,
     setConditions,
     setDeletedRules,
-    data,
     conditions,
     onChange
   } = props
   const { id, value, min, max, valError, operator, subject } = data || {}
 
-  const { primaryErrorColor, grayBorderColor } = useThemeColor([
-    'primaryErrorColor',
-    'grayBorderColor'
-  ])
+  const { primaryErrorColor } = useThemeColor(['primaryErrorColor'])
 
   const handleBlur = (rule) => {
     const newData = conditions.map((item) => {
@@ -107,15 +103,8 @@ const Value = (props) => {
     }))
   ]
 
-  const selectStyles = {
-    container: (baseStyles) => ({
-      ...baseStyles,
-      minWidth: '100px'
-    })
-  }
-
   return (
-    <Flex alignItems={'center'} gap={4}>
+    <Flex alignItems={'center'} gap={4} justifyContent={'space-between'}>
       {subject === 'VULNERABILITY_SEV' && (
         <FormControl isRequired>
           <LynkSelect
@@ -127,12 +116,11 @@ const Value = (props) => {
             dropDown
             placeholder={'-- Select --'}
             isDisabled={operator === 'EXISTS' || operator === 'NOT_EXISTS'}
-            styles={selectStyles}
           />
         </FormControl>
       )}
       {subject === 'VULNERABILITY_KEV' && (
-        <FormControl isRequired minWidth={140}>
+        <FormControl isRequired>
           <LynkSelect
             id='operator'
             name='operator'
@@ -141,7 +129,6 @@ const Value = (props) => {
             options={kevOptions}
             dropDown
             placeholder={'-- Select --'}
-            styles={selectStyles}
           />
         </FormControl>
       )}
@@ -156,7 +143,6 @@ const Value = (props) => {
             hidden={operator === 'EXISTS' || operator === 'NOT_EXISTS'}
             dropDown
             placeholder={'-- Select --'}
-            styles={selectStyles}
           />
         </FormControl>
       )}
@@ -170,7 +156,6 @@ const Value = (props) => {
             options={statusCompletenessOptions}
             dropDown
             placeholder={'-- Select --'}
-            styles={selectStyles}
           />
         </FormControl>
       )}
@@ -185,7 +170,6 @@ const Value = (props) => {
               options={licenseOptions}
               placeholder={'-- Select --'}
               dropDown
-              styles={selectStyles}
             />
           </FormControl>
         )}
@@ -203,7 +187,6 @@ const Value = (props) => {
               placeholder={'-- Select --'}
               dropDown={true}
               width={'100%'}
-              styles={selectStyles}
             />
           </FormControl>
         )}
@@ -334,26 +317,15 @@ const Value = (props) => {
             placeholder='Value'
             value={value}
             onChange={(e) => onChange(e.target.value, id, 'value')}
-            minWidth={140}
+            w={'150px'}
           />
         )}
-      <Flex gap={4} justifyContent={'space-between'}>
-        {conditions?.length > 1 && (
-          <IconButton
-            border='1px solid'
-            colorScheme='white'
-            borderColor={grayBorderColor}
-            aria-label='Remove condition'
-            onClick={() => deleteRow(data)}
-            icon={
-              <Icon
-                sx={{ w: 6, h: 6, color: primaryErrorColor }}
-                as={MdDeleteOutline}
-              />
-            }
-          />
-        )}
-      </Flex>
+      {index !== 0 && (
+        <DeleteButton
+          aria-label='Remove condition'
+          onClick={() => deleteRow(data)}
+        />
+      )}
     </Flex>
   )
 }

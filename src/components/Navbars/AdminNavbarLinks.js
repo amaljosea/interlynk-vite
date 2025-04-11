@@ -1,12 +1,11 @@
 import { useTour } from '@reactour/tour'
 import PropTypes from 'prop-types'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { customerRoutes } from 'routes'
 import { dashRoutes } from 'routes.js'
 import { getSignedUrlParams } from 'utils'
 import { logoutUser } from 'utils/authUtils'
-import { getItem, removeItem, setItem } from 'utils/localStorageUtils'
 
 import { Button, Flex, useColorMode } from '@chakra-ui/react'
 import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'

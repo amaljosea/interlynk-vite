@@ -657,6 +657,8 @@ export const fetchNodes = (res, selector) => {
 }
 
 export const calculateExpiryDate = (days) => {
+  if (!days || days <= 0) return 'N/A'
+
   const today = new Date()
   today.setUTCDate(today.getUTCDate() + days)
   return today.toLocaleDateString()

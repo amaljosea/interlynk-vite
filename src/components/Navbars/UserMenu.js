@@ -1,5 +1,6 @@
 import { useTour } from '@reactour/tour'
 import { Link, useParams } from 'react-router-dom'
+import { truncatedValue } from 'utils'
 import { homeSteps, productSteps } from 'utils/tourUtils'
 
 import { Avatar, Flex, Icon, Stack, Text } from '@chakra-ui/react'
@@ -34,6 +35,9 @@ export const UserMenu = ({ handleLogout }) => {
   const { isDashboardView, isProductsPage } = useRouteFlags()
 
   const currentUser = organization?.currentUser
+  const userName = currentUser?.name
+    ? truncatedValue(currentUser?.name, 20)
+    : 'N/A'
 
   const updateTour = (steps, name) => {
     localStorage.setItem('activeTour', name)
@@ -68,7 +72,7 @@ export const UserMenu = ({ handleLogout }) => {
               <Flex flexDirection='row' alignItems='flex-start' gap={3}>
                 <Icon as={FaUser} width={2.5} mt={1} />
                 <Stack spacing={0}>
-                  {currentUser?.name && <Text>{currentUser?.name}</Text>}
+                  {currentUser?.name && <Text>{userName}</Text>}
                   <Text fontSize='sm' color={sameSecondaryText}>
                     {currentUser?.email}
                   </Text>

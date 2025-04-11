@@ -32,7 +32,6 @@ import { GetComponentData } from 'graphQL/Queries'
 
 import CompDrawer from '../components/CompDrawer'
 import CompInsights from '../components/CompInsights'
-import CompSupport from '../components/CompSupport'
 import ConfirmationModal from '../components/ConfirmationModal'
 import HealthMap from '../components/HealthMap'
 import ComponentsColumns from './Components/tableColumns/ComponentsColumns'
@@ -133,7 +132,6 @@ const Components = ({ sbomData }) => {
   const COMPONENT = useDisclosure()
   const INSIGHTS = useDisclosure()
   const VULNS = useDisclosure()
-  const SUPPORT = useDisclosure()
   const DELETE_SUPPLIER = useDisclosure()
   const LICENSE_STATUS = useDisclosure()
 
@@ -162,8 +160,6 @@ const Components = ({ sbomData }) => {
         return NOTES.onOpen()
       case 'view_component_vulnerabilities':
         return VULNS.onOpen()
-      case 'edit_component_support':
-        return SUPPORT.onOpen()
       case 'view_health_map':
         return MAP.onOpen()
       default:
@@ -401,14 +397,6 @@ const Components = ({ sbomData }) => {
           data={activeRow}
           isOpen={NOTES.isOpen}
           onClose={NOTES.onClose}
-        />
-      )}
-
-      {SUPPORT.isOpen && (
-        <CompSupport
-          data={activeRow}
-          isOpen={SUPPORT.isOpen}
-          onClose={SUPPORT.onClose}
         />
       )}
 

@@ -5,15 +5,15 @@ import { getFullDate, timeSince, truncatedValue } from 'utils'
 import { customStyles } from 'utils/styleUtils'
 import { getShareLinklUrl } from 'utils/url'
 
-import { DeleteIcon } from '@chakra-ui/icons'
 import { Button, Checkbox, Divider, Input, Stack, Tag } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
-import { Flex, IconButton, Text, Tooltip } from '@chakra-ui/react'
+import { Flex, Text, Tooltip } from '@chakra-ui/react'
 import { useClipboard } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
 import CopyButton from 'components/Icons/CopyButton'
+import DeleteButton from 'components/Icons/DeleteButton'
 import LynkDate from 'components/LynkDate'
 import LynkDrawer from 'components/LynkDrawer'
 
@@ -225,12 +225,8 @@ const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
       id: 'ACTION',
       name: 'ACTION',
       selector: (row) => (
-        <IconButton
-          size='sm'
-          cursor='pointer'
-          colorScheme='red'
-          variant='outline'
-          icon={<DeleteIcon />}
+        <DeleteButton
+          variant='solid'
           onClick={() => handleDeleteLynk(row?.id)}
         />
       ),

@@ -1,17 +1,12 @@
 import { useState } from 'react'
 import { generateRandomColor, hexToRGBA } from 'utils/styleUtils'
 
-import {
-  CheckIcon,
-  CloseIcon,
-  DeleteIcon,
-  EditIcon,
-  RepeatIcon
-} from '@chakra-ui/icons'
+import { CheckIcon, CloseIcon, EditIcon, RepeatIcon } from '@chakra-ui/icons'
 import { Flex, IconButton, Stack, Text } from '@chakra-ui/react'
 import { Divider, Input, Spacer } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import DeleteButton from 'components/Icons/DeleteButton'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -22,10 +17,7 @@ const LabelList = ({ loading, labels, onDeleteLabel, onEditLabel }) => {
   const [editName, setEditName] = useState('')
   const [editColor, setEditColor] = useState('')
 
-  const { sameSecondaryText, primaryErrorColor } = useThemeColor([
-    'sameSecondaryText',
-    'primaryErrorColor'
-  ])
+  const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
 
   const startEditing = (label) => {
     setEditingId(label.id)
@@ -130,13 +122,11 @@ const LabelList = ({ loading, labels, onDeleteLabel, onEditLabel }) => {
                       className='text-blue-500 hover:text-blue-700 focus:outline-none mr-2'
                       title='Edit label'
                     />
-
-                    <IconButton
+                    <DeleteButton
                       size='sm'
-                      icon={<DeleteIcon size={18} color={primaryErrorColor} />}
                       onClick={() => onDeleteLabel(label.id)}
-                      className='text-red-500 hover:text-red-700 focus:outline-none'
                       title='Delete label'
+                      variant={'solid'}
                     />
                   </Flex>
                 </Flex>

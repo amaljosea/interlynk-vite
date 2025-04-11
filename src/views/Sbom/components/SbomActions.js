@@ -9,6 +9,7 @@ import { EditIcon } from '@chakra-ui/icons'
 import { Flex, IconButton, Tooltip, useDisclosure } from '@chakra-ui/react'
 
 import SystemLogs from 'components/Drawer/SystemLogs'
+import DeleteButton from 'components/Icons/DeleteButton'
 import PrimaryTreeView from 'components/PrimaryTreeView'
 import ReleaseDate from 'components/ReleaseDate'
 import SbomDownload from 'components/SbomDownload'
@@ -29,7 +30,6 @@ import {
   ShareProject
 } from 'graphQL/Queries'
 
-import { BiTrash } from 'react-icons/bi'
 import { FiCheckCircle } from 'react-icons/fi'
 
 import CheckModal from './CheckModal'
@@ -234,15 +234,13 @@ const SbomActions = ({ sbom }) => {
           />
         </Tooltip>
         {/* DELETE SBOM */}
-        <Tooltip label='Delete'>
-          <IconButton
-            colorScheme='red'
-            onClick={DELETE.onOpen}
-            isDisabled={!archiveSboms}
-            icon={<BiTrash size={18} />}
-            display={signedUrlParams ? 'none' : 'flex'}
-          />
-        </Tooltip>
+        <DeleteButton
+          variant={'solid'}
+          onClick={DELETE.onOpen}
+          isDisabled={!archiveSboms}
+          display={signedUrlParams ? 'none' : 'flex'}
+          tooltip={'Delete'}
+        />
       </Flex>
 
       {/* ---------- ACTIONS MODALS / DRAWERS ------------- */}

@@ -4,6 +4,7 @@ import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getSignedUrlParams } from 'utils'
 import { parseEpssRange } from 'utils'
+import { isSbomArchived } from 'utils'
 import { customStyles } from 'utils/styleUtils'
 import VulnerabilityColumns from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableColumns/VulnerabilityColumns'
 import ExpandedComponent from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableExpanded/VulnerabilityExpanded'
@@ -125,8 +126,15 @@ const Vulnerabilities = ({ sbomData }) => {
     onClose: onCvssClose
   } = useDisclosure()
 
+  const handleCvssOpen = (data) => {
+    setActiveRow(data)
+    onCvssOpen()
+  }
+
+  const isArchived = isSbomArchived(sbomData)
+
   // COLUMNS
-  const columns = VulnerabilityColumns()
+  const columns = VulnerabilityColumns({ isArchived })
 
   // CLEAR SERACH
   const handleClear = useCallback(() => {
@@ -206,7 +214,7 @@ const Vulnerabilities = ({ sbomData }) => {
           expandableRowsComponent={ExpandedComponent}
           expandableRowsComponentProps={{
             setActiveRow,
-            onCvssOpen
+            onCvssOpen: handleCvssOpen
           }}
         />
       </Flex>

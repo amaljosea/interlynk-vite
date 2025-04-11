@@ -1,13 +1,11 @@
+import { components } from 'react-select'
 import { updatedValue } from 'utils'
 
-import { Box, Flex, Select, Tag, Text } from '@chakra-ui/react'
-import { Icon, IconButton } from '@chakra-ui/react'
-import { Input, InputGroup, InputLeftElement } from '@chakra-ui/react'
+import { Box, Flex, Input, Tag, Text } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage } from '@chakra-ui/react'
 
-import { useThemeColor } from 'hooks/useThemeColors'
-
-import { MdDeleteOutline } from 'react-icons/md'
+import DeleteButton from 'components/Icons/DeleteButton'
+import LynkSelect from 'components/LynkSelect'
 
 import SubjectIcon from './SubjectIcon'
 
@@ -24,11 +22,6 @@ const RuleConditions = ({
   setDeletedCondition,
   automationConditionSubjectFieldMapping
 }) => {
-  const { grayBorderColor, primaryErrorColor } = useThemeColor([
-    'grayBorderColor',
-    'primaryErrorColor'
-  ])
-
   const onCondtionChange = (value, id, field) => {
     setError('')
     const newData = conditions.map((item) => {
@@ -123,6 +116,41 @@ const RuleConditions = ({
     }
   }
 
+  const SingleValue = ({ data, ...props }) => {
+    return (
+      <components.SingleValue {...props}>
+        <Flex display='flex' alignItems='center' gap={'7px'}>
+          <SubjectIcon subject={data?.value} isSystem={isSystem} />
+          <Text>{data.label}</Text>
+        </Flex>
+      </components.SingleValue>
+    )
+  }
+
+  const subjectOptions = [
+    {
+      label: '',
+      options: [{ value: '', label: '-- Subject --' }]
+    },
+    ...categories.map((category) => ({
+      label: category,
+      options: automationConditionSubjectFieldMapping
+        .filter((item) => item.subject === category)
+        .map((item) => ({
+          value: optionsByCategory[category]?.find(
+            (opt) => opt.props.children === item.name
+          ).props.value,
+          label: item.name
+        }))
+    }))
+  ]
+
+  const booleanSelectOptions = [
+    { label: '-- Select --', value: '' },
+    { label: 'Yes', value: 'true' },
+    { label: 'No', value: 'false' }
+  ]
+
   return (
     <>
       {conditions?.length > 0 &&
@@ -132,75 +160,65 @@ const RuleConditions = ({
               key={index}
               sx={{ w: '100%', gap: 2, mt: 1.5, alignItems: 'flex-start' }}
             >
-              {/* ICON */}
-              <InputGroup>
-                <InputLeftElement pointerEvents='none'>
-                  <SubjectIcon subject={item?.subject} isSystem={isSystem} />
-                </InputLeftElement>
-                {/* SUBJECT */}
-                <FormControl isInvalid={item?.subError !== ''}>
-                  <Select
-                    isDisabled={isSystem}
-                    value={item?.subject}
-                    onChange={(e) =>
-                      onCondtionChange(e.target.value, item.id, 'subject')
-                    }
-                    onBlur={() => onSubjectBlur(item)}
-                    placeholder='-- Subject --'
-                    onBlurCapture={() => onSubjectBlur(item)}
-                    textTransform={'capitalize'}
-                    sx={{ paddingLeft: '34px' }}
-                    data-testid={`auto_conditon_subject_${index}`}
-                  >
-                    {conditions?.length > 1 &&
-                    conditions?.some((item) => item?.category === 'component')
-                      ? [...categories]
-                          ?.filter((item) => item !== 'version')
-                          .map((category) => (
-                            <optgroup key={category} label={category}>
-                              {optionsByCategory[category]}
-                            </optgroup>
-                          ))
-                      : conditions?.length > 1 &&
-                          conditions?.some(
-                            (item) => item?.category === 'version'
-                          )
-                        ? [...categories]
-                            ?.filter((item) => item !== 'component')
-                            .map((category) => (
-                              <optgroup key={category} label={category}>
-                                {optionsByCategory[category]}
-                              </optgroup>
-                            ))
-                        : categories.map((category) => (
-                            <optgroup key={category} label={category}>
-                              {optionsByCategory[category]}
-                            </optgroup>
-                          ))}
-                  </Select>
-                  <FormErrorMessage>{item?.subError}</FormErrorMessage>
-                </FormControl>
-              </InputGroup>
+              {/* SUBJECT */}
+              <FormControl isInvalid={item?.subError !== ''}>
+                <LynkSelect
+                  isDisabled={isSystem}
+                  onChange={(selected) =>
+                    onCondtionChange(selected?.value, item?.id, 'subject')
+                  }
+                  onBlur={() => onSubjectBlur(item)}
+                  placeholder='-- Subject --'
+                  id={`auto_conditon_subject_${index}`}
+                  options={
+                    conditions.length > 1 &&
+                    !(
+                      conditions[0]?.subject === '' &&
+                      conditions[1]?.subject === ''
+                    )
+                      ? subjectOptions.filter(
+                          (item, index) =>
+                            index === 0 ||
+                            item.label === conditions[0]?.category
+                        )
+                      : subjectOptions
+                  }
+                  components={{ SingleValue }}
+                  dropDown
+                />
+
+                <FormErrorMessage>{item?.subError}</FormErrorMessage>
+              </FormControl>
               {/* OPERATOR */}
               <FormControl isInvalid={item?.opError !== ''}>
-                <Select
-                  id='operator'
+                <LynkSelect
                   name='operator'
-                  value={item?.operator}
-                  onChange={(e) =>
-                    onCondtionChange(e.target.value, item.id, 'operator')
+                  onChange={(selected) =>
+                    onCondtionChange(selected?.value, item.id, 'operator')
+                  }
+                  value={
+                    [
+                      { label: '-- Operator --', value: '' },
+                      ...(item?.list ?? []).map((option) => ({
+                        label: updatedValue(option),
+                        value: option
+                      }))
+                    ].find((option) => option.value === item?.operator) || null
                   }
                   placeholder='-- Operator --'
                   onBlur={() => onOperatorBlur(item)}
                   isDisabled={isSystem}
-                  data-testid={`auto_conditon_operator_${index}`}
-                >
-                  {item?.list?.map((option) => (
-                    <option value={option} key={option}>
-                      {updatedValue(option)}
-                    </option>
-                  ))}
-                </Select>
+                  id={`auto_conditon_operator_${index}`}
+                  options={[
+                    { label: '-- Operator --', value: '' },
+                    ...(item?.list ?? []).map((option) => ({
+                      label: updatedValue(option),
+                      value: option
+                    }))
+                  ]}
+                  styles={{ container: (base) => ({ ...base, minWidth: 160 }) }}
+                  dropDown
+                />
                 <FormErrorMessage>{item?.opError}</FormErrorMessage>
               </FormControl>
               {/* VALUE */}
@@ -214,39 +232,29 @@ const RuleConditions = ({
                     onChange={(e) =>
                       onCondtionChange(e.target.value, item.id, 'value')
                     }
-                    sx={{ minW: 140, fontSize: 'sm' }}
+                    sx={{ fontSize: 'sm' }}
                   />
                 )}
               {item?.operator === 'boolean_is' && (
-                <Select
-                  type={'text'}
-                  value={item?.value}
-                  onChange={(e) =>
-                    onCondtionChange(e.target.value, item.id, 'value')
+                <LynkSelect
+                  type='text'
+                  onChange={(selected) =>
+                    onCondtionChange(selected?.value, item.id, 'value')
                   }
-                  sx={{ minW: 140 }}
-                >
-                  <option value=''>-- Select --</option>
-                  <option value={'true'}>Yes</option>
-                  <option value={'false'}>No</option>
-                </Select>
+                  value={booleanSelectOptions.find(
+                    (option) => option.value === item?.value
+                  )}
+                  styles={{ container: (base) => ({ ...base, minWidth: 140 }) }}
+                  placeholder='-- Select --'
+                  options={booleanSelectOptions}
+                  dropDown
+                />
               )}
               <Flex gap={4} justifyContent={'space-between'}>
-                {conditions?.length > 1 && (
-                  <IconButton
-                    border='1px solid'
-                    colorScheme='white'
-                    borderColor={grayBorderColor}
+                {index !== 0 && (
+                  <DeleteButton
                     aria-label='Remove condition'
                     onClick={() => onDeleteCondtion(item)}
-                    icon={
-                      <Icon
-                        color={primaryErrorColor}
-                        w={6}
-                        h={6}
-                        as={MdDeleteOutline}
-                      />
-                    }
                   />
                 )}
               </Flex>

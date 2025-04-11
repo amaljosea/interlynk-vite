@@ -7,14 +7,12 @@ import {
   validateUrl
 } from 'utils/formValidationUtils'
 
-import { Icon, IconButton } from '@chakra-ui/react'
 import { Button, Flex, Heading, Input, Stack } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
+import DeleteButton from 'components/Icons/DeleteButton'
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
-
-import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
   OrganizationManufacturerCreate,
@@ -23,7 +21,6 @@ import {
 
 import { BsGear } from 'react-icons/bs'
 import { FaPlus } from 'react-icons/fa6'
-import { MdDeleteOutline } from 'react-icons/md'
 
 const LegalModal = ({ data, isOpen, onClose }) => {
   const [url, setUrl] = useState('')
@@ -31,11 +28,6 @@ const LegalModal = ({ data, isOpen, onClose }) => {
   const [orgName, setOrgName] = useState('')
   const [contacts, setContacts] = useState([])
   const [isValidUrl, setIsValidUrl] = useState('')
-
-  const { grayBorderColor, primaryErrorColor } = useThemeColor([
-    'grayBorderColor',
-    'primaryErrorColor'
-  ])
 
   const [deletedContacts, setDeletedContacts] = useState([])
 
@@ -366,20 +358,9 @@ const LegalModal = ({ data, isOpen, onClose }) => {
                     </FormErrorMessage>
                   )}
                 </FormControl>
-                <IconButton
-                  border='1px solid'
-                  colorScheme='white'
-                  borderColor={grayBorderColor}
+                <DeleteButton
                   aria-label='Remove config'
                   onClick={() => deleteRow(item)}
-                  icon={
-                    <Icon
-                      color={primaryErrorColor}
-                      w={6}
-                      h={6}
-                      as={MdDeleteOutline}
-                    />
-                  }
                 />
               </Flex>
             ))}

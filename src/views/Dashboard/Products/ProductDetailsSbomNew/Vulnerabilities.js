@@ -349,7 +349,7 @@ const Vulnerabilities = ({ sbomData }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const onCvssOpen = () => action('view_cvss', null)
+  const onCvssOpen = (data) => action('view_cvss', data)
 
   // COLUMNS
   const columns = VulnerabilityColumns({ isArchived, action })

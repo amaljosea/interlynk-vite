@@ -4,6 +4,7 @@ import { getSignedUrlParams } from 'utils'
 
 import { Flex, IconButton, Tooltip, useDisclosure } from '@chakra-ui/react'
 
+import DeleteButton from 'components/Icons/DeleteButton'
 import EnvList from 'components/Misc/EnvList'
 import NotificationMenuBell from 'components/Notifications/NotificationMenuBell'
 
@@ -12,7 +13,6 @@ import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { DeleteProjectGroup } from 'graphQL/Mutation'
 
-import { FaRegTrashAlt } from 'react-icons/fa'
 import {
   FaDiagramProject,
   FaRegPenToSquare,
@@ -117,15 +117,13 @@ const ProductActions = ({ data }) => {
             />
           </Tooltip>
           {/* ARCHIVE PRODUCT */}
-          <Tooltip label='Delete Product'>
-            <IconButton
-              colorScheme='red'
-              aria-label='delete_product'
-              onClick={DELETE.onOpen}
-              icon={<FaRegTrashAlt />}
-              isDisabled={!archiveProduct || signedUrlParams}
-            />
-          </Tooltip>
+          <DeleteButton
+            variant={'solid'}
+            aria-label='delete_product'
+            onClick={DELETE.onOpen}
+            isDisabled={!archiveProduct || signedUrlParams}
+            tooltip={'Delete Product'}
+          />
         </Flex>
       </Flex>
 

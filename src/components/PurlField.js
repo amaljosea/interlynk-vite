@@ -3,10 +3,12 @@ import { PackageURL } from 'packageurl-js'
 import { useContext } from 'react'
 import IdentifierLabel from 'views/Dashboard/Products/components/IdentifierLabel'
 
-import { Input } from '@chakra-ui/react'
+import { Input, InputGroup, useClipboard } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage } from '@chakra-ui/react'
 
 import { useRouteFlags } from 'hooks/useRouteFlags'
+
+import CopyButton from './Icons/CopyButton'
 
 const PurlField = ({ isOpen, onOpen, onClose }) => {
   const { isCustomerView } = useRouteFlags()
@@ -44,6 +46,8 @@ const PurlField = ({ isOpen, onOpen, onClose }) => {
     }
   }
 
+  const purlString = useClipboard(identifiers?.purl || '')
+
   return (
     <FormControl
       isDisabled={isCustomerView}
@@ -55,17 +59,25 @@ const PurlField = ({ isOpen, onOpen, onClose }) => {
         onClose={onClose}
         title={`Package URL (PURL)`}
       />
-      <Input
-        type='text'
-        size='md'
-        id='purl'
-        name='purl'
-        fontSize={'sm'}
-        autoComplete='off'
-        onBlur={onBlur}
-        onChange={onChange}
-        value={identifiers?.purl}
-      />
+      <InputGroup gap={1}>
+        <Input
+          type='text'
+          size='md'
+          id='purl'
+          name='purl'
+          fontSize={'sm'}
+          autoComplete='off'
+          onBlur={onBlur}
+          onChange={onChange}
+          value={identifiers?.purl}
+        />
+        <CopyButton
+          size={'md'}
+          hasCopied={purlString?.hasCopied}
+          onCopy={() => purlString.onCopy()}
+          colorScheme={{ copied: 'green', default: 'blue' }}
+        />
+      </InputGroup>
       <FormErrorMessage>{identifiers?.purlError}</FormErrorMessage>
     </FormControl>
   )

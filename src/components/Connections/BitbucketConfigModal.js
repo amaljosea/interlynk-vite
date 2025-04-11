@@ -46,7 +46,7 @@ const BitbucketConfigModal = (props) => {
     setError('')
   }
 
-  const [getWorksapces] = useLazyQuery(BitbucketWorkspace)
+  const [getWorkspaces] = useLazyQuery(BitbucketWorkspace)
 
   const [createConnection, { loading: createLoading }] = useMutation(
     CreateBitbucketConnection
@@ -58,6 +58,8 @@ const BitbucketConfigModal = (props) => {
     DeleteBitbucketConnection
   )
 
+  const isLoading = createLoading || workspaceLoading || deleteLoading
+
   const handleVerify = () => {
     createConnection({
       variables: { enabled: true, ...formData }
@@ -66,7 +68,7 @@ const BitbucketConfigModal = (props) => {
         setConnection(
           res?.data?.bitbucketConnectionCreate?.organizationConnection
         )
-        getWorksapces({ variables: { first: 10 } }).then((res) => {
+        getWorkspaces({ variables: { first: 10 } }).then((res) => {
           const { edges } = res?.data?.bitbucketWorkspaces || {}
           if (edges?.length > 0) {
             setWorkspaceList(edges)
@@ -147,6 +149,31 @@ const BitbucketConfigModal = (props) => {
     }
   }, [data])
 
+  const VerificationDetails = ({ connection }) => (
+    <Stack p={4} mt={2} borderRadius='md' border={`1px solid ${mutedBorder}`}>
+      <Text fontWeight='bold' mb={1}>
+        Verification Details:
+      </Text>
+      <Text>
+        <b>Username:</b> {connection?.userName}
+      </Text>
+      <Text>
+        <b>Workspace:</b> {connection?.workspace}
+      </Text>
+      <Text>
+        <b>Workspace Access:</b>{' '}
+        {connection?.checkWorkspaceAccess ? 'Yes' : 'No'}
+      </Text>
+      <Text>
+        <b>Repository Access:</b>{' '}
+        {connection?.checkRepositoryAccess ? 'Yes' : 'No'}
+      </Text>
+      <Text>
+        <b>Webhook Access:</b> {connection?.checkWebhookAccess ? 'Yes' : 'No'}
+      </Text>
+    </Stack>
+  )
+
   return (
     <LynkModal
       isOpen={isOpen}
@@ -157,7 +184,7 @@ const BitbucketConfigModal = (props) => {
       Icon={IoSettingsOutline}
       title={'Bitbucket Configuration'}
       buttonText={connection ? 'Save' : 'Verify'}
-      isLoading={createLoading || workspaceLoading}
+      isLoading={isLoading}
       hidden={!connection && data?.connection?.userName}
       rightFooterContent={
         showDeleteBtn && (
@@ -165,7 +192,7 @@ const BitbucketConfigModal = (props) => {
             colorScheme='red'
             onClick={handleDelete}
             isDisabled={!updateCon}
-            isLoading={deleteLoading}
+            isLoading={isLoading}
             loadingText='Deleting....'
             title='Delete Bitbucket Configuration'
           >
@@ -230,36 +257,7 @@ const BitbucketConfigModal = (props) => {
           </FormControl>
         )}
         {!connection && data?.connection && (
-          <Stack
-            p={4}
-            mt={2}
-            borderRadius='md'
-            border={`1px solid ${mutedBorder}`}
-          >
-            <Text fontWeight='bold' mb={1}>
-              Verification Details:
-            </Text>
-            <Text>
-              <span style={{ fontWeight: 600 }}>Username:</span>{' '}
-              {data?.connection?.userName}
-            </Text>
-            <Text>
-              <span style={{ fontWeight: 600 }}>Workspace:</span>{' '}
-              {data?.connection?.workspace}
-            </Text>
-            <Text>
-              <span style={{ fontWeight: 600 }}>Workspace Access:</span>{' '}
-              {data?.connection?.checkWorkspaceAccess ? 'Yes' : 'No'}
-            </Text>
-            <Text>
-              <span style={{ fontWeight: 600 }}>Repository Access:</span>{' '}
-              {data?.connection?.checkRepositoryAccess ? 'Yes' : 'No'}
-            </Text>
-            <Text>
-              <span style={{ fontWeight: 600 }}>Webhook Access:</span>{' '}
-              {data?.connection?.checkWebhookAccess ? 'Yes' : 'No'}
-            </Text>
-          </Stack>
+          <VerificationDetails connection={data.connection} />
         )}
       </Stack>
     </LynkModal>

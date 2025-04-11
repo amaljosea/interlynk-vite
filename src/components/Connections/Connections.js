@@ -121,7 +121,7 @@ const Connections = ({ org }) => {
       case 'Teams':
         return 'Microsoft Teams integration supports delivering Interlynk notifications in configured Teams Channel.'
       case 'Email':
-        return 'Email aliases can be configured to deliver all notificationns at organizational level or subscribed notifications at personal level.'
+        return 'Email aliases can be configured to deliver all notifications at organizational level or subscribed notifications at personal level.'
       case 'Github':
         return 'Monitor SBOM directly in GitHub, simplifying compliance checks within repositories'
       case 'BitBucket':

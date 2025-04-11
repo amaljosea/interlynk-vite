@@ -774,6 +774,7 @@ export const GetGlobalVulnData = gql`
         kev
         epssScore
         epssPercentile
+        cwes
       }
       projectGroups {
         nodes {
@@ -1671,6 +1672,10 @@ export const GetComponentData = gql`
               id
               name
             }
+          }
+          componentSupportLevelAutomatic {
+            level
+            notes
           }
           externalUrls {
             name
@@ -3391,6 +3396,10 @@ export const GetCompSupportData = gql`
               name
             }
           }
+          componentSupportLevelAutomatic {
+            level
+            notes
+          }
         }
       }
     }
@@ -4243,10 +4252,12 @@ export const GetSelectedUser = gql`
   query GetSelectedUser {
     organization {
       users {
-        name
-        email
-        role {
+        nodes {
           name
+          email
+          role {
+            name
+          }
         }
       }
     }
@@ -5554,6 +5565,10 @@ export const GetComponentSupportLevels = gql`
         }
         updatedAt
         createdAt
+      }
+      componentSupportLevelAutomatic {
+        level
+        notes
       }
     }
   }

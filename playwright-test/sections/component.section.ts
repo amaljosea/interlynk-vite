@@ -269,7 +269,7 @@ export default class ComponentSection {
           await this.page.getByPlaceholder('Add URL').fill('github.com')
           await this.page.waitForTimeout(2000)
 
-          await this.page.getByRole('button', { name: 'Save' }).click()
+          await this.page.getByRole('button', { name: 'Add Link' }).click()
           await this.page.waitForTimeout(4000)
 
           await this.page
@@ -345,7 +345,9 @@ export default class ComponentSection {
           await this.page.waitForTimeout(2000)
           await this.page.keyboard.press('Enter')
 
-          await this.page.getByRole('button', { name: 'Save' }).click()
+          await this.page
+            .getByRole('button', { name: 'Add Relationship' })
+            .click()
           await this.page.waitForTimeout(2000)
 
           await this.page.getByTestId('delete_depends_on').first().click()
