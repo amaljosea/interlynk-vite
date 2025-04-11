@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getUndefinedIfEmptyOrAll } from 'utils'
 import ComponentsColumns from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableColumns/ComponentsColumns'
@@ -10,7 +9,6 @@ import CompDrawer from 'views/Dashboard/Products/components/CompDrawer'
 import { Flex, Text, useDisclosure } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
-import CustomLoader from 'components/CustomLoader'
 import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
@@ -18,15 +16,14 @@ import Pagination from 'components/Pagination'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ShareComponentData } from 'graphQL/Queries'
+import LynkTable from 'components/LynkTable'
 
 const Components = ({ sbomData }) => {
   const params = useParams()
   const activeTab = useQueryParam('tab')
-  const customStyles = useDataTableStyles()
 
   const sbomId = params.sbomid
 
@@ -169,23 +166,18 @@ const Components = ({ sbomData }) => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'} height={'auto'}>
-        <DataTable
+        <LynkTable
           columns={columns}
           data={components}
           onSort={handleSort}
-          customStyles={customStyles}
-          defaultSortAsc={false}
           defaultSortFieldId={field}
           progressPending={loading}
-          progressComponent={<CustomLoader />}
           subHeader
           subHeaderComponent={subHeader}
           expandableRows
           expandOnRowClicked
-          persistTableHead
           expandableRowsComponent={ExpandedComponent}
           expandableRowsComponentProps={{ action }}
-          responsive={true}
         />
       </Flex>
 

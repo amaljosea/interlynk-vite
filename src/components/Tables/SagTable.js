@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { Link } from 'react-router-dom'
 import SagFilters from 'views/Dashboard/SAG/Filters'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -7,14 +6,13 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { Badge, Button, Flex, IconButton, Stack, Text } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
-import CustomLoader from 'components/CustomLoader'
+import LynkTable from 'components/LynkTable'
+
 
 import { FaEnvelope } from 'react-icons/fa6'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 
 const SagTable = ({ data }) => {
-    const customStyles = useDataTableStyles()
-  
+
   const [searchInput, setSearchInput] = useState('')
   const [filterText, setFilterText] = useState(searchInput)
   const [supplier, setSupplier] = useState('')
@@ -190,15 +188,11 @@ const SagTable = ({ data }) => {
 
   return (
     <Card>
-      <DataTable
+      <LynkTable
         columns={columns}
         data={filteredData || []}
-        customStyles={customStyles}
         subHeader
         subHeaderComponent={subHeader}
-        progressComponent={<CustomLoader />}
-        persistTableHead
-        responsive={true}
       />
     </Card>
   )

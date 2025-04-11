@@ -1,6 +1,5 @@
 import { useMutation } from '@apollo/client'
 import React, { useCallback, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
 import { FREE_TIER_USER_LIMIT } from 'variables/general'
 import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
@@ -25,7 +24,6 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import LynkModal from 'components/LynkModal'
@@ -38,13 +36,13 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
 import { useRouteFlags } from 'hooks/useRouteFlags'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { InviteUser, deleteOrgUser } from 'graphQL/Mutation'
 import { GetUsers } from 'graphQL/Queries'
 
 import { BiTrash } from 'react-icons/bi'
+import LynkTable from 'components/LynkTable'
 
 function userTimeStart(row) {
   let timeStart
@@ -58,7 +56,6 @@ function userTimeStart(row) {
 
 const TeamTable = () => {
   const activetab = useQueryParam('tab')
-  const customStyles = useDataTableStyles()
   const { isCustomerView } = useRouteFlags()
   const { showToast } = useCustomToast()
   const { organization } = useGlobalState()
@@ -391,16 +388,12 @@ const TeamTable = () => {
 
   return (
     <>
-      <DataTable
+      <LynkTable
         subHeader
-        responsive={true}
         columns={columns}
         data={nodes || []}
-        defaultSortAsc={false}
         progressPending={loading}
         defaultSortFieldId={'joinedDate'}
-        progressComponent={<CustomLoader />}
-        customStyles={customStyles}
         subHeaderComponent={subHeaderComponent}
       />
 

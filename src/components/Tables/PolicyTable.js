@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useCallback, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { getFullDate, timeSince, updatedValue } from 'utils'
 import { formatConditionValue } from 'utils'
@@ -28,7 +27,6 @@ import { Tag, TagLabel } from '@chakra-ui/react'
 import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
-import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import { CustomText } from 'components/Misc/CustomText'
@@ -40,15 +38,14 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { DeletePolicyExclusion, PolicyExclusionCreate } from 'graphQL/Mutation'
 import { GetPolicies, PolicySubjectOperators } from 'graphQL/Queries'
+import LynkTable from 'components/LynkTable'
 
 const PolicyTable = () => {
   const { showToast } = useCustomToast()
-  const customStyles = useDataTableStyles()
 
   const location = useLocation()
   const params = useParams()
@@ -546,19 +543,15 @@ const PolicyTable = () => {
     <>
       <Card padding={productId ? '0px' : '22px'}>
         <Flex flexDir={'column'} width={'100%'}>
-          <DataTable
+          <LynkTable
             columns={columns}
             data={nodes || []}
-            customStyles={customStyles}
             progressPending={loading}
-            progressComponent={<CustomLoader />}
             subHeader
             subHeaderComponent={subHeader}
             expandableRows
             expandOnRowClicked
             expandableRowsComponent={ExpandedComponent}
-            persistTableHead
-            responsive={true}
             conditionalRowStyles={conditionalRowStyles}
           />
 

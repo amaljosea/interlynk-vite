@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
 import React, { useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import LegalModal from 'views/Dashboard/Profile/components/LegalModal'
@@ -16,16 +15,15 @@ import {
 } from '@chakra-ui/react'
 import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
 import ExternalNavIcon from 'components/Icons/ExternalNavIcon'
+import LynkTable from 'components/LynkTable'
 import LynkAction from 'components/Misc/LynkAction'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { OrganizationManufacturerDelete } from 'graphQL/Mutation'
@@ -34,7 +32,6 @@ import { GetOrgManufacturers } from 'graphQL/Queries'
 const LegalTable = () => {
   const { showToast } = useCustomToast()
   const activetab = useQueryParam('tab')
-  const customStyles = useDataTableStyles()
   const { orgView } = useGlobalQueryContext()
   const { primaryTextColor, primaryErrorColor, primaryBlueText } =
     useThemeColor(['primaryTextColor', 'primaryErrorColor', 'primaryBlueText'])
@@ -275,16 +272,12 @@ const LegalTable = () => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           subHeader
-          persistTableHead
-          responsive={true}
           columns={columns}
           data={nodes || []}
           progressPending={loading}
           subHeaderComponent={subHeader}
-          customStyles={customStyles}
-          progressComponent={<CustomLoader />}
         />
       </Flex>
 

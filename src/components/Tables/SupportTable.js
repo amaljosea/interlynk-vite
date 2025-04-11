@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getFullDate, timeSince } from 'utils'
 import { getSupportStatusColor } from 'utils/styleUtils'
@@ -22,9 +21,9 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
+import LynkTable from 'components/LynkTable'
 import CpeCard from 'components/Misc/CpeCard'
 import LynkAction from 'components/Misc/LynkAction'
 import LynkSwitch from 'components/Misc/LynkSwitch'
@@ -32,7 +31,6 @@ import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
 
 import { useHasPermission } from 'hooks/useHasPermission'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const SupportTable = ({
@@ -43,7 +41,6 @@ const SupportTable = ({
   setFilters
 }) => {
   const params = useParams()
-  const customStyles = useDataTableStyles()
 
   const sbomId = params.sbomid
 
@@ -365,19 +362,14 @@ const SupportTable = ({
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           columns={columns}
           data={data || []}
-          customStyles={customStyles}
           onSort={handleSort}
           defaultSortFieldId={field}
-          defaultSortAsc={false}
           progressPending={loading}
-          persistTableHead
           subHeader
           subHeaderComponent={subHeader}
-          progressComponent={<CustomLoader />}
-          responsive={true}
         />
 
         {/* PAGINATION */}

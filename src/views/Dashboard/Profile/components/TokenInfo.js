@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useMemo, useRef, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { getFullDate, truncatedValue } from 'utils'
 
 import { AddIcon } from '@chakra-ui/icons'
@@ -15,22 +14,20 @@ import {
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import LynkAction from 'components/Misc/LynkAction'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import useQueryParam from 'hooks/useQueryParam'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { deleteApiToken, updateApiToken } from 'graphQL/Mutation'
 import { GetApiKeys } from 'graphQL/Queries'
 
 import TokenModal from './TokenModal'
+import LynkTable from 'components/LynkTable'
 
 const TokenInfo = () => {
   const activetab = useQueryParam('tab')
-  const customStyles = useDataTableStyles()
   const { orgView } = useGlobalQueryContext()
 
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -271,17 +268,12 @@ const TokenInfo = () => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           subHeader
-          persistTableHead
-          responsive={true}
           columns={columns}
           data={apiKeys || []}
-          defaultSortAsc={false}
           progressPending={loading}
           defaultSortFieldId={'updated'}
-          progressComponent={<CustomLoader />}
-          customStyles={customStyles}
           subHeaderComponent={subHeaderComponent}
         />
       </Flex>

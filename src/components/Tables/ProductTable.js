@@ -1,7 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { useCallback, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useNavigate } from 'react-router-dom'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import GithubAddModal from 'views/Dashboard/Products/components/GithubAddModal'
@@ -12,9 +11,9 @@ import UploadModal from 'views/Dashboard/Products/components/UploadModal'
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
-import CustomLoader from 'components/CustomLoader'
 import ShareLynkDrawer from 'components/Drawer/ShareLynkDrawer'
 import TagDrawer from 'components/Drawer/TagDrawer'
+import LynkTable from 'components/LynkTable'
 import BitbucketProjects from 'components/Modal/BitbucketProjects'
 import ProductColumns from 'components/columns/ProductColumns'
 import ProductHeader from 'components/headers/ProductHeader'
@@ -22,9 +21,7 @@ import ProductHeader from 'components/headers/ProductHeader'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 
-// import { useThemeColor } from 'hooks/useThemeColors'
 import { DeleteProjectGroup } from 'graphQL/Mutation'
 import {
   GetBitbucketConnection,
@@ -37,7 +34,6 @@ import Pagination from '../Pagination'
 const ProductTable = (props) => {
   const navigate = useNavigate()
   const { setIsOpen } = useTour()
-  const customStyles = useDataTableStyles()
   const { orgView, isFreeTier } = useGlobalQueryContext()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
@@ -64,7 +60,7 @@ const ProductTable = (props) => {
 
   const { prodState, setEnvName, setClearSelect, dispatch, envName } =
     useGlobalState()
-  const { field, direction, searchInput } = prodState
+  const { field, searchInput } = prodState
 
   const environment = envName
   const { prodDispatch } = dispatch
@@ -232,26 +228,19 @@ const ProductTable = (props) => {
     reset()
   }
 
-  const dataTableProps = {
-    columns: columns,
-    data: filterMode === 'AND' ? filteredNodes : data,
-    onSort: handleSort,
-    customStyles: customStyles,
-    defaultSortFieldId: field,
-    defaultSortAsc: direction === 'ASC' ? true : false,
-    subHeader: true,
-    subHeaderComponent: subHeaderComponent,
-    progressPending: loading,
-    progressComponent: <CustomLoader />,
-    responsive: true,
-    persistTableHead: true
-  }
-
   return (
     <>
       <Card pos={'relative'}>
         <Flex flexDir={'column'} width={'100%'}>
-          <DataTable {...dataTableProps} />
+          <LynkTable
+            subHeader
+            columns={columns}
+            onSort={handleSort}
+            progressPending={loading}
+            defaultSortFieldId={field}
+            subHeaderComponent={subHeaderComponent}
+            data={filterMode === 'AND' ? filteredNodes : data}
+          />
           <Pagination {...paginationProps} />
         </Flex>
       </Card>

@@ -1,13 +1,12 @@
 import { useMutation } from '@apollo/client'
 import { useCallback, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { Flex, Stack, Text } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import LynkDrawer from 'components/LynkDrawer'
+import LynkTable from 'components/LynkTable'
 import Pagination from 'components/Pagination'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -16,11 +15,9 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { BitbucketRepositoryBulkImport } from 'graphQL/Mutation'
 import { BitbucketRepositories } from 'graphQL/Queries'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 
 const BitbucketProjects = ({ isOpen, onClose }) => {
   const { showToast } = useCustomToast()
-  const customStyles = useDataTableStyles()
 
   const { primaryTextColor, secondaryTextColor } = useThemeColor([
     'primaryTextColor',
@@ -156,20 +153,16 @@ const BitbucketProjects = ({ isOpen, onClose }) => {
       isDisabled={repositories?.length === 0}
     >
       <Stack spacing={4} overflowY={'scroll'}>
-        <DataTable
-          responsive
+        <LynkTable
           subHeader
           selectableRows
-          persistTableHead
           columns={columns}
           data={nodes || []}
           progressPending={loading}
           clearSelectedRows={toggleClear}
           className='data-table-container'
           onSelectedRowsChange={handleSelect}
-          progressComponent={<CustomLoader />}
           subHeaderComponent={subHeaderComponent}
-          customStyles={customStyles}
         />
         <Pagination {...paginationProps} />
       </Stack>

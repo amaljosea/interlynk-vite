@@ -1,12 +1,10 @@
 import { useMutation } from '@apollo/client'
 import { useCallback, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { isSbomArchived } from 'utils'
 
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import ViolationDrawer from 'components/Drawer/ViolationDrawer'
 import Pagination from 'components/Pagination'
 
@@ -15,7 +13,6 @@ import { useGradualPolling } from 'hooks/useGradualPolling'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 
 import { SbomPolicyScan } from 'graphQL/Mutation'
 import { PolicyResults } from 'graphQL/Queries'
@@ -23,13 +20,13 @@ import { PolicyResults } from 'graphQL/Queries'
 import PolicyColumns from './Components/tableColumns/PolicyColumns'
 import ExpandedComponent from './Components/tableExpanded/PolicyExpanded'
 import PolicySubHeader from './Components/tableSubHeaders/PolicySubHeader'
+import LynkTable from 'components/LynkTable'
 
 const Policies = ({ sbomData }) => {
   const { showToast } = useCustomToast()
   const params = useParams()
   const sbomId = params.sbomid
   const activeTab = useQueryParam('tab')
-  const customStyles = useDataTableStyles()
 
   const isArchived = isSbomArchived(sbomData)
 
@@ -95,16 +92,12 @@ const Policies = ({ sbomData }) => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           columns={columns}
           data={nodes || []}
-          customStyles={customStyles}
           progressPending={loading}
-          progressComponent={<CustomLoader />}
           subHeader
           subHeaderComponent={subHeader}
-          persistTableHead
-          responsive={true}
           expandableRows
           expandOnRowClicked
           expandableRowsComponent={ExpandedComponent}

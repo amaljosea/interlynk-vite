@@ -1,11 +1,9 @@
 import { useCallback, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getUndefinedIfEmptyOrAll } from 'utils'
 
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
 import SupportStatus from 'components/Modal/SupportStatus'
@@ -15,7 +13,6 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 
 import { GetCompSupportData } from 'graphQL/Queries'
 
@@ -23,13 +20,13 @@ import CompSupport from '../components/CompSupport'
 import SupportColumns from './Components/tableColumns/SupportColumns'
 import SupportExpanded from './Components/tableExpanded/SupportExpanded'
 import SupportSubHeader from './Components/tableSubHeaders/SupportSubHeader'
+import LynkTable from 'components/LynkTable'
 
 const Support = () => {
   const params = useParams()
   const projectId = params.productid
   const sbomId = params.sbomid
   const activeTab = useQueryParam('tab')
-  const customStyles = useDataTableStyles()
 
   const editComponent = useHasPermission({
     parentKey: 'view_sbom',
@@ -145,15 +142,12 @@ const Support = () => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           subHeader
           expandableRows
-          persistTableHead
-          responsive={true}
           columns={columns}
           expandOnRowClicked
           onSort={handleSort}
-          defaultSortAsc={true}
           data={nodes || []}
           progressPending={loading}
           defaultSortFieldId={field}
@@ -162,9 +156,7 @@ const Support = () => {
           clearSelectedRows={toggleClear}
           className='data-table-container'
           onSelectedRowsChange={handleChange}
-          progressComponent={<CustomLoader />}
           expandableRowsComponent={SupportExpanded}
-          customStyles={customStyles}
           selectableRowDisabled={(row) => row?.sbom?.id !== sbomId}
         />
 

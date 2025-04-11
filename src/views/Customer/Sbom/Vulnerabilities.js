@@ -1,6 +1,5 @@
 import { useQuery } from '@apollo/client'
 import { useCallback, useEffect, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getSignedUrlParams } from 'utils'
 import { parseEpssRange } from 'utils'
@@ -11,14 +10,13 @@ import VulnerabilitySubHeader from 'views/Dashboard/Products/ProductDetailsSbomN
 
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
+import LynkTable from 'components/LynkTable'
 import CvssCard from 'components/Misc/CvssCard'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 
 import {
   FirstDegreePartVulns,
@@ -28,7 +26,6 @@ import {
 
 const Vulnerabilities = ({ sbomData }) => {
   const params = useParams()
-  const customStyles = useDataTableStyles()
   const sbomId = params.sbomid
   const activeTab = useQueryParam('tab')
 
@@ -194,22 +191,17 @@ const Vulnerabilities = ({ sbomData }) => {
     <>
       <Flex flexDir={'column'} width={'100%'}>
         {/* TABLE */}
-        <DataTable
+        <LynkTable
           className='data-table-container'
           columns={columns}
           data={nodes}
-          customStyles={customStyles}
           onSort={handleSort}
-          defaultSortAsc={false}
           defaultSortFieldId={field}
           progressPending={loading}
-          progressComponent={<CustomLoader />}
           subHeader
           subHeaderComponent={subHeader}
-          responsive={true}
           expandableRows
           expandOnRowClicked
-          persistTableHead
           expandableRowsComponent={ExpandedComponent}
           expandableRowsComponentProps={{
             setActiveRow,

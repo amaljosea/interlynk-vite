@@ -1,6 +1,5 @@
 import { useMutation } from '@apollo/client'
 import React, { useCallback, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
 import { getStatusColor } from 'utils/styleUtils'
 
@@ -9,7 +8,6 @@ import { Tooltip, useDisclosure } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { MenuItem, MenuList } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import SearchFilter from 'components/Licenses/LicenseSearchFilter'
@@ -17,7 +15,6 @@ import LynkAction from 'components/Misc/LynkAction'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { RequestCancel, RequestResend } from 'graphQL/Mutation'
@@ -27,12 +24,12 @@ import ConfirmationModal from '../Products/components/ConfirmationModal'
 import Filters from './Filters'
 import RequestAcceptModal from './RequestAcceptModal'
 import RequestModal from './RequestModal'
+import LynkTable from 'components/LynkTable'
 
 const RequestTable = (props) => {
   const { data, loading, filters, setFilters, paginationProps } = props
 
   const { showToast } = useCustomToast()
-  const customStyles = useDataTableStyles()
 
   const addReq = useHasPermission({
     parentKey: 'view_requests',
@@ -310,19 +307,15 @@ const RequestTable = (props) => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           columns={columns}
           data={data}
-          customStyles={customStyles}
           onSort={handleSort}
           defaultSortFieldId='REQUESTS_REQUESTED_AT'
-          defaultSortAsc={false}
           progressPending={loading}
           persistTableHead
           subHeader
           subHeaderComponent={subHeader}
-          progressComponent={<CustomLoader />}
-          responsive={true}
         />
       </Flex>
 

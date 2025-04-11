@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getFullDate, timeSince } from 'utils'
 import Filters from 'views/Dashboard/Policies/components/Filters'
@@ -14,20 +13,18 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import ViolationDrawer from 'components/Drawer/ViolationDrawer'
 import RefreshBtn from 'components/Icons/RefreshBtn'
+import LynkTable from 'components/LynkTable'
 import Pagination from 'components/Pagination'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetPolicyResults } from 'graphQL/Queries'
 
 const PolicyResultsTable = () => {
   const params = useParams()
-  const customStyles = useDataTableStyles()
 
   const policyId = params.policyid
 
@@ -164,22 +161,16 @@ const PolicyResultsTable = () => {
     <>
       {/* TABLE */}
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           subHeader
-          responsive
           expandableRows
-          persistTableHead
           columns={columns}
           data={nodes || []}
           expandOnRowClicked
           progressPending={loading}
           subHeaderComponent={subHeader}
-          progressComponent={<CustomLoader />}
-          customStyles={customStyles}
           expandableRowsComponent={ExpandedComponent}
-          expandableRowsComponentProps={{
-            onCheckViolations
-          }}
+          expandableRowsComponentProps={{ onCheckViolations }}
         />
         <Pagination {...paginationProps} />
       </Flex>

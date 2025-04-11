@@ -1,6 +1,5 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import {
   getSignedUrlParams,
@@ -14,7 +13,6 @@ import ImportWizard from 'views/Sbom/components/ImportWizard'
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
 import JiraCreateIssueModal from 'components/Connections/JiraCreateIssueModal'
-import CustomLoader from 'components/CustomLoader'
 import VulnAdvisoriesDrawer from 'components/Drawer/VulnAdvisoriesDrawer'
 import VulnDrawer from 'components/Drawer/VulnDrawer'
 import VulnLinkDrawer from 'components/Drawer/VulnLinkDrawer'
@@ -28,7 +26,6 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 
 import { ManualVulnScan } from 'graphQL/Mutation'
 import { CustomVulnUpdate } from 'graphQL/Mutation'
@@ -44,6 +41,7 @@ import ConfirmationModal from '../components/ConfirmationModal'
 import VulnerabilityColumns from './Components/tableColumns/VulnerabilityColumns'
 import ExpandedComponent from './Components/tableExpanded/VulnerabilityExpanded'
 import VulnerabilitySubHeader from './Components/tableSubHeaders/VulnerabilitySubHeader'
+import LynkTable from 'components/LynkTable'
 
 export const GetProjectSettings = gql`
   query GetProjectSettings($id: Uuid!) {
@@ -58,7 +56,6 @@ export const GetProjectSettings = gql`
 const Vulnerabilities = ({ sbomData }) => {
   const params = useParams()
   const productId = params.productid
-  const customStyles = useDataTableStyles()
 
   const isArchived = isSbomArchived(sbomData)
 
@@ -369,22 +366,17 @@ const Vulnerabilities = ({ sbomData }) => {
     <>
       <Flex flexDir={'column'} width={'100%'}>
         {/* TABLE */}
-        <DataTable
+        <LynkTable
           className='data-table-container'
           columns={columns}
           data={nodes}
-          customStyles={customStyles}
           onSort={handleSort}
-          defaultSortAsc={false}
           defaultSortFieldId={field}
           progressPending={loading}
-          progressComponent={<CustomLoader />}
           subHeader
           subHeaderComponent={subHeader}
-          responsive={true}
           expandableRows
           expandOnRowClicked
-          persistTableHead
           expandableRowsComponent={ExpandedComponent}
           expandableRowsComponentProps={{
             setActiveRow,

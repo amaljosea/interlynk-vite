@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince, truncatedValue } from 'utils'
 import { getShareLinklUrl } from 'utils/url'
 
@@ -10,14 +9,13 @@ import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 import { Flex, IconButton, Text, Tooltip } from '@chakra-ui/react'
 import { useClipboard } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
 import CopyButton from 'components/Icons/CopyButton'
 import LynkDate from 'components/LynkDate'
 import LynkDrawer from 'components/LynkDrawer'
+import LynkTable from 'components/LynkTable'
 
 import useCustomToast from 'hooks/useCustomToast'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CreateShareLynk, DeleteSharelynk } from 'graphQL/Mutation'
@@ -27,7 +25,6 @@ import { PiFileSvgDuotone } from 'react-icons/pi'
 
 const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
   const { showToast } = useCustomToast()
-  const customStyles = useDataTableStyles()
 
   const BACKEND_URL = process.env.REACT_APP_SERVER
 
@@ -287,18 +284,14 @@ const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
         </Flex>
       </Stack>
       <Divider hidden={!show} my={4} />
-      <DataTable
+      <LynkTable
         subHeader={!show}
-        persistTableHead
-        responsive={true}
         columns={columns}
         data={nodes || []}
         defaultSortAsc={false}
         progressPending={loading}
         subHeaderComponent={subHeader}
         defaultSortFieldId={'UPDATED_AT'}
-        progressComponent={<CustomLoader />}
-        customStyles={customStyles}
       />
     </LynkDrawer>
   )

@@ -1,31 +1,28 @@
 import { useQuery } from '@apollo/client'
 import { useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
 
 import { Flex, Portal, Tag, Text, Tooltip } from '@chakra-ui/react'
 import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 import { useDisclosure } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
 import LynkAction from 'components/Misc/LynkAction'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetCustomFields } from 'graphQL/Queries'
 
 import FieldModal from './FieldModal'
 import FieldWarning from './FieldWarning'
+import LynkTable from 'components/LynkTable'
 
 const CustomFields = () => {
   const activetab = useQueryParam('tab')
   const { organization } = useGlobalState()
-  const customStyles = useDataTableStyles()
   const { isFreeTier } = useGlobalQueryContext()
 
   const { data, loading } = useQuery(GetCustomFields, {
@@ -174,16 +171,12 @@ const CustomFields = () => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           subHeader
-          persistTableHead
-          responsive={true}
           columns={columns}
           data={nodes || []}
           progressPending={loading}
           subHeaderComponent={subHeader}
-          customStyles={customStyles}
-          progressComponent={<CustomLoader />}
         />
       </Flex>
 

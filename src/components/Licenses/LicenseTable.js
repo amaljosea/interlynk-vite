@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { parseLicenseString, truncatedValue } from 'utils'
 
 import {
@@ -14,12 +13,11 @@ import { Tag, TagLabel } from '@chakra-ui/react'
 import { Grid, GridItem } from '@chakra-ui/react'
 import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import ExternalNavIcon from 'components/Icons/ExternalNavIcon'
+import LynkTable from 'components/LynkTable'
 import LynkAction from 'components/Misc/LynkAction'
 
 import { useHasPermission } from 'hooks/useHasPermission'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaScaleBalanced } from 'react-icons/fa6'
@@ -29,7 +27,6 @@ import LicenseModal from './LicenseModal'
 import { SubHeaderComponent } from './SubHeaderComponent'
 
 const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
-  const customStyles = useDataTableStyles()
   const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const [activeRow, setActiveRow] = useState(null)
@@ -260,19 +257,13 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           progressPending={loading}
           subHeaderComponent={subHeaderComponent}
           columns={columns}
           data={licenses}
-          customStyles={customStyles}
-          defaultSortAsc={false}
           defaultSortFieldId='ORGANIZATION_LICENSES_UPDATED_AT'
-          progressComponent={<CustomLoader />}
           onSort={handleSort}
-          subHeader
-          responsive
-          persistTableHead
         />
       </Flex>
       {/* PAGINATION */}

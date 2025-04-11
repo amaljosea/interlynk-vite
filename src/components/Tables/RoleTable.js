@@ -1,6 +1,5 @@
 import { useQuery } from '@apollo/client'
 import { useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
 import CreateRole from 'views/Dashboard/Profile/components/CreateRole'
 import DeleteRole from 'views/Dashboard/Profile/components/DeleteRole'
@@ -16,22 +15,20 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import PermissionDrawer from 'components/Drawer/PermissionDrawer'
 import AddButton from 'components/Icons/AddButton'
+import LynkTable from 'components/LynkTable'
 import LynkAction from 'components/Misc/LynkAction'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetRoles } from 'graphQL/Queries'
 
 const RoleTable = () => {
   const activetab = useQueryParam('tab')
-  const customStyles = useDataTableStyles()
   const { orgView } = useGlobalQueryContext()
 
   const updateOrgs = useHasPermission({
@@ -171,17 +168,13 @@ const RoleTable = () => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           subHeader
-          responsive={true}
           columns={columns}
-          defaultSortAsc={false}
           progressPending={loading}
           defaultSortFieldId={'createdAt'}
           data={organizationRoles || []}
           subHeaderComponent={subHeader}
-          progressComponent={<CustomLoader />}
-          customStyles={customStyles}
         />
       </Flex>
 

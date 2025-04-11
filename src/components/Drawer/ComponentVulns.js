@@ -1,5 +1,4 @@
 import React from 'react'
-import DataTable from 'react-data-table-component'
 import { useNavigate } from 'react-router-dom'
 import { linkURl } from 'utils'
 import { statusColor } from 'utils/styleUtils'
@@ -7,9 +6,9 @@ import { statusColor } from 'utils/styleUtils'
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { Flex, Stack, Text } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import ExternalNavIcon from 'components/Icons/ExternalNavIcon'
 import LynkDrawer from 'components/LynkDrawer'
+import LynkTable from 'components/LynkTable'
 import CompInfo from 'components/Misc/CompInfo'
 import SeverityTag from 'components/Misc/SeverityTag'
 import Pagination from 'components/Pagination'
@@ -17,7 +16,6 @@ import Pagination from 'components/Pagination'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetComponentVulns } from 'graphQL/Queries'
@@ -25,7 +23,6 @@ import { GetComponentVulns } from 'graphQL/Queries'
 const ComponentVulns = ({ data, isOpen, onClose }) => {
   const navigate = useNavigate()
   const { dispatch } = useGlobalState()
-  const customStyles = useDataTableStyles()
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
@@ -115,14 +112,10 @@ const ComponentVulns = ({ data, isOpen, onClose }) => {
       noFooter
     >
       <Stack>
-        <DataTable
-          responsive
+        <LynkTable
           columns={columns}
           data={nodes || []}
-          customStyles={customStyles}
           progressPending={loading}
-          progressComponent={<CustomLoader />}
-          persistTableHead
         />
         <Pagination {...paginationProps} />
       </Stack>

@@ -1,7 +1,6 @@
 import { gql, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { useCallback, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getSignedUrlParams } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
@@ -10,10 +9,10 @@ import SbomList from 'views/Dashboard/Products/components/SbomList'
 
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import ArchivedVersions from 'components/Drawer/ArchivedVersions'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import ToolsDrawer from 'components/Drawer/ToolsDrawer'
+import LynkTable from 'components/LynkTable'
 import ArchiveSbom from 'components/Modal/ArchiveSbom'
 import AutomationWarning from 'components/Modal/AutomationWarning'
 import DeleteSbom from 'components/Modal/DeleteSbom'
@@ -30,7 +29,6 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import useQueryParam from 'hooks/useQueryParam'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetVersionsTable, ShareVersionTable } from 'graphQL/Queries'
@@ -64,7 +62,6 @@ const VersionsTable = (props) => {
   const navigate = useNavigate()
   const params = useParams()
   const productId = params.productid
-  const customStyles = useDataTableStyles()
   const signedUrlParams = getSignedUrlParams()
   const {
     clearSelect,
@@ -284,31 +281,25 @@ const VersionsTable = (props) => {
     return false
   }
 
-  const dataTableProps = {
-    columns: columns,
-    data: nodes || [],
-    customStyles: customStyles,
-    onSort: handleSort,
-    defaultSortFieldId: filters?.field,
-    defaultSortAsc: filters?.direction === 'ASC' ? true : false,
-    subHeader: true,
-    subHeaderComponent: subHeader,
-    progressPending: loading,
-    progressComponent: <CustomLoader />,
-    responsive: true,
-    persistTableHead: true,
-    selectableRows: true,
-    clearSelectedRows: clearSelect,
-    onSelectedRowsChange: handleChange,
-    selectableRowDisabled: disableRowCheckBox
-  }
-
   const existingSbom = nodes?.length > 0 ? nodes[0] : null
 
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable {...dataTableProps} className='data-table-container' />
+        <LynkTable
+          columns={columns}
+          data={nodes || []}
+          onSort={handleSort}
+          defaultSortFieldId={filters?.field}
+          subHeader
+          subHeaderComponent={subHeader}
+          progressPending={loading}
+          selectableRows
+          clearSelectedRows={clearSelect}
+          onSelectedRowsChange={handleChange}
+          selectableRowDisabled={disableRowCheckBox}
+          className='data-table-container'
+        />
         <Pagination {...paginationProps} />
       </Flex>
       {/* VERSION LIFECYCLE */}

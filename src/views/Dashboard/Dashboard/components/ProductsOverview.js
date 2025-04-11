@@ -1,4 +1,3 @@
-import DataTable from 'react-data-table-component'
 import { Link, useNavigate } from 'react-router-dom'
 import { getFullDate, normalizeSBOMVersion, timeSince } from 'utils'
 
@@ -7,17 +6,15 @@ import { Flex, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 // Custom components
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
-import CustomLoader from 'components/CustomLoader'
+import LynkTable from 'components/LynkTable'
 import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const ProductsOverview = ({ loading, title, data }) => {
   const navigate = useNavigate()
-  const customStyles = useDataTableStyles()
   const { dispatch } = useGlobalState()
   const { prodDispatch, prodVulnDispatch } = dispatch
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
@@ -267,14 +264,10 @@ const ProductsOverview = ({ loading, title, data }) => {
       {/* HEADING */}
       <Text fontWeight={'semibold'}>{title}</Text>
       <CardBody mt={6}>
-        <DataTable
-          responsive
-          persistTableHead
+        <LynkTable
           columns={columns}
           data={data || []}
-          customStyles={customStyles}
           progressPending={loading}
-          progressComponent={<CustomLoader />}
         />
       </CardBody>
     </Card>

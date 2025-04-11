@@ -1,23 +1,20 @@
-import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { truncatedValue } from 'utils'
 
 import { Box, Stack, Text, Tooltip } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import LynkDrawer from 'components/LynkDrawer'
+import LynkTable from 'components/LynkTable'
 import Pagination from 'components/Pagination'
 import RowComponent from 'components/RowComponent'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { PolicyRuleViolations } from 'graphQL/Queries'
 
 const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
   const params = useParams()
-  const customStyles = useDataTableStyles()
 
   const { subject, category, name, operatorWording, value } = activeRow || {}
   const { primaryTextColor, secondaryTextColor } = useThemeColor([
@@ -177,14 +174,10 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
         </Text>
       </Stack>
       <Box overflowY={'scroll'} hidden={category === 'version'}>
-        <DataTable
-          responsive
+        <LynkTable
           columns={columns}
           data={nodes || []}
-          customStyles={customStyles}
           progressPending={loading}
-          progressComponent={<CustomLoader />}
-          persistTableHead
         />
       </Box>
       <Box hidden={category === 'version' || nodes?.length === 0}>

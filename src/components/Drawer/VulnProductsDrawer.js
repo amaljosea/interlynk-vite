@@ -1,17 +1,15 @@
 import { gql } from '@apollo/client'
 import { useMemo } from 'react'
-import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
 
 import { Flex, Tag, Text, Tooltip } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import LynkDrawer from 'components/LynkDrawer'
+import LynkTable from 'components/LynkTable'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const GetCompVulnData = gql`
@@ -57,8 +55,6 @@ const GetCompVulnData = gql`
 `
 
 const VulnProductsDrawer = ({ isOpen, onClose, data }) => {
-  const customStyles = useDataTableStyles()
-
   const { primaryTextColor } = useThemeColor(['primaryTextColor'])
   const { envName } = useGlobalState()
   const { nodes, paginationProps, loading } = usePaginatedQuery(
@@ -132,15 +128,11 @@ const VulnProductsDrawer = ({ isOpen, onClose, data }) => {
       onClose={onClose}
       noFooter
     >
-      <DataTable
-        responsive
-        persistTableHead
+      <LynkTable
         columns={columns}
         progressPending={loading}
         data={statusResults}
-        progressComponent={<CustomLoader />}
         className='data-table-container'
-        customStyles={customStyles}
       />
       <Pagination {...paginationProps} totalCount={statusResults?.length} />
     </LynkDrawer>

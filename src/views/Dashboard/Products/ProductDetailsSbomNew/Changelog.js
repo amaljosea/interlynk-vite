@@ -1,11 +1,10 @@
 import { useQuery } from '@apollo/client'
 import React, { useCallback, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
+import LynkTable from 'components/LynkTable'
 import PurlCard from 'components/Misc/PurlCard'
 import UserCard from 'components/Misc/UserCard'
 import VersionCard from 'components/Misc/VersionCard'
@@ -14,7 +13,6 @@ import Pagination from 'components/Pagination'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
-import { useDataTableStyles } from 'hooks/useTableStyles'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetChangeLogs, GetSbomLogFilters } from 'graphQL/Queries'
@@ -27,7 +25,6 @@ const Changelog = () => {
   const productId = params.productid
   const sbomId = params.sbomid
   const activeTab = useQueryParam('tab')
-  const customStyles = useDataTableStyles()
 
   const { secondaryBgColor } = useThemeColor(['secondaryBgColor'])
 
@@ -71,8 +68,6 @@ const Changelog = () => {
       VERSION.onOpen()
     }
   }
-
-  const { field } = paginationProps
 
   // GET SBOM CHANGELOG FILTER HEADS
   const { data: filters } = useQuery(GetSbomLogFilters, {
@@ -176,20 +171,15 @@ const Changelog = () => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'} position={'relative'}>
-        <DataTable
+        <LynkTable
           columns={columns}
           data={nodes}
           onSort={handleSort}
-          defaultSortAsc={false}
           defaultSortFieldId='ACTIVITY_LOGS_CREATED_AT'
-          customStyles={customStyles}
           progressPending={loading}
-          progressComponent={<CustomLoader />}
           subHeader
-          persistTableHead
           subHeaderComponent={subHeader}
           conditionalRowStyles={rowStyles}
-          responsive={true}
         />
         <Pagination {...paginationProps} />
       </Flex>
