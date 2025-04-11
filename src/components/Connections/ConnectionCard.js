@@ -1,5 +1,5 @@
 import { CheckCircleIcon } from '@chakra-ui/icons'
-import { Button, Flex, Text } from '@chakra-ui/react'
+import { Button, Flex, Image, Text } from '@chakra-ui/react'
 
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -34,7 +34,7 @@ const ConnectionCard = ({
     >
       <Flex direction='column' height='100%' gap={'16px'}>
         <Flex align='center'>
-          <img
+          <Image
             src={iconSrc}
             alt={`${name} icon`}
             width={'40px'}
