@@ -22,6 +22,7 @@ export class BibucketIntegration {
   async saveWorkspace() {
     await this.page.getByLabel('Workspace*').selectOption('interlynk')
     await this.page.getByRole('button', { name: 'Save' }).click()
+    await this.page.waitForTimeout(2000)
   }
 
   async importBitbucketProject() {
@@ -37,15 +38,15 @@ export class BibucketIntegration {
         await repository.check()
         await this.page.waitForTimeout(2000)
         await this.page.getByRole('button', { name: 'drawer_submit' }).click()
+        await this.page.waitForTimeout(2000)
       }
     }
   }
 
   async deleteProjectGroup() {
-    await this.page.locator("//a[@aria-label='products']").click()
-    await this.page.waitForTimeout(2000)
+    await this.page.getByLabel('products').click()
     await this.page.getByRole('button', { name: 'refresh' }).click()
-    await this.page.waitForTimeout(5000)
+    await this.page.waitForTimeout(2000)
     await this.page.getByTestId('product-actions').first().click()
     await this.page.waitForTimeout(2000)
     await this.page.getByTestId('delete_product').first().click()

@@ -11,18 +11,28 @@ test.beforeEach(async ({ page }) => {
   await page.goto(url)
 })
 
-test('should add bitbucket connection and import project', async ({ page }) => {
+test('Should add bitbucket connection', async ({ page }) => {
   test.setTimeout(30000)
 
   const settingsPage = new BibucketIntegration(page)
-
   await settingsPage.openConnectionTab()
   await settingsPage.addConfig(
     'dreamer87',
     'ATBBb33VAj9R4kDqDwRUQEbkEbNJ21907B14'
   )
-
   await settingsPage.saveWorkspace()
+})
+
+test('Import repositories from bitbucket', async ({ page }) => {
+  test.setTimeout(30000)
+
+  const settingsPage = new BibucketIntegration(page)
   await settingsPage.importBitbucketProject()
+})
+
+test('Delete bitbucket repo from product table', async ({ page }) => {
+  test.setTimeout(30000)
+
+  const settingsPage = new BibucketIntegration(page)
   await settingsPage.deleteProjectGroup()
 })
