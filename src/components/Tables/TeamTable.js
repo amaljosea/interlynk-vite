@@ -2,6 +2,7 @@ import { useMutation } from '@apollo/client'
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
+import { truncatedValue } from 'utils'
 import { customStyles } from 'utils/styleUtils'
 import { FREE_TIER_USER_LIMIT } from 'variables/general'
 import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
@@ -142,7 +143,7 @@ const TeamTable = () => {
             color={primaryTextColor}
             sx={{ fontSize: '14px', w: 'fit-content' }}
           >
-            {row.name}
+            {row.name ? truncatedValue(row.name, 20) : 'N/A'}
           </Text>
           {row.email === email && (
             <Badge

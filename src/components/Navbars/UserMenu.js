@@ -61,7 +61,6 @@ export const UserMenu = ({ handleLogout }) => {
       <MenuButton>
         <Avatar
           size='sm'
-          name={userName}
           src={`${SERVER_URL}/${currentUser?.profileImage?.url}`}
         />
       </MenuButton>
