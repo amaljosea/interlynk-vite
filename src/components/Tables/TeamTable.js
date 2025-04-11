@@ -122,7 +122,8 @@ const TeamTable = () => {
             sx={{ w: '100%', px: 0, py: '.8rem', gap: 2, alignItems: 'center' }}
           >
             <Avatar
-              sx={{ w: '30px', h: '30px' }}
+              size={'sm'}
+              name={row?.name || 'User'}
               src={profileImage && `${SERVER_URL}/${profileImage?.url}`}
             />
             <Text color={primaryTextColor} my={2}>

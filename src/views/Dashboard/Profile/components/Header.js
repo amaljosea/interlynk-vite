@@ -50,7 +50,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   )
 
   const { organization: orgData } = useGlobalState()
-  const { id, profileImage: dp } = orgData?.currentUser || ''
+  const { id, name, profileImage: dp } = orgData?.currentUser || ''
   const activeOrgTier = orgData?.tier
   const lastUpdated = orgData?.updatedAt
   const timeAgo =
@@ -245,6 +245,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                   <Spinner width='80px' height='80px' />
                 ) : (
                   <Avatar
+                    name={name}
                     me={{ md: '22px' }}
                     src={profileImage}
                     ignoreFallback={dp || profileImage ? true : false}
