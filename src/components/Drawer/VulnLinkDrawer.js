@@ -143,7 +143,7 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
   )
 
   const isDisabled =
-    !validateUrl(link.trim()) || linkError !== '' || error !== ''
+    !validateUrl(link.trim()) || linkError !== '' || error !== '' || !type
 
   useEffect(() => {
     if (externalUrls?.length > 0) {
@@ -213,7 +213,8 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
           <FormControl
             isRequired
             isInvalid={
-              (link !== '' && !validateUrl(link.trim())) || containsSpace
+              (linkError !== '' && link !== '' && !validateUrl(link.trim())) ||
+              containsSpace
             }
           >
             <FormLabel>Link</FormLabel>

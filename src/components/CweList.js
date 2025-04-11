@@ -7,11 +7,15 @@ import { useThemeColor } from 'hooks/useThemeColors'
 const CweList = ({ data }) => {
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
-  if (data?.length === 0) return 'N/A'
+  const filteredData = data?.filter(
+    (item) => item !== 'NVD-CWE-noinfo' && item !== 'NVD-CWE-Other'
+  )
+
+  if (!filteredData || filteredData.length === 0) return 'N/A'
 
   return (
     <Flex gap={2} flexWrap={'wrap'}>
-      {data?.map((item, index) => {
+      {filteredData.map((item, index) => {
         const number = item?.match(/\d+/)?.[0]
         return (
           <Link
@@ -21,7 +25,7 @@ const CweList = ({ data }) => {
             to={`https://cwe.mitre.org/data/definitions/${number}.html`}
           >
             {number && item}
-            {index + 1 !== data?.length && ', '}
+            {index + 1 !== filteredData.length && ', '}
           </Link>
         )
       })}
