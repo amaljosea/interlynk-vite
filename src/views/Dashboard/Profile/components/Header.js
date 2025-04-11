@@ -311,7 +311,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                     color: primaryTextColor
                   }}
                 >
-                  {truncatedValue(userName, 30)}
+                  {userName ? truncatedValue(userName, 30) : 'N/A'}
                 </Text>
                 {isPersonal && (
                   <Tag
