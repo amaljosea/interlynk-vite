@@ -74,6 +74,7 @@ const PolicyConditions = ({
               {/* VALUE */}
               <Value
                 data={item}
+                index={index}
                 setError={setError}
                 conditions={conditions}
                 onChange={onChangeRule}

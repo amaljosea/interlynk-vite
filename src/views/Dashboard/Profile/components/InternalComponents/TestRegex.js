@@ -5,30 +5,23 @@ import {
   Box,
   Button,
   FormLabel,
-  Icon,
-  IconButton,
   Input,
   InputGroup,
   InputRightElement,
   Tooltip
 } from '@chakra-ui/react'
 
+import DeleteButton from 'components/Icons/DeleteButton'
 import LynkAlert from 'components/LynkAlert'
 
 import useCustomToast from 'hooks/useCustomToast'
-import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaCircleCheck, FaPlus } from 'react-icons/fa6'
 import { IoIosCloseCircle } from 'react-icons/io'
-import { MdDeleteOutline } from 'react-icons/md'
 
 export const TextRegex = ({ regex, ignoreCase }) => {
   const [items, setItems] = useState([{ id: uuidv4(), value: '' }])
   const [error, setError] = useState('')
-  const { grayBorderColor, primaryErrorColor } = useThemeColor([
-    'grayBorderColor',
-    'primaryErrorColor'
-  ])
 
   const hasSimilarRow = (data) => {
     const emptyValues = data.filter((item) => item.value === '')
@@ -113,21 +106,10 @@ export const TextRegex = ({ regex, ignoreCase }) => {
                 </Tooltip>
               </InputRightElement>
             </InputGroup>
-            <IconButton
-              border='1px solid'
-              colorScheme='white'
-              borderColor={grayBorderColor}
+            <DeleteButton
               aria-label='Remove'
               hidden={items.length === 1}
               onClick={() => handleDelete(item.id)}
-              icon={
-                <Icon
-                  color={primaryErrorColor}
-                  w={6}
-                  h={6}
-                  as={MdDeleteOutline}
-                />
-              }
             />
           </Box>
         )

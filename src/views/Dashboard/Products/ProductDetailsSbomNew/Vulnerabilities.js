@@ -13,10 +13,10 @@ import ImportWizard from 'views/Sbom/components/ImportWizard'
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
 import JiraCreateIssueModal from 'components/Connections/JiraCreateIssueModal'
-import VulnAdvisoriesDrawer from 'components/Drawer/VulnAdvisoriesDrawer'
 import VulnDrawer from 'components/Drawer/VulnDrawer'
 import VulnLinkDrawer from 'components/Drawer/VulnLinkDrawer'
 import LynkDrawer from 'components/LynkDrawer'
+import LynkTable from 'components/LynkTable'
 import CvssCard from 'components/Misc/CvssCard'
 import CustomVuln from 'components/Modal/CustomVuln'
 import Pagination from 'components/Pagination'
@@ -41,7 +41,6 @@ import ConfirmationModal from '../components/ConfirmationModal'
 import VulnerabilityColumns from './Components/tableColumns/VulnerabilityColumns'
 import ExpandedComponent from './Components/tableExpanded/VulnerabilityExpanded'
 import VulnerabilitySubHeader from './Components/tableSubHeaders/VulnerabilitySubHeader'
-import LynkTable from 'components/LynkTable'
 
 export const GetProjectSettings = gql`
   query GetProjectSettings($id: Uuid!) {
@@ -164,7 +163,6 @@ const Vulnerabilities = ({ sbomData }) => {
   const IMPORT = useDisclosure()
   const CUSTOM_VULNS = useDisclosure()
   const DELETE = useDisclosure()
-  const ADVISORIES = useDisclosure()
 
   const action = (type, data) => {
     setActiveRow(data)
@@ -185,8 +183,6 @@ const Vulnerabilities = ({ sbomData }) => {
         return CUSTOM_VULNS.onOpen()
       case 'remove_vuln':
         return DELETE.onOpen()
-      case 'view_advisories':
-        return ADVISORIES.onOpen()
       default:
         return VEX.onOpen()
     }
@@ -476,15 +472,6 @@ const Vulnerabilities = ({ sbomData }) => {
           title={'Remove Vulnerability'}
           name={activeRow?.vuln?.vulnId}
           description={`You are about to remove the custom vulnerability from this version`}
-        />
-      )}
-
-      {/* VULN ADVISORIES */}
-      {ADVISORIES.isOpen && (
-        <VulnAdvisoriesDrawer
-          data={activeRow}
-          isOpen={ADVISORIES.isOpen}
-          onClose={ADVISORIES.onClose}
         />
       )}
     </>

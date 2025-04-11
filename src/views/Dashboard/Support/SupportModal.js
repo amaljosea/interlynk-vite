@@ -11,13 +11,12 @@ import {
   FormErrorMessage,
   FormLabel,
   HStack,
-  Icon,
-  IconButton,
   Input,
   Stack,
   Text
 } from '@chakra-ui/react'
 
+import DeleteButton from 'components/Icons/DeleteButton'
 import LynkAlert from 'components/LynkAlert'
 import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
@@ -31,7 +30,6 @@ import {
 
 import { BsHeartPulse } from 'react-icons/bs'
 import { FaPlus } from 'react-icons/fa'
-import { MdDeleteOutline } from 'react-icons/md'
 
 const SupportModal = ({ supports, data, isOpen, onClose }) => {
   const initialData = {
@@ -61,10 +59,7 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
     setError('')
   }
 
-  const { primaryErrorColor, grayBorderColor } = useThemeColor([
-    'primaryErrorColor',
-    'grayBorderColor'
-  ])
+  const { primaryErrorColor } = useThemeColor(['primaryErrorColor'])
 
   const hasSimilarRow = (data) => {
     for (let i = 0; i < data.length; i++) {
@@ -388,19 +383,10 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
                             </Text>
                           )}
                         </Stack>
-                        <IconButton
-                          border='1px solid'
-                          colorScheme='white'
-                          borderColor={grayBorderColor}
+                        <DeleteButton
                           aria-label='Remove id'
                           onClick={() => deleteRow(item?.id)}
                           display={item?.id === 1 ? 'none' : 'flex'}
-                          icon={
-                            <Icon
-                              as={MdDeleteOutline}
-                              sx={{ w: 6, h: 6, color: primaryErrorColor }}
-                            />
-                          }
                         />
                       </Flex>
                     ))}

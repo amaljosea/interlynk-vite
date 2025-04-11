@@ -3,19 +3,11 @@ import { useEffect, useState } from 'react'
 import { truncatedValue } from 'utils'
 import { hasWhiteSpace, validateUrl } from 'utils/formValidationUtils'
 
-import { DeleteIcon } from '@chakra-ui/icons'
-import {
-  Button,
-  Flex,
-  IconButton,
-  Input,
-  Tag,
-  Text,
-  Tooltip
-} from '@chakra-ui/react'
+import { Button, Flex, Input, Tag, Text, Tooltip } from '@chakra-ui/react'
 import { Table, Tbody, Td, Tr } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
+import DeleteButton from 'components/Icons/DeleteButton'
 import LynkDrawer from 'components/LynkDrawer'
 import LynkSelect from 'components/LynkSelect'
 
@@ -36,12 +28,10 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
   const [addUrls, { loading }] = useMutation(ComponentVulnUpdate)
   const [addPartsUrls] = useMutation(DispositionByParentUpdate)
 
-  const { primaryErrorColor, secondaryTextInverse, sameSecondaryText } =
-    useThemeColor([
-      'primaryErrorColor',
-      'secondaryTextInverse',
-      'sameSecondaryText'
-    ])
+  const { secondaryTextInverse, sameSecondaryText } = useThemeColor([
+    'secondaryTextInverse',
+    'sameSecondaryText'
+  ])
 
   const containsSpace = hasWhiteSpace(link)
 
@@ -143,20 +133,17 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
   }
 
   const DeleteAction = ({ id }) => (
-    <IconButton
+    <DeleteButton
       size='sm'
-      hidden={isPart}
-      variant='outline'
-      cursor={'pointer'}
-      icon={<DeleteIcon />}
-      color={primaryErrorColor}
+      variant={'solid'}
       data-testid='delete_vuln_link'
       onClick={() => handleLinkRemove(id)}
+      hidden={isPart}
     />
   )
 
   const isDisabled =
-    !validateUrl(link.trim()) || linkError !== '' || error !== ''
+    !validateUrl(link.trim()) || linkError !== '' || error !== '' || !type
 
   useEffect(() => {
     if (externalUrls?.length > 0) {
@@ -226,7 +213,8 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
           <FormControl
             isRequired
             isInvalid={
-              (link !== '' && !validateUrl(link.trim())) || containsSpace
+              (linkError !== '' && link !== '' && !validateUrl(link.trim())) ||
+              containsSpace
             }
           >
             <FormLabel>Link</FormLabel>

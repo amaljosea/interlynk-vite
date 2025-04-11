@@ -2,13 +2,14 @@ import { gql, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useRef, useState } from 'react'
 import { timeSince } from 'utils'
 
-import { AddIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons'
+import { AddIcon, EditIcon } from '@chakra-ui/icons'
 import { Divider, IconButton, Textarea } from '@chakra-ui/react'
 import { Button, ButtonGroup } from '@chakra-ui/react'
 import { Flex, Stack, Text } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import DeleteButton from 'components/Icons/DeleteButton'
 import LynkAlert from 'components/LynkAlert'
 import LynkDrawer from 'components/LynkDrawer'
 import CompInfo from 'components/Misc/CompInfo'
@@ -90,7 +91,10 @@ const DeleteNote = gql`
 
 const ComponentNotes = ({ data, isOpen, onClose }) => {
   const { showToast } = useCustomToast()
-  const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
+  const { sameSecondaryText, primaryTextColor } = useThemeColor([
+    'sameSecondaryText',
+    'primaryTextColor'
+  ])
 
   const { id, sbomId } = data || {}
 
@@ -296,8 +300,8 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
                           <Button
                             size='sm'
                             fontSize={12}
-                            colorScheme='red'
                             isLoading={deleteLoading}
+                            colorScheme='red'
                             onClick={() => handleDeleteNote(note?.id)}
                           >
                             Yes
@@ -308,7 +312,7 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
                           <IconButton
                             size='sm'
                             cursor='pointer'
-                            icon={<EditIcon />}
+                            icon={<EditIcon color={primaryTextColor} />}
                             onClick={() => {
                               setEdit(true)
                               setWarning('')
@@ -316,12 +320,10 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
                               setComment(note.comment)
                             }}
                           />
-                          <IconButton
+                          <DeleteButton
                             size='sm'
-                            cursor='pointer'
-                            colorScheme='red'
-                            icon={<DeleteIcon />}
                             onClick={() => setWarning(note?.id)}
+                            variant={'solid'}
                           />
                         </Flex>
                       )}

@@ -4,7 +4,7 @@ import { filterEnvList, getFullDate, isDefaultEnv, timeSince } from 'utils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import EnvModal from 'views/Dashboard/Products/components/EnvModal'
 
-import { AddIcon, CheckCircleIcon, DeleteIcon } from '@chakra-ui/icons'
+import { AddIcon, CheckCircleIcon } from '@chakra-ui/icons'
 import {
   Flex,
   IconButton,
@@ -14,6 +14,7 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
+import DeleteButton from 'components/Icons/DeleteButton'
 import LynkDrawer from 'components/LynkDrawer'
 import LynkTable from 'components/LynkTable'
 
@@ -134,11 +135,9 @@ const EnvironmentDrawer = ({
       selector: (row) => {
         const { name } = row
         return (
-          <IconButton
+          <DeleteButton
+            variant={'solid'}
             size='xs'
-            icon={<DeleteIcon />}
-            colorScheme='red'
-            variant='solid'
             isDisabled={isDefaultEnv(name)}
             onClick={() => {
               setActiveRow(row)
