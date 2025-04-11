@@ -1247,35 +1247,56 @@ export const exportCsvTableConfig = {
       'Scope',
       'Support Level',
       'End-Of-Support Date',
+      'Assessment Expires On',
+      'Support Explanation',
+      'Last Assessed By',
       'Primary',
       'Links'
     ],
-    mapDataForExport: (data) =>
-      data.map((row) => ({
-        Ecosystem: row?.purl?.split('/')[0] || '',
-        'Component Name': row?.name || 'N/A',
-        'Component Version': row?.version || '',
-        PURL: row?.purl || '',
-        Licenses: row?.licensesExp || '',
-        Updated: row?.updatedAt || '',
-        Description: `"${row?.description || 'N/A'}"`,
-        Group: row?.group || '',
-        Type: row?.kind || 'N/A',
-        Internal: row?.internal ? 'True' : 'False',
-        'Supplier Organization Name': row?.suppliers[0]?.name || 'N/A',
-        'Supplier URL': row?.suppliers[0]?.url || 'N/A',
-        'Supplier Contact Name': row?.suppliers[0]?.contactName || 'N/A',
-        'Supplier Contact Email': row?.suppliers[0]?.contactEmail || 'N/A',
-        CPES: row?.cpes?.map((item) => item) || '',
-        Scope: row?.scope || 'N/A',
-        'Support Level': row?.supportLevel || 'N/A',
-        'End-Of-Support Date': row?.endOfSupport || 'N/A',
-        Primary: row?.primary ? 'True' : 'False',
-        Links:
-          row?.externalUrls
-            ?.map((link) => `${link.name}: ${link.url}`)
-            .join('; ') || ''
-      }))
+    mapDataForExport: (data) => {
+      return data.map((row) => {
+        const {
+          componentSupportLevel: manual,
+          componentSupportLevelAutomatic: automatic
+        } = row
+
+        const supportLevel = manual?.level || automatic?.level
+        const { endDate, retainManualOverrideFor, notes, user } = manual || {}
+
+        return {
+          Ecosystem: row?.purl?.split('/')[0] || '',
+          'Component Name': row?.name || 'N/A',
+          'Component Version': row?.version || '',
+          PURL: row?.purl || '',
+          Licenses: row?.licensesExp || '',
+          Updated: row?.updatedAt || '',
+          Description: `"${row?.description || 'N/A'}"`,
+          Group: row?.group || '',
+          Type: row?.kind || 'N/A',
+          Internal: row?.internal ? 'True' : 'False',
+          'Supplier Organization Name': row?.suppliers[0]?.name || 'N/A',
+          'Supplier URL': row?.suppliers[0]?.url || 'N/A',
+          'Supplier Contact Name': row?.suppliers[0]?.contactName || 'N/A',
+          'Supplier Contact Email': row?.suppliers[0]?.contactEmail || 'N/A',
+          CPES: row?.cpes?.map((item) => item) || '',
+          Scope: row?.scope || 'N/A',
+          'Support Level':
+            capitalizeFirstLetter(supportLevel?.replaceAll('_', ' ')) || 'N/A',
+          'End-Of-Support Date': endDate
+            ? `${new Date(endDate).toLocaleDateString()}`
+            : `N/A`,
+          'Assessment Expires On':
+            calculateExpiryDate(retainManualOverrideFor) || 'N/A',
+          'Support Explanation': notes || automatic?.notes || 'N/A',
+          'Last Assessed By': user?.name || 'N/A',
+          Primary: row?.primary ? 'True' : 'False',
+          Links:
+            row?.externalUrls
+              ?.map((link) => `${link.name}: ${link.url}`)
+              .join('; ') || ''
+        }
+      })
+    }
   },
   'SBOM Vulnerability View': {
     defaultSelectedColumns: [
