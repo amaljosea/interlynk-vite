@@ -4,6 +4,19 @@ import { format as formatWithTZ, toZonedTime } from 'date-fns-tz'
 import { PackageURL } from 'packageurl-js'
 import { sbomOrigin } from 'variables/general'
 
+export const csvToJson = (csvContent) => {
+  const rows = csvContent.trim().split('\n')
+  const headers = rows[0].split(',')
+  
+  return rows.slice(1).map((row) => {
+    const values = row.split(',')
+    return headers.reduce((acc, header, i) => {
+      acc[header] = values[i]
+      return acc
+    }, {})
+  })
+}
+
 export const getUndefinedIfEmptyOrAll = (value, allValue = 'all') =>
   value.includes(allValue) || value.length === 0 ? undefined : value
 
