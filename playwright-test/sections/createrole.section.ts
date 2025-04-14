@@ -12,9 +12,9 @@ export class RolesPage {
   }
 
   async addRole(name: string, role: string) {
-    await this.page.getByRole('banner').getByRole('button').click()
-    await this.page.getByLabel('Name*').click()
+    await this.page.getByTestId(`add_role`).click()
 
+    await this.page.getByLabel('Name*').click()
     await this.page.getByLabel('Name*').press('CapsLock')
     await this.page.getByLabel('Name*').fill(name[0])
     await this.page.getByLabel('Name*').press('CapsLock')
