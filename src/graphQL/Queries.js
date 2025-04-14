@@ -5740,6 +5740,7 @@ export const BitbucketRepositories = gql`
         slug
         uuid
         workspace
+        projectName
       }
       totalCount
     }
