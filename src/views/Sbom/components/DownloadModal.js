@@ -2,8 +2,7 @@ import { gql, useLazyQuery, useQuery } from '@apollo/client'
 import { client } from 'context/ApolloWrapper'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getSignedUrlParams, truncatedValue } from 'utils'
-import { csvToJson } from 'utils'
+import { getSignedUrlParams, truncatedValue,csvToJson } from 'utils'
 
 import { DownloadIcon } from '@chakra-ui/icons'
 import {
@@ -246,7 +245,7 @@ const DownloadModal = (props) => {
           includeVulns,
           sbomId: sbomId,
           package: encoded,
-          supportLevelOnly: includeSupport,
+          includeSupportStatus: includeSupport,
           lite: spec === 'SPDX-Lite' ? true : false,
           spec: spec === 'SPDX-Lite' ? 'SPDX' : spec,
           projectId: signedUrlParams ? undefined : productId,
@@ -390,7 +389,7 @@ const DownloadModal = (props) => {
                     isDisabled={spec === 'SPDX'}
                     onChange={() => setIncludeSupport(!includeSupport)}
                   >
-                    Support Level Only
+                    Support Level
                   </Checkbox>
                 )}
                 {downloadType === 'pdf' && (
