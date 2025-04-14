@@ -5,7 +5,7 @@ import { Text, chakra } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-const ReadMore = ({ text, maxChars = 300 }) => {
+const ExpandableText = ({ text, maxChars = 300 }) => {
   const [expanded, setExpanded] = useState(false)
   const { secondaryBlueText } = useThemeColor(['secondaryBlueText'])
 
@@ -29,4 +29,4 @@ const ReadMore = ({ text, maxChars = 300 }) => {
   )
 }
 
-export default ReadMore
+export default ExpandableText

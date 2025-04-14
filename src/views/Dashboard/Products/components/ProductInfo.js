@@ -10,6 +10,7 @@ import {
 import { Search2Icon } from '@chakra-ui/icons'
 import { Flex, Icon, IconButton, Stack, Text, Tooltip } from '@chakra-ui/react'
 
+import ExpandableText from 'components/ExpandableText'
 import { SettingsTag } from 'components/Misc/SettingsTag'
 
 import useFetchAllNodes from 'hooks/useFetchAllNodes'
@@ -116,9 +117,7 @@ const ProductInfo = ({ settings, data }) => {
           <Tooltip label={name}>{truncatedValue(name, 50)}</Tooltip>
         </Text>
         {/* PRODUCT DESCRIPTION */}
-        <Text fontSize={'sm'} wordBreak={'break-all'}>
-          {description || ''}
-        </Text>
+        <ExpandableText text={description || ''} />
         {/* SETTINGS */}
         <Stack mt={description ? 1 : 0} direction='row' alignItems={'center'}>
           <SettingsTag
