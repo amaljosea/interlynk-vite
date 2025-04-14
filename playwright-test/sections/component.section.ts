@@ -257,14 +257,29 @@ export default class ComponentSection {
 
           await this.page.getByRole('tab', { name: 'links' }).click()
 
-          await this.page.getByLabel('Type*').selectOption('issue-tracker')
+          await this.page
+            .getByLabel('Links')
+            .locator('div')
+            .filter({ hasText: /^-- Select --$/ })
+            .nth(2)
+            .click()
+          await this.page.keyboard.type('issue')
+          await this.page.keyboard.press('Enter')
+
           await this.page.getByPlaceholder('Add URL').fill('github.com')
           await this.page.waitForTimeout(2000)
 
-          await this.page.getByRole('button', { name: 'Save' }).click()
+          await this.page.getByRole('button', { name: 'Add Link' }).click()
           await this.page.waitForTimeout(4000)
 
-          await this.page.getByLabel('Type*').selectOption('issue-tracker')
+          await this.page
+            .getByLabel('Links')
+            .locator('div')
+            .filter({ hasText: /^-- Select --$/ })
+            .nth(2)
+            .click()
+          await this.page.keyboard.type('issue')
+          await this.page.keyboard.press('Enter')
           const errMsg = await this.page
             .getByTestId('link_type_error')
             .isVisible()
@@ -321,16 +336,18 @@ export default class ComponentSection {
 
           await this.page.waitForTimeout(5000)
 
-          await this.page
-            .locator('[name="relationType"]')
-            .selectOption({ index: 1 })
+          await this.page.locator('#relationType').click()
+          await this.page.keyboard.press('ArrowDown')
+          await this.page.keyboard.press('Enter')
           await this.page.waitForTimeout(2000)
 
           this.page.locator('input#relationTo').fill('antlr')
           await this.page.waitForTimeout(2000)
           await this.page.keyboard.press('Enter')
 
-          await this.page.getByRole('button', { name: 'Save' }).click()
+          await this.page
+            .getByRole('button', { name: 'Add Relationship' })
+            .click()
           await this.page.waitForTimeout(2000)
 
           await this.page.getByTestId('delete_depends_on').first().click()
@@ -527,9 +544,14 @@ export default class ComponentSection {
           await this.page.getByTestId('purl_expand').first().click()
           await this.page.waitForTimeout(3000)
 
-          await this.page.getByTestId('purl_type').click()
-          await this.page.waitForTimeout(1000)
-          await this.page.getByTestId('purl_type').selectOption('npm')
+          await this.page
+            .getByLabel('Identifiers')
+            .locator('div')
+            .filter({ hasText: /^maven$/ })
+            .nth(1)
+            .click()
+          await this.page.keyboard.type('npm')
+          await this.page.keyboard.press('Enter')
           await this.page.waitForTimeout(2000)
           await this.page.locator('#purl_namespace').click()
           await this.page.keyboard.type('react')
@@ -594,9 +616,14 @@ export default class ComponentSection {
           await this.page.getByTestId('cpe_expand').first().click()
           await this.page.waitForTimeout(2000)
 
-          await this.page.getByTestId('cpe_part').click()
-          await this.page.waitForTimeout(1000)
-          await this.page.getByTestId('cpe_part').selectOption('a')
+          await this.page
+            .getByLabel('Identifiers')
+            .locator('div')
+            .filter({ hasText: /^-- Select --$/ })
+            .nth(1)
+            .click()
+          await this.page.keyboard.type('a')
+          await this.page.keyboard.press('Enter')
           await this.page.waitForTimeout(3000)
           await this.page.locator('#cpe_vendor').click()
           await this.page.keyboard.type('calibre-ebook')

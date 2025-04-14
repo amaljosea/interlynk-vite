@@ -16,7 +16,6 @@ import CustomLoader from 'components/CustomLoader'
 import ComponentNotes from 'components/Drawer/ComponentNotes'
 import ComponentVulns from 'components/Drawer/ComponentVulns'
 import LicenseStatus from 'components/Drawer/LicenseStatus'
-import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
 import ComponentAddModal from 'components/Modal/ComponentAddModal'
@@ -33,7 +32,6 @@ import { GetComponentData } from 'graphQL/Queries'
 
 import CompDrawer from '../components/CompDrawer'
 import CompInsights from '../components/CompInsights'
-import CompSupport from '../components/CompSupport'
 import ConfirmationModal from '../components/ConfirmationModal'
 import HealthMap from '../components/HealthMap'
 import ComponentsColumns from './Components/tableColumns/ComponentsColumns'
@@ -119,8 +117,6 @@ const Components = ({ sbomData }) => {
 
   const { lifecycle, primaryComponent } = sbomData || ''
 
-  const [activeComp, setActiveComp] = useState(null)
-
   const updateComponent = useHasPermission({
     parentKey: 'view_sbom',
     childKey: 'update_sbom_components'
@@ -136,7 +132,6 @@ const Components = ({ sbomData }) => {
   const COMPONENT = useDisclosure()
   const INSIGHTS = useDisclosure()
   const VULNS = useDisclosure()
-  const SUPPORT = useDisclosure()
   const DELETE_SUPPLIER = useDisclosure()
   const LICENSE_STATUS = useDisclosure()
 
@@ -165,8 +160,6 @@ const Components = ({ sbomData }) => {
         return NOTES.onOpen()
       case 'view_component_vulnerabilities':
         return VULNS.onOpen()
-      case 'edit_component_support':
-        return SUPPORT.onOpen()
       case 'view_health_map':
         return MAP.onOpen()
       default:
@@ -192,7 +185,7 @@ const Components = ({ sbomData }) => {
 
   const handleGraphView = useMemo(
     () => (row) => {
-      setActiveComp(row)
+      setActiveRow(row)
       GRAPH.onOpen()
     },
     [GRAPH]
@@ -404,14 +397,6 @@ const Components = ({ sbomData }) => {
           data={activeRow}
           isOpen={NOTES.isOpen}
           onClose={NOTES.onClose}
-        />
-      )}
-
-      {SUPPORT.isOpen && (
-        <CompSupport
-          data={activeRow}
-          isOpen={SUPPORT.isOpen}
-          onClose={SUPPORT.onClose}
         />
       )}
 

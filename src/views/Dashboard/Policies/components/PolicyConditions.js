@@ -27,6 +27,8 @@ const PolicyConditions = ({
           return {
             ...item,
             [field]: value,
+            operator: '', // Reset operator when subject is changed
+            value: '', // Reset value when subject is changed
             list: result?.operators,
             subError: ''
           }
@@ -40,7 +42,10 @@ const PolicyConditions = ({
           return {
             ...item,
             [field]: value,
-            opError: ''
+            opError: '',
+            value: '',
+            min: '0',
+            max: '0'
           }
         } else if (
           field === 'operator' &&
@@ -61,7 +66,7 @@ const PolicyConditions = ({
       {conditions?.length > 0 &&
         conditions?.map((item, index) => (
           <Box key={index}>
-            <Flex gap={2} mt={1.5} width={'100%'} alignItems={'flex-start'}>
+            <Flex gap={2} mt={1.5} alignItems={'flex-start'}>
               {/* SUBJECT */}
               <Subject index={index} data={item} onChange={onChangeRule} />
               {/* OPERATOR */}
@@ -69,6 +74,7 @@ const PolicyConditions = ({
               {/* VALUE */}
               <Value
                 data={item}
+                index={index}
                 setError={setError}
                 conditions={conditions}
                 onChange={onChangeRule}

@@ -1,24 +1,21 @@
 import { packageTypes } from 'variables/general'
 
-import { FormControl, FormLabel, Select } from '@chakra-ui/react'
+import { FormControl, FormLabel } from '@chakra-ui/react'
+
+import LynkSelect from 'components/LynkSelect'
 
 const PackageType = ({ disabled, type, onChange }) => {
   return (
     <FormControl isDisabled={disabled} isRequired>
       <FormLabel htmlFor='type'>Package Type</FormLabel>
-      <Select
-        size='md'
+      <LynkSelect
         name='type'
-        value={type}
+        value={packageTypes?.find((opt) => opt.value === type) || null}
+        onChange={(selected) => onChange('type', selected.value)}
+        options={packageTypes}
         data-testid='purl_type'
-        onChange={(e) => onChange('type', e.target.value)}
-      >
-        {packageTypes?.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </Select>
+        dropDown
+      />
     </FormControl>
   )
 }

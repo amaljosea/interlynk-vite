@@ -681,6 +681,7 @@ export const GetGlobalVulns = gql`
   query GetGlobalVulns(
     $first: Int
     $last: Int
+    $env: String
     $after: String
     $before: String
     $search: String
@@ -732,7 +733,7 @@ export const GetGlobalVulns = gql`
           source
           updatedAt
           vulnId
-          metrics {
+          metrics(projectName: $env) {
             affectedCount
             fixedCount
             inTriageCount
@@ -773,6 +774,7 @@ export const GetGlobalVulnData = gql`
         kev
         epssScore
         epssPercentile
+        cwes
       }
       projectGroups {
         nodes {
@@ -966,6 +968,7 @@ export const GetVersionsTable = gql`
     $search: String
     $field: SbomOrderByFields!
     $direction: OrderByDirection!
+    $lifestage: [ProductLifecycleStageEnum!]
   ) {
     project(id: $id) {
       id
@@ -975,6 +978,7 @@ export const GetVersionsTable = gql`
         last: $last
         before: $before
         search: $search
+        lifestage: $lifestage
         orderBy: { direction: $direction, field: $field }
       ) {
         totalCount
@@ -988,6 +992,7 @@ export const GetVersionsTable = gql`
           id
           spec
           phases
+
           creationAt
           createdAt
           updatedAt
@@ -996,6 +1001,7 @@ export const GetVersionsTable = gql`
           licensesExp
           projectVersion
           vulnRunStatus
+          productLifeCycleStage
           alternatives {
             id
           }
@@ -1667,6 +1673,10 @@ export const GetComponentData = gql`
               name
             }
           }
+          componentSupportLevelAutomatic {
+            level
+            notes
+          }
           externalUrls {
             name
             url
@@ -2174,6 +2184,8 @@ export const GetVulnData = gql`
               epssScores
               epssPercentile
               kev
+              cwes
+              advisories
             }
           }
           componentVulnLogs {
@@ -3386,6 +3398,10 @@ export const GetCompSupportData = gql`
               name
             }
           }
+          componentSupportLevelAutomatic {
+            level
+            notes
+          }
         }
       }
     }
@@ -3544,9 +3560,30 @@ export const GetRequests = gql`
 `
 
 export const GetProductNamesForRequest = gql`
-  query GetProductNamesForRequest {
+  query GetProductNamesForRequest(
+    $field: ProjectGroupOrderByFields!
+    $direction: OrderByDirection!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
     organization {
-      projectGroups(first: 500, enabled: true) {
+      projectGroups(
+        first: $first
+        last: $last
+        after: $after
+        before: $before
+        enabled: true
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
         nodes {
           id
           name
@@ -4217,10 +4254,12 @@ export const GetSelectedUser = gql`
   query GetSelectedUser {
     organization {
       users {
-        name
-        email
-        role {
+        nodes {
           name
+          email
+          role {
+            name
+          }
         }
       }
     }
@@ -4708,8 +4747,13 @@ export const CveLookup = gql`
       vulnId
       description
       lastModified
+      reportedAt
       published
+      cvssScore
+      cvssVector
       severity
+      advisories
+      cwes
     }
   }
 `
@@ -4977,6 +5021,8 @@ export const GetScoreSetting = gql`
         contributorThresholdMax
         contributorThresholdMin
         componentAbandonedThreshold
+        pkgAgeThreshold
+        repoAgeThreshold
         organization {
           id
         }
@@ -5521,6 +5567,10 @@ export const GetComponentSupportLevels = gql`
         }
         updatedAt
         createdAt
+      }
+      componentSupportLevelAutomatic {
+        level
+        notes
       }
     }
   }

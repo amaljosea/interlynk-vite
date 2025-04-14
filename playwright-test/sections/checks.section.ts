@@ -45,9 +45,12 @@ export default class ChecksSection {
       await this.page.waitForTimeout(2000)
 
       await this.page.getByTestId('filter_Check ID').click()
+      await this.page.getByRole('menuitemcheckbox', { name: 'All' }).click()
       await this.page
         .getByRole('menuitemcheckbox', { name: 'SB-HC-8: Document has' })
         .click()
+      await this.page.waitForTimeout(2000)
+
       await this.page
         .getByRole('row', { name: 'SB-HC-8 medium Document has' })
         .getByRole('button')
@@ -76,6 +79,8 @@ export default class ChecksSection {
           name: 'SB-HC-7: Document has authors'
         })
         .click()
+      await this.page.waitForTimeout(2000)
+
       await this.page
         .getByRole('row', { name: 'SB-HC-7 medium Document has' })
         .getByRole('button')

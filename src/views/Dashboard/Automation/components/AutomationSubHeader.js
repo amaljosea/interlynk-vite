@@ -1,13 +1,15 @@
-import { gql, useLazyQuery } from '@apollo/client'
+import { gql, useLazyQuery, useQuery } from '@apollo/client'
 import { useCallback, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { Flex, IconButton, Stack, Tooltip } from '@chakra-ui/react'
+import { WarningIcon } from '@chakra-ui/icons'
+import { Flex, IconButton, Stack, Text, Tooltip } from '@chakra-ui/react'
 
 import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 
 import { useHasPermission } from 'hooks/useHasPermission'
+import useQueryParam from 'hooks/useQueryParam'
 
 import { TbFileExport, TbFileImport } from 'react-icons/tb'
 
@@ -19,9 +21,27 @@ const RuleExport = gql`
   }
 `
 
+export const GetVulnSetting = gql`
+  query GetVulnSetting($id: Uuid!) {
+    project(id: $id) {
+      projectSetting {
+        automatedFixesEnabled
+      }
+    }
+  }
+`
+
 const AutomationSubHeader = ({ RULE, RULE_IMPORT, setActiveRow, projects }) => {
   const params = useParams()
+  const activeTab = useQueryParam('tab')
   const productId = params.productid
+
+  const { data: settings, loading } = useQuery(GetVulnSetting, {
+    variables: { id: params?.productid },
+    skip: activeTab === 'automation rules' ? false : true
+  })
+  const { projectSetting } = settings?.project || {}
+  const { automatedFixesEnabled } = projectSetting || {}
 
   const [exportRule, { loading: exportLoading }] = useLazyQuery(RuleExport)
 
@@ -60,9 +80,23 @@ const AutomationSubHeader = ({ RULE, RULE_IMPORT, setActiveRow, projects }) => {
     })
   }, [downloadJsonFile, exportRule, productId])
 
-  return useMemo(
-    () => (
-      <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
+  return useMemo(() => {
+    if (loading) return null
+
+    return (
+      <Flex
+        width={'100%'}
+        alignItems={'center'}
+        justifyContent={!automatedFixesEnabled ? 'space-between' : 'flex-end'}
+      >
+        {!automatedFixesEnabled && (
+          <Flex gap={2} alignItems={'center'} w={'fit-content'}>
+            <WarningIcon color={'darkorange'} />
+            <Text fontSize={'sm'} color={'darkorange'}>
+              Automation is disabled under Product Settings
+            </Text>
+          </Flex>
+        )}
         <Stack direction={'row'} spacing={2} alignItems={'center'}>
           <Tooltip label='Import Rules'>
             <IconButton
@@ -92,16 +126,17 @@ const AutomationSubHeader = ({ RULE, RULE_IMPORT, setActiveRow, projects }) => {
           <RefreshBtn />
         </Stack>
       </Flex>
-    ),
-    [
-      RULE,
-      RULE_IMPORT,
-      handleExport,
-      exportLoading,
-      setActiveRow,
-      canEditAutomations
-    ]
-  )
+    )
+  }, [
+    automatedFixesEnabled,
+    loading,
+    RULE_IMPORT.onOpen,
+    canEditAutomations,
+    handleExport,
+    exportLoading,
+    setActiveRow,
+    RULE
+  ])
 }
 
 export default AutomationSubHeader

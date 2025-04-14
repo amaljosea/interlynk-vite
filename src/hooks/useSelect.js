@@ -1,6 +1,4 @@
 /* eslint-disable */
-import { useColorModeValue } from '@chakra-ui/system'
-
 import { useThemeColor } from 'hooks/useThemeColors'
 
 export const useSelect = (type) => {
@@ -25,6 +23,10 @@ export const useSelect = (type) => {
   ])
 
   const selectStyles = {
+    container: (provided) => ({
+      ...provided,
+      width: '100%'
+    }),
     control: (baseStyles, state) => ({
       ...baseStyles,
       color: primaryTextColor,
@@ -58,7 +60,6 @@ export const useSelect = (type) => {
     }),
     menu: (provided) => ({
       ...provided,
-      zIndex: 1111,
       backgroundColor: primaryBgColor,
       width: '100%'
     }),
@@ -77,6 +78,7 @@ export const useSelect = (type) => {
     }),
     option: (provided, state) => ({
       ...provided,
+      fontSize: isLynkSelect && '14px',
       color: isBreadcrumb ? primaryTextColor : secondaryTextInverse,
       backgroundColor: state?.isFocused
         ? 'rgba(0, 0, 0, 0.04)'
@@ -126,7 +128,7 @@ export const useSelect = (type) => {
     },
     placeholder: (provided) => ({
       ...provided,
-      color: primaryTextColor
+      color: secondaryTextInverse
     })
   }
 

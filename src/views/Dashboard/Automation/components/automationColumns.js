@@ -83,7 +83,8 @@ export const useAutomationColumns = (
           </div>
         )
       },
-      width: '5%'
+      width: '5%',
+      omit: !editAutomations
     },
     // ACTIVE
     {

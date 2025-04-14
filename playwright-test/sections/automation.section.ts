@@ -29,17 +29,21 @@ export default class AutomationSection {
         await this.page.locator(addBtn).click()
         await this.page.waitForTimeout(2000)
         await this.page.getByPlaceholder('Enter rule name').fill(ruleName)
-        await this.page
-          .getByTestId(`auto_conditon_subject_0`)
-          .selectOption('component_licenses_exp')
+
+        await this.page.locator('#auto_conditon_subject_0').click()
+        await this.page.keyboard.type('component_licenses_exp')
+        await this.page.keyboard.press('Enter')
+
         await this.page.waitForTimeout(1000)
-        await this.page
-          .getByTestId(`auto_conditon_operator_0`)
-          .selectOption('not_exists')
+        await this.page.locator('#auto_conditon_operator_0').click()
+        await this.page.keyboard.type('not_exists')
+        await this.page.keyboard.press('Enter')
+
         await this.page.waitForTimeout(1000)
-        await this.page
-          .getByTestId(`auto_action_subject_0`)
-          .selectOption('component_licenses_exp')
+        await this.page.locator('#auto_action_subject_0').click()
+        await this.page.keyboard.type('component_licenses_exp')
+        await this.page.keyboard.press('Enter')
+
         await this.page.waitForTimeout(1000)
         await this.page.getByPlaceholder('Add value').fill('MIT')
         await this.page.waitForTimeout(1000)

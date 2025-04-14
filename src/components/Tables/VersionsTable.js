@@ -1,29 +1,20 @@
 import { gql, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
-import { addDays, differenceInDays, parseISO } from 'date-fns'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import { getFormat, getFullDate } from 'utils'
-import { getLink, getSignedUrlParams, timeSince } from 'utils'
+import { useNavigate, useParams } from 'react-router-dom'
+import { getSignedUrlParams, getUndefinedIfEmptyOrAll } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
-import { customStyles, getType } from 'utils/styleUtils'
+import { customStyles } from 'utils/styleUtils'
+import LifecycleModal from 'views/Dashboard/Products/components/LifecycleModal'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { Flex, useDisclosure } from '@chakra-ui/react'
-import { Link as Olink, Portal, Stack } from '@chakra-ui/react'
-import { Divider, Grid, GridItem, Icon, IconButton } from '@chakra-ui/react'
-import { Box, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
-import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import ArchivedVersions from 'components/Drawer/ArchivedVersions'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import ToolsDrawer from 'components/Drawer/ToolsDrawer'
-import RefreshBtn from 'components/Icons/RefreshBtn'
-import LynkAction from 'components/Misc/LynkAction'
-import VulnBadge from 'components/Misc/VulnBadge'
 import ArchiveSbom from 'components/Modal/ArchiveSbom'
 import AutomationWarning from 'components/Modal/AutomationWarning'
 import DeleteSbom from 'components/Modal/DeleteSbom'
@@ -31,30 +22,24 @@ import ReprocessSbom from 'components/Modal/ReprocessSbom'
 import SbomTransfer from 'components/Modal/SbomTransfer'
 import SupportAnalysis from 'components/Modal/SupportAnalysis'
 import Pagination from 'components/Pagination'
+import VersionColumns from 'components/columns/VersionColumns'
+import VersionHeader from 'components/headers/VersionHeader'
 
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useGradualPolling } from 'hooks/useGradualPolling'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import useQueryParam from 'hooks/useQueryParam'
-import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetVersionsTable, ShareVersionTable } from 'graphQL/Queries'
-
-import { FaPlus } from 'react-icons/fa6'
-import { HiOutlineDuplicate } from 'react-icons/hi'
-import { IoMdWarning } from 'react-icons/io'
-import { LuArchive, LuGitCompare } from 'react-icons/lu'
 
 // GET ACTIVCE PROJECT GROUP FOR PUBLIC VIEW
 export const GetShareProjectGroup = gql`
   query GetShareProjectGroup($id: Uuid!) {
     shareLynkQuery {
       projectGroup(id: $id) {
-        description
         enabled
         name
       }
@@ -62,51 +47,50 @@ export const GetShareProjectGroup = gql`
   }
 `
 
-const GetProjectGroup = gql`
-  query GetProjectGroup($id: Uuid!) {
-    projectGroup(id: $id) {
-      description
-      enabled
-      name
+export const GetProjectDetails = gql`
+  query GetProjectDetails($id: Uuid!) {
+    project(id: $id) {
+      projectGroup {
+        name
+        enabled
+      }
+      sboms {
+        id
+        projectVersion
+      }
+      projectSetting {
+        id
+        enableSupportLevel
+      }
     }
   }
 `
 
 const VersionsTable = (props) => {
-  const { handleSort, retentionTime, filters, setFilters } = props
+  const { retentionTime } = props
 
   const navigate = useNavigate()
   const params = useParams()
   const productId = params.productid
   const signedUrlParams = getSignedUrlParams()
-  const { isFreeTier } = useGlobalQueryContext()
   const {
     clearSelect,
     setClearSelect,
     versionState,
     dispatch,
     selectedSbom,
-    setSelectedSbom
+    setSelectedSbom,
+    onClearSelection
   } = useGlobalState()
-  const { searchInput } = versionState
-  const { prodVulnDispatch, prodCompDispatch } = dispatch
+  const { field, direction, searchInput, lifestage } = versionState
+  const { prodVulnDispatch, prodCompDispatch, versionDispatch } = dispatch
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
-  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const [filterText, setFilterText] = useState(searchInput)
   const [activeRow, setActiveRow] = useState(null)
 
-  const currentDate = new Date()
-
-  const {
-    headingTextColor,
-    primaryTextColor,
-    primaryErrorColor,
-    primaryBlueText
-  } = useThemeColor([
+  const { headingTextColor, primaryBlueText } = useThemeColor([
     'headingTextColor',
-    'primaryTextColor',
-    'primaryErrorColor',
     'primaryBlueText'
   ])
 
@@ -120,6 +104,7 @@ const VersionsTable = (props) => {
   const ARCHIVE_SBOM = useDisclosure()
   const AUTOMATION = useDisclosure()
   const SUPPORT = useDisclosure()
+  const LIFECYCLE = useDisclosure()
 
   const tab = useQueryParam('tab')
 
@@ -129,18 +114,19 @@ const VersionsTable = (props) => {
 
   // GET PROJECT DATA
   const { data } = useQuery(
-    signedUrlParams ? GetShareProjectGroup : GetProjectGroup,
+    signedUrlParams ? GetShareProjectGroup : GetProjectDetails,
     {
-      variables: { id: params?.productgroupid }
+      variables: { id: params?.productid }
     }
   )
+  const { projectGroup, projectSetting } = data?.project || {}
 
   const result = signedUrlParams
     ? data?.shareLynkQuery?.projectGroup
-    : data?.projectGroup
+    : data?.project?.projectGroup
   const { name, enabled } = result || ''
 
-  const { nodes, paginationProps, loading, startPolling, stopPolling } =
+  const { nodes, paginationProps, loading, startPolling, stopPolling, reset } =
     usePaginatedQuery(signedUrlParams ? ShareVersionTable : GetVersionsTable, {
       skip: (tab === VERSIONS || tab === null) && !TOOL.isOpen ? false : true,
       selector: signedUrlParams
@@ -148,7 +134,10 @@ const VersionsTable = (props) => {
         : 'project.sbomVersions',
       variables: {
         id: productId,
-        ...filters
+        field: field,
+        direction: direction,
+        lifestage: getUndefinedIfEmptyOrAll(lifestage),
+        search: searchInput === '' ? undefined : searchInput
       },
       onCompleted: () => setClearSelect(!clearSelect)
     })
@@ -157,18 +146,9 @@ const VersionsTable = (props) => {
 
   useGradualPolling({ shouldPoll, startPolling, stopPolling })
 
-  const createSbom = useHasPermission({
+  const updateSbom = useHasPermission({
     parentKey: 'view_sbom',
     childKey: 'update_sbom'
-  })
-  const archiveSbom = useHasPermission({
-    parentKey: 'view_sbom',
-    childKey: 'archive_sbom'
-  })
-
-  const canReprocessSbom = useHasPermission({
-    parentKey: 'view_sbom',
-    childKey: 'reprocess_sbom'
   })
 
   const onFilterSev = async (value, id, link) => {
@@ -178,31 +158,6 @@ const VersionsTable = (props) => {
       prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
     }
     navigate(link)
-  }
-
-  const handleListSbom = (row) => {
-    setActiveRow(row)
-    LIST.onOpen()
-  }
-
-  const handleTransfer = (row) => {
-    setActiveRow(row)
-    TRANSFER.onOpen()
-  }
-
-  const handleRepSbom = (row) => {
-    setActiveRow(row)
-    REPROCESS.onOpen()
-  }
-
-  const handleAutomation = (row) => {
-    setActiveRow(row)
-    AUTOMATION.onOpen()
-  }
-
-  const handleSupportAnalaysis = (row) => {
-    setActiveRow(row)
-    SUPPORT.onOpen()
   }
 
   const onSelectLicenses = (row) => {
@@ -222,376 +177,16 @@ const VersionsTable = (props) => {
     prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
   }
 
-  const retention = retentionTime && Math.floor(retentionTime)
-
-  const ignoreMsg = `An SBOM with the same version was recently imported. However, the system found no difference between the two versions, so the newer import has been ignored. On the right, you can still see its record under Action ... > View Alternates`
-
-  const onClear = useCallback(() => {
-    setSelectedSbom([])
-    setClearSelect(!clearSelect)
-  }, [clearSelect, setClearSelect, setSelectedSbom])
-
-  // COLUMNS
-  const columns = [
-    // VERSION
-    {
-      id: 'SBOMS_PROJECT_VERSION',
-      name: 'VERSION',
-      selector: (row, index) => {
-        const { projectVersion, createdAt, alternatives, isReprocess } = row
-        const parsedCreatedDate = parseISO(createdAt)
-        const endDate = addDays(parsedCreatedDate, retention)
-        const diff = differenceInDays(endDate, currentDate)
-        const daysUntilDeletion = diff <= 7 && diff >= 0 && retention !== 0
-        // const exceedingItems = endDate > currentDate
-        const link = generateProductVersionDetailPageUrlFromCurrentUrl({
-          sbomid: row.id,
-          paramsObj: {
-            tab: 'general'
-          }
-        })
-        const showIcon = alternatives?.length > 0
-
-        return (
-          <Grid
-            justifyContent={'center'}
-            templateColumns='repeat(7, 1fr)'
-            className={index === 0 ? 'versions' : ''}
-            sx={{ my: 3, gap: 2, alignItems: 'center' }}
-          >
-            {shouldShowDemoFeatures && (
-              <GridItem colSpan={1} width={'20px'}>
-                <Tooltip label={getFormat(projectVersion)} placement='top'>
-                  <Olink
-                    href={getLink(projectVersion)}
-                    isExternal={getLink(projectVersion) === '#' ? false : true}
-                  >
-                    <IconButton
-                      size='xs'
-                      isRound={true}
-                      color={primaryTextColor}
-                      icon={getType(projectVersion)}
-                      background='transparent'
-                    />
-                  </Olink>
-                </Tooltip>
-              </GridItem>
-            )}
-            <GridItem
-              display={'flex'}
-              colSpan={shouldShowDemoFeatures ? 6 : 7}
-              sx={{ gap: 2, flexDirection: 'row', alignItems: 'center' }}
-            >
-              <Link to={link} onClick={onStartTour} data-testid={`version`}>
-                <Text color={primaryBlueText} fontSize={14}>
-                  {projectVersion}
-                </Text>
-              </Link>
-              {!isReprocess && showIcon && (
-                <Tooltip label={ignoreMsg}>
-                  <Box>
-                    <Icon
-                      as={HiOutlineDuplicate}
-                      sx={{ mt: 1, fontSize: 18, color: primaryTextColor }}
-                    />
-                  </Box>
-                </Tooltip>
-              )}
-              {daysUntilDeletion && !signedUrlParams && (
-                <Tooltip
-                  label={`Marked for deletion on ${endDate ? new Date(endDate).toLocaleDateString() : ''}`}
-                >
-                  <IconButton
-                    size='xs'
-                    icon={<IoMdWarning size={16} />}
-                    sx={{ color: primaryErrorColor, bg: 'transparent' }}
-                  />
-                </Tooltip>
-              )}
-            </GridItem>
-          </Grid>
-        )
-      },
-      wrap: true,
-      sortable: true
-    },
-    // COMPONENTS
-    {
-      id: 'COMPONENTS',
-      name: 'COMPONENTS',
-      selector: (row) => {
-        const { stats, id } = row
-        return (
-          <Link
-            to={generateProductVersionDetailPageUrlFromCurrentUrl({
-              sbomid: id,
-              paramsObj: {
-                tab: 'components'
-              }
-            })}
-          >
-            <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
-              <TagLabel mx={'auto'}>{stats?.compCount}</TagLabel>
-            </Tag>
-          </Link>
-        )
-      }
-    },
-    // LICENSES
-    {
-      id: 'LICENSES',
-      name: 'LICENSES',
-      selector: (row) => {
-        const { stats } = row
-        return (
-          <Tag
-            size='md'
-            variant='subtle'
-            colorScheme={'blue'}
-            sx={{ w: 16, cursor: 'pointer' }}
-            onClick={() => onSelectLicenses(row)}
-          >
-            <TagLabel mx={'auto'}>{stats?.compLicenseCount}</TagLabel>
-          </Tag>
-        )
-      }
-    },
-    // VULNERABILITIES
-    {
-      id: 'VULNERABILITIES',
-      name: 'VULNERABILITIES',
-      width: '20%',
-      selector: (row) => {
-        const { stats, id, vulnRunStatus } = row
-        const notStarted = vulnRunStatus === 'NOT_STARTED'
-        const link = generateProductVersionDetailPageUrlFromCurrentUrl({
-          sbomid: id,
-          paramsObj: {
-            tab: 'vulnerabilities'
-          }
-        })
-        return (
-          <Flex gap={1} flexWrap={'wrap'} my={4}>
-            <VulnBadge
-              color='red'
-              label='Critical'
-              status={vulnRunStatus}
-              onClick={() => onFilterSev(['critical'], id, link)}
-            >
-              {notStarted ? '-' : stats?.vulnStats?.critical || 0}
-            </VulnBadge>
-            <VulnBadge
-              color='orange'
-              label='High'
-              status={vulnRunStatus}
-              onClick={() => onFilterSev(['high'], id, link)}
-            >
-              {notStarted ? '-' : stats?.vulnStats?.high || 0}
-            </VulnBadge>
-            <VulnBadge
-              color='yellow'
-              label='Medium'
-              status={vulnRunStatus}
-              onClick={() => onFilterSev(['medium'], id, link)}
-            >
-              {notStarted ? '-' : stats?.vulnStats?.medium || 0}
-            </VulnBadge>
-            <VulnBadge
-              color='green'
-              label='Low'
-              status={vulnRunStatus}
-              onClick={() => onFilterSev(['low'], id, link)}
-            >
-              {notStarted ? '-' : stats?.vulnStats?.low || 0}
-            </VulnBadge>
-            <VulnBadge
-              color='gray'
-              label='Unknown'
-              status={vulnRunStatus}
-              onClick={() => onFilterSev(['unknown'], id, link)}
-            >
-              {notStarted ? '-' : stats?.vulnStats?.unknown || 0}
-            </VulnBadge>
-          </Flex>
-        )
-      }
-    },
-    // STATUSES
-    {
-      id: 'STATUSES',
-      name: 'STATUSES',
-      width: '20%',
-      selector: (row) => {
-        const { vulnerabilityMetrics } = row
-        return (
-          <Flex gap={1} flexWrap={'wrap'} my={4}>
-            <VulnBadge color='gray' label='Unspecified'>
-              {vulnerabilityMetrics?.unspecifiedCount}
-            </VulnBadge>
-            <VulnBadge color='cyan' label='In Triage'>
-              {vulnerabilityMetrics?.inTriageCount}
-            </VulnBadge>
-            <VulnBadge color='red' label='Affected'>
-              {vulnerabilityMetrics?.affectedCount}
-            </VulnBadge>
-            <VulnBadge color='blue' label='Fixed'>
-              {vulnerabilityMetrics?.fixedCount}
-            </VulnBadge>
-            <VulnBadge color='green' label='Not Affected'>
-              {vulnerabilityMetrics?.notAffectedCount}
-            </VulnBadge>
-          </Flex>
-        )
-      },
-      omit: signedUrlParams
-    },
-    // CREATED AT
-    {
-      id: 'SBOMS_CREATED_AT',
-      name: 'IMPORTED',
-      selector: (row) => {
-        const { createdAt } = row
-        return (
-          <Tooltip label={getFullDate(createdAt)} placement='top'>
-            <Text color={primaryTextColor} textAlign={'right'}>
-              {timeSince(createdAt)}
-            </Text>
-          </Tooltip>
-        )
-      },
-      wrap: true,
-      right: 'true',
-      sortable: true
-    },
-    // UPDATED AT
-    {
-      id: 'SBOMS_UPDATED_AT',
-      name: 'UPDATED',
-      selector: (row) => {
-        const { updatedAt } = row
-        return (
-          <Tooltip label={getFullDate(updatedAt)} placement='top'>
-            <Text color={primaryTextColor} textAlign={'right'}>
-              {timeSince(updatedAt)}
-            </Text>
-          </Tooltip>
-        )
-      },
-      wrap: true,
-      sortable: true,
-      right: 'true'
-    },
-    // ACTIONS
-    {
-      id: 'ACTION',
-      name: 'ACTION',
-      selector: (row) => {
-        return (
-          <Menu>
-            <LynkAction
-              onClick={onClear}
-              aria-label={`sbom-${row?.projectVersion}-actions`}
-            />
-            <Portal>
-              <MenuList fontSize={'sm'}>
-                <MenuItem
-                  aria-label={`sbom-${row?.projectVersion}-reprocess`}
-                  onClick={() => handleRepSbom(row)}
-                  hidden={signedUrlParams}
-                  isDisabled={!canReprocessSbom}
-                >
-                  Rerun Import
-                </MenuItem>
-                <MenuItem
-                  aria-label={`sbom-${row?.projectVersion}-automation`}
-                  onClick={() => handleAutomation(row)}
-                  hidden={signedUrlParams || isFreeTier}
-                  isDisabled={!canReprocessSbom}
-                >
-                  Rerun Automation
-                </MenuItem>
-                <MenuItem
-                  aria-label={`sbom-${row?.projectVersion}-support-analysis`}
-                  onClick={() => handleSupportAnalaysis(row)}
-                  hidden={signedUrlParams || isFreeTier}
-                  isDisabled={!canReprocessSbom}
-                >
-                  Rerun Support Analysis
-                </MenuItem>
-                <MenuItem
-                  hidden={signedUrlParams}
-                  onClick={() => handleTransfer(row)}
-                  aria-label={`sbom-${row?.projectVersion}-transfer`}
-                >
-                  Switch Environment
-                </MenuItem>
-                <MenuItem
-                  hidden={signedUrlParams}
-                  onClick={() => handleListSbom(row)}
-                  aria-label={`sbom-${row?.projectVersion}-list`}
-                >
-                  View Alternates
-                </MenuItem>
-                <Divider />
-                <MenuItem
-                  aria-label={`sbom-${row?.projectVersion}-archive`}
-                  isDisabled={!archiveSbom || signedUrlParams}
-                  onClick={() => {
-                    setActiveRow(row)
-                    ARCHIVE_SBOM.onOpen()
-                  }}
-                >
-                  Archive
-                </MenuItem>
-                <MenuItem
-                  data-testid='sbom-delete-button'
-                  aria-label={`sbom-${row?.projectVersion}-delete`}
-                  color={primaryErrorColor}
-                  onClick={() => {
-                    setActiveRow(row)
-                    DELETE_SBOM.onOpen()
-                  }}
-                  isDisabled={!archiveSbom || signedUrlParams}
-                >
-                  Delete
-                </MenuItem>
-              </MenuList>
-            </Portal>
-          </Menu>
-        )
-      },
-      right: 'true'
-    }
-  ]
-
-  const onBuildSbom = useCallback(() => {
-    onClear()
-    prodCompDispatch({ type: 'CLEAR_LICENSES' })
-    SBOM.onOpen()
-  }, [SBOM, onClear, prodCompDispatch])
-
   const handleChange = (state) => {
     setSelectedSbom(state?.selectedRows)
   }
 
-  const setSearchFilter = useCallback(
-    (value) => {
-      setFilters((oldFilter) => ({
-        ...oldFilter,
-        search: value
-      }))
-    },
-    [setFilters]
-  )
-
   // CLEAR SERACH
   const handleClear = useCallback(async () => {
     setFilterText('')
-    setFilters((oldFilter) => ({
-      ...oldFilter,
-      search: undefined
-    }))
-  }, [setFilters])
+    versionDispatch({ type: 'CLEAR_SEARCH_INPUT' })
+    reset()
+  }, [versionDispatch, reset])
 
   // ON SEARCH INPUT CHANGE
   const onSearchInputChange = useCallback(
@@ -608,94 +203,74 @@ const VersionsTable = (props) => {
 
   // SEARCH COMPONENT
   const handleSearch = useCallback(
-    (event) => {
-      const {
-        key,
-        target: { value }
-      } = event
-      if (key === 'Enter' && value !== '') {
-        setSearchFilter(value)
+    async (event) => {
+      const { value } = event.target
+      if (event.key === 'Enter' && value !== '') {
+        versionDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+        reset()
       }
     },
-    [setSearchFilter]
+    [versionDispatch, reset]
   )
+  const action = (type, data) => {
+    setActiveRow(data)
+    switch (type) {
+      case 'build_sbom':
+        onClearSelection()
+        prodCompDispatch({ type: 'CLEAR_LICENSES' })
+        return SBOM.onOpen()
+      case 'archive_sbom':
+        return ARCHIVE_SBOM.onOpen()
+      case 'compare_version':
+        return TOOL.onOpen()
+      case 'show_archive_versions':
+        return ARC_VERSIONS.onOpen()
+      case 'delete_sbom':
+        return DELETE_SBOM.onOpen()
+      case 'view_alternates':
+        return LIST.onOpen()
+      case 'switch_environment':
+        return TRANSFER.onOpen()
+      case 'rerun_import':
+        return REPROCESS.onOpen()
+      case 'rerun_automation':
+        return AUTOMATION.onOpen()
+      case 'rerun_support_analysis':
+        return SUPPORT.onOpen()
+      case 'set_lifecycle':
+        return LIFECYCLE.onOpen()
+      default:
+        return LIST.onOpen()
+    }
+  }
 
-  const subHeaderComponent = useMemo(() => {
-    return (
-      <Flex
-        sx={{ w: '100%', alignItems: 'center' }}
-        justifyContent={'space-between'}
-      >
-        <Stack direction={'row'} alignItems={'center'} spacing={3}>
-          <SearchFilter
-            id='versions'
-            filterText={filterText}
-            onChange={onSearchInputChange}
-            onClear={handleClear}
-            onFilter={handleSearch}
-          />
-          {selectedSbom?.length === 1 && (
-            <Text color={primaryBlueText}>
-              ** Select one more version to enable comparison
-            </Text>
-          )}
-          {selectedSbom?.length > 2 && (
-            <Text color={primaryBlueText}>
-              ** Comparison is permitted with only two versions
-            </Text>
-          )}
-        </Stack>
-        <Stack direction={'row'} spacing={2} alignItems={'center'}>
-          {/* COMPARE VERSION */}
-          {selectedSbom?.length === 2 && (
-            <Tooltip label='Compare Version'>
-              <IconButton
-                onClick={TOOL.onOpen}
-                colorScheme='blue'
-                icon={<LuGitCompare size={20} />}
-              />
-            </Tooltip>
-          )}
-          {/* SHOW ARCHIVED VERSION */}
-          <Tooltip label='Show Archived Versions'>
-            <IconButton
-              isDisabled={!enabled}
-              hidden={signedUrlParams}
-              colorScheme='blue'
-              aria-label='show_archive_sboms'
-              onClick={ARC_VERSIONS.onOpen}
-              icon={<LuArchive size={20} />}
-            />
-          </Tooltip>
-          {/* BUILD SBOM */}
-          <Tooltip label='Build Version'>
-            <IconButton
-              isDisabled={!enabled || !createSbom}
-              hidden={signedUrlParams}
-              colorScheme='blue'
-              onClick={onBuildSbom}
-              aria-label='build_sbom'
-              icon={<FaPlus />}
-            />
-          </Tooltip>
-          <RefreshBtn />
-        </Stack>
-      </Flex>
-    )
-  }, [
+  const onFilterLifestage = (value) => {
+    versionDispatch({ type: 'FILTER_LIFESTAGE', payload: value })
+    reset()
+  }
+
+  // COLUMNS
+  const columns = VersionColumns({
+    action,
+    retentionTime,
+    onFilterSev,
+    onSelectLicenses,
+    onStartTour
+  })
+
+  const subHeader = VersionHeader({
     filterText,
+    onFilterLifestage,
     onSearchInputChange,
     handleClear,
     handleSearch,
-    selectedSbom?.length,
+    selectedSbom,
     primaryBlueText,
-    TOOL.onOpen,
     enabled,
     signedUrlParams,
-    ARC_VERSIONS.onOpen,
-    createSbom,
-    onBuildSbom
-  ])
+    updateSbom,
+    action
+  })
 
   const disableRowCheckBox = (row) => {
     if (selectedSbom.length >= 2) {
@@ -704,15 +279,25 @@ const VersionsTable = (props) => {
     return false
   }
 
+  const handleSort = (column, sortDirection) => {
+    versionDispatch({
+      type: 'SET_SORT_ORDER',
+      payload: {
+        field: column.id,
+        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      }
+    })
+  }
+
   const dataTableProps = {
     columns: columns,
     data: nodes || [],
     customStyles: customStyles(headingTextColor),
     onSort: handleSort,
-    defaultSortFieldId: filters?.field,
-    defaultSortAsc: filters?.direction === 'ASC' ? true : false,
+    defaultSortFieldId: field,
+    defaultSortAsc: direction === 'ASC' ? true : false,
     subHeader: true,
-    subHeaderComponent: subHeaderComponent,
+    subHeaderComponent: subHeader,
     progressPending: loading,
     progressComponent: <CustomLoader />,
     responsive: true,
@@ -731,6 +316,14 @@ const VersionsTable = (props) => {
         <DataTable {...dataTableProps} className='data-table-container' />
         <Pagination {...paginationProps} />
       </Flex>
+      {/* VERSION LIFECYCLE */}
+      {LIFECYCLE.isOpen && (
+        <LifecycleModal
+          isOpen={LIFECYCLE.isOpen}
+          onClose={LIFECYCLE.onClose}
+          data={{ projectId: productId, sbomId: activeRow?.id }}
+        />
+      )}
       {/* DELETE VERSION */}
       {DELETE_SBOM.isOpen && (
         <DeleteSbom
@@ -811,10 +404,13 @@ const VersionsTable = (props) => {
       {/* SUPPORT ANALYSIS RUN WARNING */}
       {SUPPORT.isOpen && (
         <SupportAnalysis
-          sbom={activeRow}
-          productGroup={{ name }}
           isOpen={SUPPORT.isOpen}
           onClose={SUPPORT.onClose}
+          data={{
+            id: projectSetting?.id,
+            group: projectGroup,
+            sbom: activeRow
+          }}
         />
       )}
     </>

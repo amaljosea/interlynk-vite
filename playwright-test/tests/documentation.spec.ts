@@ -10,7 +10,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('Redirect to documentation site', async ({ page }) => {
-  test.setTimeout(120000)
+  test.setTimeout(30000)
   const page1Promise = page.waitForEvent('popup')
   await page.locator('.documentation').click()
   const page1 = await page1Promise

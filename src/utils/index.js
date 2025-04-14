@@ -365,20 +365,39 @@ export const detectOS = () => {
 
 export const convertToCSV = (data, columns) => {
   const csvRows = []
-
   // Headers
-  const headers = columns.join(',')
+  const headers = columns.map((column) => escapeCSVField(column)).join(',')
   csvRows.push(headers)
-
   // Rows
   data.forEach((row) => {
-    const values = columns.map((column) =>
-      row[column] !== undefined && row[column] !== null ? row[column] : 'NA'
-    )
+    const values = columns.map((column) => {
+      const value =
+        row[column] !== undefined && row[column] !== null ? row[column] : 'NA'
+      return escapeCSVField(value)
+    })
     csvRows.push(values.join(','))
   })
-
   return csvRows.join('\n')
+}
+
+// Helper function to properly escape CSV fields
+const escapeCSVField = (field) => {
+  field = String(field)
+  // If the field contains commas, quotes, or newlines, it needs to be quoted
+  if (field.includes(',') || field.includes('"') || field.includes('\n')) {
+    const removeOuterQuotes = (str) => {
+      return str.replace(/^"(.*)"$/, '$1')
+    }
+    console.log(field)
+    field = removeOuterQuotes(field)
+    console.log(field)
+    field = field.replace(/"/g, '""')
+    console.log(field)
+    // Wrap the field in quotes
+    console.log(`"${field}"`)
+    return `"${field}"`
+  }
+  return field
 }
 
 export const downloadCSV = (csvContent, filename) => {
@@ -493,8 +512,8 @@ export const transformLicenseString = (licenseText) => {
 export const parseLicenseString = (licenseText) => {
   if (!licenseText) return ''
 
-  if (licenseText.startsWith('LicenseRef-interlynk-')) {
-    return licenseText.slice('LicenseRef-interlynk-'.length).replace(/-/g, ' ')
+  if (licenseText?.startsWith('LicenseRef-interlynk-')) {
+    return licenseText?.slice('LicenseRef-interlynk-'.length).replace(/-/g, ' ')
   }
 
   return licenseText
@@ -651,6 +670,8 @@ export const fetchNodes = (res, selector) => {
 }
 
 export const calculateExpiryDate = (days) => {
+  if (!days || days <= 0) return 'N/A'
+
   const today = new Date()
   today.setUTCDate(today.getUTCDate() + days)
   return today.toLocaleDateString()

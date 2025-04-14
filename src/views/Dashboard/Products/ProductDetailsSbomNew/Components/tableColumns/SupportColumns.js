@@ -20,7 +20,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaEllipsisV } from 'react-icons/fa'
 
-const SupportColumns = ({ handleSupport }) => {
+const SupportColumns = ({ action }) => {
   const params = useParams()
   const { isFreeTier } = useGlobalQueryContext()
 
@@ -62,10 +62,10 @@ const SupportColumns = ({ handleSupport }) => {
         wrap: true,
         selector: (row) => {
           const { duplicates } = row || {}
-          const { user } = row?.componentSupportLevel || {}
+          const { componentSupportLevel: manual } = row || {}
           return (
             <Text color={primaryTextColor}>
-              {user?.name ? 'Manual' : 'Automatic'}{' '}
+              {manual?.level ? 'Manual' : 'Automatic'}{' '}
               {duplicates?.length > 0 && `+${duplicates?.length}`}
             </Text>
           )
@@ -77,14 +77,17 @@ const SupportColumns = ({ handleSupport }) => {
         sortable: true,
         width: '18%',
         selector: (row) => {
-          const { duplicates } = row || {}
-          const { level } = row?.componentSupportLevel || {}
-          if (level) {
+          const { duplicates, componentSupportLevelAutomatic: automatic } =
+            row || {}
+          const { level } = automatic || {}
+          const supportLevel = level ? level?.replaceAll('_', ' ') : 'N/A'
+
+          if (supportLevel) {
             return (
               <Flex gap={2} alignItems={'center'}>
                 <Tag w={'184px'} colorScheme={setIntensity(level)}>
                   <TagLabel mx={'auto'} textTransform={'capitalize'}>
-                    {level?.replaceAll('_', ' ')}{' '}
+                    {supportLevel?.replaceAll('_', ' ')}{' '}
                   </TagLabel>
                 </Tag>
                 {duplicates?.length > 0 && (
@@ -173,9 +176,9 @@ const SupportColumns = ({ handleSupport }) => {
                 <MenuList fontSize={'sm'}>
                   <MenuItem
                     hidden={isFreeTier}
-                    onClick={() => handleSupport(row)}
                     data-testid='edit_component_support'
                     isDisabled={!updateComponent || isPart}
+                    onClick={() => action('view_support_drawer', row)}
                   >
                     Edit Support Status
                   </MenuItem>
@@ -190,7 +193,7 @@ const SupportColumns = ({ handleSupport }) => {
 
     return columns
   }, [
-    handleSupport,
+    action,
     isFreeTier,
     params?.sbomid,
     primaryTextColor,

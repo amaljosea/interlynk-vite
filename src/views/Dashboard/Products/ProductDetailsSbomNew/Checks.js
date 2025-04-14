@@ -137,7 +137,7 @@ const Checks = ({ sbomData }) => {
 
     // SUPPLIER SIDE DRAWER
     if (shortDesc === 'Document has data license specified') {
-      sbomDispatch({ type: 'CLEAR_LICENSES' })
+      sbomDispatch({ type: 'CLEAR_LICENSE' })
       return DOC_LICENSE.onOpen()
     }
 

@@ -1,31 +1,31 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useState } from 'react'
-import { truncatedValue } from 'utils'
 import { hasWhiteSpace, validateUrl } from 'utils/formValidationUtils'
 import { componentLinkTypes } from 'variables/general'
 
-import { DeleteIcon } from '@chakra-ui/icons'
 import {
   Divider,
   Flex,
-  IconButton,
+  Grid,
+  GridItem,
   Input,
-  Select,
-  SimpleGrid,
   Stack,
-  Text,
-  Tooltip
+  Text
 } from '@chakra-ui/react'
 import { Button, ButtonGroup } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
+import DeleteButton from 'components/Icons/DeleteButton'
 import LynkAlert from 'components/LynkAlert'
+import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UpdateCompLinks } from 'graphQL/Mutation'
+
+import { FaPlus } from 'react-icons/fa6'
 
 import ActionButton from './ActionButton'
 
@@ -70,17 +70,12 @@ const CompLinks = ({ data }) => {
     url: item?.url || ''
   }))
 
-  const {
-    secondaryTextInverse,
-    sameSecondaryText,
-    primaryErrorColor,
-    grayBorderColor
-  } = useThemeColor([
-    'secondaryTextInverse',
-    'sameSecondaryText',
-    'primaryErrorColor',
-    'grayBorderColor'
-  ])
+  const { secondaryTextInverse, sameSecondaryText, grayBorderColor } =
+    useThemeColor([
+      'secondaryTextInverse',
+      'sameSecondaryText',
+      'grayBorderColor'
+    ])
 
   const [error, setError] = useState('')
   const [activeLink, setActiveLink] = useState(null)
@@ -90,12 +85,11 @@ const CompLinks = ({ data }) => {
 
   const containsSpace = hasWhiteSpace(links?.url)
 
-  const handleTypeChange = (e) => {
-    const { value } = e.target
-    handleChange('links', 'name', value)
+  const handleTypeChange = (selectedItem) => {
+    handleChange('links', 'name', selectedItem)
     const isExists =
       externalUrls?.length > 0 &&
-      externalUrls?.some((item) => item.name === value)
+      externalUrls?.some((item) => item.name === selectedItem)
     if (isExists) {
       setError('Link type already exists!')
     } else {
@@ -179,27 +173,49 @@ const CompLinks = ({ data }) => {
 
   const container = {
     pb: 2,
-    gap: 5,
     w: '100%',
-    columns: 2,
-    justifyContent: 'space-between',
+    templateColumns: 'repeat(12, 1fr)',
     borderBottom: `1px solid ${grayBorderColor}`
+  }
+
+  const typeOptions = [
+    { label: '-- Select --', value: '' },
+    ...componentLinkTypes.map((item) => ({
+      value: item,
+      label: item
+    }))
+  ]
+
+  const selectStyles = {
+    menuList: (base) => ({
+      ...base,
+      minHeight: '300px'
+    })
   }
 
   return (
     <>
-      <Flex w={'100%'} gap={4} direction={'column'} alignItems={'flex-start'}>
+      <Flex
+        w={'100%'}
+        gap={4}
+        direction={'column'}
+        alignItems={'flex-start'}
+        minHeight='400px'
+      >
         {/* NAME */}
         <FormControl isRequired isInvalid={error}>
           <FormLabel>Type</FormLabel>
-          <Select value={links?.name} onChange={handleTypeChange}>
-            <option value=''>-- Select --</option>
-            {componentLinkTypes?.map((item, index) => (
-              <option key={index} value={item}>
-                {item}
-              </option>
-            ))}
-          </Select>
+          <LynkSelect
+            onChange={(selectedOption) =>
+              handleTypeChange(selectedOption?.value)
+            }
+            value={typeOptions.find((option) => option.value === links?.name)}
+            options={typeOptions}
+            placeholder='-- Select --'
+            dropDown
+            styles={selectStyles}
+          />
+
           <FormErrorMessage data-testid='link_type_error'>
             {error}
           </FormErrorMessage>
@@ -208,7 +224,9 @@ const CompLinks = ({ data }) => {
         <FormControl
           isRequired
           isInvalid={
-            (links?.url !== '' && !validateUrl(links?.url?.trim())) ||
+            (linkError !== '' &&
+              links?.url !== '' &&
+              !validateUrl(links?.url?.trim())) ||
             containsSpace
           }
         >
@@ -225,9 +243,10 @@ const CompLinks = ({ data }) => {
         <Stack spacing={alert ? 4 : 0}>
           {alert && <LynkAlert status='warning' msg={alertMessage} />}
           <ActionButton
-            title={'Save'}
+            title={'Add Link'}
             isDisabled={isInvalid}
             onClick={alert ? handleLinkAdd : handleSubmit}
+            icon={<FaPlus />}
           />
         </Stack>
         <Divider />
@@ -239,58 +258,60 @@ const CompLinks = ({ data }) => {
           {externalUrls?.length > 0 ? (
             <Stack w={'100%'} spacing={3} mt={4}>
               {externalUrls?.map((item, index) => (
-                <SimpleGrid {...container} key={index}>
-                  <Stack spacing={0}>
+                <Grid {...container} key={index}>
+                  <GridItem colSpan={8}>
                     {item?.url ? (
-                      <Tooltip label={item.url}>
-                        <Text fontSize={'sm'} wordBreak={'break-all'}></Text>
-                        {truncatedValue(item.url, 45)}
-                      </Tooltip>
+                      <Text
+                        fontSize={'sm'}
+                        lineHeight={'5'}
+                        wordBreak={'break-all'}
+                      >
+                        {item.url}
+                      </Text>
                     ) : (
                       <Text>N/A</Text>
                     )}
                     <Text fontSize={'sm'} color={sameSecondaryText}>
                       {item?.name}
                     </Text>
-                  </Stack>
-                  <Flex alignItems={'center'} justifyContent={'flex-end'}>
-                    {activeLink?.name === item?.name ? (
-                      <ButtonGroup>
-                        <Button
+                  </GridItem>
+                  <GridItem colSpan={4} justifyContent={'flex-end'}>
+                    <Flex alignItems={'center'} justifyContent={'flex-end'}>
+                      {activeLink?.name === item?.name ? (
+                        <ButtonGroup>
+                          <Button
+                            size='sm'
+                            title='No'
+                            fontSize={'sm'}
+                            variant='solid'
+                            onClick={() => setActiveLink(null)}
+                          >
+                            No
+                          </Button>
+                          <Button
+                            size='sm'
+                            title='Yes'
+                            fontSize={'sm'}
+                            variant='solid'
+                            colorScheme='red'
+                            isLoading={loading}
+                            onClick={handleLinkRemove}
+                            data-testid='confirm_delete_comp_link'
+                          >
+                            Yes
+                          </Button>
+                        </ButtonGroup>
+                      ) : (
+                        <DeleteButton
                           size='sm'
-                          title='No'
-                          fontSize={'sm'}
-                          variant='outline'
-                          onClick={() => setActiveLink(null)}
-                        >
-                          No
-                        </Button>
-                        <Button
-                          size='sm'
-                          title='Yes'
-                          fontSize={'sm'}
-                          variant='outline'
-                          colorScheme='red'
-                          isLoading={loading}
-                          onClick={handleLinkRemove}
-                          data-testid='confirm_delete_comp_link'
-                        >
-                          Yes
-                        </Button>
-                      </ButtonGroup>
-                    ) : (
-                      <IconButton
-                        size='sm'
-                        color={primaryErrorColor}
-                        variant='outline'
-                        cursor={'pointer'}
-                        icon={<DeleteIcon />}
-                        data-testid='delete_comp_link'
-                        onClick={() => setActiveLink(item)}
-                      />
-                    )}
-                  </Flex>
-                </SimpleGrid>
+                          variant={'solid'}
+                          data-testid='delete_comp_link'
+                          onClick={() => setActiveLink(item)}
+                        />
+                      )}
+                    </Flex>
+                  </GridItem>
+                </Grid>
               ))}
             </Stack>
           ) : (

@@ -5,23 +5,33 @@ import { Grid, Stack } from '@chakra-ui/react'
 
 import DetailItem from 'components/Misc/DetailItem'
 
-const SupportExpand = (props) => {
+const SupportExpanded = (props) => {
   const { data } = props
 
   return useMemo(() => {
-    const { sbom } = data || {}
-    const { projectVersion } = sbom || {}
-    const { notes, user, updatedAt, retainManualOverrideFor, level } =
-      data?.componentSupportLevel || {}
+    const { version } = data || {}
+    const {
+      componentSupportLevel: manual,
+      componentSupportLevelAutomatic: automatic
+    } = data || {}
+    const { user, retainManualOverrideFor, updatedAt } = manual || {}
 
-    const internalNotes = notes || 'N/A'
-    const assessment = user?.name ? 'Manual' : 'Automatic'
-    const supportLevel = level ? level?.replaceAll('_', ' ') : 'N/A'
-    const lastAssessedBy = user?.name || 'N/A'
-    const lastAssessedAt = updatedAt ? getFullDate(updatedAt) : 'N/A'
-    const assessmentExpiresOn = retainManualOverrideFor
-      ? calculateExpiryDate(retainManualOverrideFor)
+    const assessment = manual?.level ? 'Manual' : 'Automatic'
+
+    // AUTOMATIC SUPPORT LEVEL
+    const systemSupportLevel = automatic?.level
+      ? automatic?.level?.replaceAll('_', ' ')
       : 'N/A'
+    const systemNotes = automatic?.notes || 'N/A'
+
+    // MANNUAL SUPPORT LEVEL
+    const manualSupportLevel = manual?.level
+      ? manual?.level?.replaceAll('_', ' ')
+      : 'N/A'
+    const manualNotes = manual?.notes || 'N/A'
+    const assessmentExpiresOn = calculateExpiryDate(retainManualOverrideFor)
+    const assessedBy = user?.name || 'N/A'
+    const lastAssessed = updatedAt ? getFullDate(updatedAt) : 'N/A'
 
     return (
       <Stack
@@ -30,23 +40,31 @@ const SupportExpand = (props) => {
       >
         <Grid templateColumns='repeat(4, 1fr)' py={2} gap={6}>
           {/* PART */}
-          <DetailItem label='Version' value={projectVersion} />
+          <DetailItem label='Version' value={version} />
           {/* ASSESSMENT */}
           <DetailItem label='Assessment' value={assessment} />
-          {/* LEVEL */}
+          {/* SYSTEM LEVEL */}
           <DetailItem
-            label='Level'
-            value={supportLevel}
+            label='Level (Auto Suggested)'
+            value={systemSupportLevel}
+            valueStyle={{ textTransform: 'capitalize' }}
+          />
+          {/* SYSTEM LEVEL */}
+          <DetailItem
+            label='Level (Manual Override)'
+            value={manualSupportLevel}
             valueStyle={{ textTransform: 'capitalize' }}
           />
           {/* ASSESSED DATE */}
-          <DetailItem label='Last Assessed' value={lastAssessedAt} />
+          <DetailItem label='Last Assessed' value={lastAssessed} />
           {/* ASSESSED BY */}
-          <DetailItem label='Last Assessed By' value={lastAssessedBy} />
+          <DetailItem label='Last Assessed By' value={assessedBy} />
           {/* INTERNAL NOTES */}
-          <DetailItem label='Support Explanation' value={internalNotes} />
+          <DetailItem label='Notes (Auto Suggested)' value={systemNotes} />
+          {/* SYSTEM NOTES */}
+          <DetailItem label='Notes (Manual Override)' value={manualNotes} />
           {/* ASSESSMENT EXPIERS ON */}
-          {level !== 'no_longer_maintained' && (
+          {manualSupportLevel !== 'no_longer_maintained' && (
             <DetailItem
               label='Assessment Expires On'
               value={assessmentExpiresOn}
@@ -58,4 +76,4 @@ const SupportExpand = (props) => {
   }, [data])
 }
 
-export default SupportExpand
+export default SupportExpanded

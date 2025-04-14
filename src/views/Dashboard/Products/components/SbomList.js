@@ -10,6 +10,7 @@ import { Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 import LynkDrawer from 'components/LynkDrawer'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useHasPermission } from 'hooks/useHasPermission'
 
 import { sbomUpdate } from 'graphQL/Mutation'
 import { GetSbomAlternatives } from 'graphQL/Queries'
@@ -24,6 +25,11 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
 
   const PROMOTE_WARNING = useDisclosure()
   const [activeSbom, setActiveSbom] = useState(null)
+
+  const editSbom = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'update_sbom'
+  })
 
   const columns = [
     'COMPONENTS',
@@ -127,10 +133,10 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
                       <Td px={0} fontSize={'sm'} width='130px'>
                         <Tag
                           size='md'
-                          variant='subtle'
                           width={16}
-                          colorScheme={'blue'}
                           mx={'auto'}
+                          variant='subtle'
+                          colorScheme={'blue'}
                         >
                           <TagLabel mx={'auto'}>
                             {stats?.compLicenseCount}
@@ -162,6 +168,7 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
                             size='sm'
                             colorScheme='blue'
                             icon={<FaArrowUp />}
+                            isDisabled={!editSbom}
                             onClick={() => handleWarning(item)}
                           />
                         </Tooltip>

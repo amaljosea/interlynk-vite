@@ -8,7 +8,7 @@ const EnvList = ({ data }) => {
   const params = useParams()
   const productId = params.productid
   const { projects } = data || ''
-  const { onChangeEnv, dispatch } = useGlobalState()
+  const { onChangeEnv, onClearSelection, dispatch } = useGlobalState()
 
   const { prodDispatch } = dispatch
 
@@ -17,6 +17,7 @@ const EnvList = ({ data }) => {
 
   const handleClick = (value) => {
     const env = projects?.find((item) => item.name === value)
+    onClearSelection()
     onChangeEnv(env?.name)
     prodDispatch({
       type: 'SET_CURRENT_PRODUCT',

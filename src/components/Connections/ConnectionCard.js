@@ -1,5 +1,5 @@
 import { CheckCircleIcon } from '@chakra-ui/icons'
-import { Button, Flex, Text } from '@chakra-ui/react'
+import { Button, Flex, Image, Text } from '@chakra-ui/react'
 
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -7,13 +7,11 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import Card from '../Card/Card'
 
 const ConnectionCard = ({
-  icon: Icon,
   iconSrc,
   name,
   onConfigure,
   isConnected,
-  description,
-  color
+  description
 }) => {
   const { primaryTextColor, secondaryTextInverse } = useThemeColor([
     'primaryTextColor',
@@ -36,16 +34,12 @@ const ConnectionCard = ({
     >
       <Flex direction='column' height='100%' gap={'16px'}>
         <Flex align='center'>
-          {iconSrc ? (
-            <img
-              src={iconSrc}
-              alt={`${name} icon`}
-              width={'40px'}
-              height='40px'
-            />
-          ) : (
-            <Icon color={color} size='40px' />
-          )}
+          <Image
+            src={iconSrc}
+            alt={`${name} icon`}
+            width={'40px'}
+            height='40px'
+          />
           <Text
             ml={'16px'}
             noOfLines={1}
@@ -69,7 +63,7 @@ const ConnectionCard = ({
           isDisabled={!canUpdate}
           width={isConnected ? '150px' : '120px'}
           colorScheme={isConnected ? 'blue' : 'gray'}
-          leftIcon={isConnected ? <CheckCircleIcon /> : undefined}
+          leftIcon={isConnected && <CheckCircleIcon />}
         >
           {isConnected ? 'Configured' : 'Configure'}
         </Button>

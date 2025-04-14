@@ -37,9 +37,10 @@ const GlobalStateProvider = ({ children }) => {
   })
   // SBOM VERSIONS
   const [versionState, versionDispatch] = useReducer(versionReducer, {
-    field: 'SBOMS_CREATED_AT',
+    field: 'SBOMS_UPDATED_AT',
     direction: 'DESC',
     searchInput: '',
+    lifestage: [],
     pageIndex: 1
   })
 
@@ -117,9 +118,7 @@ const GlobalStateProvider = ({ children }) => {
     search: ''
   })
   const [sbomState, sbomDispatch] = useReducer(sbomReducer, {
-    licenseType: 'license_exp',
-    expLicense: '',
-    licenseString: null
+    license: []
   })
   // SBOM VERSIONS
   const [toolsState, toolsDispatch] = useReducer(toolsReducer, {
@@ -158,6 +157,11 @@ const GlobalStateProvider = ({ children }) => {
     setEnvName(env)
   }
 
+  const onClearSelection = () => {
+    setSelectedSbom([])
+    setClearSelect(!clearSelect)
+  }
+
   return (
     <GlobalStateContext.Provider
       value={{
@@ -176,6 +180,7 @@ const GlobalStateProvider = ({ children }) => {
         versionState,
         toolsState,
         onChangeEnv,
+        onClearSelection,
         sbomCheckState,
         globalVulnState,
         selectedSbom,

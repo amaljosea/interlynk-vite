@@ -7,6 +7,7 @@ const versionReducer = (state, action) => {
         field: 'SBOMS_UPDATED_AT',
         direction: 'DESC',
         searchInput: '',
+        lifestage: [],
         pageIndex: 1
       }
     case 'CHANGE_SEARCH_INPUT':
@@ -24,6 +25,12 @@ const versionReducer = (state, action) => {
       return {
         ...state,
         searchInput: '',
+        pageIndex: 1
+      }
+    case 'FILTER_LIFESTAGE':
+      return {
+        ...state,
+        lifestage: [...payload]?.includes('all') ? [] : payload,
         pageIndex: 1
       }
     case 'DECREMENT_PAGE':

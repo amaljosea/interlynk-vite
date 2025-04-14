@@ -28,6 +28,7 @@ import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -48,6 +49,11 @@ const WeightControl = () => {
   const { showToast } = useCustomToast()
   const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
 
+  const canEditOrg = useHasPermission({
+    parentKey: 'view_organization',
+    childKey: 'update_organization'
+  })
+
   const [updateScore, { loading: updateLoading }] =
     useMutation(UpdateScoreSetting)
 
@@ -56,11 +62,12 @@ const WeightControl = () => {
   })
   const { scoreSetting } = data?.organization || ''
 
-  const [threshold, setThreshold] = useState(365)
-  const [communityScore, setCommunityScore] = useState([5, 20])
   const [ageWeight, setAgeWeight] = useState(30)
-  const [communityWeight, setCommunityWeight] = useState(30)
   const [securityWeight, setSecurityWeight] = useState(40)
+  const [communityWeight, setCommunityWeight] = useState(30)
+  const [pkgAgeThreshold, setPkgAgeThreshold] = useState(365)
+  const [repoAgeThreshold, setRepoAgeThreshold] = useState(365)
+  const [communityScore, setCommunityScore] = useState([5, 20])
 
   const [showTooltip, setShowTooltip] = useState(false)
 
@@ -73,8 +80,7 @@ const WeightControl = () => {
     return (
       Array.isArray(input) &&
       input.length === 2 &&
-      input[0] === 0 &&
-      input[1] === 0
+      (input[0] === 0 || input[1] === 0)
     )
   }
 
@@ -98,7 +104,8 @@ const WeightControl = () => {
           ageWeight: Number(ageWeight),
           communityWeight: Number(communityWeight),
           securityWeight: Number(securityWeight),
-          componentAbandonedThreshold: Number(threshold),
+          pkgAgeThreshold: Number(pkgAgeThreshold),
+          repoAgeThreshold: Number(repoAgeThreshold),
           contributorThresholdMin: communityScore[0],
           contributorThresholdMax: communityScore[1]
         }
@@ -122,8 +129,10 @@ const WeightControl = () => {
     !validScore(ageWeight) ||
     !validScore(communityWeight) ||
     !validScore(securityWeight) ||
-    !threshold ||
-    threshold > 3650 ||
+    repoAgeThreshold < 1 ||
+    repoAgeThreshold > 3650 ||
+    pkgAgeThreshold < 1 ||
+    pkgAgeThreshold > 3650 ||
     isInvalidArray(communityScore)
 
   useEffect(() => {
@@ -131,7 +140,8 @@ const WeightControl = () => {
       setAgeWeight(scoreSetting?.ageWeight * 100 || 0)
       setCommunityWeight(scoreSetting?.communityWeight * 100 || 0)
       setSecurityWeight(scoreSetting?.securityWeight * 100 || 0)
-      setThreshold(scoreSetting?.componentAbandonedThreshold || '')
+      setPkgAgeThreshold(scoreSetting?.pkgAgeThreshold || 0)
+      setRepoAgeThreshold(scoreSetting?.repoAgeThreshold || 0)
       setCommunityScore([
         scoreSetting?.contributorThresholdMin,
         scoreSetting?.contributorThresholdMax
@@ -187,6 +197,7 @@ const WeightControl = () => {
               <FormControl
                 w={'400px'}
                 isRequired
+                isDisabled={!canEditOrg}
                 isInvalid={!validScore(ageWeight)}
               >
                 <FormLabel>Age Weight {`(%)`}</FormLabel>
@@ -199,6 +210,7 @@ const WeightControl = () => {
               <FormControl
                 w={'400px'}
                 isRequired
+                isDisabled={!canEditOrg}
                 isInvalid={!validScore(communityWeight)}
               >
                 <FormLabel>Community Weight {`(%)`}</FormLabel>
@@ -211,6 +223,7 @@ const WeightControl = () => {
               <FormControl
                 w={'400px'}
                 isRequired
+                isDisabled={!canEditOrg}
                 isInvalid={!validScore(securityWeight)}
               >
                 <FormLabel>Security Weight {`(%)`}</FormLabel>
@@ -243,26 +256,34 @@ const WeightControl = () => {
             <Stack spacing={5}>
               <FormControl
                 w={'400px'}
-                isRequired
-                isInvalid={!threshold || threshold > 3650}
+                isDisabled={!canEditOrg}
+                isInvalid={repoAgeThreshold < 1 || repoAgeThreshold > 3650}
               >
                 <FormLabel>
-                  Consider Repository Abandoned After Inactive {`(in days)`}
+                  Mark Repository Unmaintained After Inactivity {`(in days)`}
                 </FormLabel>
                 <Input
                   type='number'
-                  value={threshold}
-                  onChange={(e) => setThreshold(e.target.value)}
+                  value={repoAgeThreshold}
+                  onChange={(e) => setRepoAgeThreshold(e.target.value)}
                 />
                 <FormErrorMessage>
                   Value must be between 1 and 3650
                 </FormErrorMessage>
               </FormControl>
-              <FormControl w={'400px'}>
+              <FormControl
+                w={'400px'}
+                isDisabled={!canEditOrg}
+                isInvalid={pkgAgeThreshold < 1 || pkgAgeThreshold > 3650}
+              >
                 <FormLabel>
-                  Consider Package Abandoned After Inactive {`(in days)`}
+                  Mark Package Unmaintained After Inactivity {`(in days)`}
                 </FormLabel>
-                <Input defaultValue={'365'} />
+                <Input
+                  type='number'
+                  value={pkgAgeThreshold}
+                  onChange={(e) => setPkgAgeThreshold(e.target.value)}
+                />
                 <FormErrorMessage>
                   Value must be between 1 and 365
                 </FormErrorMessage>
@@ -290,6 +311,7 @@ const WeightControl = () => {
             <FormControl
               w={'400px'}
               isRequired
+              isDisabled={!canEditOrg}
               isInvalid={isInvalidArray(communityScore)}
             >
               <FormLabel>Community Count Thresholds</FormLabel>
@@ -299,6 +321,7 @@ const WeightControl = () => {
                 step={5}
                 mb={4}
                 value={communityScore}
+                isDisabled={!canEditOrg}
                 onMouseEnter={() => setShowTooltip(true)}
                 onMouseLeave={() => setShowTooltip(false)}
                 onChange={(value) => setCommunityScore(value)}
@@ -326,7 +349,7 @@ const WeightControl = () => {
                 ))}
               </RangeSlider>
               <FormErrorMessage>
-                Contributor threshold max must be greater than 0
+                Contributor threshold must be greater than 0
               </FormErrorMessage>
             </FormControl>
           </CardBody>
@@ -337,9 +360,9 @@ const WeightControl = () => {
         fontSize={'sm'}
         w={'fit-content'}
         colorScheme='blue'
-        isDisabled={disabled}
         onClick={handleSubmit}
         isLoading={updateLoading}
+        isDisabled={disabled || !canEditOrg}
       >
         Update
       </Button>

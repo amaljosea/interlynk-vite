@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useState } from 'react'
 
-import { Divider, Select, Stack, Text, useDisclosure } from '@chakra-ui/react'
+import { Divider, Stack, Text, useDisclosure } from '@chakra-ui/react'
 import {
   FormControl,
   FormErrorIcon,
@@ -13,6 +13,7 @@ import {
 import CompRelationTypes from 'components/CompRelationTypes'
 import ComponentList from 'components/ComponentList'
 import LynkAlert from 'components/LynkAlert'
+import LynkSelect from 'components/LynkSelect'
 import RelDeleteModal from 'components/RelDeleteModal'
 import RelationTreeView from 'components/RelationTreeView'
 
@@ -21,6 +22,8 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CreateCompRelation, DeleteCompRelation } from 'graphQL/Mutation'
 import { GetCompDependency } from 'graphQL/Queries'
+
+import { FaPlus } from 'react-icons/fa6'
 
 import ActionButton from './ActionButton'
 
@@ -31,7 +34,6 @@ const CompRelations = ({ data, compPath }) => {
 
   const {
     tab,
-    tabData,
     setTabData,
     handleChange,
     saveChanges,
@@ -41,13 +43,13 @@ const CompRelations = ({ data, compPath }) => {
     alertMessage,
     alertMessageSetter
   } = useContext(TabContext)
-  const { relationships } = tabData
 
   const [dependencyOfList, setDependencyOfList] = useState([])
   const [dependsOnList, setDependsOnList] = useState([])
   const [activeComp, setActiveComp] = useState(null)
   const [isAdded, setIsAdded] = useState(false)
   const [component, setComponent] = useState(null)
+  const [type, setType] = useState(null)
 
   const { headingTextColor } = useThemeColor(['headingTextColor'])
 
@@ -66,22 +68,22 @@ const CompRelations = ({ data, compPath }) => {
   } = useDisclosure()
 
   const list = dependsOnList?.filter(
-    (item) => item?.toComp?.id === relationships?.to
+    (item) => item?.toComp?.id === component?.value
   )
 
   const handleAdd = () => {
-    const isDependsOn = relationships?.relType === 'depends_on'
+    const isDependsOn = type === 'depends_on'
     addRelation({
       variables: {
-        from: isDependsOn ? id : relationships?.to,
-        to: isDependsOn ? relationships?.to : id,
+        from: isDependsOn ? id : component?.value,
+        to: isDependsOn ? component?.value : id,
         relType: 'depends_on'
       }
     }).then((res) => {
       if (res?.data) {
         saveChanges('relationships')
         setIsAdded(true)
-        if (relationships?.relType === 'dependency_of') {
+        if (type === 'dependency_of') {
           setDependencyOfList((prev) => [
             ...prev,
             res?.data?.componentRelationCreate?.compRelation
@@ -99,6 +101,7 @@ const CompRelations = ({ data, compPath }) => {
       }
     })
     setComponent(null)
+    setType(null)
     setTabData((prev) => ({ ...prev, relationships: { to: '', relType: '' } }))
   }
 
@@ -141,8 +144,7 @@ const CompRelations = ({ data, compPath }) => {
     onDelOpen()
   }
 
-  const isInvalid =
-    relationships?.relType === '' || relationships?.to === '' || list.length > 0
+  const isInvalid = !type || list.length > 0 || !component
 
   useEffect(() => {
     if (compDependency) {
@@ -150,6 +152,12 @@ const CompRelations = ({ data, compPath }) => {
       setDependsOnList(compDependency.component.dependsOn)
     }
   }, [compDependency])
+
+  const typeOptions = [
+    { value: '', label: '-- Select --' },
+    { value: 'depends_on', label: 'Depends On' },
+    { value: 'dependency_of', label: 'Dependency Of' }
+  ]
 
   return (
     <>
@@ -172,23 +180,19 @@ const CompRelations = ({ data, compPath }) => {
             <FormLabel htmlFor='relType' color={headingTextColor}>
               Type
             </FormLabel>
-            <Select
-              name='relationType'
-              value={relationships?.relType}
-              onChange={(e) =>
-                handleChange('relationships', 'relType', e.target.value)
+            <LynkSelect
+              id='relationType'
+              onChange={(selectedOption) => {
+                setType(selectedOption?.value)
+                handleChange('relationships', 'relType', selectedOption?.value)
+              }}
+              options={typeOptions}
+              value={
+                typeOptions.find((option) => option.value === type) || null
               }
-            >
-              <option value=''>-- Select --</option>
-              {[
-                { value: 'depends_on', label: 'Depends On' },
-                { value: 'dependency_of', label: 'Dependency Of' }
-              ].map((item, idx) => (
-                <option key={idx} value={item.value}>
-                  {item.label}
-                </option>
-              ))}
-            </Select>
+              placeholder='-- Select --'
+              dropDown
+            />
           </FormControl>
           {/* RELATION TO */}
           <FormControl isInvalid={list?.length > 0}>
@@ -211,16 +215,18 @@ const CompRelations = ({ data, compPath }) => {
             <Stack spacing={4}>
               <LynkAlert status='warning' msg={alertMessage} />
               <ActionButton
-                title={'Save'}
+                title={'Add Relationship'}
                 onClick={handleAdd}
                 isDisabled={isInvalid}
+                icon={<FaPlus />}
               />
             </Stack>
           ) : (
             <ActionButton
-              title={'Save'}
+              title={'Add Relationship'}
               isDisabled={isInvalid}
               onClick={handleSubmit}
+              icon={<FaPlus />}
             />
           )}
         </Stack>

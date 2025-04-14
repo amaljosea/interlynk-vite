@@ -186,6 +186,7 @@ const Components = ({ sbomData }) => {
           expandOnRowClicked
           persistTableHead
           expandableRowsComponent={ExpandedComponent}
+          expandableRowsComponentProps={{ action }}
           responsive={true}
         />
       </Flex>

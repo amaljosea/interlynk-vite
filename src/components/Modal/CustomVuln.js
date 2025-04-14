@@ -2,7 +2,7 @@ import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { PackageURL } from 'packageurl-js'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getSignedUrlParams } from 'utils'
+import { formatString, getSignedUrlParams } from 'utils'
 import { validateCPEString } from 'utils/cpeUtils'
 import { severityList } from 'variables/general'
 
@@ -11,7 +11,6 @@ import {
   Flex,
   IconButton,
   Input,
-  Select,
   Stack,
   Text,
   Textarea
@@ -22,11 +21,13 @@ import DividerWithText from 'components/DividerWithText'
 import LynkAlert from 'components/LynkAlert'
 import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
+import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { CustomVulnCreate } from 'graphQL/Mutation'
+import { ComponentVulnUpdate } from 'graphQL/Mutation'
 import {
   CveLookup,
   GetAllComponents,
@@ -49,6 +50,7 @@ const CustomVuln = ({ isOpen, onClose }) => {
     direction: direction
   }
 
+  const [addUrls, { loading: urlLoading }] = useMutation(ComponentVulnUpdate)
   const [createVuln, { loading }] = useMutation(CustomVulnCreate)
   const [lookup, { loading: cveLoading }] = useLazyQuery(CveLookup)
   const { data: compData } = useQuery(GetTotalComponents, {
@@ -83,7 +85,10 @@ const CustomVuln = ({ isOpen, onClose }) => {
     cpe: undefined,
     reportedAt: undefined,
     publishedAt: undefined,
-    lastModifiedAt: undefined
+    lastModifiedAt: undefined,
+    cvssScore: undefined,
+    cvssVector: undefined,
+    advisories: []
   })
 
   const handleChange = (e) => {
@@ -126,14 +131,19 @@ const CustomVuln = ({ isOpen, onClose }) => {
     if (cve !== '') {
       lookup({ variables: { vulnId: cve } }).then((res) => {
         const { cveLookup } = res?.data || ''
+        const { vulnId, description, advisories } = cveLookup || {}
         if (cveLookup) {
           setFormData((prev) => ({
             ...prev,
-            desc: cveLookup?.description,
-            vulnIdentifier: cveLookup?.vulnId,
+            desc: description,
+            vulnIdentifier: vulnId,
+            cvssScore: cveLookup?.cvssScore,
+            cvssVector: cveLookup?.cvssVector,
             sev: cveLookup?.severity?.toLowerCase(),
+            reportedAt: new Date(cveLookup?.reportedAt),
             publishedAt: new Date(cveLookup?.published),
-            lastModifiedAt: new Date(cveLookup?.lastModified)
+            lastModifiedAt: new Date(cveLookup?.lastModified),
+            advisories: advisories?.length > 0 ? advisories : []
           }))
         } else {
           setError('Data not found')
@@ -154,9 +164,29 @@ const CustomVuln = ({ isOpen, onClose }) => {
     }
   }
 
-  const onChangeComponent = (e) => {
-    setCompId(e.target.value)
+  const onChangeComponent = (selectedItem) => {
+    setCompId(selectedItem.value)
     setError('')
+  }
+
+  const addVulnLinks = (id) => {
+    const extUrls = []
+    formData?.advisories?.map((item) =>
+      extUrls.push({ name: 'advisories', url: item })
+    )
+    addUrls({
+      variables: {
+        componentVulnId: id,
+        externalUrls: extUrls
+      }
+    }).then((res) => {
+      const errors = res?.data?.componentVulnUpdate?.errors
+      if (errors?.length > 0) {
+        setError(errors[0])
+      } else {
+        setError('')
+      }
+    })
   }
 
   const handleSubmit = async () => {
@@ -173,6 +203,9 @@ const CustomVuln = ({ isOpen, onClose }) => {
       if (res?.data?.customVulnCreate?.errors?.length > 0) {
         setError(res?.data?.customVulnCreate?.errors[0])
       } else {
+        if (formData?.advisories?.length > 0) {
+          addVulnLinks(res?.data?.customVulnCreate?.customVuln?.id)
+        }
         showToast({
           description: 'Data added successfully',
           status: 'success'
@@ -193,17 +226,43 @@ const CustomVuln = ({ isOpen, onClose }) => {
     }
   }, [components])
 
+  const sevOptions = [
+    { label: '-- Select --', value: '' },
+    ...severityList.map((item) => ({
+      label: formatString(item),
+      value: item
+    }))
+  ]
+  const compOptions = [
+    { label: '-- Select --', value: '' },
+    ...(nodes ?? []) // Ensures nodes is always an array
+      .sort((a, b) => (a?.name || '').localeCompare(b?.name || ''))
+      .map((item) => ({
+        label: `${item?.name}-${item?.version}${item?.primary ? ' [Primary Component]' : ''}`,
+        value: item?.id
+      }))
+  ]
+
+  const CompValue = nodes?.find((item) => item.id === compId)
+    ? {
+        label: `${nodes?.find((item) => item.id === compId).name}-${
+          nodes?.find((item) => item.id === compId).version
+        }${nodes?.find((item) => item.id === compId).primary ? ' [Primary Component]' : ''}`,
+        value: compId
+      }
+    : null
+
   return (
     <LynkModal
       Icon={FaBug}
       isOpen={isOpen}
       onClose={onClose}
       buttonText={'Save'}
-      isLoading={loading}
       disabled={isDisabled}
       onSubmit={handleSubmit}
       hidden={signedUrlParams}
       title='Add Custom Vulerability'
+      isLoading={loading || urlLoading}
     >
       <Stack spacing={4}>
         {error !== '' && <LynkAlert msg={error} />}
@@ -249,23 +308,23 @@ const CustomVuln = ({ isOpen, onClose }) => {
         </FormControl>
         <FormControl>
           <FormLabel htmlFor='sev'>Severity</FormLabel>
-          <Select
+          <LynkSelect
             name='sev'
-            value={formData?.sev}
-            onChange={handleChange}
-            textTransform={'capitalize'}
-          >
-            <option value=''>-- Select --</option>
-            {severityList?.map((item, index) => (
-              <option
-                key={index}
-                value={item}
-                style={{ textTransform: 'capitalize' }}
-              >
-                {item}
-              </option>
-            ))}
-          </Select>
+            value={
+              severityList?.find((item) => item === formData?.sev)
+                ? {
+                    label: formatString(formData.sev),
+                    value: formData.sev
+                  }
+                : null
+            }
+            onChange={(selected) =>
+              handleChange({ target: { name: 'sev', value: selected.value } })
+            }
+            options={sevOptions}
+            placeholder={'-- Select --'}
+            dropDown
+          />
         </FormControl>
         <FormControl>
           <FormLabel htmlFor='reportedAt'>Reported At</FormLabel>
@@ -315,21 +374,15 @@ const CustomVuln = ({ isOpen, onClose }) => {
         {!compLoading && nodes && (
           <FormControl>
             <FormLabel htmlFor='componentId'>Component</FormLabel>
-            <Select
-              value={compId}
+            <LynkSelect
               name='componentId'
-              onChange={onChangeComponent}
-            >
-              <option value=''>-- Select --</option>
-              {[...nodes]
-                .sort((a, b) => a?.name?.localeCompare(b?.name))
-                .map((item, idx) => (
-                  <option key={idx} value={item?.id}>
-                    {item?.name}-{item?.version}
-                    {item?.primary ? ` [Primary Component]` : ''}
-                  </option>
-                ))}
-            </Select>
+              value={CompValue}
+              onChange={(selected) => onChangeComponent(selected)}
+              options={compOptions}
+              dropDown
+              menuPlacement='top'
+              placeholder={'-- Select --'}
+            />
           </FormControl>
         )}
       </Stack>

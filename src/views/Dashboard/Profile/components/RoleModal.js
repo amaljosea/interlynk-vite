@@ -71,6 +71,7 @@ const RoleModal = ({ isOpen, onClose, data }) => {
             <FormLabel>Role</FormLabel>
             <LynkSelect
               name='role'
+              id='role'
               value={
                 roleOptions.find((option) => option.value === role) || null
               }

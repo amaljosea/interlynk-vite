@@ -1,15 +1,14 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { getDate, getFullDate, getTotalDays, timeSince } from 'utils'
+import { assessmentExpiryWarning } from 'variables/general'
 
-import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
+import { EditIcon } from '@chakra-ui/icons'
 import {
   Flex,
   FormErrorMessage,
   IconButton,
   Input,
-  Select,
-  SimpleGrid,
   Stack,
   Tag,
   Text,
@@ -20,8 +19,10 @@ import { Button, ButtonGroup } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import DeleteButton from 'components/Icons/DeleteButton'
 import LynkDate from 'components/LynkDate'
 import LynkDrawer from 'components/LynkDrawer'
+import LynkSelect from 'components/LynkSelect'
 import CompInfo from 'components/Misc/CompInfo'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -35,15 +36,13 @@ import {
 } from 'graphQL/Mutation'
 import { GetComponentSupportLevels } from 'graphQL/Queries'
 
-const CompSupport = ({ data, isOpen, onClose }) => {
+const CompSupport = ({ data, isOpen, onClose, enableSupportLevel }) => {
   const [edit, setEdit] = useState(false)
 
   const { data: supports, loading } = useQuery(GetComponentSupportLevels, {
     skip: isOpen ? false : true,
     variables: { id: data?.id, sbomId: data?.sbom?.id }
   })
-
-  const { componentSupportLevel } = supports?.component || {}
 
   const Header = () => {
     if (!data) return null
@@ -83,7 +82,11 @@ const CompSupport = ({ data, isOpen, onClose }) => {
               }}
             />
           ) : (
-            <SupportCard setEdit={setEdit} data={componentSupportLevel} />
+            <SupportCard
+              setEdit={setEdit}
+              data={supports?.component}
+              enableSupportLevel={enableSupportLevel}
+            />
           )}
         </Stack>
       )}
@@ -91,14 +94,14 @@ const CompSupport = ({ data, isOpen, onClose }) => {
   )
 }
 
-const SupportCard = ({ setEdit, data }) => {
-  const { level, updatedAt, user, endDate, retainManualOverrideFor, notes } =
-    data || {}
+const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
+  const {
+    componentSupportLevel: manual,
+    componentSupportLevelAutomatic: automatic
+  } = data || {}
 
-  const { sameSecondaryText, grayBorderColor } = useThemeColor([
-    'sameSecondaryText',
-    'grayBorderColor'
-  ])
+  const { sameSecondaryText, grayBorderColor, primaryErrorColor } =
+    useThemeColor(['sameSecondaryText', 'grayBorderColor', 'primaryErrorColor'])
 
   const label = { fontSize: 12, color: sameSecondaryText }
   const infoStyle = {
@@ -106,72 +109,116 @@ const SupportCard = ({ setEdit, data }) => {
   }
   const container = {
     pb: 2,
-    gap: 5,
     w: '100%',
-    columns: 2,
+    spacing: 0,
     borderBottom: `1px solid ${grayBorderColor}`
   }
 
+  const assessment = manual?.level ? 'Manual' : 'Automatic'
+
+  // AUTOMATIC SUPPORT LEVEL
+  const systemSupportLevel = automatic?.level
+    ? automatic?.level?.replaceAll('_', ' ')
+    : 'N/A'
+  const systemNotes = automatic?.notes || 'N/A'
+
+  // MANNUAL SUPPORT LEVEL
+  const manualSupportLevel = manual?.level
+    ? manual?.level?.replaceAll('_', ' ')
+    : 'N/A'
+  const endOfSupport = manual?.endDate
+  const assessmentExpiresOn = manual?.retainManualOverrideFor
+  const manualNotes = manual?.notes || 'N/A'
+  const assessedBy = manual?.user?.name
+  const lastAssessed = manual?.updatedAt
+
   return (
     <Stack spacing={4} mt={3}>
-      <Tooltip label='Edit'>
-        <IconButton
-          aria-label='Edit'
-          icon={<EditIcon />}
-          colorScheme='blue'
-          variant='solid'
-          fontSize={'sm'}
-          alignSelf='end'
-          onClick={() => setEdit(true)}
-        />
-      </Tooltip>
-      <Stack spacing={3}>
-        <SimpleGrid {...container}>
-          <Text {...label}>Assessment</Text>
-          <Text {...infoStyle}>{user?.id ? 'Manual' : 'Automatic'}</Text>
-        </SimpleGrid>
-        <SimpleGrid {...container}>
-          <Text {...label}>Support Level</Text>
-          <Text {...infoStyle} textTransform={'capitalize'}>
-            {level?.replaceAll('_', ' ') || 'N/A'}
+      <Flex
+        gap={2}
+        alignItems={'center'}
+        justifyContent={!enableSupportLevel ? 'space-between' : 'flex-end'}
+      >
+        {!enableSupportLevel && (
+          <Text fontSize={'sm'} color={primaryErrorColor}>
+            Component support level analysis is not enabled for this product
           </Text>
-        </SimpleGrid>
-        <SimpleGrid {...container}>
+        )}
+        <Tooltip label='Edit'>
+          <IconButton
+            aria-label='Edit'
+            icon={<EditIcon />}
+            colorScheme='blue'
+            variant='solid'
+            fontSize={'sm'}
+            alignSelf='end'
+            onClick={() => setEdit(true)}
+          />
+        </Tooltip>
+      </Flex>
+
+      <Stack spacing={3}>
+        <Stack {...container}>
+          <Text {...label}>Assessment</Text>
+          <Text {...infoStyle}>{assessment}</Text>
+        </Stack>
+        <Stack {...container}>
+          <Text {...label}>{`Level (Auto Suggested)`}</Text>
+          <Text {...infoStyle} textTransform={'capitalize'}>
+            {systemSupportLevel}
+          </Text>
+        </Stack>
+        <Stack {...container}>
+          <Text {...label}>{`Level (Manual Override)`}</Text>
+          <Text {...infoStyle} textTransform={'capitalize'}>
+            {manualSupportLevel}
+          </Text>
+        </Stack>
+        <Stack {...container}>
           <Text {...label}>End of Support</Text>
           <Text {...infoStyle} textTransform={'capitalize'}>
-            {endDate ? new Date(endDate).toLocaleDateString() : 'N/A'}
+            {endOfSupport ? new Date(endOfSupport).toLocaleDateString() : 'N/A'}
           </Text>
-        </SimpleGrid>
-        <SimpleGrid {...container} hidden={level === 'no_longer_maintained'}>
+        </Stack>
+        <Stack
+          {...container}
+          hidden={manualSupportLevel === 'no_longer_maintained'}
+        >
           <Text {...label}>Assessment Expires On</Text>
           <Text {...infoStyle} textTransform={'capitalize'}>
-            {retainManualOverrideFor
-              ? getDate(retainManualOverrideFor).toLocaleDateString()
+            {assessmentExpiresOn
+              ? getDate(assessmentExpiresOn).toLocaleDateString()
               : 'N/A'}
           </Text>
-        </SimpleGrid>
-        <SimpleGrid {...container}>
-          <Text {...label}>Explanation</Text>
-          <Text {...infoStyle} textTransform={'capitalize'}>
-            {notes || 'N/A'}
+        </Stack>
+        <Stack {...container}>
+          <Text {...label}>{`Notes (Auto Suggested)`}</Text>
+          <Text {...infoStyle}>
+            {systemNotes}
           </Text>
-        </SimpleGrid>
-        <SimpleGrid {...container}>
+        </Stack>
+        <Stack {...container}>
+          <Text {...label}>{`Notes (Manual Override)`}</Text>
+          <Text {...infoStyle}>
+            {manualNotes}
+          </Text>
+        </Stack>
+        <Stack {...container}>
           <Text {...label}>Last Assessed By</Text>
           <Text {...infoStyle} textTransform={'capitalize'}>
-            {user?.name || 'N/A'}
+            {assessedBy || 'N/A'}
           </Text>
-        </SimpleGrid>
-        <SimpleGrid {...container}>
+        </Stack>
+        <Stack {...container}>
           <Text {...label}>Last Assessed</Text>
-          {updatedAt ? (
-            <Tooltip label={getFullDate(updatedAt)}>
-              <Text {...infoStyle}>{timeSince(updatedAt)}</Text>
+          {lastAssessed ? (
+            <Tooltip label={getFullDate(lastAssessed)}>
+              <Text {...infoStyle}>{timeSince(lastAssessed)}</Text>
             </Tooltip>
           ) : (
             <Text {...infoStyle}>{'N/A'}</Text>
           )}
-        </SimpleGrid>
+        </Stack>
       </Stack>
     </Stack>
   )
@@ -181,12 +228,23 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
   const { isCustomerView } = useRouteFlags()
   const { showToast } = useCustomToast()
 
-  const { componentSupportLevel } = data || {}
+  const defaultDate = new Date()
+  defaultDate.setDate(defaultDate.getDate() + 365)
+
+  const {
+    componentSupportLevel: manual,
+    componentSupportLevelAutomatic: automatic
+  } = data || {}
+
+  const { endDate, retainManualOverrideFor } = manual || {}
+
+  const endOfSupport = endDate
+  const assessmentExpiresOn =
+    retainManualOverrideFor > 0 ? getDate(retainManualOverrideFor) : defaultDate
+  const explanation = automatic?.notes || manual?.notes
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const defaultDate = new Date()
-  defaultDate.setDate(defaultDate.getDate() + 365)
   const [formData, setFormData] = useState({
     supportLevel: '',
     endOfSupport: '',
@@ -195,30 +253,40 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
   })
 
   const totalDays = Number(getTotalDays(formData?.assessmentExpiresOn))
+  const isAbandoned = formData?.supportLevel !== 'abandoned'
 
   const isDisabled =
     formData?.supportLevel === '' ||
-    (!component?.internal && totalDays < 1) ||
-    (!component?.internal && totalDays > 365)
+    (isAbandoned && !component?.internal && totalDays < 1) ||
+    (isAbandoned && !component?.internal && totalDays > 365)
 
   const noLongerMaintained = formData?.supportLevel === 'no_longer_maintained'
 
   const handleChange = (e) => {
     const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleSelect = (selectedItem, name) => {
+    const { value } = selectedItem
     const isUnspecified =
       name === 'supportLevel' && (value === 'unspecified' || noLongerMaintained)
     if (isUnspecified) {
       setFormData((prev) => ({
         ...prev,
         [name]: value,
-        endOfSupport: '',
-        explanation: '',
-        assessmentExpiresOn: ''
+        endOfSupport: endOfSupport || '',
+        explanation: explanation || '',
+        assessmentExpiresOn: assessmentExpiresOn
       }))
     } else {
       setFormData((prev) => ({
         ...prev,
-        [name]: value
+        [name]: value,
+        assessmentExpiresOn: assessmentExpiresOn
       }))
     }
   }
@@ -243,10 +311,10 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
   const handleUpdate = () => {
     updateSupport({
       variables: {
-        id: componentSupportLevel?.id,
+        id: manual?.id,
         level: formData?.supportLevel || undefined,
         notes: formData?.explanation || undefined,
-        retainManualOverrideFor: totalDays > 0 ? totalDays : undefined,
+        retainManualOverrideFor: totalDays > 0 ? totalDays : 0,
         endDate: formData?.endOfSupport
           ? new Date(formData?.endOfSupport).toISOString()
           : undefined
@@ -259,6 +327,11 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
             description: errors[0],
             status: 'error'
           })
+        } else {
+          showToast({
+            description: 'Status updated successfully',
+            status: 'success'
+          })
         }
       })
       .finally(() => handleClose(false))
@@ -270,7 +343,7 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
         id: data?.id,
         level: formData?.supportLevel || undefined,
         notes: formData?.explanation || undefined,
-        retainManualOverrideFor: totalDays > 0 ? totalDays : undefined,
+        retainManualOverrideFor: totalDays > 0 ? totalDays : 0,
         endDate: formData?.endOfSupport
           ? new Date(formData?.endOfSupport).toISOString()
           : undefined
@@ -283,13 +356,18 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
             description: errors[0],
             status: 'error'
           })
+        } else {
+          showToast({
+            description: 'Status updated successfully',
+            status: 'success'
+          })
         }
       })
       .finally(() => handleClose(false))
   }
 
   const handleRemove = () => {
-    deleteSupport({ variables: { id: componentSupportLevel?.id } })
+    deleteSupport({ variables: { id: manual?.id } })
       .then((res) => {
         const { errors } = res?.data?.componentSupportLevelDelete || {}
         if (errors?.length > 0) {
@@ -313,21 +391,24 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
 
   const inputStyle = { size: 'md' }
 
+  const hasManualSupport = manual?.level
+
   useEffect(() => {
-    if (componentSupportLevel) {
-      const { level, endDate, notes, retainManualOverrideFor } =
-        componentSupportLevel || {}
+    if (automatic || manual) {
+      const defaultDate = new Date()
+      defaultDate.setDate(defaultDate.getDate() + 365)
+      const { level, endDate, notes, retainManualOverrideFor } = manual || {}
       setFormData((prev) => ({
         ...prev,
-        explanation: notes || '',
-        supportLevel: level || '',
+        explanation: notes || automatic?.notes,
+        supportLevel: level || automatic?.level,
         endOfSupport: endDate ? new Date(endDate) : '',
         assessmentExpiresOn: retainManualOverrideFor
           ? getDate(retainManualOverrideFor)
-          : undefined
+          : defaultDate
       }))
     }
-  }, [componentSupportLevel])
+  }, [automatic, manual])
 
   if (isOpen)
     return (
@@ -348,26 +429,31 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
       </Stack>
     )
 
+  const supportLevelOptions = [
+    { value: '', label: '-- Select --' },
+    { value: 'unspecified', label: 'Unspecified' },
+    { value: 'actively_maintained', label: 'Actively Maintained' },
+    { value: 'no_longer_maintained', label: 'No Longer Maintained' },
+    { value: 'abandoned', label: 'Abandoned' }
+  ]
+
   return (
     <Stack spacing={4} mt={2}>
       {/* SUPPRT LEVEL */}
       <FormControl>
         <FormLabel htmlFor='supportLevel'>Support Level</FormLabel>
-        <Select
-          sx={inputStyle}
+        <LynkSelect
           name='supportLevel'
-          value={formData?.supportLevel}
+          value={
+            supportLevelOptions.find(
+              (opt) => opt.value === formData?.supportLevel
+            ) || null
+          }
+          onChange={(selected) => handleSelect(selected, 'supportLevel')}
+          options={supportLevelOptions}
           isDisabled={isCustomerView}
-          onChange={handleChange}
-        >
-          <option value='' style={{ background: 'lightgray' }}>
-            -- Select --
-          </option>
-          <option value='unspecified'>Unspecified</option>
-          <option value='actively_maintained'>Actively Maintained</option>
-          <option value='no_longer_maintained'>No Longer Maintained</option>
-          <option value='abandoned'>Abandoned</option>
-        </Select>
+          dropDown
+        />
       </FormControl>
       {/* END-OF-SUPPORT DATE */}
       {(formData?.supportLevel === 'actively_maintained' ||
@@ -384,7 +470,9 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
       {/* RETAIN MANNUAL OVERRIDE */}
       <FormControl
         hidden={noLongerMaintained}
-        isRequired={!component?.internal}
+        isRequired={
+          !component?.internal && formData?.supportLevel !== 'abandoned'
+        }
         isInvalid={totalDays > 365}
       >
         <FormLabel htmlFor='assessmentExpiresOn'>
@@ -395,7 +483,7 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
           value={formData?.assessmentExpiresOn}
           onChange={(value) => handleDateChange(value, 'assessmentExpiresOn')}
         />
-        <FormErrorMessage>Value must be between 1 and 365 days</FormErrorMessage>
+        <FormErrorMessage>{assessmentExpiryWarning}</FormErrorMessage>
       </FormControl>
       {/* EXPLANATION */}
       <FormControl>
@@ -420,17 +508,16 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
             isDisabled={isDisabled}
             loadingText='Saving...'
             isLoading={createLoading || updateLoading}
-            onClick={componentSupportLevel ? handleUpdate : handleSubmit}
+            onClick={hasManualSupport ? handleUpdate : handleSubmit}
           >
-            {componentSupportLevel ? 'Update' : 'Save'}
+            {hasManualSupport ? 'Update' : 'Save'}
           </Button>
         </ButtonGroup>
-        {componentSupportLevel && (
-          <IconButton
+        {hasManualSupport && (
+          <DeleteButton
             onClick={onOpen}
-            colorScheme='red'
-            icon={<DeleteIcon />}
             title='Remove support'
+            variant={'solid'}
           />
         )}
       </Flex>

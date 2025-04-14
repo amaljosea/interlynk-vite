@@ -1,14 +1,17 @@
 import { gql, useQuery } from '@apollo/client'
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getFullDate, linkURl } from 'utils'
+import { getFullDate, linkURl, truncatedValue } from 'utils'
 
-import { Link, SkeletonText } from '@chakra-ui/react'
+import { SkeletonText, chakra } from '@chakra-ui/react'
 import { Grid, GridItem } from '@chakra-ui/react'
 import { Flex, Icon, Stack, Text, useDisclosure } from '@chakra-ui/react'
 import { Stat, StatLabel, StatNumber } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
+import CweList from 'components/CweList'
+import ExternalNavIcon from 'components/Icons/ExternalNavIcon'
 import IconBox from 'components/Icons/IconBox'
 import { CustomText } from 'components/Misc/CustomText'
 import CvssCard from 'components/Misc/CvssCard'
@@ -83,6 +86,7 @@ const VulnInfo = () => {
   const params = useParams()
   const id = useQueryParam('vulnId') || params.vulnerabilityid
 
+  const [expand, setExpand] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
   const { primaryBlueText, secondaryBlueText, primaryTextColor } =
     useThemeColor(['primaryBlueText', 'secondaryBlueText', 'primaryTextColor'])
@@ -117,7 +121,7 @@ const VulnInfo = () => {
     cvssScore
   } = vuln || ''
 
-  const { kev, epssScore, epssPercentile } = vulnInfo || ''
+  const { kev, epssScore, epssPercentile, cwes } = vulnInfo || ''
 
   const productList =
     projectGroups?.nodes?.length > 0 ? projectGroups?.nodes : []
@@ -167,23 +171,29 @@ const VulnInfo = () => {
                 color={secondaryBlueText}
               />
               <Flex width={'100%'} direction={'column'} gap={0.5}>
-                {/* PRODUCT TITLE */}
-                <Link
-                  isExternal
-                  w={'fit-content'}
-                  href={linkURl(source, vuln?.vulnId)}
-                >
-                  <Text
-                    fontSize={22}
-                    fontWeight={'semibold'}
-                    _hover={{ color: primaryBlueText }}
-                  >
+                <Flex gap={3} alignItems={'center'}>
+                  <Text fontSize={22} fontWeight={'semibold'}>
                     {vuln?.vulnId}
                   </Text>
-                </Link>
-                <Text fontSize={'sm'} my={0.5}>
-                  {desc || ''}
-                </Text>
+                  <ExternalNavIcon
+                    size={6}
+                    href={linkURl(source, vuln.vulnId)}
+                  />
+                </Flex>
+                {desc !== '' && (
+                  <Text fontSize={'sm'} my={0.5}>
+                    {expand ? desc : truncatedValue(desc, 300)}{' '}
+                    {desc?.length > 300 && (
+                      <chakra.span
+                        cursor={'pointer'}
+                        color={secondaryBlueText}
+                        onClick={() => setExpand(!expand)}
+                      >
+                        Read {expand ? 'less' : 'more'}
+                      </chakra.span>
+                    )}
+                  </Text>
+                )}
                 <Flex
                   mt={6}
                   w={'100%'}
@@ -228,6 +238,11 @@ const VulnInfo = () => {
                   <Stack spacing={1} fontSize={'sm'} whiteSpace='break-words'>
                     <CustomText>CVSS :</CustomText>
                     <Text>{cvssScore}</Text>
+                  </Stack>
+                  {/* CEWS */}
+                  <Stack spacing={1} fontSize={'sm'} whiteSpace='break-words'>
+                    <CustomText>CWE :</CustomText>
+                    <CweList data={cwes} />
                   </Stack>
                   {/* CVSS Vector */}
                   <Stack spacing={1} fontSize={'sm'} whiteSpace='break-words'>

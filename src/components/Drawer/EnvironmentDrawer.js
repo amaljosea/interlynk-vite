@@ -6,7 +6,7 @@ import { customStyles } from 'utils/styleUtils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import EnvModal from 'views/Dashboard/Products/components/EnvModal'
 
-import { AddIcon, CheckCircleIcon, DeleteIcon } from '@chakra-ui/icons'
+import { AddIcon, CheckCircleIcon } from '@chakra-ui/icons'
 import {
   Flex,
   IconButton,
@@ -17,6 +17,7 @@ import {
 } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
+import DeleteButton from 'components/Icons/DeleteButton'
 import LynkDrawer from 'components/LynkDrawer'
 
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -136,11 +137,9 @@ const EnvironmentDrawer = ({
       selector: (row) => {
         const { name } = row
         return (
-          <IconButton
+          <DeleteButton
+            variant={'solid'}
             size='xs'
-            icon={<DeleteIcon />}
-            colorScheme='red'
-            variant='solid'
             isDisabled={isDefaultEnv(name)}
             onClick={() => {
               setActiveRow(row)

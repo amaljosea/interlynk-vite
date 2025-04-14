@@ -3,9 +3,10 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { capitalizeFirstLetter, envOrderList, isDefaultEnv } from 'utils'
 
-import { FormControl, FormLabel, Select, Tag, Text } from '@chakra-ui/react'
+import { FormControl, FormLabel, Tag, Text } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
+import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
 
@@ -77,6 +78,28 @@ const SbomTransfer = ({ sbom, isOpen, onClose, productGroup }) => {
     }
   }, [params?.productid, projects])
 
+  const envOptions = [
+    { label: '-- Select --', value: '' },
+    ...envOrderList(envList).map((item) => ({
+      label: isDefaultEnv(item.label)
+        ? capitalizeFirstLetter(item.label)
+        : capitalizeFirstLetter(item.label),
+      value: item.value
+    }))
+  ]
+
+  const envValue =
+    envList?.length > 0
+      ? envOrderList(envList).find((opt) => opt.value === value)
+        ? {
+            ...envOrderList(envList).find((opt) => opt.value === value),
+            label: capitalizeFirstLetter(
+              envOrderList(envList).find((opt) => opt.value === value).label
+            )
+          }
+        : null
+      : null
+
   return (
     <LynkModal
       isOpen={isOpen}
@@ -95,27 +118,14 @@ const SbomTransfer = ({ sbom, isOpen, onClose, productGroup }) => {
       </Tag>
       <FormControl isRequired>
         <FormLabel htmlFor='environment'>Environment</FormLabel>
-        <Select
-          value={value}
-          name={'environment'}
-          onChange={(e) => setValue(e.target.value)}
-        >
-          <option value=''>-- Select --</option>
-          {envList?.length > 0 &&
-            envOrderList(envList).map((item, index) => (
-              <option
-                key={index}
-                value={item.value}
-                label={
-                  isDefaultEnv(item.label)
-                    ? capitalizeFirstLetter(item.label)
-                    : item.label
-                }
-              >
-                {item.label}
-              </option>
-            ))}
-        </Select>
+        <LynkSelect
+          value={envValue}
+          name='environment'
+          onChange={(selected) => setValue(selected.value)}
+          options={envOptions}
+          placeholder={'-- Select --'}
+          dropDown
+        />
       </FormControl>
     </LynkModal>
   )

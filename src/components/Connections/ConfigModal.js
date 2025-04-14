@@ -3,20 +3,18 @@ import { useEffect, useState } from 'react'
 import { validateEmail } from 'utils/formValidationUtils'
 
 import { Box, Button, HStack, Input, Stack } from '@chakra-ui/react'
-import { Icon, IconButton } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage } from '@chakra-ui/react'
 
+import DeleteButton from 'components/Icons/DeleteButton'
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
-import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaPlus } from 'react-icons/fa6'
 import { IoSettingsOutline } from 'react-icons/io5'
-import { MdDeleteOutline } from 'react-icons/md'
 
 const options = [
   { value: 'All', label: 'All' },
@@ -54,11 +52,6 @@ const ConfigModal = ({
       frequency: 'Instant',
       isValid: true
     }
-  ])
-
-  const { grayBorderColor, primaryErrorColor } = useThemeColor([
-    'grayBorderColor',
-    'primaryErrorColor'
   ])
 
   const updateCon = useHasPermission({
@@ -123,15 +116,40 @@ const ConfigModal = ({
     }
   }
 
-  const handleUpdate = async () => {
-    const validConfigs = configs.filter(
-      (config) => config.address.trim() !== ''
-    )
+  const getValidConfigs = () =>
+    configs.filter((config) => config.address.trim() !== '')
 
-    const hasDuplicates = (configs) => {
-      const addresses = configs.map((config) => config.address)
-      return new Set(addresses).size !== addresses.length
+  const hasDuplicates = (configs) => {
+    const addresses = configs.map((config) => config.address)
+    return new Set(addresses).size !== addresses.length
+  }
+
+  const getConfigsForMutation = (validConfigs) =>
+    // eslint-disable-next-line no-unused-vars
+    validConfigs.map(({ isValid, error, ...rest }) => rest)
+
+  const handleMutationResponse = (res, actionText) => {
+    const responseData = res?.data
+    const connectionKey = Object.keys(responseData)?.[0]
+    const errors = responseData?.[connectionKey]?.errors
+
+    if (!errors || errors.length === 0) {
+      setError(false)
+      setGreenCheck((prev) => ({ ...prev, [greenCheckKey]: true }))
+      onClose()
+      showToast({
+        title: `Configuration ${actionText}.`,
+        description: `Your ${title} has been successfully ${actionText.toLowerCase()}.`,
+        status: 'success'
+      })
+    } else {
+      setError(true)
+      setErrorMessage(`Saving failed. An error occurred: ${errors.join(', ')}`)
     }
+  }
+
+  const handleUpdate = async () => {
+    const validConfigs = getValidConfigs()
 
     if (validConfigs.length === 0) {
       onClose()
@@ -144,10 +162,8 @@ const ConfigModal = ({
       return
     }
 
-    const configsForMutation = validConfigs.map(
-      // eslint-disable-next-line no-unused-vars
-      ({ isValid, error, ...rest }) => rest
-    )
+    const configsForMutation = getConfigsForMutation(validConfigs)
+
     try {
       const res = await updateConn({
         variables: {
@@ -156,40 +172,14 @@ const ConfigModal = ({
           configs: configsForMutation
         }
       })
-
-      const responseData = res?.data
-      const connectionKey = Object.keys(responseData)?.[0] // Get the first key
-      const errors = responseData?.[connectionKey]?.errors
-
-      if (!errors || errors.length === 0) {
-        setError(false)
-        setGreenCheck((prev) => ({ ...prev, [greenCheckKey]: true }))
-        onClose()
-        showToast({
-          title: 'Configuration saved.',
-          description: `Your ${title} has been successfully updated.`,
-          status: 'success'
-        })
-      } else {
-        setError(true)
-        setErrorMessage(
-          `Saving failed. An error occurred: ${errors.join(', ')}`
-        )
-      }
+      handleMutationResponse(res, 'updated')
     } catch (error) {
       setErrorMessage(`Saving failed. Unexpected error: ${error.message}`)
     }
   }
 
   const handleSave = async () => {
-    const validConfigs = configs.filter(
-      (config) => config.address.trim() !== ''
-    )
-
-    const hasDuplicates = (configs) => {
-      const addresses = configs.map((config) => config.address)
-      return new Set(addresses).size !== addresses.length
-    }
+    const validConfigs = getValidConfigs()
 
     if (validConfigs.length === 0) {
       setErrorMessage(
@@ -203,10 +193,7 @@ const ConfigModal = ({
       return
     }
 
-    const configsForMutation = validConfigs.map(
-      // eslint-disable-next-line no-unused-vars
-      ({ isValid, error, ...rest }) => rest
-    )
+    const configsForMutation = getConfigsForMutation(validConfigs)
 
     try {
       const res = await createConn({
@@ -215,28 +202,9 @@ const ConfigModal = ({
           configs: configsForMutation
         }
       })
-
-      const responseData = res?.data
-      const connectionKey = Object.keys(responseData)?.[0] // Get the first key
-      const errors = responseData?.[connectionKey]?.errors
-
-      if (!errors || errors.length === 0) {
-        setError(false)
-        setGreenCheck((prev) => ({ ...prev, [greenCheckKey]: true }))
-        onClose()
-        showToast({
-          title: 'Configuration saved.',
-          description: `Your ${title} has been successfully saved.`,
-          status: 'success'
-        })
-      } else {
-        setError(true)
-        setErrorMessage(
-          `Saving failed. An error occurred: ${errors.join(', ')}`
-        )
-      }
+      handleMutationResponse(res, 'saved')
     } catch (error) {
-      setErrorMessage(`Saving failed. Unexpected error: ${error.message}}`)
+      setErrorMessage(`Saving failed. Unexpected error: ${error.message}`)
     }
   }
 
@@ -247,7 +215,7 @@ const ConfigModal = ({
     setConfigs(newConfigs)
   }
 
-  const hasSimilarRow = (data) => {
+  const hasExactDuplicateConfig = (data) => {
     for (let i = 0; i < data.length; i++) {
       for (let j = i + 1; j < data.length; j++) {
         if (
@@ -263,7 +231,7 @@ const ConfigModal = ({
   }
 
   const handleAddConfig = () => {
-    if (hasSimilarRow(configs)) {
+    if (hasExactDuplicateConfig(configs)) {
       setErrorMessage(
         `A row with the empty or same values already exists. Please update or remove it before continue.`
       )
@@ -360,23 +328,11 @@ const ConfigModal = ({
                 dropDown
                 styles={selectStyles}
               />
-
               {updateCon && configs?.length > 1 && (
-                <IconButton
-                  border='1px solid'
-                  borderColor={grayBorderColor}
-                  variant='ghost'
-                  isLoading={deleteLoading}
-                  aria-label='Delete configuration'
+                <DeleteButton
                   onClick={() => handleRemoveConfig(index)}
-                  icon={
-                    <Icon
-                      as={MdDeleteOutline}
-                      w={5}
-                      h={5}
-                      color={primaryErrorColor}
-                    />
-                  }
+                  isLoading={deleteLoading}
+                  aria-label={'Delete configuration'}
                 />
               )}
             </HStack>

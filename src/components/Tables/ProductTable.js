@@ -1,56 +1,28 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useNavigate } from 'react-router-dom'
-import { getFullDate, timeSince } from 'utils'
-import { getFormat, getLink } from 'utils'
-import { getSignedUrlParams, truncatedValue } from 'utils'
-import { customStyles, getType } from 'utils/styleUtils'
-import { FREE_TIER_PRODUCT_LIMIT } from 'variables/general'
+import { customStyles } from 'utils/styleUtils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import GithubAddModal from 'views/Dashboard/Products/components/GithubAddModal'
-import LabelInput from 'views/Dashboard/Products/components/LabelInput'
-import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
 import ProductModal from 'views/Dashboard/Products/components/ProductModal'
 import StatusModal from 'views/Dashboard/Products/components/StatusModal'
 import UploadModal from 'views/Dashboard/Products/components/UploadModal'
-import ProductSearchFilter from 'views/Sbom/components/ProductSearchFilter'
 
-import {
-  Box,
-  Divider,
-  Fade,
-  Flex,
-  IconButton,
-  Link as Olink,
-  Portal,
-  Stack,
-  Text,
-  Tooltip,
-  useDisclosure
-} from '@chakra-ui/react'
-import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
+import { Flex, useDisclosure } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CustomLoader from 'components/CustomLoader'
 import ShareLynkDrawer from 'components/Drawer/ShareLynkDrawer'
 import TagDrawer from 'components/Drawer/TagDrawer'
-import AddButton from 'components/Icons/AddButton'
-import IconBox from 'components/Icons/IconBox'
-import RefreshBtn from 'components/Icons/RefreshBtn'
-import ProdLabel from 'components/Label/ProdLabel'
-import EnvList from 'components/Misc/EnvList'
-import LynkAction from 'components/Misc/LynkAction'
-import LynkSwitch from 'components/Misc/LynkSwitch'
 import BitbucketProjects from 'components/Modal/BitbucketProjects'
+import ProductColumns from 'components/columns/ProductColumns'
+import ProductHeader from 'components/headers/ProductHeader'
 
-import useGithubConfigSaved from 'hooks/useGithubConfigSaved'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useHasPermission } from 'hooks/useHasPermission'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
-import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { DeleteProjectGroup } from 'graphQL/Mutation'
@@ -60,17 +32,12 @@ import {
   GetTotalProduct
 } from 'graphQL/Queries'
 
-import { FaGithub } from 'react-icons/fa'
-import { FaBitbucket, FaTag } from 'react-icons/fa6'
-
 import Pagination from '../Pagination'
 
 const ProductTable = (props) => {
   const navigate = useNavigate()
   const { setIsOpen } = useTour()
-  const signedUrlParams = getSignedUrlParams()
   const { orgView, isFreeTier } = useGlobalQueryContext()
-  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
   const { data, reset, loading, paginationProps } = props
@@ -89,24 +56,9 @@ const ProductTable = (props) => {
   })
   const { totalCount } = prodData?.organization?.projectGroups || ''
 
-  const {
-    primaryBlueText,
-    headingTextColor,
-    primaryTextColor,
-    grayBorderColor,
-    secondaryBgColor,
-    semiTransparentBorder,
-    lightAndDarkBgColor,
-    primaryErrorColor
-  } = useThemeColor([
-    'primaryBlueText',
+  const { headingTextColor, semiTransparentBorder } = useThemeColor([
     'headingTextColor',
-    'primaryTextColor',
-    'grayBorderColor',
-    'secondaryBgColor',
-    'semiTransparentBorder',
-    'lightAndDarkBgColor',
-    'primaryErrorColor'
+    'semiTransparentBorder'
   ])
 
   const { prodState, setEnvName, setClearSelect, dispatch, envName } =
@@ -117,7 +69,6 @@ const ProductTable = (props) => {
   const { prodDispatch } = dispatch
 
   const [activeRow, setActiveRow] = useState(null)
-  const isGithubConfigSaved = useGithubConfigSaved()
   const [openTagMenu, setOpenTagMenu] = useState(false)
   const [filterText, setFilterText] = useState(searchInput || '')
   const [selectedTags, setSelectedTags] = useState([])
@@ -132,36 +83,58 @@ const ProductTable = (props) => {
   const GITHUB = useDisclosure()
   const BITBUCKET = useDisclosure()
 
-  const canAddProduct = useHasPermission({
-    parentKey: 'view_product_group',
-    childKey: 'create_product_group'
-  })
+  const action = (type, data) => {
+    setActiveRow(data)
+    switch (type) {
+      case 'status_warning':
+        return WARNING.onOpen()
+      case 'update_product':
+        return PRODUCT.onOpen()
+      case 'upload_sbom':
+        return UPLOAD.onOpen()
+      case 'delete_product':
+        return DELETE.onOpen()
+      case 'view_sharelynk':
+        return SHARELYNK.onOpen()
+      case 'create_labels':
+        return LABEL.onOpen()
+      case 'edit_labels':
+        setOpenTagMenu(true)
+        return
+      case 'import_github':
+        return GITHUB.onOpen()
+      case 'import_bitbucket':
+        return BITBUCKET.onOpen()
+      default:
+        return PRODUCT.onOpen()
+    }
+  }
 
-  const canEditProduct = useHasPermission({
-    parentKey: 'view_product_group',
-    childKey: 'update_product_group'
-  })
-
-  const canArchiveProduct = useHasPermission({
-    parentKey: 'view_product_group',
-    childKey: 'archive_product_group'
-  })
-
-  const canEditShareynk = useHasPermission({
-    parentKey: 'view_product_group',
-    childKey: 'edit_share_lynk'
-  })
-
-  const canCreateSBOM = useHasPermission({
-    parentKey: 'view_sbom',
-    childKey: 'update_sbom'
-  })
+  const handleClick = (data) => {
+    const { id, projects, defaultProject } = data || {}
+    setIsOpen(false)
+    setClearSelect(true)
+    const env = projects?.find((item) => item.name === environment)
+    setEnvName(env ? env?.name : defaultProject?.name)
+    prodDispatch({
+      type: 'SET_CURRENT_PRODUCT',
+      payload: { id: env?.id || defaultProject?.id }
+    })
+    const link = generateProductDetailPageUrlFromCurrentUrl({
+      productgroupid: id,
+      productid: env?.id || defaultProject?.id,
+      paramsObj: {
+        tab: 'versions'
+      }
+    })
+    navigate(link)
+  }
 
   const { data: prodLabels, loading: labelLoading } = useQuery(GetLabels, {
     skip: openTagMenu ? false : true,
     variables: { first: 100 }
   })
-  const { nodes } = prodLabels?.labels || ''
+  const { nodes: productLabels } = prodLabels?.labels || ''
 
   const [deleteProjectGroup, { loading: dLLoading }] =
     useMutation(DeleteProjectGroup)
@@ -211,11 +184,6 @@ const ProductTable = (props) => {
     [setSearchFilter]
   )
 
-  const onSharelynkOpen = (row) => {
-    setActiveRow(row)
-    SHARELYNK.onOpen()
-  }
-
   const filteredNodes = data?.filter((node) => {
     const nodeTags = node?.labels?.map((label) => label.name)
     if (filterMode === 'AND') {
@@ -227,368 +195,30 @@ const ProductTable = (props) => {
   })
 
   // HEADER
-  const subHeaderComponent = useMemo(() => {
-    return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
-        <Flex gap={2}>
-          {/* SEARCH PRODUCTS */}
-          <ProductSearchFilter
-            id='product'
-            filterText={filterText}
-            onChange={onSearchInputChange}
-            onClear={handleClear}
-            onFilter={handleSearch}
-          />
-          {/* FILTER PRODUCTS */}
-          {!signedUrlParams && (
-            <ProdFilterMenu
-              reset={reset}
-              filterMode={filterMode}
-              setFilterMode={setFilterMode}
-              setSelectedTags={setSelectedTags}
-            />
-          )}
-        </Flex>
-        <Flex gap={2}>
-          {/* ADD GITHUB PROJECT */}
-          {shouldShowDemoFeatures && isGithubConfigSaved && (
-            <Tooltip label='Add GitHub Project'>
-              <IconButton
-                icon={<FaGithub />}
-                variant='outline'
-                onClick={GITHUB.onOpen}
-              />
-            </Tooltip>
-          )}
-          {/* EDIT LABEL */}
-          <Tooltip label='Manage Labels'>
-            <IconButton
-              aria-label='Manage Labels'
-              icon={<FaTag />}
-              variant='outline'
-              onClick={LABEL.onOpen}
-              isDisabled={!canAddProduct}
-              hidden={signedUrlParams || isFreeTier}
-            />
-          </Tooltip>
-          {!isFreeTier && bitbucket && (
-            <Tooltip label='Import from Bitbucket'>
-              <IconButton
-                colorScheme='blue'
-                icon={<FaBitbucket />}
-                onClick={BITBUCKET.onOpen}
-              />
-            </Tooltip>
-          )}
-          {/* ADD PRODUCT */}
-          <Box position='relative'>
-            <Tooltip
-              label={
-                isFreeTier && totalCount >= FREE_TIER_PRODUCT_LIMIT
-                  ? 'Limit reached for free tier'
-                  : 'Add product'
-              }
-              isDisabled={false} // Ensure the tooltip is never disabled
-            >
-              <Box>
-                <AddButton
-                  aria-label='Add product'
-                  onClick={() => {
-                    setActiveRow(null)
-                    PRODUCT.onOpen()
-                  }}
-                  isDisabled={
-                    !canAddProduct ||
-                    (isFreeTier && totalCount >= FREE_TIER_PRODUCT_LIMIT)
-                  }
-                  hidden={signedUrlParams}
-                />
-              </Box>
-            </Tooltip>
-          </Box>
-          {/* REFRESH */}
-          <RefreshBtn />
-        </Flex>
-      </Flex>
-    )
-  }, [
+  const subHeaderComponent = ProductHeader({
+    action,
+    reset,
     filterText,
     onSearchInputChange,
     handleClear,
     handleSearch,
-    signedUrlParams,
-    reset,
     filterMode,
-    shouldShowDemoFeatures,
-    isGithubConfigSaved,
-    GITHUB.onOpen,
-    LABEL.onOpen,
-    canAddProduct,
-    isFreeTier,
+    setFilterMode,
+    setSelectedTags,
     bitbucket,
-    BITBUCKET.onOpen,
-    totalCount,
-    PRODUCT
-  ])
+    totalCount
+  })
 
   // COLUMNS
-  const columns = [
-    // ACTIVE
-    {
-      id: 'PROJECT_GROUPS_ENABLED',
-      name: 'ACTIVE',
-      selector: (row) => {
-        const { enabled, name } = row
-        return (
-          <LynkSwitch
-            name={name}
-            id={name}
-            size='md'
-            isChecked={enabled}
-            isDisabled={signedUrlParams || !canEditProduct}
-            onChange={() => {
-              setActiveRow(row)
-              WARNING.onOpen()
-            }}
-          />
-        )
-      },
-      width: '100px',
-      sortable: true
-    },
-    // PRODUCT
-    {
-      id: 'PROJECT_GROUPS_NAME',
-      name: 'PRODUCT NAME',
-      selector: (row, index) => {
-        const { id, name, projects, defaultProject, description, labels } = row
-        const handleClick = () => {
-          setIsOpen(false)
-          setClearSelect(true)
-          const env = projects?.find((item) => item.name === environment)
-          setEnvName(env ? env?.name : defaultProject?.name)
-          prodDispatch({
-            type: 'SET_CURRENT_PRODUCT',
-            payload: { id: env?.id || defaultProject?.id }
-          })
-          const link = generateProductDetailPageUrlFromCurrentUrl({
-            productgroupid: id,
-            productid: env?.id || defaultProject?.id,
-            paramsObj: {
-              tab: 'versions'
-            }
-          })
-          navigate(link)
-        }
-        return (
-          <Flex
-            my={3}
-            alignItems={'center'}
-            gap={shouldShowDemoFeatures ? 3 : 0}
-            className={index === 0 ? 'product' : ''}
-          >
-            {shouldShowDemoFeatures && (
-              <Tooltip label={getFormat(name)} placement='top'>
-                <Olink
-                  href={name ? getLink(name) : ''}
-                  isExternal={getLink(name) === '' ? false : true}
-                >
-                  <IconBox
-                    h={'40px'}
-                    w={'40px'}
-                    bg={secondaryBgColor}
-                    color={primaryBlueText}
-                  >
-                    {getType(name)}
-                  </IconBox>
-                </Olink>
-              </Tooltip>
-            )}
-            <Stack spacing={1}>
-              <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
-                <Text
-                  fontSize={16}
-                  color={primaryBlueText}
-                  cursor={'pointer'}
-                  width={'fit-content'}
-                  onClick={handleClick}
-                  aria-label='product_name'
-                  data-testid={`product_${name}`}
-                >
-                  {name?.length > 54 ? (
-                    <Tooltip label={name}>{truncatedValue(name, 54)}</Tooltip>
-                  ) : (
-                    name
-                  )}
-                </Text>
-                {labels?.map((item, index) => (
-                  <ProdLabel key={index} item={item} />
-                ))}
-              </Flex>
-              <Text color={primaryTextColor} pr={32} wordBreak={'break-all'}>
-                {description}
-              </Text>
-            </Stack>
-          </Flex>
-        )
-      },
-      width: '54%',
-      wrap: true,
-      sortable: true
-    },
-    // UPDATEDAT
-    {
-      id: 'PROJECT_GROUPS_UPDATED_AT',
-      name: 'UPDATED',
-      selector: (row) => {
-        const { updatedAt } = row
-        return (
-          <Tooltip label={getFullDate(updatedAt)} placement={'top'}>
-            <Text color={primaryTextColor}>{timeSince(updatedAt)}</Text>
-          </Tooltip>
-        )
-      },
-      sortable: true,
-      sortFunction: (a, b) => {
-        const dateA = new Date(a.updatedAt)
-        const dateB = new Date(b.updatedAt)
-        return dateA - dateB
-      },
-      wrap: true
-    },
-    // ENVIRONMENT
-    {
-      id: 'ENVIRONMENTS',
-      name: 'ENVIRONMENTS',
-      selector: (row) => <EnvList data={row} />,
-      width: '20%',
-      wrap: true,
-      right: signedUrlParams ? true : false
-    },
-    // ACTIONS
-    {
-      id: 'ACTIONS',
-      name: '',
-      selector: (row) => {
-        const { enabled, name } = row
-        return (
-          <Menu>
-            <LynkAction
-              data-testid='product-actions'
-              onClick={() => setOpenTagMenu(false)}
-              aria-label={`dropdown menu for ${name}`}
-            />
-            <Portal>
-              <MenuList fontSize={'sm'}>
-                {/* EDIT PRODUCT */}
-                <MenuItem
-                  onClick={() => {
-                    setActiveRow(row)
-                    PRODUCT.onOpen()
-                  }}
-                  onMouseEnter={() => {
-                    setOpenTagMenu(false)
-                  }}
-                  isDisabled={!enabled || !canEditProduct}
-                >
-                  Edit Product
-                </MenuItem>
-                <MenuItem
-                  hidden={isFreeTier}
-                  position={'relative'}
-                  closeOnSelect={false}
-                  onMouseEnter={() => {
-                    setOpenTagMenu(true)
-                    setActiveRow(row)
-                  }}
-                  aria-label={`add_label`}
-                  isDisabled={!enabled || !canEditProduct}
-                  sx={{
-                    bg:
-                      openTagMenu && activeRow === row
-                        ? semiTransparentBorder
-                        : 'inherit'
-                  }}
-                >
-                  Edit Labels
-                </MenuItem>
-                {openTagMenu && !labelLoading && (
-                  <Fade initialScale={0.9} in={openTagMenu} delay={0.2}>
-                    <Box
-                      h={'auto'}
-                      top={0}
-                      right={226}
-                      width='220px'
-                      borderRadius='md'
-                      bg={lightAndDarkBgColor}
-                      position='absolute'
-                      border={`1px solid ${grayBorderColor}`}
-                      onMouseEnter={() => setOpenTagMenu(true)}
-                    >
-                      <LabelInput
-                        data={row}
-                        nodes={nodes}
-                        setOpen={setOpenTagMenu}
-                        onOpenLabel={LABEL.onOpen}
-                      />
-                    </Box>
-                  </Fade>
-                )}
-                {/* UPLOAD SBOM */}
-                <MenuItem
-                  aria-label={`upload sbom for ${name}`}
-                  onClick={() => {
-                    setActiveRow(row)
-                    UPLOAD.onOpen()
-                  }}
-                  onMouseEnter={() => {
-                    setOpenTagMenu(false)
-                  }}
-                  isDisabled={!enabled || !canCreateSBOM}
-                >
-                  Upload SBOM
-                </MenuItem>
-                {/* VIEW SHARELYNK */}
-                <MenuItem
-                  isDisabled={!enabled || !canEditShareynk}
-                  onClick={() => onSharelynkOpen(row)}
-                  onMouseEnter={() => {
-                    setOpenTagMenu(false)
-                  }}
-                >
-                  View ShareLynk
-                </MenuItem>
-                <Divider />
-                {/* ARCHIVE PRODUCT GROUP */}
-                <MenuItem
-                  data-testid='delete_product'
-                  aria-label={`Delete product ${name}`}
-                  color={primaryErrorColor}
-                  onClick={() => {
-                    setActiveRow(row)
-                    DELETE.onOpen()
-                  }}
-                  onMouseEnter={() => {
-                    setOpenTagMenu(false)
-                  }}
-                  isDisabled={!canArchiveProduct}
-                >
-                  Delete Product
-                </MenuItem>
-              </MenuList>
-            </Portal>
-          </Menu>
-        )
-      },
-      width: '5%',
-      right: 'true',
-      omit: signedUrlParams
-    }
-  ]
+  const columns = ProductColumns({
+    action,
+    handleClick,
+    openTagMenu,
+    setOpenTagMenu,
+    activeRow,
+    labelLoading,
+    productLabels
+  })
 
   const handleSort = (column, sortDirection) => {
     prodDispatch({

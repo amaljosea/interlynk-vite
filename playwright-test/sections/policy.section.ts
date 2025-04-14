@@ -42,10 +42,12 @@ export default class PolicySection {
       await this.page.keyboard.press('Enter')
 
       await this.page.locator("button[type='submit']").click()
+      await this.page.waitForTimeout(1000)
 
       await this.page.locator('.chakra-switch__thumb').nth(0).click()
 
       await this.page.locator("button[type='submit']").click()
+      await this.page.waitForTimeout(1000)
 
       await this.page.locator('.chakra-switch__thumb').nth(0).click()
 
@@ -70,10 +72,12 @@ export default class PolicySection {
         await this.page.getByTestId(`add_policy_condition`).click()
 
         await this.page.locator('#condition_subject_1').click()
+        await this.page.waitForTimeout(1000)
         await this.page.keyboard.type('COMPONENT_TYPE')
         await this.page.keyboard.press('Enter')
 
         await this.page.locator('#condition_operator_1').click()
+        await this.page.waitForTimeout(1000)
         await this.page.keyboard.type('NOT_EXISTS')
         await this.page.keyboard.press('Enter')
 

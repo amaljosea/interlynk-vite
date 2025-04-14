@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client'
 import { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { getFullDate, timeSince } from 'utils'
+import { getFullDate, timeSince, truncatedValue } from 'utils'
 import { customStyles } from 'utils/styleUtils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 
@@ -54,13 +54,11 @@ const CustomVulnTable = () => {
   const {
     headingTextColor,
     primaryTextColor,
-    primaryBlueText,
     secondaryTextColor,
     primaryErrorColor
   } = useThemeColor([
     'headingTextColor',
     'primaryTextColor',
-    'primaryBlueText',
     'secondaryTextColor',
     'primaryErrorColor'
   ])
@@ -124,16 +122,18 @@ const CustomVulnTable = () => {
         const { desc, vulnIdentifier } = row
         return (
           <Stack spacing={1} my={4}>
-            <Text fontSize='sm' color={primaryBlueText}>
+            <Text fontSize='sm' color={primaryTextColor}>
               {vulnIdentifier || ''}
             </Text>
-            <Text fontSize='sm' color={secondaryTextColor}>
-              {desc || ''}
-            </Text>
+            {desc && (
+              <Text fontSize='sm' color={secondaryTextColor}>
+                {truncatedValue(desc, 100)}
+              </Text>
+            )}
           </Stack>
         )
       },
-      width: '18%',
+      width: '35%',
       sortable: true
     },
     // SEVERITY
@@ -142,7 +142,7 @@ const CustomVulnTable = () => {
       name: 'SEVERITY',
       selector: (row) => <SeverityTag value={row?.sev} />,
       sortable: true,
-      width: '10%',
+      width: '12%',
       wrap: true
     },
     // REPORTED AT
@@ -250,7 +250,7 @@ const CustomVulnTable = () => {
         )
       },
       right: 'true',
-      omit: true // isFreeTier
+      omit: true
     }
   ]
 

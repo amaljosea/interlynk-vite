@@ -1,17 +1,19 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { getTotalDays } from 'utils'
+import { getDate } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
+import { assessmentExpiryWarning } from 'variables/general'
 
-import { Button, Select, Stack } from '@chakra-ui/react'
-import { NumberInput, NumberInputField } from '@chakra-ui/react'
-import { Input, InputGroup, InputRightAddon } from '@chakra-ui/react'
+import { Button, FormErrorMessage, Input, Stack } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
 
 import EnvironmentSelector from 'components/EnvironmentSelector'
 import LynkAlert from 'components/LynkAlert'
 import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
+import LynkSelect from 'components/LynkSelect'
 import CompInfo from 'components/Misc/CompInfo'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -33,10 +35,13 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
   const { status, component } = activeRow || ''
+
   const { name, version, componentSupportLevel } = component || ''
   const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
 
   const inputStyle = { size: 'md', fontSize: 'sm' }
+  const defaultDate = new Date()
+  defaultDate.setDate(defaultDate.getDate() + 365)
 
   const [error, setError] = useState('')
   const [selectedEnvironments, setSelectedEnvironments] = useState([])
@@ -59,11 +64,27 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
   )
 
   const resolved = status === 'resolved'
+
+  const isAbandoned = formData?.supportLevel !== 'abandoned'
+  const totalDays = Number(getTotalDays(formData?.assessmentExpiresOn))
+
   const disabled =
-    formData?.supportLevel === '' && formData?.endOfSupport === ''
+    formData?.supportLevel === '' ||
+    (isAbandoned && !component?.internal && totalDays < 1) ||
+    (isAbandoned && !component?.internal && totalDays > 365)
+
+  const noLongerMaintained = formData?.supportLevel === 'no_longer_maintained'
 
   const handleChange = (e) => {
     const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleSelect = (selectedItem, name) => {
+    const { value } = selectedItem
     const isUnspecified = name === 'supportLevel' && value === 'unspecified'
     if (isUnspecified) {
       setFormData((prev) => ({
@@ -71,12 +92,13 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
         [name]: value,
         endOfSupport: '',
         explanation: '',
-        assessmentExpiresOn: 0
+        assessmentExpiresOn: defaultDate
       }))
     } else {
       setFormData((prev) => ({
         ...prev,
-        [name]: value
+        [name]: value,
+        assessmentExpiresOn: defaultDate
       }))
     }
   }
@@ -175,8 +197,7 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
         id: component?.id,
         level: formData?.supportLevel || undefined,
         notes: formData?.explanation || undefined,
-        retainManualOverrideFor:
-          Number(formData?.assessmentExpiresOn) || undefined,
+        retainManualOverrideFor: totalDays > 0 ? totalDays : undefined,
         endDate: formData?.endOfSupport
           ? new Date(formData?.endOfSupport).toISOString()
           : undefined
@@ -206,8 +227,7 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
         id: componentSupportLevel?.id,
         level: formData?.supportLevel || undefined,
         notes: formData?.explanation || undefined,
-        retainManualOverrideFor:
-          Number(formData?.assessmentExpiresOn) || undefined,
+        retainManualOverrideFor: totalDays > 0 ? totalDays : undefined,
         endDate: formData?.endOfSupport
           ? new Date(formData?.endOfSupport).toISOString()
           : undefined
@@ -279,11 +299,19 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
         supportLevel: level || '',
         endOfSupport: endDate ? new Date(endDate) : '',
         assessmentExpiresOn: retainManualOverrideFor
-          ? Number(retainManualOverrideFor)
-          : 0
+          ? getDate(retainManualOverrideFor)
+          : undefined
       }))
     }
   }, [componentSupportLevel])
+
+  const supportLevelOptions = [
+    { value: '', label: '-- Select --' },
+    { value: 'unspecified', label: 'Unspecified' },
+    { value: 'actively_maintained', label: 'Actively Maintained' },
+    { value: 'no_longer_maintained', label: 'No Longer Maintained' },
+    { value: 'abandoned', label: 'Abandoned' }
+  ]
 
   return (
     <LynkModal
@@ -308,52 +336,46 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
         {/* SUPPRT LEVEL */}
         <FormControl isRequired>
           <FormLabel htmlFor='supportLevel'>Support Level</FormLabel>
-          <Select
-            sx={inputStyle}
+          <LynkSelect
+            styles={inputStyle}
             name='supportLevel'
-            value={formData?.supportLevel}
-            onChange={handleChange}
-          >
-            <option value='' style={{ background: 'lightgray' }}>
-              -- Select --
-            </option>
-            <option value='unspecified'>Unspecified</option>
-            <option value='actively_maintained'>Actively Maintained</option>
-            <option value='no_longer_maintained'>No Longer Maintained</option>
-            <option value='abandoned'>Abandoned</option>
-          </Select>
-        </FormControl>
-        {/* END-OF-SUPPORT DATE */}
-        <FormControl>
-          <FormLabel htmlFor='endOfSupport'>End-Of-Support Date</FormLabel>
-          <LynkDate
-            name='endOfSupport'
-            value={formData?.endOfSupport}
-            onChange={(value) => handleDateChange(value, 'endOfSupport')}
+            value={
+              supportLevelOptions.find(
+                (opt) => opt.value === formData?.supportLevel
+              ) || null
+            }
+            onChange={(selected) => handleSelect(selected, 'supportLevel')}
+            options={supportLevelOptions}
+            dropDown
           />
         </FormControl>
+        {/* END-OF-SUPPORT DATE */}
+        {(formData?.supportLevel === 'actively_maintained' ||
+          formData?.supportLevel === 'no_longer_maintained') && (
+          <FormControl>
+            <FormLabel htmlFor='endOfSupport'>End-Of-Support Date</FormLabel>
+            <LynkDate
+              name='endOfSupport'
+              value={formData?.endOfSupport}
+              onChange={(value) => handleDateChange(value, 'endOfSupport')}
+            />
+          </FormControl>
+        )}
         {/* RETAIN MANNUAL OVERRIDE */}
-        <FormControl>
+        <FormControl
+          hidden={noLongerMaintained}
+          isInvalid={totalDays > 365}
+          isRequired={!component?.internal}
+        >
           <FormLabel htmlFor='assessmentExpiresOn'>
             Assessment Expires On
           </FormLabel>
-          <InputGroup>
-            <NumberInput
-              max={365}
-              w={'100%'}
-              name='assessmentExpiresOn'
-              value={formData?.assessmentExpiresOn}
-              onChange={(valueString) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  assessmentExpiresOn: valueString
-                }))
-              }
-            >
-              <NumberInputField fontSize={'sm'} borderRightRadius={0} />
-            </NumberInput>
-            <InputRightAddon>Days</InputRightAddon>
-          </InputGroup>
+          <LynkDate
+            name='assessmentExpiresOn'
+            value={formData?.assessmentExpiresOn}
+            onChange={(value) => handleDateChange(value, 'assessmentExpiresOn')}
+          />
+          <FormErrorMessage>{assessmentExpiryWarning}</FormErrorMessage>
         </FormControl>
         {/* EXPLANATION */}
         <FormControl>

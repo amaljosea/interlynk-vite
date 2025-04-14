@@ -71,8 +71,6 @@ const ProductLabels = () => {
 
   const total = filterLabels?.reduce((sum, stage) => sum + stage.count, 0)
 
-  if (loading) return <LynkLoader />
-
   const handleFilter = (value) => {
     prodDispatch({
       type: 'PRODUCT_BY_LABEL',
@@ -80,6 +78,10 @@ const ProductLabels = () => {
     })
     navigate('/vendor/products')
   }
+
+  if (loading) return <LynkLoader />
+
+  if (total === 0) return null
 
   return (
     <Card maxH='100%' overflowY='auto'>
