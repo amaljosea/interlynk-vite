@@ -164,7 +164,7 @@ const ProductColumns = (props) => {
                     <ProdLabel key={index} item={item} />
                   ))}
                 </Flex>
-                <ExpandableText text={description} />
+                <ExpandableText pr={32} text={description} />
               </Stack>
             </Flex>
           )

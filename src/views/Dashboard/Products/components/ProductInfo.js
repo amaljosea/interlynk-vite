@@ -117,7 +117,7 @@ const ProductInfo = ({ settings, data }) => {
           <Tooltip label={name}>{truncatedValue(name, 50)}</Tooltip>
         </Text>
         {/* PRODUCT DESCRIPTION */}
-        <ExpandableText text={description || ''} />
+        <ExpandableText text={description || ''} fontSize={'sm'} />
         {/* SETTINGS */}
         <Stack mt={description ? 1 : 0} direction='row' alignItems={'center'}>
           <SettingsTag
