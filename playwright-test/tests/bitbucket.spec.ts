@@ -36,3 +36,10 @@ test('Delete bitbucket repo from product table', async ({ page }) => {
   const settingsPage = new BibucketIntegration(page)
   await settingsPage.deleteProjectGroup()
 })
+
+test('Remove bitbucket configuration', async ({ page }) => {
+  test.setTimeout(30000)
+
+  const settingsPage = new BibucketIntegration(page)
+  await settingsPage.removeConfiguration()
+})

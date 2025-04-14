@@ -53,4 +53,12 @@ export class BibucketIntegration {
     await this.page.getByTestId(`delete-field`).fill('DELETE')
     await this.page.locator("button[type='submit']").click()
   }
+
+  async removeConfiguration() {
+    await this.page.getByLabel('settings').click()
+    await this.page.getByRole('tab', { name: 'integration' }).click()
+    await this.page.getByRole('button', { name: 'Configured' }).first().click()
+    await this.page.getByRole('button', { name: 'Delete' }).click()
+    await this.page.waitForTimeout(5000)
+  }
 }
