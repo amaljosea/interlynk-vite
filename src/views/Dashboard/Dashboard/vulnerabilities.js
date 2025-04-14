@@ -12,7 +12,7 @@ import {
   rectSortingStrategy,
   sortableKeyboardCoordinates
 } from '@dnd-kit/sortable'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 
 import {
   Box,
@@ -31,37 +31,50 @@ import CriticalVulnerabilitiesByStatus from 'components/Graphs/CriticalVulnerabi
 import HighVulnerabilitiesByStatus from 'components/Graphs/HighVulnerabilitiesByStatus'
 import KevVulnerabilitiesByStatus from 'components/Graphs/KevVulnerabilitiesByStatus'
 
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import { LuLayoutGrid, LuLayoutList, LuPlus } from 'react-icons/lu'
 
 function VulnerabilityGroup() {
+  const { selectedVulns } = useGlobalState()
+
   const [vulnCards, setVulnCards] = useState([
     {
       id: '1',
+      key: 'all_vulns_by_severity',
       title: 'All Vulnerabilities by Severity',
       content: <AllVulnerabilitiesBySeverity />
     },
     {
       id: '2',
+      key: 'all_vulns_by_status',
       title: 'All Vulnerabilities by Status',
       content: <AllVulnerabilitiesByStatus />
     },
     {
       id: '3',
+      key: 'critical_vulns_by_status',
       title: 'Critical Vulnerabilities by Status',
       content: <CriticalVulnerabilitiesByStatus />
     },
     {
       id: '4',
+      key: 'high_vulns_by_status',
       title: 'High Vulnerabilities by Status',
       content: <HighVulnerabilitiesByStatus />
     },
     {
       id: '5',
+      key: 'kev_vulns_by_status',
       title: 'KEV Vulnerabilties by Status',
       content: <KevVulnerabilitiesByStatus />
     }
   ])
   const [isGridLayout, setIsGridLayout] = useState(true)
+
+  const filteredVulnCards = useMemo(() => {
+    return vulnCards.filter((card) => selectedVulns.includes(card.key))
+  }, [vulnCards, selectedVulns])
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -94,6 +107,8 @@ function VulnerabilityGroup() {
   const handleDeleteCard = (id) => {
     setVulnCards(vulnCards?.filter((card) => card.id !== id))
   }
+
+  if (filteredVulnCards?.length === 0) return null
 
   return (
     <Box>
@@ -130,12 +145,15 @@ function VulnerabilityGroup() {
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
       >
-        <SortableContext items={vulnCards} strategy={rectSortingStrategy}>
+        <SortableContext
+          items={filteredVulnCards}
+          strategy={rectSortingStrategy}
+        >
           <SimpleGrid
             columns={isGridLayout ? { base: 1, md: 2, lg: 3 } : 1}
             spacing={5}
           >
-            {vulnCards?.map((card) => (
+            {filteredVulnCards?.map((card) => (
               <DashboardCard
                 key={card.id}
                 id={card.id}

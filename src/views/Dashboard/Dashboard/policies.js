@@ -12,7 +12,7 @@ import {
   rectSortingStrategy,
   sortableKeyboardCoordinates
 } from '@dnd-kit/sortable'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 
 import {
   Box,
@@ -26,19 +26,28 @@ import {
 
 import { DashboardCard } from 'components/DashboardCard'
 
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import { LuLayoutGrid, LuLayoutList, LuPlus } from 'react-icons/lu'
 
 import PolicyGraphs from './components/category/PolicyGraphs'
 
 function PolicyGroup() {
+  const { selectedPolicies } = useGlobalState()
+
   const [policyCards, setPolicyCards] = useState([
     {
       id: '1',
+      key: 'policy_results',
       title: 'Policy Results',
       content: <PolicyGraphs />
     }
   ])
   const [isGridLayout, setIsGridLayout] = useState(true)
+
+  const filteredPolicyCards = useMemo(() => {
+    return policyCards.filter((card) => selectedPolicies.includes(card.key))
+  }, [policyCards, selectedPolicies])
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -71,6 +80,8 @@ function PolicyGroup() {
   const handleDeleteCard = (id) => {
     setPolicyCards(policyCards?.filter((card) => card.id !== id))
   }
+
+  if (filteredPolicyCards?.length === 0) return null
 
   return (
     <Box>
@@ -107,12 +118,15 @@ function PolicyGroup() {
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
       >
-        <SortableContext items={policyCards} strategy={rectSortingStrategy}>
+        <SortableContext
+          items={filteredPolicyCards}
+          strategy={rectSortingStrategy}
+        >
           <SimpleGrid
             columns={isGridLayout ? { base: 1, md: 2, lg: 3 } : 1}
             spacing={5}
           >
-            {policyCards?.map((card) => (
+            {filteredPolicyCards?.map((card) => (
               <DashboardCard
                 key={card.id}
                 id={card.id}

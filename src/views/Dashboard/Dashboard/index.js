@@ -7,6 +7,7 @@ import { Button, Flex, Heading, Skeleton, Stack } from '@chakra-ui/react'
 import { Grid, GridItem, SimpleGrid } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
+import CardList from 'components/CardList'
 import CustomLoader from 'components/CustomLoader'
 import GlobalEnvFilter from 'components/Misc/GlobalEnvFilter'
 import GlobalLabelFilter from 'components/Misc/GlobalLabelFilter'
@@ -99,6 +100,8 @@ export default function Page() {
           <GlobalLabelFilter value={labelIds} setValue={setLabelIds} />
           {/* ENVIRONMENT FILTER */}
           {organization && <GlobalEnvFilter />}
+          {/* GRAPH CARD LIGHT */}
+          <CardList />
         </Flex>
       </Flex>
       <Stack spacing={10}>
@@ -110,29 +113,29 @@ export default function Page() {
         <VulnerabilityTrendsGroup />
         {/* POLICY GRAPHS */}
         <PolicyGroup />
-      </Stack>
-      {/* ACTIVITIES AND CHANGELOGS */}
-      <Stack spacing={4} mt={6}>
-        <Heading size={'md'}>Activities</Heading>
-        <Grid templateColumns='repeat(12, 1fr)' gap={5} flexWrap={'wrap'}>
-          {/* RECENT IMPORTS */}
-          <GridItem colSpan={8} w='100%'>
-            <ProductsOverview
-              loading={loading}
-              title={'Recent Imports'}
-              data={metrics?.organizationMetric?.latestVersions}
-            />
-          </GridItem>
-          {/* LATEST ACTIVITIES */}
-          <GridItem colSpan={4} w='100%'>
-            <ActivitiesOverview
-              loading={loading}
-              title={'Recent Activities'}
-              amount={metrics?.organizationMetric?.latestActivity?.length}
-              data={metrics?.organizationMetric?.latestActivity}
-            />
-          </GridItem>
-        </Grid>
+        {/* ACTIVITIES AND CHANGELOGS */}
+        <Stack spacing={4}>
+          <Heading size={'md'}>Activities</Heading>
+          <Grid templateColumns='repeat(12, 1fr)' gap={5} flexWrap={'wrap'}>
+            {/* RECENT IMPORTS */}
+            <GridItem colSpan={8} w='100%'>
+              <ProductsOverview
+                loading={loading}
+                title={'Recent Imports'}
+                data={metrics?.organizationMetric?.latestVersions}
+              />
+            </GridItem>
+            {/* LATEST ACTIVITIES */}
+            <GridItem colSpan={4} w='100%'>
+              <ActivitiesOverview
+                loading={loading}
+                title={'Recent Activities'}
+                amount={metrics?.organizationMetric?.latestActivity?.length}
+                data={metrics?.organizationMetric?.latestActivity}
+              />
+            </GridItem>
+          </Grid>
+        </Stack>
       </Stack>
     </Flex>
   )

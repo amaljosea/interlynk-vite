@@ -41,7 +41,7 @@ export function DashboardCard({
 
   return (
     <Card ref={setNodeRef} style={style} rounded='lg' bg={lightAndDarkBgColor}>
-      <CardHeader h={'24'}>
+      <CardHeader h={desc ? '24' : 'auto'}>
         <Flex justify='space-between' align='center' mb={2}>
           <Flex align='center'>
             <IconButton
@@ -58,18 +58,21 @@ export function DashboardCard({
             <Heading size='md'>{title}</Heading>
           </Flex>
           <IconButton
+            hidden
             aria-label='Delete card'
             icon={<LuX />}
             variant='ghost'
             colorScheme='red'
-            hidden={isAnalytics}
+            // hidden={isAnalytics}
             onClick={() => onDelete(id)}
             _hover={{ bg: 'none' }}
           />
         </Flex>
-        <Text fontSize='sm'>{desc}</Text>
+        {desc && <Text fontSize='sm'>{desc}</Text>}
       </CardHeader>
-      <CardBody pb={8} h='fit-content'>{content}</CardBody>
+      <CardBody pb={8} h='fit-content'>
+        {content}
+      </CardBody>
     </Card>
   )
 }

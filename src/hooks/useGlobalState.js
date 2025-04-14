@@ -14,6 +14,31 @@ import React, { createContext, useContext, useReducer, useState } from 'react'
 
 const GlobalStateContext = createContext()
 
+export const allProducts = [
+  'products_by_lifestages',
+  'versions_by_lifestages',
+  'products_by_labels'
+]
+
+export const allVulns = [
+  'critical_vulns_by_status',
+  'high_vulns_by_status',
+  'kev_vulns_by_status',
+  'all_vulns_by_severity',
+  'all_vulns_by_status'
+]
+
+export const allTrends = [
+  'vulns_by_severity',
+  'vulns_by_status',
+  'defect_density',
+  'resolution_age',
+  'resotion_velocity',
+  'patch_velocity'
+]
+
+export const allPolicies = ['policy_results']
+
 const GlobalStateProvider = ({ children }) => {
   const env = localStorage.getItem('environment')
   const [organization, setOrganization] = useState(null)
@@ -22,6 +47,17 @@ const GlobalStateProvider = ({ children }) => {
   const [clearSelect, setClearSelect] = useState(false)
   const [selectedSbom, setSelectedSbom] = useState([])
   const [labelIds, setLabelIds] = useState([])
+  const [selectedProducts, setSelectedProducts] = useState(allProducts)
+  const [selectedVulns, setSelectedVulns] = useState(allVulns)
+  const [selectedTrends, setSelectedTrends] = useState(allTrends)
+  const [selectedPolicies, setSelectedPolicies] = useState(allPolicies)
+
+  const handleClearAll = () => {
+    setSelectedProducts([])
+    setSelectedVulns([])
+    setSelectedTrends([])
+    setSelectedPolicies([])
+  }
 
   // PRODUCTS
   const [prodState, prodDispatch] = useReducer(prodReducer, {
@@ -177,6 +213,15 @@ const GlobalStateProvider = ({ children }) => {
         setOrganization,
         userPermissions,
         setUserPermissions,
+        selectedProducts,
+        setSelectedProducts,
+        selectedVulns,
+        setSelectedVulns,
+        selectedTrends,
+        setSelectedTrends,
+        selectedPolicies,
+        setSelectedPolicies,
+        handleClearAll,
         envName,
         setEnvName,
         clearSelect,

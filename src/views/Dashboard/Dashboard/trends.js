@@ -12,7 +12,7 @@ import {
   rectSortingStrategy,
   sortableKeyboardCoordinates
 } from '@dnd-kit/sortable'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 
 import {
   Box,
@@ -32,42 +32,52 @@ import VulnAge from 'components/Graphs/VulnAge'
 import VulnBySeverity from 'components/Graphs/VulnBySeverity'
 import VulnByStatus from 'components/Graphs/VulnByStatus'
 
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import { LuLayoutGrid, LuLayoutList, LuPlus } from 'react-icons/lu'
 
 function VulnerabilityTrendsGroup() {
+  const { selectedTrends } = useGlobalState()
+
   const [trendCards, setTrendCards] = useState([
     {
       id: '1',
       title: 'Vulnerabilities by Severity',
+      key: 'vulns_by_severity',
       desc: 'Number of vulnerabilities in included versions grouped by their severity',
       content: <VulnBySeverity />
     },
     {
       id: '2',
+      key: 'vulns_by_status',
       title: 'Vulnerabilities by Status',
       desc: 'Number of vulnerabilities in included versions grouped by their vulnerabilty status',
       content: <VulnByStatus />
     },
     {
       id: '3',
+      key: 'defect_density',
       title: 'Defect Density',
       desc: 'Percentage of identified vulnerabilities that are updated or patched',
       content: <DefectDensity />
     },
     {
       id: '4',
+      key: 'resolution_age',
       title: 'Resolution Age',
       desc: 'Total number of days all vulnerabilities are present before resolution',
       content: <VulnAge />
     },
     {
       id: '5',
+      key: 'resotion_velocity',
       title: 'Resolution Velocity',
       desc: 'Average number of days a vulnerability is present before resolution',
       content: <IdentityVelocity />
     },
     {
       id: '6',
+      key: 'patch_velocity',
       title: 'Patch Velocity',
       desc: 'Duration from vulnerability identification to when it is updated or patched',
       content: <PatchVelocity />
@@ -75,6 +85,10 @@ function VulnerabilityTrendsGroup() {
   ])
 
   const [isGridLayout, setIsGridLayout] = useState(true)
+
+  const filteredTrendCards = useMemo(() => {
+    return trendCards.filter((card) => selectedTrends.includes(card.key))
+  }, [trendCards, selectedTrends])
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -107,6 +121,8 @@ function VulnerabilityTrendsGroup() {
   const handleDeleteCard = (id) => {
     setTrendCards(trendCards?.filter((card) => card.id !== id))
   }
+
+  if (filteredTrendCards?.length === 0) return null
 
   return (
     <Box>
@@ -143,12 +159,15 @@ function VulnerabilityTrendsGroup() {
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
       >
-        <SortableContext items={trendCards} strategy={rectSortingStrategy}>
+        <SortableContext
+          items={filteredTrendCards}
+          strategy={rectSortingStrategy}
+        >
           <SimpleGrid
             columns={isGridLayout ? { base: 1, md: 2, lg: 3 } : 1}
             spacing={5}
           >
-            {trendCards?.map((card) => (
+            {filteredTrendCards?.map((card) => (
               <DashboardCard
                 key={card.id}
                 id={card.id}

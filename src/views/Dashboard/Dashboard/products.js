@@ -12,7 +12,7 @@ import {
   rectSortingStrategy,
   sortableKeyboardCoordinates
 } from '@dnd-kit/sortable'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 
 import {
   Box,
@@ -26,6 +26,8 @@ import {
 
 import { DashboardCard } from 'components/DashboardCard'
 
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import { LuLayoutGrid, LuLayoutList, LuPlus } from 'react-icons/lu'
 
 import ProductLabels from './components/ProductLabels'
@@ -33,24 +35,33 @@ import ProductLifestages from './components/ProductLifestages'
 import VersionLifestages from './components/VersionLifestage'
 
 function ProductGroup() {
+  const { selectedProducts } = useGlobalState()
+
   const [productCards, setProductCards] = useState([
     {
       id: '1',
+      key: 'products_by_lifestages',
       title: 'Products by Lifestages',
       content: <ProductLifestages />
     },
     {
       id: '2',
+      key: 'versions_by_lifestages',
       title: 'Versions by Lifestages',
       content: <VersionLifestages />
     },
     {
       id: '3',
+      key: 'products_by_labels',
       title: 'Products by Label',
       content: <ProductLabels />
     }
   ])
   const [isGridLayout, setIsGridLayout] = useState(true)
+
+  const filteredProductCards = useMemo(() => {
+    return productCards.filter((card) => selectedProducts.includes(card.key))
+  }, [productCards, selectedProducts])
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -83,6 +94,8 @@ function ProductGroup() {
   const handleDeleteCard = (id) => {
     setProductCards(productCards?.filter((card) => card.id !== id))
   }
+
+  if (filteredProductCards?.length === 0) return null
 
   return (
     <Box>
@@ -119,12 +132,15 @@ function ProductGroup() {
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
       >
-        <SortableContext items={productCards} strategy={rectSortingStrategy}>
+        <SortableContext
+          items={filteredProductCards}
+          strategy={rectSortingStrategy}
+        >
           <SimpleGrid
             columns={isGridLayout ? { base: 1, md: 2, lg: 3 } : 1}
             spacing={5}
           >
-            {productCards.map((card) => (
+            {filteredProductCards.map((card) => (
               <DashboardCard
                 key={card.id}
                 id={card.id}
