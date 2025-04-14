@@ -18,11 +18,12 @@ import { GetOrgMetrics } from 'graphQL/Queries'
 
 import ActivitiesOverview from './components/ActivitiesOverview'
 import ProductsOverview from './components/ProductsOverview'
-import PolicyGraphs from './components/category/PolicyGraphs'
-import ProductGraphs from './components/category/ProductGraphs'
-import VulnGraphs from './components/category/VulnGraphs'
+import PolicyGroup from './policies'
+import ProductGroup from './products'
+import VulnerabilityTrendsGroup from './trends'
+import VulnerabilityGroup from './vulnerabilities'
 
-export default function Dashboard() {
+export default function Page() {
   const { setIsOpen } = useTour()
   const product = useQueryParam('id')
   const { dispatch, envName, organization, labelIds, setLabelIds } =
@@ -100,12 +101,16 @@ export default function Dashboard() {
           {organization && <GlobalEnvFilter />}
         </Flex>
       </Flex>
-      {/* PRODUCTS GRAPHS */}
-      <ProductGraphs />
-      {/* VULNERABILITIRS GRAPHS */}
-      <VulnGraphs />
-      {/* POLICY GRAPHS */}
-      <PolicyGraphs />
+      <Stack spacing={10}>
+        {/* PRODUCTS GRAPHS */}
+        <ProductGroup />
+        {/* VULNERABILITIRS GRAPHS */}
+        <VulnerabilityGroup />
+        {/* VULNERABILITY TRENDS GRAPHS */}
+        <VulnerabilityTrendsGroup />
+        {/* POLICY GRAPHS */}
+        <PolicyGroup />
+      </Stack>
       {/* ACTIVITIES AND CHANGELOGS */}
       <Stack spacing={4} mt={6}>
         <Heading size={'md'}>Activities</Heading>

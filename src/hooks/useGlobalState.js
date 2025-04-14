@@ -1,6 +1,7 @@
 import { sbomCheckReducer } from 'context/reducers'
 import { globalVulnReducer } from 'context/reducers'
 import {
+  analyticsReducer,
   prodCompReducer,
   prodReducer,
   prodVulnReducer,
@@ -151,6 +152,13 @@ const GlobalStateProvider = ({ children }) => {
     minEpss: 0,
     maxEpss: 0
   })
+  // ANALYTICS
+  const [analyticsState, analyticsDispatch] = useReducer(analyticsReducer, {
+    product: [],
+    label: null,
+    version: [],
+    duration: null
+  })
 
   const onChangeEnv = (env) => {
     localStorage.setItem('environment', env)
@@ -188,6 +196,7 @@ const GlobalStateProvider = ({ children }) => {
         labelIds,
         setLabelIds,
         supportState,
+        analyticsState,
         dispatch: {
           prodDispatch,
           prodCompDispatch,
@@ -197,7 +206,8 @@ const GlobalStateProvider = ({ children }) => {
           toolsDispatch,
           sbomCheckDispatch,
           globalVulnDispatch,
-          supportDispatch
+          supportDispatch,
+          analyticsDispatch
         }
       }}
     >

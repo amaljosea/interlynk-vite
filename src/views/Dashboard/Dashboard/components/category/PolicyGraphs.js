@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import { useQuery } from '@apollo/client'
 
-import { Heading, SimpleGrid, Stack } from '@chakra-ui/react'
+import { SimpleGrid } from '@chakra-ui/react'
 
 import LynkPieChart from 'components/Charts/LynkPieChart'
 
@@ -35,16 +35,11 @@ const PolicyGraphs = () => {
   ]
 
   return (
-    <Stack spacing={4} mt={6}>
-      <Heading size={'md'}>Policies</Heading>
-      <SimpleGrid columns={{ sm: 1, md: 3 }} spacing={5}>
-        <LynkPieChart
-          loading={loading}
-          title='Policy Results'
-          data={policyResults}
-        />
-      </SimpleGrid>
-    </Stack>
+    <LynkPieChart
+      loading={loading}
+      title='Policy Results'
+      data={policyResults}
+    />
   )
 }
 

@@ -3,12 +3,13 @@ import { useMemo } from 'react'
 import { SingleGraph } from 'views/Dashboard/Analytics/SingleGraph'
 import { getDays } from 'views/Dashboard/Analytics/utils'
 
-import { Stack, Text, useTheme } from '@chakra-ui/react'
+import { useTheme } from '@chakra-ui/react'
 
-import Card from 'components/Card/Card'
 import LynkLoader from 'components/Misc/LynkLoader'
 
+import useDateRange from 'hooks/useDateRange'
 import useFetchAllNodes from 'hooks/useFetchAllNodes'
+import { useGlobalState } from 'hooks/useGlobalState'
 
 const PatchVelocityMetrics = gql`
   query PatchVelocityMetrics(
@@ -53,11 +54,11 @@ const PatchVelocityMetrics = gql`
   }
 `
 
-const PatchVelocity = ({ filters }) => {
+const PatchVelocity = () => {
   const theme = useTheme()
-
-  const { product, label } = filters || {}
-  const { startDate, endDate } = filters?.duration || {}
+  const { analyticsState } = useGlobalState()
+  const { startDate, endDate } = useDateRange()
+  const { product, label } = analyticsState || {}
 
   const { dates } = getDays({ startDate, endDate })
 
@@ -68,7 +69,7 @@ const PatchVelocity = ({ filters }) => {
       labelIds: label?.length > 0 ? label : [],
       projectGroupIds: product?.length > 0 ? product?.map((p) => p.value) : []
     }),
-    [endDate, startDate, label, product]
+    [endDate, label, product, startDate]
   )
 
   const { data, loading } = useFetchAllNodes({
@@ -138,20 +139,7 @@ const PatchVelocity = ({ filters }) => {
 
   if (loading) return <LynkLoader />
 
-  return (
-    <Card>
-      <Stack h='90px' spacing={1} mb={4}>
-        <Text fontSize='lg' fontWeight='bold'>
-          Patch Velocity
-        </Text>
-        <Text fontSize='sm'>
-          Duration from vulnerability identification to when it is updated or
-          patched
-        </Text>
-      </Stack>
-      <SingleGraph data={vulnMetrics} lines={lines} averages={true} />
-    </Card>
-  )
+  return <SingleGraph data={vulnMetrics} lines={lines} averages={true} />
 }
 
 export default PatchVelocity

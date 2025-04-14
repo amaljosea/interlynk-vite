@@ -3,11 +3,11 @@ import { SingleGraph } from 'views/Dashboard/Analytics/SingleGraph'
 import { getDays } from 'views/Dashboard/Analytics/utils'
 import { formatDate } from 'views/Dashboard/Analytics/utils'
 
-import { Stack, Text, useTheme } from '@chakra-ui/react'
+import { useTheme } from '@chakra-ui/react'
 
-import Card from 'components/Card/Card'
 import LynkLoader from 'components/Misc/LynkLoader'
 
+import useDateRange from 'hooks/useDateRange'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 const VulnStatusMetrics = gql`
@@ -45,11 +45,11 @@ const VulnStatusMetrics = gql`
   }
 `
 
-const VulnByStatus = ({ filters }) => {
+const VulnByStatus = () => {
   const theme = useTheme()
-  const { envName } = useGlobalState()
-  const { version, product, duration, label } = filters || ''
-  const { startDate, endDate } = duration || ''
+  const { envName, analyticsState } = useGlobalState()
+  const { startDate, endDate } = useDateRange()
+  const { product, label, version } = analyticsState || {}
 
   const { dates } = getDays({ startDate, endDate })
 
@@ -136,20 +136,7 @@ const VulnByStatus = ({ filters }) => {
 
   if (loading) return <LynkLoader />
 
-  return (
-    <Card>
-      <Stack h='90px' spacing={1} mb={4}>
-        <Text fontSize='lg' fontWeight='bold'>
-          Vulnerabilities by Status
-        </Text>
-        <Text fontSize='sm'>
-          Number of vulnerabilities in included versions grouped by their
-          vulnerabilty status
-        </Text>
-      </Stack>
-      <SingleGraph lines={lines} data={statusMetrics} />
-    </Card>
-  )
+  return <SingleGraph lines={lines} data={statusMetrics} />
 }
 
 export default VulnByStatus

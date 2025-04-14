@@ -1,3 +1,5 @@
+import { useGlobalState } from 'hooks/useGlobalState'
+
 import { CustomSelect } from './Select'
 
 const getVersionOptions = (filters, env) => {
@@ -25,13 +27,16 @@ const getVersionOptions = (filters, env) => {
   return optionsFinal
 }
 
-export const VersionSelect = ({ env, value, onChange, filters }) => {
-  const options = getVersionOptions(filters, env)
+export const VersionSelect = ({ value, onChange }) => {
+  const { envName, analyticsState } = useGlobalState()
+  const { product } = analyticsState || {}
+
+  const options = getVersionOptions(analyticsState, envName)
 
   return (
     <CustomSelect
       isMulti
-      isDisabled={!filters?.product?.length}
+      isDisabled={!product?.length}
       label='Version'
       options={options}
       value={value}

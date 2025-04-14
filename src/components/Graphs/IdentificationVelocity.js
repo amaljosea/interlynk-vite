@@ -4,11 +4,11 @@ import { SingleGraph } from 'views/Dashboard/Analytics/SingleGraph'
 import { getDays } from 'views/Dashboard/Analytics/utils'
 import { formatDate } from 'views/Dashboard/Analytics/utils'
 
-import { Stack, Text, useTheme } from '@chakra-ui/react'
+import { useTheme } from '@chakra-ui/react'
 
-import Card from 'components/Card/Card'
 import LynkLoader from 'components/Misc/LynkLoader'
 
+import useDateRange from 'hooks/useDateRange'
 import useFetchAllNodes from 'hooks/useFetchAllNodes'
 
 const IdentityVelocityMetrics = gql`
@@ -54,22 +54,20 @@ const IdentityVelocityMetrics = gql`
   }
 `
 
-const IdentityVelocity = ({ filters }) => {
+const IdentityVelocity = () => {
   const theme = useTheme()
-
-  const { product, label } = filters || ''
-  const { startDate, endDate } = filters?.duration || {}
+  const { startDate, endDate } = useDateRange()
 
   const { dates } = getDays({ startDate, endDate })
 
   const variables = useMemo(
     () => ({
       endDate,
-      startDate,
-      labelIds: label?.length > 0 ? label : [],
-      projectGroupIds: product?.length > 0 ? product?.map((p) => p.value) : []
+      startDate
+      // labelIds: label?.length > 0 ? label : [],
+      // projectGroupIds: product?.length > 0 ? product?.map((p) => p.value) : []
     }),
-    [endDate, startDate, label, product]
+    [endDate, startDate]
   )
 
   const { data, loading } = useFetchAllNodes({
@@ -153,19 +151,7 @@ const IdentityVelocity = ({ filters }) => {
 
   if (loading) return <LynkLoader />
 
-  return (
-    <Card>
-      <Stack h='90px' spacing={1} mb={4}>
-        <Text fontSize='lg' fontWeight='bold'>
-          Resolution Velocity
-        </Text>
-        <Text fontSize='sm'>
-          Average number of days a vulnerability is present before resolution
-        </Text>
-      </Stack>
-      <SingleGraph data={vulnMetrics} lines={lines} averages={true} />
-    </Card>
-  )
+  return <SingleGraph data={vulnMetrics} lines={lines} averages={true} />
 }
 
 export default IdentityVelocity

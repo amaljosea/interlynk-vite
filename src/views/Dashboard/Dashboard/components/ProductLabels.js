@@ -6,8 +6,6 @@ import { Grid, GridItem, SimpleGrid, Stack } from '@chakra-ui/react'
 import { Tag, TagLabel, Text } from '@chakra-ui/react'
 import { Stat, StatGroup, StatNumber } from '@chakra-ui/react'
 
-import Card from 'components/Card/Card'
-import CardBody from 'components/Card/CardBody'
 import LynkLoader from 'components/Misc/LynkLoader'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -84,63 +82,54 @@ const ProductLabels = () => {
   if (total === 0) return null
 
   return (
-    <Card maxH='100%' overflowY='auto'>
-      {/* HEADING */}
-      <Text fontWeight={'semibold'}>Products by Label</Text>
-      <CardBody mt={6} h='100%'>
-        <Grid w={'100%'} templateColumns='repeat(12, 1fr)' gap={6}>
-          <GridItem colSpan={4}>
-            <StatGroup
-              pr={4}
-              h={'100%'}
-              alignItems={'center'}
-              borderRight={`1px solid ${grayBorderColor}`}
-            >
-              <Stat textAlign={'right'}>
-                <StatNumber
-                  fontWeight={'normal'}
-                  fontSize={['4xl', '5xl', '6xl']}
+    <Grid w={'100%'} templateColumns='repeat(12, 1fr)' gap={6}>
+      <GridItem colSpan={4}>
+        <StatGroup
+          pr={4}
+          h={'100%'}
+          alignItems={'center'}
+          borderRight={`1px solid ${grayBorderColor}`}
+        >
+          <Stat textAlign={'right'}>
+            <StatNumber fontWeight={'normal'} fontSize={['4xl', '5xl', '6xl']}>
+              {total || 0}
+            </StatNumber>
+          </Stat>
+        </StatGroup>
+      </GridItem>
+      <GridItem colSpan={8}>
+        <Stack>
+          {filterLabels?.map((item, index) => (
+            <SimpleGrid key={index} w={'100%'} columns={2} spacing={2}>
+              <Text
+                fontSize={'sm'}
+                cursor={'pointer'}
+                // color={item?.color}
+                _hover={{ color: primaryBlueText }}
+                onClick={() => handleFilter(item.id)}
+              >
+                {item?.label}
+              </Text>
+              <Tag
+                cursor={'pointer'}
+                bg={hexToRGBA(item?.color, 0.1)}
+                onClick={() => handleFilter(item.id)}
+                borderColor={hexToRGBA(item?.color, 0.4)}
+              >
+                <TagLabel
+                  mx={'auto'}
+                  fontSize={'sm'}
+                  color={item?.color}
+                  borderColor={hexToRGBA(item?.color, 0.4)}
                 >
-                  {total || 0}
-                </StatNumber>
-              </Stat>
-            </StatGroup>
-          </GridItem>
-          <GridItem colSpan={8}>
-            <Stack>
-              {filterLabels?.map((item, index) => (
-                <SimpleGrid key={index} w={'100%'} columns={2} spacing={2}>
-                  <Text
-                    fontSize={'sm'}
-                    cursor={'pointer'}
-                    // color={item?.color}
-                    _hover={{ color: primaryBlueText }}
-                    onClick={() => handleFilter(item.id)}
-                  >
-                    {item?.label}
-                  </Text>
-                  <Tag
-                    cursor={'pointer'}
-                    bg={hexToRGBA(item?.color, 0.1)}
-                    onClick={() => handleFilter(item.id)}
-                    borderColor={hexToRGBA(item?.color, 0.4)}
-                  >
-                    <TagLabel
-                      mx={'auto'}
-                      fontSize={'sm'}
-                      color={item?.color}
-                      borderColor={hexToRGBA(item?.color, 0.4)}
-                    >
-                      {item?.count}
-                    </TagLabel>
-                  </Tag>
-                </SimpleGrid>
-              ))}
-            </Stack>
-          </GridItem>
-        </Grid>
-      </CardBody>
-    </Card>
+                  {item?.count}
+                </TagLabel>
+              </Tag>
+            </SimpleGrid>
+          ))}
+        </Stack>
+      </GridItem>
+    </Grid>
   )
 }
 

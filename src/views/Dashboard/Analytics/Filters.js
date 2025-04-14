@@ -7,46 +7,44 @@ import LabelSelect from './Selects/LabelSelect'
 import { ProductSelect } from './Selects/ProductSelect'
 import { VersionSelect } from './Selects/VersionSelect'
 
-export const Filters = ({ filters, setFilters }) => {
-  const { envName } = useGlobalState()
+export const Filters = () => {
+  const { analyticsState, dispatch } = useGlobalState()
+  const { analyticsDispatch } = dispatch
+
+  const { product, label, version, duration } = analyticsState || {}
 
   const changeFilter = (key, value) => {
-    setFilters((filtersOld) => ({
-      ...filtersOld,
-      product: key === 'label' ? [] : filtersOld.product,
-      version: key === 'product' || key === 'label' ? [] : filtersOld.version,
-      [key]: value
-    }))
+    switch (key) {
+      case 'label':
+        return analyticsDispatch({ type: 'FILTER_LABEL', payload: value })
+      case 'product':
+        return analyticsDispatch({ type: 'FILTER_PRODUCT', payload: value })
+      case 'version':
+        return analyticsDispatch({ type: 'FILTER_VERSION', payload: value })
+      case 'duration':
+        return analyticsDispatch({ type: 'FILTER_DURATION', payload: value })
+      default:
+        return null
+    }
   }
 
   return (
     <SimpleGrid width='100%' columns={4} gap={5} alignItems='center'>
       <LabelSelect
-        value={filters.labels}
-        onChange={(value) => {
-          changeFilter('label', value)
-        }}
+        value={label}
+        onChange={(value) => changeFilter('label', value)}
       />
       <ProductSelect
-        filters={filters}
-        value={filters.product}
-        onChange={(value) => {
-          changeFilter('product', value)
-        }}
+        value={product}
+        onChange={(value) => changeFilter('product', value)}
       />
       <VersionSelect
-        env={envName}
-        filters={filters}
-        value={filters.version}
-        onChange={(value) => {
-          changeFilter('version', value)
-        }}
+        value={version}
+        onChange={(value) => changeFilter('version', value)}
       />
       <DurationSelect
-        value={filters.duration}
-        onChange={(value) => {
-          changeFilter('duration', value)
-        }}
+        value={duration}
+        onChange={(value) => changeFilter('duration', value)}
       />
     </SimpleGrid>
   )
