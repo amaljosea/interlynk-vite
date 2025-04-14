@@ -7,7 +7,7 @@ import { sbomOrigin } from 'variables/general'
 export const csvToJson = (csvContent) => {
   const rows = csvContent.trim().split('\n')
   const headers = rows[0].split(',')
-  
+
   return rows.slice(1).map((row) => {
     const values = row.split(',')
     return headers.reduce((acc, header, i) => {
@@ -746,4 +746,8 @@ export const getTotalDays = (dateString) => {
 
   const diffInMs = givenDate - today
   return Math.floor(diffInMs / (1000 * 60 * 60 * 24))
+}
+
+export const formatDate = (date) => {
+  return date ? new Date(date).toLocaleDateString() : 'N/A'
 }
