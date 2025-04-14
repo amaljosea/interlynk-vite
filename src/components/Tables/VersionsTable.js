@@ -2,7 +2,7 @@ import { gql, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { useCallback, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { getSignedUrlParams } from 'utils'
+import { getSignedUrlParams, getUndefinedIfEmptyOrAll } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import LifecycleModal from 'views/Dashboard/Products/components/LifecycleModal'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
@@ -65,7 +65,7 @@ export const GetProjectDetails = gql`
 `
 
 const VersionsTable = (props) => {
-  const { handleSort, retentionTime, filters, setFilters } = props
+  const { retentionTime } = props
 
   const navigate = useNavigate()
   const params = useParams()
@@ -80,8 +80,8 @@ const VersionsTable = (props) => {
     setSelectedSbom,
     onClearSelection
   } = useGlobalState()
-  const { searchInput } = versionState
-  const { prodVulnDispatch, prodCompDispatch } = dispatch
+  const { field, direction, searchInput, lifestage } = versionState
+  const { prodVulnDispatch, prodCompDispatch, versionDispatch } = dispatch
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
   const [filterText, setFilterText] = useState(searchInput)
@@ -129,7 +129,10 @@ const VersionsTable = (props) => {
         : 'project.sbomVersions',
       variables: {
         id: productId,
-        ...filters
+        field: field,
+        direction: direction,
+        lifestage: getUndefinedIfEmptyOrAll(lifestage),
+        search: searchInput === '' ? undefined : searchInput
       },
       onCompleted: () => setClearSelect(!clearSelect)
     })
@@ -173,24 +176,12 @@ const VersionsTable = (props) => {
     setSelectedSbom(state?.selectedRows)
   }
 
-  const setSearchFilter = useCallback(
-    (value) => {
-      setFilters((oldFilter) => ({
-        ...oldFilter,
-        search: value
-      }))
-    },
-    [setFilters]
-  )
-
   // CLEAR SERACH
   const handleClear = useCallback(async () => {
     setFilterText('')
-    setFilters((oldFilter) => ({
-      ...oldFilter,
-      search: undefined
-    }))
-  }, [setFilters])
+    versionDispatch({ type: 'CLEAR_SEARCH_INPUT' })
+    reset()
+  }, [versionDispatch, reset])
 
   // ON SEARCH INPUT CHANGE
   const onSearchInputChange = useCallback(
@@ -207,26 +198,15 @@ const VersionsTable = (props) => {
 
   // SEARCH COMPONENT
   const handleSearch = useCallback(
-    (event) => {
-      const {
-        key,
-        target: { value }
-      } = event
-      if (key === 'Enter' && value !== '') {
-        setSearchFilter(value)
+    async (event) => {
+      const { value } = event.target
+      if (event.key === 'Enter' && value !== '') {
+        versionDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+        reset()
       }
     },
-    [setSearchFilter]
+    [versionDispatch, reset]
   )
-
-  const onFilterLifestage = (value) => {
-    setFilters((prev) => ({
-      ...prev,
-      lifestage: value?.includes('all') ? [] : value
-    }))
-    reset()
-  }
-
   const action = (type, data) => {
     setActiveRow(data)
     switch (type) {
@@ -259,6 +239,11 @@ const VersionsTable = (props) => {
     }
   }
 
+  const onFilterLifestage = (value) => {
+    versionDispatch({ type: 'FILTER_LIFESTAGE', payload: value })
+    reset()
+  }
+
   // COLUMNS
   const columns = VersionColumns({
     action,
@@ -269,9 +254,8 @@ const VersionsTable = (props) => {
   })
 
   const subHeader = VersionHeader({
-    filters,
-    onFilterLifestage,
     filterText,
+    onFilterLifestage,
     onSearchInputChange,
     handleClear,
     handleSearch,
@@ -290,6 +274,16 @@ const VersionsTable = (props) => {
     return false
   }
 
+  const handleSort = (column, sortDirection) => {
+    versionDispatch({
+      type: 'SET_SORT_ORDER',
+      payload: {
+        field: column.id,
+        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      }
+    })
+  }
+
   const existingSbom = nodes?.length > 0 ? nodes[0] : null
 
   return (
@@ -299,7 +293,7 @@ const VersionsTable = (props) => {
           columns={columns}
           data={nodes || []}
           onSort={handleSort}
-          defaultSortFieldId={filters?.field}
+          defaultSortFieldId={field}
           subHeader
           subHeaderComponent={subHeader}
           progressPending={loading}

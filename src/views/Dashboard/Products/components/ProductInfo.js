@@ -1,7 +1,11 @@
 import { addDays, differenceInDays, parseISO } from 'date-fns'
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getSignedUrlParams, truncatedValue } from 'utils'
+import {
+  getSignedUrlParams,
+  getUndefinedIfEmptyOrAll,
+  truncatedValue
+} from 'utils'
 
 import { Search2Icon } from '@chakra-ui/icons'
 import { Flex, Icon, IconButton, Stack, Text, Tooltip } from '@chakra-ui/react'
@@ -10,6 +14,7 @@ import { SettingsTag } from 'components/Misc/SettingsTag'
 
 import useFetchAllNodes from 'hooks/useFetchAllNodes'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetVersionsDate } from 'graphQL/Queries'
@@ -19,10 +24,14 @@ import { FaBug, FaRobot, FaTag, FaWindowMaximize } from 'react-icons/fa6'
 import { IoMdWarning } from 'react-icons/io'
 import { TbActivity } from 'react-icons/tb'
 
-const ProductInfo = ({ settings, data, filters, handleSort }) => {
+const ProductInfo = ({ settings, data }) => {
   const params = useParams()
+  const { versionState, dispatch } = useGlobalState()
   const signedUrlParams = getSignedUrlParams()
   const { isFreeTier } = useGlobalQueryContext()
+
+  const { field, direction, searchInput, lifestage } = versionState
+  const { versionDispatch } = dispatch
 
   const { name, description } = data || ''
 
@@ -47,9 +56,12 @@ const ProductInfo = ({ settings, data, filters, handleSort }) => {
   const variables = useMemo(
     () => ({
       id: params?.productid,
-      ...filters
+      field: field,
+      direction: direction,
+      lifestage: getUndefinedIfEmptyOrAll(lifestage),
+      search: searchInput === '' ? undefined : searchInput
     }),
-    [params?.productid, filters]
+    [direction, field, lifestage, params?.productid, searchInput]
   )
 
   const { data: versionDates } = useFetchAllNodes({
@@ -58,6 +70,16 @@ const ProductInfo = ({ settings, data, filters, handleSort }) => {
     selector: 'project.sbomVersions',
     skip: signedUrlParams
   })
+
+  const handleSort = (column, sortDirection) => {
+    versionDispatch({
+      type: 'SET_SORT_ORDER',
+      payload: {
+        field: column?.id,
+        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      }
+    })
+  }
 
   useEffect(() => {
     if (versionDates && dataRetentionDays) {
