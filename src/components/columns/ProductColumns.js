@@ -25,6 +25,7 @@ import {
   Tooltip
 } from '@chakra-ui/react'
 
+import ExpandableText from 'components/ExpandableText'
 import IconBox from 'components/Icons/IconBox'
 import ProdLabel from 'components/Label/ProdLabel'
 import EnvList from 'components/Misc/EnvList'
@@ -163,9 +164,7 @@ const ProductColumns = (props) => {
                     <ProdLabel key={index} item={item} />
                   ))}
                 </Flex>
-                <Text color={primaryTextColor} pr={32} wordBreak={'break-all'}>
-                  {description}
-                </Text>
+                <ExpandableText text={description} />
               </Stack>
             </Flex>
           )
