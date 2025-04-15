@@ -2,7 +2,7 @@ import { useQuery } from '@apollo/client'
 import { useNavigate } from 'react-router-dom'
 import { hexToRGBA } from 'utils/styleUtils'
 
-import { Grid, GridItem, SimpleGrid, Stack } from '@chakra-ui/react'
+import { Center, Grid, GridItem, SimpleGrid, Stack } from '@chakra-ui/react'
 import { Tag, TagLabel, Text } from '@chakra-ui/react'
 import { Stat, StatGroup, StatNumber } from '@chakra-ui/react'
 
@@ -16,10 +16,8 @@ import { getProductsByLabels } from 'graphQL/Queries'
 const ProductLabels = () => {
   const navigate = useNavigate()
   const { organization, dispatch } = useGlobalState()
-  const { grayBorderColor, primaryBlueText } = useThemeColor([
-    'grayBorderColor',
-    'primaryBlueText'
-  ])
+  const { grayBorderColor, primaryBlueText, secondaryTextColor } =
+    useThemeColor(['grayBorderColor', 'primaryBlueText', 'secondaryTextColor'])
 
   const { prodDispatch } = dispatch
 
@@ -79,7 +77,12 @@ const ProductLabels = () => {
 
   if (loading) return <LynkLoader />
 
-  if (total === 0) return null
+  if (total === 0)
+    return (
+      <Center h={'full'} justifyContent={'center'} alignItems={'center'}>
+        <Text color={secondaryTextColor}>No record to display</Text>
+      </Center>
+    )
 
   return (
     <Grid w={'100%'} templateColumns='repeat(12, 1fr)' gap={6}>

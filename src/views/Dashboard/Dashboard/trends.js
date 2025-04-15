@@ -32,12 +32,14 @@ import VulnAge from 'components/Graphs/VulnAge'
 import VulnBySeverity from 'components/Graphs/VulnBySeverity'
 import VulnByStatus from 'components/Graphs/VulnByStatus'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { LuLayoutGrid, LuLayoutList, LuPlus } from 'react-icons/lu'
 
 function VulnerabilityTrendsGroup() {
   const { selectedTrends } = useGlobalState()
+  const { isFreeTier } = useGlobalQueryContext()
 
   const [trendCards, setTrendCards] = useState([
     {
@@ -59,28 +61,28 @@ function VulnerabilityTrendsGroup() {
       key: 'defect_density',
       title: 'Defect Density',
       desc: 'Percentage of identified vulnerabilities that are updated or patched',
-      content: <DefectDensity />
+      content: !isFreeTier ? <DefectDensity /> : null
     },
     {
       id: '4',
       key: 'resolution_age',
       title: 'Resolution Age',
       desc: 'Total number of days all vulnerabilities are present before resolution',
-      content: <VulnAge />
+      content: !isFreeTier ? <VulnAge /> : null
     },
     {
       id: '5',
       key: 'resotion_velocity',
       title: 'Resolution Velocity',
       desc: 'Average number of days a vulnerability is present before resolution',
-      content: <IdentityVelocity />
+      content: !isFreeTier ? <IdentityVelocity /> : null
     },
     {
       id: '6',
       key: 'patch_velocity',
       title: 'Patch Velocity',
       desc: 'Duration from vulnerability identification to when it is updated or patched',
-      content: <PatchVelocity />
+      content: !isFreeTier ? <PatchVelocity /> : null
     }
   ])
 

@@ -39,6 +39,8 @@ export function DashboardCard({
     transition
   }
 
+  if (!content) return null
+
   return (
     <Card ref={setNodeRef} style={style} rounded='lg' bg={lightAndDarkBgColor}>
       <CardHeader h={desc ? '24' : 'auto'}>

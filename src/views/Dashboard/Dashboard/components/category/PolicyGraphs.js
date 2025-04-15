@@ -1,7 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import { useQuery } from '@apollo/client'
 
-import { SimpleGrid } from '@chakra-ui/react'
 
 import LynkPieChart from 'components/Charts/LynkPieChart'
 

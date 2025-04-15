@@ -26,6 +26,7 @@ import {
 
 import { DashboardCard } from 'components/DashboardCard'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { LuLayoutGrid, LuLayoutList, LuPlus } from 'react-icons/lu'
@@ -36,6 +37,7 @@ import VersionLifestages from './components/VersionLifestage'
 
 function ProductGroup() {
   const { selectedProducts } = useGlobalState()
+  const { isFreeTier } = useGlobalQueryContext()
 
   const [productCards, setProductCards] = useState([
     {
@@ -54,7 +56,7 @@ function ProductGroup() {
       id: '3',
       key: 'products_by_labels',
       title: 'Products by Label',
-      content: <ProductLabels />
+      content: !isFreeTier ? <ProductLabels /> : null
     }
   ])
   const [isGridLayout, setIsGridLayout] = useState(true)

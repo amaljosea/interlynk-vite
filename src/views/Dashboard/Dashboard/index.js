@@ -12,6 +12,7 @@ import CustomLoader from 'components/CustomLoader'
 import GlobalEnvFilter from 'components/Misc/GlobalEnvFilter'
 import GlobalLabelFilter from 'components/Misc/GlobalLabelFilter'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
 
@@ -27,6 +28,7 @@ import VulnerabilityGroup from './vulnerabilities'
 export default function Page() {
   const { setIsOpen } = useTour()
   const product = useQueryParam('id')
+  const { isFreeTier } = useGlobalQueryContext()
   const { dispatch, envName, organization, labelIds, setLabelIds } =
     useGlobalState()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
@@ -101,7 +103,7 @@ export default function Page() {
           {/* ENVIRONMENT FILTER */}
           {organization && <GlobalEnvFilter />}
           {/* GRAPH CARD LIGHT */}
-          <CardList />
+          {!isFreeTier && <CardList />}
         </Flex>
       </Flex>
       <Stack spacing={10}>
