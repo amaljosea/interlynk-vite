@@ -1,6 +1,12 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { getDate, getFullDate, getTotalDays, timeSince } from 'utils'
+import {
+  formatDate,
+  getDate,
+  getFullDate,
+  getTotalDays,
+  timeSince
+} from 'utils'
 import { assessmentExpiryWarning } from 'variables/general'
 
 import { EditIcon } from '@chakra-ui/icons'
@@ -111,9 +117,6 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
     spacing: 0,
     borderBottom: `1px solid ${grayBorderColor}`
   }
-
-  const formatDate = (date) =>
-    date ? new Date(date).toLocaleDateString() : 'N/A'
 
   const assessment = manual.level ? 'Manual' : 'Automatic'
 
