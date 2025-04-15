@@ -81,7 +81,6 @@ const ProductsOverview = ({ loading, title, data }) => {
     {
       id: 'PRODUCT',
       name: 'PRODUCT',
-      compact: true,
       wrap: true,
       selector: (row) => {
         const { id, project } = row
@@ -256,7 +255,6 @@ const ProductsOverview = ({ loading, title, data }) => {
     {
       id: 'IMPORTED',
       name: 'IMPORTED',
-      compact: true,
       wrap: true,
       right: 'true',
       selector: (row) => {
