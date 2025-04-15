@@ -14,21 +14,17 @@ const SupportExpanded = (props) => {
       componentSupportLevel: manual,
       componentSupportLevelAutomatic: automatic
     } = data || {}
-    const { user, retainManualOverrideFor, updatedAt } = manual || {}
+    const {
+      user,
+      retainManualOverrideFor,
+      updatedAt,
+      endOfSupport: endDate
+    } = manual || {}
 
     const assessment = manual?.level ? 'Manual' : 'Automatic'
-
-    // AUTOMATIC SUPPORT LEVEL
-    const systemSupportLevel = automatic?.level
-      ? automatic?.level?.replaceAll('_', ' ')
-      : 'N/A'
-    const systemNotes = automatic?.notes || 'N/A'
-
-    // MANNUAL SUPPORT LEVEL
-    const manualSupportLevel = manual?.level
-      ? manual?.level?.replaceAll('_', ' ')
-      : 'N/A'
-    const manualNotes = manual?.notes || 'N/A'
+    const supportLevel = manual?.level || automatic?.level
+    const explanation = manual?.notes || automatic?.notes
+    const endOfSupport = endDate ? getFullDate(endDate) : 'N/A'
     const assessmentExpiresOn = calculateExpiryDate(retainManualOverrideFor)
     const assessedBy = user?.name || 'N/A'
     const lastAssessed = updatedAt ? getFullDate(updatedAt) : 'N/A'
@@ -39,32 +35,26 @@ const SupportExpanded = (props) => {
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
         <Grid templateColumns='repeat(4, 1fr)' py={2} gap={6}>
-          {/* PART */}
-          <DetailItem label='Version' value={version} />
+          {/* COMPONENT VERSION */}
+          <DetailItem label='Component Version' value={version} />
+          {/* SYSTEM LEVEL */}
+          <DetailItem
+            label='Level'
+            value={supportLevel?.replaceAll('_', ' ') || 'N/A'}
+            valueStyle={{ textTransform: 'capitalize' }}
+          />
+          {/* END OF SUPPORT */}
+          <DetailItem label='End of Support' value={endOfSupport} />
+          {/* EXPLANATION */}
+          <DetailItem label='Explanation' value={explanation} />
           {/* ASSESSMENT */}
           <DetailItem label='Assessment' value={assessment} />
-          {/* SYSTEM LEVEL */}
-          <DetailItem
-            label='Level (Auto Suggested)'
-            value={systemSupportLevel}
-            valueStyle={{ textTransform: 'capitalize' }}
-          />
-          {/* SYSTEM LEVEL */}
-          <DetailItem
-            label='Level (Manual Override)'
-            value={manualSupportLevel}
-            valueStyle={{ textTransform: 'capitalize' }}
-          />
           {/* ASSESSED DATE */}
           <DetailItem label='Last Assessed' value={lastAssessed} />
           {/* ASSESSED BY */}
           <DetailItem label='Last Assessed By' value={assessedBy} />
-          {/* INTERNAL NOTES */}
-          <DetailItem label='Notes (Auto Suggested)' value={systemNotes} />
-          {/* SYSTEM NOTES */}
-          <DetailItem label='Notes (Manual Override)' value={manualNotes} />
           {/* ASSESSMENT EXPIERS ON */}
-          {manualSupportLevel !== 'no_longer_maintained' && (
+          {supportLevel !== 'no_longer_maintained' && (
             <DetailItem
               label='Assessment Expires On'
               value={assessmentExpiresOn}

@@ -116,19 +116,10 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
 
   const assessment = manual?.level ? 'Manual' : 'Automatic'
 
-  // AUTOMATIC SUPPORT LEVEL
-  const systemSupportLevel = automatic?.level
-    ? automatic?.level?.replaceAll('_', ' ')
-    : 'N/A'
-  const systemNotes = automatic?.notes || 'N/A'
-
-  // MANNUAL SUPPORT LEVEL
-  const manualSupportLevel = manual?.level
-    ? manual?.level?.replaceAll('_', ' ')
-    : 'N/A'
+  const supportLevel = manual?.level || automatic?.level
+  const explanation = manual?.notes || automatic?.notes
   const endOfSupport = manual?.endDate
   const assessmentExpiresOn = manual?.retainManualOverrideFor
-  const manualNotes = manual?.notes || 'N/A'
   const assessedBy = manual?.user?.name
   const lastAssessed = manual?.updatedAt
 
@@ -163,15 +154,9 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
           <Text {...infoStyle}>{assessment}</Text>
         </Stack>
         <Stack {...container}>
-          <Text {...label}>{`Level (Auto Suggested)`}</Text>
+          <Text {...label}>{`Level`}</Text>
           <Text {...infoStyle} textTransform={'capitalize'}>
-            {systemSupportLevel}
-          </Text>
-        </Stack>
-        <Stack {...container}>
-          <Text {...label}>{`Level (Manual Override)`}</Text>
-          <Text {...infoStyle} textTransform={'capitalize'}>
-            {manualSupportLevel}
+            {supportLevel?.replaceAll('_', ' ') || 'N/A'}
           </Text>
         </Stack>
         <Stack {...container}>
@@ -180,10 +165,7 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
             {endOfSupport ? new Date(endOfSupport).toLocaleDateString() : 'N/A'}
           </Text>
         </Stack>
-        <Stack
-          {...container}
-          hidden={manualSupportLevel === 'no_longer_maintained'}
-        >
+        <Stack {...container} hidden={supportLevel === 'no_longer_maintained'}>
           <Text {...label}>Assessment Expires On</Text>
           <Text {...infoStyle} textTransform={'capitalize'}>
             {assessmentExpiresOn
@@ -192,16 +174,8 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
           </Text>
         </Stack>
         <Stack {...container}>
-          <Text {...label}>{`Notes (Auto Suggested)`}</Text>
-          <Text {...infoStyle}>
-            {systemNotes}
-          </Text>
-        </Stack>
-        <Stack {...container}>
-          <Text {...label}>{`Notes (Manual Override)`}</Text>
-          <Text {...infoStyle}>
-            {manualNotes}
-          </Text>
+          <Text {...label}>{`Explanation`}</Text>
+          <Text {...infoStyle}>{explanation}</Text>
         </Stack>
         <Stack {...container}>
           <Text {...label}>Last Assessed By</Text>
