@@ -102,8 +102,8 @@ const CompSupport = ({ data, isOpen, onClose, enableSupportLevel }) => {
 
 const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
   const {
-    componentSupportLevel: manual = {},
-    componentSupportLevelAutomatic: automatic = {}
+    componentSupportLevel: manual,
+    componentSupportLevelAutomatic: automatic
   } = data || {}
 
   const { sameSecondaryText, grayBorderColor, primaryErrorColor } =
@@ -118,19 +118,19 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
     borderBottom: `1px solid ${grayBorderColor}`
   }
 
-  const assessment = manual.level ? 'Manual' : 'Automatic'
+  const assessment = manual?.level ? 'Manual' : 'Automatic'
 
-  const systemSupportLevel = automatic.level?.replaceAll('_', ' ') || 'N/A'
-  const systemNotes = automatic.notes || 'N/A'
+  const systemSupportLevel = automatic?.level?.replaceAll('_', ' ') || 'N/A'
+  const systemNotes = automatic?.notes || 'N/A'
 
-  const manualSupportLevel = manual.level?.replaceAll('_', ' ') || 'N/A'
-  const endOfSupport = formatDate(manual.endDate)
+  const manualSupportLevel = manual?.level?.replaceAll('_', ' ') || 'N/A'
+  const endOfSupport = formatDate(manual?.endDate)
   const assessmentExpiresOn = formatDate(
-    getDate(manual.retainManualOverrideFor)
+    getDate(manual?.retainManualOverrideFor)
   )
-  const manualNotes = manual.notes || 'N/A'
-  const assessedBy = manual.user?.name || 'N/A'
-  const lastAssessed = manual.updatedAt
+  const manualNotes = manual?.notes || 'N/A'
+  const assessedBy = manual?.user?.name || 'N/A'
+  const lastAssessed = manual?.updatedAt
 
   return (
     <Stack spacing={4} mt={3}>
