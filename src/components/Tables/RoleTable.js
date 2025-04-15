@@ -160,6 +160,7 @@ const RoleTable = () => {
           label='Add Role'
           onClick={onRoleOpen}
           isDisabled={!updateOrgs}
+          data-testid='add_role'
         />
       </Flex>
     )

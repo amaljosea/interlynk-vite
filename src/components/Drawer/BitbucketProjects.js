@@ -53,7 +53,8 @@ const BitbucketProjects = ({ isOpen, onClose }) => {
       fullName: item?.fullName,
       slug: item?.slug,
       workspace: item?.workspace,
-      mainbranch: item?.mainbranch
+      mainbranch: item?.mainbranch,
+      projectName: item?.projectName
     }))
 
   const handleSubmit = () => {

@@ -14,7 +14,7 @@ import Card from 'components/Card/Card'
 import ShareLynkDrawer from 'components/Drawer/ShareLynkDrawer'
 import TagDrawer from 'components/Drawer/TagDrawer'
 import LynkTable from 'components/LynkTable'
-import BitbucketProjects from 'components/Modal/BitbucketProjects'
+import BitbucketProjects from 'components/Drawer/BitbucketProjects'
 import ProductColumns from 'components/columns/ProductColumns'
 import ProductHeader from 'components/headers/ProductHeader'
 

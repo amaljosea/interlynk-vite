@@ -94,6 +94,7 @@ const ProductHeader = (props) => {
               <IconButton
                 colorScheme='blue'
                 icon={<FaBitbucket />}
+                aria-label='import_bitbucket_projects'
                 onClick={() => action('import_bitbucket', null)}
               />
             </Tooltip>
