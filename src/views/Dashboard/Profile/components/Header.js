@@ -4,13 +4,12 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { truncatedValue } from 'utils'
 
-import { ChevronDownIcon, EditIcon } from '@chakra-ui/icons'
+import { ChevronDownIcon } from '@chakra-ui/icons'
 import {
   Avatar,
   Box,
   Button,
   Flex,
-  IconButton,
   Input,
   Menu,
   MenuButton,
@@ -21,12 +20,12 @@ import {
   Tag,
   TagLabel,
   Text,
-  Tooltip,
   useDisclosure
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
+import EditButton from 'components/Icons/EditButton'
 import LynkAlert from 'components/LynkAlert'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -337,28 +336,15 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
             </Flex>
           </Flex>
           <Flex gap={2}>
-            {isPersonal ? (
-              <Tooltip label='Edit Profile'>
-                <IconButton
-                  aria-label='Edit'
-                  icon={<EditIcon />}
-                  colorScheme='blue'
-                  variant='solid'
-                  onClick={handleEditProfileClick}
-                />
-              </Tooltip>
-            ) : (
-              <Tooltip label={'Edit Organization'} placement={'left'}>
-                <IconButton
-                  variant='solid'
-                  aria-label='Edit'
-                  colorScheme='blue'
-                  icon={<EditIcon />}
-                  isDisabled={!canEditOrg}
-                  onClick={handleEditOrgClick}
-                />
-              </Tooltip>
-            )}
+            <EditButton
+              type={'primary'}
+              size={'md'}
+              aria-label='Edit'
+              tooltip={isPersonal ? 'Edit Profile' : 'Edit Organization'}
+              tooltipPlacement='left'
+              isDisabled={!isPersonal && !canEditOrg}
+              onClick={isPersonal ? handleEditProfileClick : handleEditOrgClick}
+            />
           </Flex>
         </CardBody>
       </Card>

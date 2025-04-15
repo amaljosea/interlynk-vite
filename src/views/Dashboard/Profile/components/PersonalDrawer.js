@@ -4,19 +4,11 @@ import Cookies from 'js-cookie'
 import { useEffect, useState } from 'react'
 import { nameValidation, validPassword } from 'utils/formValidationUtils'
 
-import { EditIcon } from '@chakra-ui/icons'
-import {
-  Avatar,
-  Box,
-  Flex,
-  IconButton,
-  Stack,
-  Text,
-  Tooltip
-} from '@chakra-ui/react'
+import { Avatar, Box, Flex, Stack, Text } from '@chakra-ui/react'
 import { Input, InputGroup, InputRightElement } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
+import EditButton from 'components/Icons/EditButton'
 import LynkDrawer from 'components/LynkDrawer'
 import ToggleVisibilityButton from 'components/Misc/ToggleVisibilityButton'
 
@@ -255,14 +247,13 @@ const PersonalDrawer = ({ isOpen, onClose, inputRef }) => {
           />
           {/* Only show Avatar when there's an image */}
           <Flex ml='auto' gap={2}>
-            <Tooltip placement='left' label='Upload Profile Picture'>
-              <IconButton
-                icon={<EditIcon />}
-                aria-label='Edit Profile Picture'
-                variant='outline'
-                onClick={onProfileClick}
-              />
-            </Tooltip>
+            <EditButton
+              size='md'
+              tooltip={'Upload Profile Picture'}
+              aria-label='Edit Profile Picture'
+              onClick={onProfileClick}
+              tooltipPlacement='left'
+            />
           </Flex>
         </Flex>
 
@@ -293,14 +284,13 @@ const PersonalDrawer = ({ isOpen, onClose, inputRef }) => {
                 placeholder='************'
               />
             </FormControl>
-            <Tooltip label='Edit Password'>
-              <IconButton
-                variant='outline'
-                icon={<EditIcon />}
-                aria-label='Edit Password'
-                onClick={() => setIsPasswordEdit(true)}
-              />
-            </Tooltip>
+            <EditButton
+              size={'md'}
+              aria-label='Edit Password'
+              onClick={() => setIsPasswordEdit(true)}
+              tooltip={'Edit Password'}
+              tooltipPlacement={'left'}
+            />
           </Flex>
         )}
 

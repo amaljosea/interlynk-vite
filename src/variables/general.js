@@ -4,6 +4,7 @@ import NTIA from 'assets/img/ntia.jpg'
 import { capitalizeFirstLetter, getFullDate } from 'utils'
 import { parseLicenseString } from 'utils'
 import { calculateExpiryDate } from 'utils'
+import { formatDate } from 'utils'
 
 import { Stack, Text } from '@chakra-ui/react'
 
@@ -1452,8 +1453,8 @@ export const exportCsvTableConfig = {
       'Support Explanation',
       'Assessment Expires On'
     ],
-    mapDataForExport: (data, filters) => {
-      return data.map((row) => {
+    mapDataForExport: (data, filters) =>
+      data.map((row) => {
         const {
           name,
           version,
@@ -1461,56 +1462,59 @@ export const exportCsvTableConfig = {
           componentSupportLevel: manual,
           componentSupportLevelAutomatic: automatic
         } = row || {}
-        const { endDate, user, notes, updatedAt, retainManualOverrideFor } =
-          manual || {}
+
+        const {
+          endDate,
+          user,
+          notes,
+          updatedAt,
+          retainManualOverrideFor,
+          level: manualLevel
+        } = manual || {}
 
         const { projectVersion, project } = sbom || {}
         const { projectGroup } = project || {}
 
-        const supportLevel = manual?.level || automatic?.level
+        const supportLevel = manualLevel || automatic?.level
+        const formattedSupportLevel = supportLevel
+          ? capitalizeFirstLetter(supportLevel.replaceAll('_', ' '))
+          : 'N/A'
 
         return {
-          Name: name,
+          Name: name || 'N/A',
           Version: version || 'N/A',
           Part: filters?.includeParts
-            ? `${projectGroup?.name} ${projectVersion && `: ${projectVersion}`}`
+            ? `${projectGroup?.name || ''}${
+                projectVersion ? `: ${projectVersion}` : ''
+              }`
             : 'N/A',
           Assessment: user?.name ? 'Manual' : 'Automatic',
-          'Support Level': capitalizeFirstLetter(
-            supportLevel?.replaceAll('_', ' ')
-          ),
-          'End Of Support': endDate
-            ? new Date(endDate).toLocaleDateString()
-            : 'N/A',
-          'Last Assessed': updatedAt
-            ? new Date(updatedAt).toLocaleDateString()
-            : 'N/A',
+          'Support Level': formattedSupportLevel,
+          'End Of Support': formatDate(endDate),
+          'Last Assessed': formatDate(updatedAt),
           'Last Assessed By': user?.name || 'N/A',
           'Support Explanation': notes || 'N/A',
-          Updated: updatedAt ? new Date(updatedAt).toLocaleDateString() : 'N/A',
+          Updated: formatDate(updatedAt),
           'Assessment Expires On': calculateExpiryDate(retainManualOverrideFor)
         }
       })
-    }
   },
   Users: {
     defaultSelectedColumns: ['Name', 'Email', 'Role', 'Joined', 'Status'],
     additionalColumns: [],
-    mapDataForExport: (data) => {
-      return data?.map((row) => {
-        const { email, name, role, invitationAcceptedAt, invitationStatus } =
-          row || {}
+    mapDataForExport: (data) =>
+      data?.map((row = {}) => {
+        const { name, email, role, invitationAcceptedAt, invitationStatus } =
+          row
+
         return {
           Name: name || 'N/A',
           Email: email || 'N/A',
           Role: role?.name || 'N/A',
-          Joined: invitationAcceptedAt
-            ? new Date(invitationAcceptedAt).toLocaleDateString()
-            : 'N/A',
+          Joined: formatDate(invitationAcceptedAt),
           Status: invitationStatus?.replace(/_/g, ' ') || 'N/A'
         }
       })
-    }
   }
 }
 
