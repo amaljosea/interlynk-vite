@@ -91,6 +91,7 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
       id: 'COMPONENTS',
       name: 'COMPONENTS',
       compact: true,
+      wrap: true,
       selector: (row) => {
         const { stats } = row || {}
         return (
@@ -98,12 +99,12 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
             <TagLabel mx={'auto'}>{stats?.compCount}</TagLabel>
           </Tag>
         )
-      },
-      wrap: true
+      }
     },
     {
       id: 'LICENSES',
       name: 'LICENSES',
+      wrap: true,
       selector: (row) => {
         const { stats } = row || {}
         return (
@@ -117,12 +118,12 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
             <TagLabel mx={'auto'}>{stats?.compLicenseCount}</TagLabel>
           </Tag>
         )
-      },
-      wrap: true
+      }
     },
     {
       id: 'STATUS',
       name: 'STATUS',
+      wrap: true,
       selector: (row) => {
         const { lifecycle } = row || {}
         return (
@@ -130,14 +131,13 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
             <TagLabel mx={'auto'}>{lifecycle}</TagLabel>
           </Tag>
         )
-      },
-
-      right: true,
-      wrap: true
+      }
     },
     {
       id: 'IMPORTED',
       name: 'IMPORTED',
+      right: true,
+      wrap: true,
       selector: (row) => {
         const { createdAt } = row || {}
         return (
@@ -145,13 +145,13 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
             <Text color={primaryTextColor}>{timeSince(createdAt)}</Text>
           </Tooltip>
         )
-      },
-      right: true,
-      wrap: true
+      }
     },
     {
       id: 'UPDATED',
       name: 'UPDATED',
+      right: true,
+      wrap: true,
       selector: (row) => {
         const { updatedAt } = row || {}
         return (
@@ -159,14 +159,14 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
             <Text color={primaryTextColor}>{timeSince(updatedAt)}</Text>
           </Tooltip>
         )
-      },
-      right: true,
-      wrap: true
+      }
     },
     {
       id: 'ACTIONS',
       name: 'ACTIONS',
       compact: true,
+      right: true,
+      wrap: true,
       selector: (row) => (
         <Tooltip label={'Promote to version'} placement='top'>
           <IconButton
@@ -177,9 +177,7 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
             onClick={() => handleWarning(row)}
           />
         </Tooltip>
-      ),
-      right: true,
-      wrap: true
+      )
     }
   ]
 
