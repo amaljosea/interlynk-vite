@@ -5,11 +5,11 @@ import { getSignedUrlParams } from 'utils'
 import CompDrawer from 'views/Dashboard/Products/components/CompDrawer'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 
-import { EditIcon } from '@chakra-ui/icons'
 import { Flex, IconButton, Tooltip, useDisclosure } from '@chakra-ui/react'
 
 import SystemLogs from 'components/Drawer/SystemLogs'
 import DeleteButton from 'components/Icons/DeleteButton'
+import EditButton from 'components/Icons/EditButton'
 import PrimaryTreeView from 'components/PrimaryTreeView'
 import ReleaseDate from 'components/ReleaseDate'
 import SbomDownload from 'components/SbomDownload'
@@ -199,15 +199,14 @@ const SbomActions = ({ sbom }) => {
     <>
       <Flex gap={1} alignItems={'center'} justifyContent={'flex-end'}>
         {/* UPDATE PRIMARY COMPONENT */}
-        <Tooltip label={updateLabel} isDisabled={false}>
-          <IconButton
-            colorScheme='blue'
-            icon={<EditIcon />}
-            onClick={handleEditSbom}
-            display={signedUrlParams ? 'none' : 'flex'}
-            isDisabled={status === 'signed' || !updateSboms || noPrimaryComp}
-          />
-        </Tooltip>
+        <EditButton
+          size={'md'}
+          type={'primary'}
+          tooltip={updateLabel}
+          onClick={handleEditSbom}
+          display={signedUrlParams ? 'none' : 'flex'}
+          isDisabled={status === 'signed' || !updateSboms || noPrimaryComp}
+        />
         {/* GRAPH VIEW */}
         <PrimaryTreeView
           status={status}

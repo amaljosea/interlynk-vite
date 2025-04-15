@@ -9,11 +9,9 @@ import {
 } from 'utils'
 import { assessmentExpiryWarning } from 'variables/general'
 
-import { EditIcon } from '@chakra-ui/icons'
 import {
   Flex,
   FormErrorMessage,
-  IconButton,
   Input,
   Stack,
   Tag,
@@ -26,6 +24,7 @@ import { FormControl, FormLabel } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import DeleteButton from 'components/Icons/DeleteButton'
+import EditButton from 'components/Icons/EditButton'
 import LynkDate from 'components/LynkDate'
 import LynkDrawer from 'components/LynkDrawer'
 import LynkSelect from 'components/LynkSelect'
@@ -144,17 +143,14 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
             Component support level analysis is not enabled for this product
           </Text>
         )}
-        <Tooltip label='Edit'>
-          <IconButton
-            aria-label='Edit'
-            icon={<EditIcon />}
-            colorScheme='blue'
-            variant='solid'
-            fontSize={'sm'}
-            alignSelf='end'
-            onClick={() => setEdit(true)}
-          />
-        </Tooltip>
+        <EditButton
+          size={'md'}
+          aria-label='Edit'
+          alignSelf='end'
+          onClick={() => setEdit(true)}
+          tooltip={'Edit'}
+          type={'primary'}
+        />
       </Flex>
 
       <Stack spacing={3}>

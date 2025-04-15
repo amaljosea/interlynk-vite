@@ -2,14 +2,15 @@ import { gql, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useRef, useState } from 'react'
 import { timeSince } from 'utils'
 
-import { AddIcon, EditIcon } from '@chakra-ui/icons'
-import { Divider, IconButton, Textarea } from '@chakra-ui/react'
+import { AddIcon } from '@chakra-ui/icons'
+import { Divider, Textarea } from '@chakra-ui/react'
 import { Button, ButtonGroup } from '@chakra-ui/react'
 import { Flex, Stack, Text } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import DeleteButton from 'components/Icons/DeleteButton'
+import EditButton from 'components/Icons/EditButton'
 import LynkAlert from 'components/LynkAlert'
 import LynkDrawer from 'components/LynkDrawer'
 import CompInfo from 'components/Misc/CompInfo'
@@ -91,10 +92,7 @@ const DeleteNote = gql`
 
 const ComponentNotes = ({ data, isOpen, onClose }) => {
   const { showToast } = useCustomToast()
-  const { sameSecondaryText, primaryTextColor } = useThemeColor([
-    'sameSecondaryText',
-    'primaryTextColor'
-  ])
+  const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
 
   const { id, sbomId } = data || {}
 
@@ -309,10 +307,7 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
                         </Flex>
                       ) : (
                         <Flex gap={2} alignItems={'center'}>
-                          <IconButton
-                            size='sm'
-                            cursor='pointer'
-                            icon={<EditIcon color={primaryTextColor} />}
+                          <EditButton
                             onClick={() => {
                               setEdit(true)
                               setWarning('')
