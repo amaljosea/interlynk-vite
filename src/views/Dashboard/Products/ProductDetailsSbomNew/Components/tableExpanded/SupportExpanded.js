@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { calculateExpiryDate, getFullDate } from 'utils'
 
-import { Grid, Stack } from '@chakra-ui/react'
+import { Box, Grid, Stack } from '@chakra-ui/react'
 
 import DetailItem from 'components/Misc/DetailItem'
 
@@ -18,13 +18,13 @@ const SupportExpanded = (props) => {
       user,
       retainManualOverrideFor,
       updatedAt,
-      endOfSupport: endDate
+      // endOfSupport: endDate
     } = manual || {}
 
     const assessment = manual?.level ? 'Manual' : 'Automatic'
     const supportLevel = manual?.level || automatic?.level
     const explanation = manual?.notes || automatic?.notes
-    const endOfSupport = endDate ? getFullDate(endDate) : 'N/A'
+    // const endOfSupport = endDate ? getFullDate(endDate) : 'N/A'
     const assessmentExpiresOn = calculateExpiryDate(retainManualOverrideFor)
     const assessedBy = user?.name || 'N/A'
     const lastAssessed = updatedAt ? getFullDate(updatedAt) : 'N/A'
@@ -44,9 +44,10 @@ const SupportExpanded = (props) => {
             valueStyle={{ textTransform: 'capitalize' }}
           />
           {/* END OF SUPPORT */}
-          <DetailItem label='End of Support' value={endOfSupport} />
+          {/* <DetailItem label='End of Support' value={endOfSupport} /> */}
           {/* EXPLANATION */}
           <DetailItem label='Explanation' value={explanation} />
+          <Box />
           {/* ASSESSMENT */}
           <DetailItem label='Assessment' value={assessment} />
           {/* ASSESSED DATE */}
