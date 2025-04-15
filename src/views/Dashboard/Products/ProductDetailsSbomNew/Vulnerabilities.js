@@ -30,8 +30,7 @@ import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { ManualVulnScan } from 'graphQL/Mutation'
-import { CustomVulnUpdate } from 'graphQL/Mutation'
+import { CustomVulnUpdate, ManualVulnScan } from 'graphQL/Mutation'
 import {
   FirstDegreePartVulns,
   GetVulnData,
