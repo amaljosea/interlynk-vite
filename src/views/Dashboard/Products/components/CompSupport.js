@@ -1,24 +1,15 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import {
-  formatDate,
-  getDate,
-  getFullDate,
-  getTotalDays,
-  timeSince
-} from 'utils'
+import { formatDate, getDate, getTotalDays } from 'utils'
 import { assessmentExpiryWarning } from 'variables/general'
 
-import { EditIcon } from '@chakra-ui/icons'
 import {
   Flex,
   FormErrorMessage,
-  IconButton,
   Input,
   Stack,
   Tag,
   Text,
-  Tooltip,
   useDisclosure
 } from '@chakra-ui/react'
 import { Button, ButtonGroup } from '@chakra-ui/react'
@@ -26,6 +17,7 @@ import { FormControl, FormLabel } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import DeleteButton from 'components/Icons/DeleteButton'
+import EditButton from 'components/Icons/EditButton'
 import LynkDate from 'components/LynkDate'
 import LynkDrawer from 'components/LynkDrawer'
 import LynkSelect from 'components/LynkSelect'
@@ -119,18 +111,12 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
   }
 
   const assessment = manual?.level ? 'Manual' : 'Automatic'
-
-  const systemSupportLevel = automatic?.level?.replaceAll('_', ' ') || 'N/A'
-  const systemNotes = automatic?.notes || 'N/A'
-
-  const manualSupportLevel = manual?.level?.replaceAll('_', ' ') || 'N/A'
+  const supportLevel = manual?.level || automatic?.level
+  const explanation = manual?.notes || automatic?.notes
   const endOfSupport = formatDate(manual?.endDate)
-  const assessmentExpiresOn = formatDate(
-    getDate(manual?.retainManualOverrideFor)
-  )
-  const manualNotes = manual?.notes || 'N/A'
+  const assessmentExpiresOn = formatDate(manual?.retainManualOverrideFor)
   const assessedBy = manual?.user?.name || 'N/A'
-  const lastAssessed = manual?.updatedAt
+  const lastAssessed = formatDate(manual?.updatedAt)
 
   return (
     <Stack spacing={4} mt={3}>
@@ -144,17 +130,14 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
             Component support level analysis is not enabled for this product
           </Text>
         )}
-        <Tooltip label='Edit'>
-          <IconButton
-            aria-label='Edit'
-            icon={<EditIcon />}
-            colorScheme='blue'
-            variant='solid'
-            fontSize={'sm'}
-            alignSelf='end'
-            onClick={() => setEdit(true)}
-          />
-        </Tooltip>
+        <EditButton
+          size={'md'}
+          aria-label='Edit'
+          alignSelf='end'
+          onClick={() => setEdit(true)}
+          tooltip={'Edit'}
+          type={'primary'}
+        />
       </Flex>
 
       <Stack spacing={3}>
@@ -162,57 +145,36 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
           <Text {...labelStyle}>Assessment</Text>
           <Text {...infoStyle}>{assessment}</Text>
         </Stack>
-
         <Stack {...containerStyle}>
-          <Text {...labelStyle}>Level (Auto Suggested)</Text>
-          <Text {...infoStyle} textTransform='capitalize'>
-            {systemSupportLevel}
+          <Text {...labelStyle}>{`Level`}</Text>
+          <Text {...infoStyle} textTransform={'capitalize'}>
+            {supportLevel?.replaceAll('_', ' ') || 'N/A'}
           </Text>
         </Stack>
-
-        <Stack {...containerStyle}>
-          <Text {...labelStyle}>Level (Manual Override)</Text>
-          <Text {...infoStyle} textTransform='capitalize'>
-            {manualSupportLevel}
-          </Text>
-        </Stack>
-
         <Stack {...containerStyle}>
           <Text {...labelStyle}>End of Support</Text>
           <Text {...infoStyle}>{endOfSupport}</Text>
         </Stack>
-
-        {manualSupportLevel !== 'no_longer_maintained' && (
-          <Stack {...containerStyle}>
-            <Text {...labelStyle}>Assessment Expires On</Text>
-            <Text {...infoStyle}>{assessmentExpiresOn}</Text>
-          </Stack>
-        )}
-
-        <Stack {...containerStyle}>
-          <Text {...labelStyle}>Notes (Auto Suggested)</Text>
-          <Text {...infoStyle}>{systemNotes}</Text>
+        <Stack
+          {...containerStyle}
+          hidden={supportLevel === 'no_longer_maintained'}
+        >
+          <Text {...labelStyle}>Assessment Expires On</Text>
+          <Text {...infoStyle}>{assessmentExpiresOn}</Text>
         </Stack>
-
         <Stack {...containerStyle}>
-          <Text {...labelStyle}>Notes (Manual Override)</Text>
-          <Text {...infoStyle}>{manualNotes}</Text>
+          <Text {...labelStyle}>{`Explanation`}</Text>
+          <Text {...infoStyle}>{explanation}</Text>
         </Stack>
-
         <Stack {...containerStyle}>
           <Text {...labelStyle}>Last Assessed By</Text>
-          <Text {...infoStyle}>{assessedBy}</Text>
+          <Text {...infoStyle} textTransform={'capitalize'}>
+            {assessedBy}
+          </Text>
         </Stack>
-
         <Stack {...containerStyle}>
           <Text {...labelStyle}>Last Assessed</Text>
-          {lastAssessed ? (
-            <Tooltip label={getFullDate(lastAssessed)}>
-              <Text {...infoStyle}>{timeSince(lastAssessed)}</Text>
-            </Tooltip>
-          ) : (
-            <Text {...infoStyle}>N/A</Text>
-          )}
+          <Text {...infoStyle}>{lastAssessed}</Text>
         </Stack>
       </Stack>
     </Stack>

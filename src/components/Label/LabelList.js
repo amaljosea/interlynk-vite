@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { generateRandomColor, hexToRGBA } from 'utils/styleUtils'
 
-import { CheckIcon, CloseIcon, EditIcon, RepeatIcon } from '@chakra-ui/icons'
+import { CheckIcon, CloseIcon, RepeatIcon } from '@chakra-ui/icons'
 import { Flex, IconButton, Stack, Text } from '@chakra-ui/react'
 import { Divider, Input, Spacer } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import DeleteButton from 'components/Icons/DeleteButton'
+import EditButton from 'components/Icons/EditButton'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -115,11 +116,8 @@ const LabelList = ({ loading, labels, onDeleteLabel, onEditLabel }) => {
                 >
                   <ProdLabel item={label} />
                   <Flex gap={2} alignItems={'center'}>
-                    <IconButton
-                      size='sm'
-                      icon={<EditIcon size={18} />}
+                    <EditButton
                       onClick={() => startEditing(label)}
-                      className='text-blue-500 hover:text-blue-700 focus:outline-none mr-2'
                       title='Edit label'
                     />
                     <DeleteButton

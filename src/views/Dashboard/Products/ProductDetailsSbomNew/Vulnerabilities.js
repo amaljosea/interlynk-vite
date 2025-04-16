@@ -27,8 +27,7 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
 
-import { ManualVulnScan } from 'graphQL/Mutation'
-import { CustomVulnUpdate } from 'graphQL/Mutation'
+import { CustomVulnUpdate, ManualVulnScan } from 'graphQL/Mutation'
 import {
   FirstDegreePartVulns,
   GetVulnData,

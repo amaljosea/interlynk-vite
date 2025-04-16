@@ -4,13 +4,14 @@ import { useParams } from 'react-router-dom'
 import { getFullDate, timeSince, truncatedValue } from 'utils'
 
 import { IconButton, Stack, useDisclosure } from '@chakra-ui/react'
-import { Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
 import { Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 
 import LynkDrawer from 'components/LynkDrawer'
+import LynkTable from 'components/LynkTable'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { sbomUpdate } from 'graphQL/Mutation'
 import { GetSbomAlternatives } from 'graphQL/Queries'
@@ -31,14 +32,7 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
     childKey: 'update_sbom'
   })
 
-  const columns = [
-    'COMPONENTS',
-    'LICENSES',
-    'STATUS',
-    'IMPORTED',
-    'UPDATED',
-    ''
-  ]
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const [updateSbom, { loading: updateLoading }] = useMutation(sbomUpdate)
 
@@ -49,6 +43,7 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
       sbomId: sbomId
     }
   })
+  const { alternatives } = sbomAlts?.sbom || {}
 
   const handleWarning = (item) => {
     setActiveSbom(item)
@@ -75,8 +70,6 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
       .finally(() => onClose())
   }
 
-  if (loading) return null
-
   const subtitle = (
     <Stack spacing={1}>
       <Tag w={'fit-content'} colorScheme='blue' py={1.5}>
@@ -88,6 +81,103 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
     </Stack>
   )
 
+  const columns = [
+    {
+      id: 'COMPONENTS',
+      name: 'COMPONENTS',
+      compact: true,
+      wrap: true,
+      selector: (row) => {
+        const { stats } = row || {}
+        return (
+          <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
+            <TagLabel mx={'auto'}>{stats?.compCount}</TagLabel>
+          </Tag>
+        )
+      }
+    },
+    {
+      id: 'LICENSES',
+      name: 'LICENSES',
+      wrap: true,
+      selector: (row) => {
+        const { stats } = row || {}
+        return (
+          <Tag
+            size='md'
+            width={16}
+            mx={'auto'}
+            variant='subtle'
+            colorScheme={'blue'}
+          >
+            <TagLabel mx={'auto'}>{stats?.compLicenseCount}</TagLabel>
+          </Tag>
+        )
+      }
+    },
+    {
+      id: 'STATUS',
+      name: 'STATUS',
+      wrap: true,
+      selector: (row) => {
+        const { lifecycle } = row || {}
+        return (
+          <Tag width={24} colorScheme='cyan' textTransform={'capitalize'}>
+            <TagLabel mx={'auto'}>{lifecycle}</TagLabel>
+          </Tag>
+        )
+      }
+    },
+    {
+      id: 'IMPORTED',
+      name: 'IMPORTED',
+      right: true,
+      wrap: true,
+      selector: (row) => {
+        const { createdAt } = row || {}
+        return (
+          <Tooltip label={getFullDate(createdAt)} placement='top'>
+            <Text color={primaryTextColor}>{timeSince(createdAt)}</Text>
+          </Tooltip>
+        )
+      }
+    },
+    {
+      id: 'UPDATED',
+      name: 'UPDATED',
+      right: true,
+      wrap: true,
+      selector: (row) => {
+        const { updatedAt } = row || {}
+        return (
+          <Tooltip label={getFullDate(updatedAt)} placement='top'>
+            <Text color={primaryTextColor}>{timeSince(updatedAt)}</Text>
+          </Tooltip>
+        )
+      }
+    },
+    {
+      id: 'ACTIONS',
+      name: 'ACTIONS',
+      compact: true,
+      right: true,
+      wrap: true,
+      selector: (row) => (
+        <Tooltip label={'Promote to version'} placement='top'>
+          <IconButton
+            size='sm'
+            colorScheme='blue'
+            icon={<FaArrowUp />}
+            isDisabled={!editSbom}
+            onClick={() => handleWarning(row)}
+          />
+        </Tooltip>
+      )
+    }
+  ]
+
+  if (loading) return null
+
   return (
     <>
       <LynkDrawer
@@ -98,86 +188,12 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
         subtitle={subtitle}
         noFooter
       >
-        <Table variant='simple' m={0} p={0}>
-          <Thead>
-            <Tr>
-              {columns.map((item, index) => (
-                <Th px={0} key={index}>
-                  {item}
-                </Th>
-              ))}
-            </Tr>
-          </Thead>
-          <Tbody>
-            {sbomAlts?.sbom?.alternatives?.length > 0 &&
-              [...sbomAlts.sbom.alternatives]
-                .sort((a, b) => {
-                  const dateA = new Date(a.updatedAt)
-                  const dateB = new Date(b.updatedAt)
-                  return dateB - dateA
-                })
-                .map((item, index) => {
-                  const { createdAt, stats, lifecycle, updatedAt } = item
-                  return (
-                    <Tr key={index}>
-                      <Td px={0} fontSize={'sm'} width='130px'>
-                        <Tag
-                          size='md'
-                          variant='subtle'
-                          width={16}
-                          colorScheme={'blue'}
-                        >
-                          <TagLabel mx={'auto'}>{stats?.compCount}</TagLabel>
-                        </Tag>
-                      </Td>
-                      <Td px={0} fontSize={'sm'} width='130px'>
-                        <Tag
-                          size='md'
-                          width={16}
-                          mx={'auto'}
-                          variant='subtle'
-                          colorScheme={'blue'}
-                        >
-                          <TagLabel mx={'auto'}>
-                            {stats?.compLicenseCount}
-                          </TagLabel>
-                        </Tag>
-                      </Td>
-                      <Td px={0} fontSize={'sm'} width='150px'>
-                        <Tag
-                          width={24}
-                          colorScheme='cyan'
-                          textTransform={'capitalize'}
-                        >
-                          <TagLabel mx={'auto'}>{lifecycle}</TagLabel>
-                        </Tag>
-                      </Td>
-                      <Td px={0} fontSize={'sm'}>
-                        <Tooltip label={getFullDate(createdAt)} placement='top'>
-                          <Text>{timeSince(createdAt)}</Text>
-                        </Tooltip>
-                      </Td>
-                      <Td px={0} fontSize={'sm'}>
-                        <Tooltip label={getFullDate(updatedAt)} placement='top'>
-                          <Text>{timeSince(updatedAt)}</Text>
-                        </Tooltip>
-                      </Td>
-                      <Td px={0} fontSize={'sm'}>
-                        <Tooltip label={'Promote to version'} placement='top'>
-                          <IconButton
-                            size='sm'
-                            colorScheme='blue'
-                            icon={<FaArrowUp />}
-                            isDisabled={!editSbom}
-                            onClick={() => handleWarning(item)}
-                          />
-                        </Tooltip>
-                      </Td>
-                    </Tr>
-                  )
-                })}
-          </Tbody>
-        </Table>
+        <LynkTable
+          columns={columns}
+          data={alternatives}
+          progressPending={loading}
+          className='data-table-container'
+        />
       </LynkDrawer>
 
       {PROMOTE_WARNING?.isOpen && (

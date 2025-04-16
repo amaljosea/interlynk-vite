@@ -25,9 +25,9 @@ const ActivitiesOverview = ({ loading, title, data }) => {
           {title}
         </Text>
         {loading ? (
-          <CustomLoader />
+          <CustomLoader mt={4} />
         ) : (
-          <CardBody mt={8} ps='20px' pe='0px' position='relative'>
+          <CardBody mt={6} ps='20px' pe='0px' position='relative'>
             <Flex direction='column'>
               {data?.length > 0 &&
                 data?.map((row, index) => {

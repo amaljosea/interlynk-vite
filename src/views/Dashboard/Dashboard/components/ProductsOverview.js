@@ -1,9 +1,13 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { getFullDate, normalizeSBOMVersion, timeSince } from 'utils'
+import {
+  getFullDate,
+  normalizeSBOMVersion,
+  timeSince,
+  truncatedValue
+} from 'utils'
 
 import { Flex, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 
-// Custom components
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import LynkTable from 'components/LynkTable'
@@ -84,10 +88,10 @@ const ProductsOverview = ({ loading, title, data }) => {
             onClick={() => handleClick(row)}
           >
             <Text
-              my={1}
+              my={3}
               color={uniqueSbom ? primaryBlueText : secondaryTextInverse}
             >
-              {project?.projectGroup?.name}
+              {truncatedValue(project?.projectGroup?.name, 16)}
             </Text>
           </Link>
         )
@@ -119,7 +123,7 @@ const ProductsOverview = ({ loading, title, data }) => {
               color={uniqueSbom ? primaryBlueText : secondaryTextInverse}
               textAlign={'right'}
             >
-              {projectVersion}
+              {projectVersion ? truncatedValue(projectVersion, 12) : 'N/A'}
             </Text>
           </Link>
         )
@@ -261,7 +265,6 @@ const ProductsOverview = ({ loading, title, data }) => {
 
   return (
     <Card maxH='100%'>
-      {/* HEADING */}
       <Text fontWeight={'semibold'}>{title}</Text>
       <CardBody mt={6}>
         <LynkTable
