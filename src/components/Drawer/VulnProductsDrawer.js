@@ -1,6 +1,7 @@
 import { gql } from '@apollo/client'
 import { useMemo } from 'react'
 import { getFullDate, timeSince } from 'utils'
+import { getUniqueAffectedProducts } from 'utils/getUniqueAffectedProducts'
 
 import { Flex, Tag, Text, Tooltip } from '@chakra-ui/react'
 
@@ -66,24 +67,7 @@ const VulnProductsDrawer = ({ isOpen, onClose, data }) => {
     }
   )
 
-  const statusResults = useMemo(() => {
-    if (!nodes) return []
-
-    // Create a Map to store unique projectGroup names since components and versions are not listed
-    const uniqueNodes = new Map()
-
-    nodes.forEach((node) => {
-      const projectGroupName =
-        node?.component?.sbom?.project?.projectGroup?.name
-      if (projectGroupName && !uniqueNodes.has(projectGroupName)) {
-        uniqueNodes.set(projectGroupName, node)
-      }
-    })
-
-    return [...uniqueNodes.values()].sort(
-      (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
-    )
-  }, [nodes])
+  const statusResults = useMemo(() => getUniqueAffectedProducts(nodes), [nodes])
 
   const columns = [
     // PRODUCTS

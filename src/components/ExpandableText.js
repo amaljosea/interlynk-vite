@@ -12,6 +12,8 @@ const ExpandableText = ({ text, maxChars = 300, ...props }) => {
     'secondaryBlueText'
   ])
 
+  if (!text) return
+
   if (text === '')
     return (
       <Text color={primaryTextColor} {...props}>
@@ -19,7 +21,7 @@ const ExpandableText = ({ text, maxChars = 300, ...props }) => {
       </Text>
     )
 
-  if (text.length <= maxChars)
+  if (text?.length <= maxChars)
     return (
       <Text color={primaryTextColor} {...props}>
         {text}

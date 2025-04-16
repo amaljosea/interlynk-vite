@@ -14,8 +14,8 @@ import PackageType from './PackageType'
 import Qualifiers from './Qualifiers'
 import Version from './Version'
 
-const PurlEditor = ({ isOpen, onOpen, onClose }) => {
-  const { tabData, setTabData } = useContext(TabContext)
+const PurlEditor = ({ isOpen, onOpen, onClose, setSavePending }) => {
+  const { tabData, setTabData, handleChange } = useContext(TabContext)
   const { identifiers } = tabData || {}
 
   const [purlData, setPurlData] = useState({
@@ -33,9 +33,8 @@ const PurlEditor = ({ isOpen, onOpen, onClose }) => {
   const QUALIFIERS = purlData?.qualifiers ? `?${purlData?.qualifiers}` : ``
   const PURL_STRING = `pkg:${TYPE}${NAMESPACE}${NAME}${VERSION}${QUALIFIERS}`
 
-  // console.log('PURL_STRING', PURL_STRING)
-
   const onChange = (name, value) => {
+    handleChange('identifiers', 'purl', value)
     setPurlData((prev) => ({
       ...prev,
       [name]: value || ''
@@ -66,6 +65,7 @@ const PurlEditor = ({ isOpen, onOpen, onClose }) => {
           purl: pkg.toString()
         }
       }))
+      setSavePending('Click Save to confirm PURL update')
       onClose()
     } catch (error) {
       setTabData((prev) => ({
