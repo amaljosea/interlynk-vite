@@ -116,7 +116,7 @@ export default function Page() {
         {/* POLICY GRAPHS */}
         <PolicyGroup />
         {/* ACTIVITIES AND CHANGELOGS */}
-        <Stack spacing={4}>
+        <Stack spacing={3}>
           <Heading size={'md'}>Activities</Heading>
           <Grid templateColumns='repeat(12, 1fr)' gap={5} flexWrap={'wrap'}>
             {/* RECENT IMPORTS */}

@@ -14,15 +14,7 @@ import {
 } from '@dnd-kit/sortable'
 import React, { useMemo, useState } from 'react'
 
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  Flex,
-  Heading,
-  IconButton,
-  SimpleGrid
-} from '@chakra-ui/react'
+import { Heading, SimpleGrid, Stack } from '@chakra-ui/react'
 
 import { DashboardCard } from 'components/DashboardCard'
 import AllVulnerabilitiesBySeverity from 'components/Graphs/AllVulnerabilitiesBySeverity'
@@ -33,10 +25,8 @@ import KevVulnerabilitiesByStatus from 'components/Graphs/KevVulnerabilitiesBySt
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { LuLayoutGrid, LuLayoutList, LuPlus } from 'react-icons/lu'
-
 function VulnerabilityGroup() {
-  const { selectedVulns } = useGlobalState()
+  const { selectedVulns, setSelectedVulns } = useGlobalState()
 
   const [vulnCards, setVulnCards] = useState([
     {
@@ -95,51 +85,15 @@ function VulnerabilityGroup() {
     }
   }
 
-  const handleAddCard = () => {
-    const newCard = {
-      id: Date.now().toString(),
-      title: 'New Card',
-      content: 'Add your content here'
-    }
-    setVulnCards([...vulnCards, newCard])
-  }
-
-  const handleDeleteCard = (id) => {
-    setVulnCards(vulnCards?.filter((card) => card.id !== id))
+  const handleDeleteCard = (key) => {
+    setSelectedVulns(selectedVulns?.filter((item) => item !== key))
   }
 
   if (filteredVulnCards?.length === 0) return null
 
   return (
-    <Box>
-      <Flex justify='space-between' align='center' mb={4}>
-        <Heading size={'md'}>Vulnerabilities</Heading>
-        <Flex gap={4} hidden>
-          <ButtonGroup size='md' isAttached variant='outline'>
-            <IconButton
-              aria-label='Grid Layout'
-              icon={<LuLayoutGrid />}
-              onClick={() => setIsGridLayout(true)}
-              colorScheme={isGridLayout ? 'blue' : 'gray'}
-            />
-            <IconButton
-              aria-label='List Layout'
-              icon={<LuLayoutList />}
-              onClick={() => setIsGridLayout(false)}
-              colorScheme={!isGridLayout ? 'blue' : 'gray'}
-            />
-          </ButtonGroup>
-          <Button
-            fontSize={'sm'}
-            leftIcon={<LuPlus />}
-            colorScheme='blue'
-            onClick={handleAddCard}
-          >
-            Add Card
-          </Button>
-        </Flex>
-      </Flex>
-
+    <Stack spacing={3}>
+      <Heading size={'md'}>Vulnerabilities</Heading>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -156,7 +110,7 @@ function VulnerabilityGroup() {
             {filteredVulnCards?.map((card) => (
               <DashboardCard
                 key={card.id}
-                id={card.id}
+                id={card.key}
                 title={card.title}
                 content={card.content}
                 onDelete={handleDeleteCard}
@@ -166,7 +120,7 @@ function VulnerabilityGroup() {
           </SimpleGrid>
         </SortableContext>
       </DndContext>
-    </Box>
+    </Stack>
   )
 }
 

@@ -14,15 +14,7 @@ import {
 } from '@dnd-kit/sortable'
 import React, { useMemo, useState } from 'react'
 
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  Flex,
-  Heading,
-  IconButton,
-  SimpleGrid
-} from '@chakra-ui/react'
+import { Heading, SimpleGrid, Stack } from '@chakra-ui/react'
 
 import { DashboardCard } from 'components/DashboardCard'
 import DefectDensity from 'components/Graphs/DefectDensity'
@@ -35,10 +27,8 @@ import VulnByStatus from 'components/Graphs/VulnByStatus'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { LuLayoutGrid, LuLayoutList, LuPlus } from 'react-icons/lu'
-
 function VulnerabilityTrendsGroup() {
-  const { selectedTrends } = useGlobalState()
+  const { selectedTrends, setSelectedTrends } = useGlobalState()
   const { isFreeTier } = useGlobalQueryContext()
 
   const [trendCards, setTrendCards] = useState([
@@ -111,51 +101,15 @@ function VulnerabilityTrendsGroup() {
     }
   }
 
-  const handleAddCard = () => {
-    const newCard = {
-      id: Date.now().toString(),
-      title: 'New Card',
-      content: 'Add your content here'
-    }
-    setTrendCards([...trendCards, newCard])
-  }
-
-  const handleDeleteCard = (id) => {
-    setTrendCards(trendCards?.filter((card) => card.id !== id))
+  const handleDeleteCard = (key) => {
+    setSelectedTrends(selectedTrends?.filter((item) => item !== key))
   }
 
   if (filteredTrendCards?.length === 0) return null
 
   return (
-    <Box>
-      <Flex justify='space-between' align='center' mb={4}>
-        <Heading size={'md'}>Vulnerability Trends</Heading>
-        <Flex gap={4} hidden>
-          <ButtonGroup size='md' isAttached variant='outline'>
-            <IconButton
-              aria-label='Grid Layout'
-              icon={<LuLayoutGrid />}
-              onClick={() => setIsGridLayout(true)}
-              colorScheme={isGridLayout ? 'blue' : 'gray'}
-            />
-            <IconButton
-              aria-label='List Layout'
-              icon={<LuLayoutList />}
-              onClick={() => setIsGridLayout(false)}
-              colorScheme={!isGridLayout ? 'blue' : 'gray'}
-            />
-          </ButtonGroup>
-          <Button
-            fontSize={'sm'}
-            leftIcon={<LuPlus />}
-            colorScheme='blue'
-            onClick={handleAddCard}
-          >
-            Add Card
-          </Button>
-        </Flex>
-      </Flex>
-
+    <Stack spacing={3}>
+      <Heading size={'md'}>Vulnerability Trends</Heading>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -172,7 +126,7 @@ function VulnerabilityTrendsGroup() {
             {filteredTrendCards?.map((card) => (
               <DashboardCard
                 key={card.id}
-                id={card.id}
+                id={card.key}
                 title={card.title}
                 desc={card.desc}
                 content={card.content}
@@ -183,7 +137,7 @@ function VulnerabilityTrendsGroup() {
           </SimpleGrid>
         </SortableContext>
       </DndContext>
-    </Box>
+    </Stack>
   )
 }
 

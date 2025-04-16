@@ -14,26 +14,16 @@ import {
 } from '@dnd-kit/sortable'
 import React, { useMemo, useState } from 'react'
 
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  Flex,
-  Heading,
-  IconButton,
-  SimpleGrid
-} from '@chakra-ui/react'
+import { Heading, SimpleGrid, Stack } from '@chakra-ui/react'
 
 import { DashboardCard } from 'components/DashboardCard'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { LuLayoutGrid, LuLayoutList, LuPlus } from 'react-icons/lu'
-
 import PolicyGraphs from './components/category/PolicyGraphs'
 
 function PolicyGroup() {
-  const { selectedPolicies } = useGlobalState()
+  const { selectedPolicies, setSelectedPolicies } = useGlobalState()
 
   const [policyCards, setPolicyCards] = useState([
     {
@@ -68,51 +58,15 @@ function PolicyGroup() {
     }
   }
 
-  const handleAddCard = () => {
-    const newCard = {
-      id: Date.now().toString(),
-      title: 'New Card',
-      content: 'Add your content here'
-    }
-    setPolicyCards([...policyCards, newCard])
-  }
-
-  const handleDeleteCard = (id) => {
-    setPolicyCards(policyCards?.filter((card) => card.id !== id))
+  const handleDeleteCard = (key) => {
+    setSelectedPolicies(selectedPolicies?.filter((item) => item !== key))
   }
 
   if (filteredPolicyCards?.length === 0) return null
 
   return (
-    <Box>
-      <Flex justify='space-between' align='center' mb={4}>
-        <Heading size={'md'}>Policies</Heading>
-        <Flex gap={4} hidden>
-          <ButtonGroup size='md' isAttached variant='outline'>
-            <IconButton
-              aria-label='Grid Layout'
-              icon={<LuLayoutGrid />}
-              onClick={() => setIsGridLayout(true)}
-              colorScheme={isGridLayout ? 'blue' : 'gray'}
-            />
-            <IconButton
-              aria-label='List Layout'
-              icon={<LuLayoutList />}
-              onClick={() => setIsGridLayout(false)}
-              colorScheme={!isGridLayout ? 'blue' : 'gray'}
-            />
-          </ButtonGroup>
-          <Button
-            fontSize={'sm'}
-            leftIcon={<LuPlus />}
-            colorScheme='blue'
-            onClick={handleAddCard}
-          >
-            Add Card
-          </Button>
-        </Flex>
-      </Flex>
-
+    <Stack spacing={3}>
+      <Heading size={'md'}>Policies</Heading>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -129,7 +83,7 @@ function PolicyGroup() {
             {filteredPolicyCards?.map((card) => (
               <DashboardCard
                 key={card.id}
-                id={card.id}
+                id={card.key}
                 title={card.title}
                 content={card.content}
                 onDelete={handleDeleteCard}
@@ -139,7 +93,7 @@ function PolicyGroup() {
           </SimpleGrid>
         </SortableContext>
       </DndContext>
-    </Box>
+    </Stack>
   )
 }
 
