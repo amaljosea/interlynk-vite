@@ -79,7 +79,7 @@ export default function Page() {
   }
 
   return (
-    <Stack width={'100%'} spacing={8}>
+    <Stack width={'100%'} spacing={10}>
       {/* FILTERS */}
       <Flex
         width={'100%'}
@@ -106,7 +106,7 @@ export default function Page() {
           {!isFreeTier && <CardList />}
         </Flex>
       </Flex>
-      <Stack spacing={12}>
+      <Stack spacing={10}>
         {/* PRODUCTS GRAPHS */}
         <ProductGroup />
         {/* VULNERABILITIRS GRAPHS */}
