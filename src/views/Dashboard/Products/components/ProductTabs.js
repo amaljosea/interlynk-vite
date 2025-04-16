@@ -9,7 +9,6 @@ import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 
 import ChangelogTable from 'components/Tables/ChangelogTable'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
-import PolicyTable from 'components/Tables/PolicyTable'
 import VersionsTable from 'components/Tables/VersionsTable'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -17,7 +16,8 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
-import { GetGlobalVulns, GetOrgMfc, GetProjectPolicies } from 'graphQL/Queries'
+import { GetGlobalVulns, GetOrgMfc } from 'graphQL/Queries'
+import PolicyTable from 'components/Tables/PolicyTable'
 
 const tabs = [
   'versions',
@@ -41,11 +41,11 @@ const ProductTabs = (props) => {
   const tab = queryParams[0].get('tab')
   const activeTabNumber = Math.max(tabs.indexOf(tab), 0)
 
-  const { data, settings, activeEnv } = props
+  const { data, settings } = props
 
   const { enabled, projects } = data || ''
 
-  const { VULNERABILITIES, POLICIES, SETTINGS } = ProductDetailsTabs
+  const { VULNERABILITIES, SETTINGS } = ProductDetailsTabs
 
   const getDisplay = (item) => {
     const conditions = {
@@ -89,19 +89,6 @@ const ProductTabs = (props) => {
     skip: tab === VULNERABILITIES ? false : true,
     selector: 'organization.vulns',
     variables: { ...vulnFilters }
-  })
-
-  // GET POLICY DATA
-  const {
-    nodes: policyData,
-    paginationProps: policyPaginationProps,
-    loading: policyloading
-  } = usePaginatedQuery(GetProjectPolicies, {
-    skip: tab === POLICIES ? false : true,
-    selector: 'projectPolicies',
-    variables: {
-      projectId: activeEnv
-    }
   })
 
   // GET MANUFACTURER DATA
@@ -164,11 +151,7 @@ const ProductTabs = (props) => {
         </TabPanel>
         {/* POLICIES */}
         <TabPanel px={0}>
-          <PolicyTable
-            data={policyData}
-            loading={policyloading}
-            paginationProps={policyPaginationProps}
-          />
+          <PolicyTable />
         </TabPanel>
         {/* CHANGE LOG */}
         <TabPanel px={0}>

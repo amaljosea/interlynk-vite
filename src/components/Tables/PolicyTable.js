@@ -1,104 +1,82 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { Link, useLocation, useParams } from 'react-router-dom'
-import { getFullDate, timeSince, updatedValue } from 'utils'
-import { formatConditionValue } from 'utils'
+import { useParams } from 'react-router-dom'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
-import { getIcon } from 'utils/styleUtils'
 import { customStyles } from 'utils/styleUtils'
 import DeleteModal from 'views/Dashboard/Policies/DeleteModal'
 import PolicyModal from 'views/Dashboard/Policies/PolicyModal'
-import RuleModal from 'views/Dashboard/Policies/RuleModal'
 import WarnModal from 'views/Dashboard/Policies/WarnModal'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import {
-  Box,
-  Flex,
-  Icon,
-  Portal,
-  Select,
-  Stack,
-  Text,
-  Tooltip,
-  useDisclosure
-} from '@chakra-ui/react'
-import { Input, InputGroup, InputLeftAddon } from '@chakra-ui/react'
-import { Tag, TagLabel } from '@chakra-ui/react'
-import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
+import { Stack, useDisclosure } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
+import GlobalPolicyColumns from 'components/Columns/GlobalPolicyColumns'
 import CustomLoader from 'components/CustomLoader'
-import AddButton from 'components/Icons/AddButton'
-import RefreshBtn from 'components/Icons/RefreshBtn'
-import { CustomText } from 'components/Misc/CustomText'
-import LynkAction from 'components/Misc/LynkAction'
-import LynkSwitch from 'components/Misc/LynkSwitch'
+import GlobalPolicyHeader from 'components/Headers/GlobalPolicyHeader'
 import Pagination from 'components/Pagination'
+import GlobalPolicyExpand from 'components/expand-view/GlobalPolicyExpand'
 
 import useCustomToast from 'hooks/useCustomToast'
-import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { DeletePolicyExclusion, PolicyExclusionCreate } from 'graphQL/Mutation'
-import { GetPolicies, PolicySubjectOperators } from 'graphQL/Queries'
+import {
+  GetPolicies,
+  GetProjectPolicies,
+  PolicySubjectOperators
+} from 'graphQL/Queries'
 
 const PolicyTable = () => {
-  const { showToast } = useCustomToast()
-  const location = useLocation()
   const params = useParams()
-  const productId = params.productid
   const tab = useQueryParam('tab')
+  const { showToast } = useCustomToast()
 
-  const editProdPolicies = useHasPermission({
-    parentKey: 'view_product_group',
-    childKey: 'edit_product_policies'
-  })
+  const productId = params.productid
+  const { POLICIES } = ProductDetailsTabs
 
-  const updatePolicy = useHasPermission({
-    parentKey: 'view_policy',
-    childKey: 'create_update_policy'
-  })
-
-  const removePolicy = useHasPermission({
-    parentKey: 'view_policy',
-    childKey: 'remove_policy'
-  })
-
-  const {
-    primaryBlueText,
-    headingTextColor,
-    primaryTextColor,
-    secondaryTextInverse,
-    primaryErrorColor
-  } = useThemeColor([
-    'primaryBlueText',
+  const { headingTextColor, blurBackground } = useThemeColor([
     'headingTextColor',
-    'primaryTextColor',
-    'secondaryTextInverse',
-    'primaryErrorColor'
+    'blurBackground'
   ])
 
-  const [filters, setFilters] = useState({
-    search: ''
-  })
+  const POLICY = useDisclosure()
+  const STATUS = useDisclosure()
+  const DELETE = useDisclosure()
 
-  const { nodes, paginationProps, loading, reset } = usePaginatedQuery(
-    GetPolicies,
-    {
-      selector: 'policies',
-      variables: { ...filters }
-    }
-  )
+  const [filters, setFilters] = useState({ search: '' })
+  const { search } = filters || {}
 
-  const { search } = filters || ''
   const [activeRow, setActiveRow] = useState(null)
   const [filterText, setFilterText] = useState(filters ? search : '')
 
-  const { POLICIES } = ProductDetailsTabs
+  const [createExclusion] = useMutation(PolicyExclusionCreate)
+  const [deleteExclusion] = useMutation(DeletePolicyExclusion)
+
+  const {
+    nodes: policyData,
+    paginationProps: policyPaginationProps,
+    loading: policyloading
+  } = usePaginatedQuery(GetProjectPolicies, {
+    skip: tab === POLICIES ? false : true,
+    selector: 'projectPolicies',
+    variables: {
+      projectId: productId
+    }
+  })
+
+  const {
+    nodes: globalData,
+    paginationProps: globalPaginationProps,
+    loading: globalLoading,
+    reset
+  } = usePaginatedQuery(GetPolicies, {
+    selector: 'policies',
+    variables: { ...filters },
+    skip: tab === POLICIES ? true : false
+  })
 
   const { data: subOperators } = useQuery(PolicySubjectOperators, {
     skip:
@@ -106,26 +84,6 @@ const PolicyTable = () => {
         ? false
         : true
   })
-
-  const formatSubject = (value) => {
-    if (subOperators) {
-      const result = subOperators.policySubjectOperatorMapping.find(
-        (item) => item?.subject === value
-      )
-      return result
-        ? { name: result.name, category: result.category }
-        : { name: '', category: '' }
-    }
-    return { name: '', category: '' }
-  }
-
-  const [createExclusion] = useMutation(PolicyExclusionCreate)
-  const [deleteExclusion] = useMutation(DeletePolicyExclusion)
-
-  const UPDATE = useDisclosure()
-  const WARNING = useDisclosure()
-  const DELETE = useDisclosure()
-  const RULE = useDisclosure()
 
   const handleCreateExclusion = async (id) => {
     await createExclusion({
@@ -136,6 +94,11 @@ const PolicyTable = () => {
         showToast({
           description: errors[0],
           status: 'error'
+        })
+      } else {
+        showToast({
+          description: 'Exclusion updated successfully',
+          status: 'success'
         })
       }
     })
@@ -151,9 +114,37 @@ const PolicyTable = () => {
           description: errors[0],
           status: 'error'
         })
+      } else {
+        showToast({
+          description: 'Exclusion updated successfully',
+          status: 'success'
+        })
       }
     })
   }
+
+  const action = (type, data) => {
+    setActiveRow(data)
+    switch (type) {
+      case 'create_policy':
+        return POLICY.onOpen()
+      case 'edit_policy':
+        return POLICY.onOpen()
+      case 'update_policy_status':
+        return STATUS.onOpen()
+      case 'delete_policy':
+        return DELETE.onOpen()
+      default:
+        return POLICY.onOpen()
+    }
+  }
+
+  const handleApply = (data) =>
+    data?.isExcluded
+      ? handleDeleteExclusion(data?.id)
+      : handleCreateExclusion(data?.id)
+
+  const columns = GlobalPolicyColumns({ action, handleApply })
 
   const setSearchFilter = useCallback(
     (value) => {
@@ -200,403 +191,86 @@ const PolicyTable = () => {
     [setSearchFilter]
   )
 
-  // SUB HEADER
-  const subHeader = useMemo(() => {
-    const handleCreate = () => {
-      setActiveRow(null)
-      UPDATE.onOpen()
-    }
-    return (
-      <Flex
-        w={'100%'}
-        alignItems={'center'}
-        justifyContent={productId ? 'flex-end' : 'space-between'}
-      >
-        {!productId && (
-          <SearchFilter
-            id='policies'
-            onClear={handleClear}
-            filterText={filterText}
-            onFilter={handleSearch}
-            onChange={onSearchInputChange}
-          />
-        )}
-        <Stack spacing={2} alignItems={'center'} direction={'row'}>
-          <AddButton
-            hidden={productId}
-            label='Create Policy'
-            onClick={handleCreate}
-            aria-label='add_policy'
-            isDisabled={!updatePolicy}
-          />
-          <RefreshBtn />
-        </Stack>
-      </Flex>
-    )
-  }, [
-    UPDATE,
+  const header = GlobalPolicyHeader({
+    action,
     filterText,
     handleClear,
     handleSearch,
-    onSearchInputChange,
-    productId,
-    updatePolicy
-  ])
+    onSearchInputChange
+  })
 
-  // COLUMNS
-  const columns = [
-    {
-      id: 'ACTIVE',
-      name: 'ACTIVE',
-      selector: (row) => {
-        const { isEnabled } = row
-        return (
-          <LynkSwitch
-            size='md'
-            isDisabled={!updatePolicy}
-            isChecked={isEnabled}
-            onChange={() => {
-              setActiveRow(row)
-              WARNING.onOpen()
-            }}
-          />
-        )
-      },
-      width: '7%',
-      omit: productId
-    },
-    {
-      id: 'POLICY',
-      name: 'POLICY',
-      selector: (row, index) => (
-        <Stack my={4} spacing={1}>
-          <Link to={`/vendor/policies/${row?.id}`}>
-            <Text color={primaryBlueText} data-testid={`policy_${index}`}>
-              {row?.name}
-            </Text>
-          </Link>
-          <Text size='sm' color={secondaryTextInverse}>
-            {row?.description}
-          </Text>
-        </Stack>
-      ),
-      width: '32%',
-      wrap: true
-    },
-    {
-      id: 'EXCLUDED',
-      name: 'EXCLUDED',
-      selector: (row) => {
-        const { excludePrimaryComponent, excludeInternalComponent } = row || ''
-        return (
-          <Flex gap={2} alignItems={'center'}>
-            {!excludePrimaryComponent && !excludeInternalComponent && (
-              <Text color={primaryTextColor}>N/A</Text>
-            )}
-            {excludePrimaryComponent && (
-              <Tag variant='solid' colorScheme='blue'>
-                Primary
-              </Tag>
-            )}
-            {excludeInternalComponent && (
-              <Tag variant='solid' colorScheme='cyan'>
-                Internal
-              </Tag>
-            )}
-          </Flex>
-        )
-      },
-      omit: productId
-    },
-    {
-      id: 'CONDITIONS',
-      name: 'CONDITIONS',
-      selector: (row) => (
-        <Tag
-          minW={'60px'}
-          textTransform={'uppercase'}
-          colorScheme={row?.operator === 'any' ? 'red' : 'green'}
-        >
-          <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
-            {row?.operator}
-          </TagLabel>
-        </Tag>
-      ),
-      width: '10%',
-      wrap: true
-    },
-    {
-      id: 'RESULT',
-      name: 'RESULT',
-      selector: (row) => {
-        const { resultType } = row
-        return (
-          <Tag
-            minW={'80px'}
-            colorScheme={
-              resultType === 'inform'
-                ? 'blue'
-                : resultType === 'warn'
-                  ? 'yellow'
-                  : 'red'
-            }
-          >
-            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
-              {resultType}
-            </TagLabel>
-          </Tag>
-        )
-      },
-      width: '10%',
-      wrap: true
-    },
-    // UPDATED AT
-    {
-      id: 'UPDATED',
-      name: 'UPDATED',
-      selector: (row) => (
-        <Tooltip label={getFullDate(row?.updatedAt)} placement={'top'}>
-          <Text color={primaryTextColor}>{timeSince(row?.updatedAt)}</Text>
-        </Tooltip>
-      ),
-      right: 'true',
-      wrap: true
-    },
-    // EXCLUSION
-    {
-      id: 'APPLY',
-      name: 'APPLY',
-      selector: (row) => {
-        const { isExcluded, id } = row
-        return (
-          <Select
-            size='sm'
-            value={isExcluded ? 'no' : 'yes'}
-            onChange={() =>
-              isExcluded ? handleDeleteExclusion(id) : handleCreateExclusion(id)
-            }
-            color={primaryTextColor}
-            isDisabled={!editProdPolicies}
-            textTransform={'capitalize'}
-          >
-            {['yes', 'no'].map((itm, index) => (
-              <option
-                key={index}
-                value={itm}
-                style={{ textTransform: 'capitalize' }}
-              >
-                {itm}
-              </option>
-            ))}
-          </Select>
-        )
-      },
-      right: 'true',
-      omit: !productId
-    },
-    {
-      id: 'ACTION',
-      name: 'ACTION',
-      selector: (row, index) => {
-        return (
-          <Menu>
-            <LynkAction data-testid={`policy_actions_${index}`} />
-            <Portal>
-              <MenuList fontSize={'sm'}>
-                {/* EDIT POLICY */}
-                <MenuItem
-                  isDisabled={!updatePolicy}
-                  hidden={productId}
-                  onClick={() => {
-                    setActiveRow(row)
-                    UPDATE.onOpen()
-                  }}
-                  data-testid={`policy_edit_${index}`}
-                >
-                  Edit Policy
-                </MenuItem>
-                {/* ADD POLICY RULE */}
-                <MenuItem
-                  hidden
-                  onClick={() => {
-                    setActiveRow(row)
-                    RULE.onOpen()
-                  }}
-                >
-                  Add Policy Rule
-                </MenuItem>
-                {/* DELETE POLICY  */}
-                <MenuItem
-                  color={primaryErrorColor}
-                  isDisabled={!removePolicy}
-                  onClick={() => {
-                    setActiveRow(row)
-                    DELETE.onOpen()
-                  }}
-                  hidden={productId}
-                  data-testid={`policy_delete_${index}`}
-                >
-                  Delete Policy
-                </MenuItem>
-              </MenuList>
-            </Portal>
-          </Menu>
-        )
-      },
-      width: '10%',
-      right: 'true',
-      omit: productId
+  const formatSubject = (value) => {
+    if (subOperators) {
+      const result = subOperators.policySubjectOperatorMapping.find(
+        (item) => item?.subject === value
+      )
+      return result
+        ? { name: result.name, category: result.category }
+        : { name: '', category: '' }
     }
-  ]
+    return { name: '', category: '' }
+  }
+
+  const data = tab === POLICIES ? policyData : globalData
+  const loading = tab === POLICIES ? policyloading : globalLoading
+  const paginationProps =
+    tab === POLICIES ? policyPaginationProps : globalPaginationProps
 
   const conditionalRowStyles = [
     {
       when: (row) => row.isExcluded === true,
       style: {
-        // eslint-disable-next-line
-        backgroundColor: '#f2f2f2',
-        // eslint-disable-next-line
-        color: '#111',
+        backgroundColor: blurBackground,
         '&:hover': { cursor: 'pointer' }
       }
     }
   ]
 
-  // EXPAND VIEW
-  const ExpandedComponent = ({ data }) => {
-    const { policyRules } = data || {}
-
-    return (
-      <Flex
-        p={5}
-        gap={6}
-        width={'100%'}
-        flexDir={'column'}
-        boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
-      >
-        <Box>
-          <CustomText>CONDITIONS :</CustomText>
-          <Stack mt={3} spacing={3}>
-            {policyRules?.map((item, index) => {
-              const { name, category } = formatSubject(item?.subject)
-              return (
-                <Flex gap={3} key={index} alignItems={'center'}>
-                  <Text w={'12'} fontSize={'sm'} color={primaryTextColor}>
-                    {index + 1}.
-                  </Text>
-                  <InputGroup
-                    size='sm'
-                    fontSize={'sm'}
-                    color={primaryTextColor}
-                  >
-                    <InputLeftAddon>
-                      <Tooltip label={category} textTransform={'capitalize'}>
-                        <Flex>
-                          <Icon
-                            color={primaryBlueText}
-                            as={getIcon(item.subject)}
-                          />
-                        </Flex>
-                      </Tooltip>
-                    </InputLeftAddon>
-                    <Input
-                      readOnly
-                      textTransform={'capitalize'}
-                      _focus={{ boxShadow: 'none' }}
-                      defaultValue={name}
-                    />
-                  </InputGroup>
-                  <InputGroup
-                    size='sm'
-                    fontSize={'sm'}
-                    color={primaryTextColor}
-                  >
-                    <InputLeftAddon>Operator</InputLeftAddon>
-                    <Input
-                      readOnly
-                      _focus={{ boxShadow: 'none' }}
-                      defaultValue={updatedValue(item?.operator?.toLowerCase())}
-                    />
-                  </InputGroup>
-                  {item?.value && (
-                    <InputGroup
-                      size='sm'
-                      fontSize={'sm'}
-                      color={primaryTextColor}
-                    >
-                      <InputLeftAddon>Value</InputLeftAddon>
-                      <Input
-                        readOnly
-                        textTransform={'capitalize'}
-                        _focus={{ boxShadow: 'none' }}
-                        defaultValue={formatConditionValue(item)}
-                      />
-                    </InputGroup>
-                  )}
-                </Flex>
-              )
-            })}
-          </Stack>
-        </Box>
-      </Flex>
-    )
-  }
-
   return (
     <>
       <Card padding={productId ? '0px' : '22px'}>
-        <Flex flexDir={'column'} width={'100%'}>
+        <Stack>
           <DataTable
-            columns={columns}
-            data={nodes || []}
-            customStyles={customStyles(headingTextColor)}
-            progressPending={loading}
-            progressComponent={<CustomLoader />}
             subHeader
-            subHeaderComponent={subHeader}
             expandableRows
-            expandOnRowClicked
-            expandableRowsComponent={ExpandedComponent}
             persistTableHead
             responsive={true}
+            columns={columns}
+            data={data || []}
+            expandOnRowClicked
+            progressPending={loading}
+            subHeaderComponent={header}
+            progressComponent={<CustomLoader />}
+            expandableRowsComponent={GlobalPolicyExpand}
             conditionalRowStyles={conditionalRowStyles}
+            customStyles={customStyles(headingTextColor)}
+            expandableRowsComponentProps={{ formatSubject }}
           />
-
-          {/* PAGINATION */}
           {<Pagination {...paginationProps} />}
-        </Flex>
+        </Stack>
       </Card>
 
-      {UPDATE.isOpen && (
+      {POLICY.isOpen && (
         <PolicyModal
           data={activeRow}
-          isOpen={UPDATE.isOpen}
-          onClose={UPDATE.onClose}
+          isOpen={POLICY.isOpen}
+          onClose={POLICY.onClose}
           plSubjects={subOperators?.policySubjectOperatorMapping || []}
         />
       )}
 
-      {RULE.isOpen && (
-        <RuleModal
-          activeRow={activeRow}
-          data={activeRow.policyRules[0]}
-          isOpen={RULE.isOpen}
-          onClose={RULE.onClose}
-        />
-      )}
-
-      {WARNING.isOpen && (
+      {STATUS.isOpen && (
         <WarnModal
-          isOpen={WARNING.isOpen}
-          onClose={WARNING.onClose}
           data={activeRow}
+          isOpen={STATUS.isOpen}
+          onClose={STATUS.onClose}
         />
       )}
       {DELETE.isOpen && (
         <DeleteModal
+          data={activeRow}
           isOpen={DELETE.isOpen}
           onClose={DELETE.onClose}
-          data={activeRow}
         />
       )}
     </>
