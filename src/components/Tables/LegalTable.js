@@ -1,8 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import React, { useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import LegalModal from 'views/Dashboard/Profile/components/LegalModal'
 
@@ -17,9 +15,9 @@ import {
 } from '@chakra-ui/react'
 import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
 import ExternalNavIcon from 'components/Icons/ExternalNavIcon'
+import LynkTable from 'components/LynkTable'
 import LynkAction from 'components/Misc/LynkAction'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -35,17 +33,8 @@ const LegalTable = () => {
   const { showToast } = useCustomToast()
   const activetab = useQueryParam('tab')
   const { orgView } = useGlobalQueryContext()
-  const {
-    headingTextColor,
-    primaryTextColor,
-    primaryErrorColor,
-    primaryBlueText
-  } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor',
-    'primaryErrorColor',
-    'primaryBlueText'
-  ])
+  const { primaryTextColor, primaryErrorColor, primaryBlueText } =
+    useThemeColor(['primaryTextColor', 'primaryErrorColor', 'primaryBlueText'])
 
   const updateOrg = useHasPermission({
     parentKey: 'view_organization',
@@ -53,9 +42,6 @@ const LegalTable = () => {
   })
 
   const [activeRow, setActiveRow] = useState(null)
-
-  const paddingCell = 0
-  const paddingHeadCell = 0
 
   const { data, loading } = useQuery(GetOrgManufacturers, {
     skip: !orgView ? true : activetab === 'legal' ? false : true
@@ -286,21 +272,12 @@ const LegalTable = () => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           subHeader
-          persistTableHead
-          responsive={true}
           columns={columns}
           data={nodes || []}
           progressPending={loading}
           subHeaderComponent={subHeader}
-          customStyles={customStyles(
-            headingTextColor,
-            null,
-            paddingCell,
-            paddingHeadCell
-          )}
-          progressComponent={<CustomLoader />}
         />
       </Flex>
 

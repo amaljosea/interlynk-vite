@@ -1,8 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince, truncatedValue } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 import { getShareLinklUrl } from 'utils/url'
 
 import { Button, Checkbox, Divider, Input, Stack, Tag } from '@chakra-ui/react'
@@ -10,12 +8,12 @@ import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 import { Flex, Text, Tooltip } from '@chakra-ui/react'
 import { useClipboard } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
 import CopyButton from 'components/Icons/CopyButton'
 import DeleteButton from 'components/Icons/DeleteButton'
 import LynkDate from 'components/LynkDate'
 import LynkDrawer from 'components/LynkDrawer'
+import LynkTable from 'components/LynkTable'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -27,14 +25,12 @@ import { PiFileSvgDuotone } from 'react-icons/pi'
 
 const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
   const { showToast } = useCustomToast()
+
   const BACKEND_URL = process.env.REACT_APP_SERVER
 
   const { name, id: groupId } = prodData || {}
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const defaultDate = new Date()
   defaultDate.setDate(defaultDate.getDate() + 90)
@@ -284,18 +280,14 @@ const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
         </Flex>
       </Stack>
       <Divider hidden={!show} my={4} />
-      <DataTable
+      <LynkTable
         subHeader={!show}
-        persistTableHead
-        responsive={true}
         columns={columns}
         data={nodes || []}
         defaultSortAsc={false}
         progressPending={loading}
         subHeaderComponent={subHeader}
         defaultSortFieldId={'UPDATED_AT'}
-        progressComponent={<CustomLoader />}
-        customStyles={customStyles(headingTextColor)}
       />
     </LynkDrawer>
   )

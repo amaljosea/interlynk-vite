@@ -1,17 +1,14 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getSignedUrlParams } from 'utils'
 import { isSbomArchived } from 'utils'
 import { ProductGeneralTabs } from 'utils/TabsObjects'
-import { customStyles } from 'utils/styleUtils'
 
 import { Flex, Text } from '@chakra-ui/react'
 import { useColorMode, useDisclosure } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
-import CustomLoader from 'components/CustomLoader'
 import CreateParts from 'components/Modal/CreateParts'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -20,7 +17,6 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import useQueryParam from 'hooks/useQueryParam'
-import { useThemeColor } from 'hooks/useThemeColors'
 
 import { SbomPartDelete } from 'graphQL/Mutation'
 import { GetSbomParts } from 'graphQL/Queries'
@@ -28,12 +24,14 @@ import { GetSbomParts } from 'graphQL/Queries'
 import ConfirmationModal from '../components/ConfirmationModal'
 import PartsColumns from './Components/tableColumns/PartsColumns'
 import PartsSubHeader from './Components/tableSubHeaders/PartsSubHeader'
+import LynkTable from 'components/LynkTable'
 
 const Parts = ({ data }) => {
   const params = useParams()
   const navigate = useNavigate()
   const { colorMode } = useColorMode()
   const partsContext = usePartsContext()
+
   const sbomId = params.sbomid
   const prodId = params.productid
   const activeTab = useQueryParam('tab')
@@ -43,8 +41,6 @@ const Parts = ({ data }) => {
   const isArchived = isSbomArchived(data)
 
   const { dispatch } = useGlobalState()
-
-  const { headingTextColor } = useThemeColor(['headingTextColor'])
 
   const { prodVulnDispatch } = dispatch
 
@@ -131,14 +127,10 @@ const Parts = ({ data }) => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           subHeader
           data={sbomParts}
-          persistTableHead
           columns={columns}
-          responsive={true}
-          progressComponent={<CustomLoader />}
-          customStyles={customStyles(headingTextColor)}
           subHeaderComponent={subHeader}
           progressPending={sbomParts ? false : true}
         />

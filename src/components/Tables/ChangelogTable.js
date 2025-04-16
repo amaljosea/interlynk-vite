@@ -1,15 +1,14 @@
 import { useCallback, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
-import { customStyles, getChangelogColor } from 'utils/styleUtils'
+import { getChangelogColor } from 'utils/styleUtils'
 import ChangelogFilterMenu from 'views/Sbom/components/ChangelogFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { Flex, Tag, Text, Tooltip, useDisclosure } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import RefreshBtn from 'components/Icons/RefreshBtn'
+import LynkTable from 'components/LynkTable'
 import UserCard from 'components/Misc/UserCard'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
@@ -21,10 +20,7 @@ import { GetProjectLogs } from 'graphQL/Queries'
 import Pagination from '../Pagination'
 
 const ChangelogTable = ({ activeEnv }) => {
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const [prodLogState, setProdLogState] = useState({
     field: 'ACTIVITY_LOGS_CREATED_AT',
@@ -249,18 +245,13 @@ const ChangelogTable = ({ activeEnv }) => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           subHeader
           data={nodes}
-          persistTableHead
           columns={columns}
-          responsive={true}
           onSort={handleSort}
-          defaultSortAsc={false}
           progressPending={loading}
-          customStyles={customStyles(headingTextColor)}
           subHeaderComponent={subHeader}
-          progressComponent={<CustomLoader />}
           defaultSortFieldId={prodLogState?.field}
         />
 

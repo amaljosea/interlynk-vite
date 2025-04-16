@@ -1,7 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
-import DataTable from 'react-data-table-component'
 import { sevColor } from 'utils/styleUtils'
-import { customStyles } from 'utils/styleUtils'
 
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import {
@@ -17,7 +15,6 @@ import {
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
-import CustomLoader from 'components/CustomLoader'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -28,18 +25,14 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { orgRuleUpdate } from 'graphQL/Mutation'
 import { GetOrgRules } from 'graphQL/Queries'
+import LynkTable from 'components/LynkTable'
 
 const Checks = () => {
+  const showToast = useCustomToast()
   const activetab = useQueryParam('tab')
   const { orgView } = useGlobalQueryContext()
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
-  const showToast = useCustomToast()
-  const paddingCell = 0
-  const paddingHeadCell = 0
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const canEdit = useHasPermission({
     parentKey: 'view_organization',
@@ -211,20 +204,11 @@ const Checks = () => {
       </CardHeader>
       <CardBody>
         {data && data.organization && (
-          <DataTable
+          <LynkTable
             columns={columns}
             data={data && data.organization.organizationRules}
-            defaultSortAsc={true}
             defaultSortFieldId={'RULES_FRIENDLY_ID'}
-            customStyles={customStyles(
-              headingTextColor,
-              null,
-              paddingCell,
-              paddingHeadCell
-            )}
             progressPending={loading}
-            progressComponent={<CustomLoader />}
-            responsive={true}
           />
         )}
       </CardBody>

@@ -1,20 +1,18 @@
 import { gql, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { useCallback, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getSignedUrlParams, getUndefinedIfEmptyOrAll } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
-import { customStyles } from 'utils/styleUtils'
 import LifecycleModal from 'views/Dashboard/Products/components/LifecycleModal'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import ArchivedVersions from 'components/Drawer/ArchivedVersions'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import ToolsDrawer from 'components/Drawer/ToolsDrawer'
+import LynkTable from 'components/LynkTable'
 import ArchiveSbom from 'components/Modal/ArchiveSbom'
 import AutomationWarning from 'components/Modal/AutomationWarning'
 import DeleteSbom from 'components/Modal/DeleteSbom'
@@ -22,8 +20,8 @@ import ReprocessSbom from 'components/Modal/ReprocessSbom'
 import SbomTransfer from 'components/Modal/SbomTransfer'
 import SupportAnalysis from 'components/Modal/SupportAnalysis'
 import Pagination from 'components/Pagination'
-import VersionColumns from 'components/Columns/VersionColumns'
-import VersionHeader from 'components/Headers/VersionHeader'
+import VersionColumns from 'components/columns/VersionColumns'
+import VersionHeader from 'components/headers/VersionHeader'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useGradualPolling } from 'hooks/useGradualPolling'
@@ -89,10 +87,7 @@ const VersionsTable = (props) => {
   const [filterText, setFilterText] = useState(searchInput)
   const [activeRow, setActiveRow] = useState(null)
 
-  const { headingTextColor, primaryBlueText } = useThemeColor([
-    'headingTextColor',
-    'primaryBlueText'
-  ])
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   const LIST = useDisclosure()
   const TOOL = useDisclosure()
@@ -289,31 +284,25 @@ const VersionsTable = (props) => {
     })
   }
 
-  const dataTableProps = {
-    columns: columns,
-    data: nodes || [],
-    customStyles: customStyles(headingTextColor),
-    onSort: handleSort,
-    defaultSortFieldId: field,
-    defaultSortAsc: direction === 'ASC' ? true : false,
-    subHeader: true,
-    subHeaderComponent: subHeader,
-    progressPending: loading,
-    progressComponent: <CustomLoader />,
-    responsive: true,
-    persistTableHead: true,
-    selectableRows: true,
-    clearSelectedRows: clearSelect,
-    onSelectedRowsChange: handleChange,
-    selectableRowDisabled: disableRowCheckBox
-  }
-
   const existingSbom = nodes?.length > 0 ? nodes[0] : null
 
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable {...dataTableProps} className='data-table-container' />
+        <LynkTable
+          columns={columns}
+          data={nodes || []}
+          onSort={handleSort}
+          defaultSortFieldId={field}
+          subHeader
+          subHeaderComponent={subHeader}
+          progressPending={loading}
+          selectableRows
+          clearSelectedRows={clearSelect}
+          onSelectedRowsChange={handleChange}
+          selectableRowDisabled={disableRowCheckBox}
+          className='data-table-container'
+        />
         <Pagination {...paginationProps} />
       </Flex>
       {/* VERSION LIFECYCLE */}

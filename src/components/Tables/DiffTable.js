@@ -1,24 +1,20 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
-import { customStyles } from 'utils/styleUtils'
 import ToolsFilterMenu from 'views/Dashboard/Tools/Filters'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { Badge, Flex, Tag, Text } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
+import LynkTable from 'components/LynkTable'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const DiffTable = ({ diffs, isLoading, sbomOne, sbomTwo }) => {
   const { toolsState, dispatch } = useGlobalState()
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
+
   const { searchInput, difference, component } = toolsState
   const { toolsDispatch } = dispatch
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
 
   const [filterText, setFilterText] = useState(searchInput)
 
@@ -303,16 +299,12 @@ const DiffTable = ({ diffs, isLoading, sbomOne, sbomTwo }) => {
   }, [diffs, toolsDispatch])
 
   return (
-    <DataTable
+    <LynkTable
       columns={columns}
       data={sbomOne && sbomTwo ? filteredData : []}
-      customStyles={customStyles(headingTextColor)}
       progressPending={isLoading}
       subHeader={sbomOne && sbomTwo && diffs?.sbomDrift ? true : false}
       subHeaderComponent={subHeader}
-      progressComponent={<CustomLoader />}
-      persistTableHead
-      responsive={true}
     />
   )
 }

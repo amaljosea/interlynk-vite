@@ -1,8 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { useMemo } from 'react'
-import DataTable from 'react-data-table-component'
 import { linkURl } from 'utils'
-import { customStyles, statusColor } from 'utils/styleUtils'
+import { statusColor } from 'utils/styleUtils'
 
 import {
   Box,
@@ -15,7 +14,6 @@ import {
 } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import ExternalNavIcon from 'components/Icons/ExternalNavIcon'
 import SeverityTag from 'components/Misc/SeverityTag'
 
@@ -25,10 +23,15 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { IntersectingVulns } from 'graphQL/Queries'
 
 import { BsCircleHalf } from 'react-icons/bs'
+import LynkTable from 'components/LynkTable'
 
 const StepTwo = ({ sbomId, currentSbomId }) => {
-  const { headingTextColor, primaryTextColor, primaryErrorColor } =
-    useThemeColor(['headingTextColor', 'primaryTextColor', 'primaryErrorColor'])
+
+  const { primaryTextColor, primaryErrorColor } = useThemeColor([
+    'primaryTextColor',
+    'primaryErrorColor'
+  ])
+
   const { colorMode } = useColorMode()
   const { prodVulnState, dispatch } = useGlobalState()
   const { selectedVulns } = prodVulnState
@@ -193,19 +196,15 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
         Select common vulnerabilities for status update
       </Heading>
       <Flex mt={5} flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           subHeader
           columns={columns}
           className={tableClassName + 'data-table-container'}
           data={data?.intersectingVulns || []}
-          customStyles={customStyles(headingTextColor)}
           progressPending={data ? false : true}
-          progressComponent={<CustomLoader />}
           subHeaderComponent={subHeaderComponentMemo}
-          responsive={true}
           selectableRows={true}
           fixedHeader
-          persistTableHead
           fixedHeaderScrollHeight='50vh'
           onSelectedRowsChange={handleChange}
           selectableRowDisabled={conditionalRowDisabled}

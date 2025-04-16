@@ -1,25 +1,22 @@
 import { useQuery } from '@apollo/client'
 import { useCallback, useEffect, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getSignedUrlParams } from 'utils'
 import { parseEpssRange } from 'utils'
 import { isSbomArchived } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 import VulnerabilityColumns from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableColumns/VulnerabilityColumns'
 import ExpandedComponent from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableExpanded/VulnerabilityExpanded'
 import VulnerabilitySubHeader from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableSubHeaders/VulnerabilitySubHeader'
 
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
+import LynkTable from 'components/LynkTable'
 import CvssCard from 'components/Misc/CvssCard'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
-import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
   FirstDegreePartVulns,
@@ -49,7 +46,6 @@ const Vulnerabilities = ({ sbomData }) => {
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
-  const { headingTextColor } = useThemeColor(['headingTextColor'])
   const [activeRow, setActiveRow] = useState(null)
   const [vulnSearch, setVulnSearch] = useState(searchInput)
 
@@ -195,22 +191,17 @@ const Vulnerabilities = ({ sbomData }) => {
     <>
       <Flex flexDir={'column'} width={'100%'}>
         {/* TABLE */}
-        <DataTable
+        <LynkTable
           className='data-table-container'
           columns={columns}
           data={nodes}
-          customStyles={customStyles(headingTextColor)}
           onSort={handleSort}
-          defaultSortAsc={false}
           defaultSortFieldId={field}
           progressPending={loading}
-          progressComponent={<CustomLoader />}
           subHeader
           subHeaderComponent={subHeader}
-          responsive={true}
           expandableRows
           expandOnRowClicked
-          persistTableHead
           expandableRowsComponent={ExpandedComponent}
           expandableRowsComponentProps={{
             setActiveRow,

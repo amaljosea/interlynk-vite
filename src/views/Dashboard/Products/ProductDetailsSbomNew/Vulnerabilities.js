@@ -1,6 +1,5 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import {
   getSignedUrlParams,
@@ -8,17 +7,16 @@ import {
   parseEpssRange,
   setKEV
 } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 import VexModal from 'views/Dashboard/Vulnerabilities/components/VexModal'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
 
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
 import JiraCreateIssueModal from 'components/Connections/JiraCreateIssueModal'
-import CustomLoader from 'components/CustomLoader'
 import VulnDrawer from 'components/Drawer/VulnDrawer'
 import VulnLinkDrawer from 'components/Drawer/VulnLinkDrawer'
 import LynkDrawer from 'components/LynkDrawer'
+import LynkTable from 'components/LynkTable'
 import CvssCard from 'components/Misc/CvssCard'
 import CustomVuln from 'components/Modal/CustomVuln'
 import Pagination from 'components/Pagination'
@@ -28,7 +26,6 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
-import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CustomVulnUpdate, ManualVulnScan } from 'graphQL/Mutation'
 import {
@@ -57,7 +54,6 @@ export const GetProjectSettings = gql`
 const Vulnerabilities = ({ sbomData }) => {
   const params = useParams()
   const productId = params.productid
-  const { headingTextColor } = useThemeColor(['headingTextColor'])
 
   const isArchived = isSbomArchived(sbomData)
 
@@ -365,22 +361,17 @@ const Vulnerabilities = ({ sbomData }) => {
     <>
       <Flex flexDir={'column'} width={'100%'}>
         {/* TABLE */}
-        <DataTable
+        <LynkTable
           className='data-table-container'
           columns={columns}
           data={nodes}
-          customStyles={customStyles(headingTextColor)}
           onSort={handleSort}
-          defaultSortAsc={false}
           defaultSortFieldId={field}
           progressPending={loading}
-          progressComponent={<CustomLoader />}
           subHeader
           subHeaderComponent={subHeader}
-          responsive={true}
           expandableRows
           expandOnRowClicked
-          persistTableHead
           expandableRowsComponent={ExpandedComponent}
           expandableRowsComponentProps={{
             setActiveRow,

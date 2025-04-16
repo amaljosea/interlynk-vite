@@ -1,19 +1,16 @@
 import { useQuery } from '@apollo/client'
 import { useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
-import { customStyles } from 'utils/styleUtils'
 
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
 import CardBody from 'components/Card/CardBody'
-import CustomLoader from 'components/CustomLoader'
+import LynkTable from 'components/LynkTable'
 import Pagination from 'components/Pagination'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
-import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
   AutomationConditionSubjectFieldMapping,
@@ -30,9 +27,8 @@ import { useAutomationColumns } from './components/automationColumns'
 
 const Automation = ({ projects }) => {
   const params = useParams()
-  const productId = params.productid
 
-  const { headingTextColor } = useThemeColor(['headingTextColor'])
+  const productId = params.productid
 
   const [activeRow, setActiveRow] = useState(null)
   const [activeEnv, setActiveEnv] = useState(null)
@@ -94,15 +90,11 @@ const Automation = ({ projects }) => {
     <>
       <CardBody>
         <Flex flexDir={'column'} width={'100%'}>
-          <DataTable
+          <LynkTable
             subHeader
             data={nodes}
-            persistTableHead
-            responsive={true}
             columns={columns}
-            customStyles={customStyles(headingTextColor)}
             progressPending={loading}
-            progressComponent={<CustomLoader />}
             subHeaderComponent={subHeaderComponent}
           />
           <Pagination {...paginationProps} />

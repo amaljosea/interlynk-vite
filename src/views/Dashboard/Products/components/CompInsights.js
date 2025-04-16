@@ -1,8 +1,8 @@
 import { useQuery } from '@apollo/client'
 import { getFullDateTime, timeSince } from 'utils'
-import { pkgData, pkgVersionData, repositoryData } from 'variables/general'
+import { getHealthScore, getTotalHealthScore } from 'utils/healthScoreUtils'
 
-import { Divider, SimpleGrid, Skeleton, Spacer, Stack } from '@chakra-ui/react'
+import { SimpleGrid, Skeleton, Spacer, Stack } from '@chakra-ui/react'
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 import { Box, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 
@@ -15,8 +15,16 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { GetEnrichedData } from 'graphQL/Queries'
 
 const Container = ({ children }) => {
+  const { grayBorderColor } = useThemeColor(['grayBorderColor'])
+
   return (
-    <SimpleGrid columns={2} spacing={4} fontSize={'sm'}>
+    <SimpleGrid
+      pb={2}
+      columns={2}
+      spacing={4}
+      fontSize={'sm'}
+      borderBottom={`1px solid ${grayBorderColor}`}
+    >
       {children}
     </SimpleGrid>
   )
@@ -41,15 +49,55 @@ const DateField = ({ value }) => {
   )
 }
 
+const HealthScore = ({ scores }) => {
+  const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
+
+  if (scores?.age) {
+    const { age, community, security } = scores || {}
+
+    const data = [
+      { id: 1, label: 'Age Score', value: getHealthScore(age) },
+      {
+        id: 2,
+        label: 'Community Score',
+        value: getHealthScore(community)
+      },
+      {
+        id: 3,
+        label: 'Security Score',
+        value: getHealthScore(security)
+      },
+      {
+        id: 4,
+        label: 'Total Score',
+        value: getTotalHealthScore(age, community, security)
+      }
+    ]
+
+    return (
+      <Stack>
+        {data?.map((item) => (
+          <Container key={item?.id}>
+            <Text>{item?.label}</Text>
+            <Text>{item?.value}</Text>
+          </Container>
+        ))}
+      </Stack>
+    )
+  }
+
+  return (
+    <Text textAlign={'center'} color={sameSecondaryText}>
+      Not available
+    </Text>
+  )
+}
+
 const CompInsights = ({ isOpen, onClose, data }) => {
-  const { id, scores } = data || ''
+  const { id, scores } = data || {}
+
   const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
   const { secondaryBgColor } = useThemeColor(['secondaryBgColor'])
-
-  const { age, community, security } = scores || ''
-  const ageScore = Math.round(age)
-  const communityScore = Math.round(community)
-  const securityScore = Math.round(security)
 
   const { data: insights, loading } = useQuery(GetEnrichedData, {
     skip: isOpen ? false : true,
@@ -60,20 +108,9 @@ const CompInsights = ({ isOpen, onClose, data }) => {
   const { packageVersion, latestPackageVersion, repository } =
     enrichedContent || ''
 
-  const onCheck = (category, title) => {
-    if (category === 'package') {
-      const result = pkgData.find((item) => item?.title === title)
-      return result?.desc
-    } else if (category === 'packageVersion') {
-      const result = pkgVersionData.find((item) => item?.title === title)
-      return result?.desc
-    } else if (category === 'repository') {
-      const result = repositoryData.find((item) => item?.title === title)
-      return result?.desc
-    }
-  }
-
   const getLicense = (item) => {
+    if (!item) return 'N/A'
+
     const result = JSON.parse(item)
     if (result?.length > 0) {
       return result[0]?.name !== '' ? result[0]?.name : 'N/A'
@@ -83,6 +120,144 @@ const CompInsights = ({ isOpen, onClose, data }) => {
   }
 
   const tabs = ['Package', 'Version', 'Source Code', 'Health Score']
+
+  const packageData = [
+    {
+      id: 1,
+      label: 'Most Recent Version',
+      value: <Text>{latestPackageVersion?.version || 'N/A'}</Text>
+    },
+    {
+      id: 2,
+      label: 'Deprecated',
+      value: <LynkTag value={enrichedContent?.package?.isDeprecated || 'N/A'} />
+    },
+    {
+      id: 3,
+      label: 'Last Checked',
+      value: <DateField value={enrichedContent?.package?.updatedAt || 'N/A'} />
+    }
+  ]
+
+  const packageVersionData = [
+    {
+      id: 1,
+      label: 'Version',
+      value: <Text>{packageVersion?.version || 'N/A'}</Text>
+    },
+    {
+      id: 2,
+      label: 'License',
+      value: <Text>{getLicense(packageVersion?.license)}</Text>
+    },
+    {
+      id: 3,
+      label: 'Deprecated',
+      value: <LynkTag value={packageVersion?.isDeprecated || 'N/A'} />
+    },
+    {
+      id: 4,
+      label: 'Archived',
+      value: <LynkTag value={packageVersion?.isArchived || 'N/A'} />
+    },
+    {
+      id: 5,
+      label: 'Pre-release',
+      value: <LynkTag value={packageVersion?.isPreRelease || 'N/A'} />
+    },
+    {
+      id: 6,
+      label: 'Outdated',
+      value: <LynkTag value={packageVersion?.isOutdated || 'N/A'} />
+    },
+    {
+      id: 7,
+      label: 'Published',
+      value: <DateField value={packageVersion?.publishedAt || 'N/A'} />
+    },
+    {
+      id: 8,
+      label: 'Last Checked',
+      value: <DateField value={packageVersion?.updatedAt || 'N/A'} />
+    }
+  ]
+
+  const sourceCodeData = [
+    {
+      id: 1,
+      label: 'Name',
+      value: <Text>{repository?.name || 'N/A'}</Text>
+    },
+    {
+      id: 2,
+      label: 'Owner',
+      value: <Text>{repository?.owner || 'N/A'}</Text>
+    },
+    {
+      id: 3,
+      label: 'Description',
+      value: <Text>{repository?.description || 'N/A'}</Text>
+    },
+    {
+      id: 4,
+      label: 'Source Archived',
+      value: <LynkTag value={repository?.isArchived || 'N/A'} />
+    },
+    {
+      id: 5,
+      label: 'Stars',
+      value: <Text>{repository?.starsCount || 'N/A'}</Text>
+    },
+    {
+      id: 6,
+      label: 'Forks',
+      value: <Text>{repository?.forksCount || 'N/A'}</Text>
+    },
+    {
+      id: 7,
+      label: 'Last Commit',
+      value: <DateField value={repository?.lastCommitDate || 'N/A'} />
+    },
+    {
+      id: 8,
+      label: 'Contibutors',
+      value: <Text>{repository?.contributorCount || 'N/A'}</Text>
+    },
+    {
+      id: 9,
+      label: 'Last Merged',
+      value: <DateField value={repository?.lastMergedPrDate} />
+    },
+    {
+      id: 10,
+      label: 'Last Relasesd',
+      value: <DateField value={repository?.lastReleaseDate} />
+    },
+    {
+      id: 11,
+      label: 'Last Repo Update',
+      value: <DateField value={repository?.lastRepoUpdateDate || 'N/A'} />
+    },
+    {
+      id: 12,
+      label: 'OpenSSF Scorecard',
+      value: <Text>{repository?.scorecardScore || 'N/A'}</Text>
+    },
+    {
+      id: 13,
+      label: 'License',
+      value: (
+        <Tag colorScheme='blue' w='fit-content'>
+          <TagLabel fontSize={'xs'}>{getLicense(repository?.license)}</TagLabel>
+        </Tag>
+      )
+    },
+    {
+      id: 14,
+      label: 'Last Checked',
+      value: <DateField value={repository?.updatedAt || 'N/A'} />
+    }
+  ]
 
   return (
     <LynkDrawer
@@ -99,7 +274,7 @@ const CompInsights = ({ isOpen, onClose, data }) => {
       noFooter
     >
       {loading ? (
-        <Box px={5}>
+        <Box py={2}>
           <CustomLoader />
         </Box>
       ) : (
@@ -128,232 +303,56 @@ const CompInsights = ({ isOpen, onClose, data }) => {
             <TabPanel>
               {enrichedContent?.package ? (
                 <Stack>
-                  <Container>
-                    <Tooltip
-                      label={onCheck('packageVersion', 'Most Recent Version')}
-                    >
-                      <Text cursor={'pointer'}>Most Recent Version</Text>
-                    </Tooltip>
-                    <Text>{latestPackageVersion?.version}</Text>
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Tooltip label={onCheck('package', 'Deprecated')}>
-                      <Text cursor={'pointer'}>Deprecated</Text>
-                    </Tooltip>
-                    <LynkTag value={enrichedContent?.package?.isDeprecated} />
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Tooltip label={onCheck('packageVersion', 'Last Checked')}>
-                      <Text cursor={'pointer'}>Last Checked</Text>
-                    </Tooltip>
-                    <DateField value={enrichedContent?.package?.updatedAt} />
-                  </Container>
+                  {packageData?.map((item) => (
+                    <Container key={item?.id}>
+                      <Text>{item?.label}</Text>
+                      {item?.value}
+                    </Container>
+                  ))}
                 </Stack>
               ) : (
-                <Text color={sameSecondaryText}>Not available</Text>
+                <Text textAlign={'center'} color={sameSecondaryText}>
+                  Not available
+                </Text>
               )}
             </TabPanel>
             {/* PACKAGE VERSION */}
             <TabPanel>
               {packageVersion ? (
                 <Stack>
-                  <Container>
-                    <Text>Version</Text>
-                    <Text>{packageVersion?.version}</Text>
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Tooltip label={onCheck('packageVersion', 'License')}>
-                      <Text cursor={'pointer'}>License</Text>
-                    </Tooltip>
-                    <Text>{getLicense(packageVersion?.license)}</Text>
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Tooltip label={onCheck('packageVersion', 'Deprecated')}>
-                      <Text cursor={'pointer'}>Deprecated</Text>
-                    </Tooltip>
-                    <LynkTag value={packageVersion?.isDeprecated} />
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Tooltip label={onCheck('packageVersion', 'Archived')}>
-                      <Text cursor={'pointer'}>Archived</Text>
-                    </Tooltip>
-                    <LynkTag value={packageVersion?.isArchived} />
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Tooltip label={onCheck('packageVersion', 'Pre-release')}>
-                      <Text cursor={'pointer'}>Pre-release</Text>
-                    </Tooltip>
-                    <LynkTag value={packageVersion?.isPreRelease} />
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Tooltip label={onCheck('packageVersion', 'Outdated')}>
-                      <Text cursor={'pointer'}>Outdated</Text>
-                    </Tooltip>
-                    <LynkTag value={packageVersion?.isOutdated} />
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Tooltip label={onCheck('packageVersion', 'Published')}>
-                      <Text cursor={'pointer'}>Published</Text>
-                    </Tooltip>
-                    <DateField value={packageVersion?.publishedAt} />
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Tooltip label={onCheck('packageVersion', 'Last Checked')}>
-                      <Text cursor={'pointer'}>Last Checked</Text>
-                    </Tooltip>
-                    <DateField value={packageVersion?.updatedAt} />
-                  </Container>
+                  {packageVersionData?.map((item) => (
+                    <Container key={item?.id}>
+                      <Text>{item?.label}</Text>
+                      {item?.value}
+                    </Container>
+                  ))}
                 </Stack>
               ) : (
-                <Text color={sameSecondaryText}>Not available</Text>
+                <Text textAlign={'center'} color={sameSecondaryText}>
+                  Not available
+                </Text>
               )}
             </TabPanel>
             {/* SOURCE CODE */}
             <TabPanel>
               {repository ? (
                 <Stack>
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'Name')}>
-                      <Text cursor={'pointer'}>Name</Text>
-                    </Tooltip>
-                    <Text>{repository?.name}</Text>
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'Owner')}>
-                      <Text cursor={'pointer'}>Owner</Text>
-                    </Tooltip>
-                    <Text>{repository?.owner}</Text>
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'Description')}>
-                      <Text cursor={'pointer'}>Description</Text>
-                    </Tooltip>
-                    <Text>{repository?.description}</Text>
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'Source Archived')}>
-                      <Text cursor={'pointer'}>Source Archived</Text>
-                    </Tooltip>
-                    <LynkTag value={repository?.isArchived} />
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'Stars')}>
-                      <Text cursor={'pointer'}>Stars</Text>
-                    </Tooltip>
-                    <Text>{repository?.starsCount}</Text>
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'Forks')}>
-                      <Text cursor={'pointer'}>Forks</Text>
-                    </Tooltip>
-                    <Text>{repository?.forksCount}</Text>
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'Last Commit')}>
-                      <Text cursor={'pointer'}>Last Commit</Text>
-                    </Tooltip>
-                    <DateField value={repository?.lastCommitDate} />
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'Contibutors')}>
-                      <Text cursor={'pointer'}>Contibutors</Text>
-                    </Tooltip>
-                    <Text>{repository?.contributorCount}</Text>
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'Last Merged')}>
-                      <Text cursor={'pointer'}>Last Merged</Text>
-                    </Tooltip>
-                    <DateField value={repository?.lastMergedPrDate} />
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'Relases')}>
-                      <Text cursor={'pointer'}>Last Relasesd</Text>
-                    </Tooltip>
-                    <DateField value={repository?.lastReleaseDate} />
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'Last Repo Update')}>
-                      <Text cursor={'pointer'}>Last Repo Update</Text>
-                    </Tooltip>
-                    <DateField value={repository?.lastRepoUpdateDate} />
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'OpenSSF Scorecard')}>
-                      <Text cursor={'pointer'}>OpenSSF Scorecard</Text>
-                    </Tooltip>
-                    <Text>{repository?.scorecardScore}</Text>
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'License')}>
-                      <Text cursor={'pointer'}>License</Text>
-                    </Tooltip>
-                    <Tag colorScheme='blue' w='fit-content'>
-                      <TagLabel fontSize={'xs'}>
-                        {getLicense(repository?.license)}
-                      </TagLabel>
-                    </Tag>
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Tooltip label={onCheck('repository', 'Last Checked')}>
-                      <Text cursor={'pointer'}>Last Checked</Text>
-                    </Tooltip>
-                    <DateField value={repository?.updatedAt} />
-                  </Container>
+                  {sourceCodeData?.map((item) => (
+                    <Container key={item?.id}>
+                      <Text>{item?.label}</Text>
+                      {item?.value}
+                    </Container>
+                  ))}
                 </Stack>
               ) : (
-                <Text color={sameSecondaryText}>Not available</Text>
+                <Text textAlign={'center'} color={sameSecondaryText}>
+                  Not available
+                </Text>
               )}
             </TabPanel>
             {/* HEALTH SCORE */}
             <TabPanel>
-              {scores?.age ? (
-                <Stack>
-                  <Container>
-                    <Text>Age Score</Text>
-                    <Text>{ageScore}%</Text>
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Text>Community Score</Text>
-                    <Text>{communityScore}%</Text>
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Text>Security Score</Text>
-                    <Text>{securityScore}%</Text>
-                  </Container>
-                  <Divider />
-                  <Container>
-                    <Text>Total Score</Text>
-                    <Text>{ageScore + communityScore + securityScore}%</Text>
-                  </Container>
-                </Stack>
-              ) : (
-                <Text color={sameSecondaryText}>Not available</Text>
-              )}
+              <HealthScore scores={scores} />
             </TabPanel>
           </TabPanels>
         </Tabs>

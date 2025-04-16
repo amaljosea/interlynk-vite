@@ -1,6 +1,4 @@
-import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
-import { customStyles } from 'utils/styleUtils'
 import LicenseColumns from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableColumns/LicenseColumns'
 import ExpandedRow from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableExpanded/LicensesExpanded'
 import LicensesSubHeader from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableSubHeaders/LicensesSubHeader'
@@ -8,7 +6,6 @@ import LicensesSubHeader from 'views/Dashboard/Products/ProductDetailsSbomNew/Co
 import { Flex, Text } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
-import CustomLoader from 'components/CustomLoader'
 import Pagination from 'components/Pagination'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
@@ -16,16 +13,14 @@ import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetShareLicensesTable } from 'graphQL/Queries'
+import LynkTable from 'components/LynkTable'
 
 const Licenses = () => {
   const params = useParams()
   const sbomId = params.sbomid
   const activeTab = useQueryParam('tab')
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const { nodes, loading, error, paginationProps } = usePaginatedQuery(
     GetShareLicensesTable,
@@ -53,18 +48,13 @@ const Licenses = () => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           columns={columns}
           data={nodes || []}
-          customStyles={customStyles(headingTextColor)}
-          defaultSortAsc={false}
           defaultSortFieldId={'UPDATED_AT'}
           progressPending={loading}
-          progressComponent={<CustomLoader />}
           subHeader
           subHeaderComponent={subHeader}
-          responsive
-          persistTableHead
           expandableRows
           expandOnRowClicked
           expandableRowsComponent={ExpandedRow}

@@ -98,7 +98,7 @@ const Vulnerabilities = () => {
         </Flex>
 
         <TabPanels>
-          <TabPanel>
+          <TabPanel px={0}>
             <GlobalVulnTable
               vulns={nodes}
               reset={reset}
@@ -107,7 +107,7 @@ const Vulnerabilities = () => {
               paginationProps={paginationProps}
             />
           </TabPanel>
-          <TabPanel>
+          <TabPanel px={0}>
             <CustomVulnTable />
           </TabPanel>
         </TabPanels>

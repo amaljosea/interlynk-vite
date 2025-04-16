@@ -1,15 +1,13 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getFullDate, timeSince, truncatedValue } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 
 import { IconButton, Stack, useDisclosure } from '@chakra-ui/react'
 import { Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import LynkDrawer from 'components/LynkDrawer'
+import LynkTable from 'components/LynkTable'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -34,10 +32,7 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
     childKey: 'update_sbom'
   })
 
-  const { primaryTextColor, headingTextColor } = useThemeColor([
-    'primaryTextColor',
-    'headingTextColor'
-  ])
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const [updateSbom, { loading: updateLoading }] = useMutation(sbomUpdate)
 
@@ -193,15 +188,11 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
         subtitle={subtitle}
         noFooter
       >
-        <DataTable
-          responsive
-          persistTableHead
+        <LynkTable
           columns={columns}
-          progressPending={loading}
           data={alternatives}
-          progressComponent={<CustomLoader />}
+          progressPending={loading}
           className='data-table-container'
-          customStyles={customStyles(headingTextColor)}
         />
       </LynkDrawer>
 

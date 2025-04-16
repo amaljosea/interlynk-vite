@@ -1,9 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import React, { useCallback, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
-import { customStyles } from 'utils/styleUtils'
 import DeleteModal from 'views/Dashboard/Policies/DeleteModal'
 import PolicyModal from 'views/Dashboard/Policies/PolicyModal'
 import WarnModal from 'views/Dashboard/Policies/WarnModal'
@@ -11,9 +9,9 @@ import WarnModal from 'views/Dashboard/Policies/WarnModal'
 import { Stack, useDisclosure } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
-import GlobalPolicyColumns from 'components/Columns/GlobalPolicyColumns'
-import CustomLoader from 'components/CustomLoader'
-import GlobalPolicyHeader from 'components/Headers/GlobalPolicyHeader'
+import GlobalPolicyColumns from 'components/columns/GlobalPolicyColumns'
+import GlobalPolicyHeader from 'components/headers/GlobalPolicyHeader'
+import LynkTable from 'components/LynkTable'
 import Pagination from 'components/Pagination'
 import GlobalPolicyExpand from 'components/expand-view/GlobalPolicyExpand'
 
@@ -37,10 +35,7 @@ const PolicyTable = () => {
   const productId = params.productid
   const { POLICIES } = ProductDetailsTabs
 
-  const { headingTextColor, blurBackground } = useThemeColor([
-    'headingTextColor',
-    'blurBackground'
-  ])
+  const { blurBackground } = useThemeColor(['blurBackground'])
 
   const POLICY = useDisclosure()
   const STATUS = useDisclosure()
@@ -230,20 +225,16 @@ const PolicyTable = () => {
     <>
       <Card padding={productId ? '0px' : '22px'}>
         <Stack>
-          <DataTable
+          <LynkTable
             subHeader
             expandableRows
-            persistTableHead
-            responsive={true}
             columns={columns}
             data={data || []}
             expandOnRowClicked
             progressPending={loading}
             subHeaderComponent={header}
-            progressComponent={<CustomLoader />}
             expandableRowsComponent={GlobalPolicyExpand}
             conditionalRowStyles={conditionalRowStyles}
-            customStyles={customStyles(headingTextColor)}
             expandableRowsComponentProps={{ formatSubject }}
           />
           {<Pagination {...paginationProps} />}

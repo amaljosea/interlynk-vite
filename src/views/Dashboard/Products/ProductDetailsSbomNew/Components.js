@@ -1,18 +1,15 @@
 import { useMutation } from '@apollo/client'
 import { debounce } from 'lodash'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getUndefinedIfEmptyOrAll } from 'utils'
 import { isSbomArchived } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
 
 import { Flex, Text } from '@chakra-ui/react'
 import { useDisclosure } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
-import CustomLoader from 'components/CustomLoader'
 import ComponentNotes from 'components/Drawer/ComponentNotes'
 import ComponentVulns from 'components/Drawer/ComponentVulns'
 import LicenseStatus from 'components/Drawer/LicenseStatus'
@@ -25,7 +22,6 @@ import TreeView from 'components/TreeView'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
-import { useThemeColor } from 'hooks/useThemeColors'
 
 import { deleteComSupplier } from 'graphQL/Mutation'
 import { GetComponentData } from 'graphQL/Queries'
@@ -37,15 +33,15 @@ import HealthMap from '../components/HealthMap'
 import ComponentsColumns from './Components/tableColumns/ComponentsColumns'
 import ExpandedComponent from './Components/tableExpanded/ComponentsExpanded'
 import ComponentsSubHeader from './Components/tableSubHeaders/ComponentsSubHeader'
+import LynkTable from 'components/LynkTable'
 
 const Components = ({ sbomData }) => {
   const params = useParams()
+
   const productId = params.productid
   const sbomId = params.sbomid
 
   const isArchived = isSbomArchived(sbomData)
-
-  const { headingTextColor } = useThemeColor(['headingTextColor'])
 
   const { prodCompState, dispatch } = useGlobalState()
   const {
@@ -280,23 +276,18 @@ const Components = ({ sbomData }) => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'} height={'auto'}>
-        <DataTable
+        <LynkTable
           subHeader
           data={nodes}
           expandableRows
-          persistTableHead
-          responsive={true}
           columns={columns}
           expandOnRowClicked
           onSort={handleSort}
-          defaultSortAsc={false}
           progressPending={loading}
           defaultSortFieldId={field}
           onRowClicked={handleRowClick}
           subHeaderComponent={subHeader}
-          progressComponent={<CustomLoader />}
           expandableRowsComponent={ExpandedComponent}
-          customStyles={customStyles(headingTextColor)}
           expandableRowsComponentProps={{ isArchived, action }}
           expandableRowExpanded={(row) => expandedRows?.includes(row?.name)}
         />
