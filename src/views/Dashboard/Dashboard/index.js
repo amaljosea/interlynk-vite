@@ -79,7 +79,7 @@ export default function Page() {
   }
 
   return (
-    <Flex width={'100%'} flexDirection='column' gap={5}>
+    <Stack width={'100%'} spacing={8}>
       {/* FILTERS */}
       <Flex
         width={'100%'}
@@ -106,7 +106,7 @@ export default function Page() {
           {!isFreeTier && <CardList />}
         </Flex>
       </Flex>
-      <Stack spacing={10}>
+      <Stack spacing={12}>
         {/* PRODUCTS GRAPHS */}
         <ProductGroup />
         {/* VULNERABILITIRS GRAPHS */}
@@ -139,6 +139,6 @@ export default function Page() {
           </Grid>
         </Stack>
       </Stack>
-    </Flex>
+    </Stack>
   )
 }

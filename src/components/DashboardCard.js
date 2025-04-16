@@ -63,7 +63,6 @@ export function DashboardCard({
             aria-label='Delete card'
             icon={<LuX />}
             variant='ghost'
-            colorScheme='red'
             hidden={isAnalytics}
             onClick={() => onDelete(id)}
             _hover={{ bg: 'none' }}
