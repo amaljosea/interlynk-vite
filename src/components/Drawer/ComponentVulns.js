@@ -1,15 +1,14 @@
 import React from 'react'
-import DataTable from 'react-data-table-component'
 import { useNavigate } from 'react-router-dom'
 import { linkURl } from 'utils'
-import { customStyles, statusColor } from 'utils/styleUtils'
+import { statusColor } from 'utils/styleUtils'
 
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { Flex, Stack, Text } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import ExternalNavIcon from 'components/Icons/ExternalNavIcon'
 import LynkDrawer from 'components/LynkDrawer'
+import LynkTable from 'components/LynkTable'
 import CompInfo from 'components/Misc/CompInfo'
 import SeverityTag from 'components/Misc/SeverityTag'
 import Pagination from 'components/Pagination'
@@ -23,15 +22,12 @@ import { GetComponentVulns } from 'graphQL/Queries'
 
 const ComponentVulns = ({ data, isOpen, onClose }) => {
   const navigate = useNavigate()
+  const { dispatch } = useGlobalState()
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
-  const { dispatch } = useGlobalState()
-  const { prodVulnDispatch } = dispatch
 
-  const { primaryBlueText, headingTextColor } = useThemeColor([
-    'primaryBlueText',
-    'headingTextColor'
-  ])
+  const { prodVulnDispatch } = dispatch
 
   const { nodes, paginationProps, loading } = usePaginatedQuery(
     GetComponentVulns,
@@ -116,14 +112,10 @@ const ComponentVulns = ({ data, isOpen, onClose }) => {
       noFooter
     >
       <Stack>
-        <DataTable
-          responsive
+        <LynkTable
           columns={columns}
           data={nodes || []}
-          customStyles={customStyles(headingTextColor)}
           progressPending={loading}
-          progressComponent={<CustomLoader />}
-          persistTableHead
         />
         <Pagination {...paginationProps} />
       </Stack>

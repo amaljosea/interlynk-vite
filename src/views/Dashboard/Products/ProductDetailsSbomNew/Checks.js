@@ -1,10 +1,8 @@
 import { useMutation, useQuery } from '@apollo/client'
 import React, { useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getUndefinedIfEmptyOrAll } from 'utils'
 import { isSbomArchived } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CheckModal from 'views/Sbom/components/CheckModal'
@@ -13,7 +11,6 @@ import SupplierModal from 'views/Sbom/components/SupplierModal'
 
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import LicenseModal from 'components/LicenseModal'
 import Pagination from 'components/Pagination'
@@ -21,7 +18,6 @@ import Pagination from 'components/Pagination'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
-import { useThemeColor } from 'hooks/useThemeColors'
 
 import { recheckHealth } from 'graphQL/Mutation'
 import { GetCheckResults, GetProductData } from 'graphQL/Queries'
@@ -31,6 +27,7 @@ import FixedModal from '../components/FixedModal'
 import ChecksColumns from './Components/tableColumns/ChecksColumns'
 import ChecksSubHeader from './Components/tableSubHeaders/ChecksSubHeader'
 import Support from './SbomChecks/Support'
+import LynkTable from 'components/LynkTable'
 
 const Checks = ({ sbomData }) => {
   const params = useParams()
@@ -39,8 +36,6 @@ const Checks = ({ sbomData }) => {
   const activeTab = useQueryParam('tab')
 
   const isArchived = isSbomArchived(sbomData)
-
-  const { headingTextColor } = useThemeColor(['headingTextColor'])
 
   const { sbomCheckState, dispatch } = useGlobalState()
   const { prodCompDispatch, sbomDispatch, sbomCheckDispatch } = dispatch
@@ -227,19 +222,14 @@ const Checks = ({ sbomData }) => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           subHeader
           data={nodes}
-          persistTableHead
           columns={columns}
-          responsive={true}
           onSort={handleSort}
-          defaultSortAsc={false}
           progressPending={loading}
           defaultSortFieldId={field}
           subHeaderComponent={subHeader}
-          progressComponent={<CustomLoader />}
-          customStyles={customStyles(headingTextColor)}
         />
         {/* PAGINATION */}
         <Pagination {...paginationProps} />

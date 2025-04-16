@@ -1,9 +1,8 @@
 import { useLazyQuery } from '@apollo/client'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { areArraysEqual, getFullDate, timeSince } from 'utils'
-import { customStyles, statusColor } from 'utils/styleUtils'
+import { statusColor } from 'utils/styleUtils'
 import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -18,7 +17,6 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import ConnectedSbomDrawer from 'components/Drawer/ConnectedSbomDrawer'
 import Pagination from 'components/Pagination'
 
@@ -34,14 +32,12 @@ import { FaFolderTree } from 'react-icons/fa6'
 
 import VexModal from './VexModal'
 import VulnFilters from './VulnsFilter'
+import LynkTable from 'components/LynkTable'
 
 const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
   const params = useParams()
   const productGroupId = params?.productgroupid
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const { id, vulnId } = vuln || ''
 
@@ -352,19 +348,15 @@ const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
     <>
       {/* TABLE */}
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           subHeader
-          responsive
           selectableRows
-          persistTableHead
           columns={columns}
           progressPending={loading}
           data={statusResults || []}
           clearSelectedRows={toggleClear}
           onSelectedRowsChange={handleChange}
-          progressComponent={<CustomLoader />}
           className='data-table-container'
-          customStyles={customStyles(headingTextColor)}
           subHeaderComponent={subHeaderComponent}
         />
         <Pagination {...paginationProps} />

@@ -1,12 +1,10 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useCallback, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { getFullDate, timeSince, updatedValue } from 'utils'
 import { formatConditionValue } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import { getIcon } from 'utils/styleUtils'
-import { customStyles } from 'utils/styleUtils'
 import DeleteModal from 'views/Dashboard/Policies/DeleteModal'
 import PolicyModal from 'views/Dashboard/Policies/PolicyModal'
 import RuleModal from 'views/Dashboard/Policies/RuleModal'
@@ -29,7 +27,6 @@ import { Tag, TagLabel } from '@chakra-ui/react'
 import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
-import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import { CustomText } from 'components/Misc/CustomText'
@@ -45,9 +42,11 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { DeletePolicyExclusion, PolicyExclusionCreate } from 'graphQL/Mutation'
 import { GetPolicies, PolicySubjectOperators } from 'graphQL/Queries'
+import LynkTable from 'components/LynkTable'
 
 const PolicyTable = () => {
   const { showToast } = useCustomToast()
+
   const location = useLocation()
   const params = useParams()
   const productId = params.productid
@@ -70,13 +69,11 @@ const PolicyTable = () => {
 
   const {
     primaryBlueText,
-    headingTextColor,
     primaryTextColor,
     secondaryTextInverse,
     primaryErrorColor
   } = useThemeColor([
     'primaryBlueText',
-    'headingTextColor',
     'primaryTextColor',
     'secondaryTextInverse',
     'primaryErrorColor'
@@ -546,19 +543,15 @@ const PolicyTable = () => {
     <>
       <Card padding={productId ? '0px' : '22px'}>
         <Flex flexDir={'column'} width={'100%'}>
-          <DataTable
+          <LynkTable
             columns={columns}
             data={nodes || []}
-            customStyles={customStyles(headingTextColor)}
             progressPending={loading}
-            progressComponent={<CustomLoader />}
             subHeader
             subHeaderComponent={subHeader}
             expandableRows
             expandOnRowClicked
             expandableRowsComponent={ExpandedComponent}
-            persistTableHead
-            responsive={true}
             conditionalRowStyles={conditionalRowStyles}
           />
 

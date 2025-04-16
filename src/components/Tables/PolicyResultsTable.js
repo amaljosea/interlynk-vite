@@ -1,8 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getFullDate, timeSince } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 import Filters from 'views/Dashboard/Policies/components/Filters'
 import ExpandedComponent from 'views/Dashboard/Products/ProductDetailsSbomNew/Components/tableExpanded/PolicyExpanded'
 
@@ -15,9 +13,9 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import ViolationDrawer from 'components/Drawer/ViolationDrawer'
 import RefreshBtn from 'components/Icons/RefreshBtn'
+import LynkTable from 'components/LynkTable'
 import Pagination from 'components/Pagination'
 
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
@@ -27,12 +25,10 @@ import { GetPolicyResults } from 'graphQL/Queries'
 
 const PolicyResultsTable = () => {
   const params = useParams()
+
   const policyId = params.policyid
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const [filters, setFilters] = useState({
     result: [],
@@ -165,22 +161,16 @@ const PolicyResultsTable = () => {
     <>
       {/* TABLE */}
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           subHeader
-          responsive
           expandableRows
-          persistTableHead
           columns={columns}
           data={nodes || []}
           expandOnRowClicked
           progressPending={loading}
           subHeaderComponent={subHeader}
-          progressComponent={<CustomLoader />}
-          customStyles={customStyles(headingTextColor)}
           expandableRowsComponent={ExpandedComponent}
-          expandableRowsComponentProps={{
-            onCheckViolations
-          }}
+          expandableRowsComponentProps={{ onCheckViolations }}
         />
         <Pagination {...paginationProps} />
       </Flex>
