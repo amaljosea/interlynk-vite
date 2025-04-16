@@ -1,3 +1,5 @@
+import { getHealthScore, getTotalHealthScore } from 'utils/healthScoreUtils'
+
 import { Box, Stack, Text, Tooltip } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -8,22 +10,26 @@ export const HealthScore = ({ value, scores, isComponent }) => {
     'secondaryBgColor'
   ])
 
+  const getScore = (value) => Math.round(value)
+
   const gradient =
     'linear-gradient(to right, #FF9F9B, #FFBB8A, #FFDB8A, #88EEB0)'
 
-  const getScore = (value) => Math.round(value)
-
   const ScoreInfo = () => {
     const { age, community, security } = scores || ''
-    const ageScore = Math.round(age)
-    const communityScore = Math.round(community)
-    const securityScore = Math.round(security)
+
+    const ageScore = getHealthScore(age)
+    const securityScore = getHealthScore(security)
+    const communityScore = getHealthScore(community)
+
+    const finalScore = getTotalHealthScore(age, security, community)
+
     return (
       <Stack spacing={0} p={1}>
-        <Text>Age Score: {ageScore}%</Text>
-        <Text>Community Score: {communityScore}%</Text>
-        <Text>Security Score: {securityScore}%</Text>
-        <Text>Final Score: {ageScore + communityScore + securityScore}%</Text>
+        <Text>Age Score: {ageScore}</Text>
+        <Text>Community Score: {communityScore}</Text>
+        <Text>Security Score: {securityScore}</Text>
+        <Text>Final Score: {finalScore}</Text>
       </Stack>
     )
   }
@@ -62,7 +68,7 @@ export const HealthScore = ({ value, scores, isComponent }) => {
           justifyContent='center'
         >
           <Text color={primaryTextColor}>
-            {value ? `${getScore(value)} %` : `N/A`}
+            {value ? `${getScore(value)}%` : `N/A`}
           </Text>
         </Box>
       </Box>
