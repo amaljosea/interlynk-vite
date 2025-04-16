@@ -88,7 +88,6 @@ export const TabProvider = ({ children }) => {
   }
 
   const saveChanges = (tab) => {
-    setAlert(false)
     resetUnsavedChange(tab)
   }
 
@@ -109,7 +108,7 @@ export const TabProvider = ({ children }) => {
 
     setAlertMessage(
       unsavedTabs
-        ? `You have unsaved changes in ${unsavedTabs} tab. You can still proceed to save this tab, Save other tabs separately to retain their data.`
+        ? `You have unsaved changes in ${unsavedTabs} tab. Save other tabs separately to retain their data.`
         : ''
     )
   }

@@ -139,10 +139,9 @@ const CompDetails = ({ data, primaryComp }) => {
   }
 
   const handleSubmit = () => {
+    handleUpdateCom()
     if (checkData()) {
       setAlert(true)
-    } else {
-      handleUpdateCom()
     }
   }
 
@@ -215,6 +214,7 @@ const CompDetails = ({ data, primaryComp }) => {
           'scrollbar-width': 'none'
         }}
       >
+        {alert && <LynkAlert status='warning' msg={alertMessage} />}
         {/* Name */}
         <FormControl isDisabled={isCustomerView} isRequired>
           <LynkFormLabel
@@ -384,24 +384,12 @@ const CompDetails = ({ data, primaryComp }) => {
             </Tooltip>
           </FormLabel>
         </FormControl>
-
-        {alert ? (
-          <Stack spacing={4}>
-            <LynkAlert status='warning' msg={alertMessage} />
-            <ActionButton
-              title={'Save'}
-              isDisabled={isInvalid}
-              onClick={handleUpdateCom}
-            />
-          </Stack>
-        ) : (
-          <ActionButton
-            title={'Save'}
-            hidden={isCustomerView}
-            isDisabled={isInvalid}
-            onClick={handleSubmit}
-          />
-        )}
+        <ActionButton
+          title={'Save'}
+          hidden={isCustomerView}
+          isDisabled={isInvalid}
+          onClick={handleSubmit}
+        />
       </Stack>
 
       {isOpen && (

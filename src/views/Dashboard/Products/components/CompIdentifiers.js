@@ -47,12 +47,17 @@ const CompIdentifiers = ({ data }) => {
   const [cpeValue, setCpeValue] = useState('')
   const [purlOpen, setPurlOpen] = useState(false)
   const [cpeOpen, setCpeOpen] = useState(false)
+  const [savePending, setSavePending] = useState('')
 
-  const handlePurlModal = () => setPurlOpen(true)
+  const handlePurlModal = () => {
+    setPurlOpen(true)
+    setSavePending('')
+  }
 
   const handleCpeModal = () => {
     setCpeValue(identifiers?.cpe || 'cpe:2.3:*:*:*:*:*:*:*:*:*:*:*')
     setCpeOpen(true)
+    setSavePending('')
   }
 
   const handleUpdateCom = () => {
@@ -86,10 +91,10 @@ const CompIdentifiers = ({ data }) => {
   }
 
   const handleSubmit = () => {
+    setSavePending('')
+    handleUpdateCom()
     if (checkData()) {
       setAlert(true)
-    } else {
-      handleUpdateCom()
     }
   }
 
@@ -135,12 +140,14 @@ const CompIdentifiers = ({ data }) => {
         direction={'column'}
         height={cpeOpen || purlOpen ? '100%' : '70vh'}
       >
+        {alert && <LynkAlert status='warning' msg={alertMessage} />}
         {/* PURL INPUI */}
         {purlOpen ? (
           <PurlEditor
             isOpen={purlOpen}
             onOpen={() => setPurlOpen(true)}
             onClose={() => setPurlOpen(false)}
+            setSavePending={setSavePending}
           />
         ) : (
           <PurlField
@@ -157,6 +164,7 @@ const CompIdentifiers = ({ data }) => {
             setValue={setCpeValue}
             onOpen={() => setCpeOpen(true)}
             onClose={() => setCpeOpen(false)}
+            setSavePending={setSavePending}
           />
         ) : (
           <CpeField
@@ -165,24 +173,16 @@ const CompIdentifiers = ({ data }) => {
             onClose={() => setCpeOpen(false)}
           />
         )}
-        {alert ? (
-          <Stack spacing={4}>
-            <LynkAlert status='warning' msg={alertMessage} />
-            <ActionButton
-              title={'Save'}
-              isLoading={loading}
-              onClick={handleUpdateCom}
-              hidden={purlOpen || cpeOpen}
-            />
-          </Stack>
-        ) : (
-          <ActionButton
-            title={'Save'}
-            isLoading={loading}
-            onClick={handleSubmit}
-            hidden={purlOpen || cpeOpen || isCustomerView}
-          />
-        )}
+        <ActionButton
+          title={'Save'}
+          isLoading={loading}
+          onClick={handleSubmit}
+          hidden={purlOpen || cpeOpen || isCustomerView}
+        />
+        {savePending !== '' &&
+          unsavedChanges.identifiers &&
+          !purlOpen &&
+          !cpeOpen && <LynkAlert status='warning' msg={savePending} />}
       </Stack>
     </>
   )

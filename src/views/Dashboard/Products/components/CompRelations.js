@@ -113,10 +113,9 @@ const CompRelations = ({ data, compPath }) => {
   }
 
   const handleSubmit = () => {
+    handleAdd()
     if (checkData()) {
       setAlert(true)
-    } else {
-      handleAdd()
     }
   }
 
@@ -175,6 +174,7 @@ const CompRelations = ({ data, compPath }) => {
       >
         {/* CREATE RELATIONSHIP */}
         <Stack spacing={4} width={'100%'}>
+          {alert && <LynkAlert status='warning' msg={alertMessage} />}
           {/* RELATION TYPE */}
           <FormControl>
             <FormLabel htmlFor='relType' color={headingTextColor}>
@@ -211,24 +211,12 @@ const CompRelations = ({ data, compPath }) => {
             </FormErrorMessage>
           </FormControl>
           {/* ACTION */}
-          {alert ? (
-            <Stack spacing={4}>
-              <LynkAlert status='warning' msg={alertMessage} />
-              <ActionButton
-                title={'Add Relationship'}
-                onClick={handleAdd}
-                isDisabled={isInvalid}
-                icon={<FaPlus />}
-              />
-            </Stack>
-          ) : (
-            <ActionButton
-              title={'Add Relationship'}
-              isDisabled={isInvalid}
-              onClick={handleSubmit}
-              icon={<FaPlus />}
-            />
-          )}
+          <ActionButton
+            title={'Add Relationship'}
+            isDisabled={isInvalid}
+            onClick={handleSubmit}
+            icon={<FaPlus />}
+          />
         </Stack>
         <Divider />
         {/* RELATION TYPES */}
