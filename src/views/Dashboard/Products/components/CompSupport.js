@@ -114,7 +114,10 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
   const supportLevel = manual?.level || automatic?.level
   const explanation = manual?.notes || automatic?.notes
   const endOfSupport = formatDate(manual?.endDate)
-  const assessmentExpiresOn = formatDate(manual?.retainManualOverrideFor)
+  const assessmentExpiresOn =
+    manual?.retainManualOverrideFor > 0
+      ? formatDate(getDate(manual?.retainManualOverrideFor))
+      : 'N/A'
   const assessedBy = manual?.user?.name || 'N/A'
   const lastAssessed = formatDate(manual?.updatedAt)
 

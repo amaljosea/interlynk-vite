@@ -372,9 +372,10 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
             type='text'
             name='ruleName'
             value={ruleName}
+            isDisabled={isSystem}
             onChange={onNameChange}
             placeholder='Enter rule name'
-            sx={{ fontSize: 'sm', pointerEvents: isSystem ? 'none' : 'auto' }}
+            sx={{ fontSize: 'sm' }}
           />
         </FormControl>
         {/* CONDITIONS */}
@@ -403,7 +404,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
           fontWeight={'medium'}
           leftIcon={<FaPlus />}
           onClick={onAddCondtion}
-          isDisabled={isSystem}
+          hidden={isSystem}
           title='Add automation condition'
         >
           Add condition
@@ -432,7 +433,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
           colorScheme='blue'
           leftIcon={<FaPlus />}
           onClick={onAddAction}
-          isDisabled={isSystem}
+          hidden={isSystem}
           title='Add automation action'
           sx={{ fontSize: 'sm', fontWeight: 'medium', marginBottom: 1 }}
         >
