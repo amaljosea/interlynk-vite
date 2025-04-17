@@ -1,9 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { useCallback, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useNavigate } from 'react-router-dom'
-import { customStyles } from 'utils/styleUtils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import GithubAddModal from 'views/Dashboard/Products/components/GithubAddModal'
 import ProductModal from 'views/Dashboard/Products/components/ProductModal'
@@ -13,17 +11,16 @@ import UploadModal from 'views/Dashboard/Products/components/UploadModal'
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
-import CustomLoader from 'components/CustomLoader'
 import ShareLynkDrawer from 'components/Drawer/ShareLynkDrawer'
 import TagDrawer from 'components/Drawer/TagDrawer'
-import BitbucketProjects from 'components/Modal/BitbucketProjects'
+import LynkTable from 'components/LynkTable'
+import BitbucketProjects from 'components/Drawer/BitbucketProjects'
 import ProductColumns from 'components/columns/ProductColumns'
 import ProductHeader from 'components/headers/ProductHeader'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
-import { useThemeColor } from 'hooks/useThemeColors'
 
 import { DeleteProjectGroup } from 'graphQL/Mutation'
 import {
@@ -56,14 +53,14 @@ const ProductTable = (props) => {
   })
   const { totalCount } = prodData?.organization?.projectGroups || ''
 
-  const { headingTextColor, semiTransparentBorder } = useThemeColor([
-    'headingTextColor',
-    'semiTransparentBorder'
-  ])
+  // const { headingTextColor, semiTransparentBorder } = useThemeColor([
+  //   'headingTextColor',
+  //   'semiTransparentBorder'
+  // ])
 
   const { prodState, setEnvName, setClearSelect, dispatch, envName } =
     useGlobalState()
-  const { field, direction, searchInput } = prodState
+  const { field, searchInput } = prodState
 
   const environment = envName
   const { prodDispatch } = dispatch
@@ -231,26 +228,19 @@ const ProductTable = (props) => {
     reset()
   }
 
-  const dataTableProps = {
-    columns: columns,
-    data: filterMode === 'AND' ? filteredNodes : data,
-    onSort: handleSort,
-    customStyles: customStyles(headingTextColor, semiTransparentBorder),
-    defaultSortFieldId: field,
-    defaultSortAsc: direction === 'ASC' ? true : false,
-    subHeader: true,
-    subHeaderComponent: subHeaderComponent,
-    progressPending: loading,
-    progressComponent: <CustomLoader />,
-    responsive: true,
-    persistTableHead: true
-  }
-
   return (
     <>
       <Card pos={'relative'}>
         <Flex flexDir={'column'} width={'100%'}>
-          <DataTable {...dataTableProps} />
+          <LynkTable
+            subHeader
+            columns={columns}
+            onSort={handleSort}
+            progressPending={loading}
+            defaultSortFieldId={field}
+            subHeaderComponent={subHeaderComponent}
+            data={filterMode === 'AND' ? filteredNodes : data}
+          />
           <Pagination {...paginationProps} />
         </Flex>
       </Card>

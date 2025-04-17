@@ -1,17 +1,15 @@
 import { useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { Link, useParams } from 'react-router-dom'
 import { getFullDate, linkURl, timeSince } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 import SubHeader from 'views/Dashboard/Vulnerabilities/components/SubHeader'
 
 import { Badge, Flex, Stack, Text } from '@chakra-ui/react'
 import { IconButton, Tooltip, useDisclosure } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import VulnProductsDrawer from 'components/Drawer/VulnProductsDrawer'
 import ExternalNavIcon from 'components/Icons/ExternalNavIcon'
+import LynkTable from 'components/LynkTable'
 import CvssTag from 'components/Misc/CvssTag'
 import EpssTag from 'components/Misc/EpssTag'
 import SeverityTag from 'components/Misc/SeverityTag'
@@ -26,6 +24,7 @@ import { FaEye } from 'react-icons/fa6'
 import Pagination from '../Pagination'
 
 const GlobalVulnTable = (props) => {
+
   const { vulns, reset, filters, loading, paginationProps } = props
   const { isOpen, onClose, onOpen } = useDisclosure()
 
@@ -35,9 +34,10 @@ const GlobalVulnTable = (props) => {
   const { generateProductVulnerabilityDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
 
-  const { headingTextColor, primaryTextColor, primaryBlueText } = useThemeColor(
-    ['headingTextColor', 'primaryTextColor', 'primaryBlueText']
-  )
+  const { primaryTextColor, primaryBlueText } = useThemeColor([
+    'primaryTextColor',
+    'primaryBlueText'
+  ])
 
   const params = useParams()
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
@@ -274,18 +274,14 @@ const GlobalVulnTable = (props) => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           subHeader
-          responsive
           data={data}
-          persistTableHead
           columns={columns}
           onSort={handleSort}
           progressPending={loading}
-          progressComponent={<CustomLoader />}
           subHeaderComponent={subHeaderComponent}
           defaultSortFieldId={globalVulnState?.field}
-          customStyles={customStyles(headingTextColor)}
           defaultSortAsc={globalVulnState?.direction === 'ASC' ? true : false}
         />
         <Pagination {...paginationProps} />

@@ -1,18 +1,15 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { getDate, getFullDate, getTotalDays, timeSince } from 'utils'
+import { formatDate, getDate, getTotalDays } from 'utils'
 import { assessmentExpiryWarning } from 'variables/general'
 
-import { EditIcon } from '@chakra-ui/icons'
 import {
   Flex,
   FormErrorMessage,
-  IconButton,
   Input,
   Stack,
   Tag,
   Text,
-  Tooltip,
   useDisclosure
 } from '@chakra-ui/react'
 import { Button, ButtonGroup } from '@chakra-ui/react'
@@ -20,6 +17,7 @@ import { FormControl, FormLabel } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import DeleteButton from 'components/Icons/DeleteButton'
+import EditButton from 'components/Icons/EditButton'
 import LynkDate from 'components/LynkDate'
 import LynkDrawer from 'components/LynkDrawer'
 import LynkSelect from 'components/LynkSelect'
@@ -103,11 +101,9 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
   const { sameSecondaryText, grayBorderColor, primaryErrorColor } =
     useThemeColor(['sameSecondaryText', 'grayBorderColor', 'primaryErrorColor'])
 
-  const label = { fontSize: 12, color: sameSecondaryText }
-  const infoStyle = {
-    fontSize: 14
-  }
-  const container = {
+  const labelStyle = { fontSize: 12, color: sameSecondaryText }
+  const infoStyle = { fontSize: 14 }
+  const containerStyle = {
     pb: 2,
     w: '100%',
     spacing: 0,
@@ -115,22 +111,15 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
   }
 
   const assessment = manual?.level ? 'Manual' : 'Automatic'
-
-  // AUTOMATIC SUPPORT LEVEL
-  const systemSupportLevel = automatic?.level
-    ? automatic?.level?.replaceAll('_', ' ')
-    : 'N/A'
-  const systemNotes = automatic?.notes || 'N/A'
-
-  // MANNUAL SUPPORT LEVEL
-  const manualSupportLevel = manual?.level
-    ? manual?.level?.replaceAll('_', ' ')
-    : 'N/A'
-  const endOfSupport = manual?.endDate
-  const assessmentExpiresOn = manual?.retainManualOverrideFor
-  const manualNotes = manual?.notes || 'N/A'
-  const assessedBy = manual?.user?.name
-  const lastAssessed = manual?.updatedAt
+  const supportLevel = manual?.level || automatic?.level
+  const explanation = manual?.notes || automatic?.notes
+  const endOfSupport = formatDate(manual?.endDate)
+  const assessmentExpiresOn =
+    manual?.retainManualOverrideFor > 0
+      ? formatDate(getDate(manual?.retainManualOverrideFor))
+      : 'N/A'
+  const assessedBy = manual?.user?.name || 'N/A'
+  const lastAssessed = formatDate(manual?.updatedAt)
 
   return (
     <Stack spacing={4} mt={3}>
@@ -144,80 +133,51 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
             Component support level analysis is not enabled for this product
           </Text>
         )}
-        <Tooltip label='Edit'>
-          <IconButton
-            aria-label='Edit'
-            icon={<EditIcon />}
-            colorScheme='blue'
-            variant='solid'
-            fontSize={'sm'}
-            alignSelf='end'
-            onClick={() => setEdit(true)}
-          />
-        </Tooltip>
+        <EditButton
+          size={'md'}
+          aria-label='Edit'
+          alignSelf='end'
+          onClick={() => setEdit(true)}
+          tooltip={'Edit'}
+          type={'primary'}
+        />
       </Flex>
 
       <Stack spacing={3}>
-        <Stack {...container}>
-          <Text {...label}>Assessment</Text>
+        <Stack {...containerStyle}>
+          <Text {...labelStyle}>Assessment</Text>
           <Text {...infoStyle}>{assessment}</Text>
         </Stack>
-        <Stack {...container}>
-          <Text {...label}>{`Level (Auto Suggested)`}</Text>
+        <Stack {...containerStyle}>
+          <Text {...labelStyle}>{`Level`}</Text>
           <Text {...infoStyle} textTransform={'capitalize'}>
-            {systemSupportLevel}
+            {supportLevel?.replaceAll('_', ' ') || 'N/A'}
           </Text>
         </Stack>
-        <Stack {...container}>
-          <Text {...label}>{`Level (Manual Override)`}</Text>
-          <Text {...infoStyle} textTransform={'capitalize'}>
-            {manualSupportLevel}
-          </Text>
-        </Stack>
-        <Stack {...container}>
-          <Text {...label}>End of Support</Text>
-          <Text {...infoStyle} textTransform={'capitalize'}>
-            {endOfSupport ? new Date(endOfSupport).toLocaleDateString() : 'N/A'}
-          </Text>
+        <Stack {...containerStyle}>
+          <Text {...labelStyle}>End of Support</Text>
+          <Text {...infoStyle}>{endOfSupport}</Text>
         </Stack>
         <Stack
-          {...container}
-          hidden={manualSupportLevel === 'no_longer_maintained'}
+          {...containerStyle}
+          hidden={supportLevel === 'no_longer_maintained'}
         >
-          <Text {...label}>Assessment Expires On</Text>
+          <Text {...labelStyle}>Assessment Expires On</Text>
+          <Text {...infoStyle}>{assessmentExpiresOn}</Text>
+        </Stack>
+        <Stack {...containerStyle}>
+          <Text {...labelStyle}>{`Explanation`}</Text>
+          <Text {...infoStyle}>{explanation}</Text>
+        </Stack>
+        <Stack {...containerStyle}>
+          <Text {...labelStyle}>Last Assessed By</Text>
           <Text {...infoStyle} textTransform={'capitalize'}>
-            {assessmentExpiresOn
-              ? getDate(assessmentExpiresOn).toLocaleDateString()
-              : 'N/A'}
+            {assessedBy}
           </Text>
         </Stack>
-        <Stack {...container}>
-          <Text {...label}>{`Notes (Auto Suggested)`}</Text>
-          <Text {...infoStyle}>
-            {systemNotes}
-          </Text>
-        </Stack>
-        <Stack {...container}>
-          <Text {...label}>{`Notes (Manual Override)`}</Text>
-          <Text {...infoStyle}>
-            {manualNotes}
-          </Text>
-        </Stack>
-        <Stack {...container}>
-          <Text {...label}>Last Assessed By</Text>
-          <Text {...infoStyle} textTransform={'capitalize'}>
-            {assessedBy || 'N/A'}
-          </Text>
-        </Stack>
-        <Stack {...container}>
-          <Text {...label}>Last Assessed</Text>
-          {lastAssessed ? (
-            <Tooltip label={getFullDate(lastAssessed)}>
-              <Text {...infoStyle}>{timeSince(lastAssessed)}</Text>
-            </Tooltip>
-          ) : (
-            <Text {...infoStyle}>{'N/A'}</Text>
-          )}
+        <Stack {...containerStyle}>
+          <Text {...labelStyle}>Last Assessed</Text>
+          <Text {...infoStyle}>{lastAssessed}</Text>
         </Stack>
       </Stack>
     </Stack>

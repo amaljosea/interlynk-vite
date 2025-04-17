@@ -1,13 +1,12 @@
 import { gql } from '@apollo/client'
 import { useMemo } from 'react'
-import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
-import { customStyles } from 'utils/styleUtils'
+import { getUniqueAffectedProducts } from 'utils/getUniqueAffectedProducts'
 
 import { Flex, Tag, Text, Tooltip } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import LynkDrawer from 'components/LynkDrawer'
+import LynkTable from 'components/LynkTable'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -57,10 +56,7 @@ const GetCompVulnData = gql`
 `
 
 const VulnProductsDrawer = ({ isOpen, onClose, data }) => {
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
   const { envName } = useGlobalState()
   const { nodes, paginationProps, loading } = usePaginatedQuery(
     GetCompVulnData,
@@ -71,24 +67,7 @@ const VulnProductsDrawer = ({ isOpen, onClose, data }) => {
     }
   )
 
-  const statusResults = useMemo(() => {
-    if (!nodes) return []
-
-    // Create a Map to store unique projectGroup names since components and versions are not listed
-    const uniqueNodes = new Map()
-
-    nodes.forEach((node) => {
-      const projectGroupName =
-        node?.component?.sbom?.project?.projectGroup?.name
-      if (projectGroupName && !uniqueNodes.has(projectGroupName)) {
-        uniqueNodes.set(projectGroupName, node)
-      }
-    })
-
-    return [...uniqueNodes.values()].sort(
-      (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
-    )
-  }, [nodes])
+  const statusResults = useMemo(() => getUniqueAffectedProducts(nodes), [nodes])
 
   const columns = [
     // PRODUCTS
@@ -133,15 +112,11 @@ const VulnProductsDrawer = ({ isOpen, onClose, data }) => {
       onClose={onClose}
       noFooter
     >
-      <DataTable
-        responsive
-        persistTableHead
+      <LynkTable
         columns={columns}
         progressPending={loading}
         data={statusResults}
-        progressComponent={<CustomLoader />}
         className='data-table-container'
-        customStyles={customStyles(headingTextColor)}
       />
       <Pagination {...paginationProps} totalCount={statusResults?.length} />
     </LynkDrawer>

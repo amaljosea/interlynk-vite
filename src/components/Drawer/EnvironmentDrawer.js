@@ -1,8 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { filterEnvList, getFullDate, isDefaultEnv, timeSince } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import EnvModal from 'views/Dashboard/Products/components/EnvModal'
 
@@ -16,9 +14,9 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import DeleteButton from 'components/Icons/DeleteButton'
 import LynkDrawer from 'components/LynkDrawer'
+import LynkTable from 'components/LynkTable'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -162,22 +160,17 @@ const EnvironmentDrawer = ({
         noFooter
       >
         <Flex flexDir={'column'} width={'100%'}>
-          <DataTable
+          <LynkTable
+            subHeader
             columns={columns}
             data={
               data?.projectGroup
                 ? filterEnvList(data?.projectGroup?.projects)
                 : []
             }
-            customStyles={customStyles}
-            defaultSortAsc
             defaultSortFieldId={'NAME'}
             progressPending={data?.projectGroup ? false : true}
-            progressComponent={<CustomLoader />}
-            subHeader
             subHeaderComponent={Header}
-            persistTableHead
-            responsive={true}
           />
         </Flex>
       </LynkDrawer>

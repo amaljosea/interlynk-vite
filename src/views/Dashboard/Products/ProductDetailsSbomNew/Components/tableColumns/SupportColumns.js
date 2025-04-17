@@ -73,13 +73,12 @@ const SupportColumns = ({ action }) => {
       },
       {
         id: 'COMPONENT_SUPPORT_LEVELS_LEVEL',
-        name: 'SUPPORT LEVEL',
+        name: 'LEVEL',
         sortable: true,
         width: '18%',
         selector: (row) => {
-          const { duplicates, componentSupportLevelAutomatic: automatic } =
-            row || {}
-          const { level } = automatic || {}
+          const { duplicates, componentSupportLevel } = row || {}
+          const { level } = componentSupportLevel || {}
           const supportLevel = level ? level?.replaceAll('_', ' ') : 'N/A'
 
           if (supportLevel) {

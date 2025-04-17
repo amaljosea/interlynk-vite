@@ -1,15 +1,13 @@
 import { useMutation } from '@apollo/client'
 import React, { useCallback, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
-import { customStyles, getStatusColor } from 'utils/styleUtils'
+import { getStatusColor } from 'utils/styleUtils'
 
 import { Flex, Menu, Portal, Stack, Text } from '@chakra-ui/react'
 import { Tooltip, useDisclosure } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { MenuItem, MenuList } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import SearchFilter from 'components/Licenses/LicenseSearchFilter'
@@ -26,6 +24,7 @@ import ConfirmationModal from '../Products/components/ConfirmationModal'
 import Filters from './Filters'
 import RequestAcceptModal from './RequestAcceptModal'
 import RequestModal from './RequestModal'
+import LynkTable from 'components/LynkTable'
 
 const RequestTable = (props) => {
   const { data, loading, filters, setFilters, paginationProps } = props
@@ -37,8 +36,10 @@ const RequestTable = (props) => {
     childKey: 'create_request'
   })
 
-  const { headingTextColor, primaryTextColor, primaryErrorColor } =
-    useThemeColor(['headingTextColor', 'primaryTextColor', 'primaryErrorColor'])
+  const { primaryTextColor, primaryErrorColor } = useThemeColor([
+    'primaryTextColor',
+    'primaryErrorColor'
+  ])
 
   const [resendRequest] = useMutation(RequestResend)
   const [cancelRequest] = useMutation(RequestCancel)
@@ -306,19 +307,15 @@ const RequestTable = (props) => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           columns={columns}
           data={data}
-          customStyles={customStyles(headingTextColor)}
           onSort={handleSort}
           defaultSortFieldId='REQUESTS_REQUESTED_AT'
-          defaultSortAsc={false}
           progressPending={loading}
           persistTableHead
           subHeader
           subHeaderComponent={subHeader}
-          progressComponent={<CustomLoader />}
-          responsive={true}
         />
       </Flex>
 

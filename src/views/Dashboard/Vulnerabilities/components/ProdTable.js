@@ -1,9 +1,8 @@
 import { useLazyQuery } from '@apollo/client'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { areArraysEqual, getFullDate, timeSince } from 'utils'
-import { customStyles, statusColor } from 'utils/styleUtils'
+import { statusColor } from 'utils/styleUtils'
 import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -18,8 +17,8 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import ConnectedSbomDrawer from 'components/Drawer/ConnectedSbomDrawer'
+import LynkTable from 'components/LynkTable'
 import Pagination from 'components/Pagination'
 
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -38,16 +37,13 @@ import VulnFilters from './VulnsFilter'
 const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
   const params = useParams()
   const productGroupId = params?.productgroupid
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const { id, vulnId } = vuln || ''
 
-  const manageFeeds = useHasPermission({
-    parentKey: 'view_feeds',
-    childKey: 'manage_feeds'
+  const editVulns = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'edit_vulnerabilities'
   })
 
   const [vulnState, setVulnState] = useState({
@@ -295,7 +291,7 @@ const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
                 fontWeight='normal'
                 title='Set vuln status'
                 onClick={STATUS.onOpen}
-                isDisabled={!manageFeeds}
+                isDisabled={!editVulns}
               />
             </Tooltip>
           )}
@@ -312,7 +308,7 @@ const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
     vulnState,
     selectedVulns.length,
     STATUS.onOpen,
-    manageFeeds,
+    editVulns,
     reset
   ])
 
@@ -352,19 +348,15 @@ const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
     <>
       {/* TABLE */}
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           subHeader
-          responsive
           selectableRows
-          persistTableHead
           columns={columns}
           progressPending={loading}
           data={statusResults || []}
           clearSelectedRows={toggleClear}
           onSelectedRowsChange={handleChange}
-          progressComponent={<CustomLoader />}
           className='data-table-container'
-          customStyles={customStyles(headingTextColor)}
           subHeaderComponent={subHeaderComponent}
         />
         <Pagination {...paginationProps} />

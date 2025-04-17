@@ -32,6 +32,8 @@ import SwiftIcon from 'assets/svg/swift.png'
 import { toLower } from 'lodash'
 import { sbomOrigin } from 'variables/general'
 
+import { useColorModeValue } from '@chakra-ui/system'
+
 import { BsBack } from 'react-icons/bs'
 import {
   FaBalanceScale,
@@ -64,85 +66,6 @@ import {
 } from 'react-icons/fa6'
 import { MdDelete, MdOutlineArchive, MdOutlineUnarchive } from 'react-icons/md'
 import { VscDebugRerun } from 'react-icons/vsc'
-
-export const customStyles = (
-  headColor,
-  dividerColor,
-  paddingCell,
-  paddingHeadCell
-) => {
-  return {
-    headCells: {
-      style: {
-        fontFamily: 'inherit',
-        fontWeight: 700,
-        backgroundColor: 'transparent', // change this to the desired color
-        color: headColor, // change this to the desired text color
-        padding: paddingHeadCell
-      }
-    },
-    headRow: {
-      style: {
-        borderBottomStyle: 'solid',
-        borderBottomWidth: '1px',
-        borderBottomColor: dividerColor
-      }
-    },
-    cells: {
-      style: {
-        backgroundColor: 'transparent', // cell background color
-        padding: paddingCell
-      }
-    },
-    rows: {
-      style: {
-        backgroundColor: 'transparent', // row background color
-        '&:not(:last-of-type)': {
-          borderBottomStyle: 'solid',
-          borderBottomWidth: '1px',
-          borderBottomColor: dividerColor
-        }
-      },
-      stripedStyle: {
-        backgroundColor: 'transparent' // striped row background color
-      }
-    },
-    table: {
-      style: {
-        backgroundColor: 'transparent' // entire table background color
-      }
-    },
-    progress: {
-      style: {
-        backgroundColor: 'transparent' // progress component background color
-      }
-    },
-    subHeader: {
-      style: {
-        padding: 0,
-        backgroundColor: 'transparent' // sub-header background color
-      }
-    },
-    noData: {
-      style: {
-        backgroundColor: 'transparent',
-        color: headColor
-      }
-    },
-    expanderRow: {
-      style: {
-        backgroundColor: 'transparent' // expandable row background color
-      }
-    },
-    expanderCell: {
-      style: {
-        '& svg': {
-          color: 'darkgray'
-        }
-      }
-    }
-  }
-}
 
 export const sevColor = (severity) => {
   switch (toLower(severity)) {

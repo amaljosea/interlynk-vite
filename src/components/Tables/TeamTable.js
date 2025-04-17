@@ -1,9 +1,6 @@
 import { useMutation } from '@apollo/client'
 import React, { useCallback, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
-import { getFullDate, timeSince } from 'utils'
-import { truncatedValue } from 'utils'
-import { customStyles } from 'utils/styleUtils'
+import { getFullDate, timeSince, truncatedValue } from 'utils'
 import { FREE_TIER_USER_LIMIT } from 'variables/general'
 import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
 import RoleModal from 'views/Dashboard/Profile/components/RoleModal'
@@ -27,10 +24,10 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import LynkModal from 'components/LynkModal'
+import LynkTable from 'components/LynkTable'
 import LynkAction from 'components/Misc/LynkAction'
 import Pagination from 'components/Pagination'
 
@@ -64,12 +61,7 @@ const TeamTable = () => {
   const { organization } = useGlobalState()
   const SERVER_URL = process.env.REACT_APP_SERVER
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
-  const paddingCell = 0
-  const paddingHeadCell = 0
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const { tier, currentUser } = organization || ''
   const { email } = currentUser || ''
@@ -397,21 +389,12 @@ const TeamTable = () => {
 
   return (
     <>
-      <DataTable
+      <LynkTable
         subHeader
-        responsive={true}
         columns={columns}
         data={nodes || []}
-        defaultSortAsc={false}
         progressPending={loading}
         defaultSortFieldId={'joinedDate'}
-        progressComponent={<CustomLoader />}
-        customStyles={customStyles(
-          headingTextColor,
-          null,
-          paddingCell,
-          paddingHeadCell
-        )}
         subHeaderComponent={subHeaderComponent}
       />
 

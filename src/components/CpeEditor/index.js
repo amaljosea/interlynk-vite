@@ -13,7 +13,14 @@ import TargetHardware from './TargetHardware'
 import Vendor from './Vendor'
 import Version from './Version'
 
-const CpeEditor = ({ value, setValue, isOpen, onOpen, onClose }) => {
+const CpeEditor = ({
+  value,
+  setValue,
+  isOpen,
+  onOpen,
+  onClose,
+  setSavePending
+}) => {
   const { handleChange } = useContext(TabContext)
 
   const [cpeData, setCpeData] = useState({
@@ -50,6 +57,7 @@ const CpeEditor = ({ value, setValue, isOpen, onOpen, onClose }) => {
     const matches = validateCpe(value)
     if (matches) {
       handleChange('identifiers', 'cpeError', '')
+      setSavePending('Click Save to confirm CPE update')
     } else {
       handleChange('identifiers', 'cpeError', 'Invalid CPE')
     }

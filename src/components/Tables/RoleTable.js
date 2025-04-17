@@ -1,8 +1,6 @@
 import { useQuery } from '@apollo/client'
 import { useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 import CreateRole from 'views/Dashboard/Profile/components/CreateRole'
 import DeleteRole from 'views/Dashboard/Profile/components/DeleteRole'
 
@@ -17,9 +15,9 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import PermissionDrawer from 'components/Drawer/PermissionDrawer'
 import AddButton from 'components/Icons/AddButton'
+import LynkTable from 'components/LynkTable'
 import LynkAction from 'components/Misc/LynkAction'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -61,10 +59,10 @@ const RoleTable = () => {
     onOpen: onRoleOpen,
     onClose: onRoleClose
   } = useDisclosure()
-  const { headingTextColor, primaryTextColor, primaryErrorColor } =
-    useThemeColor(['headingTextColor', 'primaryTextColor', 'primaryErrorColor'])
-  const paddingCell = 0
-  const paddingHeadCell = 0
+  const { primaryTextColor, primaryErrorColor } = useThemeColor([
+    'primaryTextColor',
+    'primaryErrorColor'
+  ])
 
   const columns = [
     // NAME
@@ -162,6 +160,7 @@ const RoleTable = () => {
           label='Add Role'
           onClick={onRoleOpen}
           isDisabled={!updateOrgs}
+          data-testid='add_role'
         />
       </Flex>
     )
@@ -170,22 +169,13 @@ const RoleTable = () => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           subHeader
-          responsive={true}
           columns={columns}
-          defaultSortAsc={false}
           progressPending={loading}
           defaultSortFieldId={'createdAt'}
           data={organizationRoles || []}
           subHeaderComponent={subHeader}
-          progressComponent={<CustomLoader />}
-          customStyles={customStyles(
-            headingTextColor,
-            null,
-            paddingCell,
-            paddingHeadCell
-          )}
         />
       </Flex>
 

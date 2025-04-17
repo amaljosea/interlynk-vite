@@ -1,8 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { getFullDate, timeSince, truncatedValue } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 
 import {
@@ -18,8 +16,8 @@ import {
 } from '@chakra-ui/react'
 import { IconButton } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import RefreshBtn from 'components/Icons/RefreshBtn'
+import LynkTable from 'components/LynkTable'
 import LynkAction from 'components/Misc/LynkAction'
 import SeverityTag from 'components/Misc/SeverityTag'
 import CustomVuln from 'components/Modal/CustomVuln'
@@ -51,17 +49,12 @@ const CustomVulnTable = () => {
   const DELETE = useDisclosure()
   const [activeRow, setActiveRow] = useState(null)
 
-  const {
-    headingTextColor,
-    primaryTextColor,
-    secondaryTextColor,
-    primaryErrorColor
-  } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor',
-    'secondaryTextColor',
-    'primaryErrorColor'
-  ])
+  const { primaryTextColor, secondaryTextColor, primaryErrorColor } =
+    useThemeColor([
+      'primaryTextColor',
+      'secondaryTextColor',
+      'primaryErrorColor'
+    ])
 
   const [deleteVuln, { loading: deleteLoading }] = useMutation(CustomVulnDelete)
   const { nodes, paginationProps, loading } = usePaginatedQuery(
@@ -258,17 +251,13 @@ const CustomVulnTable = () => {
     <>
       {/* TABLE */}
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           subHeader
-          responsive
           data={nodes}
           keyField='key'
-          persistTableHead
           columns={columns}
           progressPending={loading}
           subHeaderComponent={SubHeader}
-          progressComponent={<CustomLoader />}
-          customStyles={customStyles(headingTextColor)}
         />
         <Pagination {...paginationProps} />
       </Flex>

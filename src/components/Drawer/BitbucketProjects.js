@@ -1,14 +1,12 @@
 import { useMutation } from '@apollo/client'
 import { useCallback, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
-import { customStyles } from 'utils/styleUtils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { Flex, Stack, Text } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import LynkDrawer from 'components/LynkDrawer'
+import LynkTable from 'components/LynkTable'
 import Pagination from 'components/Pagination'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -20,12 +18,11 @@ import { BitbucketRepositories } from 'graphQL/Queries'
 
 const BitbucketProjects = ({ isOpen, onClose }) => {
   const { showToast } = useCustomToast()
-  const { primaryTextColor, headingTextColor, secondaryTextColor } =
-    useThemeColor([
-      'primaryTextColor',
-      'headingTextColor',
-      'secondaryTextColor'
-    ])
+
+  const { primaryTextColor, secondaryTextColor } = useThemeColor([
+    'primaryTextColor',
+    'secondaryTextColor'
+  ])
 
   const [searchInput, setSearchInput] = useState('')
   const [filterText, setFilterText] = useState('')
@@ -56,7 +53,8 @@ const BitbucketProjects = ({ isOpen, onClose }) => {
       fullName: item?.fullName,
       slug: item?.slug,
       workspace: item?.workspace,
-      mainbranch: item?.mainbranch
+      mainbranch: item?.mainbranch,
+      projectName: item?.projectName
     }))
 
   const handleSubmit = () => {
@@ -156,20 +154,16 @@ const BitbucketProjects = ({ isOpen, onClose }) => {
       isDisabled={repositories?.length === 0}
     >
       <Stack spacing={4} overflowY={'scroll'}>
-        <DataTable
-          responsive
+        <LynkTable
           subHeader
           selectableRows
-          persistTableHead
           columns={columns}
           data={nodes || []}
           progressPending={loading}
           clearSelectedRows={toggleClear}
           className='data-table-container'
           onSelectedRowsChange={handleSelect}
-          progressComponent={<CustomLoader />}
           subHeaderComponent={subHeaderComponent}
-          customStyles={customStyles(headingTextColor)}
         />
         <Pagination {...paginationProps} />
       </Stack>

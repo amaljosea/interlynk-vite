@@ -15,8 +15,7 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Input,
-  Stack
+  Input
 } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
@@ -160,10 +159,9 @@ const CompSupplier = ({ data }) => {
   }
 
   const handleSubmit = () => {
+    suppliers?.length > 0 ? handleUpdate() : handleSave()
     if (checkData()) {
       setAlert(true)
-    } else {
-      suppliers?.length > 0 ? handleUpdate() : handleSave()
     }
   }
 
@@ -209,6 +207,7 @@ const CompSupplier = ({ data }) => {
 
   return (
     <Flex width={'100%'} direction={'column'} gap={4} pb={20}>
+      {alert && <LynkAlert status='warning' msg={alertMessage} />}
       {/* ORG NAME */}
       <FormControl isRequired>
         <FormLabel>Organization Name</FormLabel>
@@ -269,40 +268,28 @@ const CompSupplier = ({ data }) => {
         />
         <FormErrorMessage>{emailError}</FormErrorMessage>
       </FormControl>
-
-      {alert ? (
-        <Stack spacing={4}>
-          <LynkAlert status='warning' msg={alertMessage} />
-          <ActionButton
-            isDisabled={isInvalid}
-            title={suppliers?.length > 0 ? 'Update' : 'Save'}
-            onClick={suppliers?.length > 0 ? handleUpdate : handleSave}
-          />
-        </Stack>
-      ) : (
-        <ButtonGroup>
-          <ActionButton
-            isDisabled={isInvalid}
-            onClick={handleSubmit}
-            title={suppliers?.length > 0 ? 'Update' : 'Save'}
-          />
-          {suppliers?.length > 0 && (
-            <Button
-              variant='ghost'
-              title='Remove supplier'
-              onClick={handleRemove}
-              isDisabled={isDisabled}
-              sx={{
-                fontSize: '14px',
-                fontWeight: 400,
-                color: secondaryTextInverse
-              }}
-            >
-              Remove Supplier
-            </Button>
-          )}
-        </ButtonGroup>
-      )}
+      <ButtonGroup>
+        <ActionButton
+          isDisabled={isInvalid}
+          onClick={handleSubmit}
+          title={suppliers?.length > 0 ? 'Update' : 'Save'}
+        />
+        {suppliers?.length > 0 && (
+          <Button
+            variant='ghost'
+            title='Remove supplier'
+            onClick={handleRemove}
+            isDisabled={isDisabled}
+            sx={{
+              fontSize: '14px',
+              fontWeight: 400,
+              color: secondaryTextInverse
+            }}
+          >
+            Remove Supplier
+          </Button>
+        )}
+      </ButtonGroup>
     </Flex>
   )
 }

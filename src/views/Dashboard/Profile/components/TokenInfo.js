@@ -1,8 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useMemo, useRef, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { getFullDate, truncatedValue } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 
 import { AddIcon } from '@chakra-ui/icons'
 import {
@@ -16,7 +14,6 @@ import {
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import LynkAction from 'components/Misc/LynkAction'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -27,6 +24,7 @@ import { deleteApiToken, updateApiToken } from 'graphQL/Mutation'
 import { GetApiKeys } from 'graphQL/Queries'
 
 import TokenModal from './TokenModal'
+import LynkTable from 'components/LynkTable'
 
 const TokenInfo = () => {
   const activetab = useQueryParam('tab')
@@ -34,13 +32,7 @@ const TokenInfo = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const { headingTextColor, primaryTextColor } = useThemeColor([
-    'headingTextColor',
-    'primaryTextColor'
-  ])
-
-  const paddingCell = 0
-  const paddingHeadCell = 0
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const { data, loading } = useQuery(GetApiKeys, {
     skip: !orgView || activetab !== 'security tokens'
@@ -276,22 +268,12 @@ const TokenInfo = () => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           subHeader
-          persistTableHead
-          responsive={true}
           columns={columns}
           data={apiKeys || []}
-          defaultSortAsc={false}
           progressPending={loading}
           defaultSortFieldId={'updated'}
-          progressComponent={<CustomLoader />}
-          customStyles={customStyles(
-            headingTextColor,
-            null,
-            paddingCell,
-            paddingHeadCell
-          )}
           subHeaderComponent={subHeaderComponent}
         />
       </Flex>

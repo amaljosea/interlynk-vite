@@ -145,10 +145,9 @@ const CompLinks = ({ data }) => {
   }
 
   const handleSubmit = () => {
+    handleLinkAdd()
     if (checkData()) {
       setAlert(true)
-    } else {
-      handleLinkAdd()
     }
   }
 
@@ -202,6 +201,7 @@ const CompLinks = ({ data }) => {
         alignItems={'flex-start'}
         minHeight='400px'
       >
+        {alert && <LynkAlert status='warning' msg={alertMessage} />}
         {/* NAME */}
         <FormControl isRequired isInvalid={error}>
           <FormLabel>Type</FormLabel>
@@ -240,15 +240,12 @@ const CompLinks = ({ data }) => {
           />
           <FormErrorMessage>{linkError}</FormErrorMessage>
         </FormControl>
-        <Stack spacing={alert ? 4 : 0}>
-          {alert && <LynkAlert status='warning' msg={alertMessage} />}
-          <ActionButton
-            title={'Add Link'}
-            isDisabled={isInvalid}
-            onClick={alert ? handleLinkAdd : handleSubmit}
-            icon={<FaPlus />}
-          />
-        </Stack>
+        <ActionButton
+          title={'Add Link'}
+          isDisabled={isInvalid}
+          onClick={alert ? handleLinkAdd : handleSubmit}
+          icon={<FaPlus />}
+        />
         <Divider />
         {/* TABLE */}
         <Flex mb={4} width={'100%'} flexDir={'column'}>

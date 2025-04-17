@@ -1,13 +1,10 @@
 import { gql, useQuery } from '@apollo/client'
 import { useCallback, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useParams } from 'react-router-dom'
 import { getUndefinedIfEmptyOrAll } from 'utils'
-import { customStyles } from 'utils/styleUtils'
 
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import SupportAnalysis from 'components/Modal/SupportAnalysis'
 import SupportStatus from 'components/Modal/SupportStatus'
 import Pagination from 'components/Pagination'
@@ -16,7 +13,6 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
-import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetCompSupportData } from 'graphQL/Queries'
 
@@ -24,6 +20,7 @@ import CompSupport from '../components/CompSupport'
 import SupportColumns from './Components/tableColumns/SupportColumns'
 import SupportExpanded from './Components/tableExpanded/SupportExpanded'
 import SupportSubHeader from './Components/tableSubHeaders/SupportSubHeader'
+import LynkTable from 'components/LynkTable'
 
 export const GetSupportSettings = gql`
   query GetSupportSettings($id: Uuid!) {
@@ -57,8 +54,6 @@ const Support = () => {
   const { supportState, dispatch } = useGlobalState()
   const { level, include, field, direction, searchInput } = supportState
   const { supportDispatch } = dispatch
-
-  const { headingTextColor } = useThemeColor(['headingTextColor'])
 
   const [activeRow, setActiveRow] = useState(null)
   const [toggleClear, setToggleClear] = useState(false)
@@ -178,15 +173,12 @@ const Support = () => {
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
+        <LynkTable
           subHeader
           expandableRows
-          persistTableHead
-          responsive={true}
           columns={columns}
           expandOnRowClicked
           onSort={handleSort}
-          defaultSortAsc={true}
           data={nodes || []}
           progressPending={loading}
           defaultSortFieldId={field}
@@ -195,9 +187,7 @@ const Support = () => {
           clearSelectedRows={toggleClear}
           className='data-table-container'
           onSelectedRowsChange={handleChange}
-          progressComponent={<CustomLoader />}
           expandableRowsComponent={SupportExpanded}
-          customStyles={customStyles(headingTextColor)}
           selectableRowDisabled={(row) => row?.sbom?.id !== sbomId}
         />
 

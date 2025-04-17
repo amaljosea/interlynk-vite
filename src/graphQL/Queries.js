@@ -2809,6 +2809,8 @@ export const DownloadSBOM = gql`
     $package: Boolean
     $lite: Boolean
     $excludeParts: Boolean
+    $supportLevelOnly: Boolean
+    $includeSupportStatus: Boolean
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       download(
@@ -2819,6 +2821,8 @@ export const DownloadSBOM = gql`
         dontPackageSbom: $package
         lite: $lite
         excludeParts: $excludeParts
+        supportLevelOnly: $supportLevelOnly
+        includeSupportStatus: $includeSupportStatus
       ) {
         content
         contentType
@@ -5736,6 +5740,7 @@ export const BitbucketRepositories = gql`
         slug
         uuid
         workspace
+        projectName
       }
       totalCount
     }
