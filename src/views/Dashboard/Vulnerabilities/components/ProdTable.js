@@ -18,6 +18,7 @@ import {
 } from '@chakra-ui/react'
 
 import ConnectedSbomDrawer from 'components/Drawer/ConnectedSbomDrawer'
+import LynkTable from 'components/LynkTable'
 import Pagination from 'components/Pagination'
 
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -32,7 +33,6 @@ import { FaFolderTree } from 'react-icons/fa6'
 
 import VexModal from './VexModal'
 import VulnFilters from './VulnsFilter'
-import LynkTable from 'components/LynkTable'
 
 const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
   const params = useParams()
@@ -41,9 +41,9 @@ const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
 
   const { id, vulnId } = vuln || ''
 
-  const manageFeeds = useHasPermission({
-    parentKey: 'view_feeds',
-    childKey: 'manage_feeds'
+  const editVulns = useHasPermission({
+    parentKey: 'view_sbom',
+    childKey: 'edit_vulnerabilities'
   })
 
   const [vulnState, setVulnState] = useState({
@@ -291,7 +291,7 @@ const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
                 fontWeight='normal'
                 title='Set vuln status'
                 onClick={STATUS.onOpen}
-                isDisabled={!manageFeeds}
+                isDisabled={!editVulns}
               />
             </Tooltip>
           )}
@@ -308,7 +308,7 @@ const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
     vulnState,
     selectedVulns.length,
     STATUS.onOpen,
-    manageFeeds,
+    editVulns,
     reset
   ])
 
