@@ -32,7 +32,7 @@ const ImportWizard = ({ currentSbomId, currentProductId, onClose }) => {
   const groupId = params.productgroupid
   const { secondaryBgColor } = useThemeColor(['secondaryBgColor'])
 
-  const [compVexImport] = useMutation(ComponentVulnVexImport)
+  const [compVexImport, { loading }] = useMutation(ComponentVulnVexImport)
 
   const { prodVulnState, dispatch } = useGlobalState()
   const { selectedVulns } = prodVulnState
@@ -182,6 +182,7 @@ const ImportWizard = ({ currentSbomId, currentProductId, onClose }) => {
                 title='Submit'
                 variant='solid'
                 colorScheme='blue'
+                isLoading={loading}
                 onClick={handleSubmit}
                 aria-label='vulnStepTwo'
                 disabled={selectedVulns?.length === 0}

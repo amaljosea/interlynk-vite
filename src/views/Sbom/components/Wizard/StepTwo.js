@@ -15,6 +15,7 @@ import {
 import { Tag, TagLabel } from '@chakra-ui/react'
 
 import ExternalNavIcon from 'components/Icons/ExternalNavIcon'
+import LynkTable from 'components/LynkTable'
 import SeverityTag from 'components/Misc/SeverityTag'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -23,10 +24,8 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { IntersectingVulns } from 'graphQL/Queries'
 
 import { BsCircleHalf } from 'react-icons/bs'
-import LynkTable from 'components/LynkTable'
 
 const StepTwo = ({ sbomId, currentSbomId }) => {
-
   const { primaryTextColor, primaryErrorColor } = useThemeColor([
     'primaryTextColor',
     'primaryErrorColor'
@@ -198,16 +197,16 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
       <Flex mt={5} flexDir={'column'} width={'100%'}>
         <LynkTable
           subHeader
+          fixedHeader
           columns={columns}
-          className={tableClassName + 'data-table-container'}
+          selectableRows={true}
+          fixedHeaderScrollHeight='50vh'
+          onSelectedRowsChange={handleChange}
           data={data?.intersectingVulns || []}
           progressPending={data ? false : true}
           subHeaderComponent={subHeaderComponentMemo}
-          selectableRows={true}
-          fixedHeader
-          fixedHeaderScrollHeight='50vh'
-          onSelectedRowsChange={handleChange}
           selectableRowDisabled={conditionalRowDisabled}
+          className={tableClassName + ' data-table-container'}
         />
       </Flex>
     </Box>
