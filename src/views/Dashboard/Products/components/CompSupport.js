@@ -179,6 +179,20 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
           <Text {...labelStyle}>Last Assessed</Text>
           <Text {...infoStyle}>{lastAssessed}</Text>
         </Stack>
+        {manual?.level && (
+          <Stack {...containerStyle}>
+            <Text {...labelStyle}>{`Level (System)`}</Text>
+            <Text {...infoStyle} textTransform={'capitalize'}>
+              {automatic?.level?.replaceAll('_', ' ') || 'N/A'}
+            </Text>
+          </Stack>
+        )}
+        {manual?.notes && (
+          <Stack {...containerStyle}>
+            <Text {...labelStyle}>{`Explanation (System)`}</Text>
+            <Text {...infoStyle}>{automatic?.notes || 'N/A'}</Text>
+          </Stack>
+        )}
       </Stack>
     </Stack>
   )

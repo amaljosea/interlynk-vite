@@ -9,7 +9,7 @@ import RefreshBtn from 'components/Icons/RefreshBtn'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useRouteFlags } from 'hooks/useRouteFlags'
 
-import { BiScan } from 'react-icons/bi'
+import { TbActivity } from 'react-icons/tb'
 import { FaPen } from 'react-icons/fa6'
 
 import SupportFilters from '../../SupportFilters'
@@ -60,7 +60,7 @@ const SupportSubHeader = ({
           {!isCustomerView && (
             <Tooltip placement='left' label={'Rerun Support Analysis'}>
               <IconButton
-                icon={<BiScan size={20} />}
+                icon={<TbActivity size={20} />}
                 colorScheme='blue'
                 isDisabled={!editComponent}
                 onClick={() => action('rerun_support_analysis', null)}
