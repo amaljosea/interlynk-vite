@@ -135,7 +135,7 @@ const CompInsights = ({ isOpen, onClose, data }) => {
     {
       id: 3,
       label: 'Last Checked',
-      value: <DateField value={enrichedContent?.package?.updatedAt || 'N/A'} />
+      value: <DateField value={enrichedContent?.package?.updatedAt} />
     }
   ]
 
@@ -173,12 +173,12 @@ const CompInsights = ({ isOpen, onClose, data }) => {
     {
       id: 7,
       label: 'Published',
-      value: <DateField value={packageVersion?.publishedAt || 'N/A'} />
+      value: <DateField value={packageVersion?.publishedAt} />
     },
     {
       id: 8,
       label: 'Last Checked',
-      value: <DateField value={packageVersion?.updatedAt || 'N/A'} />
+      value: <DateField value={packageVersion?.updatedAt} />
     }
   ]
 
@@ -216,7 +216,7 @@ const CompInsights = ({ isOpen, onClose, data }) => {
     {
       id: 7,
       label: 'Last Commit',
-      value: <DateField value={repository?.lastCommitDate || 'N/A'} />
+      value: <DateField value={repository?.lastCommitDate} />
     },
     {
       id: 8,
@@ -236,7 +236,7 @@ const CompInsights = ({ isOpen, onClose, data }) => {
     {
       id: 11,
       label: 'Last Repo Update',
-      value: <DateField value={repository?.lastRepoUpdateDate || 'N/A'} />
+      value: <DateField value={repository?.lastRepoUpdateDate} />
     },
     {
       id: 12,
@@ -255,7 +255,7 @@ const CompInsights = ({ isOpen, onClose, data }) => {
     {
       id: 14,
       label: 'Last Checked',
-      value: <DateField value={repository?.updatedAt || 'N/A'} />
+      value: <DateField value={repository?.updatedAt} />
     }
   ]
 
