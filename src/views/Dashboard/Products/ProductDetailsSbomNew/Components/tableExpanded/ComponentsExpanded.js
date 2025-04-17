@@ -89,7 +89,6 @@ const ExpandedComponent = (props) => {
                       key={index}
                       item={item}
                       editable={false}
-                      premission={isArchived}
                       onDelete={() => action('delete_component_supplier', item)}
                     />
                   ))}

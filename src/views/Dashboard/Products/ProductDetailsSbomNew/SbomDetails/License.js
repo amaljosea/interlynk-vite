@@ -2,8 +2,8 @@ import { useMutation } from '@apollo/client'
 import { parseLicenseString } from 'utils'
 import { transformLicenseString } from 'utils'
 
-import { useDisclosure } from '@chakra-ui/react'
-import { Tag, TagCloseButton, TagLabel, TagRightIcon } from '@chakra-ui/react'
+import { Flex, useDisclosure } from '@chakra-ui/react'
+import { Tag, TagCloseButton, TagLabel } from '@chakra-ui/react'
 
 import LicenseField from 'components/Licenses/LicenseField'
 import LynkModal from 'components/LynkModal'
@@ -16,7 +16,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { sbomUpdate } from 'graphQL/Mutation'
 
-import { FaPen, FaScaleBalanced } from 'react-icons/fa6'
+import { FaScaleBalanced } from 'react-icons/fa6'
 
 import ConfirmationModal from '../../components/ConfirmationModal'
 
@@ -24,8 +24,12 @@ const License = ({ data, permission }) => {
   const { isCustomerView } = useRouteFlags()
   const { showToast } = useCustomToast()
   const { sbomState, dispatch } = useGlobalState()
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
   const { sbomDispatch } = dispatch
+
+  const { primaryBlueText, sameSecondaryText } = useThemeColor([
+    'primaryBlueText',
+    'sameSecondaryText'
+  ])
 
   const { id, spec, license } = data || ''
 
@@ -105,32 +109,30 @@ const License = ({ data, permission }) => {
       .finally(() => DELETE_LICENSE?.onClose())
   }
 
+  const licenseExists = license && license !== ''
+
   return (
     <>
-      {license && license !== '' ? (
-        <Tag variant='subtle' colorScheme='green'>
-          <TagLabel>{parseLicenseString(license)}</TagLabel>
-          <TagRightIcon
-            as={FaPen}
-            hidden={permission}
-            _hover={{ opacity: 1 }}
-            onClick={onLicenseOpen}
-            data-testid='edit_license'
-            sx={{ fontSize: 12, cursor: 'pointer', opacity: 0.5 }}
-          />
-          <TagCloseButton
-            hidden={permission}
-            data-testid='delete_license'
-            onClick={DELETE_LICENSE?.onOpen}
-          />
-        </Tag>
-      ) : (
+      <Flex flexWrap={'wrap'} alignItems={'center'} gap={2}>
+        {licenseExists && (
+          <Tag variant='subtle' colorScheme='green'>
+            <TagLabel>{parseLicenseString(license)}</TagLabel>
+            <TagCloseButton
+              hidden={permission}
+              data-testid='delete_license'
+              onClick={DELETE_LICENSE?.onOpen}
+            />
+          </Tag>
+        )}
         <ActiveBtn
-          title='Add License'
+          hidden={permission}
+          label={'edit_license'}
           onClick={onLicenseOpen}
-          color={primaryBlueText}
+          editable={licenseExists ? true : false}
+          title={licenseExists ? 'Update' : 'Add License'}
+          color={licenseExists ? sameSecondaryText : primaryBlueText}
         />
-      )}
+      </Flex>
 
       {/* SBOM LICENSE MODAL */}
       {LICENSE?.isOpen && (

@@ -2,10 +2,11 @@ import { useMutation } from '@apollo/client'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { Flex, Stack, Text, Tooltip, useDisclosure } from '@chakra-ui/react'
+import { Flex, Tooltip, useDisclosure } from '@chakra-ui/react'
 import { Tag, TagCloseButton, TagLabel } from '@chakra-ui/react'
 
 import ActiveBtn from 'components/Misc/ActiveBtn'
+import AuthorInfo from 'components/Misc/AuthorInfo'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -13,16 +14,6 @@ import { authorDelete } from 'graphQL/Mutation'
 
 import AuthorModal from '../../components/AuthorModal'
 import ConfirmationModal from '../../components/ConfirmationModal'
-
-const authorInfo = (item) => {
-  return (
-    <Stack dir='column' spacing={1}>
-      <Text>Name: {item?.name || 'N/A'}</Text>
-      {item?.email && <Text>Email: {item?.email}</Text>}
-      {item?.phone && <Text>Phone: {item?.phone}</Text>}
-    </Stack>
-  )
-}
 
 const Authors = ({ data, permission }) => {
   const params = useParams()
@@ -53,7 +44,7 @@ const Authors = ({ data, permission }) => {
     <>
       <Flex alignItems={'center'} flexWrap={'wrap'} gap={2}>
         {data?.map((item, index) => (
-          <Tooltip key={index} label={authorInfo(item)}>
+          <Tooltip key={index} label={<AuthorInfo item={item} />}>
             <Tag
               variant='subtle'
               colorScheme='blue'

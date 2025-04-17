@@ -1,12 +1,10 @@
 import { Link, Stack, Text, Tooltip } from '@chakra-ui/react'
-import { Tag, TagCloseButton, TagLabel, TagRightIcon } from '@chakra-ui/react'
+import { Tag, TagCloseButton, TagLabel } from '@chakra-ui/react'
 
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useRouteFlags } from 'hooks/useRouteFlags'
 
-import { FaPen } from 'react-icons/fa6'
-
-const SupplierTag = ({ item, premission, onEdit, onDelete, editable }) => {
+const SupplierTag = ({ item, onDelete, editable }) => {
   const { isCustomerView } = useRouteFlags()
   const { contactName, contactEmail, url, name } = item || {}
   const supplierURL = url?.startsWith('http') ? item.url : `http://${url}`
@@ -36,16 +34,6 @@ const SupplierTag = ({ item, premission, onEdit, onDelete, editable }) => {
           </Link>
         </TagLabel>
       </Tooltip>
-      {editable && (
-        <TagRightIcon
-          as={FaPen}
-          onClick={onEdit}
-          hidden={premission}
-          _hover={{ opacity: 1 }}
-          aria-label='supplier_edit'
-          sx={{ fontSize: 12, opacity: 0.5, cursor: 'pointer' }}
-        />
-      )}
       {editable && !isCustomerView && updateSbom && (
         <TagCloseButton
           aria-label='supplier_delete'
