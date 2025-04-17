@@ -57,6 +57,11 @@ const TagDrawer = ({ isOpen, onClose }) => {
       const { errors } = res?.data?.labelDelete || ''
       if (errors?.length > 0) {
         showToast({ description: errors[0], status: 'error' })
+      } else {
+        showToast({
+          description: 'Label deleted successfully',
+          status: 'success'
+        })
       }
     })
   }
