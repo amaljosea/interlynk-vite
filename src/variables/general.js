@@ -1330,7 +1330,7 @@ export const exportCsvTableConfig = {
         'Component Name': row?.component?.name || '',
         'Component Version': row?.component?.version || '',
         Part: row?.isPart
-          ? `${row?.component?.sbom?.project?.projectGroup?.name || ''} : ${row?.component?.name || ''}`
+          ? row?.component?.sbom?.project?.projectGroup?.name || ''
           : 'N/A',
         Severity: row?.vuln?.sev || '',
         Source: row?.vuln?.source || '',
