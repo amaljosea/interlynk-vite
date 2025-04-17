@@ -5,6 +5,7 @@ import { getUndefinedIfEmptyOrAll } from 'utils'
 
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
+import LynkTable from 'components/LynkTable'
 import SupportAnalysis from 'components/Modal/SupportAnalysis'
 import SupportStatus from 'components/Modal/SupportStatus'
 import Pagination from 'components/Pagination'
@@ -20,7 +21,6 @@ import CompSupport from '../components/CompSupport'
 import SupportColumns from './Components/tableColumns/SupportColumns'
 import SupportExpanded from './Components/tableExpanded/SupportExpanded'
 import SupportSubHeader from './Components/tableSubHeaders/SupportSubHeader'
-import LynkTable from 'components/LynkTable'
 
 export const GetSupportSettings = gql`
   query GetSupportSettings($id: Uuid!) {
@@ -179,7 +179,6 @@ const Support = () => {
           columns={columns}
           expandOnRowClicked
           onSort={handleSort}
-          data={nodes || []}
           progressPending={loading}
           defaultSortFieldId={field}
           subHeaderComponent={subHeader}
@@ -187,12 +186,13 @@ const Support = () => {
           clearSelectedRows={toggleClear}
           className='data-table-container'
           onSelectedRowsChange={handleChange}
+          data={enableSupportLevel ? nodes : []}
           expandableRowsComponent={SupportExpanded}
           selectableRowDisabled={(row) => row?.sbom?.id !== sbomId}
         />
 
         {/* PAGINATION */}
-        <Pagination {...paginationProps} />
+        {enableSupportLevel && <Pagination {...paginationProps} />}
       </Flex>
 
       {UPDATE_STATUS.isOpen && (
@@ -217,6 +217,7 @@ const Support = () => {
       {/* SUPPORT ANALYSIS RUN WARNING */}
       {ANALYSIS.isOpen && (
         <SupportAnalysis
+          reset={reset}
           isOpen={ANALYSIS.isOpen}
           onClose={ANALYSIS.onClose}
           data={{

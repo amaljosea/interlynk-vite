@@ -148,8 +148,18 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
           <Text {...labelStyle}>Assessment</Text>
           <Text {...infoStyle}>{assessment}</Text>
         </Stack>
+        {manual?.level && (
+          <Stack {...containerStyle}>
+            <Text {...labelStyle}>{`Level (System)`}</Text>
+            <Text {...infoStyle} textTransform={'capitalize'}>
+              {automatic?.level?.replaceAll('_', ' ') || 'N/A'}
+            </Text>
+          </Stack>
+        )}
         <Stack {...containerStyle}>
-          <Text {...labelStyle}>{`Level`}</Text>
+          <Text {...labelStyle}>
+            {`Level`} {manual?.level && `(Manual)`}
+          </Text>
           <Text {...infoStyle} textTransform={'capitalize'}>
             {supportLevel?.replaceAll('_', ' ') || 'N/A'}
           </Text>
@@ -165,8 +175,16 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
           <Text {...labelStyle}>Assessment Expires On</Text>
           <Text {...infoStyle}>{assessmentExpiresOn}</Text>
         </Stack>
+        {manual?.notes && (
+          <Stack {...containerStyle}>
+            <Text {...labelStyle}>{`Explanation (System)`}</Text>
+            <Text {...infoStyle}>{automatic?.notes || 'N/A'}</Text>
+          </Stack>
+        )}
         <Stack {...containerStyle}>
-          <Text {...labelStyle}>{`Explanation`}</Text>
+          <Text {...labelStyle}>
+            {`Explanation`} {manual?.level && `(Manual)`}
+          </Text>
           <Text {...infoStyle}>{explanation}</Text>
         </Stack>
         <Stack {...containerStyle}>

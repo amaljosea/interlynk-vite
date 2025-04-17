@@ -5,13 +5,15 @@ import useCustomToast from 'hooks/useCustomToast'
 
 import { ProjectSettingUpdate, ReRunSbomSupportLevel } from 'graphQL/Mutation'
 
-const SupportAnalysis = ({ isOpen, onClose, data }) => {
+const SupportAnalysis = ({ reset, isOpen, onClose, data }) => {
   const { showToast } = useCustomToast()
 
   const { id, group, sbom } = data || {}
 
-  const [updateSettings] = useMutation(ProjectSettingUpdate)
   const [reRunSupport, { loading }] = useMutation(ReRunSbomSupportLevel)
+  const [updateSettings] = useMutation(ProjectSettingUpdate, {
+    onCompleted: () => reset()
+  })
 
   const updateSupportSetting = () => {
     updateSettings({
