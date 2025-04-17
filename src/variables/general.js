@@ -1302,6 +1302,7 @@ export const exportCsvTableConfig = {
   'SBOM Vulnerability View': {
     defaultSelectedColumns: [
       'ID',
+      'Part',
       'Component Name',
       'Component Version',
       'Severity',
@@ -1328,6 +1329,9 @@ export const exportCsvTableConfig = {
         ID: row?.vuln?.vulnId || '',
         'Component Name': row?.component?.name || '',
         'Component Version': row?.component?.version || '',
+        Part: row?.isPart
+          ? `${row?.component?.sbom?.project?.projectGroup?.name || ''} : ${row?.component?.name || ''}`
+          : 'N/A',
         Severity: row?.vuln?.sev || '',
         Source: row?.vuln?.source || '',
         CVSS: row?.vuln?.cvssScore || '',
