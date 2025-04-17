@@ -11,10 +11,10 @@ import UploadModal from 'views/Dashboard/Products/components/UploadModal'
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
+import BitbucketProjects from 'components/Drawer/BitbucketProjects'
 import ShareLynkDrawer from 'components/Drawer/ShareLynkDrawer'
 import TagDrawer from 'components/Drawer/TagDrawer'
 import LynkTable from 'components/LynkTable'
-import BitbucketProjects from 'components/Drawer/BitbucketProjects'
 import ProductColumns from 'components/columns/ProductColumns'
 import ProductHeader from 'components/headers/ProductHeader'
 
