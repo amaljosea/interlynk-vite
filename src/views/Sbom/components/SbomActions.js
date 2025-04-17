@@ -197,7 +197,7 @@ const SbomActions = ({ sbom }) => {
 
   return (
     <>
-      <Flex gap={1} alignItems={'center'} justifyContent={'flex-end'}>
+      <Flex gap={2} alignItems={'center'} justifyContent={'flex-end'}>
         {/* UPDATE PRIMARY COMPONENT */}
         <EditButton
           size={'md'}
