@@ -1825,8 +1825,7 @@ export const ShareComponentData = gql`
     $primary: Boolean
     $direct: Boolean
     $includeParts: Boolean
-    $field: ComponentOrderByFields!
-    $direction: OrderByDirection!
+    $orderBy: ComponentOrderByInput
   ) {
     shareLynkQuery {
       sbom(id: $sbomId) {
@@ -1845,7 +1844,7 @@ export const ShareComponentData = gql`
           primary: $primary
           direct: $direct
           includeParts: $includeParts
-          orderBy: { field: $field, direction: $direction }
+          orderBy: $orderBy
         ) {
           totalCount
           pageInfo {
@@ -1857,6 +1856,17 @@ export const ShareComponentData = gql`
           nodes {
             id
             name
+            sbomId
+            sbom {
+              id
+              projectVersion
+              project {
+                id
+                projectGroup {
+                  name
+                }
+              }
+            }
             version
             primary
             internal

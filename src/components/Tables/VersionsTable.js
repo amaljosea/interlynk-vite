@@ -111,7 +111,10 @@ const VersionsTable = (props) => {
   const { data } = useQuery(
     signedUrlParams ? GetShareProjectGroup : GetProjectDetails,
     {
-      variables: { id: params?.productid }
+      skip: params?.productgroupid ? false : true,
+      variables: {
+        id: signedUrlParams ? params?.productgroupid : params?.productid
+      }
     }
   )
   const { projectGroup, projectSetting } = data?.project || {}
