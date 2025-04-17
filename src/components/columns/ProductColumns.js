@@ -153,9 +153,12 @@ const ProductColumns = (props) => {
                     aria-label='product_name'
                     data-testid={`product_${name}`}
                     onClick={() => handleClick(row)}
-                    _hover={{ textDecorationLine: 'underline' }}
                   >
-                    {name?.length > 54 ? truncatedValue(name, 54) : name}
+                    {name?.length > 54 ? (
+                      <Tooltip label={name}>{truncatedValue(name, 54)}</Tooltip>
+                    ) : (
+                      name
+                    )}
                   </Text>
                   {labels?.map((item, index) => (
                     <ProdLabel key={index} item={item} />
