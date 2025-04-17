@@ -9,6 +9,7 @@ import CompDrawer from 'views/Dashboard/Products/components/CompDrawer'
 import { Flex, Text, useDisclosure } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
+import LynkTable from 'components/LynkTable'
 import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
@@ -19,7 +20,6 @@ import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ShareComponentData } from 'graphQL/Queries'
-import LynkTable from 'components/LynkTable'
 
 const Components = ({ sbomData }) => {
   const params = useParams()
@@ -68,10 +68,9 @@ const Components = ({ sbomData }) => {
     selector: 'shareLynkQuery.sbom.components',
     variables: {
       sbomId: sbomId,
-      search: searchInput !== '' ? searchInput : undefined,
       ...compData,
-      field: field,
-      direction: direction
+      orderBy: searchInput === '' ? { field, direction } : undefined,
+      search: searchInput !== '' ? searchInput : undefined
     }
   })
 
