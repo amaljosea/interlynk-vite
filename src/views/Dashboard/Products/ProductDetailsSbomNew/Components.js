@@ -13,6 +13,7 @@ import Card from 'components/Card/Card'
 import ComponentNotes from 'components/Drawer/ComponentNotes'
 import ComponentVulns from 'components/Drawer/ComponentVulns'
 import LicenseStatus from 'components/Drawer/LicenseStatus'
+import LynkTable from 'components/LynkTable'
 import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
 import ComponentAddModal from 'components/Modal/ComponentAddModal'
@@ -33,7 +34,6 @@ import HealthMap from '../components/HealthMap'
 import ComponentsColumns from './Components/tableColumns/ComponentsColumns'
 import ExpandedComponent from './Components/tableExpanded/ComponentsExpanded'
 import ComponentsSubHeader from './Components/tableSubHeaders/ComponentsSubHeader'
-import LynkTable from 'components/LynkTable'
 
 const Components = ({ sbomData }) => {
   const params = useParams()
