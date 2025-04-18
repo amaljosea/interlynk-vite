@@ -37,7 +37,7 @@ function VulnerabilityGroup() {
     },
     {
       id: '2',
-      keytype: 'all_vulns_by_status',
+      type: 'all_vulns_by_status',
       title: 'All Vulnerabilities by Status',
       content: <AllVulnerabilitiesByStatus />
     },
@@ -110,7 +110,7 @@ function VulnerabilityGroup() {
             {filteredVulnCards?.map((card) => (
               <DashboardCard
                 key={card.id}
-                id={card.key}
+                id={card.id}
                 type={card.type}
                 title={card.title}
                 content={card.content}

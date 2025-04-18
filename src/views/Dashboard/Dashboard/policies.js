@@ -83,7 +83,7 @@ function PolicyGroup() {
             {filteredPolicyCards?.map((card) => (
               <DashboardCard
                 key={card.id}
-                id={card.key}
+                id={card.id}
                 type={card.type}
                 title={card.title}
                 content={card.content}

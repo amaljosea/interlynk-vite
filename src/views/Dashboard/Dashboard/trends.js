@@ -126,7 +126,7 @@ function VulnerabilityTrendsGroup() {
             {filteredTrendCards?.map((card) => (
               <DashboardCard
                 key={card.id}
-                id={card.key}
+                id={card.id}
                 type={card.type}
                 title={card.title}
                 desc={card.desc}
