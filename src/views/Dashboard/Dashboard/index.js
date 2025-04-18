@@ -7,10 +7,12 @@ import { Button, Flex, Heading, Skeleton, Stack } from '@chakra-ui/react'
 import { Grid, GridItem, SimpleGrid } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
+import CardList from 'components/CardList'
 import CustomLoader from 'components/CustomLoader'
 import GlobalEnvFilter from 'components/Misc/GlobalEnvFilter'
 import GlobalLabelFilter from 'components/Misc/GlobalLabelFilter'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
 
@@ -18,13 +20,15 @@ import { GetOrgMetrics } from 'graphQL/Queries'
 
 import ActivitiesOverview from './components/ActivitiesOverview'
 import ProductsOverview from './components/ProductsOverview'
-import PolicyGraphs from './components/category/PolicyGraphs'
-import ProductGraphs from './components/category/ProductGraphs'
-import VulnGraphs from './components/category/VulnGraphs'
+import PolicyGroup from './policies'
+import ProductGroup from './products'
+import VulnerabilityTrendsGroup from './trends'
+import VulnerabilityGroup from './vulnerabilities'
 
-export default function Dashboard() {
+export default function Page() {
   const { setIsOpen } = useTour()
   const product = useQueryParam('id')
+  const { isFreeTier } = useGlobalQueryContext()
   const { dispatch, envName, organization, labelIds, setLabelIds } =
     useGlobalState()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
@@ -75,7 +79,7 @@ export default function Dashboard() {
   }
 
   return (
-    <Flex width={'100%'} flexDirection='column' gap={5}>
+    <Stack width={'100%'} spacing={10}>
       {/* FILTERS */}
       <Flex
         width={'100%'}
@@ -98,37 +102,43 @@ export default function Dashboard() {
           <GlobalLabelFilter value={labelIds} setValue={setLabelIds} />
           {/* ENVIRONMENT FILTER */}
           {organization && <GlobalEnvFilter />}
+          {/* GRAPH CARD LIGHT */}
+          {!isFreeTier && <CardList />}
         </Flex>
       </Flex>
-      {/* PRODUCTS GRAPHS */}
-      <ProductGraphs />
-      {/* VULNERABILITIRS GRAPHS */}
-      <VulnGraphs />
-      {/* POLICY GRAPHS */}
-      <PolicyGraphs />
-      {/* ACTIVITIES AND CHANGELOGS */}
-      <Stack spacing={4} mt={6}>
-        <Heading size={'md'}>Activities</Heading>
-        <Grid templateColumns='repeat(12, 1fr)' gap={5} flexWrap={'wrap'}>
-          {/* RECENT IMPORTS */}
-          <GridItem colSpan={8} w='100%'>
-            <ProductsOverview
-              loading={loading}
-              title={'Recent Imports'}
-              data={metrics?.organizationMetric?.latestVersions}
-            />
-          </GridItem>
-          {/* LATEST ACTIVITIES */}
-          <GridItem colSpan={4} w='100%'>
-            <ActivitiesOverview
-              loading={loading}
-              title={'Recent Activities'}
-              amount={metrics?.organizationMetric?.latestActivity?.length}
-              data={metrics?.organizationMetric?.latestActivity}
-            />
-          </GridItem>
-        </Grid>
+      <Stack spacing={10}>
+        {/* PRODUCTS GRAPHS */}
+        <ProductGroup />
+        {/* VULNERABILITIRS GRAPHS */}
+        <VulnerabilityGroup />
+        {/* VULNERABILITY TRENDS GRAPHS */}
+        <VulnerabilityTrendsGroup />
+        {/* POLICY GRAPHS */}
+        <PolicyGroup />
+        {/* ACTIVITIES AND CHANGELOGS */}
+        <Stack spacing={3}>
+          <Heading size={'md'}>Activities</Heading>
+          <Grid templateColumns='repeat(12, 1fr)' gap={5} flexWrap={'wrap'}>
+            {/* RECENT IMPORTS */}
+            <GridItem colSpan={8} w='100%'>
+              <ProductsOverview
+                loading={loading}
+                title={'Recent Imports'}
+                data={metrics?.organizationMetric?.latestVersions}
+              />
+            </GridItem>
+            {/* LATEST ACTIVITIES */}
+            <GridItem colSpan={4} w='100%'>
+              <ActivitiesOverview
+                loading={loading}
+                title={'Recent Activities'}
+                amount={metrics?.organizationMetric?.latestActivity?.length}
+                data={metrics?.organizationMetric?.latestActivity}
+              />
+            </GridItem>
+          </Grid>
+        </Stack>
       </Stack>
-    </Flex>
+    </Stack>
   )
 }

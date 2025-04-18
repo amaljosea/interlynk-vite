@@ -4,11 +4,11 @@ import { SingleGraph } from 'views/Dashboard/Analytics/SingleGraph'
 import { getDays } from 'views/Dashboard/Analytics/utils'
 import { formatDate } from 'views/Dashboard/Analytics/utils'
 
-import { Stack, Text, useTheme } from '@chakra-ui/react'
+import { CardBody, useTheme } from '@chakra-ui/react'
 
-import Card from 'components/Card/Card'
 import LynkLoader from 'components/Misc/LynkLoader'
 
+import useDateRange from 'hooks/useDateRange'
 import useFetchAllNodes from 'hooks/useFetchAllNodes'
 import { useGlobalState } from 'hooks/useGlobalState'
 
@@ -55,11 +55,11 @@ const DeployVelocityMetrics = gql`
   }
 `
 
-const DeployVelocity = ({ filters }) => {
+const DeployVelocity = () => {
   const theme = useTheme()
-  const { envName } = useGlobalState()
-  const { version, product, duration, label } = filters || ''
-  const { startDate, endDate } = duration || ''
+  const { envName, analyticsState } = useGlobalState()
+  const { startDate, endDate } = useDateRange()
+  const { product, label, version } = analyticsState || {}
 
   const { dates } = getDays({ startDate, endDate })
 
@@ -146,18 +146,9 @@ const DeployVelocity = ({ filters }) => {
   if (loading) return <LynkLoader />
 
   return (
-    <Card>
-      <Stack h='90px' spacing={1} mb={4}>
-        <Text fontSize='lg' fontWeight='bold'>
-          Deploy Velocity
-        </Text>
-        <Text fontSize='sm'>
-          Duration from when an update or patch is available to complete
-          implementation in devices deployed in the field, to the extent known
-        </Text>
-      </Stack>
+    <CardBody py={4}>
       <SingleGraph data={deployMetrics} lines={lines} />
-    </Card>
+    </CardBody>
   )
 }
 

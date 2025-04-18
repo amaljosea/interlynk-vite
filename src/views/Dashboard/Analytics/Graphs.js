@@ -2,6 +2,7 @@ import { Center, Icon, SimpleGrid, Text } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
+import { DashboardCard } from 'components/DashboardCard'
 import ComponentCount from 'components/Graphs/ComponentCount'
 import DefectDensity from 'components/Graphs/DefectDensity'
 import DeployVelocity from 'components/Graphs/DeployVelocity'
@@ -11,15 +12,63 @@ import VulnBySeverity from 'components/Graphs/VulnBySeverity'
 import VulnByStatus from 'components/Graphs/VulnByStatus'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaChartArea } from 'react-icons/fa6'
 
-export const Graphs = ({ filters }) => {
+export const Graphs = () => {
   const { orgView } = useGlobalQueryContext()
+  const { analyticsState } = useGlobalState()
+
   const { headingTextSecondary } = useThemeColor(['headingTextSecondary'])
 
-  const { product, version, duration } = filters || ''
+  const { product, version, duration } = analyticsState || {}
+
+  const trendCards = [
+    {
+      id: '1',
+      title: 'Component Count',
+      desc: 'Number of components in included versions over time',
+      content: <ComponentCount />
+    },
+    {
+      id: '2',
+      title: 'License Count',
+      desc: ' Number of unique licenses included in versions over time',
+      content: <LicenseCount />
+    },
+    {
+      id: '3',
+      title: 'Vulnerabilities by Severity',
+      desc: 'Number of vulnerabilities in included versions grouped by their severity',
+      content: <VulnBySeverity />
+    },
+    {
+      id: '4',
+      title: 'Vulnerabilities by Status',
+      desc: 'Number of vulnerabilities in included versions grouped by their vulnerabilty status',
+      content: <VulnByStatus />
+    },
+    {
+      id: '5',
+      title: 'Patch Velocity',
+      desc: 'Duration from vulnerability identification to when it is updated or patched',
+      content: <PatchVelocity />
+    },
+    {
+      id: '6',
+      title: 'Defect Density',
+      desc: 'Percentage of identified vulnerabilities that are updated or patched',
+      content: <DefectDensity />
+    },
+    {
+      id: '7',
+      title: 'Deploy Velocity',
+      desc: 'Duration from when an update or patch is available to complete implementation in devices deployed in the field, to the extent known',
+      content: <DeployVelocity />
+    }
+  ]
 
   if (!product?.length || !version?.length || !duration) {
     return (
@@ -48,13 +97,15 @@ export const Graphs = ({ filters }) => {
 
   return (
     <SimpleGrid gap={6} width={'100%'} columns={[2, 3]}>
-      <ComponentCount filters={filters} />
-      <LicenseCount filters={filters} />
-      <VulnBySeverity filters={filters} />
-      <VulnByStatus filters={filters} />
-      <PatchVelocity filters={filters} />
-      <DefectDensity filters={filters} />
-      <DeployVelocity filters={filters} />
+      {trendCards?.map((card) => (
+        <DashboardCard
+          key={card.id}
+          id={card.id}
+          title={card.title}
+          desc={card.desc}
+          content={card.content}
+        />
+      ))}
     </SimpleGrid>
   )
 }

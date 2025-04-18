@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 import { Button, Flex } from '@chakra-ui/react'
 
@@ -12,22 +12,14 @@ import { Filters } from './Filters'
 import { Graphs } from './Graphs'
 
 const Analytics = () => {
-  const { organization, envName } = useGlobalState()
-  const [filters, setFilters] = useState({
-    product: [],
-    label: null,
-    version: [],
-    duration: null
-  })
+  const { organization, envName, dispatch } = useGlobalState()
+  const { analyticsDispatch } = dispatch
 
   useEffect(() => {
     if (envName) {
-      setFilters((filtersOld) => ({
-        ...filtersOld,
-        version: []
-      }))
+      analyticsDispatch({ type: 'CLEAR_FILTERS' })
     }
-  }, [envName])
+  }, [analyticsDispatch, envName])
 
   return (
     <Flex gap={6} width={'100%'} flexDir={'column'} alignItems={'flex-start'}>
@@ -47,11 +39,11 @@ const Analytics = () => {
       </Flex>
       <Card>
         <CardBody>
-          <Filters filters={filters} setFilters={setFilters} />
+          <Filters />
         </CardBody>
       </Card>
       {/* GRAPHS */}
-      <Graphs filters={filters} />
+      <Graphs />
     </Flex>
   )
 }

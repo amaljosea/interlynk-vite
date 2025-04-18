@@ -3,9 +3,6 @@ import { SingleGraph } from 'views/Dashboard/Analytics/SingleGraph'
 import { getDays } from 'views/Dashboard/Analytics/utils'
 import { formatForGraph } from 'views/Dashboard/Analytics/utils'
 
-import { Stack, Text } from '@chakra-ui/react'
-
-import Card from 'components/Card/Card'
 import LynkLoader from 'components/Misc/LynkLoader'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -40,9 +37,9 @@ const ComponentMetrics = gql`
   }
 `
 
-const ComponentCount = ({ filters }) => {
-  const { envName } = useGlobalState()
-  const { version, product, duration, label } = filters || ''
+const ComponentCount = () => {
+  const { envName, analyticsState } = useGlobalState()
+  const { version, product, duration, label } = analyticsState || {}
   const { startDate, endDate } = duration || ''
 
   const { dates } = getDays({ startDate, endDate })
@@ -76,19 +73,7 @@ const ComponentCount = ({ filters }) => {
 
   if (loading) return <LynkLoader />
 
-  return (
-    <Card>
-      <Stack h='90px' spacing={1} mb={4}>
-        <Text fontSize='lg' fontWeight='bold'>
-          Component Count
-        </Text>
-        <Text fontSize='sm'>
-          Number of components in included versions over time
-        </Text>
-      </Stack>
-      <SingleGraph lines={lines} data={dataForGraph} />
-    </Card>
-  )
+  return <SingleGraph lines={lines} data={dataForGraph} />
 }
 
 export default ComponentCount

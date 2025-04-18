@@ -4,8 +4,6 @@ import { Grid, GridItem, SimpleGrid, Stack, Text } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { Stat, StatGroup, StatNumber } from '@chakra-ui/react'
 
-import Card from 'components/Card/Card'
-import CardBody from 'components/Card/CardBody'
 import LynkLoader from 'components/Misc/LynkLoader'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -97,47 +95,38 @@ const VersionLifestages = () => {
   if (loading) return <LynkLoader />
 
   return (
-    <Card maxH='100%' height='320px' overflowY='auto'>
-      {/* HEADING */}
-      <Text fontWeight='semibold'>Versions by Lifestages</Text>
-      <CardBody mt={6} h='100%'>
-        <Grid w={'100%'} templateColumns='repeat(12, 1fr)' gap={6}>
-          <GridItem colSpan={4}>
-            <StatGroup
-              pr={4}
-              h={'100%'}
-              alignItems={'center'}
-              borderRight={`1px solid ${grayBorderColor}`}
-            >
-              <Stat textAlign={'right'}>
-                <StatNumber
-                  fontWeight={'normal'}
-                  fontSize={['4xl', '5xl', '6xl']}
-                >
-                  {total || 0}
-                </StatNumber>
-              </Stat>
-            </StatGroup>
-          </GridItem>
-          <GridItem colSpan={8}>
-            <Stack>
-              {lifeStages?.map((item, index) => (
-                <SimpleGrid w={'100%'} key={index} columns={2} spacing={2}>
-                  <Text fontSize={'sm'} textTransform={'capitalize'}>
-                    {item?.label?.replaceAll('_', ' ')}
-                  </Text>
-                  <Tag colorScheme={item?.color}>
-                    <TagLabel mx={'auto'} fontSize={'sm'}>
-                      {item?.count}
-                    </TagLabel>
-                  </Tag>
-                </SimpleGrid>
-              ))}
-            </Stack>
-          </GridItem>
-        </Grid>
-      </CardBody>
-    </Card>
+    <Grid w={'100%'} templateColumns='repeat(12, 1fr)' gap={6}>
+      <GridItem colSpan={4}>
+        <StatGroup
+          pr={4}
+          h={'100%'}
+          alignItems={'center'}
+          borderRight={`1px solid ${grayBorderColor}`}
+        >
+          <Stat textAlign={'right'}>
+            <StatNumber fontWeight={'normal'} fontSize={['4xl', '5xl', '6xl']}>
+              {total || 0}
+            </StatNumber>
+          </Stat>
+        </StatGroup>
+      </GridItem>
+      <GridItem colSpan={8}>
+        <Stack>
+          {lifeStages?.map((item, index) => (
+            <SimpleGrid w={'100%'} key={index} columns={2} spacing={2}>
+              <Text fontSize={'sm'} textTransform={'capitalize'}>
+                {item?.label?.replaceAll('_', ' ')}
+              </Text>
+              <Tag colorScheme={item?.color}>
+                <TagLabel mx={'auto'} fontSize={'sm'}>
+                  {item?.count}
+                </TagLabel>
+              </Tag>
+            </SimpleGrid>
+          ))}
+        </Stack>
+      </GridItem>
+    </Grid>
   )
 }
 

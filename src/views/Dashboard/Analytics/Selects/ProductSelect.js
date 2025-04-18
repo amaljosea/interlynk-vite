@@ -28,9 +28,9 @@ const PRODUCT_OPTION_QUERY = gql`
   }
 `
 
-export const ProductSelect = ({ value, onChange, filters }) => {
-  const { orgView } = useGlobalQueryContext()
-  const { label } = filters
+export const ProductSelect = ({ value, onChange }) => {
+  const { orgView, analyticsState } = useGlobalQueryContext()
+  const { label } = analyticsState || {}
 
   const { data, loading, error } = useQuery(PRODUCT_OPTION_QUERY, {
     skip: !orgView,

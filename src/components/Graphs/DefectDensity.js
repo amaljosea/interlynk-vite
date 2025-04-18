@@ -4,11 +4,11 @@ import { SingleGraph } from 'views/Dashboard/Analytics/SingleGraph'
 import { getDays } from 'views/Dashboard/Analytics/utils'
 import { formatDate } from 'views/Dashboard/Analytics/utils'
 
-import { Stack, Text, theme } from '@chakra-ui/react'
+import { theme } from '@chakra-ui/react'
 
-import Card from 'components/Card/Card'
 import LynkLoader from 'components/Misc/LynkLoader'
 
+import useDateRange from 'hooks/useDateRange'
 import useFetchAllNodes from 'hooks/useFetchAllNodes'
 import { useGlobalState } from 'hooks/useGlobalState'
 
@@ -55,10 +55,10 @@ const DefectDensityMetrics = gql`
   }
 `
 
-const DefectDensity = ({ filters }) => {
-  const { envName } = useGlobalState()
-  const { version, product, duration, label } = filters || ''
-  const { startDate, endDate } = duration || ''
+const DefectDensity = () => {
+  const { envName, analyticsState } = useGlobalState()
+  const { startDate, endDate } = useDateRange()
+  const { product, label, version } = analyticsState || {}
 
   const { dates } = getDays({ startDate, endDate })
 
@@ -121,19 +121,7 @@ const DefectDensity = ({ filters }) => {
 
   if (loading) return <LynkLoader />
 
-  return (
-    <Card>
-      <Stack h='90px' spacing={1} mb={4}>
-        <Text fontSize='lg' fontWeight='bold'>
-          Defect Density
-        </Text>
-        <Text fontSize='sm'>
-          Percentage of identified vulnerabilities that are updated or patched
-        </Text>
-      </Stack>
-      <SingleGraph lines={lines} percentage={true} data={defectMetrics} />
-    </Card>
-  )
+  return <SingleGraph lines={lines} percentage={true} data={defectMetrics} />
 }
 
 export default DefectDensity
