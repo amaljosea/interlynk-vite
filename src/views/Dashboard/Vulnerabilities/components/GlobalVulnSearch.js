@@ -3,7 +3,7 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-const GlobalVulnSearch = () => {
+const GlobalVulnSearch = ({ reset }) => {
   const { globalVulnState, dispatch } = useGlobalState()
   const { globalVulnDispatch } = dispatch
 
@@ -15,6 +15,7 @@ const GlobalVulnSearch = () => {
         type: 'CHANGE_SEARCH_INPUT',
         payload: event.target.value
       })
+      reset()
     }
   }
 
