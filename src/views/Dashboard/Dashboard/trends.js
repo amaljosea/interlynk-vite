@@ -35,41 +35,41 @@ function VulnerabilityTrendsGroup() {
     {
       id: '1',
       title: 'Vulnerabilities by Severity',
-      key: 'vulns_by_severity',
+      type: 'vulns_by_severity',
       desc: 'Number of vulnerabilities in included versions grouped by their severity',
       content: <VulnBySeverity />
     },
     {
       id: '2',
-      key: 'vulns_by_status',
+      type: 'vulns_by_status',
       title: 'Vulnerabilities by Status',
       desc: 'Number of vulnerabilities in included versions grouped by their vulnerabilty status',
       content: <VulnByStatus />
     },
     {
       id: '3',
-      key: 'defect_density',
+      type: 'defect_density',
       title: 'Defect Density',
       desc: 'Percentage of identified vulnerabilities that are updated or patched',
       content: !isFreeTier ? <DefectDensity /> : null
     },
     {
       id: '4',
-      key: 'resolution_age',
+      type: 'resolution_age',
       title: 'Resolution Age',
       desc: 'Total number of days all vulnerabilities are present before resolution',
       content: !isFreeTier ? <VulnAge /> : null
     },
     {
       id: '5',
-      key: 'resotion_velocity',
+      type: 'resotion_velocity',
       title: 'Resolution Velocity',
       desc: 'Average number of days a vulnerability is present before resolution',
       content: !isFreeTier ? <IdentityVelocity /> : null
     },
     {
       id: '6',
-      key: 'patch_velocity',
+      type: 'patch_velocity',
       title: 'Patch Velocity',
       desc: 'Duration from vulnerability identification to when it is updated or patched',
       content: !isFreeTier ? <PatchVelocity /> : null
@@ -79,7 +79,7 @@ function VulnerabilityTrendsGroup() {
   const [isGridLayout, setIsGridLayout] = useState(true)
 
   const filteredTrendCards = useMemo(() => {
-    return trendCards.filter((card) => selectedTrends.includes(card.key))
+    return trendCards.filter((card) => selectedTrends.includes(card.type))
   }, [trendCards, selectedTrends])
 
   const sensors = useSensors(
@@ -127,6 +127,7 @@ function VulnerabilityTrendsGroup() {
               <DashboardCard
                 key={card.id}
                 id={card.key}
+                type={card.type}
                 title={card.title}
                 desc={card.desc}
                 content={card.content}

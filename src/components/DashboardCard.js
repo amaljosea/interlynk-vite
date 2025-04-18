@@ -19,6 +19,7 @@ import { LuGripVertical, LuX } from 'react-icons/lu'
 
 export function DashboardCard({
   id,
+  type,
   title,
   content,
   desc,
@@ -64,7 +65,7 @@ export function DashboardCard({
             icon={<LuX />}
             variant='ghost'
             hidden={isAnalytics}
-            onClick={() => onDelete(id)}
+            onClick={() => onDelete(type)}
             _hover={{ bg: 'none' }}
           />
         </Flex>

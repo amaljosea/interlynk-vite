@@ -31,31 +31,31 @@ function VulnerabilityGroup() {
   const [vulnCards, setVulnCards] = useState([
     {
       id: '1',
-      key: 'all_vulns_by_severity',
+      type: 'all_vulns_by_severity',
       title: 'All Vulnerabilities by Severity',
       content: <AllVulnerabilitiesBySeverity />
     },
     {
       id: '2',
-      key: 'all_vulns_by_status',
+      keytype: 'all_vulns_by_status',
       title: 'All Vulnerabilities by Status',
       content: <AllVulnerabilitiesByStatus />
     },
     {
       id: '3',
-      key: 'critical_vulns_by_status',
+      type: 'critical_vulns_by_status',
       title: 'Critical Vulnerabilities by Status',
       content: <CriticalVulnerabilitiesByStatus />
     },
     {
       id: '4',
-      key: 'high_vulns_by_status',
+      type: 'high_vulns_by_status',
       title: 'High Vulnerabilities by Status',
       content: <HighVulnerabilitiesByStatus />
     },
     {
       id: '5',
-      key: 'kev_vulns_by_status',
+      type: 'kev_vulns_by_status',
       title: 'KEV Vulnerabilties by Status',
       content: <KevVulnerabilitiesByStatus />
     }
@@ -63,7 +63,7 @@ function VulnerabilityGroup() {
   const [isGridLayout, setIsGridLayout] = useState(true)
 
   const filteredVulnCards = useMemo(() => {
-    return vulnCards.filter((card) => selectedVulns.includes(card.key))
+    return vulnCards.filter((card) => selectedVulns.includes(card.type))
   }, [vulnCards, selectedVulns])
 
   const sensors = useSensors(
@@ -111,6 +111,7 @@ function VulnerabilityGroup() {
               <DashboardCard
                 key={card.id}
                 id={card.key}
+                type={card.type}
                 title={card.title}
                 content={card.content}
                 onDelete={handleDeleteCard}
