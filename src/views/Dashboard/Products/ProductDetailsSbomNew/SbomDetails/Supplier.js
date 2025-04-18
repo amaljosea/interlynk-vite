@@ -2,7 +2,7 @@ import { useMutation } from '@apollo/client'
 import { useState } from 'react'
 import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 
-import { useDisclosure } from '@chakra-ui/react'
+import { Flex, useDisclosure } from '@chakra-ui/react'
 
 import ActiveBtn from 'components/Misc/ActiveBtn'
 import SupplierTag from 'components/SupplierTag'
@@ -16,7 +16,10 @@ import ConfirmationModal from '../../components/ConfirmationModal'
 
 const Supplier = ({ data, permission }) => {
   const { isFreeTier } = useGlobalQueryContext()
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+  const { primaryBlueText, sameSecondaryText } = useThemeColor([
+    'primaryBlueText',
+    'sameSecondaryText'
+  ])
 
   const SUPPLIER = useDisclosure()
   const DELETE_SUPPLIER = useDisclosure()
@@ -36,26 +39,29 @@ const Supplier = ({ data, permission }) => {
       .finally(() => DELETE_SUPPLIER?.onClose())
   }
 
+  const supplierExists = data?.length > 0
+
   return (
     <>
-      {data?.length > 0 ? (
-        data?.map((item, index) => (
-          <SupplierTag
-            key={index}
-            item={item}
-            editable={true}
-            premission={permission}
-            onEdit={SUPPLIER?.onOpen}
-            onDelete={() => onDeleteSup(item)}
-          />
-        ))
-      ) : (
+      <Flex flexWrap={'wrap'} alignItems={'center'} gap={2}>
+        {supplierExists &&
+          data?.map((item, index) => (
+            <SupplierTag
+              key={index}
+              item={item}
+              editable={true}
+              onDelete={() => onDeleteSup(item)}
+            />
+          ))}
         <ActiveBtn
-          title=' Add Supplier'
-          color={primaryBlueText}
+          hidden={permission}
+          label={'supplier_edit'}
           onClick={SUPPLIER?.onOpen}
+          editable={supplierExists ? true : false}
+          title={supplierExists ? 'Update' : 'Add Supplier'}
+          color={supplierExists ? sameSecondaryText : primaryBlueText}
         />
-      )}
+      </Flex>
 
       {/* SUPPLIER MODAL */}
       {SUPPLIER?.isOpen && (

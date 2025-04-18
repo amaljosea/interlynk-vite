@@ -150,14 +150,18 @@ export default class GeneralSection {
           await version.click()
           await this.page.waitForTimeout(2000)
 
-          await this.page.getByRole('button', { name: 'Add Supplier' }).click()
+          await this.page
+            .locator(`//button[@aria-label='supplier_edit']`)
+            .click()
           await this.page
             .getByPlaceholder('Enter organization name')
             .fill('Microsoft')
           await this.page.getByRole('button', { name: 'Save' }).click()
           await this.page.waitForTimeout(3000)
 
-          await this.page.getByLabel('supplier_edit').click()
+          await this.page
+            .locator(`//button[@aria-label='supplier_edit']`)
+            .click()
           await this.page
             .getByPlaceholder('Enter URL')
             .fill('https://microsoft.com')
@@ -199,7 +203,9 @@ export default class GeneralSection {
           await version.click()
           await this.page.waitForTimeout(2000)
 
-          await this.page.getByRole('button', { name: 'Add License' }).click()
+          await this.page
+            .locator(`//button[@aria-label='edit_license']`)
+            .click()
           await this.page.getByRole('combobox').fill('ap')
           await this.page.waitForTimeout(3000)
           await this.page.keyboard.press('Enter')
@@ -208,7 +214,9 @@ export default class GeneralSection {
           await this.page.locator("button[type='submit']").click()
           await this.page.waitForTimeout(3000)
 
-          await this.page.getByTestId('edit_license').click()
+          await this.page
+            .locator(`//button[@aria-label='edit_license']`)
+            .click()
           await this.page.getByRole('combobox').fill('mit')
           await this.page.waitForTimeout(3000)
           await this.page.keyboard.press('Enter')
@@ -231,7 +239,7 @@ export default class GeneralSection {
             .click()
           await this.page.getByTestId(`delete-field`).fill('DELETE')
           await this.page.locator("button[type='submit']").click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(3000)
         } else {
           errors.push('Version not found')
         }
