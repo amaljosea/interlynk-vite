@@ -1,6 +1,5 @@
 import { useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
 
 import {
   Menu,
@@ -20,13 +19,10 @@ import { GetLabels } from 'graphQL/Queries'
 import MenuHeading from './MenuHeading'
 
 const GlobalLabelFilter = ({ value, setValue }) => {
-  const location = useLocation()
   const { dispatch } = useGlobalState()
   const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
   const { isFreeTier } = useGlobalQueryContext()
   const { globalVulnDispatch } = dispatch
-
-  const isDashboardPage = location.pathname === '/vendor/dashboard'
 
   const [labels, setLabels] = useState([
     { id: 'all', name: 'All', color: secondaryTextColor }
@@ -38,7 +34,7 @@ const GlobalLabelFilter = ({ value, setValue }) => {
   }
 
   const { data } = useQuery(GetLabels, {
-    skip: !isFreeTier && isDashboardPage ? false : true,
+    skip: !isFreeTier ? false : true,
     variables: { first: 100 }
   })
   const { nodes } = data?.labels || {}
