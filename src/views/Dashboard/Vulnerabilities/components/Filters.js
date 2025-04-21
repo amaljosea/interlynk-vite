@@ -4,7 +4,7 @@ import GlobalVulnSearch from './GlobalVulnSearch'
 const Filters = ({ reset }) => {
   return (
     <>
-      <GlobalVulnSearch />
+      <GlobalVulnSearch reset={reset} />
       <GlobalVulnFilters reset={reset} />
     </>
   )
