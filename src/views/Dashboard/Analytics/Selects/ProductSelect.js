@@ -41,27 +41,25 @@ export const ProductSelect = ({ value, onChange }) => {
   })
 
   useEffect(() => {
-    if (label?.value) {
-      getProducts({ variables: { labelIds: [label?.value] } }).then((res) => {
-        if (res?.data?.organization?.projectGroups?.nodes) {
-          const newOptions = res?.data?.organization?.projectGroups?.nodes.map(
-            (item) => ({
-              label: item?.label,
-              value: item?.value,
-              projects: item?.projects?.map((project) => ({
-                label: project?.name,
-                value: project?.id,
-                versions: project?.sbomVersions?.nodes.map((version) => ({
-                  label: version?.projectVersion,
-                  value: version?.id
-                }))
-              }))
-            })
-          )
-          setOptions(newOptions)
-        }
-      })
-    }
+    const labelIds = label?.value ? [label.value] : []
+    getProducts({ variables: { labelIds } }).then((res) => {
+      const nodes = res?.data?.organization?.projectGroups?.nodes
+      if (!nodes) return
+
+      const newOptions = nodes.map((item) => ({
+        label: item?.label,
+        value: item?.value,
+        projects: item?.projects?.map((project) => ({
+          label: project?.name,
+          value: project?.id,
+          versions: project?.sbomVersions?.nodes.map((version) => ({
+            label: version?.projectVersion,
+            value: version?.id
+          }))
+        }))
+      }))
+      setOptions(newOptions)
+    })
   }, [getProducts, label])
 
   return (
