@@ -7,7 +7,7 @@ import { Button, Flex, Input, Tag, Text, Tooltip } from '@chakra-ui/react'
 import { Table, Tbody, Td, Tr } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
-import DeleteButton from 'components/Icons/DeleteButton'
+import ConfirmDeleteButton from 'components/ConfirmDeleteButton'
 import LynkDrawer from 'components/LynkDrawer'
 import LynkSelect from 'components/LynkSelect'
 
@@ -133,12 +133,13 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
   }
 
   const DeleteAction = ({ id }) => (
-    <DeleteButton
-      size='sm'
-      variant={'solid'}
-      data-testid='delete_vuln_link'
-      onClick={() => handleLinkRemove(id)}
-      hidden={isPart}
+    <ConfirmDeleteButton
+      deleteBtnProps={{
+        'data-testid': 'delete_vuln_links',
+        hidden: isPart
+      }}
+      handleDelete={handleLinkRemove}
+      itemId={id}
     />
   )
 
@@ -246,7 +247,11 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
                 <Tbody>
                   {externalData?.length > 0 &&
                     externalData?.map((item, index) => (
-                      <Tr key={index}>
+                      <Tr
+                        key={index}
+                        display={'flex'}
+                        justifyContent={'space-between'}
+                      >
                         <Td pl={0} wordBreak={'break-all'}>
                           <Text>
                             {item?.url ? (
@@ -266,7 +271,11 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
                     ))}
                   {currentData?.length > 0 &&
                     currentData?.map((item, index) => (
-                      <Tr key={index}>
+                      <Tr
+                        display={'flex'}
+                        justifyContent={'space-between'}
+                        key={index}
+                      >
                         <Td pl={0} wordBreak={'break-all'}>
                           <Text>
                             {item?.url ? (

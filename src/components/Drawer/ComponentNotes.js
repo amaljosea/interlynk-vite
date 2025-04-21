@@ -8,9 +8,8 @@ import { Button, ButtonGroup } from '@chakra-ui/react'
 import { Flex, Stack, Text } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
 
+import ConfirmDeleteButton from 'components/ConfirmDeleteButton'
 import CustomLoader from 'components/CustomLoader'
-import DeleteButton from 'components/Icons/DeleteButton'
-import EditButton from 'components/Icons/EditButton'
 import LynkAlert from 'components/LynkAlert'
 import LynkDrawer from 'components/LynkDrawer'
 import CompInfo from 'components/Misc/CompInfo'
@@ -101,7 +100,6 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
   const [error, setError] = useState('')
   const [noteId, setNoteId] = useState('')
   const [comment, setComment] = useState('')
-  const [warning, setWarning] = useState('')
 
   const [createNote, { loading: createLoading }] = useMutation(CreateNote)
   const [updateNote, { loading: updateLoading }] = useMutation(UpdateNote)
@@ -250,7 +248,6 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
                 setNoteId('')
                 setComment('')
                 setEdit(true)
-                setWarning('')
               }}
             >
               Add Note
@@ -285,43 +282,18 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
                           </Text>
                         </Stack>
                       </Flex>
-                      {warning === note?.id ? (
-                        <Flex gap={2} alignItems={'center'}>
-                          <Button
-                            size='sm'
-                            fontSize={12}
-                            hidden={deleteLoading}
-                            onClick={() => setWarning('')}
-                          >
-                            No
-                          </Button>
-                          <Button
-                            size='sm'
-                            fontSize={12}
-                            isLoading={deleteLoading}
-                            colorScheme='red'
-                            onClick={() => handleDeleteNote(note?.id)}
-                          >
-                            Yes
-                          </Button>
-                        </Flex>
-                      ) : (
-                        <Flex gap={2} alignItems={'center'}>
-                          <EditButton
-                            onClick={() => {
-                              setEdit(true)
-                              setWarning('')
-                              setNoteId(note?.id)
-                              setComment(note.comment)
-                            }}
-                          />
-                          <DeleteButton
-                            size='sm'
-                            onClick={() => setWarning(note?.id)}
-                            variant={'solid'}
-                          />
-                        </Flex>
-                      )}
+                      <ConfirmDeleteButton
+                        itemId={note?.id}
+                        handleDelete={handleDeleteNote}
+                        loading={deleteLoading}
+                        editBtnProps={{
+                          onClick: () => {
+                            setEdit(true)
+                            setNoteId(note?.id)
+                            setComment(note.comment)
+                          }
+                        }}
+                      />
                     </Flex>
                   ))}
                 </Stack>

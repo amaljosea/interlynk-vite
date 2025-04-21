@@ -8,9 +8,9 @@ import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 import { Flex, Text, Tooltip } from '@chakra-ui/react'
 import { useClipboard } from '@chakra-ui/react'
 
+import ConfirmDeleteButton from 'components/ConfirmDeleteButton'
 import AddButton from 'components/Icons/AddButton'
 import CopyButton from 'components/Icons/CopyButton'
-import DeleteButton from 'components/Icons/DeleteButton'
 import LynkDate from 'components/LynkDate'
 import LynkDrawer from 'components/LynkDrawer'
 import LynkTable from 'components/LynkTable'
@@ -41,7 +41,7 @@ const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
   const [show, setShow] = useState(false)
 
   const [createLynk, { loading: createLoading }] = useMutation(CreateShareLynk)
-  const [deleteLynk] = useMutation(DeleteSharelynk)
+  const [deleteLynk, { loading: deleteLoading }] = useMutation(DeleteSharelynk)
 
   const { data, loading } = useQuery(GetSharelynks, {
     skip: isOpen ? false : true,
@@ -184,7 +184,7 @@ const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
             />
             <Input
               isReadOnly
-              w={'300px'}
+              w={'290px'}
               fontSize={'sm'}
               aria-label='lynk_url'
               color={primaryTextColor}
@@ -193,7 +193,7 @@ const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
           </Flex>
         )
       },
-      width: '60%',
+      width: '55%',
       wrap: true
     },
     // UPDATED AT
@@ -221,12 +221,13 @@ const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
       id: 'ACTION',
       name: 'ACTION',
       selector: (row) => (
-        <DeleteButton
-          variant='solid'
-          onClick={() => handleDeleteLynk(row?.id)}
+        <ConfirmDeleteButton
+          itemId={row.id}
+          handleDelete={handleDeleteLynk}
+          loading={deleteLoading}
         />
       ),
-      width: '14%',
+      width: '25%',
       right: 'true'
     }
   ]

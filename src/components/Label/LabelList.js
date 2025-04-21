@@ -5,9 +5,8 @@ import { CheckIcon, CloseIcon, RepeatIcon } from '@chakra-ui/icons'
 import { Flex, IconButton, Stack, Text } from '@chakra-ui/react'
 import { Divider, Input, Spacer } from '@chakra-ui/react'
 
+import ConfirmDeleteButton from 'components/ConfirmDeleteButton'
 import CustomLoader from 'components/CustomLoader'
-import DeleteButton from 'components/Icons/DeleteButton'
-import EditButton from 'components/Icons/EditButton'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -115,18 +114,18 @@ const LabelList = ({ loading, labels, onDeleteLabel, onEditLabel }) => {
                   }}
                 >
                   <ProdLabel item={label} />
-                  <Flex gap={2} alignItems={'center'}>
-                    <EditButton
-                      onClick={() => startEditing(label)}
-                      title='Edit label'
-                    />
-                    <DeleteButton
-                      size='sm'
-                      onClick={() => onDeleteLabel(label.id)}
-                      title='Delete label'
-                      variant={'solid'}
-                    />
-                  </Flex>
+                  <ConfirmDeleteButton
+                    itemId={label.id}
+                    handleDelete={onDeleteLabel}
+                    deleteBtnProps={{
+                      title: 'Delete label'
+                    }}
+                    editBtnProps={{
+                      title: 'Edit label',
+                      onClick: () => startEditing(label)
+                    }}
+                    buttonSize={'sm'}
+                  />
                 </Flex>
               )}
             </Flex>

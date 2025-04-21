@@ -13,10 +13,9 @@ import {
   Stack,
   Text
 } from '@chakra-ui/react'
-import { Button, ButtonGroup } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
-import DeleteButton from 'components/Icons/DeleteButton'
+import ConfirmDeleteButton from 'components/ConfirmDeleteButton'
 import LynkAlert from 'components/LynkAlert'
 import LynkSelect from 'components/LynkSelect'
 
@@ -78,7 +77,6 @@ const CompLinks = ({ data }) => {
     ])
 
   const [error, setError] = useState('')
-  const [activeLink, setActiveLink] = useState(null)
   const [linkError, setLinkError] = useState('')
 
   const [updateLinks, { loading }] = useMutation(UpdateCompLinks)
@@ -134,7 +132,6 @@ const CompLinks = ({ data }) => {
       }
     })
     setTabData((prev) => ({ ...prev, links: { name: '', url: '' } }))
-    setActiveLink(null)
   }
 
   const checkData = () => {
@@ -151,9 +148,9 @@ const CompLinks = ({ data }) => {
     }
   }
 
-  const handleLinkRemove = () => {
+  const handleLinkRemove = (activeLinkName) => {
     const updatedList = filterUrls?.filter(
-      (url) => url?.name !== activeLink?.name
+      (url) => url?.name !== activeLinkName
     )
     updateLinks({
       variables: {
@@ -161,7 +158,7 @@ const CompLinks = ({ data }) => {
         sbomId,
         urls: updatedList
       }
-    }).then(() => setActiveLink(null))
+    })
   }
 
   const isInvalid =
@@ -274,38 +271,15 @@ const CompLinks = ({ data }) => {
                   </GridItem>
                   <GridItem colSpan={4} justifyContent={'flex-end'}>
                     <Flex alignItems={'center'} justifyContent={'flex-end'}>
-                      {activeLink?.name === item?.name ? (
-                        <ButtonGroup>
-                          <Button
-                            size='sm'
-                            title='No'
-                            fontSize={'sm'}
-                            variant='solid'
-                            onClick={() => setActiveLink(null)}
-                          >
-                            No
-                          </Button>
-                          <Button
-                            size='sm'
-                            title='Yes'
-                            fontSize={'sm'}
-                            variant='solid'
-                            colorScheme='red'
-                            isLoading={loading}
-                            onClick={handleLinkRemove}
-                            data-testid='confirm_delete_comp_link'
-                          >
-                            Yes
-                          </Button>
-                        </ButtonGroup>
-                      ) : (
-                        <DeleteButton
-                          size='sm'
-                          variant={'solid'}
-                          data-testid='delete_comp_link'
-                          onClick={() => setActiveLink(item)}
-                        />
-                      )}
+                      <ConfirmDeleteButton
+                        itemId={item.name}
+                        deleteBtnProps={{
+                          'data-testid': 'delete_comp_link'
+                        }}
+                        customDeleteFunction={handleLinkRemove}
+                        customDeleteVariable={item.name}
+                        loading={loading}
+                      />
                     </Flex>
                   </GridItem>
                 </Grid>
