@@ -3,20 +3,16 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { CustomSelect } from './Select'
 
 const getVersionOptions = (filters, env) => {
-  const optionsFinal = filters?.product?.reduce((options, singleProduct) => {
-    const selectedProject = singleProduct.projects?.find(
-      (project) => project.name === env
+  const { product } = filters || {}
+
+  const optionsFinal = product?.reduce((options, singleProduct) => {
+    const selectedProject = singleProduct?.projects?.find(
+      (project) => project?.label === env
     )
 
-    const optionsInternal = selectedProject.sbomVersions.nodes.reduce(
+    const optionsInternal = selectedProject?.versions?.reduce(
       (acc, version) => {
-        return [
-          ...acc,
-          {
-            label: version.projectVersion,
-            value: version.id
-          }
-        ]
+        return [...acc, { label: version?.label, value: version?.value }]
       },
       []
     )

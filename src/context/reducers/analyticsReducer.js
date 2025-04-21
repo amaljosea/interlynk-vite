@@ -3,7 +3,7 @@ const analyticsReducer = (state, action) => {
   switch (type) {
     case 'CLEAR_FILTERS':
       return {
-        product: [],
+        product: null,
         label: null,
         version: [],
         duration: null
@@ -11,11 +11,10 @@ const analyticsReducer = (state, action) => {
     case 'FILTER_LABEL':
       return {
         ...state,
-        product: [],
+        product: null,
         version: [],
         label: payload
       }
-
     case 'FILTER_PRODUCT':
       return {
         ...state,

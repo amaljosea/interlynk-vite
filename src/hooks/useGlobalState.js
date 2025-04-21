@@ -190,7 +190,7 @@ const GlobalStateProvider = ({ children }) => {
   })
   // ANALYTICS
   const [analyticsState, analyticsDispatch] = useReducer(analyticsReducer, {
-    product: [],
+    product: null,
     label: null,
     version: [],
     duration: null
