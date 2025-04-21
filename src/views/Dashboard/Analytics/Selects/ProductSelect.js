@@ -1,6 +1,7 @@
-import { gql, useQuery } from '@apollo/client'
+import { gql, useLazyQuery } from '@apollo/client'
+import { useEffect, useState } from 'react'
 
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useGlobalState } from 'hooks/useGlobalState'
 
 import { CustomSelect } from './Select'
 
@@ -29,18 +30,39 @@ const PRODUCT_OPTION_QUERY = gql`
 `
 
 export const ProductSelect = ({ value, onChange }) => {
-  const { orgView, analyticsState } = useGlobalQueryContext()
+  const { orgView, analyticsState } = useGlobalState()
   const { label } = analyticsState || {}
 
-  const { data, loading, error } = useQuery(PRODUCT_OPTION_QUERY, {
+  const [options, setOptions] = useState([])
+
+  const [getProducts, { loading }] = useLazyQuery(PRODUCT_OPTION_QUERY, {
     skip: !orgView,
     variables: { labelIds: label ? [label?.value] : undefined }
   })
-  const options = data?.organization?.projectGroups?.nodes || []
 
-  if (error) {
-    return 'Error'
-  }
+  useEffect(() => {
+    if (label?.value) {
+      getProducts({ variables: { labelIds: [label?.value] } }).then((res) => {
+        if (res?.data?.organization?.projectGroups?.nodes) {
+          const newOptions = res?.data?.organization?.projectGroups?.nodes.map(
+            (item) => ({
+              label: item?.label,
+              value: item?.value,
+              projects: item?.projects?.map((project) => ({
+                label: project?.name,
+                value: project?.id,
+                versions: project?.sbomVersions?.nodes.map((version) => ({
+                  label: version?.projectVersion,
+                  value: version?.id
+                }))
+              }))
+            })
+          )
+          setOptions(newOptions)
+        }
+      })
+    }
+  }, [getProducts, label])
 
   return (
     <CustomSelect
