@@ -2,12 +2,19 @@ import { useMemo } from 'react'
 
 import { Flex, IconButton, Tooltip } from '@chakra-ui/react'
 
+import RefreshBtn from 'components/Icons/RefreshBtn'
+
 import { BiScan } from 'react-icons/bi'
 
-const PolicySubHeader = (isArchived, handleRefresh, policyRun) => {
+const PolicySubHeader = (reset, isArchived, handleRefresh, policyRun) => {
   const subHeader = useMemo(() => {
     return (
-      <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
+      <Flex
+        gap={2}
+        width={'100%'}
+        alignItems={'center'}
+        justifyContent={'flex-end'}
+      >
         <Tooltip label='Policy Scan'>
           <IconButton
             colorScheme='blue'
@@ -17,9 +24,10 @@ const PolicySubHeader = (isArchived, handleRefresh, policyRun) => {
             icon={<BiScan size={20} />}
           />
         </Tooltip>
+        <RefreshBtn onClick={reset} />
       </Flex>
     )
-  }, [isArchived, handleRefresh, policyRun])
+  }, [isArchived, handleRefresh, policyRun, reset])
 
   return subHeader
 }
