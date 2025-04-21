@@ -220,6 +220,7 @@ const Support = () => {
           reset={reset}
           isOpen={ANALYSIS.isOpen}
           onClose={ANALYSIS.onClose}
+          enabled={enableSupportLevel}
           data={{
             id: projectSetting?.id,
             group: projectGroup,
