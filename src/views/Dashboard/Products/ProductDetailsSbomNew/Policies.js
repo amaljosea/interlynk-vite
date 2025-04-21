@@ -6,6 +6,7 @@ import { isSbomArchived } from 'utils'
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
 import ViolationDrawer from 'components/Drawer/ViolationDrawer'
+import LynkTable from 'components/LynkTable'
 import Pagination from 'components/Pagination'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -20,7 +21,6 @@ import { PolicyResults } from 'graphQL/Queries'
 import PolicyColumns from './Components/tableColumns/PolicyColumns'
 import ExpandedComponent from './Components/tableExpanded/PolicyExpanded'
 import PolicySubHeader from './Components/tableSubHeaders/PolicySubHeader'
-import LynkTable from 'components/LynkTable'
 
 const Policies = ({ sbomData }) => {
   const { showToast } = useCustomToast()
@@ -35,7 +35,7 @@ const Policies = ({ sbomData }) => {
     childKey: 'run_policy_scan'
   })
 
-  const { nodes, paginationProps, loading, startPolling, stopPolling } =
+  const { nodes, paginationProps, loading, reset, startPolling, stopPolling } =
     usePaginatedQuery(PolicyResults, {
       skip: activeTab === 'policies' ? false : true,
       selector: 'policyResults',
@@ -87,7 +87,7 @@ const Policies = ({ sbomData }) => {
   const columns = PolicyColumns(isInitialized)
 
   // SUB HEADER
-  const subHeader = PolicySubHeader(isArchived, handleRefresh, policyRun)
+  const subHeader = PolicySubHeader(reset, isArchived, handleRefresh, policyRun)
 
   return (
     <>
