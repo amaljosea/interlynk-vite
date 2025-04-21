@@ -5,7 +5,7 @@ import useCustomToast from 'hooks/useCustomToast'
 
 import { ProjectSettingUpdate, ReRunSbomSupportLevel } from 'graphQL/Mutation'
 
-const SupportAnalysis = ({ reset, isOpen, onClose, data }) => {
+const SupportAnalysis = ({ reset, isOpen, onClose, data, enabled }) => {
   const { showToast } = useCustomToast()
 
   const { id, group, sbom } = data || {}
@@ -15,20 +15,15 @@ const SupportAnalysis = ({ reset, isOpen, onClose, data }) => {
     onCompleted: () => reset()
   })
 
-  const updateSupportSetting = () => {
-    updateSettings({
-      variables: { id: id, enableSupportLevel: true }
-    })
-  }
-
-  const handleSubmit = () => {
+  const handleRescan = () => {
     reRunSupport({ variables: { sbomId: sbom?.id } })
       .then((res) => {
         const { errors } = res?.data?.componentSupportLevelRun || {}
         if (!errors) {
-          updateSupportSetting()
           showToast({
-            description: 'Support analysis run successfully',
+            title: 'Analysis run successfully',
+            description:
+              'Supports will be available shortly. Please refresh to update the records',
             status: 'success'
           })
         } else {
@@ -39,6 +34,20 @@ const SupportAnalysis = ({ reset, isOpen, onClose, data }) => {
         }
       })
       .finally(() => onClose())
+  }
+
+  const updateSupportSetting = () => {
+    updateSettings({ variables: { id: id, enableSupportLevel: true } }).then(
+      (res) => res?.data && handleRescan()
+    )
+  }
+
+  const handleSubmit = () => {
+    if (enabled) {
+      handleRescan()
+    } else {
+      updateSupportSetting()
+    }
   }
 
   const title = `${group?.name} - ${sbom?.projectVersion}`

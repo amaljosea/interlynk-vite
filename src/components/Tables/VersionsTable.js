@@ -118,6 +118,7 @@ const VersionsTable = (props) => {
     }
   )
   const { projectGroup, projectSetting } = data?.project || {}
+  const { enableSupportLevel } = projectSetting || {}
 
   const result = signedUrlParams
     ? data?.shareLynkQuery?.projectGroup
@@ -398,6 +399,7 @@ const VersionsTable = (props) => {
         <SupportAnalysis
           isOpen={SUPPORT.isOpen}
           onClose={SUPPORT.onClose}
+          enabled={enableSupportLevel}
           data={{
             id: projectSetting?.id,
             group: projectGroup,
