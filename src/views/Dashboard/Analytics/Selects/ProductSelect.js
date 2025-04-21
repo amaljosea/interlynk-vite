@@ -46,13 +46,13 @@ export const ProductSelect = ({ value, onChange }) => {
       const nodes = res?.data?.organization?.projectGroups?.nodes
       if (!nodes) return
 
-      const newOptions = nodes.map((item) => ({
+      const newOptions = nodes?.map((item) => ({
         label: item?.label,
         value: item?.value,
         projects: item?.projects?.map((project) => ({
           label: project?.name,
           value: project?.id,
-          versions: project?.sbomVersions?.nodes.map((version) => ({
+          versions: project?.sbomVersions?.nodes?.map((version) => ({
             label: version?.projectVersion,
             value: version?.id
           }))
