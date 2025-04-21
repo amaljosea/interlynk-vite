@@ -38,14 +38,13 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const subHeaderComponent = (
-    <SubHeaderComponent
-      onOpen={onOpen}
-      createLic={updateLic}
-      setActiveRow={setActiveRow}
-      setFilters={setFilters}
-    />
-  )
+  const subHeaderComponent = SubHeaderComponent({
+    onOpen,
+    updateLic,
+    setActiveRow,
+    setFilters
+  })
+
   // COLUMNS
   const columns = [
     // NAME
@@ -220,11 +219,15 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
       selector: (row) => {
         return (
           <Menu>
-            <LynkAction aria-label={`license action ${row?.content?.name}`} />
+            <LynkAction
+              data-testid='license_actions'
+              aria-label={`license action ${row?.content?.name}`}
+            />
             <Portal>
               <MenuList fontSize={'sm'}>
                 {/* Edit License */}
                 <MenuItem
+                  data-testid='edit_license'
                   onClick={() => {
                     setActiveRow(row)
                     onOpen()
@@ -258,6 +261,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
     <>
       <Flex flexDir={'column'} width={'100%'}>
         <LynkTable
+          subHeader
           progressPending={loading}
           subHeaderComponent={subHeaderComponent}
           columns={columns}
