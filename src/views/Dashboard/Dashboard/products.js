@@ -32,19 +32,19 @@ function ProductGroup() {
   const [productCards, setProductCards] = useState([
     {
       id: '1',
-      key: 'products_by_lifestages',
+      type: 'products_by_lifestages',
       title: 'Products by Lifestages',
       content: <ProductLifestages />
     },
     {
       id: '2',
-      key: 'versions_by_lifestages',
+      type: 'versions_by_lifestages',
       title: 'Versions by Lifestages',
       content: <VersionLifestages />
     },
     {
       id: '3',
-      key: 'products_by_labels',
+      type: 'products_by_labels',
       title: 'Products by Label',
       content: !isFreeTier ? <ProductLabels /> : null
     }
@@ -52,7 +52,7 @@ function ProductGroup() {
   const [isGridLayout, setIsGridLayout] = useState(true)
 
   const filteredProductCards = useMemo(() => {
-    return productCards.filter((card) => selectedProducts.includes(card.key))
+    return productCards.filter((card) => selectedProducts.includes(card.type))
   }, [productCards, selectedProducts])
 
   const sensors = useSensors(
@@ -99,7 +99,8 @@ function ProductGroup() {
             {filteredProductCards.map((card) => (
               <DashboardCard
                 key={card.id}
-                id={card.key}
+                id={card.id}
+                type={card.type}
                 title={card.title}
                 content={card.content}
                 onDelete={handleDeleteCard}

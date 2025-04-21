@@ -28,7 +28,7 @@ function PolicyGroup() {
   const [policyCards, setPolicyCards] = useState([
     {
       id: '1',
-      key: 'policy_results',
+      type: 'policy_results',
       title: 'Policy Results',
       content: <PolicyGraphs />
     }
@@ -36,7 +36,7 @@ function PolicyGroup() {
   const [isGridLayout, setIsGridLayout] = useState(true)
 
   const filteredPolicyCards = useMemo(() => {
-    return policyCards.filter((card) => selectedPolicies.includes(card.key))
+    return policyCards.filter((card) => selectedPolicies.includes(card.type))
   }, [policyCards, selectedPolicies])
 
   const sensors = useSensors(
@@ -83,7 +83,8 @@ function PolicyGroup() {
             {filteredPolicyCards?.map((card) => (
               <DashboardCard
                 key={card.id}
-                id={card.key}
+                id={card.id}
+                type={card.type}
                 title={card.title}
                 content={card.content}
                 onDelete={handleDeleteCard}
