@@ -153,18 +153,6 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
 
         // Checking if the content only has headers
         const splitContent = content.trim().split('\n')
-        if (
-          splitContent.length <= 1 ||
-          splitContent.slice(1).every((line) => !line.trim())
-        ) {
-          showToast({
-            description:
-              'No components with enabled support levels found for this version.',
-            status: 'warning'
-          })
-          setIsLoading(false)
-          return
-        }
 
         // Process the content and format the level column values
         const formattedContent = splitContent
