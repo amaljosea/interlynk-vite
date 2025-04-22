@@ -3,7 +3,12 @@ import { useTour } from '@reactour/tour'
 import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { Flex, Grid, GridItem } from '@chakra-ui/react'
+import { Flex, Grid, GridItem, SimpleGrid } from '@chakra-ui/react'
+
+import ComponentParts from 'components/Graphs/ComponentParts'
+import LicenseParts from 'components/Graphs/LicenseParts'
+import PolicyParts from 'components/Graphs/PolicyParts'
+import VulnParts from 'components/Graphs/VulnParts'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useGradualPolling } from 'hooks/useGradualPolling'
@@ -44,8 +49,9 @@ const ProductDetailsSbomNew = () => {
     }
   )
 
-  const { stats, vulnRunStatus, policyResultMetrics } = data?.sbom || ''
-  const { compCount, compLicenseCount, vulnStats, sbomParts } = stats || ''
+  const { stats, vulnRunStatus, policyResultMetrics, sbomParts } =
+    data?.sbom || {}
+  const { compCount, compLicenseCount, vulnStats } = stats || ''
 
   const { data: settings } = useQuery(GetProjectSettings, {
     variables: { id: productId }
@@ -108,6 +114,7 @@ const ProductDetailsSbomNew = () => {
         <GridItem colSpan={3}>
           <SbomStats
             amount={vulnStats}
+            sbomParts={sbomParts}
             status={vulnRunStatus}
             title={'Vulnerabilities'}
             icon={<FaBug size={20} />}
@@ -121,6 +128,27 @@ const ProductDetailsSbomNew = () => {
           />
         </GridItem>
       </Grid>
+      {sbomParts?.length > 0 && (
+        <SimpleGrid
+          gap={4}
+          width={'100%'}
+          alignItems={'flex-start'}
+          templateColumns='repeat(12, 1fr)'
+        >
+          <GridItem colSpan={3}>
+            <ComponentParts />
+          </GridItem>
+          <GridItem colSpan={3}>
+            <LicenseParts />
+          </GridItem>
+          <GridItem colSpan={3}>
+            <VulnParts />
+          </GridItem>
+          <GridItem colSpan={3}>
+            <PolicyParts />
+          </GridItem>
+        </SimpleGrid>
+      )}
       <SbomTable data={data?.sbom} error={error} loading={loading} />
     </Flex>
   )
