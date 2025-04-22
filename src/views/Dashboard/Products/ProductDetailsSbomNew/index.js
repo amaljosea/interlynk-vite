@@ -108,7 +108,6 @@ const ProductDetailsSbomNew = () => {
         <GridItem colSpan={3}>
           <SbomStats
             amount={vulnStats}
-            sbomParts={sbomParts}
             status={vulnRunStatus}
             title={'Vulnerabilities'}
             icon={<FaBug size={20} />}

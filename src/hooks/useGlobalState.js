@@ -103,7 +103,7 @@ const GlobalStateProvider = ({ children }) => {
     isCpeValid: true,
     expandedRows: [],
     purlString: '',
-    include: [],
+    include: ['parts'],
     selectedComp: null
   })
   const [prodVulnState, prodVulnDispatch] = useReducer(prodVulnReducer, {
@@ -117,7 +117,7 @@ const GlobalStateProvider = ({ children }) => {
     severities: [],
     components: [],
     statues: [],
-    include: [],
+    include: ['parts'],
     source: false,
     kev: '',
     epss: '',

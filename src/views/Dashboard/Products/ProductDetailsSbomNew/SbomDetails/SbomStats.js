@@ -18,7 +18,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { PolicyResultsType } from 'graphQL/Queries'
 
-const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
+const SbomStats = ({ title, amount, icon, status }) => {
   const params = useParams()
   const navigate = useNavigate()
   const signedUrlParams = getSignedUrlParams()
@@ -66,10 +66,6 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
   const onSelectVulns = () => {
     prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     if (!signedUrlParams) {
-      prodVulnDispatch({
-        type: 'FILTER_INCLUDE',
-        payload: sbomParts?.length > 0 ? ['parts'] : []
-      })
       setActiveTab('vulnerabilities')
     }
   }
@@ -110,10 +106,6 @@ const SbomStats = ({ title, amount, icon, status, sbomParts }) => {
   const onFilterVuln = (value) => {
     prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
-    prodVulnDispatch({
-      type: 'FILTER_INCLUDE',
-      payload: sbomParts?.length > 0 ? ['parts'] : []
-    })
     if (!signedUrlParams) {
       setActiveTab('vulnerabilities')
     }
