@@ -14,6 +14,8 @@ import React, { createContext, useContext, useReducer, useState } from 'react'
 
 const GlobalStateContext = createContext()
 
+export const allActivities = ['recent_imports', 'recent_changes']
+
 export const allProducts = [
   'products_by_lifestages',
   'versions_by_lifestages',
@@ -47,6 +49,7 @@ const GlobalStateProvider = ({ children }) => {
   const [clearSelect, setClearSelect] = useState(false)
   const [selectedSbom, setSelectedSbom] = useState([])
   const [labelIds, setLabelIds] = useState([])
+  const [selectedActivities, setSelectedActivities] = useState(allActivities)
   const [selectedProducts, setSelectedProducts] = useState(allProducts)
   const [selectedVulns, setSelectedVulns] = useState(allVulns)
   const [selectedTrends, setSelectedTrends] = useState(allTrends)
@@ -57,6 +60,15 @@ const GlobalStateProvider = ({ children }) => {
     setSelectedVulns([])
     setSelectedTrends([])
     setSelectedPolicies([])
+    setSelectedActivities([])
+  }
+
+  const handleSelectAll = () => {
+    setSelectedProducts(allProducts)
+    setSelectedVulns(allVulns)
+    setSelectedTrends(allTrends)
+    setSelectedPolicies(allPolicies)
+    setSelectedActivities(allActivities)
   }
 
   // PRODUCTS
@@ -213,6 +225,8 @@ const GlobalStateProvider = ({ children }) => {
         setOrganization,
         userPermissions,
         setUserPermissions,
+        selectedActivities,
+        setSelectedActivities,
         selectedProducts,
         setSelectedProducts,
         selectedVulns,
@@ -222,6 +236,7 @@ const GlobalStateProvider = ({ children }) => {
         selectedPolicies,
         setSelectedPolicies,
         handleClearAll,
+        handleSelectAll,
         envName,
         setEnvName,
         clearSelect,

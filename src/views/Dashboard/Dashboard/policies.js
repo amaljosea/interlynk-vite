@@ -66,7 +66,7 @@ function PolicyGroup() {
 
   return (
     <Stack spacing={3}>
-      <Heading size={'md'}>Policies</Heading>
+      <Heading size={'md'}>Policy</Heading>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}

@@ -82,7 +82,7 @@ function ProductGroup() {
 
   return (
     <Stack spacing={3}>
-      <Heading size={'md'}>Products</Heading>
+      <Heading size={'md'}>Product</Heading>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}

@@ -93,7 +93,7 @@ function VulnerabilityGroup() {
 
   return (
     <Stack spacing={3}>
-      <Heading size={'md'}>Vulnerabilities</Heading>
+      <Heading size={'md'}>Vulnerability</Heading>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
