@@ -86,7 +86,7 @@ const CardList = () => {
         <MenuDivider />
 
         <MenuOptionGroup
-          title='Trend'
+          title='Vulnerability Trends'
           type='checkbox'
           value={selectedTrends}
           onChange={(values) => setSelectedTrends(values)}
