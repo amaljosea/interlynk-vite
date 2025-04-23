@@ -1,8 +1,6 @@
 import React, { useState } from 'react'
 
-import { Button, Flex, Icon, Tooltip } from '@chakra-ui/react'
-
-import { MdDeleteOutline } from 'react-icons/md'
+import { Button, Flex, Tooltip } from '@chakra-ui/react'
 
 import DeleteButton from './Icons/DeleteButton'
 import EditButton from './Icons/EditButton'
@@ -72,6 +70,7 @@ const ConfirmDeleteButton = ({
           // leftIcon={<Icon as={MdDeleteOutline} w={5} h={5} />}
           px={2}
           iconSpacing='4px'
+          data-testid='confirm_delete'
           isLoading={deletingId === itemId && loading}
         >
           Yes
