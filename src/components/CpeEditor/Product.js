@@ -5,6 +5,8 @@ import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import LynkSelect from 'components/LynkSelect'
 
+import { useDebounce } from 'hooks/useDebounce'
+
 import { CpeAutoComplete } from 'graphQL/Queries'
 
 const Product = ({ disabled, product, onChange, isValid, vendor }) => {
@@ -13,6 +15,7 @@ const Product = ({ disabled, product, onChange, isValid, vendor }) => {
   const [value, setValue] = useState(null)
   const [searchInput, setSearchInput] = useState('')
   const [options, setOptions] = useState([])
+  const debouncedInput = useDebounce(searchInput, 300)
 
   const handleChange = (item) => {
     setValue(item)
@@ -27,32 +30,33 @@ const Product = ({ disabled, product, onChange, isValid, vendor }) => {
 
   const onInputChange = (value) => {
     setSearchInput(value)
-    if (value !== '') {
+  }
+
+  useEffect(() => {
+    if (debouncedInput) {
       getCpe({
         variables: {
           input: {
             idType: 'cpe',
             ecosystem: 'cpe',
             search: {
-              product: value
+              product: debouncedInput
             },
             hints: vendor ? { cpe: { vendor } } : undefined
           }
         }
       }).then((res) => {
         const { result } = res.data.idAutoComplete || ''
-        if (result?.length > 0) {
-          setOptions(() =>
-            result?.map((item) => ({ label: item, value: item }))
-          )
-        } else {
-          setOptions([{ label: value, value: value }])
-        }
+        setOptions(
+          result?.length > 0
+            ? result.map((item) => ({ label: item, value: item }))
+            : [{ label: debouncedInput, value: debouncedInput }]
+        )
       })
     } else {
       setOptions([])
     }
-  }
+  }, [debouncedInput, vendor, getCpe])
 
   useEffect(() => {
     if (product) {
