@@ -1,57 +1,69 @@
+import { gql, useQuery } from '@apollo/client'
 import { useState } from 'react'
 
-import { Flex, Text, useDisclosure } from '@chakra-ui/react'
+import { Box, Flex, useDisclosure } from '@chakra-ui/react'
 
-import Card from 'components/Card/Card.js'
-import CardBody from 'components/Card/CardBody.js'
-import CustomLoader from 'components/CustomLoader'
 import CpeCard from 'components/Misc/CpeCard'
+import LynkLoader from 'components/Misc/LynkLoader'
 import PurlCard from 'components/Misc/PurlCard'
 import ActivitiesOverviewRow from 'components/Tables/ActivitiesOverviewRow'
 
-import { useThemeColor } from 'hooks/useThemeColors'
+import { useGlobalState } from 'hooks/useGlobalState'
 
-const ActivitiesOverview = ({ loading, title, data }) => {
-  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
+export const GetLatestActivity = gql`
+  query GetOrgMetrics($env: String) {
+    organizationMetric(envName: $env) {
+      latestActivity {
+        event
+        updatedAt
+        changedBy
+        action
+        orig
+        updated
+      }
+    }
+  }
+`
+
+const ActivitiesOverview = () => {
+  const { organization, envName } = useGlobalState()
+
+  const { data, loading } = useQuery(GetLatestActivity, {
+    skip: organization ? false : true,
+    variables: { env: envName }
+  })
+  const { latestActivity } = data?.organizationMetric || {}
+
   const [activeRow, setActiveRow] = useState('')
 
   const PURL = useDisclosure()
   const CPE = useDisclosure()
 
+  if (loading) return <LynkLoader />
+
   return (
     <>
-      <Card maxH='100%'>
-        <Text fontWeight={'semibold'} color={primaryTextColor}>
-          {title}
-        </Text>
-        {loading ? (
-          <CustomLoader mt={4} />
-        ) : (
-          <CardBody mt={6} ps='20px' pe='0px' position='relative'>
-            <Flex direction='column'>
-              {data?.length > 0 &&
-                data?.map((row, index) => {
-                  return (
-                    <ActivitiesOverviewRow
-                      key={index}
-                      event={row.event}
-                      orig={row.orig}
-                      updated={row.updated}
-                      changedBy={row.changedBy}
-                      date={row.updatedAt}
-                      index={index}
-                      arrLength={data?.length}
-                      action={row.action}
-                      onOpen={PURL.onOpen}
-                      onCpeOpen={CPE.onOpen}
-                      setActiveRow={setActiveRow}
-                    />
-                  )
-                })}
-            </Flex>
-          </CardBody>
-        )}
-      </Card>
+      <Box ps='20px' pe='0px' maxH='100%' position='relative'>
+        <Flex direction='column'>
+          {latestActivity?.length > 0 &&
+            latestActivity?.map((row, index) => (
+              <ActivitiesOverviewRow
+                key={index}
+                event={row.event}
+                orig={row.orig}
+                updated={row.updated}
+                changedBy={row.changedBy}
+                date={row.updatedAt}
+                index={index}
+                arrLength={latestActivity?.length}
+                action={row.action}
+                onOpen={PURL.onOpen}
+                onCpeOpen={CPE.onOpen}
+                setActiveRow={setActiveRow}
+              />
+            ))}
+        </Flex>
+      </Box>
 
       {PURL.isOpen && (
         <PurlCard

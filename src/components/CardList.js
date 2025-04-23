@@ -1,7 +1,7 @@
 import { HamburgerIcon } from '@chakra-ui/icons'
 import {
-  Box,
   Button,
+  ButtonGroup,
   IconButton,
   Menu,
   MenuButton,
@@ -11,14 +11,19 @@ import {
   MenuOptionGroup
 } from '@chakra-ui/react'
 
-import { allPolicies } from 'hooks/useGlobalState'
-import { allTrends } from 'hooks/useGlobalState'
-import { allVulns } from 'hooks/useGlobalState'
-import { allProducts } from 'hooks/useGlobalState'
 import { useGlobalState } from 'hooks/useGlobalState'
+import {
+  allActivities,
+  allPolicies,
+  allProducts,
+  allTrends,
+  allVulns
+} from 'hooks/useGlobalState'
 
 const CardList = () => {
   const {
+    selectedActivities,
+    setSelectedActivities,
     selectedProducts,
     setSelectedProducts,
     selectedVulns,
@@ -27,7 +32,8 @@ const CardList = () => {
     setSelectedTrends,
     selectedPolicies,
     setSelectedPolicies,
-    handleClearAll
+    handleClearAll,
+    handleSelectAll
   } = useGlobalState()
 
   return (
@@ -46,7 +52,7 @@ const CardList = () => {
         overflowY={'scroll'}
       >
         <MenuOptionGroup
-          title='Product Graphs'
+          title='Product'
           type='checkbox'
           value={selectedProducts}
           onChange={(values) => setSelectedProducts(values)}
@@ -63,7 +69,7 @@ const CardList = () => {
         <MenuDivider />
 
         <MenuOptionGroup
-          title='Vulnerability Graphs'
+          title='Vulnerability'
           type='checkbox'
           value={selectedVulns}
           onChange={(values) => setSelectedVulns(values)}
@@ -80,7 +86,7 @@ const CardList = () => {
         <MenuDivider />
 
         <MenuOptionGroup
-          title='Trend Graphs'
+          title='Vulnerability Trends'
           type='checkbox'
           value={selectedTrends}
           onChange={(values) => setSelectedTrends(values)}
@@ -97,7 +103,7 @@ const CardList = () => {
         <MenuDivider />
 
         <MenuOptionGroup
-          title='Policy Graphs'
+          title='Policy'
           type='checkbox'
           value={selectedPolicies}
           onChange={(values) => setSelectedPolicies(values)}
@@ -113,7 +119,32 @@ const CardList = () => {
 
         <MenuDivider />
 
-        <Box px={3} py={2} display='flex' justifyContent='space-between'>
+        <MenuOptionGroup
+          title='Activity'
+          type='checkbox'
+          value={selectedActivities}
+          onChange={(values) => setSelectedActivities(values)}
+        >
+          {allActivities.map((value) => (
+            <MenuItemOption key={value} value={value}>
+              {value
+                .replaceAll('_', ' ')
+                .replace(/\b\w/g, (l) => l.toUpperCase())}
+            </MenuItemOption>
+          ))}
+        </MenuOptionGroup>
+
+        <MenuDivider />
+
+        <ButtonGroup px={3} py={2}>
+          <Button
+            size='xs'
+            onClick={handleSelectAll}
+            colorScheme='blue'
+            variant='outline'
+          >
+            Select All
+          </Button>
           <Button
             size='xs'
             onClick={handleClearAll}
@@ -122,7 +153,7 @@ const CardList = () => {
           >
             Clear All
           </Button>
-        </Box>
+        </ButtonGroup>
       </MenuList>
     </Menu>
   )
