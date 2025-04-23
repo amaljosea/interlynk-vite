@@ -63,6 +63,7 @@ const SupportSubHeader = ({
                 icon={<TbActivity size={20} />}
                 colorScheme='blue'
                 isDisabled={!editComponent}
+                data-testid='rerun_support_analysis'
                 onClick={() => action('rerun_support_analysis', null)}
               />
             </Tooltip>
