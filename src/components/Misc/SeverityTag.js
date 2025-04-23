@@ -1,29 +1,28 @@
 import { sevColor } from 'utils/styleUtils'
 
-import { Tag, TagLabel } from '@chakra-ui/react'
+import { Circle, HStack, Text } from '@chakra-ui/react'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 const SeverityTag = ({ value }) => {
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
+
   if (value) {
     return (
-      <Tag
-        size='md'
-        variant='subtle'
-        width={'120px'}
-        bg={sevColor(value)?.bg}
-        textColor={sevColor(value)?.text}
-      >
-        <TagLabel textTransform='capitalize' mx={'auto'}>
+      <HStack>
+        <Circle size='2' bg={sevColor(value)?.bg} />
+        <Text
+          fontSize='sm'
+          color={primaryTextColor}
+          textTransform={'capitalize'}
+        >
           {value}
-        </TagLabel>
-      </Tag>
+        </Text>
+      </HStack>
     )
   }
 
-  return (
-    <Tag w={'120px'}>
-      <TagLabel mx={'auto'}>N/A</TagLabel>
-    </Tag>
-  )
+  return <Text color={primaryTextColor}>N/A</Text>
 }
 
 export default SeverityTag
