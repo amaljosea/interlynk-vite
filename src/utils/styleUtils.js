@@ -440,3 +440,10 @@ export const getSupportStatusColor = (eolDate, warningMonths = 6) => {
     return 'green'
   }
 }
+
+export const COLORS = {
+  0: '#bee3f8',
+  1: '#63b3ed',
+  2: '#3182ce',
+  3: '#2c5282'
+}

@@ -1,6 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import { gql, useQuery } from '@apollo/client'
 import { useParams } from 'react-router-dom'
+import { COLORS } from 'utils/styleUtils'
 
 import {
   Box,
@@ -8,6 +9,7 @@ import {
   Flex,
   HStack,
   Icon,
+  SkeletonText,
   Stack,
   Text,
   VStack
@@ -15,13 +17,16 @@ import {
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
-import LynkLoader from 'components/Misc/LynkLoader'
 
 import { FaBalanceScale } from 'react-icons/fa'
 
 const GetPartLicenses = gql`
   query GetSbomParts($projectId: Uuid!, $sbomId: Uuid!) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
+      projectVersion
+      componentLicenses {
+        totalCount
+      }
       sbomParts {
         id
         part {
@@ -46,30 +51,35 @@ const LicenseParts = () => {
     skip: !params.productid || !params.sbomid,
     variables: { projectId: params.productid, sbomId: params.sbomid }
   })
-  const { sbomParts } = data?.sbom || {}
+  const { projectVersion, componentLicenses, sbomParts } = data?.sbom || {}
 
-  const total = sbomParts?.reduce(
-    (acc, { part }) => acc + (part?.stats?.compLicenseCount || 0),
-    0
-  )
+  const list = [
+    {
+      color: COLORS[0],
+      group: projectVersion,
+      count: componentLicenses?.totalCount || 0
+    }
+  ]
+  sbomParts?.forEach(({ part }, index) => {
+    list.push({
+      color: COLORS[index + 1],
+      group: part?.project?.projectGroup?.name,
+      count: part?.stats?.compLicenseCount || 0
+    })
+  })
+  const total = list.reduce((acc, { count }) => acc + count, 0)
 
   const percent = (value) => `${(value / total) * 100}%`
 
-  const COLORS = {
-    0: '#E2E8F0', // light gray
-    1: '#3182CE', // blue
-    2: '#90CDF4' // light blue
-  }
-
   if (loading)
     return (
-      <Card minH={'200px'}>
-        <LynkLoader />
+      <Card>
+        <SkeletonText noOfLines={2} gap='4' skeletonHeight='3' />
       </Card>
     )
 
   return (
-    <Card minH={'200px'}>
+    <Card maxH={'200px'}>
       <CardBody>
         <Stack w={'100%'}>
           <Flex justify='space-between' align='center'>
@@ -82,29 +92,25 @@ const LicenseParts = () => {
             </Text>
           </Flex>
           <Flex
+            hidden={sbomParts?.length === 0}
             height='8px'
             borderRadius='full'
             overflow='hidden'
             w='100%'
             my='2'
           >
-            {sbomParts?.map(({ id, part }, index) => (
-              <Box
-                key={id}
-                bg={COLORS[index]}
-                width={percent(part?.stats?.compLicenseCount || 0)}
-                borderLeftRadius={sbomParts?.length > 2 ? 'full' : 'none'}
-              />
+            {list?.map(({ color, count }, index) => (
+              <Box key={index} bg={color} width={percent(count || 0)} />
             ))}
           </Flex>
-          <VStack align='start' spacing={2}>
-            {sbomParts?.map(({ id, part }, index) => (
-              <HStack key={id} w='full' justify='space-between'>
+          <VStack align='start' spacing={2} hidden={sbomParts?.length === 0}>
+            {list?.map(({ group, color, count }, index) => (
+              <HStack key={index} w='full' justify='space-between'>
                 <HStack>
-                  <Circle size='2' bg={COLORS[index]} />
-                  <Text fontSize='sm'>{part?.project?.projectGroup?.name}</Text>
+                  <Circle size='2' bg={color} />
+                  <Text fontSize='sm'>{group}</Text>
                 </HStack>
-                <Text fontSize='sm'>{part?.stats?.compLicenseCount || 0}</Text>
+                <Text fontSize='sm'>{count || 0}</Text>
               </HStack>
             ))}
           </VStack>

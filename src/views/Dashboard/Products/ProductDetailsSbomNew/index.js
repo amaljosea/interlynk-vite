@@ -92,6 +92,7 @@ const ProductDetailsSbomNew = () => {
     <Flex width={'100%'} flexDir={'column'} gap={5}>
       <SbomInfo data={data?.sbom} error={error} loading={loading} />
       <Grid
+        hidden
         gap={4}
         width={'100%'}
         alignItems={'flex-start'}
@@ -128,27 +129,25 @@ const ProductDetailsSbomNew = () => {
           />
         </GridItem>
       </Grid>
-      {sbomParts?.length > 0 && (
-        <SimpleGrid
-          gap={4}
-          width={'100%'}
-          alignItems={'flex-start'}
-          templateColumns='repeat(12, 1fr)'
-        >
-          <GridItem colSpan={3}>
-            <ComponentParts />
-          </GridItem>
-          <GridItem colSpan={3}>
-            <LicenseParts />
-          </GridItem>
-          <GridItem colSpan={3}>
-            <VulnParts />
-          </GridItem>
-          <GridItem colSpan={3}>
-            <PolicyParts />
-          </GridItem>
-        </SimpleGrid>
-      )}
+      <SimpleGrid
+        gap={4}
+        width={'100%'}
+        alignItems={'flex-start'}
+        templateColumns='repeat(12, 1fr)'
+      >
+        <GridItem colSpan={3}>
+          <ComponentParts />
+        </GridItem>
+        <GridItem colSpan={3}>
+          <LicenseParts />
+        </GridItem>
+        <GridItem colSpan={3}>
+          <VulnParts />
+        </GridItem>
+        <GridItem colSpan={3}>
+          <PolicyParts />
+        </GridItem>
+      </SimpleGrid>
       <SbomTable data={data?.sbom} error={error} loading={loading} />
     </Flex>
   )

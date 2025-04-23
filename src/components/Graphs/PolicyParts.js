@@ -1,6 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import { gql, useQuery } from '@apollo/client'
 import { useParams } from 'react-router-dom'
+import { COLORS } from 'utils/styleUtils'
 
 import {
   Box,
@@ -8,6 +9,7 @@ import {
   Flex,
   HStack,
   Icon,
+  SkeletonText,
   Stack,
   Text,
   VStack
@@ -15,7 +17,6 @@ import {
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
-import LynkLoader from 'components/Misc/LynkLoader'
 import VulnBadge from 'components/Misc/VulnBadge'
 
 import { MdPolicy } from 'react-icons/md'
@@ -23,6 +24,7 @@ import { MdPolicy } from 'react-icons/md'
 const GetPartPolicies = gql`
   query GetSbomParts($projectId: Uuid!, $sbomId: Uuid!) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
+      projectVersion
       sbomParts {
         id
         part {
@@ -45,6 +47,9 @@ const GetPartPolicies = gql`
           }
         }
       }
+    }
+    policyResults(sbomId: [$sbomId]) {
+      totalCount
     }
   }
 `
@@ -72,7 +77,8 @@ const PolicyParts = () => {
     skip: !params.productid || !params.sbomid,
     variables: { projectId: params.productid, sbomId: params.sbomid }
   })
-  const { sbomParts } = data?.sbom || {}
+  const { projectVersion, sbomParts } = data?.sbom || {}
+  const { policyResults } = data || {}
 
   const filteredData = sbomParts?.map((item) => {
     const metrics = item?.part?.policyResultMetrics
@@ -92,25 +98,35 @@ const PolicyParts = () => {
     }
   })
 
-  const total = filteredData?.reduce((acc, { total }) => acc + (total || 0), 0)
+  const list = [
+    {
+      color: COLORS[0],
+      group: projectVersion,
+      count: policyResults?.totalCount || 0
+    }
+  ]
+
+  filteredData?.forEach(({ total, projectGroup }, index) => {
+    list.push({
+      color: COLORS[index + 1],
+      group: projectGroup,
+      count: total || 0
+    })
+  })
+
+  const total = list.reduce((acc, { count }) => acc + count, 0)
 
   const percent = (value) => `${(value / total) * 100}%`
 
-  const COLORS = {
-    0: '#E2E8F0', // light gray
-    1: '#3182CE', // blue
-    2: '#90CDF4' // light blue
-  }
-
   if (loading)
     return (
-      <Card minH={'200px'}>
-        <LynkLoader />
+      <Card>
+        <SkeletonText noOfLines={2} gap='4' skeletonHeight='3' />
       </Card>
     )
 
   return (
-    <Card minH={'200px'}>
+    <Card maxH={'200px'}>
       <CardBody>
         <Stack w={'100%'}>
           <Flex justify='space-between' align='center'>
@@ -123,29 +139,25 @@ const PolicyParts = () => {
             </Text>
           </Flex>
           <Flex
+            hidden={sbomParts?.length === 0}
             height='8px'
             borderRadius='full'
             overflow='hidden'
             w='100%'
             my='2'
           >
-            {filteredData?.map(({ id, total }, index) => (
-              <Box
-                key={id}
-                bg={COLORS[index]}
-                width={percent(total || 0)}
-                borderLeftRadius={sbomParts?.length > 2 ? 'full' : 'none'}
-              />
+            {list?.map(({ color, count }, index) => (
+              <Box key={index} bg={color} width={percent(count || 0)} />
             ))}
           </Flex>
-          <VStack align='start' spacing={2}>
-            {filteredData?.map(({ id, projectGroup, total }, index) => (
-              <HStack key={id} w='full' justify='space-between'>
+          <VStack align='start' spacing={2} hidden={sbomParts?.length === 0}>
+            {list?.map(({ color, group, count }, index) => (
+              <HStack key={index} w='full' justify='space-between'>
                 <HStack>
-                  <Circle size='2' bg={COLORS[index]} />
-                  <Text fontSize='sm'>{projectGroup}</Text>
+                  <Circle size='2' bg={color} />
+                  <Text fontSize='sm'>{group}</Text>
                 </HStack>
-                <Text fontSize='sm'>{total || 0}</Text>
+                <Text fontSize='sm'>{count || 0}</Text>
               </HStack>
             ))}
           </VStack>
