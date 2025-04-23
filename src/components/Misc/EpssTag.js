@@ -1,22 +1,18 @@
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons'
-import { Flex, Text, Tooltip } from '@chakra-ui/react'
+import { Tag, TagLabel, Tooltip } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const EpssTag = ({ value }) => {
-  const { primaryTextColor, primarySuccessColor, primaryErrorColor } =
-    useThemeColor([
-      'primaryTextColor',
-      'primarySuccessColor',
-      'primaryErrorColor'
-    ])
+  const { primarySuccessColor, primaryErrorColor } = useThemeColor([
+    'primarySuccessColor',
+    'primaryErrorColor'
+  ])
 
   if (value?.length > 0) {
     return (
-      <Flex gap={1} flexWrap={'wrap'} alignItems={'center'}>
-        <Text color={primaryTextColor}>
-          {`${(value[0] * 100).toFixed(2)} %`}
-        </Text>
+      <Tag width={'100px'} alignItems={'center'} justifyContent={'center'}>
+        <TagLabel mr={1}>{`${(value[0] * 100).toFixed(2)} %`}</TagLabel>
         {value?.length > 1 ? (
           value[0] > value[value?.length - 1] ? (
             <Tooltip
@@ -34,11 +30,15 @@ const EpssTag = ({ value }) => {
             </Tooltip>
           ) : null
         ) : null}
-      </Flex>
+      </Tag>
     )
   }
 
-  return <Text color={primaryTextColor}>N/A</Text>
+  return (
+    <Tag w={'100px'}>
+      <TagLabel mx={'auto'}>N/A</TagLabel>
+    </Tag>
+  )
 }
 
 export default EpssTag
