@@ -7,6 +7,10 @@ import {
   useSensors
 } from '@dnd-kit/core'
 import {
+  restrictToHorizontalAxis,
+  restrictToWindowEdges
+} from '@dnd-kit/modifiers'
+import {
   SortableContext,
   arrayMove,
   rectSortingStrategy,
@@ -87,6 +91,7 @@ function ProductGroup() {
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
+        modifiers={[restrictToHorizontalAxis, restrictToWindowEdges]}
       >
         <SortableContext
           items={filteredProductCards}
