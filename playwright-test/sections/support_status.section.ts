@@ -53,6 +53,15 @@ export default class SupportStatusSection {
           await this.page.waitForTimeout(2000)
 
           await this.page.getByRole('tab', { name: 'Support Status' }).click()
+          await this.page.waitForTimeout(2000)
+
+          await this.page.getByTestId('rerun_support_analysis').click()
+          await this.page.getByRole('button', { name: 'Yes' }).click()
+          await this.page.waitForTimeout(2000)
+
+          await this.page.locator("//button[@aria-label='refresh']").click()
+          await this.page.waitForTimeout(2000)
+
           await this.page.getByTestId('support-actions').first().click()
           await this.page.getByTestId('edit_component_support').first().click()
           await this.page.waitForTimeout(2000)
