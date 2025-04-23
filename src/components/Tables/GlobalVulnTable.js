@@ -37,12 +37,14 @@ const GlobalVulnTable = (props) => {
     primaryTextColor,
     primaryBlueText,
     primaryErrorColor,
-    primarySuccessColor
+    primarySuccessColor,
+    secondaryTextColor
   } = useThemeColor([
     'primaryTextColor',
     'primaryBlueText',
     'primaryErrorColor',
-    'primarySuccessColor'
+    'primarySuccessColor',
+    'secondaryTextColor'
   ])
 
   const params = useParams()
@@ -64,7 +66,8 @@ const GlobalVulnTable = (props) => {
       name: 'ID',
       wrap: true,
       selector: (row) => {
-        const { vulnId, id, vulnInfo, source } = row
+        const { vulnId, id, vulnInfo, source, lastModifiedAt } = row
+        const modified = lastModifiedAt ? timeSince(lastModifiedAt) : ''
         return (
           <Flex direction='row' alignItems={'center'} gap={2} my={3}>
             <Tooltip placement='top' label={source} textTransform={'uppercase'}>
@@ -94,15 +97,25 @@ const GlobalVulnTable = (props) => {
                 </Link>
                 <ExternalNavIcon href={linkURl(source, vulnId)} />
               </Flex>
-              {vulnInfo?.kev === true && (
-                <Badge
-                  colorScheme='red'
-                  w={'fit-content'}
-                  fontWeight={'normal'}
-                >
-                  KEV
-                </Badge>
-              )}
+              <Flex gap={2} alignItems={'center'} flexWrap={'wrap'}>
+                {vulnInfo?.kev === true && (
+                  <Badge
+                    colorScheme='red'
+                    w={'fit-content'}
+                    fontWeight={'normal'}
+                  >
+                    KEV
+                  </Badge>
+                )}
+                <Text hidden={!vulnInfo?.kev} color={secondaryTextColor}>
+                  •
+                </Text>
+                <Tooltip label={modified ? getFullDate(lastModifiedAt) : 'N/A'}>
+                  <Text color={secondaryTextColor} textAlign={'right'}>
+                    {modified || 'N/A'}
+                  </Text>
+                </Tooltip>
+              </Flex>
             </Stack>
           </Flex>
         )
@@ -196,34 +209,6 @@ const GlobalVulnTable = (props) => {
         const dateB = new Date(b?.publishedAt)
         return dateA - dateB // Sort in descending order
       },
-      wrap: true,
-      right: 'true'
-    },
-    // MODIFIED AT
-    {
-      id: 'VULNS_LAST_MODIFIED_AT',
-      name: 'MODIFIED',
-      selector: (row) => {
-        const { lastModifiedAt } = row
-        const modified = lastModifiedAt ? timeSince(lastModifiedAt) : ''
-        return (
-          <Tooltip
-            label={modified ? getFullDate(lastModifiedAt) : 'N/A'}
-            placement={'top'}
-          >
-            <Text color={primaryTextColor} textAlign={'right'}>
-              {modified || 'N/A'}
-            </Text>
-          </Tooltip>
-        )
-      },
-      sortable: true,
-      sortFunction: (a, b) => {
-        const dateA = new Date(a?.lastModifiedAt)
-        const dateB = new Date(b?.lastModifiedAt)
-        return dateA - dateB // Sort in descending order
-      },
-      width: '9%',
       wrap: true,
       right: 'true'
     },
