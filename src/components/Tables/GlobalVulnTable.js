@@ -5,7 +5,6 @@ import SubHeader from 'views/Dashboard/Vulnerabilities/components/SubHeader'
 
 import { Badge, Flex, Stack, Text } from '@chakra-ui/react'
 import { IconButton, Tooltip, useDisclosure } from '@chakra-ui/react'
-import { Tag, TagLabel } from '@chakra-ui/react'
 
 import VulnProductsDrawer from 'components/Drawer/VulnProductsDrawer'
 import ExternalNavIcon from 'components/Icons/ExternalNavIcon'
@@ -20,11 +19,11 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaEye } from 'react-icons/fa6'
+import { LuCircleDot, LuDatabaseZap, LuSparkle } from 'react-icons/lu'
 
 import Pagination from '../Pagination'
 
 const GlobalVulnTable = (props) => {
-
   const { vulns, reset, filters, loading, paginationProps } = props
   const { isOpen, onClose, onOpen } = useDisclosure()
 
@@ -34,15 +33,28 @@ const GlobalVulnTable = (props) => {
   const { generateProductVulnerabilityDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
 
-  const { primaryTextColor, primaryBlueText } = useThemeColor([
+  const {
+    primaryTextColor,
+    primaryBlueText,
+    primaryErrorColor,
+    primarySuccessColor
+  } = useThemeColor([
     'primaryTextColor',
-    'primaryBlueText'
+    'primaryBlueText',
+    'primaryErrorColor',
+    'primarySuccessColor'
   ])
 
   const params = useParams()
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
   const [activeRow, setActiveRow] = useState({})
+
+  const sourceIcon = {
+    osv: <LuCircleDot color={primaryErrorColor} />,
+    nvd: <LuDatabaseZap color={primaryBlueText} />,
+    custom: <LuSparkle color={primarySuccessColor} />
+  }
 
   // COLUMNS
   const columns = [
@@ -54,10 +66,16 @@ const GlobalVulnTable = (props) => {
       selector: (row) => {
         const { vulnId, id, vulnInfo, source } = row
         return (
-          <Stack spacing={1} my={2}>
-            <Flex direction='row' alignItems={'flex-start'} gap={2} my={3}>
-              <ExternalNavIcon href={linkURl(source, vulnId)} />
-              <Stack>
+          <Flex direction='row' alignItems={'center'} gap={2} my={3}>
+            <Tooltip placement='top' label={source} textTransform={'uppercase'}>
+              <IconButton
+                size={'sm'}
+                isRound={true}
+                icon={sourceIcon[source]}
+              />
+            </Tooltip>
+            <Stack direction={'column'} spacing={1.5}>
+              <Flex gap={2} alignItems={'center'} flexWrap={'wrap'}>
                 <Link
                   to={
                     params?.productgroupid
@@ -74,21 +92,22 @@ const GlobalVulnTable = (props) => {
                     {vulnId || ''}
                   </Text>
                 </Link>
-                {vulnInfo?.kev === true && (
-                  <Badge
-                    width={'fit-content'}
-                    variant='subtle'
-                    colorScheme='red'
-                  >
-                    KEV
-                  </Badge>
-                )}
-              </Stack>
-            </Flex>
-          </Stack>
+                <ExternalNavIcon href={linkURl(source, vulnId)} />
+              </Flex>
+              {vulnInfo?.kev === true && (
+                <Badge
+                  colorScheme='red'
+                  w={'fit-content'}
+                  fontWeight={'normal'}
+                >
+                  KEV
+                </Badge>
+              )}
+            </Stack>
+          </Flex>
         )
       },
-      width: '12%',
+      width: '20%',
       sortable: true
     },
     // SEVERITY
@@ -98,53 +117,6 @@ const GlobalVulnTable = (props) => {
       selector: (row) => <SeverityTag value={row?.sev} />,
       sortable: true,
       width: '10%',
-      wrap: true
-    },
-    // SOURCE
-    {
-      id: 'VULNS_SOURCE',
-      name: 'SOURCE',
-      selector: (row) => {
-        const { source } = row
-        return (
-          <Tag
-            size='sm'
-            key='md'
-            variant='solid'
-            colorScheme={source === 'osv' ? 'red' : 'blue'}
-            textTransform={'uppercase'}
-            width={'100%'}
-            alignItems={'center'}
-            justifyContent={'center'}
-          >
-            <TagLabel>{source}</TagLabel>
-          </Tag>
-        )
-      },
-      width: '9%',
-      wrap: true,
-      sortable: true
-    },
-    // CVSS
-    {
-      id: 'VULNS_CVSS_SCORE',
-      name: 'CVSS',
-      selector: (row) => <CvssTag value={row?.cvssScore} />,
-      width: '7%',
-      wrap: true,
-      sortable: true
-    },
-    // EPSS
-    {
-      id: 'VULN_INFOS_EPSS_SCORES',
-      name: 'EPSS',
-      selector: (row) => {
-        const { vulnInfo } = row
-        const { epssScores } = vulnInfo || ''
-        return <EpssTag value={epssScores} />
-      },
-      sortable: true,
-      width: '12%',
       wrap: true
     },
     // STATUSES
@@ -174,6 +146,30 @@ const GlobalVulnTable = (props) => {
         )
       },
       width: '22%',
+      wrap: true
+    },
+    // CVSS
+    {
+      id: 'VULNS_CVSS_SCORE',
+      name: 'CVSS',
+      selector: (row) => <CvssTag value={row?.cvssScore} />,
+      width: '7%',
+      wrap: true,
+      sortable: true,
+      right: 'true'
+    },
+    // EPSS
+    {
+      id: 'VULN_INFOS_EPSS_SCORES',
+      name: 'EPSS',
+      selector: (row) => {
+        const { vulnInfo } = row
+        const { epssScores } = vulnInfo || ''
+        return <EpssTag value={epssScores} />
+      },
+      sortable: true,
+      width: '12%',
+      right: 'true',
       wrap: true
     },
     // PUBLISHED AT
