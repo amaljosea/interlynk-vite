@@ -65,7 +65,9 @@ const PurlEditor = ({ isOpen, onOpen, onClose, setSavePending }) => {
           purl: pkg.toString()
         }
       }))
-      setSavePending('Click Save to confirm PURL update')
+      if (setSavePending) {
+        setSavePending('Click Save to confirm PURL update')
+      }
       onClose()
     } catch (error) {
       setTabData((prev) => ({

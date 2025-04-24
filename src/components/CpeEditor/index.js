@@ -57,7 +57,9 @@ const CpeEditor = ({
     const matches = validateCpe(value)
     if (matches) {
       handleChange('identifiers', 'cpeError', '')
-      setSavePending('Click Save to confirm CPE update')
+      if (setSavePending) {
+        setSavePending('Click Save to confirm CPE update')
+      }
     } else {
       handleChange('identifiers', 'cpeError', 'Invalid CPE')
     }
