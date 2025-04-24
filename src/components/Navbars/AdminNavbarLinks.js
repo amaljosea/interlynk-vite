@@ -26,7 +26,7 @@ export default function AdminNavbarLinks(props) {
   const params = useParams()
   const sbomId = params.sbomid
   const productId = params.productid
-  const { organization, setOrganization } = useGlobalState()
+  const { organization } = useGlobalState()
   const { colorMode, setColorMode } = useColorMode()
   const [currentMode, setCurrentMode] = useState(colorMode || 'system')
 
@@ -36,10 +36,7 @@ export default function AdminNavbarLinks(props) {
 
   const handleLogout = async () => {
     setLoading(true)
-    await logoutUser().then(() => {
-      setLoading(false)
-      setOrganization(null)
-    })
+    await logoutUser().then(() => setLoading(false))
   }
 
   const { setIsOpen, setCurrentStep } = useTour()

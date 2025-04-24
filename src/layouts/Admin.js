@@ -14,7 +14,7 @@ import { Box, Button, Center, Flex, Img, Stack, Text } from '@chakra-ui/react'
 
 import DeviceWarning from 'components/DeviceWarning'
 import Kbar from 'components/Kbar'
-// Layout components
+import Loading from 'components/Misc/Loading'
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
 
@@ -35,7 +35,7 @@ export default function Admin() {
 
   const { steps } = useTour()
   const navigate = useNavigate()
-  const { organization, setOrganization } = useGlobalState()
+  const { setOrganization } = useGlobalState()
   const isMobile = isMobileOrTablet()
 
   const productId = params.productid
@@ -177,6 +177,8 @@ export default function Admin() {
 
   if (isMobile) return <DeviceWarning />
 
+  if (loading) return <Loading type='login' />
+
   return (
     <KBarProvider options={{ enableHistory: true }}>
       <Kbar />
@@ -249,7 +251,7 @@ export default function Admin() {
               />
             </Box>
             <Box my={4} px={5}>
-              {organization ? <Outlet /> : <OrgRegister loading={loading} />}
+              {data?.organization ? <Outlet /> : <OrgRegister />}
             </Box>
           </Flex>
         </TourProvider>

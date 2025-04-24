@@ -5,6 +5,8 @@ const Loading = ({ type }) => {
 
   const getStatus = (type) => {
     switch (type) {
+      case 'login':
+        return 'Loading...'
       case 'signout':
         return 'Signing out'
       case 'support':
