@@ -17,7 +17,6 @@ import {
   sortableKeyboardCoordinates
 } from '@dnd-kit/sortable'
 import React, { useMemo, useState } from 'react'
-import { setItem } from 'utils/localStorageUtils'
 
 import { Heading, SimpleGrid, Stack } from '@chakra-ui/react'
 
@@ -58,7 +57,7 @@ function ProductGroup() {
   const [isGridLayout, setIsGridLayout] = useState(true)
 
   const filteredProductCards = useMemo(() => {
-    return productCards.filter((card) => selectedProducts.includes(card.type))
+    return productCards.filter((card) => selectedProducts?.includes(card.type))
   }, [productCards, selectedProducts])
 
   const sensors = useSensors(

@@ -49,7 +49,7 @@ function Activities() {
 
   const filteredActivityCards = useMemo(() => {
     return activityCards.filter((card) =>
-      selectedActivities.includes(card.type)
+      selectedActivities?.includes(card.type)
     )
   }, [activityCards, selectedActivities])
 

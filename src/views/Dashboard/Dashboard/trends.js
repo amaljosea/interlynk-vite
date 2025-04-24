@@ -80,7 +80,7 @@ function VulnerabilityTrendsGroup() {
   const [isGridLayout, setIsGridLayout] = useState(true)
 
   const filteredTrendCards = useMemo(() => {
-    return trendCards.filter((card) => selectedTrends.includes(card.type))
+    return trendCards.filter((card) => selectedTrends?.includes(card.type))
   }, [trendCards, selectedTrends])
 
   const sensors = useSensors(

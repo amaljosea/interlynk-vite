@@ -64,7 +64,7 @@ function VulnerabilityGroup() {
   const [isGridLayout, setIsGridLayout] = useState(true)
 
   const filteredVulnCards = useMemo(() => {
-    return vulnCards.filter((card) => selectedVulns.includes(card.type))
+    return vulnCards.filter((card) => selectedVulns?.includes(card.type))
   }, [vulnCards, selectedVulns])
 
   const sensors = useSensors(

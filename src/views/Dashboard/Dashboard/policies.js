@@ -41,7 +41,7 @@ function PolicyGroup() {
   const [isGridLayout, setIsGridLayout] = useState(true)
 
   const filteredPolicyCards = useMemo(() => {
-    return policyCards.filter((card) => selectedPolicies.includes(card.type))
+    return policyCards.filter((card) => selectedPolicies?.includes(card.type))
   }, [policyCards, selectedPolicies])
 
   const sensors = useSensors(
