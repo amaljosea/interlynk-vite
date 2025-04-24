@@ -16,6 +16,7 @@ import LynkSwitch from 'components/Misc/LynkSwitch'
 import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 
 const GetEcosystems = gql`
   query GetEcosystems($productId: Uuid!, $sbomId: Uuid!) {
@@ -47,8 +48,58 @@ const GetLicenses = gql`
   }
 `
 
+const GetShareLynkEcosystems = gql`
+  query GetEcosystems($sbomId: Uuid!) {
+    shareLynkQuery {
+      sbom(id: $sbomId) {
+        filters {
+          ecosystems
+        }
+      }
+    }
+  }
+`
+
+// const GetShareLynkSupplierNames = gql`
+//   query GetSupplierNames($sbomId: Uuid!) {
+//     shareLynkQuery {
+//       sbom(id: $sbomId) {
+//         filters {
+//           supplierNames
+//         }
+//       }
+//     }
+//   }
+// `
+
+const GetShareLynkKinds = gql`
+  query GetKinds($sbomId: Uuid!) {
+    shareLynkQuery {
+      sbom(id: $sbomId) {
+        filters {
+          kinds
+        }
+      }
+    }
+  }
+`
+
+const GetShareLynkLicenses = gql`
+  query GetLicenses($sbomId: Uuid!) {
+    shareLynkQuery {
+      sbom(id: $sbomId) {
+        filters {
+          licenses
+        }
+      }
+    }
+  }
+`
+
 const CompFilters = ({ reset }) => {
   const params = useParams()
+  const { isCustomerView } = useRouteFlags()
+
   const productId = params?.productid
   const sbomId = params?.sbomid
   const { prodCompState, dispatch } = useGlobalState()
@@ -61,14 +112,17 @@ const CompFilters = ({ reset }) => {
   const [compKinds, setCompKinds] = useState(['All'])
 
   // GET COMPONENT FILTER HEADS
-  const [getEcosystems, { loading: ecoLoading }] = useLazyQuery(GetEcosystems)
-  const [getKinds, { loading: kindLoading }] = useLazyQuery(GetKinds)
-  const [getLicenses, { loading: licLoading }] = useLazyQuery(GetLicenses)
+  const [getEcosystems, { loading: ecoLoading }] = useLazyQuery(
+    isCustomerView ? GetShareLynkEcosystems : GetEcosystems
+  )
+  const [getKinds, { loading: kindLoading }] = useLazyQuery(
+    isCustomerView ? GetShareLynkKinds : GetKinds
+  )
+  const [getLicenses, { loading: licLoading }] = useLazyQuery(
+    isCustomerView ? GetShareLynkLicenses : GetLicenses
+  )
 
-  const variables = {
-    productId,
-    sbomId
-  }
+  const variables = isCustomerView ? { sbomId } : { productId, sbomId }
 
   const onFilterType = (value) => {
     prodCompDispatch({ type: 'FILTER_SCOPE', payload: value })
@@ -89,22 +143,31 @@ const CompFilters = ({ reset }) => {
     switch (type) {
       case 'Ecosystem':
         getEcosystems({ variables }).then((res) => {
-          if (res?.data?.sbom?.filters?.ecosystems?.length > 0) {
-            setCompEcosystems(['All', ...res.data.sbom.filters.ecosystems])
+          const result = isCustomerView
+            ? res?.data?.shareLynkQuery?.sbom?.filters?.ecosystems
+            : res?.data?.sbom?.filters?.ecosystems
+          if (result?.length > 0) {
+            setCompEcosystems(['All', ...result])
           }
         })
         break
       case 'Kind':
         getKinds({ variables }).then((res) => {
-          if (res?.data?.sbom?.filters?.kinds?.length > 0) {
-            setCompKinds(['All', ...res.data.sbom.filters.kinds])
+          const result = isCustomerView
+            ? res?.data?.shareLynkQuery?.sbom?.filters?.kinds
+            : res?.data?.sbom?.filters?.kinds
+          if (result?.length > 0) {
+            setCompKinds(['All', ...result])
           }
         })
         break
       case 'License':
         getLicenses({ variables }).then((res) => {
-          if (res?.data?.sbom?.filters?.licenses?.length > 0) {
-            setCompLicenses(['All', ...res.data.sbom.filters.licenses])
+          const result = isCustomerView
+            ? res?.data?.shareLynkQuery?.sbom?.filters?.licenses
+            : res?.data?.sbom?.filters?.licenses
+          if (result?.length > 0) {
+            setCompLicenses(['All', ...result])
           }
         })
         break

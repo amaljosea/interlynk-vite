@@ -51,8 +51,11 @@ const ActivitiesOverviewRow = (props) => {
         </Tooltip>
         <Box
           w='2px'
+          pos={'relative'}
+          top={'-5px'}
+          hidden={index === arrLength - 1}
           bg={grayBorderColor}
-          h={index === arrLength - 1 ? '15px' : '100%'}
+          h={'50px'}
         />
       </Flex>
       <Stack

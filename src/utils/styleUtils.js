@@ -71,18 +71,18 @@ export const sevColor = (severity) => {
   switch (toLower(severity)) {
     case 'critical':
     case 'super critical':
-      return { bg: '#FED7D7', text: '#822727' }
+      return { bg: '#F56565', text: '#822727' }
     case 'high':
     case 'super high':
-      return { bg: '#FEEBC8', text: '#7B341E' }
+      return { bg: '#ED8936', text: '#7B341E' }
     case 'medium':
-      return { bg: '#FEFCBF', text: '#744210' }
+      return { bg: '#ECC94B', text: '#744210' }
     case 'low':
     case 'super low':
     case 'negligible':
-      return { bg: '#C6F6D5', text: '#22543D' }
+      return { bg: '#48BB78', text: '#22543D' }
     case 'unknown':
-      return { bg: '#EDF2F7', text: '#1A202C' }
+      return { bg: '#A0AEC0', text: '#1A202C' }
   }
 }
 
@@ -162,15 +162,15 @@ export const GetIcon = (name, colorMode) => {
 
 export const cvssColor = (cvss) => {
   if (cvss >= 9.0) {
-    return 'red'
+    return '#F56565'
   } else if (cvss >= 7.0) {
-    return 'orange'
+    return '#ED8936'
   } else if (cvss >= 6.0) {
-    return 'yellow'
+    return '#ECC94B'
   } else if (cvss === '') {
-    return 'gray'
+    return '#A0AEC0'
   } else {
-    return 'green'
+    return '#48BB78'
   }
 }
 

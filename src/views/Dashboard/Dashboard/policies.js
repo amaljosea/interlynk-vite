@@ -7,6 +7,10 @@ import {
   useSensors
 } from '@dnd-kit/core'
 import {
+  restrictToHorizontalAxis,
+  restrictToWindowEdges
+} from '@dnd-kit/modifiers'
+import {
   SortableContext,
   arrayMove,
   rectSortingStrategy,
@@ -66,11 +70,12 @@ function PolicyGroup() {
 
   return (
     <Stack spacing={3}>
-      <Heading size={'md'}>Policies</Heading>
+      <Heading size={'md'}>Policy</Heading>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
+        modifiers={[restrictToHorizontalAxis, restrictToWindowEdges]}
       >
         <SortableContext
           items={filteredPolicyCards}

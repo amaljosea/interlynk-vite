@@ -1,10 +1,9 @@
 /* eslint-disable no-restricted-syntax */
-import { useQuery } from '@apollo/client'
 import { useTour } from '@reactour/tour'
 import { useEffect } from 'react'
 
-import { Button, Flex, Heading, Skeleton, Stack } from '@chakra-ui/react'
-import { Grid, GridItem, SimpleGrid } from '@chakra-ui/react'
+import { Button, Flex, Skeleton, Stack } from '@chakra-ui/react'
+import { Grid, SimpleGrid } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardList from 'components/CardList'
@@ -16,10 +15,7 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
 
-import { GetOrgMetrics } from 'graphQL/Queries'
-
-import ActivitiesOverview from './components/ActivitiesOverview'
-import ProductsOverview from './components/ProductsOverview'
+import Activities from './activities'
 import PolicyGroup from './policies'
 import ProductGroup from './products'
 import VulnerabilityTrendsGroup from './trends'
@@ -32,11 +28,6 @@ export default function Page() {
   const { dispatch, envName, organization, labelIds, setLabelIds } =
     useGlobalState()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
-
-  const { data: metrics, loading } = useQuery(GetOrgMetrics, {
-    skip: organization ? false : true,
-    variables: { env: envName }
-  })
 
   const endDate = new Date()
   const startDate = new Date()
@@ -116,28 +107,7 @@ export default function Page() {
         {/* POLICY GRAPHS */}
         <PolicyGroup />
         {/* ACTIVITIES AND CHANGELOGS */}
-        <Stack spacing={3}>
-          <Heading size={'md'}>Activities</Heading>
-          <Grid templateColumns='repeat(12, 1fr)' gap={5} flexWrap={'wrap'}>
-            {/* RECENT IMPORTS */}
-            <GridItem colSpan={8} w='100%'>
-              <ProductsOverview
-                loading={loading}
-                title={'Recent Imports'}
-                data={metrics?.organizationMetric?.latestVersions}
-              />
-            </GridItem>
-            {/* LATEST ACTIVITIES */}
-            <GridItem colSpan={4} w='100%'>
-              <ActivitiesOverview
-                loading={loading}
-                title={'Recent Activities'}
-                amount={metrics?.organizationMetric?.latestActivity?.length}
-                data={metrics?.organizationMetric?.latestActivity}
-              />
-            </GridItem>
-          </Grid>
-        </Stack>
+        <Activities />
       </Stack>
     </Stack>
   )

@@ -6,6 +6,7 @@ import {
   useSensor,
   useSensors
 } from '@dnd-kit/core'
+import { restrictToWindowEdges } from '@dnd-kit/modifiers'
 import {
   SortableContext,
   arrayMove,
@@ -93,11 +94,12 @@ function VulnerabilityGroup() {
 
   return (
     <Stack spacing={3}>
-      <Heading size={'md'}>Vulnerabilities</Heading>
+      <Heading size={'md'}>Vulnerability</Heading>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
+        modifiers={[restrictToWindowEdges]}
       >
         <SortableContext
           items={filteredVulnCards}

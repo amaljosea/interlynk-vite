@@ -289,13 +289,10 @@ export default class ComponentSection {
             errors?.push('Link validation not working')
           } else {
             await this.page.getByTestId('delete_comp_link').first().click()
-            await this.page
-              .getByTestId('confirm_delete_comp_link')
-              .first()
-              .click()
+            await this.page.getByTestId('confirm_delete').first().click()
+            await this.page.waitForTimeout(4000)
           }
 
-          await this.page.waitForTimeout(4000)
           await this.page.locator("//button[@aria-label='comp_close']").click()
         } else {
           errors?.push('Version not found')

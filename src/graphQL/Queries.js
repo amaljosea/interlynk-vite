@@ -196,39 +196,6 @@ export const GetOrgMetrics = gql`
         vulnId
         desc
       }
-      latestVersions {
-        id
-        createdAt
-        creationAt
-        updatedAt
-        projectId
-        projectVersion
-        project {
-          id
-          name
-          sboms {
-            id
-          }
-          projectGroup {
-            id
-            name
-            defaultProject {
-              id
-              name
-            }
-          }
-        }
-        primaryComponent {
-          id
-          name
-          version
-        }
-        stats {
-          compCount
-          compLicenseCount
-          vulnStats
-        }
-      }
       latestProjects {
         id
         name
@@ -245,14 +212,6 @@ export const GetOrgMetrics = gql`
             vulnStats
           }
         }
-      }
-      latestActivity {
-        event
-        updatedAt
-        changedBy
-        action
-        orig
-        updated
       }
     }
   }

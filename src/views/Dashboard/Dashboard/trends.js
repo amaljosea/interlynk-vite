@@ -7,6 +7,9 @@ import {
   useSensors
 } from '@dnd-kit/core'
 import {
+  restrictToWindowEdges
+} from '@dnd-kit/modifiers'
+import {
   SortableContext,
   arrayMove,
   rectSortingStrategy,
@@ -114,6 +117,7 @@ function VulnerabilityTrendsGroup() {
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
+        modifiers={[restrictToWindowEdges]}
       >
         <SortableContext
           items={filteredTrendCards}
