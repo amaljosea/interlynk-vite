@@ -166,6 +166,24 @@ const colors = {
   hoverBgColor: {
     light: '#EDF2F7',
     dark: '#1A202C'
+  },
+
+   // Brand Colors
+   lynkRedColor: {
+    light: '#DE001A',
+    dark: '#FF7875'
+  },
+  lynkOrangeColor: {
+    light: '#D04200',
+    dark: '#FFC069'
+  },
+  lynkYellowColor: {
+    light: '#A66900',
+    dark: '#FFE58F'
+  },
+  lynkGreenColor: {
+    light: '#0E8A16',
+    dark: '#95DE64'
   }
 }
 
