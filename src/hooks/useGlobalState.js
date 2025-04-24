@@ -11,13 +11,7 @@ import {
   toolsReducer,
   versionReducer
 } from 'context/reducers'
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useReducer,
-  useState
-} from 'react'
+import React, { createContext, useContext, useReducer, useState } from 'react'
 import {
   allActivities,
   allPolicies,
@@ -34,7 +28,6 @@ const GlobalStateProvider = ({ children }) => {
   const env = getItem('environment')
   const cards = getItem('selectedCards')
   const selectedCards = cards ? JSON.parse(cards) : null
-  const { activities, products, vulns, trends, policies } = selectedCards || {}
 
   const [organization, setOrganization] = useState(null)
   const [userPermissions, setUserPermissions] = useState([])
@@ -259,16 +252,6 @@ const GlobalStateProvider = ({ children }) => {
     setSelectedSbom([])
     setClearSelect(!clearSelect)
   }
-
-  useEffect(() => {
-    if (selectedCards) {
-      setSelectedProducts(products)
-      setSelectedActivities(activities)
-      setSelectedTrends(trends)
-      setSelectedVulns(vulns)
-      setSelectedPolicies(policies)
-    }
-  }, [])
 
   return (
     <GlobalStateContext.Provider
