@@ -5,17 +5,19 @@ import { Circle, HStack, Text } from '@chakra-ui/react'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 const SeverityTag = ({ value }) => {
-  const { primaryTextColor, secondaryTextInverse } = useThemeColor([
-    'primaryTextColor',
-    'secondaryTextInverse'
-  ])
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
-  if (!value) return <Text color={secondaryTextInverse}>N/A</Text>
+  if (!value)
+    return (
+      <Text fontSize={14} color={primaryTextColor}>
+        N/A
+      </Text>
+    )
 
   return (
     <HStack>
       <Circle size='2' bg={sevColor(value)?.bg} />
-      <Text fontSize='sm' color={primaryTextColor} textTransform={'capitalize'}>
+      <Text fontSize={14} color={primaryTextColor} textTransform={'capitalize'}>
         {value}
       </Text>
     </HStack>
