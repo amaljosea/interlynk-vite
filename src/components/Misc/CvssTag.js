@@ -7,11 +7,11 @@ import { useThemeColor } from 'hooks/useThemeColors'
 const CvssTag = ({ value }) => {
   const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
-  if (value) {
-    return <Text color={cvssColor(value)}>{value}</Text>
-  }
-
-  return <Text color={primaryTextColor}>N/A</Text>
+  return (
+    <Text fontSize={14} color={value ? cvssColor(value) : primaryTextColor}>
+      {value || 'N/A'}
+    </Text>
+  )
 }
 
 export default CvssTag
