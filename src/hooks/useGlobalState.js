@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { sbomCheckReducer } from 'context/reducers'
 import { globalVulnReducer } from 'context/reducers'
 import {
@@ -10,7 +11,13 @@ import {
   toolsReducer,
   versionReducer
 } from 'context/reducers'
-import React, { createContext, useContext, useReducer, useState } from 'react'
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useReducer,
+  useState
+} from 'react'
 import {
   allActivities,
   allPolicies,
@@ -35,11 +42,11 @@ const GlobalStateProvider = ({ children }) => {
   const [clearSelect, setClearSelect] = useState(false)
   const [selectedSbom, setSelectedSbom] = useState([])
   const [labelIds, setLabelIds] = useState([])
-  const [selectedActivities, setSelectedActivities] = useState(activities)
-  const [selectedProducts, setSelectedProducts] = useState(products)
-  const [selectedVulns, setSelectedVulns] = useState(vulns)
-  const [selectedTrends, setSelectedTrends] = useState(trends)
-  const [selectedPolicies, setSelectedPolicies] = useState(policies)
+  const [selectedActivities, setSelectedActivities] = useState([])
+  const [selectedProducts, setSelectedProducts] = useState([])
+  const [selectedVulns, setSelectedVulns] = useState([])
+  const [selectedTrends, setSelectedTrends] = useState([])
+  const [selectedPolicies, setSelectedPolicies] = useState([])
 
   const updateSelection = (data) => {
     setItem('selectedCards', JSON.stringify(data))
@@ -252,6 +259,16 @@ const GlobalStateProvider = ({ children }) => {
     setSelectedSbom([])
     setClearSelect(!clearSelect)
   }
+
+  useEffect(() => {
+    if (selectedCards) {
+      setSelectedProducts(products)
+      setSelectedActivities(activities)
+      setSelectedTrends(trends)
+      setSelectedVulns(vulns)
+      setSelectedPolicies(policies)
+    }
+  }, [])
 
   return (
     <GlobalStateContext.Provider
