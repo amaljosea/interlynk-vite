@@ -3,6 +3,7 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { initializeDashboardData } from 'utils/initDashboardData'
 
 import { Button, Flex, Stack, Text } from '@chakra-ui/react'
 import { Alert, AlertDescription, AlertIcon } from '@chakra-ui/react'
@@ -53,6 +54,7 @@ const LoginForm = () => {
           setLoading(false)
           Cookies.set('authToken', response.headers.authorization)
           Cookies.set('refreshToken', status?.data?.refresh_token)
+          initializeDashboardData()
           navigate('/vendor/dashboard')
         }
       })

@@ -6,9 +6,7 @@ import {
   useSensor,
   useSensors
 } from '@dnd-kit/core'
-import {
-  restrictToWindowEdges
-} from '@dnd-kit/modifiers'
+import { restrictToWindowEdges } from '@dnd-kit/modifiers'
 import {
   SortableContext,
   arrayMove,
@@ -31,7 +29,7 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 function VulnerabilityTrendsGroup() {
-  const { selectedTrends, setSelectedTrends } = useGlobalState()
+  const { updateCards, selectedTrends, setSelectedTrends } = useGlobalState()
   const { isFreeTier } = useGlobalQueryContext()
 
   const [trendCards, setTrendCards] = useState([
@@ -105,7 +103,9 @@ function VulnerabilityTrendsGroup() {
   }
 
   const handleDeleteCard = (key) => {
-    setSelectedTrends(selectedTrends?.filter((item) => item !== key))
+    const filteredItems = selectedTrends?.filter((item) => item !== key)
+    setSelectedTrends(filteredItems)
+    updateCards(filteredItems, 'trends')
   }
 
   if (filteredTrendCards?.length === 0) return null

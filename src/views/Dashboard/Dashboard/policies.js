@@ -27,7 +27,8 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import PolicyGraphs from './components/category/PolicyGraphs'
 
 function PolicyGroup() {
-  const { selectedPolicies, setSelectedPolicies } = useGlobalState()
+  const { updateCards, selectedPolicies, setSelectedPolicies } =
+    useGlobalState()
 
   const [policyCards, setPolicyCards] = useState([
     {
@@ -63,7 +64,9 @@ function PolicyGroup() {
   }
 
   const handleDeleteCard = (key) => {
-    setSelectedPolicies(selectedPolicies?.filter((item) => item !== key))
+    const filteredItems = selectedPolicies?.filter((item) => item !== key)
+    setSelectedPolicies(filteredItems)
+    updateCards(filteredItems, 'policies')
   }
 
   if (filteredPolicyCards?.length === 0) return null

@@ -27,7 +27,7 @@ import KevVulnerabilitiesByStatus from 'components/Graphs/KevVulnerabilitiesBySt
 import { useGlobalState } from 'hooks/useGlobalState'
 
 function VulnerabilityGroup() {
-  const { selectedVulns, setSelectedVulns } = useGlobalState()
+  const { updateCards, selectedVulns, setSelectedVulns } = useGlobalState()
 
   const [vulnCards, setVulnCards] = useState([
     {
@@ -87,7 +87,9 @@ function VulnerabilityGroup() {
   }
 
   const handleDeleteCard = (key) => {
-    setSelectedVulns(selectedVulns?.filter((item) => item !== key))
+    const filteredItems = selectedVulns?.filter((item) => item !== key)
+    setSelectedVulns(filteredItems)
+    updateCards(filteredItems, 'vulns')
   }
 
   if (filteredVulnCards?.length === 0) return null

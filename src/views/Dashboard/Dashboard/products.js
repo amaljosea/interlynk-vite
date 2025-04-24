@@ -17,6 +17,7 @@ import {
   sortableKeyboardCoordinates
 } from '@dnd-kit/sortable'
 import React, { useMemo, useState } from 'react'
+import { setItem } from 'utils/localStorageUtils'
 
 import { Heading, SimpleGrid, Stack } from '@chakra-ui/react'
 
@@ -30,7 +31,8 @@ import ProductLifestages from './components/ProductLifestages'
 import VersionLifestages from './components/VersionLifestage'
 
 function ProductGroup() {
-  const { selectedProducts, setSelectedProducts } = useGlobalState()
+  const { updateCards, selectedProducts, setSelectedProducts } =
+    useGlobalState()
   const { isFreeTier } = useGlobalQueryContext()
 
   const [productCards, setProductCards] = useState([
@@ -79,7 +81,9 @@ function ProductGroup() {
   }
 
   const handleDeleteCard = (key) => {
-    setSelectedProducts(selectedProducts?.filter((item) => item !== key))
+    const filteredItems = selectedProducts?.filter((item) => item !== key)
+    setSelectedProducts(filteredItems)
+    updateCards(filteredItems, 'products')
   }
 
   if (filteredProductCards?.length === 0) return null
