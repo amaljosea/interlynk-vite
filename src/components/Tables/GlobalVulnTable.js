@@ -62,7 +62,7 @@ const GlobalVulnTable = (props) => {
   const columns = [
     // CVE ID
     {
-      id: 'VULNS_VULN_ID',
+      id: 'VULNS_LAST_MODIFIED_AT',
       name: 'ID',
       wrap: true,
       selector: (row) => {
@@ -121,7 +121,12 @@ const GlobalVulnTable = (props) => {
         )
       },
       width: '20%',
-      sortable: true
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a?.lastModifiedAt)
+        const dateB = new Date(b?.lastModifiedAt)
+        return dateA - dateB // Sort in descending order
+      }
     },
     // SEVERITY
     {
@@ -177,7 +182,8 @@ const GlobalVulnTable = (props) => {
       name: 'EPSS',
       selector: (row) => {
         const { vulnInfo } = row
-        const { epssScores } = vulnInfo || ''
+        const { epssScore, epssScores } = vulnInfo || ''
+        if (epssScore === 0) return <Text color={primaryTextColor}>0 %</Text>
         return <EpssTag value={epssScores} />
       },
       sortable: true,
