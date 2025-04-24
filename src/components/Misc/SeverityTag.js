@@ -22,14 +22,7 @@ const SeverityTag = ({ value }) => {
     )
   }
 
-  return (
-    <HStack>
-      <Circle size='2' bg={'gray'} />
-      <Text fontSize='sm' color={primaryTextColor}>
-        N/A
-      </Text>
-    </HStack>
-  )
+  return <Text color={primaryTextColor}>N/A</Text>
 }
 
 export default SeverityTag
