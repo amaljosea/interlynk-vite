@@ -82,12 +82,20 @@ const ComponentPart = () => {
     <Card maxH={'200px'}>
       <CardBody>
         <Stack w={'100%'}>
-          <Flex justify='space-between' align='center'>
+          <Flex
+            gap={2}
+            flexDir={sbomParts?.length > 0 ? 'row' : 'column'}
+            justify='space-between'
+          >
             <HStack spacing='3'>
               <Icon as={FaCube} color='gray.500' boxSize={5} />
               <Text fontWeight='bold'>Components</Text>
             </HStack>
-            <Text fontWeight='bold' fontSize='lg'>
+            <Text
+              pl={sbomParts?.length > 0 ? 0 : 8}
+              fontWeight='bold'
+              fontSize='lg'
+            >
               {total}
             </Text>
           </Flex>
@@ -103,7 +111,7 @@ const ComponentPart = () => {
               <Box key={index} bg={color} width={percent(count || 0)} />
             ))}
           </Flex>
-          <VStack align='start' spacing={2} hidden={sbomParts?.length === 0}>
+          <VStack align='start' spacing={3} hidden={sbomParts?.length === 0}>
             {list?.map(({ group, color, count }, index) => (
               <HStack key={index} w='full' justify='space-between'>
                 <HStack>

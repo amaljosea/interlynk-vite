@@ -25,6 +25,14 @@ const GetPartPolicies = gql`
   query GetSbomParts($projectId: Uuid!, $sbomId: Uuid!) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       projectVersion
+      policyResultMetrics {
+        skippedCount
+        failedCount
+        errorCount
+        passedCount
+        informCount
+        warnCount
+      }
       sbomParts {
         id
         part {
@@ -77,7 +85,7 @@ const PolicyParts = () => {
     skip: !params.productid || !params.sbomid,
     variables: { projectId: params.productid, sbomId: params.sbomid }
   })
-  const { projectVersion, sbomParts } = data?.sbom || {}
+  const { projectVersion, policyResultMetrics, sbomParts } = data?.sbom || {}
   const { policyResults } = data || {}
 
   const filteredData = sbomParts?.map((item) => {
@@ -93,8 +101,9 @@ const PolicyParts = () => {
 
     return {
       id: item?.id,
+      total: total,
       projectGroup: item?.part?.project?.projectGroup?.name,
-      total: total
+      metrics: item?.part?.policyResultMetrics
     }
   })
 
@@ -102,15 +111,17 @@ const PolicyParts = () => {
     {
       color: COLORS[0],
       group: projectVersion,
-      count: policyResults?.totalCount || 0
+      count: policyResults?.totalCount || 0,
+      stats: policyResultMetrics
     }
   ]
 
-  filteredData?.forEach(({ total, projectGroup }, index) => {
+  filteredData?.forEach(({ total, projectGroup, metrics }, index) => {
     list.push({
+      count: total || 0,
       color: COLORS[index + 1],
       group: projectGroup,
-      count: total || 0
+      stats: metrics
     })
   })
 
@@ -129,14 +140,24 @@ const PolicyParts = () => {
     <Card maxH={'200px'}>
       <CardBody>
         <Stack w={'100%'}>
-          <Flex justify='space-between' align='center'>
+          <Flex
+            gap={2}
+            flexDir={sbomParts?.length > 0 ? 'row' : 'column'}
+            justify='space-between'
+          >
             <HStack spacing='3'>
               <Icon as={MdPolicy} color='gray.500' boxSize={5} />
               <Text fontWeight='bold'>Policies</Text>
             </HStack>
-            <Text fontWeight='bold' fontSize='lg'>
-              {total}
-            </Text>
+            {sbomParts?.length > 0 ? (
+              <Text fontWeight='bold' fontSize='lg'>
+                {total}
+              </Text>
+            ) : (
+              <Box pl={8}>
+                <PolicyTypes policy={policyResultMetrics} />
+              </Box>
+            )}
           </Flex>
           <Flex
             hidden={sbomParts?.length === 0}
@@ -151,13 +172,13 @@ const PolicyParts = () => {
             ))}
           </Flex>
           <VStack align='start' spacing={2} hidden={sbomParts?.length === 0}>
-            {list?.map(({ color, group, count }, index) => (
+            {list?.map(({ color, group, stats }, index) => (
               <HStack key={index} w='full' justify='space-between'>
                 <HStack>
                   <Circle size='2' bg={color} />
                   <Text fontSize='sm'>{group}</Text>
                 </HStack>
-                <Text fontSize='sm'>{count || 0}</Text>
+                <PolicyTypes policy={stats} />
               </HStack>
             ))}
           </VStack>

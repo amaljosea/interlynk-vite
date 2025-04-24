@@ -135,16 +135,16 @@ const ProductDetailsSbomNew = () => {
         alignItems={'flex-start'}
         templateColumns='repeat(12, 1fr)'
       >
-        <GridItem colSpan={3}>
+        <GridItem colSpan={4}>
           <ComponentParts />
         </GridItem>
-        <GridItem colSpan={3}>
+        <GridItem hidden colSpan={3}>
           <LicenseParts />
         </GridItem>
-        <GridItem colSpan={3}>
+        <GridItem colSpan={4}>
           <VulnParts />
         </GridItem>
-        <GridItem colSpan={3}>
+        <GridItem colSpan={4}>
           <PolicyParts />
         </GridItem>
       </SimpleGrid>

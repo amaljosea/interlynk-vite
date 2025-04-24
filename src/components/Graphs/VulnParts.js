@@ -25,6 +25,9 @@ const GetPartVulns = gql`
   query GetSbomParts($projectId: Uuid!, $sbomId: Uuid!) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       projectVersion
+      stats {
+        vulnStats
+      }
       vulns(sbomId: $sbomId) {
         totalCount
       }
@@ -77,17 +80,23 @@ const VulnParts = () => {
     skip: !params.productid || !params.sbomid,
     variables: { projectId: params.productid, sbomId: params.sbomid }
   })
-  const { projectVersion, vulns, sbomParts } = data?.sbom || {}
+  const { stats, projectVersion, vulns, sbomParts } = data?.sbom || {}
 
   const list = [
-    { color: COLORS[0], group: projectVersion, count: vulns?.totalCount || 0 }
+    {
+      color: COLORS[0],
+      group: projectVersion,
+      count: vulns?.totalCount || 0,
+      stats: stats?.vulnStats
+    }
   ]
   sbomParts?.length > 0 &&
     sbomParts?.map(({ part }, index) => {
       list.push({
         color: COLORS[index + 1],
         group: part?.project?.projectGroup?.name,
-        count: part?.vulns?.totalCount || 0
+        count: part?.vulns?.totalCount || 0,
+        stats: part?.stats?.vulnStats
       })
     })
   const total = list.reduce((acc, { count }) => acc + count, 0)
@@ -105,14 +114,24 @@ const VulnParts = () => {
     <Card maxH={'200px'}>
       <CardBody>
         <Stack w={'100%'}>
-          <Flex justify='space-between' align='center'>
+          <Flex
+            gap={2}
+            flexDir={sbomParts?.length > 0 ? 'row' : 'column'}
+            justify='space-between'
+          >
             <HStack spacing='3'>
               <Icon as={FaBug} color='gray.500' boxSize={5} />
               <Text fontWeight='bold'>Vulnerabilities</Text>
             </HStack>
-            <Text fontWeight='bold' fontSize='lg'>
-              {total}
-            </Text>
+            {sbomParts?.length > 0 ? (
+              <Text fontWeight='bold' fontSize='lg'>
+                {total}
+              </Text>
+            ) : (
+              <Box pl={8}>
+                <VulnTypes vuln={stats?.vulnStats} />
+              </Box>
+            )}
           </Flex>
           <Flex
             hidden={sbomParts?.length === 0}
@@ -127,13 +146,13 @@ const VulnParts = () => {
             ))}
           </Flex>
           <VStack align='start' spacing={2} hidden={sbomParts?.length === 0}>
-            {list?.map(({ color, group, count }, index) => (
+            {list?.map(({ color, group, stats }, index) => (
               <HStack key={index} w='full' justify='space-between'>
                 <HStack>
                   <Circle size='2' bg={color} />
                   <Text fontSize='sm'>{group}</Text>
                 </HStack>
-                <Text fontSize='sm'>{count || 0}</Text>
+                <VulnTypes vuln={stats} />
               </HStack>
             ))}
           </VStack>
