@@ -30,8 +30,7 @@ import ProductLifestages from './components/ProductLifestages'
 import VersionLifestages from './components/VersionLifestage'
 
 function ProductGroup() {
-  const { updateCards, selectedProducts, setSelectedProducts } =
-    useGlobalState()
+  const { updateCards, selectedProducts } = useGlobalState()
   const { isFreeTier } = useGlobalQueryContext()
 
   const [productCards, setProductCards] = useState([
@@ -81,7 +80,6 @@ function ProductGroup() {
 
   const handleDeleteCard = (key) => {
     const filteredItems = selectedProducts?.filter((item) => item !== key)
-    setSelectedProducts(filteredItems)
     updateCards(filteredItems, 'products')
   }
 

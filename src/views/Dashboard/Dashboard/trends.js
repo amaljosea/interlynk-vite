@@ -29,7 +29,7 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 function VulnerabilityTrendsGroup() {
-  const { updateCards, selectedTrends, setSelectedTrends } = useGlobalState()
+  const { updateCards, selectedTrends } = useGlobalState()
   const { isFreeTier } = useGlobalQueryContext()
 
   const [trendCards, setTrendCards] = useState([
@@ -104,7 +104,6 @@ function VulnerabilityTrendsGroup() {
 
   const handleDeleteCard = (key) => {
     const filteredItems = selectedTrends?.filter((item) => item !== key)
-    setSelectedTrends(filteredItems)
     updateCards(filteredItems, 'trends')
   }
 

@@ -28,8 +28,7 @@ import ActivitiesOverview from './components/ActivitiesOverview'
 import ProductsOverview from './components/ProductsOverview'
 
 function Activities() {
-  const { updateCards, selectedActivities, setSelectedActivities } =
-    useGlobalState()
+  const { updateCards, selectedActivities } = useGlobalState()
 
   const [activityCards, setActivityCards] = useState([
     {
@@ -74,7 +73,6 @@ function Activities() {
 
   const handleDeleteCard = (key) => {
     const filteredItems = selectedActivities?.filter((item) => item !== key)
-    setSelectedActivities(filteredItems)
     updateCards(filteredItems, 'activities')
   }
 
