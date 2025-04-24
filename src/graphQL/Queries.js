@@ -5435,10 +5435,13 @@ export const getKevVulnsByStatus = gql`
     }
   }
 `
-
+  
 // GET ALL POLICIES RULES
 export const getAllPolicies = gql`
   query GetAllPolicies {
+    total: policies {
+      totalCount
+    }
     informPolicies: policies(resultType: ["inform"]) {
       totalCount
     }
