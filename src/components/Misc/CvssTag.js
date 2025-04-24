@@ -8,13 +8,13 @@ const CvssTag = ({ value }) => {
     lynkOrangeColor,
     lynkYellowColor,
     lynkGreenColor,
-    secondaryTextInverse
+    primaryTextColor
   } = useThemeColor([
     'lynkRedColor',
     'lynkOrangeColor',
     'lynkYellowColor',
     'lynkGreenColor',
-    'secondaryTextInverse'
+    'primaryTextColor'
   ])
 
   const cvssColor = (value) => {
@@ -30,7 +30,7 @@ const CvssTag = ({ value }) => {
   }
 
   return (
-    <Text fontSize={14} color={value ? cvssColor(value) : secondaryTextInverse}>
+    <Text fontSize={14} color={value ? cvssColor(value) : primaryTextColor}>
       {value || 'N/A'}
     </Text>
   )
