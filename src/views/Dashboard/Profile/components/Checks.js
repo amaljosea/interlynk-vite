@@ -15,6 +15,7 @@ import {
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
+import LynkTable from 'components/LynkTable'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -25,7 +26,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { orgRuleUpdate } from 'graphQL/Mutation'
 import { GetOrgRules } from 'graphQL/Queries'
-import LynkTable from 'components/LynkTable'
 
 const Checks = () => {
   const showToast = useCustomToast()
@@ -124,13 +124,10 @@ const Checks = () => {
               as={Button}
               size='sm'
               bg={sevColor(severity.toLowerCase()).bg}
-              textColor={sevColor(severity.toLowerCase()).text}
+              textColor={'white'}
               borderRadius='6px'
               border='none'
               fontWeight='normal'
-              padding='0'
-              paddingLeft='4px'
-              paddingRight='8px'
               isDisabled={!canEdit}
               rightIcon={<ChevronDownIcon boxSize={5} />}
               _hover={{ bg: sevColor(severity.toLowerCase()).bg }}
