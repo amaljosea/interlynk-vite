@@ -2160,8 +2160,16 @@ export const DispositionByParentUpdate = gql`
 export const ComponentVulnVexImport = gql`
   mutation ComponentVulnVexImport(
     $vulnsToImport: [ComponentVulnImportInput!]!
+    $toSbomId: ID!
+    $fromSbomId: ID!
   ) {
-    componentVulnVexImport(input: { vulnsToImport: $vulnsToImport }) {
+    componentVulnVexImport(
+      input: {
+        vulnsToImport: $vulnsToImport
+        toSbomId: $toSbomId
+        fromSbomId: $fromSbomId
+      }
+    ) {
       errors
       componentVulns {
         id

@@ -11,10 +11,11 @@ import {
 import { Fragment, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { truncatedValue } from 'utils'
+import { detectOS } from 'utils'
 import { allDefaultActions, settingActions } from 'variables/general'
 
 import { SearchIcon } from '@chakra-ui/icons'
-import { useColorMode } from '@chakra-ui/react'
+import { Kbd, useColorMode } from '@chakra-ui/react'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -367,6 +368,8 @@ const Kbar = () => {
     )
   }
 
+  const os = detectOS()
+
   return (
     <KBarPortal>
       <KBarPositioner className='kbar_positioner'>
@@ -379,6 +382,8 @@ const Kbar = () => {
             <SearchIcon color={sameSecondaryText} />
             {/* search input */}
             <KBarSearch className='kbar_search' />
+            <Kbd>{os?.startsWith('Windows') ? 'Ctrl' : 'Cmd'}</Kbd> +
+            <Kbd> K</Kbd>
           </div>
           <div className='kbar_result_container'>
             {/* search results */}

@@ -16,6 +16,7 @@ import Organizations from 'components/Organizations'
 import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaDesktop, FaMoon, FaSun } from 'react-icons/fa6'
 
@@ -31,6 +32,7 @@ export default function AdminNavbarLinks(props) {
   const [currentMode, setCurrentMode] = useState(colorMode || 'system')
 
   const signedUrlParams = getSignedUrlParams()
+  const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
 
   const [loading, setLoading] = useState(false)
 
@@ -91,13 +93,13 @@ export default function AdminNavbarLinks(props) {
 
       {/* THEME */}
       <Menu>
-        <MenuButton size={'sm'} as={Button}>
+        <MenuButton size={'sm'} as={Button} variant={'ghost'} mr={2}>
           {currentMode === 'light' ? (
-            <FaSun />
+            <FaSun color={secondaryTextColor} size={16} />
           ) : currentMode === 'dark' ? (
-            <FaMoon />
+            <FaMoon color={secondaryTextColor} size={16} />
           ) : (
-            <FaDesktop />
+            <FaDesktop color={secondaryTextColor} size={16} />
           )}
         </MenuButton>
         <MenuList fontSize='sm'>

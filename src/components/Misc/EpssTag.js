@@ -14,7 +14,7 @@ const EpssTag = ({ value }) => {
   if (value?.length > 0) {
     return (
       <Flex gap={1} flexWrap={'wrap'} alignItems={'center'}>
-        <Text color={primaryTextColor}>
+        <Text fontSize={14} color={primaryTextColor}>
           {`${(value[0] * 100).toFixed(2)} %`}
         </Text>
         {value?.length > 1 ? (
@@ -38,7 +38,11 @@ const EpssTag = ({ value }) => {
     )
   }
 
-  return <Text color={primaryTextColor}>N/A</Text>
+  return (
+    <Text fontSize={14} color={primaryTextColor}>
+      N/A
+    </Text>
+  )
 }
 
 export default EpssTag

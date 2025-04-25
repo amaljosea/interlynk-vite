@@ -193,8 +193,9 @@ export const exportExcel = async (
       (vulnerability?.vuln?.vulnInfo?.epssPercentile * 100).toFixed() + '%' ||
       'NA',
     'EPSS Probability':
-      (vulnerability?.vuln?.vulnInfo?.epssScores[0] * 100).toFixed(3) + '%' ||
-      'NA',
+      vulnerability?.vuln?.vulnInfo?.epssScores?.[0] != null
+        ? (vulnerability.vuln.vulnInfo.epssScores[0] * 100).toFixed(3) + '%'
+        : 'NA',
     'Known Exploitable Vulnerability':
       vulnerability?.vuln?.vulnInfo?.kev === true ? 'Yes' : 'No' || 'NA',
     Status: vulnerability?.vexStatus?.name || 'Unspecified',

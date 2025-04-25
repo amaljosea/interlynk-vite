@@ -5,6 +5,7 @@ import { capitalizeFirstLetter, getFullDate } from 'utils'
 import { parseLicenseString } from 'utils'
 import { calculateExpiryDate } from 'utils'
 import { formatDate } from 'utils'
+import { getFullDateTime } from 'utils'
 
 import { Stack, Text } from '@chakra-ui/react'
 
@@ -1222,7 +1223,8 @@ export const exportCsvTableConfig = {
         Version: row?.component?.sbom?.projectVersion || '',
         'Component Name': row?.component?.name || '',
         'Component Version': row?.component?.version || '',
-        Environment: row?.component?.sbom?.project?.name || '',
+        Environment:
+          capitalizeFirstLetter(row?.component?.sbom?.project?.name) || '',
         Status: row?.vexStatus?.name || 'Unspecified'
       }))
   },
@@ -1332,15 +1334,15 @@ export const exportCsvTableConfig = {
         Part: row?.isPart
           ? row?.component?.sbom?.project?.projectGroup?.name || ''
           : 'N/A',
-        Severity: row?.vuln?.sev || '',
-        Source: row?.vuln?.source || '',
+        Severity: capitalizeFirstLetter(row?.vuln?.sev) || '',
+        Source: row?.vuln?.source.toUpperCase() || '',
         CVSS: row?.vuln?.cvssScore || '',
         EPSS:
           row?.vuln?.vulnInfo?.epssScores?.length > 0
             ? `${(row?.vuln?.vulnInfo?.epssScores[0] * 100).toFixed(3)} %`
             : '-',
         Status: row?.vexStatus?.name || 'Unspecified',
-        Updated: row?.vuln?.updatedAt || '',
+        Updated: `"${getFullDateTime(row?.vuln?.publishedAt)}"` || '',
         Description: row?.vuln?.desc || '',
         Published: `"${getFullDate(row?.vuln?.publishedAt)}"` || '',
         'Last Modified': `"${getFullDate(row?.vuln?.lastModifiedAt)}"` || '',
@@ -1427,13 +1429,13 @@ export const exportCsvTableConfig = {
           : 'No Statuses Available'
         return {
           ID: row?.vulnId,
-          Severity: row?.sev,
-          Source: row?.source,
+          Severity: capitalizeFirstLetter(row?.sev),
+          Source: row?.source.toUpperCase(),
           CVSS: row?.cvssScore,
           EPSS:
             row?.vulnInfo?.epssScores?.length > 0
               ? `${(row?.vulnInfo?.epssScores[0] * 100).toFixed(3)} %`
-              : '-',
+              : 'N/A',
           Statuses: formattedStatuses,
           Published: `"${getFullDate(row?.publishedAt)}"`,
           Modified: `"${getFullDate(row?.lastModifiedAt)}"`

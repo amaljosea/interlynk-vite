@@ -5,7 +5,6 @@ import SubHeader from 'views/Dashboard/Vulnerabilities/components/SubHeader'
 
 import { Badge, Flex, Stack, Text } from '@chakra-ui/react'
 import { IconButton, Tooltip, useDisclosure } from '@chakra-ui/react'
-import { Tag, TagLabel } from '@chakra-ui/react'
 
 import VulnProductsDrawer from 'components/Drawer/VulnProductsDrawer'
 import ExternalNavIcon from 'components/Icons/ExternalNavIcon'
@@ -20,11 +19,11 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaEye } from 'react-icons/fa6'
+import { LuCircleDot, LuDatabaseZap, LuSparkle } from 'react-icons/lu'
 
 import Pagination from '../Pagination'
 
 const GlobalVulnTable = (props) => {
-
   const { vulns, reset, filters, loading, paginationProps } = props
   const { isOpen, onClose, onOpen } = useDisclosure()
 
@@ -34,9 +33,18 @@ const GlobalVulnTable = (props) => {
   const { generateProductVulnerabilityDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
 
-  const { primaryTextColor, primaryBlueText } = useThemeColor([
+  const {
+    primaryTextColor,
+    primaryBlueText,
+    primaryErrorColor,
+    primarySuccessColor,
+    secondaryTextColor
+  } = useThemeColor([
     'primaryTextColor',
-    'primaryBlueText'
+    'primaryBlueText',
+    'primaryErrorColor',
+    'primarySuccessColor',
+    'secondaryTextColor'
   ])
 
   const params = useParams()
@@ -44,20 +52,29 @@ const GlobalVulnTable = (props) => {
 
   const [activeRow, setActiveRow] = useState({})
 
+  const sourceIcon = {
+    osv: <LuCircleDot color={primaryErrorColor} />,
+    nvd: <LuDatabaseZap color={primaryBlueText} />,
+    custom: <LuSparkle color={primarySuccessColor} />
+  }
+
   // COLUMNS
   const columns = [
     // CVE ID
     {
-      id: 'VULNS_VULN_ID',
+      id: 'VULNS_LAST_MODIFIED_AT',
       name: 'ID',
       wrap: true,
       selector: (row) => {
-        const { vulnId, id, vulnInfo, source } = row
+        const { vulnId, id, vulnInfo, source, lastModifiedAt } = row
+        const modified = lastModifiedAt ? timeSince(lastModifiedAt) : ''
         return (
-          <Stack spacing={1} my={2}>
-            <Flex direction='row' alignItems={'flex-start'} gap={2} my={3}>
-              <ExternalNavIcon href={linkURl(source, vulnId)} />
-              <Stack>
+          <Flex direction='row' alignItems={'center'} gap={2} my={3}>
+            <Tooltip placement='top' label={source} textTransform={'uppercase'}>
+              <IconButton isRound={true} icon={sourceIcon[source]} />
+            </Tooltip>
+            <Stack direction={'column'} spacing={1.5}>
+              <Flex gap={2} alignItems={'center'} flexWrap={'wrap'}>
                 <Link
                   to={
                     params?.productgroupid
@@ -74,22 +91,38 @@ const GlobalVulnTable = (props) => {
                     {vulnId || ''}
                   </Text>
                 </Link>
+                <ExternalNavIcon href={linkURl(source, vulnId)} />
+              </Flex>
+              <Flex gap={2} alignItems={'center'} flexWrap={'wrap'}>
                 {vulnInfo?.kev === true && (
                   <Badge
-                    width={'fit-content'}
-                    variant='subtle'
                     colorScheme='red'
+                    w={'fit-content'}
+                    fontWeight={'normal'}
                   >
                     KEV
                   </Badge>
                 )}
-              </Stack>
-            </Flex>
-          </Stack>
+                <Text hidden={!vulnInfo?.kev} color={secondaryTextColor}>
+                  •
+                </Text>
+                <Tooltip label={modified ? getFullDate(lastModifiedAt) : 'N/A'}>
+                  <Text color={secondaryTextColor} textAlign={'right'}>
+                    {modified || 'N/A'}
+                  </Text>
+                </Tooltip>
+              </Flex>
+            </Stack>
+          </Flex>
         )
       },
-      width: '12%',
-      sortable: true
+      width: '22%',
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a?.lastModifiedAt)
+        const dateB = new Date(b?.lastModifiedAt)
+        return dateA - dateB // Sort in descending order
+      }
     },
     // SEVERITY
     {
@@ -98,53 +131,6 @@ const GlobalVulnTable = (props) => {
       selector: (row) => <SeverityTag value={row?.sev} />,
       sortable: true,
       width: '10%',
-      wrap: true
-    },
-    // SOURCE
-    {
-      id: 'VULNS_SOURCE',
-      name: 'SOURCE',
-      selector: (row) => {
-        const { source } = row
-        return (
-          <Tag
-            size='sm'
-            key='md'
-            variant='solid'
-            colorScheme={source === 'osv' ? 'red' : 'blue'}
-            textTransform={'uppercase'}
-            width={'100%'}
-            alignItems={'center'}
-            justifyContent={'center'}
-          >
-            <TagLabel>{source}</TagLabel>
-          </Tag>
-        )
-      },
-      width: '9%',
-      wrap: true,
-      sortable: true
-    },
-    // CVSS
-    {
-      id: 'VULNS_CVSS_SCORE',
-      name: 'CVSS',
-      selector: (row) => <CvssTag value={row?.cvssScore} />,
-      width: '7%',
-      wrap: true,
-      sortable: true
-    },
-    // EPSS
-    {
-      id: 'VULN_INFOS_EPSS_SCORES',
-      name: 'EPSS',
-      selector: (row) => {
-        const { vulnInfo } = row
-        const { epssScores } = vulnInfo || ''
-        return <EpssTag value={epssScores} />
-      },
-      sortable: true,
-      width: '12%',
       wrap: true
     },
     // STATUSES
@@ -176,6 +162,31 @@ const GlobalVulnTable = (props) => {
       width: '22%',
       wrap: true
     },
+    // CVSS
+    {
+      id: 'VULNS_CVSS_SCORE',
+      name: 'CVSS',
+      selector: (row) => <CvssTag value={row?.cvssScore} />,
+      width: '7%',
+      wrap: true,
+      sortable: true,
+      right: 'true'
+    },
+    // EPSS
+    {
+      id: 'VULN_INFOS_EPSS_SCORES',
+      name: 'EPSS',
+      selector: (row) => {
+        const { vulnInfo } = row
+        const { epssScore, epssScores } = vulnInfo || ''
+        if (epssScore === 0) return <Text color={primaryTextColor}>0 %</Text>
+        return <EpssTag value={epssScores} />
+      },
+      sortable: true,
+      width: '12%',
+      right: 'true',
+      wrap: true
+    },
     // PUBLISHED AT
     {
       id: 'VULNS_PUBLISHED_AT',
@@ -200,34 +211,6 @@ const GlobalVulnTable = (props) => {
         const dateB = new Date(b?.publishedAt)
         return dateA - dateB // Sort in descending order
       },
-      wrap: true,
-      right: 'true'
-    },
-    // MODIFIED AT
-    {
-      id: 'VULNS_LAST_MODIFIED_AT',
-      name: 'MODIFIED',
-      selector: (row) => {
-        const { lastModifiedAt } = row
-        const modified = lastModifiedAt ? timeSince(lastModifiedAt) : ''
-        return (
-          <Tooltip
-            label={modified ? getFullDate(lastModifiedAt) : 'N/A'}
-            placement={'top'}
-          >
-            <Text color={primaryTextColor} textAlign={'right'}>
-              {modified || 'N/A'}
-            </Text>
-          </Tooltip>
-        )
-      },
-      sortable: true,
-      sortFunction: (a, b) => {
-        const dateA = new Date(a?.lastModifiedAt)
-        const dateB = new Date(b?.lastModifiedAt)
-        return dateA - dateB // Sort in descending order
-      },
-      width: '9%',
       wrap: true,
       right: 'true'
     },
