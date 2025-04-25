@@ -1,7 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import { useQuery } from '@apollo/client'
 
-
 import LynkPieChart from 'components/Charts/LynkPieChart'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -36,8 +35,9 @@ const PolicyGraphs = () => {
   return (
     <LynkPieChart
       loading={loading}
-      title='Policy Results'
       data={policyResults}
+      title='Policy Results'
+      total={data?.total?.totalCount}
     />
   )
 }
