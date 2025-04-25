@@ -6,7 +6,6 @@ import { GetIcon } from 'utils/styleUtils'
 
 import { ViewIcon } from '@chakra-ui/icons'
 import {
-  Badge,
   Box,
   Button,
   Divider,
@@ -30,8 +29,16 @@ import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
-import { FaEllipsisV, FaGlobe, FaLightbulb, FaSitemap } from 'react-icons/fa'
-import { FaHouseUser, FaListCheck } from 'react-icons/fa6'
+import {
+  FaBuilding,
+  FaEllipsisV,
+  FaGlobe,
+  FaLightbulb,
+  FaSitemap
+} from 'react-icons/fa'
+import { FaHouseUser, FaListCheck, FaStar, FaTextSlash } from 'react-icons/fa6'
+import { LuBug } from 'react-icons/lu'
+import { MdOutlineHourglassBottom } from 'react-icons/md'
 
 const StatusIcon = ({ icon, label, color, onClick }) => {
   return (
@@ -128,102 +135,64 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
                     {truncatedValue(name, 30)}
                   </Text>
                 </Tooltip>
-                <Flex gap={2} alignItems={'center'} flexWrap={'wrap'}>
-                  {primary && (
-                    <Badge
-                      colorScheme='green'
-                      w={'fit-content'}
-                      fontWeight={'normal'}
-                      onClick={() => action(editComponent, row)}
-                    >
-                      PRIMARY
-                    </Badge>
-                  )}
-                  <Text hidden={!primary} color={secondaryTextColor}>
-                    •
-                  </Text>
-                  {internal && (
-                    <Badge
-                      colorScheme='blue'
-                      w={'fit-content'}
-                      fontWeight={'normal'}
-                      onClick={() => action(editComponent, row)}
-                    >
-                      INTERNAL
-                    </Badge>
-                  )}
-                  <Text hidden={!internal} color={secondaryTextColor}>
-                    •
-                  </Text>
-                  {isOutdated && (
-                    <Badge
-                      colorScheme='yellow'
-                      w={'fit-content'}
-                      fontWeight={'normal'}
-                      onClick={() => action(viewInsights, row)}
-                    >
-                      OUTDATED
-                    </Badge>
-                  )}
-                  <Text hidden={!isOutdated} color={secondaryTextColor}>
-                    •
-                  </Text>
-                  {isVulnerable && !isAllVulnsNotAffected && (
-                    <Badge
-                      colorScheme='red'
-                      w={'fit-content'}
-                      fontWeight={'normal'}
-                      onClick={() => action(viewCompVulnerabilities, row)}
-                    >
-                      VULNERABLE
-                    </Badge>
-                  )}
-                  <Text hidden={!isVulnerable} color={secondaryTextColor}>
-                    •
-                  </Text>
-                  {packageVersion?.isDeprecated === true && (
-                    <Badge
-                      colorScheme='orange'
-                      w={'fit-content'}
-                      fontWeight={'normal'}
-                      onClick={() => action(viewInsights, row)}
-                    >
-                      DEPRECATED
-                    </Badge>
-                  )}
+                {bomId && isPart && (
                   <Text
-                    hidden={!packageVersion?.isDeprecated}
-                    color={secondaryTextColor}
+                    fontSize={12}
+                    w='fit-content'
+                    fontWeight={'medium'}
+                    color={primaryTextColor}
                   >
-                    •
+                    {projectGroup?.name}{' '}
+                    {projectVersion ? `: ${projectVersion}` : ''}
                   </Text>
-                  {isPart && (
-                    <Tooltip
-                      label={`${projectGroup?.name} : ${projectVersion || 'N/A'}`}
-                    >
-                      <Badge
-                        colorScheme='blue'
-                        w={'fit-content'}
-                        fontWeight={'normal'}
-                      >
-                        PART
-                      </Badge>
-                    </Tooltip>
+                )}
+                <Flex gap={1} flexWrap={'wrap'} alignItems={'center'}>
+                  {isVulnerable && !isAllVulnsNotAffected && (
+                    <StatusIcon
+                      color='red'
+                      label={'Vulnerable'}
+                      icon={<LuBug size={14} />}
+                      onClick={() => action(viewCompVulnerabilities, row)}
+                    />
                   )}
-                  <Text hidden={!isPart} color={secondaryTextColor}>
-                    •
-                  </Text>
-                  <Tooltip label={getFullDate(row?.updatedAt)}>
-                    <Text color={secondaryTextColor}>
-                      {timeSince(row?.updatedAt)}
-                    </Text>
-                  </Tooltip>
+                  {packageVersion?.isDeprecated === true && (
+                    <StatusIcon
+                      color='orange'
+                      label={'Deprecated'}
+                      icon={<FaTextSlash size={14} />}
+                      onClick={() => action(viewInsights, row)}
+                    />
+                  )}
+                  {isOutdated && (
+                    <StatusIcon
+                      color='yellow'
+                      label={'Outdated'}
+                      onClick={() => action(viewInsights, row)}
+                      icon={<MdOutlineHourglassBottom size={14} />}
+                    />
+                  )}
+                  {primary && (
+                    <StatusIcon
+                      color='green'
+                      label={'Primary'}
+                      onClick={() => action(editComponent, row)}
+                      icon={<FaStar size={14} />}
+                    />
+                  )}
+                  {internal && (
+                    <StatusIcon
+                      color='blue'
+                      label={'Internal'}
+                      onClick={() => action(editComponent, row)}
+                      icon={<FaBuilding size={14} />}
+                    />
+                  )}
                 </Flex>
               </Flex>
             </Flex>
           )
         },
-        width: '30%',
+        width: isCustomerView ? '30%' : '25%',
         wrap: true,
         sortable: true
       },
@@ -232,14 +201,12 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
         id: 'COMPONENTS_VERSION',
         name: 'VERSION',
         selector: (row) => (
-          <Tooltip label={row?.version || 'N/A'}>
-            <Text my={4} color={primaryTextColor}>
-              {row?.version ? truncatedValue(row?.version, 20) : 'N/A'}
-            </Text>
-          </Tooltip>
+          <Text my={4} color={primaryTextColor}>
+            {row?.version}
+          </Text>
         ),
         wrap: true,
-        width: '14%',
+        width: isCustomerView ? '12%' : '10%',
         sortable: true
       },
       // COMPONENT HEALTH
@@ -314,7 +281,12 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
                 <Stack direction={'row'} spacing={2}>
                   {licenses.length > 0 && (
                     <Tooltip label={licenses[0]} placement={'top'}>
-                      <Tag size={'md'} variant='subtle' colorScheme='green'>
+                      <Tag
+                        width={'150px'}
+                        size={'md'}
+                        variant='subtle'
+                        colorScheme='green'
+                      >
                         <TagLabel mx={'auto'}>{licenses[0]}</TagLabel>
                       </Tag>
                     </Tooltip>
@@ -326,7 +298,12 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
                         .replace(/"/g, '')}
                       placement={'top'}
                     >
-                      <Tag size={'md'} variant='subtle' colorScheme='green'>
+                      <Tag
+                        width={'150px'}
+                        size={'md'}
+                        variant='subtle'
+                        colorScheme='green'
+                      >
                         <TagLabel
                           mx={'auto'}
                         >{`+${totalSpdx.length}`}</TagLabel>
@@ -338,7 +315,12 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
               {/* EXPRESSION */}
               {licensesExp && licensesExp !== '' && (
                 <Tooltip label={licensesExp} placement={'top'}>
-                  <Tag size={'md'} variant='subtle' colorScheme='green'>
+                  <Tag
+                    width={'150px'}
+                    size={'md'}
+                    variant='subtle'
+                    colorScheme='green'
+                  >
                     <TagLabel mx={'auto'}>
                       {parseLicenseString(licensesExp)}
                     </TagLabel>
@@ -350,7 +332,12 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
                 <Stack direction={'row'} spacing={2}>
                   {licensesCustom.length > 0 && (
                     <Tooltip label={licensesCustom[0]} placement={'top'}>
-                      <Tag size={'md'} variant='subtle' colorScheme='green'>
+                      <Tag
+                        width={'150px'}
+                        size={'md'}
+                        variant='subtle'
+                        colorScheme='green'
+                      >
                         <TagLabel mx={'auto'}>{licensesCustom[0]}</TagLabel>
                       </Tag>
                     </Tooltip>
@@ -362,7 +349,12 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
                         .replace(/"/g, '')}
                       placement={'top'}
                     >
-                      <Tag size={'md'} variant='subtle' colorScheme='green'>
+                      <Tag
+                        width={'150px'}
+                        size={'md'}
+                        variant='subtle'
+                        colorScheme='green'
+                      >
                         <TagLabel
                           mx={'auto'}
                         >{`+${totalCustom.length}`}</TagLabel>
@@ -394,8 +386,7 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
           return dateA - dateB // Sort in descending order
         },
         width: '12%',
-        wrap: true,
-        omit: true
+        wrap: true
       },
       // ACTION
       {
