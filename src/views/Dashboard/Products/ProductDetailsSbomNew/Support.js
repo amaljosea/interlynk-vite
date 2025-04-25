@@ -16,7 +16,6 @@ import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
 
 import { ProjectSettingUpdate, ReRunSbomSupportLevel } from 'graphQL/Mutation'
-import 'graphQL/Mutation'
 import { GetCompSupportData } from 'graphQL/Queries'
 
 import CompSupport from '../components/CompSupport'
