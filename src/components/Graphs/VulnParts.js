@@ -1,6 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import { gql, useQuery } from '@apollo/client'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
+import { getSignedUrlParams } from 'utils'
 import { COLORS } from 'utils/styleUtils'
 
 import {
@@ -18,6 +19,9 @@ import {
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import VulnBadge from 'components/Misc/VulnBadge'
+
+import { useGlobalState } from 'hooks/useGlobalState'
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { FaBug } from 'react-icons/fa6'
 
@@ -51,22 +55,67 @@ const GetPartVulns = gql`
   }
 `
 
-const VulnTypes = ({ vuln }) => {
+const VulnTypes = ({ parts, vuln }) => {
+  const navigate = useNavigate()
+  const { dispatch } = useGlobalState()
+  const signedUrlParams = getSignedUrlParams()
+  const { generateProductVersionDetailPageUrlFromCurrentUrl } =
+    useProductUrlContext()
+
+  const { prodVulnDispatch } = dispatch
+
+  const setActiveTab = (value) => {
+    const link = generateProductVersionDetailPageUrlFromCurrentUrl({
+      paramsObj: {
+        tab: value
+      }
+    })
+    navigate(link)
+  }
+
+  const onFilterVuln = (value) => {
+    prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
+    prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
+    if (!signedUrlParams) {
+      setActiveTab('vulnerabilities')
+    }
+  }
+
   return (
     <Flex flexWrap={'wrap'} gap={1} scale={0.5}>
-      <VulnBadge color='red' label='Critical'>
+      <VulnBadge
+        color='red'
+        label='Critical'
+        onClick={() => (parts ? null : onFilterVuln(['critical']))}
+      >
         {vuln?.critical || 0}
       </VulnBadge>
-      <VulnBadge color='orange' label='High'>
+      <VulnBadge
+        color='orange'
+        label='High'
+        onClick={() => (parts ? null : onFilterVuln(['high']))}
+      >
         {vuln?.high || 0}
       </VulnBadge>
-      <VulnBadge color='yellow' label='Medium'>
+      <VulnBadge
+        color='yellow'
+        label='Medium'
+        onClick={() => (parts ? null : onFilterVuln(['medium']))}
+      >
         {vuln?.medium || 0}
       </VulnBadge>
-      <VulnBadge color='green' label='Low'>
+      <VulnBadge
+        color='green'
+        label='Low'
+        onClick={() => (parts ? null : onFilterVuln(['low']))}
+      >
         {vuln?.low || 0}
       </VulnBadge>
-      <VulnBadge color='gray' label='Unknown'>
+      <VulnBadge
+        color='gray'
+        label='Unknown'
+        onClick={() => (parts ? null : onFilterVuln(['unknown']))}
+      >
         {vuln?.unknown || 0}
       </VulnBadge>
     </Flex>
@@ -81,6 +130,7 @@ const VulnParts = () => {
     variables: { projectId: params.productid, sbomId: params.sbomid }
   })
   const { stats, projectVersion, vulns, sbomParts } = data?.sbom || {}
+  const partsExist = sbomParts?.length > 0
 
   const list = [
     {
@@ -111,7 +161,7 @@ const VulnParts = () => {
     )
 
   return (
-    <Card maxH={'200px'}>
+    <Card minH='auto' maxH='400px' overflowY='scroll'>
       <CardBody>
         <Stack w={'100%'}>
           <Flex
@@ -152,7 +202,7 @@ const VulnParts = () => {
                   <Circle size='2' bg={color} />
                   <Text fontSize='sm'>{group}</Text>
                 </HStack>
-                <VulnTypes vuln={stats} />
+                <VulnTypes parts={partsExist} vuln={stats} />
               </HStack>
             ))}
           </VStack>

@@ -97,6 +97,7 @@ const Parts = ({ data }) => {
 
   // SUB HEADER
   const subHeader = PartsSubHeader(
+    sbomParts,
     isArchived,
     CREATE.onOpen,
     signedUrlParams,

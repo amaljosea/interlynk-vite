@@ -5,8 +5,15 @@ import { Flex } from '@chakra-ui/react'
 import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 
-const PartsSubHeader = (isArchived, onOpen, signedUrlParams, updateSboms) => {
+const PartsSubHeader = (
+  sbomParts,
+  isArchived,
+  onOpen,
+  signedUrlParams,
+  updateSboms
+) => {
   const subHeader = useMemo(() => {
+    const disabled = !updateSboms || signedUrlParams || sbomParts?.length === 5
     return (
       <Flex
         sx={{ w: '100%', gap: 2, alignItems: 'center' }}
@@ -18,12 +25,12 @@ const PartsSubHeader = (isArchived, onOpen, signedUrlParams, updateSboms) => {
           onClick={onOpen}
           hidden={isArchived}
           aria-label='add_part'
-          isDisabled={!updateSboms || signedUrlParams}
+          isDisabled={disabled}
         />
         <RefreshBtn />
       </Flex>
     )
-  }, [isArchived, onOpen, signedUrlParams, updateSboms])
+  }, [isArchived, onOpen, sbomParts?.length, signedUrlParams, updateSboms])
 
   return subHeader
 }

@@ -137,7 +137,7 @@ const PolicyParts = () => {
     )
 
   return (
-    <Card maxH={'200px'}>
+    <Card minH='auto' maxH='400px' overflowY='scroll'>
       <CardBody>
         <Stack w={'100%'}>
           <Flex
