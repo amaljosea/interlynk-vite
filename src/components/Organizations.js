@@ -18,6 +18,7 @@ import {
 import { Button, SkeletonText, Text, useDisclosure } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { SwitchOrganization } from 'graphQL/Mutation'
 import { AllOrganizations, MyOrganizations } from 'graphQL/Queries'
@@ -33,6 +34,7 @@ const Organizations = () => {
 
   const [options, setOptions] = useState([])
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
 
   const [getAllOrg, { loading: allOrgLoading }] = useLazyQuery(AllOrganizations)
   const [getMyOrg, { loading: myOrgLoading }] = useLazyQuery(MyOrganizations)
@@ -100,7 +102,7 @@ const Organizations = () => {
           as={Button}
           fontSize='sm'
           onClick={handleFetch}
-          leftIcon={<FaBuilding />}
+          leftIcon={<FaBuilding color={secondaryTextColor} />}
           isLoading={!organization?.name}
           rightIcon={<ChevronDownIcon />}
           data-testid='org_menu'
