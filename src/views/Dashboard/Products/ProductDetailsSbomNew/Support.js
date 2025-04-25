@@ -1,4 +1,4 @@
-import { gql, useQuery } from '@apollo/client'
+import { gql, useMutation, useQuery } from '@apollo/client'
 import { useCallback, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getUndefinedIfEmptyOrAll } from 'utils'
@@ -6,15 +6,17 @@ import { getUndefinedIfEmptyOrAll } from 'utils'
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
 import LynkTable from 'components/LynkTable'
-import SupportAnalysis from 'components/Modal/SupportAnalysis'
 import SupportStatus from 'components/Modal/SupportStatus'
 import Pagination from 'components/Pagination'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
 
+import { ProjectSettingUpdate, ReRunSbomSupportLevel } from 'graphQL/Mutation'
+import 'graphQL/Mutation'
 import { GetCompSupportData } from 'graphQL/Queries'
 
 import CompSupport from '../components/CompSupport'
@@ -42,6 +44,8 @@ export const GetSupportSettings = gql`
 
 const Support = () => {
   const params = useParams()
+  const { showToast } = useCustomToast()
+
   const projectId = params.productid
   const sbomId = params.sbomid
   const activeTab = useQueryParam('tab')
@@ -62,21 +66,6 @@ const Support = () => {
 
   const UPDATE_STATUS = useDisclosure()
   const BULK_UPDATE = useDisclosure()
-  const ANALYSIS = useDisclosure()
-
-  const action = (type, data) => {
-    setActiveRow(data)
-    switch (type) {
-      case 'rerun_support_analysis':
-        return ANALYSIS.onOpen()
-      case 'view_support_modal':
-        return BULK_UPDATE.onOpen()
-      case 'view_support_drawer':
-        return UPDATE_STATUS.onOpen()
-      default:
-        return UPDATE_STATUS.onOpen()
-    }
-  }
 
   const isSortable = field !== '' && direction !== ''
 
@@ -102,14 +91,52 @@ const Support = () => {
     }
   )
 
+  const [reRunSupport] = useMutation(ReRunSbomSupportLevel)
+  const [updateSettings] = useMutation(ProjectSettingUpdate, {
+    onCompleted: () => reset()
+  })
+
   const { data: settings } = useQuery(GetSupportSettings, {
     variables: { id: params?.productid },
     skip: activeTab === 'support' ? false : true
   })
-  const { projectGroup, sboms, projectSetting } = settings?.project || {}
+  const { sboms, projectSetting } = settings?.project || {}
   const { enableSupportLevel } = projectSetting || {}
 
   const activeSbom = sboms?.find((sbom) => sbom?.id === sbomId)
+
+  const handleRescan = () => {
+    reRunSupport({ variables: { sbomId: activeSbom?.id } }).then((res) => {
+      const { errors } = res?.data?.componentSupportLevelRun || {}
+      if (!errors) {
+        showToast({
+          title: 'Successful!',
+          description:
+            'Supports will be available shortly. Please refresh to update the records',
+          status: 'success'
+        })
+      } else {
+        showToast({
+          description: res?.data?.componentSupportLevelRun?.errors[0],
+          status: 'error'
+        })
+      }
+    })
+  }
+
+  const updateSupportSetting = () => {
+    updateSettings({
+      variables: { id: projectSetting?.id, enableSupportLevel: true }
+    }).then((res) => res?.data && handleRescan())
+  }
+
+  const handleScan = () => {
+    if (enableSupportLevel) {
+      handleRescan()
+    } else {
+      updateSupportSetting()
+    }
+  }
 
   // CLEAR SERACH
   const handleClear = useCallback(async () => {
@@ -154,6 +181,20 @@ const Support = () => {
   }
 
   const handleChange = (state) => setSelectedItems(state?.selectedRows)
+
+  const action = (type, data) => {
+    setActiveRow(data)
+    switch (type) {
+      case 'rerun_support_analysis':
+        return handleScan()
+      case 'view_support_modal':
+        return BULK_UPDATE.onOpen()
+      case 'view_support_drawer':
+        return UPDATE_STATUS.onOpen()
+      default:
+        return UPDATE_STATUS.onOpen()
+    }
+  }
 
   // SUB HEADER
   const subHeader = SupportSubHeader({
@@ -211,21 +252,6 @@ const Support = () => {
           selectedItems={selectedItems}
           setToggleClear={setToggleClear}
           setSelectedItems={setSelectedItems}
-        />
-      )}
-
-      {/* SUPPORT ANALYSIS RUN WARNING */}
-      {ANALYSIS.isOpen && (
-        <SupportAnalysis
-          reset={reset}
-          isOpen={ANALYSIS.isOpen}
-          onClose={ANALYSIS.onClose}
-          enabled={enableSupportLevel}
-          data={{
-            id: projectSetting?.id,
-            group: projectGroup,
-            sbom: activeSbom
-          }}
         />
       )}
     </>

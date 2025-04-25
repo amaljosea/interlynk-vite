@@ -22,7 +22,8 @@ const SupportSubHeader = ({
   handleClear,
   onSearchInputChange,
   selectedItems,
-  supportData
+  supportData,
+  
 }) => {
   const { isCustomerView } = useRouteFlags()
 
