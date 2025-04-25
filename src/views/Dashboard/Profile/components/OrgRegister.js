@@ -141,8 +141,9 @@ const OrgRegister = ({ loading }) => {
               <FormLabel>Name</FormLabel>
               <Input
                 type='text'
-                fontSize={14}
                 value={name}
+                fontSize={14}
+                maxLength={'20'}
                 onChange={(e) => {
                   setName(e.target.value)
                   setError('')
