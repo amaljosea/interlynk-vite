@@ -21,7 +21,7 @@ const SupportExpanded = (props) => {
       endOfSupport: endDate
     } = manual || {}
 
-    const assessment = manual?.level ? 'Manual' : 'Automatic'
+    const assessment = manual?.user ? 'Manual' : 'Automatic'
     const supportLevel = manual?.level || automatic?.level
     const explanation = manual?.notes || automatic?.notes
     const endOfSupport = endDate ? getFullDate(endDate) : 'N/A'
