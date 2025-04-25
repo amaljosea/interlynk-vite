@@ -146,7 +146,7 @@ const PolicyParts = () => {
             justify='space-between'
           >
             <HStack spacing='3'>
-              <Icon as={MdPolicy} color='gray.500' boxSize={5} />
+              <Icon as={MdPolicy} color='gray.500' boxSize={6} />
               <Text fontWeight='bold'>Policies</Text>
             </HStack>
             {sbomParts?.length > 0 ? (
