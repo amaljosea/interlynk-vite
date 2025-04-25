@@ -18,6 +18,7 @@ import {
   useSteps
 } from '@chakra-ui/react'
 
+import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -29,6 +30,7 @@ import StepTwo from './Wizard/StepTwo'
 
 const ImportWizard = ({ currentSbomId, currentProductId, onClose }) => {
   const params = useParams()
+  const { showToast } = useCustomToast()
   const groupId = params.productgroupid
   const { secondaryBgColor } = useThemeColor(['secondaryBgColor'])
 
@@ -54,8 +56,21 @@ const ImportWizard = ({ currentSbomId, currentProductId, onClose }) => {
         })
       )
       compVexImport({
-        variables: { vulnsToImport: importData }
-      }).then((res) => res?.data && goToNext())
+        variables: {
+          vulnsToImport: importData,
+          toSbomId: currentSbomId,
+          fromSbomId: sbomId
+        }
+      }).then((res) => {
+        if (res?.data?.componentVulnVexImport?.errors?.length > 0) {
+          showToast({
+            descriptiopn: res?.data?.componentVulnVexImport?.errors[0],
+            status: 'error'
+          })
+        } else {
+          goToNext()
+        }
+      })
     }
   }
 

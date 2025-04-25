@@ -61,12 +61,10 @@ const SupportColumns = ({ action }) => {
         name: 'ASSESSMENT',
         wrap: true,
         selector: (row) => {
-          const { duplicates } = row || {}
           const { componentSupportLevel: manual } = row || {}
           return (
             <Text color={primaryTextColor}>
-              {manual?.level ? 'Manual' : 'Automatic'}{' '}
-              {duplicates?.length > 0 && `+${duplicates?.length}`}
+              {manual?.user ? 'Manual' : 'Automatic'}
             </Text>
           )
         }
@@ -150,7 +148,7 @@ const SupportColumns = ({ action }) => {
         sortFunction: (a, b) => {
           const dateA = new Date(a?.componentSupportLevel?.updatedAt)
           const dateB = new Date(b?.componentSupportLevel?.updatedAt)
-          return dateB - dateA
+          return dateA - dateB
         },
         right: 'true',
         wrap: true

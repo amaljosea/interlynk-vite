@@ -173,16 +173,18 @@ const CompIdentifiers = ({ data }) => {
             onClose={() => setCpeOpen(false)}
           />
         )}
+
+        {savePending !== '' &&
+          unsavedChanges.identifiers &&
+          !purlOpen &&
+          !cpeOpen && <LynkAlert status='warning' msg={savePending} />}
+
         <ActionButton
           title={'Save'}
           isLoading={loading}
           onClick={handleSubmit}
           hidden={purlOpen || cpeOpen || isCustomerView}
         />
-        {savePending !== '' &&
-          unsavedChanges.identifiers &&
-          !purlOpen &&
-          !cpeOpen && <LynkAlert status='warning' msg={savePending} />}
       </Stack>
     </>
   )

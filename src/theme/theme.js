@@ -168,8 +168,8 @@ const colors = {
     dark: '#1A202C'
   },
 
-   // Brand Colors
-   lynkRedColor: {
+  // Brand Colors
+  lynkRedColor: {
     light: '#DE001A',
     dark: '#FF7875'
   },

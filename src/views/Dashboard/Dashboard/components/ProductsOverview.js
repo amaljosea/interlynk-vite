@@ -1,3 +1,4 @@
+import { gql, useQuery } from '@apollo/client'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   getFullDate,
@@ -8,18 +9,57 @@ import {
 
 import { Flex, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 
-import Card from 'components/Card/Card'
-import CardBody from 'components/Card/CardBody'
 import LynkTable from 'components/LynkTable'
+import LynkLoader from 'components/Misc/LynkLoader'
 import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-const ProductsOverview = ({ loading, title, data }) => {
+export const GetLatestVersions = gql`
+  query GetOrgMetrics($env: String) {
+    organizationMetric(envName: $env) {
+      latestVersions {
+        id
+        createdAt
+        creationAt
+        updatedAt
+        projectId
+        projectVersion
+        project {
+          id
+          name
+          sboms {
+            id
+          }
+          projectGroup {
+            id
+            name
+            defaultProject {
+              id
+              name
+            }
+          }
+        }
+        primaryComponent {
+          id
+          name
+          version
+        }
+        stats {
+          compCount
+          compLicenseCount
+          vulnStats
+        }
+      }
+    }
+  }
+`
+
+const ProductsOverview = () => {
   const navigate = useNavigate()
-  const { dispatch } = useGlobalState()
+  const { dispatch, organization, envName } = useGlobalState()
   const { prodDispatch, prodVulnDispatch } = dispatch
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
@@ -31,6 +71,12 @@ const ProductsOverview = ({ loading, title, data }) => {
       'primaryBlueText',
       'secondaryTextInverse'
     ])
+
+  const { data, loading } = useQuery(GetLatestVersions, {
+    skip: organization ? false : true,
+    variables: { env: envName }
+  })
+  const { latestVersions } = data?.organizationMetric || {}
 
   const handleClick = (prod) => {
     const { id, projectId } = prod
@@ -53,10 +99,11 @@ const ProductsOverview = ({ loading, title, data }) => {
 
   const removeDuplicates = (versions) => {
     const uniqueVersions = []
-    versions.forEach((version) => {
+    versions?.forEach((version) => {
       const duplicateIndex = uniqueVersions.findIndex(
         (v) =>
-          v.project.projectGroup.name === version.project.projectGroup.name &&
+          v?.project?.projectGroup?.name ===
+            version?.project?.projectGroup?.name &&
           normalizeSBOMVersion(v) === normalizeSBOMVersion(version)
       )
       if (duplicateIndex === -1) {
@@ -66,7 +113,8 @@ const ProductsOverview = ({ loading, title, data }) => {
     return uniqueVersions
   }
 
-  const filteredData = data && removeDuplicates(data)
+  const filteredData =
+    latestVersions?.length > 0 && removeDuplicates(latestVersions)
 
   // COLUMNS
   const columns = [
@@ -263,17 +311,14 @@ const ProductsOverview = ({ loading, title, data }) => {
     }
   ]
 
+  if (loading) return <LynkLoader />
+
   return (
-    <Card maxH='100%'>
-      <Text fontWeight={'semibold'}>{title}</Text>
-      <CardBody mt={6}>
-        <LynkTable
-          columns={columns}
-          data={data || []}
-          progressPending={loading}
-        />
-      </CardBody>
-    </Card>
+    <LynkTable
+      columns={columns}
+      data={latestVersions || []}
+      progressPending={loading}
+    />
   )
 }
 

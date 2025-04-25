@@ -1,7 +1,5 @@
 import { gql } from '@apollo/client'
-import { useMemo } from 'react'
 import { getFullDate, timeSince } from 'utils'
-import { getUniqueAffectedProducts } from 'utils/getUniqueAffectedProducts'
 
 import { Flex, Tag, Text, Tooltip } from '@chakra-ui/react'
 
@@ -13,41 +11,39 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-const GetCompVulnData = gql`
-  query GetCompVulnData(
-    $id: Uuid!
+const GetProjectGroupsWithVulnerability = gql`
+  query ProjectGroupsWithVulnerability(
+    $vulnId: String!
+    $environment: EnvironmentEnum
     $first: Int
-    $last: Int
     $after: String
+    $last: Int
     $before: String
-    $projectNames: [String!]
   ) {
-    componentVulns(
-      vulnId: $id
-      after: $after
-      first: $first
-      before: $before
-      last: $last
-      projectNames: $projectNames
-    ) {
-      totalCount
-      pageInfo {
-        endCursor
-        hasNextPage
-        hasPreviousPage
-        startCursor
-      }
-      nodes {
-        id
-        updatedAt
-        component {
-          sbom {
-            project {
-              projectGroup {
-                id
-                name
-              }
-            }
+    organization {
+      projectGroups(
+        after: $after
+        before: $before
+        first: $first
+        last: $last
+      ) {
+        totalCount
+        pageInfo {
+          hasNextPage
+          endCursor
+          hasPreviousPage
+          startCursor
+        }
+        nodes {
+          id
+          name
+          updatedAt
+          projects(vulnerabilityId: $vulnId, environment: $environment) {
+            id
+            name
+            description
+            enabled
+            updatedAt
           }
         }
       }
@@ -59,15 +55,16 @@ const VulnProductsDrawer = ({ isOpen, onClose, data }) => {
   const { primaryTextColor } = useThemeColor(['primaryTextColor'])
   const { envName } = useGlobalState()
   const { nodes, paginationProps, loading } = usePaginatedQuery(
-    GetCompVulnData,
+    GetProjectGroupsWithVulnerability,
     {
-      skip: !data?.id,
-      selector: 'componentVulns',
-      variables: { id: data?.id, projectNames: [envName] }
+      variables: {
+        vulnId: data?.vulnId || '',
+        environment: envName
+      },
+      skip: !data?.vulnId || !envName,
+      selector: 'organization.projectGroups'
     }
   )
-
-  const statusResults = useMemo(() => getUniqueAffectedProducts(nodes), [nodes])
 
   const columns = [
     // PRODUCTS
@@ -76,12 +73,10 @@ const VulnProductsDrawer = ({ isOpen, onClose, data }) => {
       name: 'PRODUCT',
       compact: true,
       selector: (row) => {
-        const { component } = row
+        const { name } = row
         return (
           <Flex flexDir={'row'} my={3} gap={2} alignItems={'center'}>
-            <Text color={primaryTextColor}>
-              {component?.sbom?.project?.projectGroup?.name || ''}
-            </Text>
+            <Text color={primaryTextColor}>{name || ''}</Text>
           </Flex>
         )
       },
@@ -115,10 +110,10 @@ const VulnProductsDrawer = ({ isOpen, onClose, data }) => {
       <LynkTable
         columns={columns}
         progressPending={loading}
-        data={statusResults}
+        data={nodes}
         className='data-table-container'
       />
-      <Pagination {...paginationProps} totalCount={statusResults?.length} />
+      <Pagination {...paginationProps} />
     </LynkDrawer>
   )
 }

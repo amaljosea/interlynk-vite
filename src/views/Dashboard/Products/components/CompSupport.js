@@ -110,7 +110,7 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
     borderBottom: `1px solid ${grayBorderColor}`
   }
 
-  const assessment = manual?.level ? 'Manual' : 'Automatic'
+  const assessment = manual?.user ? 'Manual' : 'Automatic'
   const supportLevel = manual?.level || automatic?.level
   const explanation = manual?.notes || automatic?.notes
   const endOfSupport = formatDate(manual?.endDate)
@@ -179,7 +179,7 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
           <Text {...labelStyle}>Last Assessed</Text>
           <Text {...infoStyle}>{lastAssessed}</Text>
         </Stack>
-        {manual?.level && (
+        {manual?.user && (
           <Stack {...containerStyle}>
             <Text {...labelStyle}>{`Level (System)`}</Text>
             <Text {...infoStyle} textTransform={'capitalize'}>
@@ -187,7 +187,7 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
             </Text>
           </Stack>
         )}
-        {manual?.notes && (
+        {manual?.user && (
           <Stack {...containerStyle}>
             <Text {...labelStyle}>{`Explanation (System)`}</Text>
             <Text {...infoStyle}>{automatic?.notes || 'N/A'}</Text>
