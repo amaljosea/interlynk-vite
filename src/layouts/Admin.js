@@ -173,6 +173,8 @@ export default function Admin() {
       setSelectedTrends(trends)
       setSelectedVulns(vulns)
       setSelectedPolicies(policies)
+    } else {
+      setOrganization(null)
     }
   }, [data, setOrganization])
 
