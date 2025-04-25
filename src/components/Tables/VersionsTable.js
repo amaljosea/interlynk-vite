@@ -397,6 +397,7 @@ const VersionsTable = (props) => {
       {/* SUPPORT ANALYSIS RUN WARNING */}
       {SUPPORT.isOpen && (
         <SupportAnalysis
+          reset={reset}
           isOpen={SUPPORT.isOpen}
           onClose={SUPPORT.onClose}
           enabled={enableSupportLevel}
