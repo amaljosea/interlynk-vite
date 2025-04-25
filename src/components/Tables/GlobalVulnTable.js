@@ -71,11 +71,7 @@ const GlobalVulnTable = (props) => {
         return (
           <Flex direction='row' alignItems={'center'} gap={2} my={3}>
             <Tooltip placement='top' label={source} textTransform={'uppercase'}>
-              <IconButton
-                size={'sm'}
-                isRound={true}
-                icon={sourceIcon[source]}
-              />
+              <IconButton isRound={true} icon={sourceIcon[source]} />
             </Tooltip>
             <Stack direction={'column'} spacing={1.5}>
               <Flex gap={2} alignItems={'center'} flexWrap={'wrap'}>
@@ -120,7 +116,7 @@ const GlobalVulnTable = (props) => {
           </Flex>
         )
       },
-      width: '20%',
+      width: '22%',
       sortable: true,
       sortFunction: (a, b) => {
         const dateA = new Date(a?.lastModifiedAt)
