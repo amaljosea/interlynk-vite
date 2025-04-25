@@ -13,7 +13,8 @@ import {
   MenuItem,
   MenuItemOption,
   MenuList,
-  MenuOptionGroup
+  MenuOptionGroup,
+  Tooltip
 } from '@chakra-ui/react'
 import { Button, SkeletonText, Text, useDisclosure } from '@chakra-ui/react'
 
@@ -82,7 +83,10 @@ const Organizations = () => {
           <MenuOptionGroup key={index} value={organization?.id} type='radio'>
             <MenuItemOption value={item.id} onClick={() => onChange(item)}>
               <Text fontSize={'sm'}>
-                {item?.name} {isSuperAdmin && `(${item?.id.slice(-5)})`}
+                <Tooltip label={item?.name}>
+                  {truncatedValue(item?.name, 20)}{' '}
+                </Tooltip>
+                {isSuperAdmin && `(${item?.id.slice(-5)})`}
               </Text>
               {isSuperAdmin && (
                 <Text fontSize={'xs'}>{timeSince(item?.updatedAt)}</Text>
