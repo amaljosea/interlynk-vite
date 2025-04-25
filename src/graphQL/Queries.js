@@ -3373,6 +3373,37 @@ export const GetCompSupportData = gql`
             level
             notes
           }
+          duplicates {
+            name
+            version
+            sbom {
+              id
+              project {
+                projectGroup {
+                  name
+                }
+              }
+              projectVersion
+            }
+            componentSupportLevelAutomatic {
+              level
+              notes
+            }
+            componentSupportLevel {
+              componentId
+              createdAt
+              endDate
+              id
+              level
+              notes
+              retainManualOverrideFor
+              updatedAt
+              userId
+              user {
+                name
+              }
+            }
+          }
         }
       }
     }
