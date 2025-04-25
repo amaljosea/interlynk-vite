@@ -97,6 +97,7 @@ const OrgDrawer = ({ isOpen, onClose }) => {
         </FormLabel>
         <Input
           value={orgName}
+          maxLength={'20'}
           placeholder='Enter organization name'
           onChange={handleOrgNameChange}
           borderColor={nameError ? primaryErrorColor : 'inherit'}

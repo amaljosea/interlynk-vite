@@ -13,11 +13,13 @@ import {
   MenuItem,
   MenuItemOption,
   MenuList,
-  MenuOptionGroup
+  MenuOptionGroup,
+  Tooltip
 } from '@chakra-ui/react'
 import { Button, SkeletonText, Text, useDisclosure } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { SwitchOrganization } from 'graphQL/Mutation'
 import { AllOrganizations, MyOrganizations } from 'graphQL/Queries'
@@ -33,6 +35,7 @@ const Organizations = () => {
 
   const [options, setOptions] = useState([])
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
 
   const [getAllOrg, { loading: allOrgLoading }] = useLazyQuery(AllOrganizations)
   const [getMyOrg, { loading: myOrgLoading }] = useLazyQuery(MyOrganizations)
@@ -80,7 +83,10 @@ const Organizations = () => {
           <MenuOptionGroup key={index} value={organization?.id} type='radio'>
             <MenuItemOption value={item.id} onClick={() => onChange(item)}>
               <Text fontSize={'sm'}>
-                {item?.name} {isSuperAdmin && `(${item?.id.slice(-5)})`}
+                <Tooltip label={item?.name}>
+                  {truncatedValue(item?.name, 20)}{' '}
+                </Tooltip>
+                {isSuperAdmin && `(${item?.id.slice(-5)})`}
               </Text>
               {isSuperAdmin && (
                 <Text fontSize={'xs'}>{timeSince(item?.updatedAt)}</Text>
@@ -100,7 +106,7 @@ const Organizations = () => {
           as={Button}
           fontSize='sm'
           onClick={handleFetch}
-          leftIcon={<FaBuilding />}
+          leftIcon={<FaBuilding color={secondaryTextColor} />}
           isLoading={!organization?.name}
           rightIcon={<ChevronDownIcon />}
           data-testid='org_menu'

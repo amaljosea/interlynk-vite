@@ -5172,6 +5172,9 @@ export const getVulnsBySeverity = gql`
     $labelIds: [Uuid!]
   ) {
     organization {
+      total: vulns(projectNames: $envNames, projectGroupLabelIds: $labelIds) {
+        totalCount
+      }
       critical: vulns(
         firstMatchDateAfter: $firstMatchDateAfter
         severity: ["critical"]
@@ -5225,6 +5228,10 @@ export const getVulnsBySeverity = gql`
 export const getVulnsByStatus = gql`
   query getAllVulnsByStatuses($envNames: [String!], $labelIds: [Uuid!]) {
     organization {
+      total: vulns(projectNames: $envNames, projectGroupLabelIds: $labelIds) {
+        totalCount
+      }
+
       unspecified: vulns(
         status: ["Unspecified"]
         projectNames: $envNames
@@ -5276,6 +5283,14 @@ export const getCriticalVulnsByStatus = gql`
     $labelIds: [Uuid!]
   ) {
     organization {
+      total: vulns(
+        severity: $severity
+        projectNames: $envNames
+        projectGroupLabelIds: $labelIds
+      ) {
+        totalCount
+      }
+
       criticalUnspecified: vulns(
         severity: $severity
         status: ["Unspecified"]
@@ -5332,6 +5347,14 @@ export const getHighVulnsByStatus = gql`
     $labelIds: [Uuid!]
   ) {
     organization {
+      total: vulns(
+        severity: $severity
+        projectNames: $envNames
+        projectGroupLabelIds: $labelIds
+      ) {
+        totalCount
+      }
+
       highUnspecified: vulns(
         severity: $severity
         status: ["Unspecified"]
@@ -5388,6 +5411,14 @@ export const getKevVulnsByStatus = gql`
     $labelIds: [Uuid!]
   ) {
     organization {
+      total: vulns(
+        kev: $kev
+        projectNames: $envNames
+        projectGroupLabelIds: $labelIds
+      ) {
+        totalCount
+      }
+
       kevUnspecified: vulns(
         kev: $kev
         status: ["Unspecified"]
@@ -5435,10 +5466,13 @@ export const getKevVulnsByStatus = gql`
     }
   }
 `
-
+  
 // GET ALL POLICIES RULES
 export const getAllPolicies = gql`
   query GetAllPolicies {
+    total: policies {
+      totalCount
+    }
     informPolicies: policies(resultType: ["inform"]) {
       totalCount
     }

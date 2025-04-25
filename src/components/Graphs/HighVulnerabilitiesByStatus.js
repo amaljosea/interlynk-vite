@@ -51,8 +51,9 @@ const HighVulnerabilitiesByStatus = () => {
   return (
     <LynkPieChart
       loading={loading}
-      title='High Vulnerabilities by Status'
       data={vulnHighStatuses}
+      title='High Vulnerabilities by Status'
+      total={data?.organization?.total?.totalCount}
     />
   )
 }

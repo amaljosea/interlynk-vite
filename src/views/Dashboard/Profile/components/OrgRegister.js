@@ -15,7 +15,6 @@ import {
   FormLabel,
   Heading,
   Input,
-  Skeleton,
   useDisclosure
 } from '@chakra-ui/react'
 
@@ -28,7 +27,7 @@ import useCustomToast from 'hooks/useCustomToast'
 
 import { RegisterOrganization, SwitchOrganization } from 'graphQL/Mutation'
 
-const OrgRegister = ({ loading }) => {
+const OrgRegister = () => {
   const { showToast } = useCustomToast()
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [error, setError] = useState('')
@@ -99,13 +98,6 @@ const OrgRegister = ({ loading }) => {
     (email !== '' && emailError !== '') ||
     (url !== '' && !validateUrl(url))
 
-  if (loading)
-    return (
-      <Card>
-        <Skeleton width={'100%'} height={6} />
-      </Card>
-    )
-
   return (
     <>
       <Card p={20} alignItems={'center'} justifyContent={'center'} height={64}>
@@ -141,8 +133,9 @@ const OrgRegister = ({ loading }) => {
               <FormLabel>Name</FormLabel>
               <Input
                 type='text'
-                fontSize={14}
                 value={name}
+                fontSize={14}
+                maxLength={'20'}
                 onChange={(e) => {
                   setName(e.target.value)
                   setError('')

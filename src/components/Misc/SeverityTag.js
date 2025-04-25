@@ -7,22 +7,21 @@ import { useThemeColor } from 'hooks/useThemeColors'
 const SeverityTag = ({ value }) => {
   const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
-  if (value) {
+  if (!value)
     return (
-      <HStack>
-        <Circle size='2' bg={sevColor(value)?.bg} />
-        <Text
-          fontSize='sm'
-          color={primaryTextColor}
-          textTransform={'capitalize'}
-        >
-          {value}
-        </Text>
-      </HStack>
+      <Text fontSize={14} color={primaryTextColor}>
+        N/A
+      </Text>
     )
-  }
 
-  return <Text color={primaryTextColor}>N/A</Text>
+  return (
+    <HStack>
+      <Circle size='2' bg={sevColor(value)?.bg} />
+      <Text fontSize={14} color={primaryTextColor} textTransform={'capitalize'}>
+        {value}
+      </Text>
+    </HStack>
+  )
 }
 
 export default SeverityTag

@@ -162,15 +162,15 @@ export const GetIcon = (name, colorMode) => {
 
 export const cvssColor = (cvss) => {
   if (cvss >= 9.0) {
-    return '#F56565'
+    return '#E53E3E'
   } else if (cvss >= 7.0) {
-    return '#ED8936'
+    return '#DD6B20'
   } else if (cvss >= 6.0) {
-    return '#ECC94B'
+    return '#D69E2E'
   } else if (cvss === '') {
     return '#A0AEC0'
   } else {
-    return '#48BB78'
+    return '#38A169'
   }
 }
 

@@ -21,9 +21,8 @@ const SupportAnalysis = ({ reset, isOpen, onClose, data, enabled }) => {
         const { errors } = res?.data?.componentSupportLevelRun || {}
         if (!errors) {
           showToast({
-            title: 'Analysis run successfully',
-            description:
-              'Supports will be available shortly. Please refresh to update the records',
+            title: 'Successful!',
+            description: 'Supports will be available shortly',
             status: 'success'
           })
         } else {

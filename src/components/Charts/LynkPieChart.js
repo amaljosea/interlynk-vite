@@ -9,7 +9,7 @@ import LynkLoader from 'components/Misc/LynkLoader'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-const LynkPieChart = ({ title, data, loading }) => {
+const LynkPieChart = ({ title, total, data, loading }) => {
   const navigate = useNavigate()
   const { dispatch } = useGlobalState()
   const { globalVulnDispatch } = dispatch
@@ -17,8 +17,6 @@ const LynkPieChart = ({ title, data, loading }) => {
     'grayBorderColor',
     'primaryBlueText'
   ])
-
-  const total = data?.reduce((acc, item) => acc + item.value, 0)
 
   const handleReview = (value) => {
     if (title === 'All Vulnerabilities by Severity') {
