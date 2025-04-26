@@ -2,15 +2,8 @@ import { useMutation, useQuery } from '@apollo/client'
 import { sevColor } from 'utils/styleUtils'
 
 import { ChevronDownIcon } from '@chakra-ui/icons'
-import {
-  Button,
-  Flex,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Text
-} from '@chakra-ui/react'
+import { Button, Flex, Text } from '@chakra-ui/react'
+import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -120,19 +113,16 @@ const Checks = () => {
         return (
           <Menu>
             <MenuButton
-              width={'100px'}
               as={Button}
               size='sm'
-              bg={sevColor(severity.toLowerCase()).bg}
-              textColor={'white'}
-              borderRadius='6px'
-              border='none'
-              fontWeight='normal'
+              width={'110px'}
+              variant='solid'
               isDisabled={!canEdit}
-              rightIcon={<ChevronDownIcon boxSize={5} />}
-              _hover={{ bg: sevColor(severity.toLowerCase()).bg }}
+              _hover={{ bg: 'auto' }}
+              _active={{ bg: 'auto' }}
               _focus={{ boxShadow: 'none' }}
-              _active={{ bg: sevColor(severity.toLowerCase()).bg }}
+              rightIcon={<ChevronDownIcon boxSize={5} />}
+              colorScheme={sevColor(severity.toLowerCase()).btn}
             >
               {options.find((option) => option.value === severity)?.label ||
                 'Select option'}
