@@ -6,7 +6,8 @@ import {
   getFullDate,
   getLink,
   getSignedUrlParams,
-  timeSince
+  timeSince,
+  truncatedValue
 } from 'utils'
 import { getType } from 'utils/styleUtils'
 
@@ -138,55 +139,60 @@ const VersionColumns = (props) => {
                 </GridItem>
               )}
               <GridItem w={'100%'} colSpan={shouldShowDemoFeatures ? 6 : 7}>
-                <Flex
-                  sx={{
-                    mb: 1,
-                    gap: 2,
-                    flexDirection: 'row',
-                    alignItems: 'center'
-                  }}
-                >
-                  <Link to={link} onClick={onStartTour} data-testid={`version`}>
-                    <Text color={primaryBlueText} fontSize={14}>
-                      {projectVersion}
-                    </Text>
-                  </Link>
-                  {!isReprocess && showIcon && (
-                    <Tooltip label={ignoreMsg}>
-                      <Box>
-                        <Icon
-                          as={HiOutlineDuplicate}
-                          sx={{ mt: 1, fontSize: 18, color: primaryTextColor }}
+                <Stack spacing={1}>
+                  <Flex gap={2} alignItems={'center'}>
+                    <Tooltip label={projectVersion}>
+                      <Link
+                        to={link}
+                        onClick={onStartTour}
+                        data-testid={`version`}
+                      >
+                        <Text color={primaryBlueText} fontSize={14}>
+                          {truncatedValue(projectVersion, 20)}
+                        </Text>
+                      </Link>
+                    </Tooltip>
+                    {!isReprocess && showIcon && (
+                      <Tooltip label={ignoreMsg}>
+                        <Box>
+                          <Icon
+                            as={HiOutlineDuplicate}
+                            sx={{
+                              mt: 1,
+                              fontSize: 18,
+                              color: primaryTextColor
+                            }}
+                          />
+                        </Box>
+                      </Tooltip>
+                    )}
+                    {daysUntilDeletion && !signedUrlParams && (
+                      <Tooltip
+                        label={`Marked for deletion on ${endDate ? new Date(endDate).toLocaleDateString() : ''}`}
+                      >
+                        <IconButton
+                          size='xs'
+                          icon={<IoMdWarning size={16} />}
+                          sx={{ color: primaryErrorColor, bg: 'transparent' }}
                         />
-                      </Box>
-                    </Tooltip>
-                  )}
-                  {daysUntilDeletion && !signedUrlParams && (
-                    <Tooltip
-                      label={`Marked for deletion on ${endDate ? new Date(endDate).toLocaleDateString() : ''}`}
-                    >
-                      <IconButton
-                        size='xs'
-                        icon={<IoMdWarning size={16} />}
-                        sx={{ color: primaryErrorColor, bg: 'transparent' }}
-                      />
-                    </Tooltip>
-                  )}
-                </Flex>
-                <Tag
-                  hidden={!productLifeCycleStage}
-                  size={'sm'}
-                  variant='solid'
-                  colorScheme='blue'
-                  w={'fit-content'}
-                  cursor={'pointer'}
-                >
-                  <TagLabel textTransform={'capitalize'}>
-                    {productLifeCycleStage
-                      ? String(productLifeCycleStage).replace(/_/g, ' ')
-                      : ''}
-                  </TagLabel>
-                </Tag>
+                      </Tooltip>
+                    )}
+                  </Flex>
+                  <Tag
+                    hidden={!productLifeCycleStage}
+                    size={'sm'}
+                    variant='solid'
+                    colorScheme='blue'
+                    w={'fit-content'}
+                    cursor={'pointer'}
+                  >
+                    <TagLabel textTransform={'capitalize'}>
+                      {productLifeCycleStage
+                        ? String(productLifeCycleStage).replace(/_/g, ' ')
+                        : ''}
+                    </TagLabel>
+                  </Tag>
+                </Stack>
               </GridItem>
             </Grid>
           )
