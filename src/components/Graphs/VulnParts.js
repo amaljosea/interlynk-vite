@@ -197,8 +197,6 @@ const VulnParts = () => {
     })
   const total = list.reduce((acc, { count }) => acc + count, 0)
 
-  console.warn('list', list)
-
   const percent = (value) => `${(value / total) * 100}%`
 
   if (loading)
