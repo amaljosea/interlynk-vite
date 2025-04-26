@@ -6,6 +6,7 @@ import { GetIcon } from 'utils/styleUtils'
 
 import { ViewIcon } from '@chakra-ui/icons'
 import {
+  Badge,
   Box,
   Button,
   Divider,
@@ -17,7 +18,6 @@ import {
   Tooltip,
   useColorMode
 } from '@chakra-ui/react'
-import { Tag, TagLabel } from '@chakra-ui/react'
 import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
 import { HealthScore } from 'components/HealthScore'
@@ -29,24 +29,8 @@ import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
-import {
-  FaBuilding,
-  FaEllipsisV,
-  FaGlobe,
-  FaLightbulb,
-  FaSitemap
-} from 'react-icons/fa'
-import { FaHouseUser, FaListCheck, FaStar, FaTextSlash } from 'react-icons/fa6'
-import { LuBug } from 'react-icons/lu'
-import { MdOutlineHourglassBottom } from 'react-icons/md'
-
-const StatusIcon = ({ icon, label, color, onClick }) => {
-  return (
-    <Tooltip label={label}>
-      <IconButton size='xs' colorScheme={color} icon={icon} onClick={onClick} />
-    </Tooltip>
-  )
-}
+import { FaEllipsisV, FaGlobe, FaLightbulb, FaSitemap } from 'react-icons/fa'
+import { FaHouseUser, FaListCheck } from 'react-icons/fa6'
 
 const ComponentsColumns = ({ totalComp, isArchived, action }) => {
   const {
@@ -128,85 +112,138 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
                 {/* COMPONENT NAME */}
                 <Tooltip label={name}>
                   <Text
+                    fontSize={14}
+                    fontWeight={'medium'}
                     color={primaryTextColor}
                     aria-label='component_name'
                     data-tag='allowRowEvents'
                   >
-                    {truncatedValue(name, 30)}
+                    {truncatedValue(name, 40)}
                   </Text>
                 </Tooltip>
-                {bomId && isPart && (
-                  <Text
-                    fontSize={12}
-                    w='fit-content'
-                    fontWeight={'medium'}
-                    color={primaryTextColor}
-                  >
-                    {projectGroup?.name}{' '}
-                    {projectVersion ? `: ${projectVersion}` : ''}
-                  </Text>
-                )}
-                <Flex gap={1} flexWrap={'wrap'} alignItems={'center'}>
-                  {isVulnerable && !isAllVulnsNotAffected && (
-                    <StatusIcon
-                      color='red'
-                      label={'Vulnerable'}
-                      icon={<LuBug size={14} />}
-                      onClick={() => action(viewCompVulnerabilities, row)}
-                    />
-                  )}
-                  {packageVersion?.isDeprecated === true && (
-                    <StatusIcon
-                      color='orange'
-                      label={'Deprecated'}
-                      icon={<FaTextSlash size={14} />}
-                      onClick={() => action(viewInsights, row)}
-                    />
-                  )}
-                  {isOutdated && (
-                    <StatusIcon
-                      color='yellow'
-                      label={'Outdated'}
-                      onClick={() => action(viewInsights, row)}
-                      icon={<MdOutlineHourglassBottom size={14} />}
-                    />
-                  )}
+                <Flex gap={2} alignItems={'center'} flexWrap={'wrap'}>
                   {primary && (
-                    <StatusIcon
-                      color='green'
-                      label={'Primary'}
+                    <Badge
+                      colorScheme='green'
+                      w={'fit-content'}
+                      fontSize={14}
+                      fontWeight={'normal'}
                       onClick={() => action(editComponent, row)}
-                      icon={<FaStar size={14} />}
-                    />
+                    >
+                      Primary
+                    </Badge>
                   )}
+                  <Text hidden={!primary} color={secondaryTextColor}>
+                    •
+                  </Text>
                   {internal && (
-                    <StatusIcon
-                      color='blue'
-                      label={'Internal'}
+                    <Badge
+                      colorScheme='blue'
+                      w={'fit-content'}
+                      fontSize={14}
+                      fontWeight={'normal'}
                       onClick={() => action(editComponent, row)}
-                      icon={<FaBuilding size={14} />}
-                    />
+                    >
+                      Internal
+                    </Badge>
                   )}
+                  <Text hidden={!internal} color={secondaryTextColor}>
+                    •
+                  </Text>
+                  {isOutdated && (
+                    <Badge
+                      colorScheme='yellow'
+                      w={'fit-content'}
+                      fontSize={14}
+                      fontWeight={'normal'}
+                      onClick={() => action(viewInsights, row)}
+                    >
+                      Outdated
+                    </Badge>
+                  )}
+                  <Text hidden={!isOutdated} color={secondaryTextColor}>
+                    •
+                  </Text>
+                  {isVulnerable && !isAllVulnsNotAffected && (
+                    <Badge
+                      colorScheme='red'
+                      w={'fit-content'}
+                      fontSize={14}
+                      fontWeight={'normal'}
+                      onClick={() => action(viewCompVulnerabilities, row)}
+                    >
+                      Vulnerable
+                    </Badge>
+                  )}
+                  <Text hidden={!isVulnerable} color={secondaryTextColor}>
+                    •
+                  </Text>
+                  {packageVersion?.isDeprecated === true && (
+                    <Badge
+                      colorScheme='orange'
+                      w={'fit-content'}
+                      fontSize={14}
+                      fontWeight={'normal'}
+                      onClick={() => action(viewInsights, row)}
+                    >
+                      Deprecated
+                    </Badge>
+                  )}
+                  <Text
+                    hidden={!packageVersion?.isDeprecated}
+                    color={secondaryTextColor}
+                  >
+                    •
+                  </Text>
+                  {isPart && (
+                    <Tooltip
+                      label={`${projectGroup?.name} : ${projectVersion || 'N/A'}`}
+                    >
+                      <Badge
+                        colorScheme='blue'
+                        w={'fit-content'}
+                        fontSize={14}
+                        fontWeight={'normal'}
+                      >
+                        Part
+                      </Badge>
+                    </Tooltip>
+                  )}
+                  <Text hidden={!isPart} color={secondaryTextColor}>
+                    •
+                  </Text>
+                  <Tooltip label={getFullDate(row?.updatedAt)}>
+                    <Text fontSize={14} color={secondaryTextColor}>
+                      {timeSince(row?.updatedAt)}
+                    </Text>
+                  </Tooltip>
                 </Flex>
               </Flex>
             </Flex>
           )
         },
-        width: isCustomerView ? '30%' : '25%',
+        width: '30%',
         wrap: true,
-        sortable: true
+        sortable: true,
+        sortFunction: (a, b) => {
+          const dateA = new Date(a.updatedAt)
+          const dateB = new Date(b.updatedAt)
+          return dateA - dateB
+        }
       },
       // VERSION
       {
         id: 'COMPONENTS_VERSION',
         name: 'VERSION',
         selector: (row) => (
-          <Text my={4} color={primaryTextColor}>
-            {row?.version}
-          </Text>
+          <Tooltip label={row?.version || 'N/A'}>
+            <Text my={4} color={primaryTextColor}>
+              {row?.version ? truncatedValue(row?.version, 20) : 'N/A'}
+            </Text>
+          </Tooltip>
         ),
         wrap: true,
-        width: isCustomerView ? '12%' : '10%',
+        width: '14%',
         sortable: true
       },
       // COMPONENT HEALTH
@@ -267,125 +304,19 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
         id: 'COMPONENTS_LICENSES_EXP',
         name: 'LICENSES',
         selector: (row) => {
-          const { licenses, licensesExp, licensesCustom } = row
-          const totalSpdx = licenses?.length > 1 && licenses.slice(1)
-          const totalCustom =
-            licensesCustom?.length > 1 && licensesCustom.slice(1)
+          const { licensesExp } = row
+          const isExists = licensesExp && licensesExp !== ''
+          const license = isExists ? parseLicenseString(licensesExp) : 'N/A'
           return (
-            <Flex
-              justifyContent={'flex-end'}
-              sx={{ my: 2, gap: 2, alignItems: 'flex-end', flexWrap: 'wrap' }}
-            >
-              {/* SPDX */}
-              {licenses && (
-                <Stack direction={'row'} spacing={2}>
-                  {licenses.length > 0 && (
-                    <Tooltip label={licenses[0]} placement={'top'}>
-                      <Tag
-                        width={'150px'}
-                        size={'md'}
-                        variant='subtle'
-                        colorScheme='green'
-                      >
-                        <TagLabel mx={'auto'}>{licenses[0]}</TagLabel>
-                      </Tag>
-                    </Tooltip>
-                  )}
-                  {totalSpdx.length > 0 && (
-                    <Tooltip
-                      label={JSON.stringify(totalSpdx)
-                        .slice(1, -1)
-                        .replace(/"/g, '')}
-                      placement={'top'}
-                    >
-                      <Tag
-                        width={'150px'}
-                        size={'md'}
-                        variant='subtle'
-                        colorScheme='green'
-                      >
-                        <TagLabel
-                          mx={'auto'}
-                        >{`+${totalSpdx.length}`}</TagLabel>
-                      </Tag>
-                    </Tooltip>
-                  )}
-                </Stack>
-              )}
-              {/* EXPRESSION */}
-              {licensesExp && licensesExp !== '' && (
-                <Tooltip label={licensesExp} placement={'top'}>
-                  <Tag
-                    width={'150px'}
-                    size={'md'}
-                    variant='subtle'
-                    colorScheme='green'
-                  >
-                    <TagLabel mx={'auto'}>
-                      {parseLicenseString(licensesExp)}
-                    </TagLabel>
-                  </Tag>
-                </Tooltip>
-              )}
-              {/* CUSTOM */}
-              {licensesCustom && (
-                <Stack direction={'row'} spacing={2}>
-                  {licensesCustom.length > 0 && (
-                    <Tooltip label={licensesCustom[0]} placement={'top'}>
-                      <Tag
-                        width={'150px'}
-                        size={'md'}
-                        variant='subtle'
-                        colorScheme='green'
-                      >
-                        <TagLabel mx={'auto'}>{licensesCustom[0]}</TagLabel>
-                      </Tag>
-                    </Tooltip>
-                  )}
-                  {totalCustom && (
-                    <Tooltip
-                      label={JSON.stringify(totalCustom)
-                        .slice(1, -1)
-                        .replace(/"/g, '')}
-                      placement={'top'}
-                    >
-                      <Tag
-                        width={'150px'}
-                        size={'md'}
-                        variant='subtle'
-                        colorScheme='green'
-                      >
-                        <TagLabel
-                          mx={'auto'}
-                        >{`+${totalCustom.length}`}</TagLabel>
-                      </Tag>
-                    </Tooltip>
-                  )}
-                </Stack>
-              )}
-            </Flex>
+            <Tooltip label={licensesExp} placement={'top'}>
+              <Text color={primaryTextColor}>
+                {truncatedValue(license, 40)}
+              </Text>
+            </Tooltip>
           )
         },
         width: '13%',
         sortable: true,
-        wrap: true
-      },
-      // UPDATED AT
-      {
-        id: 'COMPONENTS_UPDATED_AT',
-        name: 'UPDATED',
-        selector: (row) => (
-          <Tooltip label={getFullDate(row.updatedAt)} placement={'top'}>
-            <Text color={primaryTextColor}>{timeSince(row.updatedAt)}</Text>
-          </Tooltip>
-        ),
-        sortable: true,
-        sortFunction: (a, b) => {
-          const dateA = new Date(a.updatedAt)
-          const dateB = new Date(b.updatedAt)
-          return dateA - dateB // Sort in descending order
-        },
-        width: '12%',
         wrap: true
       },
       // ACTION
