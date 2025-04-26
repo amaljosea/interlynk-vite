@@ -187,9 +187,7 @@ const VersionColumns = (props) => {
                     cursor={'pointer'}
                   >
                     <TagLabel textTransform={'capitalize'}>
-                      {productLifeCycleStage
-                        ? String(productLifeCycleStage).replace(/_/g, ' ')
-                        : ''}
+                      {String(productLifeCycleStage)?.replaceAll(/_/g, ' ')}
                     </TagLabel>
                   </Tag>
                 </Stack>
