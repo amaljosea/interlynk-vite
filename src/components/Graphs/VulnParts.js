@@ -21,6 +21,7 @@ import CardBody from 'components/Card/CardBody'
 import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { usePartsContext } from 'hooks/usePartsContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { FaBug } from 'react-icons/fa6'
@@ -28,7 +29,16 @@ import { FaBug } from 'react-icons/fa6'
 const GetPartVulns = gql`
   query GetSbomParts($projectId: Uuid!, $sbomId: Uuid!) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
       projectVersion
+      project {
+        id
+        name
+        projectGroup {
+          id
+          name
+        }
+      }
       stats {
         vulnStats
       }
@@ -38,8 +48,13 @@ const GetPartVulns = gql`
       sbomParts {
         id
         part {
+          id
+          projectVersion
           project {
+            id
+            name
             projectGroup {
+              id
               name
             }
           }
@@ -55,12 +70,17 @@ const GetPartVulns = gql`
   }
 `
 
-const VulnTypes = ({ parts, vuln }) => {
+const VulnTypes = ({ data }) => {
   const navigate = useNavigate()
+  const params = useParams()
   const { dispatch } = useGlobalState()
+  const partsContext = usePartsContext()
   const signedUrlParams = getSignedUrlParams()
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
+
+  const { id, project, stats } = data || {}
+  const { vulnStats } = stats || {}
 
   const { prodVulnDispatch } = dispatch
 
@@ -81,42 +101,67 @@ const VulnTypes = ({ parts, vuln }) => {
     }
   }
 
+  const link = generateProductVersionDetailPageUrlFromCurrentUrl({
+    productgroupid: project?.projectGroup?.id,
+    productid: project?.id,
+    sbomid: id,
+    paramsObj: { tab: 'vulnerabilities', parts: true }
+  })
+
+  const onSelectPart = () => partsContext.push()
+
+  const onFilterSev = (part, value, link) => {
+    prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
+    prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
+    prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
+    onSelectPart(part)
+    navigate(link)
+  }
+
+  const handleFilter = (value) => {
+    if (params?.sbomid === id) {
+      onFilterVuln(value)
+    } else {
+      onFilterSev(data, value, link)
+    }
+  }
+
   return (
     <Flex flexWrap={'wrap'} gap={1} scale={0.5}>
       <VulnBadge
         color='red'
         label='Critical'
-        onClick={() => (parts ? null : onFilterVuln(['critical']))}
+        onClick={() => handleFilter(['critical'])}
       >
-        {vuln?.critical || 0}
+        {vulnStats?.critical || 0}
       </VulnBadge>
       <VulnBadge
         color='orange'
         label='High'
-        onClick={() => (parts ? null : onFilterVuln(['high']))}
+        onClick={() => handleFilter(['high'])}
       >
-        {vuln?.high || 0}
+        {vulnStats?.high || 0}
       </VulnBadge>
       <VulnBadge
         color='yellow'
         label='Medium'
-        onClick={() => (parts ? null : onFilterVuln(['medium']))}
+        onClick={() => handleFilter(['medium'])}
       >
-        {vuln?.medium || 0}
+        {vulnStats?.medium || 0}
       </VulnBadge>
       <VulnBadge
         color='green'
         label='Low'
-        onClick={() => (parts ? null : onFilterVuln(['low']))}
+        onClick={() => handleFilter(['low'])}
       >
-        {vuln?.low || 0}
+        {vulnStats?.low || 0}
       </VulnBadge>
       <VulnBadge
         color='gray'
         label='Unknown'
-        onClick={() => (parts ? null : onFilterVuln(['unknown']))}
+        onClick={() => handleFilter(['unknown'])}
       >
-        {vuln?.unknown || 0}
+        {vulnStats?.unknown || 0}
       </VulnBadge>
     </Flex>
   )
@@ -130,14 +175,14 @@ const VulnParts = () => {
     variables: { projectId: params.productid, sbomId: params.sbomid }
   })
   const { stats, projectVersion, vulns, sbomParts } = data?.sbom || {}
-  const partsExist = sbomParts?.length > 0
 
   const list = [
     {
       color: COLORS[0],
       group: projectVersion,
       count: vulns?.totalCount || 0,
-      stats: stats?.vulnStats
+      stats: stats?.vulnStats,
+      part: data?.sbom
     }
   ]
   sbomParts?.length > 0 &&
@@ -146,10 +191,13 @@ const VulnParts = () => {
         color: COLORS[index + 1],
         group: part?.project?.projectGroup?.name,
         count: part?.vulns?.totalCount || 0,
-        stats: part?.stats?.vulnStats
+        stats: part?.stats?.vulnStats,
+        part: part
       })
     })
   const total = list.reduce((acc, { count }) => acc + count, 0)
+
+  console.warn('list', list)
 
   const percent = (value) => `${(value / total) * 100}%`
 
@@ -179,7 +227,7 @@ const VulnParts = () => {
               </Text>
             ) : (
               <Box pl={8}>
-                <VulnTypes vuln={stats?.vulnStats} />
+                <VulnTypes data={data?.sbom} />
               </Box>
             )}
           </Flex>
@@ -196,13 +244,13 @@ const VulnParts = () => {
             ))}
           </Flex>
           <VStack align='start' spacing={2} hidden={sbomParts?.length === 0}>
-            {list?.map(({ color, group, stats }, index) => (
+            {list?.map(({ color, group, part }, index) => (
               <HStack key={index} w='full' justify='space-between'>
                 <HStack>
                   <Circle size='2' bg={color} />
                   <Text fontSize='sm'>{group}</Text>
                 </HStack>
-                <VulnTypes parts={partsExist} vuln={stats} />
+                <VulnTypes data={part} />
               </HStack>
             ))}
           </VStack>
