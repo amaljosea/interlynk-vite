@@ -236,6 +236,7 @@ export default class VulnsSection {
                 errors?.push('Link validation not working')
               } else {
                 await this.page.getByTestId('delete_vuln_link').first().click()
+                await this.page.getByTestId('confirm_delete').first().click()
 
                 await this.page.waitForTimeout(4000)
                 await this.page

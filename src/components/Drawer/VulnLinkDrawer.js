@@ -135,7 +135,7 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
   const DeleteAction = ({ id }) => (
     <ConfirmDeleteButton
       deleteBtnProps={{
-        'data-testid': 'delete_vuln_links',
+        'data-testid': 'delete_vuln_link',
         hidden: isPart
       }}
       handleDelete={handleLinkRemove}
