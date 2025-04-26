@@ -13,7 +13,7 @@ const PartsSubHeader = (
   updateSboms
 ) => {
   const subHeader = useMemo(() => {
-    const disabled = !updateSboms || signedUrlParams || sbomParts?.length === 5
+    const disabled = !updateSboms || signedUrlParams || sbomParts?.length === 4
     return (
       <Flex
         sx={{ w: '100%', gap: 2, alignItems: 'center' }}
