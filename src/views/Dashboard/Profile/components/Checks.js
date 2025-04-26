@@ -25,7 +25,10 @@ const Checks = () => {
   const activetab = useQueryParam('tab')
   const { orgView } = useGlobalQueryContext()
 
-  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
+  const { primaryTextColor, secondaryTextInverse } = useThemeColor([
+    'primaryTextColor',
+    'secondaryTextInverse'
+  ])
 
   const canEdit = useHasPermission({
     parentKey: 'view_organization',
@@ -74,7 +77,9 @@ const Checks = () => {
       name: 'CHECK ID',
       width: '10%',
       selector: (row) => (
-        <Text color={primaryTextColor}>{row.rule.friendlyId}</Text>
+        <Text fontSize={14} color={primaryTextColor}>
+          {row.rule.friendlyId}
+        </Text>
       ),
       sortable: true,
       sortFunction: (a, b) => {
@@ -92,12 +97,10 @@ const Checks = () => {
         const { rule } = row
         return (
           <Flex direction='column' rowGap={1} my={3}>
-            <Text color={primaryTextColor} fontSize={'sm'}>
+            <Text color={primaryTextColor} fontSize={14}>
               {rule.shortDesc}
             </Text>
-            <Text color={primaryTextColor} fontSize={'12px'}>
-              {rule.longDesc}
-            </Text>
+            <Text color={secondaryTextInverse}>{rule.longDesc}</Text>
           </Flex>
         )
       },
