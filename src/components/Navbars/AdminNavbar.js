@@ -13,7 +13,6 @@ import { usePartsContext } from 'hooks/usePartsContext'
 import { useProjectGroup } from 'hooks/useProjectGroup'
 import useQueryParam from 'hooks/useQueryParam'
 import { useRouteFlags } from 'hooks/useRouteFlags'
-import { useSelect } from 'hooks/useSelect'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetUserPermissions } from 'graphQL/Queries'
@@ -37,8 +36,6 @@ export default function AdminNavbar(props) {
   const parts = useQueryParam('parts')
   const vulnId = useQueryParam('vulnId') || params.vulnerabilityid
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
-
-  const { style } = useSelect('breadcrumb')
 
   useQuery(GetUserPermissions, {
     skip: path === 'customer' || !orgView,
@@ -85,6 +82,18 @@ export default function AdminNavbar(props) {
 
   const isDetailsPage = prodID || vulnId || policyId
 
+  const partsData =
+    !loading && partsContext.isParts
+      ? [
+          ...partsContext.parts,
+          {
+            projectGroupName: projectGroupName,
+            versionName: sbomHookData.versionName,
+            url: null
+          }
+        ]
+      : []
+
   return (
     <Grid
       bg={mainContrastBgColor}
@@ -115,43 +124,35 @@ export default function AdminNavbar(props) {
           >
             <Link to={link}>{category}</Link>
           </BreadcrumbItem>
-          {!loading &&
-            partsContext.isParts &&
-            [
-              ...partsContext.parts,
-              {
-                projectGroupName: projectGroupName,
-                versionName: sbomHookData.versionName,
-                url: null
-              }
-            ].map((part, index) => {
-              return (
-                <BreadcrumbItem
-                  key={part.url}
-                  cursor={'pointer'}
-                  isCurrentPage={!!part.url}
+          {partsData.map((part, index) => {
+            const isCurrentPage = index === partsData?.length - 1
+            return (
+              <BreadcrumbItem
+                key={part.url}
+                cursor={'pointer'}
+                isCurrentPage={!!part.url}
+                color={isCurrentPage ? primaryTextColor : secondaryTextColor}
+              >
+                <BreadcrumbLink
+                  onClick={() => {
+                    if (part.url) {
+                      partsContext.goTo(index)
+                      navigate(part.url)
+                    }
+                  }}
                 >
-                  <BreadcrumbLink
-                    onClick={() => {
-                      if (part.url) {
-                        partsContext.goTo(index)
-                        navigate(part.url)
-                      }
-                    }}
-                  >
-                    {truncatedValue(part.projectGroupName)} (
-                    {truncatedValue(part.versionName)})
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-              )
-            })}
+                  {truncatedValue(part.projectGroupName)} (
+                  {truncatedValue(part.versionName)})
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+            )
+          })}
           {projectGroupName && prodID && !partsContext.isParts && (
             <BreadcrumbItem
               isCurrentPage={sbomId && sbomHookData?.version ? false : true}
             >
               <ProjectGroupBreadcrumb
                 projectGroupName={projectGroupName}
-                selectStyles={style}
                 defaultFirstOption={{
                   id,
                   name: projectGroupName
@@ -161,7 +162,7 @@ export default function AdminNavbar(props) {
           )}
           {!partsContext.isParts && sbomId && sbomHookData.versionName && (
             <BreadcrumbItem isCurrentPage={!parts}>
-              <VersionBreadcrumb selectStyles={style} />
+              <VersionBreadcrumb />
             </BreadcrumbItem>
           )}
           {!partsContext.isParts &&

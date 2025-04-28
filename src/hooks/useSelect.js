@@ -1,15 +1,21 @@
 /* eslint-disable */
+import { useParams } from 'react-router-dom'
+
 import { useThemeColor } from 'hooks/useThemeColors'
 
-export const useSelect = (type) => {
+export const useSelect = (type, category) => {
+  const params = useParams()
   const isBreadcrumb = type === 'breadcrumb'
   const isVersion = type === 'version'
   const isLynkSelect = type === 'lynkSelect'
+
+  const isActive = category === 'version' || !params?.sbomid
 
   const {
     primaryBlueText,
     primaryTextColor,
     primaryBgColor,
+    secondaryTextColor,
     secondaryTextInverse,
     secondaryBgColor,
     grayBorderColor
@@ -17,6 +23,7 @@ export const useSelect = (type) => {
     'primaryBlueText',
     'primaryTextColor',
     'primaryBgColor',
+    'secondaryTextColor',
     'secondaryTextInverse',
     'secondaryBgColor',
     'grayBorderColor'
@@ -129,7 +136,7 @@ export const useSelect = (type) => {
     },
     placeholder: (provided) => ({
       ...provided,
-      color: primaryTextColor
+      color: isActive ? primaryTextColor : secondaryTextColor
     })
   }
 

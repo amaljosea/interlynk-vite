@@ -12,15 +12,12 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useLazyDropDown } from 'hooks/useLazyDropDown'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useSelect } from 'hooks/useSelect'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetProjectGroupLazyDropdownQuery } from 'graphQL/Queries'
 
-const ProjectGroupBreadcrumb = ({
-  projectGroupName,
-  selectStyles,
-  defaultFirstOption
-}) => {
+const ProjectGroupBreadcrumb = ({ projectGroupName, defaultFirstOption }) => {
   const navigate = useNavigate()
 
   const location = useLocation()
@@ -33,6 +30,8 @@ const ProjectGroupBreadcrumb = ({
   const environment = envName
 
   const { grayBorderColor } = useThemeColor(['grayBorderColor'])
+
+  const { style } = useSelect('breadcrumb','product')
 
   const viewProds = useHasPermission({
     parentKey: 'view_product_group'
@@ -65,7 +64,7 @@ const ProjectGroupBreadcrumb = ({
       },
       selectorForActualCount: 'organization.allProjectGroups',
       selectedItem: projectGroupName,
-      styles: selectStyles,
+      styles: style,
       onChange: handleProductClick,
       components: {
         IndicatorSeparator: () => null,
