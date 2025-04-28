@@ -1,12 +1,12 @@
+/* eslint-disable no-restricted-syntax */
 import InterlynkLogo from 'assets/img/logo.png'
 import { useEffect, useState } from 'react'
 import ReactGA from 'react-ga4'
 import { Link, useLocation } from 'react-router-dom'
 import { getSignedUrlParams } from 'utils'
 
-import { Divider, Flex, Img, Tooltip } from '@chakra-ui/react'
+import { Button, Divider, Flex, Img, Tooltip } from '@chakra-ui/react'
 
-import IconBox from 'components/Icons/IconBox'
 import { SidebarHelp } from 'components/Sidebar/SidebarHelp'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -21,10 +21,8 @@ const SidebarContent = ({ routes }) => {
   const { organization } = useGlobalState()
   const [filteredRoutes, setFilteredRoutes] = useState([])
 
-  const { primaryBlueText, secondaryBgColor } = useThemeColor([
-    'primaryBlueText',
-    'secondaryBgColor'
-  ])
+  const { primaryBlueText, secondaryTextColor, secondaryBgColor } =
+    useThemeColor(['primaryBlueText', 'secondaryTextColor', 'secondaryBgColor'])
 
   useEffect(() => {
     // Filter routes based on the active user and free tier status
@@ -52,7 +50,7 @@ const SidebarContent = ({ routes }) => {
       : ''
   }
 
-  const renderLink = (route) => {
+  const RenderLink = ({ route }) => {
     const { name, path, layout, icon } = route
     const isActive = isActiveRoute(layout + path) === 'active'
     const toPath =
@@ -71,13 +69,15 @@ const SidebarContent = ({ routes }) => {
           className={isDashboardView ? name.toLowerCase() : ''}
           target={name === 'Documentation' ? '_blank' : '_self'}
         >
-          <IconBox
-            sx={{ w: '40px', h: '40px' }}
-            color={isActive ? 'white' : primaryBlueText}
-            bg={isActive ? primaryBlueText : secondaryBgColor}
+          <Button
+            px={3}
+            title={name}
+            bg={isActive ? primaryBlueText : 'none'}
+            color={isActive ? 'white' : secondaryTextColor}
+            _hover={{ bg: isActive ? primaryBlueText : secondaryBgColor }}
           >
             {icon}
-          </IconBox>
+          </Button>
         </Link>
       </Tooltip>
     )
@@ -101,7 +101,9 @@ const SidebarContent = ({ routes }) => {
         flexDirection={'column'}
         justifyContent={'center'}
       >
-        {filteredRoutes.map(renderLink)}
+        {filteredRoutes.map((item, index) => (
+          <RenderLink key={index} route={item} />
+        ))}
       </Flex>
       <SidebarHelp />
     </Flex>
