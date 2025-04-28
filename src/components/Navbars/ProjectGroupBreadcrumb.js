@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import AsyncSelect from 'react-select/async'
 import { truncatedValue } from 'utils'
 
@@ -19,7 +19,7 @@ import { GetProjectGroupLazyDropdownQuery } from 'graphQL/Queries'
 
 const ProjectGroupBreadcrumb = ({ projectGroupName, defaultFirstOption }) => {
   const navigate = useNavigate()
-
+  const params = useParams()
   const location = useLocation()
   const { envName } = useGlobalState()
 
@@ -29,9 +29,10 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, defaultFirstOption }) => {
 
   const environment = envName
 
-  const { grayBorderColor } = useThemeColor(['grayBorderColor'])
+  const { primaryTextColor, secondaryTextColor, grayBorderColor } =
+    useThemeColor(['primaryTextColor', 'secondaryTextColor', 'grayBorderColor'])
 
-  const { style } = useSelect('breadcrumb','product')
+  const { style } = useSelect('breadcrumb', 'product')
 
   const viewProds = useHasPermission({
     parentKey: 'view_product_group'
@@ -79,7 +80,12 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, defaultFirstOption }) => {
 
   if (path === 'customer' && projectGroupName) {
     return (
-      <Link to={generateProductDetailPageUrlFromCurrentUrl()}>
+      <Link
+        to={generateProductDetailPageUrlFromCurrentUrl()}
+        style={{
+          color: params?.sbomid ? secondaryTextColor : primaryTextColor
+        }}
+      >
         {truncatedValue(projectGroupName)}
       </Link>
     )
