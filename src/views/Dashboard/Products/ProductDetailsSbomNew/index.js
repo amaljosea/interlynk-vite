@@ -3,7 +3,12 @@ import { useTour } from '@reactour/tour'
 import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { Flex, Grid, GridItem } from '@chakra-ui/react'
+import { Flex, GridItem, SimpleGrid } from '@chakra-ui/react'
+
+import ComponentParts from 'components/Graphs/ComponentParts'
+import LicenseParts from 'components/Graphs/LicenseParts'
+import PolicyParts from 'components/Graphs/PolicyParts'
+import VulnParts from 'components/Graphs/VulnParts'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useGradualPolling } from 'hooks/useGradualPolling'
@@ -12,11 +17,6 @@ import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { GetProductData } from 'graphQL/Queries'
 import { GetProjectSettings, PolicyResultsType } from 'graphQL/Queries'
 
-import { FaBalanceScale } from 'react-icons/fa'
-import { FaBug, FaCube } from 'react-icons/fa6'
-import { MdPolicy } from 'react-icons/md'
-
-import SbomStats from './SbomDetails/SbomStats'
 import SbomInfo from './SbomInfo'
 import SbomTable from './SbomTable'
 
@@ -44,8 +44,7 @@ const ProductDetailsSbomNew = () => {
     }
   )
 
-  const { stats, vulnRunStatus, policyResultMetrics } = data?.sbom || ''
-  const { compCount, compLicenseCount, vulnStats, sbomParts } = stats || ''
+  const { vulnRunStatus } = data?.sbom || {}
 
   const { data: settings } = useQuery(GetProjectSettings, {
     variables: { id: productId }
@@ -85,42 +84,25 @@ const ProductDetailsSbomNew = () => {
   return (
     <Flex width={'100%'} flexDir={'column'} gap={5}>
       <SbomInfo data={data?.sbom} error={error} loading={loading} />
-      <Grid
+      <SimpleGrid
         gap={4}
         width={'100%'}
         alignItems={'flex-start'}
         templateColumns='repeat(12, 1fr)'
       >
-        <GridItem colSpan={3}>
-          <SbomStats
-            title={'Components'}
-            amount={compCount}
-            icon={<FaCube size={20} />}
-          />
+        <GridItem colSpan={[3, 4]}>
+          <ComponentParts />
         </GridItem>
-        <GridItem colSpan={3}>
-          <SbomStats
-            title={'Licenses'}
-            amount={compLicenseCount}
-            icon={<FaBalanceScale size={20} />}
-          />
+        <GridItem hidden colSpan={3}>
+          <LicenseParts />
         </GridItem>
-        <GridItem colSpan={3}>
-          <SbomStats
-            amount={vulnStats}
-            status={vulnRunStatus}
-            title={'Vulnerabilities'}
-            icon={<FaBug size={20} />}
-          />
+        <GridItem colSpan={[5, 4]}>
+          <VulnParts />
         </GridItem>
-        <GridItem colSpan={3}>
-          <SbomStats
-            title={'Policy Results'}
-            amount={policyResultMetrics}
-            icon={<MdPolicy size={20} />}
-          />
+        <GridItem colSpan={4}>
+          <PolicyParts />
         </GridItem>
-      </Grid>
+      </SimpleGrid>
       <SbomTable data={data?.sbom} error={error} loading={loading} />
     </Flex>
   )

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useQuery } from '@apollo/client'
 import { TourProvider, useTour } from '@reactour/tour'
 import NotFound from 'assets/svg/not-found.svg'
@@ -6,6 +7,7 @@ import { KBarProvider } from 'kbar'
 import React, { useEffect } from 'react'
 import { Outlet, useNavigate, useParams } from 'react-router-dom'
 import { displayErrorMessage } from 'utils/errorUtils'
+import { getItem } from 'utils/localStorageUtils'
 import { tourStyles } from 'utils/tourUtils'
 import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 
@@ -35,8 +37,19 @@ export default function Admin() {
 
   const { steps } = useTour()
   const navigate = useNavigate()
-  const { setOrganization } = useGlobalState()
+  const {
+    setOrganization,
+    setSelectedProducts,
+    setSelectedActivities,
+    setSelectedPolicies,
+    setSelectedTrends,
+    setSelectedVulns
+  } = useGlobalState()
   const isMobile = isMobileOrTablet()
+
+  const cards = getItem('selectedCards')
+  const selectedCards = cards ? JSON.parse(cards) : null
+  const { activities, products, vulns, trends, policies } = selectedCards || {}
 
   const productId = params.productid
   const sbomId = params.sbomid
@@ -156,6 +169,13 @@ export default function Admin() {
   useEffect(() => {
     if (data && data.organization) {
       setOrganization(data.organization)
+      setSelectedProducts(products)
+      setSelectedActivities(activities)
+      setSelectedTrends(trends)
+      setSelectedVulns(vulns)
+      setSelectedPolicies(policies)
+    } else {
+      setOrganization(null)
     }
   }, [data, setOrganization])
 

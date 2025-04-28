@@ -1,3 +1,11 @@
+import {
+  allActivities,
+  allPolicies,
+  allProducts,
+  allTrends,
+  allVulns
+} from 'utils/initDashboardData'
+
 import { HamburgerIcon } from '@chakra-ui/icons'
 import {
   Button,
@@ -12,26 +20,15 @@ import {
 } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
-import {
-  allActivities,
-  allPolicies,
-  allProducts,
-  allTrends,
-  allVulns
-} from 'hooks/useGlobalState'
 
 const CardList = () => {
   const {
+    updateCards,
     selectedActivities,
-    setSelectedActivities,
     selectedProducts,
-    setSelectedProducts,
     selectedVulns,
-    setSelectedVulns,
     selectedTrends,
-    setSelectedTrends,
     selectedPolicies,
-    setSelectedPolicies,
     handleClearAll,
     handleSelectAll
   } = useGlobalState()
@@ -55,7 +52,7 @@ const CardList = () => {
           title='Product'
           type='checkbox'
           value={selectedProducts}
-          onChange={(values) => setSelectedProducts(values)}
+          onChange={(values) => updateCards(values, 'products')}
         >
           {allProducts.map((value) => (
             <MenuItemOption key={value} value={value}>
@@ -72,7 +69,7 @@ const CardList = () => {
           title='Vulnerability'
           type='checkbox'
           value={selectedVulns}
-          onChange={(values) => setSelectedVulns(values)}
+          onChange={(values) => updateCards(values, 'vulns')}
         >
           {allVulns.map((value) => (
             <MenuItemOption key={value} value={value}>
@@ -89,7 +86,7 @@ const CardList = () => {
           title='Vulnerability Trends'
           type='checkbox'
           value={selectedTrends}
-          onChange={(values) => setSelectedTrends(values)}
+          onChange={(values) => updateCards(values, 'trends')}
         >
           {allTrends.map((value) => (
             <MenuItemOption key={value} value={value}>
@@ -106,7 +103,7 @@ const CardList = () => {
           title='Policy'
           type='checkbox'
           value={selectedPolicies}
-          onChange={(values) => setSelectedPolicies(values)}
+          onChange={(values) => updateCards(values, 'policies')}
         >
           {allPolicies.map((value) => (
             <MenuItemOption key={value} value={value}>
@@ -123,7 +120,7 @@ const CardList = () => {
           title='Activity'
           type='checkbox'
           value={selectedActivities}
-          onChange={(values) => setSelectedActivities(values)}
+          onChange={(values) => updateCards(values, 'activities')}
         >
           {allActivities.map((value) => (
             <MenuItemOption key={value} value={value}>

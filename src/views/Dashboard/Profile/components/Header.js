@@ -26,7 +26,6 @@ import {
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import EditButton from 'components/Icons/EditButton'
-import LynkAlert from 'components/LynkAlert'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -165,9 +164,6 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
       setDpLoading(false)
     }, 1000)
   }, [SERVER_URL, dp])
-
-  if (!orgData)
-    return <LynkAlert msg={'An internal error occured. Please retry later'} />
 
   return (
     <>

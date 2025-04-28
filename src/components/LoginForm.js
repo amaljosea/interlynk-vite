@@ -3,6 +3,8 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { initializeDashboardData } from 'utils/initDashboardData'
+import { getItem } from 'utils/localStorageUtils'
 
 import { Button, Flex, Stack, Text } from '@chakra-ui/react'
 import { Alert, AlertDescription, AlertIcon } from '@chakra-ui/react'
@@ -27,6 +29,8 @@ const LoginForm = () => {
   const { primaryBlueText, headingTextColor, primaryTextColor } = useThemeColor(
     ['primaryBlueText', 'headingTextColor', 'primaryTextColor']
   )
+
+  const cards = getItem('selectedCards')
 
   const loginURL = process.env.REACT_APP_VENDOR_LOGIN_URL
 
@@ -53,6 +57,7 @@ const LoginForm = () => {
           setLoading(false)
           Cookies.set('authToken', response.headers.authorization)
           Cookies.set('refreshToken', status?.data?.refresh_token)
+          !cards && initializeDashboardData()
           navigate('/vendor/dashboard')
         }
       })
