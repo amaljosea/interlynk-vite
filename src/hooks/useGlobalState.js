@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { sbomCheckReducer } from 'context/reducers'
 import { globalVulnReducer } from 'context/reducers'
 import {
@@ -11,64 +12,98 @@ import {
   versionReducer
 } from 'context/reducers'
 import React, { createContext, useContext, useReducer, useState } from 'react'
+import {
+  allActivities,
+  allPolicies,
+  allProducts,
+  allTrends,
+  allVulns
+} from 'utils/initDashboardData'
+import { setItem } from 'utils/localStorageUtils'
+import { getItem } from 'utils/localStorageUtils'
 
 const GlobalStateContext = createContext()
 
-export const allActivities = ['recent_imports', 'recent_changes']
-
-export const allProducts = [
-  'products_by_lifestages',
-  'versions_by_lifestages',
-  'products_by_labels'
-]
-
-export const allVulns = [
-  'critical_vulns_by_status',
-  'high_vulns_by_status',
-  'kev_vulns_by_status',
-  'all_vulns_by_severity',
-  'all_vulns_by_status'
-]
-
-export const allTrends = [
-  'vulns_by_severity',
-  'vulns_by_status',
-  'defect_density',
-  'resolution_age',
-  'resotion_velocity',
-  'patch_velocity'
-]
-
-export const allPolicies = ['policy_results']
-
 const GlobalStateProvider = ({ children }) => {
-  const env = localStorage.getItem('environment')
+  const env = getItem('environment')
+  const cards = getItem('selectedCards')
+  const selectedCards = cards ? JSON.parse(cards) : null
+
   const [organization, setOrganization] = useState(null)
   const [userPermissions, setUserPermissions] = useState([])
   const [envName, setEnvName] = useState(env || 'default')
   const [clearSelect, setClearSelect] = useState(false)
   const [selectedSbom, setSelectedSbom] = useState([])
   const [labelIds, setLabelIds] = useState([])
-  const [selectedActivities, setSelectedActivities] = useState(allActivities)
-  const [selectedProducts, setSelectedProducts] = useState(allProducts)
-  const [selectedVulns, setSelectedVulns] = useState(allVulns)
-  const [selectedTrends, setSelectedTrends] = useState(allTrends)
-  const [selectedPolicies, setSelectedPolicies] = useState(allPolicies)
+  const [selectedActivities, setSelectedActivities] = useState([])
+  const [selectedProducts, setSelectedProducts] = useState([])
+  const [selectedVulns, setSelectedVulns] = useState([])
+  const [selectedTrends, setSelectedTrends] = useState([])
+  const [selectedPolicies, setSelectedPolicies] = useState([])
+
+  const updateSelection = (data) => {
+    setItem('selectedCards', JSON.stringify(data))
+    const setters = {
+      products: setSelectedProducts,
+      activities: setSelectedActivities,
+      vulns: setSelectedVulns,
+      trends: setSelectedTrends,
+      policies: setSelectedPolicies
+    }
+
+    Object.entries(data).forEach(([key, value]) => {
+      setters[key](value)
+    })
+  }
+
+  const updateSelectedState = (values, key) => {
+    switch (key) {
+      case 'products':
+        setSelectedProducts(values)
+        break
+      case 'vulns':
+        setSelectedVulns(values)
+        break
+      case 'trends':
+        setSelectedTrends(values)
+        break
+      case 'policies':
+        setSelectedPolicies(values)
+        break
+      case 'activities':
+        setSelectedActivities(values)
+        break
+      default:
+        break
+    }
+  }
+
+  const updateCards = (values, key) => {
+    updateSelectedState(values, key)
+    if (selectedCards) {
+      const updated = { ...selectedCards, [key]: values }
+      setItem('selectedCards', JSON.stringify(updated))
+    }
+  }
 
   const handleClearAll = () => {
-    setSelectedProducts([])
-    setSelectedVulns([])
-    setSelectedTrends([])
-    setSelectedPolicies([])
-    setSelectedActivities([])
+    updateSelection({
+      products: [],
+      activities: [],
+      vulns: [],
+      trends: [],
+      policies: []
+    })
   }
 
   const handleSelectAll = () => {
-    setSelectedProducts(allProducts)
-    setSelectedVulns(allVulns)
-    setSelectedTrends(allTrends)
-    setSelectedPolicies(allPolicies)
-    setSelectedActivities(allActivities)
+    updateSelection({
+      products: allProducts,
+      activities: allActivities,
+      vulns: allVulns,
+      trends: allTrends,
+      policies: allPolicies
+    })
   }
 
   // PRODUCTS
@@ -235,6 +270,7 @@ const GlobalStateProvider = ({ children }) => {
         setSelectedTrends,
         selectedPolicies,
         setSelectedPolicies,
+        updateCards,
         handleClearAll,
         handleSelectAll,
         envName,
