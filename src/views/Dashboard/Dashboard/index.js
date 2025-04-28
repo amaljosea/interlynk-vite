@@ -97,7 +97,7 @@ export default function Page() {
           {!isFreeTier && <CardList />}
         </Flex>
       </Flex>
-      <Stack spacing={10}>
+      <Stack spacing={10} pb={4}>
         {/* PRODUCTS GRAPHS */}
         <ProductGroup />
         {/* VULNERABILITIRS GRAPHS */}

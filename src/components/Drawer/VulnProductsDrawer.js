@@ -1,4 +1,5 @@
 import { gql } from '@apollo/client'
+import { useMemo } from 'react'
 import { getFullDate, timeSince } from 'utils'
 
 import { Flex, Tag, Text, Tooltip } from '@chakra-ui/react'
@@ -66,6 +67,10 @@ const VulnProductsDrawer = ({ isOpen, onClose, data }) => {
     }
   )
 
+  const filteredNodes = useMemo(() => {
+    return nodes?.filter((group) => group?.projects?.length > 0)
+  }, [nodes])
+
   const columns = [
     // PRODUCTS
     {
@@ -110,10 +115,13 @@ const VulnProductsDrawer = ({ isOpen, onClose, data }) => {
       <LynkTable
         columns={columns}
         progressPending={loading}
-        data={nodes}
+        data={filteredNodes}
         className='data-table-container'
       />
-      <Pagination {...paginationProps} />
+      <Pagination
+        {...paginationProps}
+        totalCount={filteredNodes?.length || 0}
+      />
     </LynkDrawer>
   )
 }

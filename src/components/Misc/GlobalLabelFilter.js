@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import {
   Menu,
@@ -24,9 +24,12 @@ const GlobalLabelFilter = ({ value, setValue }) => {
   const { isFreeTier } = useGlobalQueryContext()
   const { globalVulnDispatch } = dispatch
 
-  const [labels, setLabels] = useState([
-    { id: 'all', name: 'All', color: secondaryTextColor }
-  ])
+  const defaultLabel = useMemo(
+    () => [{ id: 'all', name: 'All', color: secondaryTextColor }],
+    [secondaryTextColor]
+  )
+
+  const [labels, setLabels] = useState(defaultLabel)
 
   const onFilterLabel = (value) => {
     setValue(value?.includes('all') ? [] : value)
@@ -34,25 +37,25 @@ const GlobalLabelFilter = ({ value, setValue }) => {
   }
 
   const { data } = useQuery(GetLabels, {
-    skip: !isFreeTier ? false : true,
+    skip: isFreeTier,
     variables: { first: 100 }
   })
-  const { nodes } = data?.labels || {}
 
   useEffect(() => {
-    if (nodes?.length > 0) {
-      nodes?.map((item) =>
-        labels?.push({
+    if (data?.labels?.nodes?.length > 0) {
+      const newLabels = [
+        ...defaultLabel,
+        ...data.labels.nodes.map((item) => ({
           id: item?.id,
           name: item?.name,
           color: item?.color
-        })
-      )
-      setLabels(labels)
+        }))
+      ]
+      setLabels(newLabels)
     }
-  }, [labels, nodes, secondaryTextColor])
+  }, [data, defaultLabel])
 
-  if (isFreeTier || labels?.length === 1) return null
+  if (isFreeTier || labels.length <= 1) return null
 
   return (
     <Menu closeOnSelect={false}>
@@ -63,11 +66,11 @@ const GlobalLabelFilter = ({ value, setValue }) => {
           value={value}
           onChange={onFilterLabel}
         >
-          {labels?.map((item, index) => (
+          {labels.map((item, index) => (
             <MenuItemOption
               key={index}
               fontSize={'sm'}
-              value={item?.id}
+              value={item.id}
               wordBreak={'break-all'}
               aria-label={`label${index}`}
             >

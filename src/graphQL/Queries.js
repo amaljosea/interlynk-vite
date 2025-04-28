@@ -2107,6 +2107,7 @@ export const GetVulnData = gql`
         }
         nodes {
           id
+          sbomId
           impact
           isPart
           isComplete
@@ -5466,7 +5467,7 @@ export const getKevVulnsByStatus = gql`
     }
   }
 `
-  
+
 // GET ALL POLICIES RULES
 export const getAllPolicies = gql`
   query GetAllPolicies {

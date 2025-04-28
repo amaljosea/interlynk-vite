@@ -27,7 +27,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import PolicyGraphs from './components/category/PolicyGraphs'
 
 function PolicyGroup() {
-  const { selectedPolicies, setSelectedPolicies } = useGlobalState()
+  const { updateCards, selectedPolicies } = useGlobalState()
 
   const [policyCards, setPolicyCards] = useState([
     {
@@ -40,7 +40,7 @@ function PolicyGroup() {
   const [isGridLayout, setIsGridLayout] = useState(true)
 
   const filteredPolicyCards = useMemo(() => {
-    return policyCards.filter((card) => selectedPolicies.includes(card.type))
+    return policyCards.filter((card) => selectedPolicies?.includes(card.type))
   }, [policyCards, selectedPolicies])
 
   const sensors = useSensors(
@@ -63,7 +63,8 @@ function PolicyGroup() {
   }
 
   const handleDeleteCard = (key) => {
-    setSelectedPolicies(selectedPolicies?.filter((item) => item !== key))
+    const filteredItems = selectedPolicies?.filter((item) => item !== key)
+    updateCards(filteredItems, 'policies')
   }
 
   if (filteredPolicyCards?.length === 0) return null

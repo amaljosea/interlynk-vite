@@ -2,19 +2,13 @@ import { useMutation, useQuery } from '@apollo/client'
 import { sevColor } from 'utils/styleUtils'
 
 import { ChevronDownIcon } from '@chakra-ui/icons'
-import {
-  Button,
-  Flex,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Text
-} from '@chakra-ui/react'
+import { Button, Flex, Text } from '@chakra-ui/react'
+import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
+import LynkTable from 'components/LynkTable'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -25,14 +19,16 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { orgRuleUpdate } from 'graphQL/Mutation'
 import { GetOrgRules } from 'graphQL/Queries'
-import LynkTable from 'components/LynkTable'
 
 const Checks = () => {
   const showToast = useCustomToast()
   const activetab = useQueryParam('tab')
   const { orgView } = useGlobalQueryContext()
 
-  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
+  const { primaryTextColor, secondaryTextInverse } = useThemeColor([
+    'primaryTextColor',
+    'secondaryTextInverse'
+  ])
 
   const canEdit = useHasPermission({
     parentKey: 'view_organization',
@@ -81,7 +77,9 @@ const Checks = () => {
       name: 'CHECK ID',
       width: '10%',
       selector: (row) => (
-        <Text color={primaryTextColor}>{row.rule.friendlyId}</Text>
+        <Text fontSize={14} color={primaryTextColor}>
+          {row.rule.friendlyId}
+        </Text>
       ),
       sortable: true,
       sortFunction: (a, b) => {
@@ -99,12 +97,10 @@ const Checks = () => {
         const { rule } = row
         return (
           <Flex direction='column' rowGap={1} my={3}>
-            <Text color={primaryTextColor} fontSize={'sm'}>
+            <Text color={primaryTextColor} fontSize={14}>
               {rule.shortDesc}
             </Text>
-            <Text color={primaryTextColor} fontSize={'12px'}>
-              {rule.longDesc}
-            </Text>
+            <Text color={secondaryTextInverse}>{rule.longDesc}</Text>
           </Flex>
         )
       },
@@ -120,22 +116,16 @@ const Checks = () => {
         return (
           <Menu>
             <MenuButton
-              width={'100px'}
               as={Button}
               size='sm'
-              bg={sevColor(severity.toLowerCase()).bg}
-              textColor={sevColor(severity.toLowerCase()).text}
-              borderRadius='6px'
-              border='none'
-              fontWeight='normal'
-              padding='0'
-              paddingLeft='4px'
-              paddingRight='8px'
+              width={'110px'}
+              variant='solid'
               isDisabled={!canEdit}
-              rightIcon={<ChevronDownIcon boxSize={5} />}
-              _hover={{ bg: sevColor(severity.toLowerCase()).bg }}
+              _hover={{ bg: 'auto' }}
+              _active={{ bg: 'auto' }}
               _focus={{ boxShadow: 'none' }}
-              _active={{ bg: sevColor(severity.toLowerCase()).bg }}
+              rightIcon={<ChevronDownIcon boxSize={5} />}
+              colorScheme={sevColor(severity.toLowerCase()).btn}
             >
               {options.find((option) => option.value === severity)?.label ||
                 'Select option'}

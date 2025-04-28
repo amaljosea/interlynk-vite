@@ -28,7 +28,7 @@ import ActivitiesOverview from './components/ActivitiesOverview'
 import ProductsOverview from './components/ProductsOverview'
 
 function Activities() {
-  const { selectedActivities, setSelectedActivities } = useGlobalState()
+  const { updateCards, selectedActivities } = useGlobalState()
 
   const [activityCards, setActivityCards] = useState([
     {
@@ -48,7 +48,7 @@ function Activities() {
 
   const filteredActivityCards = useMemo(() => {
     return activityCards.filter((card) =>
-      selectedActivities.includes(card.type)
+      selectedActivities?.includes(card.type)
     )
   }, [activityCards, selectedActivities])
 
@@ -72,7 +72,8 @@ function Activities() {
   }
 
   const handleDeleteCard = (key) => {
-    setSelectedActivities(selectedActivities?.filter((item) => item !== key))
+    const filteredItems = selectedActivities?.filter((item) => item !== key)
+    updateCards(filteredItems, 'activities')
   }
 
   if (filteredActivityCards?.length === 0) return null
