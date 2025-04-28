@@ -1,4 +1,5 @@
 import { useMutation } from '@apollo/client'
+import Cookies from 'js-cookie'
 import { useState } from 'react'
 import { disableButtonTemporarily } from 'utils'
 import {
@@ -16,9 +17,9 @@ import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 
-import { RegisterOrganization } from 'graphQL/Mutation'
+import { RegisterOrganization, SwitchOrganization } from 'graphQL/Mutation'
 
-const OrgModal = ({ isOpen, onClose }) => {
+const OrgModal = ({ isOpen, onClose, shouldSwitchOrg = false }) => {
   const { showToast } = useCustomToast()
   const [error, setError] = useState('')
   const [name, setName] = useState('')
@@ -33,6 +34,7 @@ const OrgModal = ({ isOpen, onClose }) => {
 
   const [registerOrg, { loading: regLoading }] =
     useMutation(RegisterOrganization)
+  const [switchOrg] = useMutation(SwitchOrganization)
 
   const handleCheckEmail = () => {
     if (!validateEmail(email)) {
@@ -44,6 +46,23 @@ const OrgModal = ({ isOpen, onClose }) => {
     if (!validateUrl(url)) {
       setUrlError('Please enter a valid URL')
     }
+  }
+
+  const handleSwitchOrg = (orgId, orgName) => {
+    switchOrg({
+      variables: {
+        orgId
+      }
+    }).then((res) => {
+      if (res.data) {
+        Cookies.set('authToken', res.data.organizationSwitch.token)
+        showToast?.({
+          description: `Logged into ${orgName} successfully`,
+          status: 'success'
+        })
+        window.location.href = '/vendor/dashboard'
+      }
+    })
   }
 
   const handleCreate = () => {
@@ -60,11 +79,22 @@ const OrgModal = ({ isOpen, onClose }) => {
       if (errors?.length > 0) {
         setError(errors[0])
       } else {
-        showToast({
-          description: `Organization added successfully`,
-          status: 'success'
-        })
-        onClose()
+        const orgId = res?.data?.organizationCreate?.organization?.id
+        const orgName = res?.data?.organizationCreate?.organization?.name
+
+        !shouldSwitchOrg &&
+          showToast({
+            description: `Organization added successfully`,
+            status: 'success'
+          })
+
+        localStorage.setItem('organization', orgName)
+
+        if (shouldSwitchOrg) {
+          handleSwitchOrg(orgId, orgName)
+        } else {
+          onClose()
+        }
       }
     })
   }
