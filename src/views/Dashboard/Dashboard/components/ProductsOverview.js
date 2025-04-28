@@ -127,21 +127,23 @@ const ProductsOverview = () => {
         const { id, project } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
         return (
-          <Link
-            to={generateProductDetailPageUrlFromCurrentUrl({
-              productgroupid: project?.projectGroup?.id,
-              productid: project?.id
-            })}
-            style={{ pointerEvents: uniqueSbom ? 'inherit' : 'none' }}
-            onClick={() => handleClick(row)}
-          >
-            <Text
-              my={3}
-              color={uniqueSbom ? primaryBlueText : secondaryTextInverse}
+          <Tooltip placement='top' label={project?.projectGroup?.name}>
+            <Link
+              to={generateProductDetailPageUrlFromCurrentUrl({
+                productgroupid: project?.projectGroup?.id,
+                productid: project?.id
+              })}
+              style={{ pointerEvents: uniqueSbom ? 'inherit' : 'none' }}
+              onClick={() => handleClick(row)}
             >
-              {truncatedValue(project?.projectGroup?.name, 16)}
-            </Text>
-          </Link>
+              <Text
+                my={3}
+                color={uniqueSbom ? primaryBlueText : secondaryTextInverse}
+              >
+                {truncatedValue(project?.projectGroup?.name, 16)}
+              </Text>
+            </Link>
+          </Tooltip>
         )
       }
     },
@@ -150,30 +152,31 @@ const ProductsOverview = () => {
       id: 'VERSION',
       name: 'VERSION',
       wrap: true,
-      right: 'true',
       selector: (row) => {
         const { id, project, projectVersion } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
         return (
-          <Link
-            to={generateProductVersionDetailPageUrlFromCurrentUrl({
-              productgroupid: project?.projectGroup?.id,
-              productid: project?.id,
-              sbomid: id,
-              paramsObj: {
-                tab: 'general'
-              }
-            })}
-            style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
-          >
-            <Text
-              my={2}
-              color={uniqueSbom ? primaryBlueText : secondaryTextInverse}
-              textAlign={'right'}
+          <Tooltip placement='top' label={projectVersion}>
+            <Link
+              to={generateProductVersionDetailPageUrlFromCurrentUrl({
+                productgroupid: project?.projectGroup?.id,
+                productid: project?.id,
+                sbomid: id,
+                paramsObj: {
+                  tab: 'general'
+                }
+              })}
+              style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
             >
-              {projectVersion ? truncatedValue(projectVersion, 12) : 'N/A'}
-            </Text>
-          </Link>
+              <Text
+                my={2}
+                color={uniqueSbom ? primaryBlueText : secondaryTextInverse}
+                textAlign={'right'}
+              >
+                {projectVersion ? truncatedValue(projectVersion, 12) : 'N/A'}
+              </Text>
+            </Link>
+          </Tooltip>
         )
       }
     },
