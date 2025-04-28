@@ -107,7 +107,7 @@ const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
               />
             </Tooltip>
             <Text fontSize={14} color={primaryTextColor}>
-              {component?.sbom?.project?.projectGroup?.name || ''}
+              {component?.sbom?.project?.projectGroup?.name || 'N/A'}
             </Text>
           </Flex>
         )
@@ -167,7 +167,7 @@ const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
             color={primaryTextColor}
             textTransform={'capitalize'}
           >
-            {component?.sbom?.project?.name || ''}
+            {component?.sbom?.project?.name || 'N/A'}
           </Text>
         )
       },
