@@ -8,19 +8,21 @@ import Profile from 'views/Dashboard/Profile'
 import Support from 'views/Dashboard/Support'
 import Vulnerabilities from 'views/Dashboard/Vulnerabilities'
 
-import { HomeIcon } from 'components/Icons/Icons'
 import Licenses from 'components/Licenses'
 
 import {
-  FaBalanceScale,
-  FaBug,
-  FaHeartbeat,
-  FaRegSun,
-  FaWindowMaximize
-} from 'react-icons/fa'
-import { FaFileImport, FaFileLines, FaToolbox } from 'react-icons/fa6'
-import { IoMdAnalytics } from 'react-icons/io'
-import { MdPolicy } from 'react-icons/md'
+  LuBookOpen,
+  LuBox,
+  LuBug,
+  LuChartNoAxesCombined,
+  LuFolderDown,
+  LuGitCompare,
+  LuHeartHandshake,
+  LuHouse,
+  LuScale,
+  LuSettings,
+  LuShieldCheck
+} from 'react-icons/lu'
 
 export function useRoutes() {
   const vendorRoutes = useMemo(
@@ -28,77 +30,77 @@ export function useRoutes() {
       {
         path: '/dashboard',
         name: 'Dashboard',
-        icon: <HomeIcon />,
+        icon: <LuHouse size={20} />,
         component: Dashboard,
         layout: '/vendor'
       },
       {
         path: '/products',
         name: 'Products',
-        icon: <FaWindowMaximize />,
+        icon: <LuBox size={20} />,
         component: Products,
         layout: '/vendor'
       },
       {
         path: '/requests',
         name: 'Requests',
-        icon: <FaFileImport />,
+        icon: <LuFolderDown size={20} />,
         component: () => 'Requests',
         layout: '/vendor'
       },
       {
         path: '/vulnerabilities',
         name: 'Vulnerabilities',
-        icon: <FaBug />,
+        icon: <LuBug size={20} />,
         component: Vulnerabilities,
         layout: '/vendor'
       },
       {
         path: '/licenses',
         name: 'Licenses',
-        icon: <FaBalanceScale />,
+        icon: <LuScale size={20} />,
         component: Licenses,
         layout: '/vendor'
       },
       {
         path: '/analytics',
         name: 'Analytics',
-        icon: <IoMdAnalytics />,
+        icon: <LuChartNoAxesCombined size={20} />,
         component: () => 'Analytics',
         layout: '/vendor'
       },
       {
         path: '/tools',
         name: 'Tools',
-        icon: <FaToolbox />,
+        icon: <LuGitCompare size={20} />,
         component: () => 'Tool',
         layout: '/vendor'
       },
       {
         path: '/support',
         name: 'Support',
-        icon: <FaHeartbeat />,
+        icon: <LuHeartHandshake size={20} />,
         component: Support,
         layout: '/vendor'
       },
       {
         path: '/policies',
         name: 'Policies',
-        icon: <MdPolicy />,
+        icon: <LuShieldCheck size={20} />,
         component: Policies,
         layout: '/vendor'
       },
       {
         path: '/settings?tab=users',
         name: 'Settings',
-        icon: <FaRegSun />,
+        icon: <LuSettings size={20} />,
         component: Profile,
         layout: '/vendor'
       },
       {
         path: 'http://docs.interlynk.io/',
         name: 'Documentation',
-        icon: <FaFileLines />,
+        icon: <LuBookOpen size={20} />,
         component: () => null,
         layout: ''
       }
@@ -111,7 +113,7 @@ export function useRoutes() {
       {
         path: '/products',
         name: 'Products',
-        icon: <FaWindowMaximize />,
+        icon: <LuBox size={20} />,
         component: CustomerProducts,
         layout: '/customer'
       }

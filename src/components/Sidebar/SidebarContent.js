@@ -70,7 +70,7 @@ const SidebarContent = ({ routes }) => {
           target={name === 'Documentation' ? '_blank' : '_self'}
         >
           <Button
-            px={3}
+            px={2}
             title={name}
             bg={isActive ? primaryBlueText : 'none'}
             color={isActive ? 'white' : secondaryTextColor}
