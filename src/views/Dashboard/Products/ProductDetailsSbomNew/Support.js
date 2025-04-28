@@ -81,7 +81,7 @@ const Support = () => {
     GetCompSupportData,
     {
       skip: activeTab === 'support' ? false : true,
-      selector: 'sbom.components',
+      selector: 'componentSupportLevel',
       variables: {
         ...supportData,
         sbomId: sbomId,
@@ -228,7 +228,7 @@ const Support = () => {
           onSelectedRowsChange={handleChange}
           data={enableSupportLevel ? nodes : []}
           expandableRowsComponent={SupportExpanded}
-          selectableRowDisabled={(row) => row?.sbom?.id !== sbomId}
+          // selectableRowDisabled={(row) => row?.sbom?.id !== sbomId}
         />
 
         {/* PAGINATION */}

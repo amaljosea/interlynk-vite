@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { formatDate, getDate, getTotalDays } from 'utils'
 import { assessmentExpiryWarning } from 'variables/general'
@@ -15,7 +15,6 @@ import {
 import { Button, ButtonGroup } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import DeleteButton from 'components/Icons/DeleteButton'
 import EditButton from 'components/Icons/EditButton'
 import LynkDate from 'components/LynkDate'
@@ -28,26 +27,22 @@ import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
+  ComponentSupportLevelBulkUpdate,
   componentSupportLevelCreate,
-  componentSupportLevelDelete,
-  componentSupportLevelUpdate
+  componentSupportLevelDelete
 } from 'graphQL/Mutation'
-import { GetComponentSupportLevels } from 'graphQL/Queries'
 
 const CompSupport = ({ data, isOpen, onClose, enableSupportLevel }) => {
   const [edit, setEdit] = useState(false)
-
-  const { data: supports, loading } = useQuery(GetComponentSupportLevels, {
-    skip: isOpen ? false : true,
-    variables: { id: data?.id, sbomId: data?.sbom?.id }
-  })
+  const supports = data?.occurrences[0] || {}
+  const { internal } = supports || {}
 
   const Header = () => {
-    if (!data) return null
+    if (!supports) return null
     return (
       <Flex gap={2}>
-        <CompInfo data={data} />
-        {data?.internal && (
+        <CompInfo data={supports} />
+        {internal && (
           <Tag w={'fit-content'} colorScheme='blue'>
             Internal
           </Tag>
@@ -64,30 +59,21 @@ const CompSupport = ({ data, isOpen, onClose, enableSupportLevel }) => {
       subtitle={<Header />}
       title={'Edit Support Status'}
     >
-      {loading ? (
-        <CustomLoader />
-      ) : (
-        <Stack>
-          {edit ? (
-            <SupportForm
-              setEdit={setEdit}
-              handleClose={onClose}
-              data={data}
-              component={{
-                id: data?.id,
-                name: data?.name,
-                internal: data?.internal
-              }}
-            />
-          ) : (
-            <SupportCard
-              setEdit={setEdit}
-              data={supports?.component}
-              enableSupportLevel={enableSupportLevel}
-            />
-          )}
-        </Stack>
-      )}
+      <Stack w={'100%'}>
+        {edit ? (
+          <SupportForm
+            setEdit={setEdit}
+            handleClose={onClose}
+            data={supports}
+          />
+        ) : (
+          <SupportCard
+            setEdit={setEdit}
+            data={supports}
+            enableSupportLevel={enableSupportLevel}
+          />
+        )}
+      </Stack>
     </LynkDrawer>
   )
 }
@@ -198,17 +184,19 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
   )
 }
 
-const SupportForm = ({ component, data, setEdit, handleClose }) => {
+const SupportForm = ({ data, setEdit, handleClose }) => {
   const { isCustomerView } = useRouteFlags()
   const { showToast } = useCustomToast()
 
-  const defaultDate = new Date()
-  defaultDate.setDate(defaultDate.getDate() + 365)
-
   const {
+    name,
+    internal,
     componentSupportLevel: manual,
     componentSupportLevelAutomatic: automatic
-  } = data || {}
+  } = data?.occurrences[0] || {}
+
+  const defaultDate = new Date()
+  defaultDate.setDate(defaultDate.getDate() + 365)
 
   const { endDate, retainManualOverrideFor } = manual || {}
 
@@ -231,8 +219,8 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
 
   const isDisabled =
     formData?.supportLevel === '' ||
-    (isAbandoned && !component?.internal && totalDays < 1) ||
-    (isAbandoned && !component?.internal && totalDays > 365)
+    (isAbandoned && !internal && totalDays < 1) ||
+    (isAbandoned && !internal && totalDays > 365)
 
   const noLongerMaintained = formData?.supportLevel === 'no_longer_maintained'
 
@@ -269,7 +257,7 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
     componentSupportLevelCreate
   )
   const [updateSupport, { loading: updateLoading }] = useMutation(
-    componentSupportLevelUpdate
+    ComponentSupportLevelBulkUpdate
   )
   const [deleteSupport, { loading: deleteLoading }] = useMutation(
     componentSupportLevelDelete
@@ -283,9 +271,10 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
   }
 
   const handleUpdate = () => {
+    const ids = data?.occurrences?.map((item) => item?.id) || []
     updateSupport({
       variables: {
-        id: manual?.id,
+        ids: ids,
         level: formData?.supportLevel || undefined,
         notes: formData?.explanation || undefined,
         retainManualOverrideFor: totalDays > 0 ? totalDays : 0,
@@ -295,7 +284,7 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
       }
     })
       .then((res) => {
-        const { errors } = res?.data?.componentSupportLevelUpdate || {}
+        const { errors } = res?.data?.componentSupportLevelBulkUpdate || {}
         if (errors?.length > 0) {
           showToast({
             description: errors[0],
@@ -310,7 +299,6 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
       })
       .finally(() => handleClose(false))
   }
-
   const handleSubmit = () => {
     createSupport({
       variables: {
@@ -387,7 +375,7 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
   if (isOpen)
     return (
       <Stack spacing={4} mt={2}>
-        <Text>{`You are about to delete the support : ${component?.name} from this component.`}</Text>
+        <Text>{`You are about to delete the support : ${name} from this component.`}</Text>
         <Text fontWeight={500}>Are you sure you want to proceed?</Text>
         <ButtonGroup>
           <Button onClick={onClose}>Cancel</Button>
@@ -444,9 +432,7 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
       {/* RETAIN MANNUAL OVERRIDE */}
       <FormControl
         hidden={noLongerMaintained}
-        isRequired={
-          !component?.internal && formData?.supportLevel !== 'abandoned'
-        }
+        isRequired={!internal && formData?.supportLevel !== 'abandoned'}
         isInvalid={totalDays > 365}
       >
         <FormLabel htmlFor='assessmentExpiresOn'>

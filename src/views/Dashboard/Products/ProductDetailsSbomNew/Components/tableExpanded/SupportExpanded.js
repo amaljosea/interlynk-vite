@@ -58,17 +58,18 @@ const SupportExpanded = (props) => {
   const { data } = props
 
   return useMemo(() => {
-    const { duplicates } = data || {}
+    const { occurrences } = data || {}
 
     return (
       <Stack
         sx={{ w: '100%', p: 5 }}
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
-        <SupportInfo data={data} />
-        <Divider />
-        {duplicates?.map((item, index) => (
-          <SupportInfo key={index} data={item} />
+        {occurrences?.map((item, index) => (
+          <>
+            <SupportInfo key={index} data={item} />
+            <Divider hidden={index === occurrences?.length - 1} />
+          </>
         ))}
       </Stack>
     )
