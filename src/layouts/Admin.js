@@ -6,7 +6,6 @@ import Cookies from 'js-cookie'
 import { KBarProvider } from 'kbar'
 import React, { useEffect } from 'react'
 import { Outlet, useNavigate, useParams } from 'react-router-dom'
-import { dashRoutes } from 'routes.js'
 import { displayErrorMessage } from 'utils/errorUtils'
 import { getItem } from 'utils/localStorageUtils'
 import { tourStyles } from 'utils/tourUtils'
@@ -23,6 +22,7 @@ import Sidebar from 'components/Sidebar'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useRouteFlags } from 'hooks/useRouteFlags'
+import { useRoutes } from 'hooks/useRoutes'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetOrganization } from 'graphQL/Queries'
@@ -55,6 +55,7 @@ export default function Admin() {
   const sbomId = params.sbomid
   const authToken = Cookies.get('authToken')
   const tabRes = window.matchMedia('(max-width: 1199px)')
+  const { vendor } = useRoutes()
   const { isProductsPage, isVendorPage, isVendorRootPage } = useRouteFlags()
 
   const {
@@ -254,7 +255,7 @@ export default function Admin() {
           }
         >
           <Box pos={'sticky'} top={0}>
-            <Sidebar routes={dashRoutes} />
+            <Sidebar routes={vendor} />
           </Box>
           <Flex width={'100%'} flexDir={'column'}>
             <Box
@@ -266,8 +267,8 @@ export default function Admin() {
             >
               <AdminNavbar
                 tabRes={tabRes}
-                brandText={getActiveRoute(dashRoutes)}
-                secondary={getActiveNavbar(dashRoutes)}
+                brandText={getActiveRoute(vendor)}
+                secondary={getActiveNavbar(vendor)}
               />
             </Box>
             <Box my={4} px={5}>
