@@ -124,7 +124,7 @@ export default function AdminNavbar(props) {
           >
             <Link to={link}>{category}</Link>
           </BreadcrumbItem>
-          {partsData.map((part, index) => {
+          {partsData?.map((part, index) => {
             const isCurrentPage = index === partsData?.length - 1
             return (
               <BreadcrumbItem

@@ -9,7 +9,8 @@ export const useSelect = (type, category) => {
   const isVersion = type === 'version'
   const isLynkSelect = type === 'lynkSelect'
 
-  const isActive = category === 'version' || !params?.sbomid
+  const isActive =
+    category === 'version' || (!params?.sbomid && !params?.vulnerabilityid)
 
   const {
     primaryBlueText,

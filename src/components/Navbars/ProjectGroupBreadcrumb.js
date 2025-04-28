@@ -78,14 +78,16 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, defaultFirstOption }) => {
 
   const { nodes, totalCountActual } = lazyDropDownProps
 
+  const linkStyle = {
+    color:
+      params?.sbomid || params?.vulnerabilityid
+        ? secondaryTextColor
+        : primaryTextColor
+  }
+
   if (path === 'customer' && projectGroupName) {
     return (
-      <Link
-        to={generateProductDetailPageUrlFromCurrentUrl()}
-        style={{
-          color: params?.sbomid ? secondaryTextColor : primaryTextColor
-        }}
-      >
+      <Link style={linkStyle} to={generateProductDetailPageUrlFromCurrentUrl()}>
         {truncatedValue(projectGroupName)}
       </Link>
     )
@@ -93,7 +95,7 @@ const ProjectGroupBreadcrumb = ({ projectGroupName, defaultFirstOption }) => {
     return <AsyncSelect {...lazyDropDownProps} />
   } else if (nodes && totalCountActual === 1) {
     return (
-      <Link to={generateProductDetailPageUrlFromCurrentUrl()}>
+      <Link style={linkStyle} to={generateProductDetailPageUrlFromCurrentUrl()}>
         {truncatedValue(projectGroupName)}
       </Link>
     )
