@@ -52,7 +52,7 @@ const SupportStatusTable = () => {
   const [supportData, setSupportData] = useState({
     search: '',
     supportLevel: [],
-    include: [],
+    include: ['parts'],
     orderBy: {
       field: 'COMPONENT_SUPPORT_LEVELS_UPDATED_AT',
       direction: 'DESC'
