@@ -14,6 +14,7 @@ import { Tag, TagLabel } from '@chakra-ui/react'
 import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
 import LynkBadge from 'components/LynkBadge'
+import PartInfo from 'components/Misc/PartInfo'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -33,19 +34,6 @@ const SupportColumns = ({ action }) => {
     parentKey: 'view_sbom',
     childKey: 'update_sbom_components'
   })
-
-  const PartInfo = ({ data }) => {
-    if (data?.length === 0) return 'N/A'
-    return (
-      <Stack spacing={1}>
-        {data?.map(({ id, sbom }) => (
-          <Text key={id}>
-            {`${sbom?.project?.projectGroup?.name} : ${sbom?.projectVersion || 'N/A'}`}
-          </Text>
-        ))}
-      </Stack>
-    )
-  }
 
   return useMemo(() => {
     const columns = [
@@ -121,8 +109,8 @@ const SupportColumns = ({ action }) => {
           if (supportLevel) {
             return (
               <Flex gap={2} alignItems={'center'}>
-                <Tag colorScheme={setIntensity(level)}>
-                  <TagLabel textTransform={'capitalize'}>
+                <Tag w={'184px'} colorScheme={setIntensity(level)}>
+                  <TagLabel mx={'auto'} textTransform={'capitalize'}>
                     {supportLevel?.replaceAll('_', ' ')}{' '}
                   </TagLabel>
                 </Tag>
