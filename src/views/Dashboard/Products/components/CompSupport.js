@@ -33,7 +33,7 @@ import {
   componentSupportLevelDelete
 } from 'graphQL/Mutation'
 
-const CompSupport = ({ data, isOpen, onClose, enableSupportLevel }) => {
+const CompSupport = ({ data, reset, isOpen, onClose, enableSupportLevel }) => {
   const [edit, setEdit] = useState(false)
   const supports = data?.occurrences[0] || {}
   const { internal } = supports || {}
@@ -64,7 +64,12 @@ const CompSupport = ({ data, isOpen, onClose, enableSupportLevel }) => {
     >
       <Stack w={'100%'}>
         {edit ? (
-          <SupportForm setEdit={setEdit} handleClose={onClose} data={data} />
+          <SupportForm
+            data={data}
+            reset={reset}
+            setEdit={setEdit}
+            handleClose={onClose}
+          />
         ) : (
           <Stack spacing={4} mt={3}>
             <Flex
@@ -185,7 +190,7 @@ const SupportCard = ({ data }) => {
   )
 }
 
-const SupportForm = ({ data, setEdit, handleClose }) => {
+const SupportForm = ({ data, reset, setEdit, handleClose }) => {
   const { isCustomerView } = useRouteFlags()
   const { showToast } = useCustomToast()
 
@@ -255,13 +260,16 @@ const SupportForm = ({ data, setEdit, handleClose }) => {
   }
 
   const [createSupport, { loading: createLoading }] = useMutation(
-    componentSupportLevelCreate
+    componentSupportLevelCreate,
+    { onCompleted: () => reset() }
   )
   const [updateSupport, { loading: updateLoading }] = useMutation(
-    ComponentSupportLevelBulkUpdate
+    ComponentSupportLevelBulkUpdate,
+    { onCompleted: () => reset() }
   )
   const [deleteSupport, { loading: deleteLoading }] = useMutation(
-    componentSupportLevelDelete
+    componentSupportLevelDelete,
+    { onCompleted: () => reset() }
   )
 
   const handleDateChange = (newDate, field) => {

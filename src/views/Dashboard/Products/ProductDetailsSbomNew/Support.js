@@ -244,6 +244,7 @@ const Support = () => {
 
       {UPDATE_STATUS.isOpen && (
         <CompSupport
+          reset={reset}
           data={activeRow}
           isOpen={UPDATE_STATUS.isOpen}
           onClose={UPDATE_STATUS.onClose}
