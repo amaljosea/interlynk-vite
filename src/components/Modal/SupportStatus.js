@@ -14,10 +14,7 @@ import LynkSelect from 'components/LynkSelect'
 import useCustomToast from 'hooks/useCustomToast'
 import { useRouteFlags } from 'hooks/useRouteFlags'
 
-import {
-  ComponentSupportLevelBulkUpdate,
-  componentSupportLevelBulkCreate
-} from 'graphQL/Mutation'
+import { ComponentSupportLevelBulkUpdate } from 'graphQL/Mutation'
 
 const SupportStatus = ({
   isOpen,
@@ -37,21 +34,10 @@ const SupportStatus = ({
     onClose()
   }
 
-  const [createSupport, { loading: createLoading }] = useMutation(
-    componentSupportLevelBulkCreate,
-    { onCompleted: () => handleClear() }
-  )
   const [updateSupport, { loading: updateLoading }] = useMutation(
     ComponentSupportLevelBulkUpdate,
     { onCompleted: () => handleClear() }
   )
-
-  const componentIds = selectedItems
-    ?.filter((item) => item?.componentSupportLevel === null)
-    ?.map((comp) => comp?.id)
-  const supportIds = selectedItems
-    ?.filter((item) => item?.componentSupportLevel !== null)
-    ?.map((sup) => sup?.componentSupportLevel?.id)
 
   const defaultDate = new Date()
   defaultDate.setDate(defaultDate.getDate() + 365)
@@ -101,12 +87,15 @@ const SupportStatus = ({
     }))
   }
 
-  const handleUpdate = (data) => {
+  const occurrenceIds = selectedItems?.flatMap((group) =>
+    group?.occurrences.map((occurrence) => occurrence?.id)
+  )
+
+  const handleUpdate = () => {
     setToggleClear(false)
-    const ids = data?.length > 0 ? data?.map((item) => item) : []
     updateSupport({
       variables: {
-        ids: ids,
+        ids: occurrenceIds,
         level: formData?.supportLevel || undefined,
         notes: formData?.explanation || undefined,
         retainManualOverrideFor: totalDays > 0 ? totalDays : 0,
@@ -130,42 +119,7 @@ const SupportStatus = ({
     })
   }
 
-  const handleCreate = (data) => {
-    setToggleClear(false)
-    const ids = data?.length > 0 ? data?.map((item) => item) : []
-    createSupport({
-      variables: {
-        ids: ids,
-        level: formData?.supportLevel || undefined,
-        notes: formData?.explanation || undefined,
-        retainManualOverrideFor: totalDays > 0 ? totalDays : 0,
-        endDate: formData?.endOfSupport
-          ? new Date(formData?.endOfSupport).toISOString()
-          : undefined
-      }
-    }).then((res) => {
-      const { errors } = res?.data?.componentSupportLevelBulkCreate || {}
-      if (errors?.length > 0) {
-        showToast({
-          description: errors[0],
-          status: 'error'
-        })
-      } else {
-        showToast({
-          description: 'Status updated successfully',
-          status: 'success'
-        })
-      }
-    })
-  }
-
-  const handleSubmit = () => {
-    if (supportIds?.length > 0) {
-      handleUpdate(supportIds)
-    } else {
-      handleCreate(componentIds)
-    }
-  }
+  const handleSubmit = () => handleUpdate()
 
   const supportOptions = [
     { label: '-- Select --', value: '' },
@@ -181,10 +135,10 @@ const SupportStatus = ({
       onClose={onClose}
       Icon={SupportIcon}
       title={'Add Status'}
+      buttonText={'Update'}
       disabled={isDisabled}
       onSubmit={handleSubmit}
-      isLoading={createLoading || updateLoading}
-      buttonText={supportIds?.length > 0 ? 'Update' : 'Save'}
+      isLoading={updateLoading}
     >
       <Stack spacing={4}>
         {/* SUPPRT LEVEL */}
