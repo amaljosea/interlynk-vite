@@ -6,7 +6,6 @@ import { GetIcon } from 'utils/styleUtils'
 
 import { ViewIcon } from '@chakra-ui/icons'
 import {
-  Badge,
   Box,
   Button,
   Divider,
@@ -21,6 +20,7 @@ import {
 import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
 import { HealthScore } from 'components/HealthScore'
+import LynkBadge from 'components/LynkBadge'
 import ExternalLink from 'components/Misc/ExternalLink'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -123,71 +123,51 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
                 </Tooltip>
                 <Flex gap={2} alignItems={'center'} flexWrap={'wrap'}>
                   {primary && (
-                    <Badge
-                      colorScheme='green'
-                      w={'fit-content'}
-                      fontSize={14}
-                      fontWeight={'normal'}
-                      onClick={() => action(editComponent, row)}
-                    >
-                      Primary
-                    </Badge>
+                    <LynkBadge
+                      color='green'
+                      title='Primary'
+                      action={() => action(editComponent, row)}
+                    />
                   )}
                   <Text hidden={!primary} color={secondaryTextColor}>
                     •
                   </Text>
                   {internal && (
-                    <Badge
-                      colorScheme='blue'
-                      w={'fit-content'}
-                      fontSize={14}
-                      fontWeight={'normal'}
-                      onClick={() => action(editComponent, row)}
-                    >
-                      Internal
-                    </Badge>
+                    <LynkBadge
+                      color='blue'
+                      title='Internal'
+                      action={() => action(editComponent, row)}
+                    />
                   )}
                   <Text hidden={!internal} color={secondaryTextColor}>
                     •
                   </Text>
                   {isOutdated && (
-                    <Badge
-                      colorScheme='yellow'
-                      w={'fit-content'}
-                      fontSize={14}
-                      fontWeight={'normal'}
-                      onClick={() => action(viewInsights, row)}
-                    >
-                      Outdated
-                    </Badge>
+                    <LynkBadge
+                      color='yellow'
+                      title='Outdated'
+                      action={() => action(viewInsights, row)}
+                    />
                   )}
                   <Text hidden={!isOutdated} color={secondaryTextColor}>
                     •
                   </Text>
                   {isVulnerable && !isAllVulnsNotAffected && (
-                    <Badge
-                      colorScheme='red'
-                      w={'fit-content'}
-                      fontSize={14}
-                      fontWeight={'normal'}
-                      onClick={() => action(viewCompVulnerabilities, row)}
-                    >
-                      Vulnerable
-                    </Badge>
+                    <LynkBadge
+                      color='red'
+                      title='Vulnerable'
+                      action={() => action(viewCompVulnerabilities, row)}
+                    />
                   )}
                   <Text hidden={!isVulnerable} color={secondaryTextColor}>
                     •
                   </Text>
                   {packageVersion?.isDeprecated === true && (
-                    <Badge
-                      colorScheme='orange'
-                      w={'fit-content'}
-                      fontSize={14}
-                      fontWeight={'normal'}
-                      onClick={() => action(viewInsights, row)}
-                    >
-                      Deprecated
-                    </Badge>
+                    <LynkBadge
+                      color='orange'
+                      title='Deprecated'
+                      action={() => action(viewInsights, row)}
+                    />
                   )}
                   <Text
                     hidden={!packageVersion?.isDeprecated}
@@ -199,14 +179,7 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
                     <Tooltip
                       label={`${projectGroup?.name} : ${projectVersion || 'N/A'}`}
                     >
-                      <Badge
-                        colorScheme='blue'
-                        w={'fit-content'}
-                        fontSize={14}
-                        fontWeight={'normal'}
-                      >
-                        Part
-                      </Badge>
+                      <LynkBadge color='blue' title='Part' />
                     </Tooltip>
                   )}
                   <Text hidden={!isPart} color={secondaryTextColor}>
