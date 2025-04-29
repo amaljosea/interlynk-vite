@@ -4,6 +4,7 @@ import { formatDate, getDate, getTotalDays } from 'utils'
 import { assessmentExpiryWarning } from 'variables/general'
 
 import {
+  Box,
   Flex,
   FormErrorMessage,
   Input,
@@ -37,6 +38,8 @@ const CompSupport = ({ data, isOpen, onClose, enableSupportLevel }) => {
   const supports = data?.occurrences[0] || {}
   const { internal } = supports || {}
 
+  const { primaryErrorColor } = useThemeColor(['primaryErrorColor'])
+
   const Header = () => {
     if (!supports) return null
     return (
@@ -61,31 +64,51 @@ const CompSupport = ({ data, isOpen, onClose, enableSupportLevel }) => {
     >
       <Stack w={'100%'}>
         {edit ? (
-          <SupportForm
-            setEdit={setEdit}
-            handleClose={onClose}
-            data={supports}
-          />
+          <SupportForm setEdit={setEdit} handleClose={onClose} data={data} />
         ) : (
-          <SupportCard
-            setEdit={setEdit}
-            data={supports}
-            enableSupportLevel={enableSupportLevel}
-          />
+          <Stack spacing={4} mt={3}>
+            <Flex
+              gap={2}
+              alignItems={'center'}
+              justifyContent={'space-between'}
+            >
+              <Box>
+                {!enableSupportLevel && (
+                  <Text fontSize={'sm'} color={primaryErrorColor}>
+                    Component support level analysis is not enabled for this
+                    product
+                  </Text>
+                )}
+              </Box>
+              <EditButton
+                size={'md'}
+                type={'primary'}
+                aria-label='Edit'
+                onClick={() => setEdit(true)}
+              />
+            </Flex>
+            <SupportCard
+              setEdit={setEdit}
+              data={supports}
+              enableSupportLevel={enableSupportLevel}
+            />
+          </Stack>
         )}
       </Stack>
     </LynkDrawer>
   )
 }
 
-const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
+const SupportCard = ({ data }) => {
   const {
     componentSupportLevel: manual,
     componentSupportLevelAutomatic: automatic
   } = data || {}
 
-  const { sameSecondaryText, grayBorderColor, primaryErrorColor } =
-    useThemeColor(['sameSecondaryText', 'grayBorderColor', 'primaryErrorColor'])
+  const { sameSecondaryText, grayBorderColor } = useThemeColor([
+    'sameSecondaryText',
+    'grayBorderColor'
+  ])
 
   const labelStyle = { fontSize: 12, color: sameSecondaryText }
   const infoStyle = { fontSize: 14 }
@@ -108,78 +131,56 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
   const lastAssessed = formatDate(manual?.updatedAt)
 
   return (
-    <Stack spacing={4} mt={3}>
-      <Flex
-        gap={2}
-        alignItems={'center'}
-        justifyContent={!enableSupportLevel ? 'space-between' : 'flex-end'}
-      >
-        {!enableSupportLevel && (
-          <Text fontSize={'sm'} color={primaryErrorColor}>
-            Component support level analysis is not enabled for this product
-          </Text>
-        )}
-        <EditButton
-          size={'md'}
-          aria-label='Edit'
-          alignSelf='end'
-          onClick={() => setEdit(true)}
-          tooltip={'Edit'}
-          type={'primary'}
-        />
-      </Flex>
-
-      <Stack spacing={3}>
-        <Stack {...containerStyle}>
-          <Text {...labelStyle}>Assessment</Text>
-          <Text {...infoStyle}>{assessment}</Text>
-        </Stack>
-        <Stack {...containerStyle}>
-          <Text {...labelStyle}>{`Level`}</Text>
-          <Text {...infoStyle} textTransform={'capitalize'}>
-            {supportLevel?.replaceAll('_', ' ') || 'N/A'}
-          </Text>
-        </Stack>
-        <Stack {...containerStyle}>
-          <Text {...labelStyle}>End of Support</Text>
-          <Text {...infoStyle}>{endOfSupport}</Text>
-        </Stack>
-        <Stack
-          {...containerStyle}
-          hidden={supportLevel === 'no_longer_maintained'}
-        >
-          <Text {...labelStyle}>Assessment Expires On</Text>
-          <Text {...infoStyle}>{assessmentExpiresOn}</Text>
-        </Stack>
-        <Stack {...containerStyle}>
-          <Text {...labelStyle}>{`Explanation`}</Text>
-          <Text {...infoStyle}>{explanation}</Text>
-        </Stack>
-        <Stack {...containerStyle}>
-          <Text {...labelStyle}>Last Assessed By</Text>
-          <Text {...infoStyle} textTransform={'capitalize'}>
-            {assessedBy}
-          </Text>
-        </Stack>
-        <Stack {...containerStyle}>
-          <Text {...labelStyle}>Last Assessed</Text>
-          <Text {...infoStyle}>{lastAssessed}</Text>
-        </Stack>
-        {manual?.user && (
-          <Stack {...containerStyle}>
-            <Text {...labelStyle}>{`Level (System)`}</Text>
-            <Text {...infoStyle} textTransform={'capitalize'}>
-              {automatic?.level?.replaceAll('_', ' ') || 'N/A'}
-            </Text>
-          </Stack>
-        )}
-        {manual?.user && (
-          <Stack {...containerStyle}>
-            <Text {...labelStyle}>{`Explanation (System)`}</Text>
-            <Text {...infoStyle}>{automatic?.notes || 'N/A'}</Text>
-          </Stack>
-        )}
+    <Stack spacing={3} mt={3}>
+      <Stack {...containerStyle}>
+        <Text {...labelStyle}>Assessment</Text>
+        <Text {...infoStyle}>{assessment}</Text>
       </Stack>
+      <Stack {...containerStyle}>
+        <Text {...labelStyle}>{`Level`}</Text>
+        <Text {...infoStyle} textTransform={'capitalize'}>
+          {supportLevel?.replaceAll('_', ' ') || 'N/A'}
+        </Text>
+      </Stack>
+      <Stack {...containerStyle}>
+        <Text {...labelStyle}>End of Support</Text>
+        <Text {...infoStyle}>{endOfSupport}</Text>
+      </Stack>
+      <Stack
+        {...containerStyle}
+        hidden={supportLevel === 'no_longer_maintained'}
+      >
+        <Text {...labelStyle}>Assessment Expires On</Text>
+        <Text {...infoStyle}>{assessmentExpiresOn}</Text>
+      </Stack>
+      <Stack {...containerStyle}>
+        <Text {...labelStyle}>{`Explanation`}</Text>
+        <Text {...infoStyle}>{explanation}</Text>
+      </Stack>
+      <Stack {...containerStyle}>
+        <Text {...labelStyle}>Last Assessed By</Text>
+        <Text {...infoStyle} textTransform={'capitalize'}>
+          {assessedBy}
+        </Text>
+      </Stack>
+      <Stack {...containerStyle}>
+        <Text {...labelStyle}>Last Assessed</Text>
+        <Text {...infoStyle}>{lastAssessed}</Text>
+      </Stack>
+      {manual?.user && (
+        <Stack {...containerStyle}>
+          <Text {...labelStyle}>{`Level (System)`}</Text>
+          <Text {...infoStyle} textTransform={'capitalize'}>
+            {automatic?.level?.replaceAll('_', ' ') || 'N/A'}
+          </Text>
+        </Stack>
+      )}
+      {manual?.user && (
+        <Stack {...containerStyle}>
+          <Text {...labelStyle}>{`Explanation (System)`}</Text>
+          <Text {...infoStyle}>{automatic?.notes || 'N/A'}</Text>
+        </Stack>
+      )}
     </Stack>
   )
 }

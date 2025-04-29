@@ -34,6 +34,19 @@ const SupportColumns = ({ action }) => {
     childKey: 'update_sbom_components'
   })
 
+  const PartInfo = ({ data }) => {
+    if (data?.length === 0) return 'N/A'
+    return (
+      <Stack spacing={1}>
+        {data?.map(({ id, sbom }) => (
+          <Text key={id}>
+            {`${sbom?.project?.projectGroup?.name} : ${sbom?.projectVersion || 'N/A'}`}
+          </Text>
+        ))}
+      </Stack>
+    )
+  }
+
   return useMemo(() => {
     const columns = [
       {
@@ -44,18 +57,14 @@ const SupportColumns = ({ action }) => {
         width: '22%',
         selector: (row) => {
           const { occurrences } = row || {}
-          const { name, isPart, componentSupportLevel, sbom } =
-            occurrences[0] || {}
-          const { project, projectVersion } = sbom || {}
+          const { name, isPart, componentSupportLevel } = occurrences[0] || {}
 
           return (
             <Stack my={3} spacing={1}>
               <Text color={primaryTextColor}>{name}</Text>
               <Flex gap={2} alignItems={'center'} flexWrap={'wrap'}>
                 {isPart && (
-                  <Tooltip
-                    label={`${project?.projectGroup?.name} : ${projectVersion || 'N/A'}`}
-                  >
+                  <Tooltip label={<PartInfo data={occurrences} />}>
                     <chakra.span>
                       <LynkBadge color='blue' title='Part' />
                     </chakra.span>
