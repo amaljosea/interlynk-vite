@@ -18,7 +18,7 @@ import {
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 
-import { FaBalanceScale } from 'react-icons/fa'
+import { LuScale } from 'react-icons/lu'
 
 const GetPartLicenses = gql`
   query GetSbomParts($projectId: Uuid!, $sbomId: Uuid!) {
@@ -84,7 +84,7 @@ const LicenseParts = () => {
         <Stack w={'100%'}>
           <Flex justify='space-between' align='center'>
             <HStack spacing='3'>
-              <Icon as={FaBalanceScale} color='gray.500' boxSize={5} />
+              <Icon as={LuScale} color='gray.500' fontSize={24} />
               <Text fontWeight='bold'>Licenses</Text>
             </HStack>
             <Text fontWeight='bold' fontSize='lg'>

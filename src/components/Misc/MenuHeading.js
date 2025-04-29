@@ -4,7 +4,7 @@ import { Button, MenuButton } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaFilter } from 'react-icons/fa'
+import { LuFilter } from 'react-icons/lu'
 
 const MenuHeading = ({ title, onClick, active, name }) => {
   const location = useLocation()
@@ -38,8 +38,8 @@ const MenuHeading = ({ title, onClick, active, name }) => {
       color={active ? primaryBlueText : primaryTextColor}
       backgroundColor={active ? secondaryBgColor : 'transparent'}
       leftIcon={
-        <FaFilter
-          size={14}
+        <LuFilter
+          size={20}
           color={active ? primaryBlueText : primaryTextColor}
         />
       }

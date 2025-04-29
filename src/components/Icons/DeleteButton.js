@@ -4,14 +4,13 @@ import { Icon, IconButton, Tooltip } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { MdDeleteOutline } from 'react-icons/md'
+import { LuTrash } from 'react-icons/lu'
 
 const DeleteButton = ({
   variant = 'ghost',
   onClick,
   isLoading = false,
   size = 'md',
-  iconSize = 5,
   hidden,
   tooltip,
   ...props
@@ -36,9 +35,8 @@ const DeleteButton = ({
         {...props}
         icon={
           <Icon
-            as={MdDeleteOutline}
-            w={iconSize}
-            h={iconSize}
+            as={LuTrash}
+            fontSize={18}
             color={variant === 'ghost' ? primaryErrorColor : neutralBorder}
           />
         }

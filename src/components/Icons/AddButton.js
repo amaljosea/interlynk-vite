@@ -1,11 +1,11 @@
 import { IconButton, Tooltip } from '@chakra-ui/react'
 
-import { FaPlus } from 'react-icons/fa6'
+import { LuPlus } from 'react-icons/lu'
 
 const AddButton = ({
   label,
   colorScheme = 'blue', // default color scheme
-  icon = <FaPlus />, // default icon
+  icon = <LuPlus size={20} />, // default icon
   tooltipPlacement = 'bottom', //default tooltip placement
   variant = 'solid', //default variant
   ...props

@@ -19,8 +19,7 @@ import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { FaPlus } from 'react-icons/fa6'
-import { LuArchive, LuGitCompare } from 'react-icons/lu'
+import { LuArchive, LuGitCompare, LuPlus } from 'react-icons/lu'
 
 const VersionHeader = (props) => {
   const {
@@ -124,7 +123,7 @@ const VersionHeader = (props) => {
           {/* BUILD SBOM */}
           <Tooltip label='Build Version'>
             <IconButton
-              icon={<FaPlus />}
+              icon={<LuPlus size={20} />}
               colorScheme='blue'
               aria-label='build_sbom'
               hidden={signedUrlParams}

@@ -11,6 +11,7 @@ import RefreshBtn from 'components/Icons/RefreshBtn'
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 
+import { LuCircleAlert, LuFolderUp, LuImport } from 'react-icons/lu'
 import { TbFileExport, TbFileImport } from 'react-icons/tb'
 
 const RuleExport = gql`
@@ -91,7 +92,7 @@ const AutomationSubHeader = ({ RULE, RULE_IMPORT, setActiveRow, projects }) => {
       >
         {!automatedFixesEnabled && (
           <Flex gap={2} alignItems={'center'} w={'fit-content'}>
-            <WarningIcon color={'darkorange'} />
+            <LuCircleAlert size={20} color={'darkorange'} />
             <Text fontSize={'sm'} color={'darkorange'}>
               Automation is disabled under Product Settings
             </Text>
@@ -101,7 +102,7 @@ const AutomationSubHeader = ({ RULE, RULE_IMPORT, setActiveRow, projects }) => {
           <Tooltip label='Import Rules'>
             <IconButton
               colorScheme='blue'
-              icon={<TbFileImport size={20} />}
+              icon={<LuImport size={20} />}
               onClick={RULE_IMPORT.onOpen}
               isDisabled={!canEditAutomations}
             />
@@ -109,7 +110,7 @@ const AutomationSubHeader = ({ RULE, RULE_IMPORT, setActiveRow, projects }) => {
           <Tooltip label='Export Rules'>
             <IconButton
               colorScheme='blue'
-              icon={<TbFileExport size={20} />}
+              icon={<LuFolderUp size={20} />}
               onClick={handleExport}
               isLoading={exportLoading}
             />
