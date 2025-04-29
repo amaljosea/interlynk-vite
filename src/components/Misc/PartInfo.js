@@ -1,12 +1,12 @@
-const { Stack, Text } = require('@chakra-ui/react')
+import { Stack, Text } from '@chakra-ui/react'
 
 const PartInfo = ({ data }) => {
   if (data?.length === 0) return 'N/A'
   return (
     <Stack spacing={1}>
-      {data?.map(({ id, sbom }) => (
-        <Text key={id}>
-          {`${sbom?.project?.projectGroup?.name} : ${sbom?.projectVersion || 'N/A'}`}
+      {data?.map((item, index) => (
+        <Text key={index}>
+          {`${item?.sbom?.project?.projectGroup?.name} : ${item?.sbom?.projectVersion || 'N/A'}`}
         </Text>
       ))}
     </Stack>

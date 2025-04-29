@@ -131,7 +131,7 @@ const SupportStatusTable = () => {
             <Text color={primaryTextColor}>{name}</Text>
             <Flex gap={2} alignItems={'center'} flexWrap={'wrap'}>
               {isPart && (
-                <Tooltip label={<PartInfo data={occurrences} />}>
+                <Tooltip label={<PartInfo data={occurrences || []} />}>
                   <chakra.span>
                     <LynkBadge color='blue' title='Part' />
                   </chakra.span>
