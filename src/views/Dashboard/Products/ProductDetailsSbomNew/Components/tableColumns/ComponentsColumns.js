@@ -212,7 +212,7 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
         name: 'VERSION',
         selector: (row) => (
           <Tooltip label={row?.version || 'N/A'}>
-            <Text my={4} color={primaryTextColor}>
+            <Text my={4} fontSize={14} color={primaryTextColor}>
               {row?.version ? truncatedValue(row?.version, 20) : 'N/A'}
             </Text>
           </Tooltip>
@@ -284,13 +284,13 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
           const license = isExists ? parseLicenseString(licensesExp) : 'N/A'
           return (
             <Tooltip label={licensesExp} placement={'top'}>
-              <Text my={3} color={primaryTextColor}>
+              <Text my={3} fontSize={14} color={primaryTextColor}>
                 {truncatedValue(license, 40)}
               </Text>
             </Tooltip>
           )
         },
-        width: '15%',
+        width: '18%',
         sortable: true,
         wrap: true
       },
