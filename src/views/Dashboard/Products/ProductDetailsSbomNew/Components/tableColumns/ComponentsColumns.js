@@ -271,7 +271,7 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
             </Flex>
           )
         },
-        width: '12%',
+        width: '10%',
         wrap: true
       },
       // LICENSES
@@ -284,13 +284,13 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
           const license = isExists ? parseLicenseString(licensesExp) : 'N/A'
           return (
             <Tooltip label={licensesExp} placement={'top'}>
-              <Text color={primaryTextColor}>
+              <Text my={3} color={primaryTextColor}>
                 {truncatedValue(license, 40)}
               </Text>
             </Tooltip>
           )
         },
-        width: '13%',
+        width: '15%',
         sortable: true,
         wrap: true
       },
