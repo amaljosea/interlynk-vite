@@ -5,7 +5,7 @@ import { Link, useParams } from 'react-router-dom'
 import { getSignedUrlParams } from 'utils'
 import { logoutUser } from 'utils/authUtils'
 
-import { Button, Flex, useColorMode } from '@chakra-ui/react'
+import { Button, Flex, IconButton, useColorMode } from '@chakra-ui/react'
 import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
 import Loading from 'components/Misc/Loading'
@@ -17,7 +17,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useRoutes } from 'hooks/useRoutes'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaDesktop, FaMoon, FaSun } from 'react-icons/fa6'
+import { LuMonitor, LuMoon, LuSun } from 'react-icons/lu'
 
 import { SearchBar } from './SearchBar'
 import { UserMenu } from './UserMenu'
@@ -59,6 +59,8 @@ export default function AdminNavbarLinks(props) {
     setColorMode(mode)
   }
 
+  const iconStyle = { fontSize: 20, color: secondaryTextColor }
+
   return (
     <Flex gap={3} alignItems='center' flexDirection='row'>
       {/* JOIN WAITLIST */}
@@ -86,32 +88,23 @@ export default function AdminNavbarLinks(props) {
       )}
 
       {/* SEARCH */}
-      <SearchBar />
+      {!signedUrlParams && <SearchBar />}
 
       {/* THEME */}
       <Menu>
-        <MenuButton size={'sm'} as={Button} variant={'ghost'} mr={2}>
+        <MenuButton size={'sm'} as={IconButton} variant={'ghost'}>
           {currentMode === 'light' ? (
-            <FaSun color={secondaryTextColor} size={16} />
+            <LuSun {...iconStyle} style={{ margin: '0 auto' }} />
           ) : currentMode === 'dark' ? (
-            <FaMoon color={secondaryTextColor} size={16} />
+            <LuMoon {...iconStyle} style={{ margin: '0 auto' }} />
           ) : (
-            <FaDesktop color={secondaryTextColor} size={16} />
+            <LuMonitor {...iconStyle} style={{ margin: '0 auto' }} />
           )}
         </MenuButton>
-        <MenuList fontSize='sm'>
-          <MenuItem icon={<FaSun />} onClick={() => onThemeChange('light')}>
-            Light
-          </MenuItem>
-          <MenuItem icon={<FaMoon />} onClick={() => onThemeChange('dark')}>
-            Dark
-          </MenuItem>
-          <MenuItem
-            icon={<FaDesktop />}
-            onClick={() => onThemeChange('system')}
-          >
-            System
-          </MenuItem>
+        <MenuList minWidth='120px' fontSize='sm'>
+          <MenuItem onClick={() => onThemeChange('light')}>Light</MenuItem>
+          <MenuItem onClick={() => onThemeChange('dark')}>Dark</MenuItem>
+          <MenuItem onClick={() => onThemeChange('system')}>System</MenuItem>
         </MenuList>
       </Menu>
 
