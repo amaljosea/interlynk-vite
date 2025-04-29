@@ -13,7 +13,6 @@ import { usePartsContext } from 'hooks/usePartsContext'
 import { useProjectGroup } from 'hooks/useProjectGroup'
 import useQueryParam from 'hooks/useQueryParam'
 import { useRouteFlags } from 'hooks/useRouteFlags'
-import { useSelect } from 'hooks/useSelect'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetUserPermissions } from 'graphQL/Queries'
@@ -38,8 +37,6 @@ export default function AdminNavbar(props) {
   const vulnId = useQueryParam('vulnId') || params.vulnerabilityid
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
-  const { style } = useSelect('breadcrumb')
-
   useQuery(GetUserPermissions, {
     skip: path === 'customer' || !orgView,
     onCompleted: (data) => {
@@ -56,15 +53,18 @@ export default function AdminNavbar(props) {
 
   const urlParts = location.pathname.split('/')
   const category = urlParts[2]
-  const { inverseSecondaryBgColor, sameSecondaryText, mainContrastBgColor } =
-    useThemeColor([
-      'inverseSecondaryBgColor',
-      'sameSecondaryText',
-      'mainContrastBgColor'
-    ])
 
-  // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
-  let mainText = inverseSecondaryBgColor
+  const {
+    primaryTextColor,
+    secondaryTextColor,
+    sameSecondaryText,
+    mainContrastBgColor
+  } = useThemeColor([
+    'primaryTextColor',
+    'secondaryTextColor',
+    'sameSecondaryText',
+    'mainContrastBgColor'
+  ])
 
   const {
     id,
@@ -79,6 +79,20 @@ export default function AdminNavbar(props) {
   const link = isVuln
     ? `/${path}/${category}?tab=productVulnerabilities`
     : `/${path}/${category}`
+
+  const isDetailsPage = prodID || vulnId || policyId
+
+  const partsData =
+    !loading && partsContext.isParts
+      ? [
+          ...partsContext.parts,
+          {
+            projectGroupName: projectGroupName,
+            versionName: sbomHookData.versionName,
+            url: null
+          }
+        ]
+      : []
 
   return (
     <Grid
@@ -96,56 +110,49 @@ export default function AdminNavbar(props) {
           separator={<ChevronRightIcon color={sameSecondaryText} />}
           fontSize={'sm'}
         >
-          <BreadcrumbItem color={mainText}>
+          <BreadcrumbItem color={secondaryTextColor}>
             <Link
               to={!isCustomerView ? '/vendor/dashboard' : '/customer/products'}
-              color={'secondaryText'}
             >
               Interlynk
             </Link>
           </BreadcrumbItem>
-          <BreadcrumbItem color={mainText} textTransform={'capitalize'}>
+          <BreadcrumbItem
+            textTransform={'capitalize'}
+            isCurrentPage={isDetailsPage ? false : true}
+            color={isDetailsPage ? secondaryTextColor : primaryTextColor}
+          >
             <Link to={link}>{category}</Link>
           </BreadcrumbItem>
-          {!loading &&
-            partsContext.isParts &&
-            [
-              ...partsContext.parts,
-              {
-                projectGroupName: projectGroupName,
-                versionName: sbomHookData.versionName,
-                url: null
-              }
-            ].map((part, index) => {
-              return (
-                <BreadcrumbItem
-                  isCurrentPage={!!part.url}
-                  key={part.url}
-                  color={mainText}
-                  cursor={'pointer'}
+          {partsData?.map((part, index) => {
+            const isCurrentPage = index === partsData?.length - 1
+            return (
+              <BreadcrumbItem
+                key={part.url}
+                cursor={'pointer'}
+                isCurrentPage={!!part.url}
+                color={isCurrentPage ? primaryTextColor : secondaryTextColor}
+              >
+                <BreadcrumbLink
+                  onClick={() => {
+                    if (part.url) {
+                      partsContext.goTo(index)
+                      navigate(part.url)
+                    }
+                  }}
                 >
-                  <BreadcrumbLink
-                    onClick={() => {
-                      if (part.url) {
-                        partsContext.goTo(index)
-                        navigate(part.url)
-                      }
-                    }}
-                  >
-                    {truncatedValue(part.projectGroupName)} (
-                    {truncatedValue(part.versionName)})
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-              )
-            })}
+                  {truncatedValue(part.projectGroupName)} (
+                  {truncatedValue(part.versionName)})
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+            )
+          })}
           {projectGroupName && prodID && !partsContext.isParts && (
             <BreadcrumbItem
-              color={mainText}
               isCurrentPage={sbomId && sbomHookData?.version ? false : true}
             >
               <ProjectGroupBreadcrumb
                 projectGroupName={projectGroupName}
-                selectStyles={style}
                 defaultFirstOption={{
                   id,
                   name: projectGroupName
@@ -154,18 +161,18 @@ export default function AdminNavbar(props) {
             </BreadcrumbItem>
           )}
           {!partsContext.isParts && sbomId && sbomHookData.versionName && (
-            <BreadcrumbItem color={mainText} isCurrentPage={!parts}>
-              <VersionBreadcrumb selectStyles={style} />
+            <BreadcrumbItem isCurrentPage={!parts}>
+              <VersionBreadcrumb />
             </BreadcrumbItem>
           )}
           {!partsContext.isParts &&
             ((prodID && category === 'vulnerabilities') || vulnId) && (
-              <BreadcrumbItem color={mainText}>
+              <BreadcrumbItem isCurrentPage color={primaryTextColor}>
                 <BreadcrumbLink>{activeVuln || ''}</BreadcrumbLink>
               </BreadcrumbItem>
             )}
           {policyId && (
-            <BreadcrumbItem color={mainText} isCurrentPage>
+            <BreadcrumbItem isCurrentPage color={primaryTextColor}>
               <BreadcrumbLink>Violations</BreadcrumbLink>
             </BreadcrumbItem>
           )}

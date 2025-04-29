@@ -3,7 +3,6 @@ import { TourProvider } from '@reactour/tour'
 import NotFound from 'assets/svg/not-found.svg'
 import { useEffect } from 'react'
 import { Outlet, useNavigate, useParams } from 'react-router-dom'
-import { customerRoutes } from 'routes'
 import { tourStyles } from 'utils/tourUtils'
 
 import { Box, Center, Flex, Img, Text } from '@chakra-ui/react'
@@ -15,6 +14,7 @@ import Sidebar from 'components/Sidebar'
 
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import useQueryParam from 'hooks/useQueryParam'
+import { useRoutes } from 'hooks/useRoutes'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6'
@@ -36,6 +36,7 @@ export default function Customer() {
   const navigate = useNavigate()
   const params = useParams()
   const sbomId = params.sbomid
+  const { customer } = useRoutes()
   const signedUrlParams = useQueryParam('signed_url_params')
   const tabRes = window.matchMedia('(max-width: 1199px)')
   const isMobile = isMobileOrTablet()
@@ -336,7 +337,7 @@ export default function Customer() {
         }}
       >
         <Box pos={'sticky'} top={0}>
-          <Sidebar routes={customerRoutes} />
+          <Sidebar routes={customer} />
         </Box>
         <Flex width={'100%'} flexDir={'column'}>
           <Box
@@ -346,8 +347,8 @@ export default function Customer() {
           >
             <AdminNavbar
               tabRes={tabRes}
-              brandText={getActiveRoute(customerRoutes)}
-              secondary={getActiveNavbar(customerRoutes)}
+              brandText={getActiveRoute(customer)}
+              secondary={getActiveNavbar(customer)}
             />
           </Box>
           <Box sx={{ my: 6, px: 6 }}>
