@@ -195,6 +195,13 @@ const Support = () => {
     }
   }
 
+  const handleReset = () => {
+    setSelectedItems([])
+    setToggleClear(true)
+    BULK_UPDATE.onClose()
+    reset()
+  }
+
   // SUB HEADER
   const subHeader = SupportSubHeader({
     reset,
@@ -246,11 +253,11 @@ const Support = () => {
 
       {BULK_UPDATE.isOpen && selectedItems?.length > 0 && (
         <SupportStatus
+          handleClear={handleReset}
           isOpen={BULK_UPDATE.isOpen}
           onClose={BULK_UPDATE.onClose}
           selectedItems={selectedItems}
           setToggleClear={setToggleClear}
-          setSelectedItems={setSelectedItems}
         />
       )}
     </>

@@ -335,6 +335,13 @@ const SupportStatusTable = () => {
     supportLevel
   ])
 
+  const handleReset = () => {
+    setSelectedItems([])
+    setToggleClear(true)
+    STATUS.onClose()
+    reset()
+  }
+
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
@@ -363,9 +370,9 @@ const SupportStatusTable = () => {
         <SupportStatus
           isOpen={STATUS.isOpen}
           onClose={STATUS.onClose}
+          handleClear={handleReset}
           selectedItems={selectedItems}
           setToggleClear={setToggleClear}
-          setSelectedItems={setSelectedItems}
         />
       )}
     </>

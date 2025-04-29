@@ -20,19 +20,13 @@ const SupportStatus = ({
   isOpen,
   onClose,
   selectedItems,
-  setSelectedItems,
-  setToggleClear
+  setToggleClear,
+  handleClear
 }) => {
   const { isCustomerView } = useRouteFlags()
   const { showToast } = useCustomToast()
 
   const inputStyle = { size: 'md' }
-
-  const handleClear = () => {
-    setSelectedItems([])
-    setToggleClear(true)
-    onClose()
-  }
 
   const [updateSupport, { loading: updateLoading }] = useMutation(
     ComponentSupportLevelBulkUpdate,
