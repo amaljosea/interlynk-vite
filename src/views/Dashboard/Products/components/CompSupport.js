@@ -338,7 +338,9 @@ const SupportForm = ({ data, reset, setEdit, handleClose }) => {
   }
 
   const handleRemove = () => {
-    deleteSupport({ variables: { id: manual?.id } })
+    const ids =
+      data?.occurrences?.map((group) => group?.componentSupportLevel?.id) || []
+    deleteSupport({ variables: { id: ids[0] } })
       .then((res) => {
         const { errors } = res?.data?.componentSupportLevelDelete || {}
         if (errors?.length > 0) {

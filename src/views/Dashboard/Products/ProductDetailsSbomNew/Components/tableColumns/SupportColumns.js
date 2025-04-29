@@ -58,10 +58,13 @@ const SupportColumns = ({ action }) => {
                     </chakra.span>
                   </Tooltip>
                 )}
-                <Text hidden={!isPart} color={secondaryTextColor}>
+                <Text
+                  color={secondaryTextColor}
+                  hidden={!componentSupportLevel?.updatedAt}
+                >
                   •
                 </Text>
-                {componentSupportLevel && (
+                {componentSupportLevel?.updatedAt && (
                   <Tooltip
                     placement={'top'}
                     label={getFullDate(componentSupportLevel?.updatedAt)}
