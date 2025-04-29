@@ -260,7 +260,7 @@ export default function Admin() {
           <Flex width={'100%'} flexDir={'column'}>
             <Box
               top={0}
-              zIndex={111}
+              zIndex={1111}
               pos={'sticky'}
               bg={mainContrastBgColor}
               borderBottom={`1px solid ${neutralBorder}`}
