@@ -11,6 +11,7 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useLazyDropDown } from 'hooks/useLazyDropDown'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useRouteFlags } from 'hooks/useRouteFlags'
+import { useSelect } from 'hooks/useSelect'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
@@ -19,12 +20,14 @@ import {
 } from 'graphQL/Queries'
 import { GetArchivedVersions } from 'graphQL/Queries'
 
-const VersionBreadcrumb = ({ selectStyles }) => {
+const VersionBreadcrumb = () => {
   const navigate = useNavigate()
   const { isCustomerView } = useRouteFlags()
   const { sbomHookData, orgView } = useGlobalQueryContext()
   const params = useParams()
   const location = useLocation()
+
+  const { style } = useSelect('breadcrumb', 'version')
 
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
@@ -75,7 +78,7 @@ const VersionBreadcrumb = ({ selectStyles }) => {
       },
       selectorForActualCount: 'project.allSbomVersions',
       selectedItem: truncatedValue(selectedVersionName),
-      styles: selectStyles,
+      styles: style,
       onChange: handleVersionClick,
       components: {
         IndicatorSeparator: () => null,

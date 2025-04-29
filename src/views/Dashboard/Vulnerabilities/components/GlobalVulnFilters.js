@@ -1,4 +1,3 @@
-import { useQuery } from '@apollo/client'
 import { useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { vulnStatusTypes } from 'variables/general'
@@ -19,14 +18,17 @@ import {
   InputRightAddon
 } from '@chakra-ui/react'
 
+import { AsyncFilter } from 'components/AsyncFilter'
 import CustomList from 'components/Misc/CustomList'
 import GlobalLabelFilter from 'components/Misc/GlobalLabelFilter'
 import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useLazyDropDown } from 'hooks/useLazyDropDown'
 import { useRouteFlags } from 'hooks/useRouteFlags'
+import { useSelect } from 'hooks/useSelect'
 
-import { GetProductNames } from 'graphQL/Queries'
+import { GetProjectGroupLazyDropdownQuery } from 'graphQL/Queries'
 
 const GlobalVulnsFilters = ({ reset }) => {
   const params = useParams()
@@ -45,16 +47,7 @@ const GlobalVulnsFilters = ({ reset }) => {
 
   const { globalVulnDispatch } = dispatch
   const { isProductsPage } = useRouteFlags()
-
-  const { data } = useQuery(GetProductNames, {
-    skip: isProductsPage ? true : false,
-    variables: {
-      first: 500,
-      enabled: true,
-      direction: 'ASC',
-      field: 'PROJECT_GROUPS_NAME'
-    }
-  })
+  const { style } = useSelect('filter')
 
   const minRef = useRef()
   const maxRef = useRef()
@@ -151,6 +144,28 @@ const GlobalVulnsFilters = ({ reset }) => {
     }
   }
 
+  const { lazyDropDownProps } = useLazyDropDown(
+    GetProjectGroupLazyDropdownQuery,
+    {
+      skip: isProductsPage ? true : false,
+      selector: 'organization.projectGroups',
+      variables: {
+        field: 'PROJECT_GROUPS_NAME',
+        direction: 'ASC',
+        first: 5,
+        enabled: true
+      },
+      selectorForActualCount: 'organization.allProjectGroups',
+      styles: style,
+      onChange: onFilterProduct,
+      components: {
+        IndicatorSeparator: () => null,
+        DropdownIndicator: null
+      },
+      placeholder: 'Product'
+    }
+  )
+
   return (
     <Stack direction={'row'} alignItems={'center'} spacing={2}>
       {/* LABELS */}
@@ -163,30 +178,10 @@ const GlobalVulnsFilters = ({ reset }) => {
 
       {/* PRODUCTS */}
       {!params?.productgroupid && (
-        <Menu closeOnSelect={false}>
-          <MenuHeading title={'Product'} active={getStatus('products')} />
-          <MenuList
-            minH={'auto'}
-            maxH={'300px'}
-            overflowY={'scroll'}
-            fontSize={'sm'}
-          >
-            <MenuOptionGroup
-              type='checkbox'
-              value={projectGroupIds}
-              onChange={onFilterProduct}
-            >
-              <MenuItemOption value={'all'} fontSize={'sm'}>
-                All
-              </MenuItemOption>
-              {data?.organization?.projectGroups?.nodes?.map((item) => (
-                <MenuItemOption key={item.id} value={item.id} fontSize={'sm'}>
-                  {item.name}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
+        <AsyncFilter
+          lazyDropDownProps={lazyDropDownProps}
+          isActive={getStatus('products')}
+        />
       )}
       {/* SEVERITY */}
       <Menu closeOnSelect={false}>

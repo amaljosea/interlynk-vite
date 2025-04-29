@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import AsyncSelect from 'react-select/async'
 import { truncatedValue } from 'utils'
 
@@ -12,17 +12,14 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useLazyDropDown } from 'hooks/useLazyDropDown'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useSelect } from 'hooks/useSelect'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetProjectGroupLazyDropdownQuery } from 'graphQL/Queries'
 
-const ProjectGroupBreadcrumb = ({
-  projectGroupName,
-  selectStyles,
-  defaultFirstOption
-}) => {
+const ProjectGroupBreadcrumb = ({ projectGroupName, defaultFirstOption }) => {
   const navigate = useNavigate()
-
+  const params = useParams()
   const location = useLocation()
   const { envName } = useGlobalState()
 
@@ -32,7 +29,10 @@ const ProjectGroupBreadcrumb = ({
 
   const environment = envName
 
-  const { grayBorderColor } = useThemeColor(['grayBorderColor'])
+  const { primaryTextColor, secondaryTextColor, grayBorderColor } =
+    useThemeColor(['primaryTextColor', 'secondaryTextColor', 'grayBorderColor'])
+
+  const { style } = useSelect('breadcrumb', 'product')
 
   const viewProds = useHasPermission({
     parentKey: 'view_product_group'
@@ -65,7 +65,7 @@ const ProjectGroupBreadcrumb = ({
       },
       selectorForActualCount: 'organization.allProjectGroups',
       selectedItem: projectGroupName,
-      styles: selectStyles,
+      styles: style,
       onChange: handleProductClick,
       components: {
         IndicatorSeparator: () => null,
@@ -78,9 +78,16 @@ const ProjectGroupBreadcrumb = ({
 
   const { nodes, totalCountActual } = lazyDropDownProps
 
+  const linkStyle = {
+    color:
+      params?.sbomid || params?.vulnerabilityid
+        ? secondaryTextColor
+        : primaryTextColor
+  }
+
   if (path === 'customer' && projectGroupName) {
     return (
-      <Link to={generateProductDetailPageUrlFromCurrentUrl()}>
+      <Link style={linkStyle} to={generateProductDetailPageUrlFromCurrentUrl()}>
         {truncatedValue(projectGroupName)}
       </Link>
     )
@@ -88,7 +95,7 @@ const ProjectGroupBreadcrumb = ({
     return <AsyncSelect {...lazyDropDownProps} />
   } else if (nodes && totalCountActual === 1) {
     return (
-      <Link to={generateProductDetailPageUrlFromCurrentUrl()}>
+      <Link style={linkStyle} to={generateProductDetailPageUrlFromCurrentUrl()}>
         {truncatedValue(projectGroupName)}
       </Link>
     )
