@@ -71,18 +71,18 @@ export const sevColor = (severity) => {
   switch (toLower(severity)) {
     case 'critical':
     case 'super critical':
-      return { bg: '#F56565', text: '#822727' }
+      return { bg: '#F56565', text: '#822727', btn: 'red' }
     case 'high':
     case 'super high':
-      return { bg: '#ED8936', text: '#7B341E' }
+      return { bg: '#ED8936', text: '#7B341E', btn: 'orange' }
     case 'medium':
-      return { bg: '#ECC94B', text: '#744210' }
+      return { bg: '#ECC94B', text: '#744210', btn: 'yellow' }
     case 'low':
     case 'super low':
     case 'negligible':
-      return { bg: '#48BB78', text: '#22543D' }
+      return { bg: '#48BB78', text: '#22543D', btn: 'green' }
     case 'unknown':
-      return { bg: '#A0AEC0', text: '#1A202C' }
+      return { bg: '#A0AEC0', text: '#1A202C', btn: 'gray' }
   }
 }
 
@@ -439,4 +439,22 @@ export const getSupportStatusColor = (eolDate, warningMonths = 6) => {
   } else {
     return 'green'
   }
+}
+
+export const COLORS = {
+  0: '#f1f1f1',
+  1: '#B0E0E6',
+  2: '#87CEFA',
+  3: '#87CEEB',
+  4: '#00BFFF',
+  5: '#1E90FF',
+  6: '#6495ED',
+  7: '#4682B4',
+  8: '#4169E1',
+  9: '#6A5ACD',
+  10: '#0000CD',
+  11: '#0000FF',
+  12: '#367588',
+  13: '#000080',
+  14: '#191970'
 }

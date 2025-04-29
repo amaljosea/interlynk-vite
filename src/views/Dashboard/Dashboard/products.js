@@ -30,7 +30,7 @@ import ProductLifestages from './components/ProductLifestages'
 import VersionLifestages from './components/VersionLifestage'
 
 function ProductGroup() {
-  const { selectedProducts, setSelectedProducts } = useGlobalState()
+  const { updateCards, selectedProducts } = useGlobalState()
   const { isFreeTier } = useGlobalQueryContext()
 
   const [productCards, setProductCards] = useState([
@@ -56,7 +56,7 @@ function ProductGroup() {
   const [isGridLayout, setIsGridLayout] = useState(true)
 
   const filteredProductCards = useMemo(() => {
-    return productCards.filter((card) => selectedProducts.includes(card.type))
+    return productCards.filter((card) => selectedProducts?.includes(card.type))
   }, [productCards, selectedProducts])
 
   const sensors = useSensors(
@@ -79,7 +79,8 @@ function ProductGroup() {
   }
 
   const handleDeleteCard = (key) => {
-    setSelectedProducts(selectedProducts?.filter((item) => item !== key))
+    const filteredItems = selectedProducts?.filter((item) => item !== key)
+    updateCards(filteredItems, 'products')
   }
 
   if (filteredProductCards?.length === 0) return null

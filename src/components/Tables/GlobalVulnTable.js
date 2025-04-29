@@ -73,7 +73,7 @@ const GlobalVulnTable = (props) => {
             <Tooltip placement='top' label={source} textTransform={'uppercase'}>
               <IconButton isRound={true} icon={sourceIcon[source]} />
             </Tooltip>
-            <Stack direction={'column'} spacing={1.5}>
+            <Stack direction={'column'} spacing={1}>
               <Flex gap={2} alignItems={'center'} flexWrap={'wrap'}>
                 <Link
                   to={
@@ -159,7 +159,7 @@ const GlobalVulnTable = (props) => {
           </Flex>
         )
       },
-      width: '22%',
+      width: '30%',
       wrap: true
     },
     // CVSS
@@ -169,8 +169,7 @@ const GlobalVulnTable = (props) => {
       selector: (row) => <CvssTag value={row?.cvssScore} />,
       width: '7%',
       wrap: true,
-      sortable: true,
-      right: 'true'
+      sortable: true
     },
     // EPSS
     {
@@ -183,8 +182,7 @@ const GlobalVulnTable = (props) => {
         return <EpssTag value={epssScores} />
       },
       sortable: true,
-      width: '12%',
-      right: 'true',
+      width: '8%',
       wrap: true
     },
     // PUBLISHED AT

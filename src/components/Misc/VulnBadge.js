@@ -13,9 +13,9 @@ const VulnBadge = ({ color, children, label, status, onClick }) => {
       <Tag
         width={'60px'}
         onClick={onClick}
+        cursor={'pointer'}
         colorScheme={color}
         variant={isStatus ? 'solid' : 'subtle'}
-        cursor={onClick ? 'pointer' : 'default'}
       >
         <TagLabel
           mx={'auto'}

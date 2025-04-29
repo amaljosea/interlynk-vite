@@ -2,8 +2,6 @@ import { useTour } from '@reactour/tour'
 import PropTypes from 'prop-types'
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { customerRoutes } from 'routes'
-import { dashRoutes } from 'routes.js'
 import { getSignedUrlParams } from 'utils'
 import { logoutUser } from 'utils/authUtils'
 
@@ -16,6 +14,7 @@ import Organizations from 'components/Organizations'
 import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useRoutes } from 'hooks/useRoutes'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaDesktop, FaMoon, FaSun } from 'react-icons/fa6'
@@ -30,6 +29,7 @@ export default function AdminNavbarLinks(props) {
   const { organization, setOrganization } = useGlobalState()
   const { colorMode, setColorMode } = useColorMode()
   const [currentMode, setCurrentMode] = useState(colorMode || 'system')
+  const { vendor, customer } = useRoutes()
 
   const signedUrlParams = getSignedUrlParams()
   const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
@@ -125,10 +125,10 @@ export default function AdminNavbarLinks(props) {
       {!signedUrlParams && <UserMenu handleLogout={handleLogout} />}
 
       <SidebarResponsive
+        {...props}
         logoText={props.logoText}
         secondary={props.secondary}
-        routes={signedUrlParams ? customerRoutes : dashRoutes}
-        {...props}
+        routes={signedUrlParams ? customer : vendor}
       />
 
       {/* LOADING */}

@@ -113,7 +113,7 @@ const CompDetails = ({ data, primaryComp }) => {
         copyright: details?.copyright || undefined,
         supportLevel: details?.supportLevel || 'NONE',
         endOfSupport: details?.endOfSupport || '',
-        licenses: license ? { licensesExp: license } : undefined
+        licenses: { licensesExp: license || '' }
       }
     }).then((res) => {
       const { errors } = res?.data?.componentUpdate || ''
