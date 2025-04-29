@@ -179,7 +179,9 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
                     <Tooltip
                       label={`${projectGroup?.name} : ${projectVersion || 'N/A'}`}
                     >
-                      <LynkBadge color='blue' title='Part' />
+                      <Box>
+                        <LynkBadge color='blue' title='Part' />
+                      </Box>
                     </Tooltip>
                   )}
                   <Text hidden={!isPart} color={secondaryTextColor}>
