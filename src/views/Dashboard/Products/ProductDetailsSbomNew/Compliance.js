@@ -112,7 +112,7 @@ const Compliance = ({ sbomData }) => {
     return (
       <SimpleGrid columns={3} spacing={5} mt={2}>
         {[1, 2, 3].map((item) => (
-          <Card p={0} key={item} border={`1px solid ${grayBorderColor}`}>
+          <Card key={item} border={`1px solid ${grayBorderColor}`}>
             <LynkLoader />
           </Card>
         ))}

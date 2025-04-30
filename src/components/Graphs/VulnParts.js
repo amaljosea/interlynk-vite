@@ -24,7 +24,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
-import { FaBug } from 'react-icons/fa6'
+import { LuBug } from 'react-icons/lu'
 
 const GetPartVulns = gql`
   query GetSbomParts($projectId: Uuid!, $sbomId: Uuid!) {
@@ -216,7 +216,7 @@ const VulnParts = () => {
             justify='space-between'
           >
             <HStack spacing='3'>
-              <Icon as={FaBug} color='gray.500' boxSize={5} />
+              <Icon as={LuBug} color='gray.500' fontSize={24} />
               <Text fontWeight='bold'>Vulnerabilities</Text>
             </HStack>
             {sbomParts?.length > 0 ? (

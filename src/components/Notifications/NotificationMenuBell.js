@@ -21,7 +21,7 @@ import {
   GetUserNotificationPreferences
 } from 'graphQL/Queries'
 
-import { FaRegBell } from 'react-icons/fa6'
+import { LuBell } from 'react-icons/lu'
 
 import CheckMark from '../Misc/CheckMark'
 
@@ -112,7 +112,7 @@ const NotificationMenuBell = () => {
         {preference[0] !== 'none' && <CheckMark zIndex={1} />}
         <Tooltip label='Edit Notifications'>
           <MenuButton as={IconButton} colorScheme='blue'>
-            <Icon as={FaRegBell} mt={1} />
+            <Icon as={LuBell} fontSize={18} mt={1} />
           </MenuButton>
         </Tooltip>
         <MenuList fontSize={'sm'}>

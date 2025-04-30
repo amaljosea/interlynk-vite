@@ -19,8 +19,7 @@ import {
   OrganizationManufacturerUpdate
 } from 'graphQL/Mutation'
 
-import { BsGear } from 'react-icons/bs'
-import { FaPlus } from 'react-icons/fa6'
+import { LuCirclePlus, LuUsers } from 'react-icons/lu'
 
 const LegalModal = ({ data, isOpen, onClose }) => {
   const [url, setUrl] = useState('')
@@ -265,7 +264,7 @@ const LegalModal = ({ data, isOpen, onClose }) => {
 
   return (
     <LynkModal
-      Icon={BsGear}
+      Icon={LuUsers}
       isOpen={isOpen}
       onClose={onClose}
       isLoading={crLoading || upLoading}
@@ -371,7 +370,7 @@ const LegalModal = ({ data, isOpen, onClose }) => {
           w={'fit-content'}
           onClick={addRow}
           colorScheme='blue'
-          leftIcon={<FaPlus />}
+          leftIcon={<LuCirclePlus size={18} />}
           fontWeight={'medium'}
           paddingLeft={'2px'}
           fontSize={'sm'}

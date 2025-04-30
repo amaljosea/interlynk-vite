@@ -18,7 +18,7 @@ import {
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 
-import { FaCube } from 'react-icons/fa'
+import { LuComponent } from 'react-icons/lu'
 
 const GetPartComponents = gql`
   query GetSbomParts($projectId: Uuid!, $sbomId: Uuid!) {
@@ -88,7 +88,7 @@ const ComponentPart = () => {
             justify='space-between'
           >
             <HStack spacing='3'>
-              <Icon as={FaCube} color='gray.500' boxSize={5} />
+              <Icon as={LuComponent} color='gray.500' fontSize={24} />
               <Text fontWeight='bold'>Components</Text>
             </HStack>
             <Text

@@ -20,8 +20,7 @@ import LynkSelect from 'components/LynkSelect'
 
 import { PolicyCreate, PolicyUpdate } from 'graphQL/Mutation'
 
-import { FaPlus } from 'react-icons/fa6'
-import { MdPolicy } from 'react-icons/md'
+import { LuCirclePlus, LuShieldCheck } from 'react-icons/lu'
 
 import PolicyConditions from './components/PolicyConditions'
 
@@ -362,7 +361,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
     <>
       <LynkModal
         isOpen={isOpen}
-        Icon={MdPolicy}
+        Icon={LuShieldCheck}
         onClose={onClose}
         buttonText={data ? 'Update' : 'Save'}
         disabled={errorMessage || error !== ''}
@@ -447,7 +446,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
             variant='link'
             onClick={addRow}
             colorScheme='blue'
-            leftIcon={<FaPlus />}
+            leftIcon={<LuCirclePlus size={18} />}
             title='Add policy condition'
             data-testid='add_policy_condition'
             sx={{ fontSize: 'sm', fontWeight: 'medium', pl: '2px' }}

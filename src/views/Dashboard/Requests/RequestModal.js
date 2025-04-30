@@ -9,7 +9,7 @@ import useCustomToast from 'hooks/useCustomToast'
 
 import { RequestCreate } from 'graphQL/Mutation'
 
-import { GoVersions } from 'react-icons/go'
+import { LuFolderDown } from 'react-icons/lu'
 
 const RequestModal = ({ isOpen, onClose }) => {
   const { showToast } = useCustomToast()
@@ -60,7 +60,7 @@ const RequestModal = ({ isOpen, onClose }) => {
       onClose={onClose}
       onSubmit={handleCreate}
       title={'Request SBOM'}
-      Icon={GoVersions}
+      Icon={LuFolderDown}
       isLoading={loading}
       disabled={isSaveDisabled}
       buttonText={'Save'}

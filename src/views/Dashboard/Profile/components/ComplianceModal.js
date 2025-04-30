@@ -11,7 +11,7 @@ import useQueryParam from 'hooks/useQueryParam'
 
 import { UpdateComplianceList } from 'graphQL/Mutation'
 
-import { IoShieldCheckmark } from 'react-icons/io5'
+import { LuFileCheck2 } from 'react-icons/lu'
 
 const GetCompliances = gql`
   query GetCompliances {
@@ -110,7 +110,7 @@ const ComplianceModal = ({ data, isOpen, onClose }) => {
       buttonText='Save'
       isLoading={loading}
       onSubmit={handleSubmit}
-      Icon={IoShieldCheckmark}
+      Icon={LuFileCheck2}
       disabled={data?.length > 0 && value?.length === 0}
       title={`${data?.length > 0 ? 'Update' : 'Add'} Compliance`}
     >

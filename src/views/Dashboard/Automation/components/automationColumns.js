@@ -17,7 +17,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { AutomationRuleUpdate } from 'graphQL/Mutation'
 
-import { MdDragIndicator } from 'react-icons/md'
+import { LuGripVertical } from 'react-icons/lu'
 
 export const useAutomationColumns = (
   setActiveRow,
@@ -79,7 +79,7 @@ export const useAutomationColumns = (
             onDrag={() => setActiveRow(row)}
             onDrop={(e) => moveRow(e, row)}
           >
-            <MdDragIndicator size={20} cursor={'move'} color='darkgray' />
+            <LuGripVertical size={20} cursor={'move'} color='darkgray' />
           </div>
         )
       },

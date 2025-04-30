@@ -14,12 +14,12 @@ import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { DeleteProjectGroup } from 'graphQL/Mutation'
 
 import {
-  FaDiagramProject,
-  FaRegPenToSquare,
-  FaToggleOff,
-  FaToggleOn
-} from 'react-icons/fa6'
-import { TbUpload } from 'react-icons/tb'
+  LuChartBar,
+  LuPower,
+  LuPowerOff,
+  LuSquarePen,
+  LuUpload
+} from 'react-icons/lu'
 
 import ProductProgressModal from '../ProductGraphs/ProductProgressModal'
 import ConfirmationModal from './ConfirmationModal'
@@ -79,7 +79,7 @@ const ProductActions = ({ data }) => {
           {shouldShowDemoFeatures && (
             <Tooltip label='View Product TrailLynk'>
               <IconButton
-                icon={<FaDiagramProject />}
+                icon={<LuChartBar fontSize={18} />}
                 colorScheme='blue'
                 onClick={PROGRESS.onOpen}
               />
@@ -94,7 +94,7 @@ const ProductActions = ({ data }) => {
               colorScheme='blue'
               aria-label='edit_product'
               onClick={PRODUCT.onOpen}
-              icon={<FaRegPenToSquare />}
+              icon={<LuSquarePen fontSize={18} />}
             />
           </Tooltip>
           {/* UPLOAD SBOM */}
@@ -103,7 +103,7 @@ const ProductActions = ({ data }) => {
               isDisabled={!enabled || signedUrlParams || !canCreateSBOM}
               colorScheme='blue'
               onClick={UPLOAD.onOpen}
-              icon={<TbUpload size={18} />}
+              icon={<LuUpload fontSize={18} />}
             />
           </Tooltip>
           {/* UPDATE PRODUCT STATUS */}
@@ -113,7 +113,13 @@ const ProductActions = ({ data }) => {
               colorScheme={'blue'}
               onClick={WARNING.onOpen}
               isDisabled={signedUrlParams || !updateProduct}
-              icon={enabled ? <FaToggleOff /> : <FaToggleOn />}
+              icon={
+                enabled ? (
+                  <LuPower fontSize={18} />
+                ) : (
+                  <LuPowerOff fontSize={18} />
+                )
+              }
             />
           </Tooltip>
           {/* ARCHIVE PRODUCT */}

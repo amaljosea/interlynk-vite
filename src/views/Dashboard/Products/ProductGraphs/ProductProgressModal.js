@@ -17,13 +17,13 @@ import LynkDrawer from 'components/LynkDrawer'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaFilter } from 'react-icons/fa'
 import { FaCode, FaDesktop, FaInbox } from 'react-icons/fa6'
 
 import { defaultData } from './ProductProgressData'
 import { developmentData } from './ProductProgressData'
 import { productionData } from './ProductProgressData'
 import Tree from './Tree'
+import { LuFilter } from 'react-icons/lu'
 
 const LegendItem = ({ color, label }) => {
   const { primaryTextColorWithOpacity } = useThemeColor([
@@ -228,14 +228,14 @@ const ProductProgressModal = ({ isOpen, onClose, name }) => {
           <Flex gap={4}>
             <FilterMenu
               title={'Components'}
-              icon={FaFilter}
+              icon={LuFilter}
               value={targetComponent}
               onChange={(value) => setTargetComponent(value)}
               options={allComponents}
             />
             <FilterMenu
               title={'Vulnerability'}
-              icon={FaFilter}
+              icon={LuFilter}
               value={targetVulnerability}
               onChange={(value) => setTargetVulnerability(value)}
               options={allVulnerabilities}
@@ -243,7 +243,7 @@ const ProductProgressModal = ({ isOpen, onClose, name }) => {
             <Menu>
               <MenuHeading
                 title={'Environment'}
-                icon={FaFilter}
+                icon={LuFilter}
                 active={env.length > 0 && !env.includes('all')}
               />
               <MenuList fontSize={'sm'}>

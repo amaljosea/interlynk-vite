@@ -32,7 +32,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetCustomFields } from 'graphQL/Queries'
 
-import { FaFileCsv } from 'react-icons/fa6'
+import { GrDocumentCsv } from 'react-icons/gr'
 
 const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
   const params = useParams()
@@ -223,7 +223,7 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
       buttonText='Download'
       onSubmit={handleExport}
       title='Export CSV'
-      Icon={FaFileCsv}
+      Icon={GrDocumentCsv}
       isLoading={isLoading}
       disabled={selectedColumns.length < 1}
     >

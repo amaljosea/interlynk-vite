@@ -42,7 +42,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { InviteUser, deleteOrgUser } from 'graphQL/Mutation'
 import { GetUsers } from 'graphQL/Queries'
 
-import { BiTrash } from 'react-icons/bi'
+import { LuUserRoundX } from 'react-icons/lu'
 
 function userTimeStart(row) {
   let timeStart
@@ -422,7 +422,7 @@ const TeamTable = () => {
       {/* REMOVE User */}
       {USER.isOpen && activeRow && (
         <LynkModal
-          Icon={BiTrash}
+          Icon={LuUserRoundX}
           buttonColor='red'
           buttonText='Remove'
           isOpen={USER.isOpen}

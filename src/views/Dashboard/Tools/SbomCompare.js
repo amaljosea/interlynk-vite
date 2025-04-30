@@ -21,7 +21,7 @@ import SbomInfo from 'components/SbomInfo'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaCodeCompare, FaX } from 'react-icons/fa6'
+import { LuGitCompare, LuX } from 'react-icons/lu'
 
 const SbomCompare = ({
   isSbomOne,
@@ -146,7 +146,7 @@ const SbomCompare = ({
           )}
           {sbomInfo && !selectedSboms && !isToolsDrawer && (
             <IconButton
-              icon={<FaX color={primaryTextColor} />}
+              icon={<LuX size={18} color={primaryTextColor} />}
               size='sm'
               onClick={onClear}
             />
@@ -208,8 +208,9 @@ const SbomCompare = ({
             <Flex justifyContent={'flex-end'}>
               <Button
                 colorScheme='blue'
+                fontWeight={'medium'}
                 width={'fit-content'}
-                leftIcon={<FaCodeCompare />}
+                leftIcon={<LuGitCompare size={18} />}
                 onClick={handleCompare}
                 isDisabled={
                   !selectedVersionOne || !selectedVersionTwo || disabled

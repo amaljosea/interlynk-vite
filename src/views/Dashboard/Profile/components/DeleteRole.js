@@ -17,7 +17,7 @@ import {
 } from 'graphQL/Mutation'
 import { GetRoles } from 'graphQL/Queries'
 
-import { BiTrash } from 'react-icons/bi'
+import { LuTrash } from 'react-icons/lu'
 
 const GetUsers = gql`
   query Organization {
@@ -110,7 +110,7 @@ const DeleteRole = ({ isOpen, onClose, activeRole }) => {
 
   return (
     <LynkModal
-      Icon={BiTrash}
+      Icon={LuTrash}
       isOpen={isOpen}
       onClose={onClose}
       buttonColor='red'

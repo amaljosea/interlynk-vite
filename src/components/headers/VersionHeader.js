@@ -19,8 +19,7 @@ import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { FaPlus } from 'react-icons/fa6'
-import { LuArchive, LuGitCompare } from 'react-icons/lu'
+import { LuArchive, LuCirclePlus, LuGitCompare } from 'react-icons/lu'
 
 const VersionHeader = (props) => {
   const {
@@ -105,7 +104,7 @@ const VersionHeader = (props) => {
             <Tooltip label='Compare Version'>
               <IconButton
                 colorScheme='blue'
-                icon={<LuGitCompare size={20} />}
+                icon={<LuGitCompare size={18} />}
                 onClick={() => action('compare_version', null)}
               />
             </Tooltip>
@@ -116,7 +115,7 @@ const VersionHeader = (props) => {
               colorScheme='blue'
               isDisabled={!enabled}
               hidden={signedUrlParams}
-              icon={<LuArchive size={20} />}
+              icon={<LuArchive size={18} />}
               aria-label='show_archive_sboms'
               onClick={() => action('show_archive_versions', null)}
             />
@@ -124,7 +123,7 @@ const VersionHeader = (props) => {
           {/* BUILD SBOM */}
           <Tooltip label='Build Version'>
             <IconButton
-              icon={<FaPlus />}
+              icon={<LuCirclePlus size={18} />}
               colorScheme='blue'
               aria-label='build_sbom'
               hidden={signedUrlParams}

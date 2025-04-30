@@ -27,6 +27,7 @@ import { InternalComponents } from './components/InternalComponents'
 import RiskFields from './components/RiskFields'
 import TokenInfo from './components/TokenInfo'
 import WeightControl from './components/WeightControl'
+import { LuBuilding, LuCircleUser } from 'react-icons/lu'
 
 function Profile() {
   const { organization } = useGlobalState()
@@ -68,8 +69,8 @@ function Profile() {
 
   const tabs = useMemo(() => {
     return [
-      { name: 'PERSONAL', icon: FaUserCircle },
-      { name: 'ORGANIZATION', icon: FaBuilding }
+      { name: 'PERSONAL', icon: LuCircleUser },
+      { name: 'ORGANIZATION', icon: LuBuilding }
     ]
   }, [])
 

@@ -35,6 +35,7 @@ const Subject = ({ index, data, onChange }) => {
           color={primaryBlueText}
           as={getIcon(data.value)}
           style={{
+            fontSize: 18,
             marginRight: '6px'
           }}
         />

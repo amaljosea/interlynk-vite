@@ -7,7 +7,6 @@ import {
   truncatedValue
 } from 'utils'
 
-import { Search2Icon } from '@chakra-ui/icons'
 import { Flex, Icon, IconButton, Stack, Text, Tooltip } from '@chakra-ui/react'
 
 import ExpandableText from 'components/ExpandableText'
@@ -20,10 +19,16 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetVersionsDate } from 'graphQL/Queries'
 
-import { FaArchive } from 'react-icons/fa'
-import { FaBug, FaRobot, FaTag, FaWindowMaximize } from 'react-icons/fa6'
-import { IoMdWarning } from 'react-icons/io'
-import { TbActivity } from 'react-icons/tb'
+import {
+  LuActivity,
+  LuArchive,
+  LuBot,
+  LuBox,
+  LuBug,
+  LuMessageCircleWarning,
+  LuSearch,
+  LuTag
+} from 'react-icons/lu'
 
 const ProductInfo = ({ settings, data }) => {
   const params = useParams()
@@ -105,12 +110,7 @@ const ProductInfo = ({ settings, data }) => {
 
   return (
     <Flex direction={'row'} alignItems={'flex-start'} gap={5} width={'100%'}>
-      <Icon
-        h={'64px'}
-        w={'64px'}
-        as={FaWindowMaximize}
-        color={secondaryBlueText}
-      />
+      <Icon h={'64px'} w={'64px'} as={LuBox} color={secondaryBlueText} />
       <Flex gap={1} direction={'column'} alignItems={'flex-start'}>
         {/* PRODUCT TITLE */}
         <Text fontWeight={'semibold'} fontSize={22} lineHeight={1.2}>
@@ -121,33 +121,33 @@ const ProductInfo = ({ settings, data }) => {
         {/* SETTINGS */}
         <Stack mt={description ? 1 : 0} direction='row' alignItems={'center'}>
           <SettingsTag
-            icon={<Search2Icon />}
+            icon={<LuSearch size={14} />}
             isDisabled={!checksEnabled}
             label={`Checks ${checksEnabled ? 'Enabled' : 'Disabled'}`}
           />
           <SettingsTag
-            icon={<FaTag />}
+            icon={<LuTag size={14} />}
             isDisabled={!internalCompMatchingEnabled}
             label={`Internal Labeling ${internalCompMatchingEnabled ? 'Enabled' : 'Disabled'}`}
           />
           <SettingsTag
-            icon={<FaArchive />}
+            icon={<LuArchive size={14} />}
             isDisabled={!enableAutoArchive}
             label={`Auto Archive ${enableAutoArchive ? 'Enabled' : 'Disabled'}`}
           />
           <SettingsTag
-            icon={<FaRobot />}
+            icon={<LuBot size={14} />}
             isDisabled={!automatedFixesEnabled}
             label={`Automation ${automatedFixesEnabled ? 'Enabled' : 'Disabled'}`}
           />
           <SettingsTag
-            icon={<FaBug />}
+            icon={<LuBug size={14} />}
             isDisabled={!vulnScanningEnabled}
             label={`Vulnerability Scan ${vulnScanningEnabled ? 'Enabled' : 'Disabled'}`}
           />
           <SettingsTag
             hidden={isFreeTier}
-            icon={<TbActivity />}
+            icon={<LuActivity size={14} />}
             isDisabled={!enableSupportLevel}
             label={`Component Support Analysis ${enableSupportLevel ? 'Enabled' : 'Disabled'}`}
           />
@@ -158,7 +158,7 @@ const ProductInfo = ({ settings, data }) => {
               <IconButton
                 size='xs'
                 color={primaryErrorColor}
-                icon={<IoMdWarning size={16} />}
+                icon={<LuMessageCircleWarning size={14} />}
                 onClick={() => handleSort({ id: 'SBOMS_CREATED_AT' }, 'desc')}
                 bg='transparent'
               />

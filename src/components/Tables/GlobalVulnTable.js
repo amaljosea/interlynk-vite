@@ -18,8 +18,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaEye } from 'react-icons/fa6'
-import { LuCircleDot, LuDatabaseZap, LuSparkle } from 'react-icons/lu'
+import { LuCircleDot, LuDatabaseZap, LuEye, LuSparkle } from 'react-icons/lu'
 
 import Pagination from '../Pagination'
 
@@ -222,7 +221,7 @@ const GlobalVulnTable = (props) => {
               size='sm'
               variant={'solid'}
               colorScheme={'blue'}
-              icon={<FaEye />}
+              icon={<LuEye size={18} />}
               onClick={() => {
                 onOpen()
                 setActiveRow(row)
