@@ -2841,25 +2841,34 @@ export const UpdateBitbucketWorkspace = gql`
 
 export const componentSupportLevelBulkCreate = gql`
   mutation componentSupportLevelBulkCreate(
-    $ids: [Uuid!]!
-    $level: ComponentSupportLevelValues!
+    $componentIds: [Uuid!]!
+    $supportLevel: ComponentSupportLevelValues!
     $endDate: ISO8601DateTime
     $notes: String
     $retainManualOverrideFor: Int
   ) {
     supportLevelsCreate(
       input: {
-        componentIds: $ids
-        supportLevel: $level
+        componentIds: $componentIds
+        supportLevel: $supportLevel
         endDate: $endDate
         notes: $notes
         retainManualOverrideFor: $retainManualOverrideFor
       }
     ) {
-      errors
       componentSupportLevels {
         id
+        level
+        endDate
+        notes
+        retainManualOverrideFor
+        component {
+          id
+          name
+          version
+        }
       }
+      errors
     }
   }
 `

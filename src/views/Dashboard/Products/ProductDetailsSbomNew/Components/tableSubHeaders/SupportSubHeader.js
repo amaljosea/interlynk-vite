@@ -9,8 +9,8 @@ import RefreshBtn from 'components/Icons/RefreshBtn'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useRouteFlags } from 'hooks/useRouteFlags'
 
-import { TbActivity } from 'react-icons/tb'
 import { FaPen } from 'react-icons/fa6'
+import { TbActivity } from 'react-icons/tb'
 
 import SupportFilters from '../../SupportFilters'
 
@@ -22,8 +22,7 @@ const SupportSubHeader = ({
   handleClear,
   onSearchInputChange,
   selectedItems,
-  supportData,
-  
+  supportData
 }) => {
   const { isCustomerView } = useRouteFlags()
 
@@ -32,17 +31,20 @@ const SupportSubHeader = ({
     childKey: 'update_sbom_components'
   })
 
-  const withSupport = selectedItems?.filter(
-    (component) => component?.componentSupportLevel !== null
+  const withSupport = selectedItems?.flatMap((group) =>
+    group?.occurrences?.filter(
+      (occurrence) => occurrence?.componentSupportLevel !== null
+    )
   )
-  const withoutSupport = selectedItems?.filter(
-    (component) => component?.componentSupportLevel === null
+
+  const withoutSupport = selectedItems?.flatMap((group) =>
+    group?.occurrences?.filter(
+      (occurrence) => occurrence?.componentSupportLevel === null
+    )
   )
 
   const notAllowed = withSupport?.length > 0 && withoutSupport?.length > 0
-  const info = notAllowed
-    ? 'Create and update at the same time is not allowed'
-    : 'Set Status'
+  const info = notAllowed ? 'Not allowed' : 'Set Status'
 
   const subHeader = useMemo(() => {
     return (

@@ -14,7 +14,10 @@ import LynkSelect from 'components/LynkSelect'
 import useCustomToast from 'hooks/useCustomToast'
 import { useRouteFlags } from 'hooks/useRouteFlags'
 
-import { ComponentSupportLevelBulkUpdate } from 'graphQL/Mutation'
+import {
+  ComponentSupportLevelBulkUpdate,
+  componentSupportLevelBulkCreate
+} from 'graphQL/Mutation'
 
 const SupportStatus = ({
   isOpen,
@@ -28,6 +31,10 @@ const SupportStatus = ({
 
   const inputStyle = { size: 'md' }
 
+  const [createSupport, { loading: createLoading }] = useMutation(
+    componentSupportLevelBulkCreate,
+    { onCompleted: () => handleClear() }
+  )
   const [updateSupport, { loading: updateLoading }] = useMutation(
     ComponentSupportLevelBulkUpdate,
     { onCompleted: () => handleClear() }
@@ -113,7 +120,54 @@ const SupportStatus = ({
     })
   }
 
-  const handleSubmit = () => handleUpdate()
+  const handleCreate = () => {
+    createSupport({
+      variables: {
+        componentIds: occurrenceIds,
+        supportLevel: formData?.supportLevel || undefined,
+        notes: formData?.explanation || undefined,
+        retainManualOverrideFor: totalDays > 0 ? totalDays : 0,
+        endDate: formData?.endOfSupport
+          ? new Date(formData?.endOfSupport).toISOString()
+          : undefined
+      }
+    }).then((res) => {
+      const { errors } = res?.data?.supportLevelsCreate || {}
+      if (errors?.length > 0) {
+        showToast({
+          description: errors[0],
+          status: 'error'
+        })
+      } else {
+        showToast({
+          description: 'Status updated successfully',
+          status: 'success'
+        })
+      }
+    })
+  }
+
+  const withSupport = selectedItems?.flatMap((group) =>
+    group?.occurrences?.filter(
+      (occurrence) => occurrence?.componentSupportLevel !== null
+    )
+  )
+
+  const withoutSupport = selectedItems?.flatMap((group) =>
+    group?.occurrences?.filter(
+      (occurrence) => occurrence?.componentSupportLevel === null
+    )
+  )
+
+  const hasNoSupport = withSupport?.length === 0 && withoutSupport?.length > 0
+
+  const handleSubmit = () => {
+    if (hasNoSupport) {
+      handleCreate()
+    } else {
+      handleUpdate()
+    }
+  }
 
   const supportOptions = [
     { label: '-- Select --', value: '' },
@@ -129,10 +183,10 @@ const SupportStatus = ({
       onClose={onClose}
       Icon={SupportIcon}
       title={'Add Status'}
-      buttonText={'Update'}
       disabled={isDisabled}
       onSubmit={handleSubmit}
-      isLoading={updateLoading}
+      isLoading={updateLoading || createLoading}
+      buttonText={hasNoSupport ? 'Create' : 'Update'}
     >
       <Stack spacing={4}>
         {/* SUPPRT LEVEL */}

@@ -313,8 +313,8 @@ const SupportForm = ({ data, reset, setEdit, handleClose }) => {
     const ids = data?.occurrences?.map((item) => item?.id) || []
     createSupport({
       variables: {
-        id: ids,
-        level: formData?.supportLevel || undefined,
+        componentIds: ids,
+        supportLevel: formData?.supportLevel || undefined,
         notes: formData?.explanation || undefined,
         retainManualOverrideFor: totalDays > 0 ? totalDays : 0,
         endDate: formData?.endOfSupport
