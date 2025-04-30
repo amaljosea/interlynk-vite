@@ -1,11 +1,11 @@
 import { IconButton, Tooltip } from '@chakra-ui/react'
 
-import { LuPlus } from 'react-icons/lu'
+import { LuCirclePlus } from 'react-icons/lu'
 
 const AddButton = ({
   label,
   colorScheme = 'blue', // default color scheme
-  icon = <LuPlus size={20} />, // default icon
+  icon = <LuCirclePlus size={18} />, // default icon
   tooltipPlacement = 'bottom', //default tooltip placement
   variant = 'solid', //default variant
   ...props

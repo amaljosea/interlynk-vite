@@ -35,7 +35,7 @@ const RefreshBtn = ({ onClick }) => {
         }}
         aria-label='refresh'
         colorScheme='blue'
-        icon={loading ? <Spinner size={'sm'} /> : <LuRefreshCw size={20} />}
+        icon={loading ? <Spinner size={'sm'} /> : <LuRefreshCw size={18} />}
       ></IconButton>
     </Tooltip>
   )

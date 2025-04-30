@@ -30,7 +30,7 @@ import {
   ShareProject
 } from 'graphQL/Queries'
 
-import { FiCheckCircle } from 'react-icons/fi'
+import { LuCircleCheckBig } from 'react-icons/lu'
 
 import CheckModal from './CheckModal'
 import CopyModal from './CopyModal'
@@ -227,7 +227,7 @@ const SbomActions = ({ sbom }) => {
         <Tooltip label='System Log'>
           <IconButton
             colorScheme='blue'
-            icon={<FiCheckCircle size={16} />}
+            icon={<LuCircleCheckBig size={18} />}
             onClick={LOGS.onOpen}
             display={signedUrlParams || isFreeTier ? 'none' : 'flex'}
           />

@@ -38,10 +38,7 @@ const MenuHeading = ({ title, onClick, active, name }) => {
       color={active ? primaryBlueText : primaryTextColor}
       backgroundColor={active ? secondaryBgColor : 'transparent'}
       leftIcon={
-        <LuFilter
-          size={20}
-          color={active ? primaryBlueText : primaryTextColor}
-        />
+        <LuFilter color={active ? primaryBlueText : primaryTextColor} />
       }
       data-testid={`filter_${title}`}
       name={name}

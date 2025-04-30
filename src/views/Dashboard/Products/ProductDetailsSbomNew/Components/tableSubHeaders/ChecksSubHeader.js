@@ -15,7 +15,7 @@ import useQueryParam from 'hooks/useQueryParam'
 import { recheckHealth } from 'graphQL/Mutation'
 import { GetCheckFilterData } from 'graphQL/Queries'
 
-import { BiScan } from 'react-icons/bi'
+import { LuScanLine } from 'react-icons/lu'
 
 import CheckFilters from '../../CheckFilters'
 
@@ -129,7 +129,7 @@ const ChecksSubHeader = (reset, isArchived) => {
               onClick={handleReCheck}
               hidden={isArchived}
               isDisabled={!editChecks}
-              icon={<BiScan size={20} />}
+              icon={<LuScanLine size={18} />}
             />
           </Tooltip>
           <RefreshBtn />

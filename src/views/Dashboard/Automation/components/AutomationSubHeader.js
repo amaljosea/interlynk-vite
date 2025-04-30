@@ -2,7 +2,6 @@ import { gql, useLazyQuery, useQuery } from '@apollo/client'
 import { useCallback, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { WarningIcon } from '@chakra-ui/icons'
 import { Flex, IconButton, Stack, Text, Tooltip } from '@chakra-ui/react'
 
 import AddButton from 'components/Icons/AddButton'
@@ -12,7 +11,6 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 
 import { LuCircleAlert, LuFolderUp, LuImport } from 'react-icons/lu'
-import { TbFileExport, TbFileImport } from 'react-icons/tb'
 
 const RuleExport = gql`
   query RuleExport($id: Uuid!) {
@@ -92,7 +90,7 @@ const AutomationSubHeader = ({ RULE, RULE_IMPORT, setActiveRow, projects }) => {
       >
         {!automatedFixesEnabled && (
           <Flex gap={2} alignItems={'center'} w={'fit-content'}>
-            <LuCircleAlert size={20} color={'darkorange'} />
+            <LuCircleAlert size={18} color={'darkorange'} />
             <Text fontSize={'sm'} color={'darkorange'}>
               Automation is disabled under Product Settings
             </Text>
@@ -102,7 +100,7 @@ const AutomationSubHeader = ({ RULE, RULE_IMPORT, setActiveRow, projects }) => {
           <Tooltip label='Import Rules'>
             <IconButton
               colorScheme='blue'
-              icon={<LuImport size={20} />}
+              icon={<LuImport size={18} />}
               onClick={RULE_IMPORT.onOpen}
               isDisabled={!canEditAutomations}
             />
@@ -110,7 +108,7 @@ const AutomationSubHeader = ({ RULE, RULE_IMPORT, setActiveRow, projects }) => {
           <Tooltip label='Export Rules'>
             <IconButton
               colorScheme='blue'
-              icon={<LuFolderUp size={20} />}
+              icon={<LuFolderUp size={18} />}
               onClick={handleExport}
               isLoading={exportLoading}
             />

@@ -21,7 +21,7 @@ import {
   GetSbomDrift
 } from 'graphQL/Queries'
 
-import { FaScaleUnbalanced } from 'react-icons/fa6'
+import { LuGitCompareArrows } from 'react-icons/lu'
 
 import SbomCompare from './SbomCompare'
 
@@ -305,9 +305,9 @@ const Compare = ({ selectedSboms }) => {
         >
           <HStack spacing={4} alignItems={'flex-start'}>
             <Icon
-              as={FaScaleUnbalanced}
               h={'64px'}
               w={'64px'}
+              as={LuGitCompareArrows}
               color={secondaryBlueText}
             />
             <Stack spacing={0}>

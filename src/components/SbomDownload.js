@@ -22,9 +22,9 @@ import {
   SupportLevelCSV
 } from 'graphQL/Queries'
 
-import { FiDownload } from 'react-icons/fi'
 
 import Loading from './Misc/Loading'
+import { LuDownload } from 'react-icons/lu'
 
 const SbomDownload = ({ sbom, primaryLoading }) => {
   const params = useParams()
@@ -250,7 +250,7 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
             colorScheme='blue'
             className='download'
             isDisabled={isLoading}
-            icon={<FiDownload />}
+            icon={<LuDownload size={18} />}
           />
         </Tooltip>
         <MenuList width='220px'>

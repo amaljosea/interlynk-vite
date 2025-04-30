@@ -6,7 +6,7 @@ import { IconButton, Tooltip, useDisclosure } from '@chakra-ui/react'
 
 import { GetPrimaryComponent } from 'graphQL/Queries'
 
-import { PiTreeStructure } from 'react-icons/pi'
+import { LuNetwork } from 'react-icons/lu'
 
 import TreeView from './TreeView'
 
@@ -37,7 +37,7 @@ const PrimaryTreeView = ({ updateSboms, status, noPrimaryComp }) => {
           isLoading={loading}
           onClick={handleClick}
           hidden={signedUrlParams}
-          icon={<PiTreeStructure size={18} />}
+          icon={<LuNetwork size={18} />}
           isDisabled={status === 'signed' || !updateSboms || noPrimaryComp}
         />
       </Tooltip>

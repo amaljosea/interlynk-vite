@@ -34,7 +34,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UploadProfileImage } from 'graphQL/Mutation'
 
-import { FaCity } from 'react-icons/fa'
+import { LuBuilding2 } from 'react-icons/lu'
 
 import OrgDrawer from './OrgDrawer'
 import PersonalDrawer from './PersonalDrawer'
@@ -169,6 +169,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
     <>
       <Menu>
         <MenuButton
+          px={3}
           as={Button}
           fontSize='sm'
           colorScheme='blue'
@@ -183,10 +184,8 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
               .map((tab, index) => (
                 <tab.icon
                   key={index}
-                  w='20px'
-                  h='20px'
                   color={secondaryBgColor}
-                  style={{ marginRight: '8px' }}
+                  style={{ marginRight: '8px', fontSize: 20 }}
                 />
               ))}
 
@@ -290,7 +289,9 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
             )}
             {/*  CityIcon for org page */}
 
-            {isOrg && <FaCity size='80px' style={{ color: primaryBlueText }} />}
+            {isOrg && (
+              <LuBuilding2 size='80px' style={{ color: primaryBlueText }} />
+            )}
 
             <Flex direction='column' maxWidth='100%' my={{ sm: '14px' }}>
               <Box

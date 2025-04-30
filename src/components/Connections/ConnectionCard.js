@@ -1,8 +1,9 @@
-import { CheckCircleIcon } from '@chakra-ui/icons'
 import { Button, Flex, Image, Text } from '@chakra-ui/react'
 
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useThemeColor } from 'hooks/useThemeColors'
+
+import { LuCircleCheckBig } from 'react-icons/lu'
 
 import Card from '../Card/Card'
 
@@ -59,11 +60,11 @@ const ConnectionCard = ({
         <Button
           fontSize='sm'
           title='Configure'
+          width={'fit-content'}
           onClick={onConfigure}
           isDisabled={!canUpdate}
-          width={isConnected ? '150px' : '120px'}
           colorScheme={isConnected ? 'blue' : 'gray'}
-          leftIcon={isConnected && <CheckCircleIcon />}
+          leftIcon={isConnected && <LuCircleCheckBig size={18} />}
         >
           {isConnected ? 'Configured' : 'Configure'}
         </Button>
