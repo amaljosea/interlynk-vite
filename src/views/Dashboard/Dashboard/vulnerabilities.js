@@ -61,7 +61,6 @@ function VulnerabilityGroup() {
       content: <KevVulnerabilitiesByStatus />
     }
   ])
-  const [isGridLayout, setIsGridLayout] = useState(true)
 
   const filteredVulnCards = useMemo(() => {
     return vulnCards.filter((card) => selectedVulns?.includes(card.type))
@@ -106,10 +105,7 @@ function VulnerabilityGroup() {
           items={filteredVulnCards}
           strategy={rectSortingStrategy}
         >
-          <SimpleGrid
-            columns={isGridLayout ? { base: 1, md: 2, lg: 3 } : 1}
-            spacing={5}
-          >
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={5}>
             {filteredVulnCards?.map((card) => (
               <DashboardCard
                 key={card.id}
@@ -118,7 +114,6 @@ function VulnerabilityGroup() {
                 title={card.title}
                 content={card.content}
                 onDelete={handleDeleteCard}
-                isGridLayout={isGridLayout}
               />
             ))}
           </SimpleGrid>

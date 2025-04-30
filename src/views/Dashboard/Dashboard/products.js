@@ -53,7 +53,6 @@ function ProductGroup() {
       content: !isFreeTier ? <ProductLabels /> : null
     }
   ])
-  const [isGridLayout, setIsGridLayout] = useState(true)
 
   const filteredProductCards = useMemo(() => {
     return productCards.filter((card) => selectedProducts?.includes(card.type))
@@ -98,10 +97,7 @@ function ProductGroup() {
           items={filteredProductCards}
           strategy={rectSortingStrategy}
         >
-          <SimpleGrid
-            columns={isGridLayout ? { base: 1, md: 2, lg: 3 } : 1}
-            spacing={5}
-          >
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={5}>
             {filteredProductCards.map((card) => (
               <DashboardCard
                 key={card.id}
@@ -110,7 +106,6 @@ function ProductGroup() {
                 title={card.title}
                 content={card.content}
                 onDelete={handleDeleteCard}
-                isGridLayout={isGridLayout}
               />
             ))}
           </SimpleGrid>

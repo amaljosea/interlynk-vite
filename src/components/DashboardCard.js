@@ -17,15 +17,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { LuGripVertical, LuX } from 'react-icons/lu'
 
-export function DashboardCard({
-  id,
-  type,
-  title,
-  content,
-  desc,
-  onDelete,
-  isGridLayout
-}) {
+export function DashboardCard({ id, type, title, content, desc, onDelete }) {
   const location = useLocation()
 
   const isAnalytics = location.pathname === '/vendor/analytics'
