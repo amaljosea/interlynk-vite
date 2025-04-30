@@ -16,8 +16,7 @@ import LynkAlert from 'components/LynkAlert'
 
 import useCustomToast from 'hooks/useCustomToast'
 
-import { FaCircleCheck, FaPlus } from 'react-icons/fa6'
-import { IoIosCloseCircle } from 'react-icons/io'
+import { LuCheck, LuCirclePlus, LuX } from 'react-icons/lu'
 
 export const TextRegex = ({ regex, ignoreCase }) => {
   const [items, setItems] = useState([{ id: uuidv4(), value: '' }])
@@ -97,11 +96,7 @@ export const TextRegex = ({ regex, ignoreCase }) => {
                   }
                 >
                   <Box marginTop={2}>
-                    {isMatch ? (
-                      <FaCircleCheck size={18} color={color} />
-                    ) : (
-                      <IoIosCloseCircle size={22} color={color} />
-                    )}
+                    {isMatch ? <LuCheck size={18} /> : <LuX size={18} />}
                   </Box>
                 </Tooltip>
               </InputRightElement>
@@ -119,7 +114,7 @@ export const TextRegex = ({ regex, ignoreCase }) => {
         onClick={addMoreTest}
         aria-label='Add config'
         colorScheme='blue'
-        leftIcon={<FaPlus />}
+        leftIcon={<LuCirclePlus size={18} />}
         marginTop='10px'
         fontWeight={'medium'}
         fontSize={'sm'}

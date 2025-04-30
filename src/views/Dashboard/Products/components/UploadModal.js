@@ -17,7 +17,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UploadSbom } from 'graphQL/Mutation'
 
-import { PiFileArrowUpBold } from 'react-icons/pi'
+import { LuUpload } from 'react-icons/lu'
 
 const GetProjectGroup = gql`
   query GetProjectGroup($id: Uuid!) {
@@ -101,7 +101,7 @@ const UploadModal = ({ isOpen, onClose, group }) => {
         onClose={onClose}
         onSubmit={handleUpload}
         title={'Upload SBOM'}
-        Icon={PiFileArrowUpBold}
+        Icon={LuUpload}
         disabled={!selectedFile || loading}
         buttonText='Upload'
       >

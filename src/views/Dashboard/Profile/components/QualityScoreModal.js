@@ -10,7 +10,7 @@ import useCustomToast from 'hooks/useCustomToast'
 
 import { UpdateCompliance } from 'graphQL/Mutation'
 
-import { IoShieldCheckmark } from 'react-icons/io5'
+import { LuFileCheck2 } from 'react-icons/lu'
 
 const QualityScoreModal = ({ data, isOpen, onClose }) => {
   const { showToast } = useCustomToast()
@@ -82,7 +82,7 @@ const QualityScoreModal = ({ data, isOpen, onClose }) => {
       buttonText='Save'
       isLoading={loading}
       onSubmit={handleSubmit}
-      Icon={IoShieldCheckmark}
+      Icon={LuFileCheck2}
       disabled={data?.length > 0 && item === null}
       title={`${data?.length > 0 ? 'Update' : 'Add'} Compliance`}
     >

@@ -1,9 +1,16 @@
 import { useCallback, useEffect, useRef } from 'react'
 
-import { CloseIcon, SearchIcon } from '@chakra-ui/icons'
-import { Box, Input, InputGroup, InputLeftElement } from '@chakra-ui/react'
+import {
+  Box,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  InputRightElement
+} from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
+
+import { LuSearch, LuX } from 'react-icons/lu'
 
 const ProductSearchFilter = ({
   id,
@@ -13,9 +20,7 @@ const ProductSearchFilter = ({
   onClear
 }) => {
   const searchInputRef = useRef()
-  const { primaryBlueText, secondaryTextColor, primaryBgColor } = useThemeColor(
-    ['primaryBlueText', 'secondaryTextColor', 'primaryBgColor']
-  )
+  const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
   const focusSearchInput = () => {
     if (searchInputRef?.current) {
       searchInputRef?.current.focus()
@@ -40,7 +45,7 @@ const ProductSearchFilter = ({
       <Box pos={'relative'} width={'300px'}>
         <InputGroup>
           <InputLeftElement pointerEvents='none'>
-            <SearchIcon color={secondaryTextColor} />
+            <LuSearch fontSize={18} color={secondaryTextColor} />
           </InputLeftElement>
           <Input
             id={id}
@@ -53,23 +58,10 @@ const ProductSearchFilter = ({
             onChange={onChange}
             onKeyDown={onFilter}
           />
+          <InputRightElement hidden={filterText === ''}>
+            <LuX onClick={onClear} fontSize={18} cursor={'pointer'} />
+          </InputRightElement>
         </InputGroup>
-        {filterText !== '' && (
-          <CloseIcon
-            w={'18px'}
-            h={'18px'}
-            bg={primaryBlueText}
-            color={primaryBgColor}
-            p={1}
-            rounded={'full'}
-            position={'absolute'}
-            zIndex={11}
-            right={3}
-            top={'11px'}
-            onClick={onClear}
-            cursor={'pointer'}
-          />
-        )}
       </Box>
     </>
   )

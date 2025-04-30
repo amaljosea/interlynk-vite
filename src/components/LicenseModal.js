@@ -8,11 +8,11 @@ import { useGlobalState } from 'hooks/useGlobalState'
 
 import { sbomUpdate } from 'graphQL/Mutation'
 
-import { FaScaleBalanced } from 'react-icons/fa6'
 
 import LicenseField from './Licenses/LicenseField'
 import LynkAlert from './LynkAlert'
 import LynkModal from './LynkModal'
+import { LuScale } from 'react-icons/lu'
 
 const LicenseModal = ({ data, isOpen, onClose, activeRow, recheck }) => {
   const [error, setError] = useState('')
@@ -58,7 +58,7 @@ const LicenseModal = ({ data, isOpen, onClose, activeRow, recheck }) => {
       onClose={onClose}
       onSubmit={handleUpdateSBOM}
       title={`${resolved ? 'View' : 'Add'} License`}
-      Icon={FaScaleBalanced}
+      Icon={LuScale}
       disabled={isInvalidLicense}
       hidden={resolved}
       buttonText={'Save'}

@@ -28,8 +28,7 @@ import {
   UpdateCompSupportOverride as UpdateSupport
 } from 'graphQL/Mutation'
 
-import { BsHeartPulse } from 'react-icons/bs'
-import { FaPlus } from 'react-icons/fa'
+import { LuCirclePlus, LuHeartHandshake } from 'react-icons/lu'
 
 const SupportModal = ({ supports, data, isOpen, onClose }) => {
   const initialData = {
@@ -270,7 +269,7 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
       <LynkModal
         isOpen={isOpen}
         onClose={onClose}
-        Icon={BsHeartPulse}
+        Icon={LuHeartHandshake}
         buttonText={data ? 'Update' : 'Save'}
         isLoading={data ? upLoading : crLoading}
         onSubmit={data ? handleUpdate : handleCreate}
@@ -398,7 +397,7 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
               variant='link'
               onClick={addRow}
               colorScheme='blue'
-              leftIcon={<FaPlus />}
+              leftIcon={<LuCirclePlus size={18} />}
               title='Add support ID'
               sx={{ fontSize: 'sm', fontWeight: 'medium' }}
             >

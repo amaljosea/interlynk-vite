@@ -4,13 +4,13 @@ import { formatString } from 'utils'
 
 import { FormControl, FormLabel, Input, Stack } from '@chakra-ui/react'
 
-import { ChangeRoleIcon } from 'components/Icons/Icons'
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 import LynkSelect from 'components/LynkSelect'
 
 import { UpdateOrganizationUserRole } from 'graphQL/Mutation'
 import { GetRoles } from 'graphQL/Queries'
+import { LuUserPen } from 'react-icons/lu'
 
 const RoleModal = ({ isOpen, onClose, data }) => {
   const [role, setRole] = useState(data?.role?.id)
@@ -53,7 +53,7 @@ const RoleModal = ({ isOpen, onClose, data }) => {
       onClose={onClose}
       onSubmit={updateRole}
       title={'Change Role'}
-      Icon={ChangeRoleIcon}
+      Icon={LuUserPen}
       disabled={role === ''}
       buttonText='Update'
       isLoading={loading}

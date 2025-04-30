@@ -20,9 +20,9 @@ import useCustomToast from 'hooks/useCustomToast'
 
 import { createOrgComp, updateOrgComp } from 'graphQL/Mutation'
 
-import { BiCube } from 'react-icons/bi'
 
 import { TextRegex } from './TestRegex'
+import { LuPackage2 } from 'react-icons/lu'
 
 const checkIfRegexError = (text) => text.includes('not a valid regex')
 const checkIfDuplicateError = (text) =>
@@ -86,7 +86,7 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
       onClose={onClose}
       onSubmit={handleSubmit}
       title={`${mutateText} Internal Component`}
-      Icon={BiCube}
+      Icon={LuPackage2}
       buttonText={mutateText}
       isLoading={loading}
     >

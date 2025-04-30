@@ -12,7 +12,7 @@ import useCustomToast from 'hooks/useCustomToast'
 
 import { sbomUpdate } from 'graphQL/Mutation'
 
-import { BiLayerPlus } from 'react-icons/bi'
+import { LuArrowDownUp } from 'react-icons/lu'
 
 const ProjectGroup = gql`
   query ProjectGroup($id: Uuid!) {
@@ -105,7 +105,7 @@ const SbomTransfer = ({ sbom, isOpen, onClose, productGroup }) => {
       isOpen={isOpen}
       buttonText='Switch'
       onClose={onClose}
-      Icon={BiLayerPlus}
+      Icon={LuArrowDownUp}
       title={'Switch Environment'}
       isLoading={loading}
       onSubmit={handleSubmit}

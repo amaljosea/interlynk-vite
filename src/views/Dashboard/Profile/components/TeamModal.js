@@ -15,7 +15,7 @@ import useCustomToast from 'hooks/useCustomToast'
 import { InviteUser } from 'graphQL/Mutation'
 import { GetRoles } from 'graphQL/Queries'
 
-import { BiUserPlus } from 'react-icons/bi'
+import { LuUserPlus } from 'react-icons/lu'
 
 const TeamModal = ({ isOpen, onClose, data, changeRole }) => {
   const { showToast } = useCustomToast()
@@ -70,7 +70,7 @@ const TeamModal = ({ isOpen, onClose, data, changeRole }) => {
       onClose={onClose}
       onSubmit={handleAdd}
       title={'Invite User'}
-      Icon={BiUserPlus}
+      Icon={LuUserPlus}
       isLoading={loading}
       disabled={!validateEmail(email) || role === ''}
       buttonText='Add'

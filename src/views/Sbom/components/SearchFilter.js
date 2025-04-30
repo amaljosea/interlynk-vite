@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react'
 
-import { CloseIcon, SearchIcon } from '@chakra-ui/icons'
 import {
   Box,
   Input,
@@ -10,6 +9,8 @@ import {
 } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
+
+import { LuSearch, LuX } from 'react-icons/lu'
 
 const SearchFilter = ({ id, filterText, onChange, onFilter, onClear }) => {
   const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
@@ -37,7 +38,7 @@ const SearchFilter = ({ id, filterText, onChange, onFilter, onClear }) => {
     <Box pos={'relative'} width={'300px'}>
       <InputGroup>
         <InputLeftElement pointerEvents='none'>
-          <SearchIcon color={secondaryTextColor} />
+          <LuSearch fontSize={18} color={secondaryTextColor} />
         </InputLeftElement>
         <Input
           id={id}
@@ -51,10 +52,7 @@ const SearchFilter = ({ id, filterText, onChange, onFilter, onClear }) => {
           onKeyDown={onFilter}
         />
         <InputRightElement hidden={filterText === ''}>
-          <CloseIcon
-            onClick={onClear}
-            sx={{ fontSize: 10, cursor: 'pointer' }}
-          />
+          <LuX onClick={onClear} fontSize={18} cursor={'pointer'} />
         </InputRightElement>
       </InputGroup>
     </Box>

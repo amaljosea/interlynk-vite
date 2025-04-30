@@ -20,7 +20,7 @@ import LynkSelect from 'components/LynkSelect'
 import useCustomToast from 'hooks/useCustomToast'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaScaleBalanced } from 'react-icons/fa6'
+import { LuScale } from 'react-icons/lu'
 
 import { CreateLicense, UpdateLicense } from '../../graphQL/Mutation'
 
@@ -156,7 +156,7 @@ const LicenseModal = ({ isOpen, onClose, data, updateLic }) => {
       isOpen={isOpen}
       onClose={onClose}
       hidden={!updateLic}
-      Icon={FaScaleBalanced}
+      Icon={LuScale}
       isLoading={createLoading || updateLoading}
       disabled={!isExpanded ? name === '' : false}
       onSubmit={!isExpanded ? handleSubmit : toggleExpand}
