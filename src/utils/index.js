@@ -751,3 +751,18 @@ export const getTotalDays = (dateString) => {
 export const formatDate = (date) => {
   return date ? new Date(date).toLocaleDateString() : 'N/A'
 }
+
+export const splitBySupportLevel = (groups) => {
+  const withSupport = groups?.flatMap((group) =>
+    group?.occurrences?.filter(
+      (occurrence) => occurrence?.componentSupportLevel !== null
+    )
+  )
+  const withoutSupport = groups?.flatMap((group) =>
+    group?.occurrences?.filter(
+      (occurrence) => occurrence?.componentSupportLevel === null
+    )
+  )
+
+  return { withSupport, withoutSupport }
+}

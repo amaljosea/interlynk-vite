@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { splitBySupportLevel } from 'utils'
 import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -31,18 +32,7 @@ const SupportSubHeader = ({
     childKey: 'update_sbom_components'
   })
 
-  const withSupport = selectedItems?.flatMap((group) =>
-    group?.occurrences?.filter(
-      (occurrence) => occurrence?.componentSupportLevel !== null
-    )
-  )
-
-  const withoutSupport = selectedItems?.flatMap((group) =>
-    group?.occurrences?.filter(
-      (occurrence) => occurrence?.componentSupportLevel === null
-    )
-  )
-
+  const { withSupport, withoutSupport } = splitBySupportLevel(selectedItems)
   const notAllowed = withSupport?.length > 0 && withoutSupport?.length > 0
   const info = notAllowed ? 'Not allowed' : 'Set Status'
 

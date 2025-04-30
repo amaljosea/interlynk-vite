@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useState } from 'react'
-import { getTotalDays } from 'utils'
+import { getTotalDays, splitBySupportLevel } from 'utils'
 import { assessmentExpiryWarning } from 'variables/general'
 
 import { FormErrorMessage, Input, Stack } from '@chakra-ui/react'
@@ -147,18 +147,7 @@ const SupportStatus = ({
     })
   }
 
-  const withSupport = selectedItems?.flatMap((group) =>
-    group?.occurrences?.filter(
-      (occurrence) => occurrence?.componentSupportLevel !== null
-    )
-  )
-
-  const withoutSupport = selectedItems?.flatMap((group) =>
-    group?.occurrences?.filter(
-      (occurrence) => occurrence?.componentSupportLevel === null
-    )
-  )
-
+  const { withSupport, withoutSupport } = splitBySupportLevel(selectedItems)
   const hasNoSupport = withSupport?.length === 0 && withoutSupport?.length > 0
 
   const handleSubmit = () => {
