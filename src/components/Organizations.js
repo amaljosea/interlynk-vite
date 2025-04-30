@@ -102,6 +102,7 @@ const Organizations = () => {
     <>
       <Menu placement='bottom-end'>
         <MenuButton
+          px={2}
           size='sm'
           as={Button}
           fontSize='sm'
