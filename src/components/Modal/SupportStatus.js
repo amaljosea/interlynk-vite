@@ -98,7 +98,7 @@ const SupportStatus = ({
           : undefined
       }
     }).then((res) => {
-      const { errors } = res?.data?.componentSupportLevelBulkUpdate || {}
+      const { errors } = res?.data?.supportLevelsUpdate || {}
       if (errors?.length > 0) {
         showToast({
           description: errors[0],

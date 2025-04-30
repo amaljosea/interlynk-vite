@@ -28,9 +28,9 @@ import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
+  ComponentSupportLevelBulkDelete,
   ComponentSupportLevelBulkUpdate,
-  componentSupportLevelCreate,
-  componentSupportLevelDelete
+  componentSupportLevelBulkCreate
 } from 'graphQL/Mutation'
 
 const CompSupport = ({ data, reset, isOpen, onClose, enableSupportLevel }) => {
@@ -260,7 +260,7 @@ const SupportForm = ({ data, reset, setEdit, handleClose }) => {
   }
 
   const [createSupport, { loading: createLoading }] = useMutation(
-    componentSupportLevelCreate,
+    componentSupportLevelBulkCreate,
     { onCompleted: () => reset() }
   )
   const [updateSupport, { loading: updateLoading }] = useMutation(
@@ -268,7 +268,7 @@ const SupportForm = ({ data, reset, setEdit, handleClose }) => {
     { onCompleted: () => reset() }
   )
   const [deleteSupport, { loading: deleteLoading }] = useMutation(
-    componentSupportLevelDelete,
+    ComponentSupportLevelBulkDelete,
     { onCompleted: () => reset() }
   )
 
@@ -308,10 +308,12 @@ const SupportForm = ({ data, reset, setEdit, handleClose }) => {
       })
       .finally(() => handleClose(false))
   }
+
   const handleSubmit = () => {
+    const ids = data?.occurrences?.map((item) => item?.id) || []
     createSupport({
       variables: {
-        id: data?.id,
+        id: ids,
         level: formData?.supportLevel || undefined,
         notes: formData?.explanation || undefined,
         retainManualOverrideFor: totalDays > 0 ? totalDays : 0,
@@ -321,7 +323,7 @@ const SupportForm = ({ data, reset, setEdit, handleClose }) => {
       }
     })
       .then((res) => {
-        const { errors } = res?.data?.componentSupportLevelCreate || {}
+        const { errors } = res?.data?.supportLevelsCreate || {}
         if (errors?.length > 0) {
           showToast({
             description: errors[0],
@@ -338,11 +340,10 @@ const SupportForm = ({ data, reset, setEdit, handleClose }) => {
   }
 
   const handleRemove = () => {
-    const ids =
-      data?.occurrences?.map((group) => group?.componentSupportLevel?.id) || []
-    deleteSupport({ variables: { id: ids[0] } })
+    const ids = data?.occurrences?.map((group) => group?.id) || []
+    deleteSupport({ variables: { ids: ids } })
       .then((res) => {
-        const { errors } = res?.data?.componentSupportLevelDelete || {}
+        const { errors } = res?.data?.supportLevelsDelete || {}
         if (errors?.length > 0) {
           showToast({
             description: errors[0],

@@ -60,7 +60,7 @@ const SupportColumns = ({ action }) => {
                 )}
                 <Text
                   color={secondaryTextColor}
-                  hidden={!componentSupportLevel?.updatedAt}
+                  hidden={!isPart || !componentSupportLevel?.updatedAt}
                 >
                   •
                 </Text>

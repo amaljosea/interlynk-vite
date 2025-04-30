@@ -2742,26 +2742,6 @@ export const componentSupportLevelUpdate = gql`
   }
 `
 
-export const componentSupportLevelDelete = gql`
-  mutation componentSupportLevelDelete($id: Uuid!) {
-    componentSupportLevelDelete(input: { id: $id }) {
-      errors
-      componentSupportLevel {
-        id
-        component {
-          id
-          name
-          version
-        }
-        level
-        endDate
-        notes
-        retainManualOverrideFor
-      }
-    }
-  }
-`
-
 export const ComponentLicenseStatusUpdate = gql`
   mutation ComponentLicenseStatusUpdate(
     $id: Uuid!
@@ -2862,15 +2842,15 @@ export const UpdateBitbucketWorkspace = gql`
 export const componentSupportLevelBulkCreate = gql`
   mutation componentSupportLevelBulkCreate(
     $ids: [Uuid!]!
-    $level: ComponentSupportLevelValues
+    $level: ComponentSupportLevelValues!
     $endDate: ISO8601DateTime
     $notes: String
     $retainManualOverrideFor: Int
   ) {
-    componentSupportLevelBulkCreate(
+    supportLevelsCreate(
       input: {
         componentIds: $ids
-        level: $level
+        supportLevel: $level
         endDate: $endDate
         notes: $notes
         retainManualOverrideFor: $retainManualOverrideFor
@@ -2887,15 +2867,15 @@ export const componentSupportLevelBulkCreate = gql`
 export const ComponentSupportLevelBulkUpdate = gql`
   mutation ComponentSupportLevelBulkUpdate(
     $ids: [Uuid!]!
-    $level: ComponentSupportLevelValues
+    $level: ComponentSupportLevelValues!
     $endDate: ISO8601DateTime
     $notes: String
     $retainManualOverrideFor: Int
   ) {
-    componentSupportLevelBulkUpdate(
+    supportLevelsUpdate(
       input: {
-        ids: $ids
-        level: $level
+        componentIds: $ids
+        supportLevel: $level
         endDate: $endDate
         notes: $notes
         retainManualOverrideFor: $retainManualOverrideFor
@@ -2906,6 +2886,15 @@ export const ComponentSupportLevelBulkUpdate = gql`
       componentSupportLevels {
         id
       }
+    }
+  }
+`
+
+export const ComponentSupportLevelBulkDelete = gql`
+  mutation ComponentSupportLevelBulkDelete($ids: [Uuid!]!) {
+    supportLevelsDelete(input: { componentIds: $ids }) {
+      deletedIds
+      errors
     }
   }
 `

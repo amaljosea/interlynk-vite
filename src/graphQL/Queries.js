@@ -3346,14 +3346,10 @@ export const GetCompSupportData = gql`
             project {
               projectGroup {
                 name
-                __typename
               }
-              __typename
             }
             projectVersion
-            __typename
           }
-
           componentSupportLevel {
             componentId
             createdAt
@@ -3366,14 +3362,11 @@ export const GetCompSupportData = gql`
             userId
             user {
               name
-              __typename
             }
-            __typename
           }
           componentSupportLevelAutomatic {
             level
             notes
-            __typename
           }
         }
       }
