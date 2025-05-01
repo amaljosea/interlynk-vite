@@ -2,6 +2,7 @@
 import { gql, useQuery } from '@apollo/client'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getSignedUrlParams } from 'utils'
+import { truncatedValue } from 'utils'
 import { COLORS } from 'utils/styleUtils'
 
 import {
@@ -246,7 +247,7 @@ const VulnParts = () => {
               <HStack key={index} w='full' justify='space-between'>
                 <HStack>
                   <Circle size='2' bg={color} />
-                  <Text fontSize='sm'>{group}</Text>
+                  <Text fontSize='sm'>{truncatedValue(group, 15)}</Text>
                 </HStack>
                 <VulnTypes data={part} />
               </HStack>
