@@ -53,9 +53,10 @@ export default class SupportStatusSection {
           await this.page.waitForTimeout(2000)
 
           await this.page.getByRole('tab', { name: 'Support Status' }).click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(3000)
 
           await this.page.getByTestId('rerun_support_analysis').click()
+          await this.page.waitForTimeout(3000)
 
           await this.page.locator("//button[@aria-label='refresh']").click()
           await this.page.waitForTimeout(2000)
@@ -65,29 +66,14 @@ export default class SupportStatusSection {
           await this.page.waitForTimeout(2000)
 
           await this.page.getByRole('button', { name: 'Edit' }).click()
-          await this.page
-            .locator('.css-rldctj-control > .css-1de614h > .css-1n2nce7')
-            .click()
-          await this.page.locator('.css-rldctj-control > .css-1wy0on6').click()
-          await this.page
-            .locator('.css-rldctj-control > .css-1de614h > .css-1n2nce7')
-            .click()
-          await this.page.getByRole('option', { name: 'Unspecified' }).click()
-          await this.page.getByRole('textbox', { name: 'Select date' }).click()
-          await this.page.getByText('›').click()
-          await this.page.getByRole('cell', { name: '30' }).nth(1).click()
-          await this.page.getByRole('textbox', { name: 'Select date' }).click()
-          await this.page
-            .getByRole('group')
-            .filter({ hasText: 'Assessment Expires On*‹May' })
-            .locator('div')
-            .nth(1)
-            .click()
-          await this.page.getByRole('textbox', { name: 'Select date' }).click()
-          await this.page.getByText('‹').dblclick()
-          await this.page.getByRole('cell', { name: '10' }).click()
-          await this.page.getByRole('button', { name: 'Save' }).click()
+          await this.page.waitForTimeout(2000)
 
+          await this.page
+            .getByRole('combobox', { name: 'supportLevel' })
+            .click()
+          await this.page.keyboard.type('abandon')
+          await this.page.keyboard.press('Enter')
+          await this.page.getByRole('button', { name: 'Save' }).click()
           await this.page.waitForTimeout(2000)
 
           await this.page.locator("//a[@aria-label='products']").click()
