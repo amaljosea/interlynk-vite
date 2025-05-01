@@ -29,8 +29,14 @@ import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
-import { FaEllipsisV, FaGlobe, FaLightbulb, FaSitemap } from 'react-icons/fa'
-import { FaHouseUser, FaListCheck } from 'react-icons/fa6'
+import {
+  LuEllipsisVertical,
+  LuGlobe,
+  LuLightbulb,
+  LuListCheck,
+  LuMapPin,
+  LuUser
+} from 'react-icons/lu'
 
 const ComponentsColumns = ({ totalComp, isArchived, action }) => {
   const {
@@ -317,36 +323,34 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
               {/* WEBSITE */}
               <ExternalLink
                 link={website}
-                icon={<FaGlobe color={onCheck(website)} fontSize={16} />}
+                icon={<LuGlobe color={onCheck(website)} size={18} />}
               />
               {/* DISTRIBUTION */}
               <ExternalLink
                 link={vcs}
-                icon={<FaSitemap color={onCheck(vcs)} fontSize={16} />}
+                icon={<LuMapPin color={onCheck(vcs)} size={18} />}
               />
               {/* ADVISORIES */}
               <ExternalLink
                 link={issueTracker}
                 icon={
                   isCustomerView ? (
-                    <FaHouseUser color={onCheck(issueTracker)} fontSize={16} />
+                    <LuUser color={onCheck(issueTracker)} size={18} />
                   ) : (
-                    <FaListCheck color={onCheck(issueTracker)} fontSize={16} />
+                    <LuListCheck color={onCheck(issueTracker)} size={18} />
                   )
                 }
               />
               {/* SUPPORT */}
               <ExternalLink
                 link={distribution}
-                icon={
-                  <FaLightbulb color={onCheck(distribution)} fontSize={16} />
-                }
+                icon={<LuLightbulb color={onCheck(distribution)} size={18} />}
               />
               {!isCustomerView ? (
                 <Menu>
                   <MenuButton
                     as={IconButton}
-                    icon={<FaEllipsisV />}
+                    icon={<LuEllipsisVertical size={20} />}
                     variant='none'
                     color={secondaryTextColor}
                     data-testid='component-actions'
