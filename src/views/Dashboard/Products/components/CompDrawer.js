@@ -16,20 +16,20 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetComponentPath } from 'graphQL/Queries'
 
-import { MdWarning } from 'react-icons/md'
 
 import CompDetails from './CompDetails'
 import CompIdentifiers from './CompIdentifiers'
 import CompLinks from './CompLinks'
 import CompRelations from './CompRelations'
 import CompSupplier from './CompSupplier'
+import { LuMessageCircleWarning } from 'react-icons/lu'
 
 const Warning = ({ type }) => {
   const label = `The component version does not match the ${type === 'purl' ? 'PURL' : 'CPE'} version under Identifiers`
   return (
     <Tooltip label={label}>
       <Box>
-        <MdWarning color={'orange'} />
+        <LuMessageCircleWarning size={20} color={'orange'} />
       </Box>
     </Tooltip>
   )
@@ -81,7 +81,7 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
   return (
     <LynkDrawer
       title={
-        <Flex alignItems='center' gap={1}>
+        <Flex alignItems='center' gap={2}>
           <Text fontWeight={'medium'}>
             {signedUrlParams ? 'Component' : 'Edit Component'}
           </Text>
