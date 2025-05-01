@@ -11,6 +11,7 @@ import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaLock } from 'react-icons/fa6'
+import { LuLock } from 'react-icons/lu'
 
 import Components from './Components'
 import General from './General'
@@ -87,7 +88,8 @@ const SbomTable = ({ data, loading, error }) => {
                   item === 'checks' ||
                   item === 'changelog' ||
                   item === 'policies') && (
-                  <FaLock
+                  <LuLock
+                    size={18}
                     color={secondaryTextInverse}
                     style={{ marginRight: '6px' }}
                   />

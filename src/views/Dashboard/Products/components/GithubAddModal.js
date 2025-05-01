@@ -10,6 +10,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { CreateProjectGroup } from 'graphQL/Mutation'
 
 import { FaCodeBranch, FaGithub } from 'react-icons/fa'
+import { LuGitBranch } from 'react-icons/lu'
 
 const projects = [
   {
@@ -207,7 +208,8 @@ const GithubAddModal = ({ isOpen, onClose }) => {
                     onChange={() => handleProjectCheckboxChange(project.name)}
                   >
                     <Flex align='center'>
-                      <FaCodeBranch
+                      <LuGitBranch
+                        size={18}
                         style={{ marginRight: '8px' }}
                         color={primaryTextColor}
                       />

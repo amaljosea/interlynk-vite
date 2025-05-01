@@ -26,6 +26,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { recheckHealth } from 'graphQL/Mutation'
 
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
+import { LuCircleCheck, LuCircleX } from 'react-icons/lu'
 
 const sbomCategory = ['Timestamp', 'Supplier Name', 'Unique ID', 'Author']
 
@@ -103,9 +104,9 @@ const ComplianceChecks = (props) => {
           {sbomCategory?.includes(item?.category) ? (
             <>
               {item?.score === 100 ? (
-                <FaCheckCircle color={primarySuccessColor} size={22} />
+                <LuCircleCheck color={primarySuccessColor} size={22} />
               ) : (
-                <FaTimesCircle color={primaryErrorColor} size={22} />
+                <LuCircleX color={primaryErrorColor} size={22} />
               )}
             </>
           ) : (

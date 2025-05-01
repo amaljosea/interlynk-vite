@@ -33,6 +33,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { GetActivities } from 'graphQL/Queries'
 
 import { FaRegCalendar, FaRegClock } from 'react-icons/fa6'
+import { LuCalendar, LuClock } from 'react-icons/lu'
 import { MdCheckCircle, MdSettings } from 'react-icons/md'
 
 const runType = {
@@ -218,7 +219,7 @@ const LogDuration = ({ row }) => {
   return (
     <Stack spacing={1.5} my={3}>
       <Flex gap={2} alignItems={'center'}>
-        <FaRegCalendar fontSize={14} color={sameSecondaryText} />
+        <LuCalendar size={18} color={sameSecondaryText} />
         <Tooltip label={getFullDateTime(row?.endTime)}>
           <Text fontSize={'xs'} color={sameSecondaryText}>
             {row?.endTime ? timeSince(row?.endTime) : 'Now'}
@@ -226,7 +227,7 @@ const LogDuration = ({ row }) => {
         </Tooltip>
       </Flex>
       <Flex gap={2} alignItems={'center'}>
-        <FaRegClock fontSize={14} color={sameSecondaryText} />
+        <LuClock size={18} color={sameSecondaryText} />
         {row?.endTime ? (
           <Text fontSize={'xs'} color={sameSecondaryText}>
             {hours > 0 && `${hours} hour${hours > 1 ? 's' : ''} `}

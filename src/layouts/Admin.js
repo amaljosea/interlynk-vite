@@ -28,6 +28,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { GetOrganization } from 'graphQL/Queries'
 
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6'
+import { LuArrowLeft, LuArrowRight } from 'react-icons/lu'
 
 import { getActiveNavbar, getActiveRoute, isMobileOrTablet } from '../utils'
 import { logoutUser } from '../utils/authUtils'
@@ -216,7 +217,8 @@ export default function Admin() {
           styles={tourStyles}
           nextButton={(props) =>
             props?.stepsLength !== props?.currentStep + 1 ? (
-              <FaArrowRight
+              <LuArrowRight
+                size={18}
                 cursor={'pointer'}
                 onClick={() => onClickNext(props)}
                 style={{
@@ -234,7 +236,8 @@ export default function Admin() {
           prevButton={(props) =>
             props?.stepsLength !== 1 &&
             props?.currentStep !== 0 && (
-              <FaArrowLeft
+              <LuArrowLeft
+                size={18}
                 cursor={'pointer'}
                 onClick={() => onClickPrev(props)}
                 style={{

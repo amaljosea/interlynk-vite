@@ -29,7 +29,7 @@ import { GetCompVulnData, GetConnectedSbom } from 'graphQL/Queries'
 
 import { BsCircleHalf } from 'react-icons/bs'
 import { FaPen } from 'react-icons/fa'
-import { FaFolderTree } from 'react-icons/fa6'
+import { LuFolderTree, LuSquarePen } from 'react-icons/lu'
 
 import VexModal from './VexModal'
 import VulnFilters from './VulnsFilter'
@@ -101,7 +101,7 @@ const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
               <IconButton
                 size='xs'
                 colorScheme='blue'
-                icon={<FaFolderTree />}
+                icon={<LuFolderTree size={16} />}
                 onClick={() => handlePreview(row)}
                 isDisabled={!component?.sbom?.hasConnectedSboms}
               />
@@ -297,7 +297,7 @@ const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
           {selectedVulns.length > 0 && (
             <Tooltip label={'Set Status'}>
               <IconButton
-                icon={<FaPen />}
+                icon={<LuSquarePen size={18} />}
                 variant='solid'
                 colorScheme='blue'
                 fontWeight='normal'

@@ -13,6 +13,7 @@ import LynkModal from 'components/LynkModal'
 import { AutomationRuleCreate, AutomationRuleUpdate } from 'graphQL/Mutation'
 
 import { FaPlus } from 'react-icons/fa6'
+import { LuCirclePlus } from 'react-icons/lu'
 
 import RuleActions from './RuleActions'
 import RuleConditions from './RuleConditions'
@@ -401,7 +402,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
           colorScheme='blue'
           variant='link'
           fontWeight={'medium'}
-          leftIcon={<FaPlus />}
+          leftIcon={<LuCirclePlus size={18} />}
           onClick={onAddCondtion}
           isDisabled={isSystem}
           title='Add automation condition'
@@ -430,7 +431,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
         <Button
           variant='link'
           colorScheme='blue'
-          leftIcon={<FaPlus />}
+          leftIcon={<LuCirclePlus size={18} />}
           onClick={onAddAction}
           isDisabled={isSystem}
           title='Add automation action'
