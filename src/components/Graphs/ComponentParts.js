@@ -19,6 +19,7 @@ import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 
 import { LuComponent } from 'react-icons/lu'
+import { truncatedValue } from 'utils'
 
 const GetPartComponents = gql`
   query GetSbomParts($projectId: Uuid!, $sbomId: Uuid!) {
@@ -116,7 +117,7 @@ const ComponentPart = () => {
               <HStack key={index} w='full' justify='space-between'>
                 <HStack>
                   <Circle size='2' bg={color} />
-                  <Text fontSize='sm'>{group}</Text>
+                  <Text fontSize='sm'>{truncatedValue(group, 15)}</Text>
                 </HStack>
                 <Text fontSize='sm'>{count || 0}</Text>
               </HStack>
