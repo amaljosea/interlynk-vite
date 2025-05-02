@@ -1,18 +1,20 @@
 import { useMemo } from 'react'
-import { useParams } from 'react-router-dom'
 import { getFullDate, setIntensity, timeSince } from 'utils'
 
 import {
-  Badge,
   Flex,
   IconButton,
   Portal,
+  Stack,
   Text,
   Tooltip,
   chakra
 } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
+
+import LynkBadge from 'components/LynkBadge'
+import PartInfo from 'components/Misc/PartInfo'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -21,7 +23,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { FaEllipsisV } from 'react-icons/fa'
 
 const SupportColumns = ({ action }) => {
-  const params = useParams()
   const { isFreeTier } = useGlobalQueryContext()
 
   const { primaryTextColor, secondaryTextColor } = useThemeColor([
@@ -37,23 +38,50 @@ const SupportColumns = ({ action }) => {
   return useMemo(() => {
     const columns = [
       {
-        id: 'COMPONENTS_NAME',
+        id: 'COMPONENT_SUPPORT_LEVELS_UPDATED_AT',
         name: 'NAME',
         sortable: true,
         wrap: true,
         width: '22%',
         selector: (row) => {
-          const { name, sbom } = row || {}
+          const { occurrences } = row || {}
+          const { name, isPart, componentSupportLevel } = occurrences[0] || {}
+
           return (
-            <Text my={3} color={primaryTextColor} data-tag='allowRowEvents'>
-              {name}{' '}
-              <chakra.span>
-                {sbom?.id !== params?.sbomid && (
-                  <Badge colorScheme='blue'>P</Badge>
+            <Stack my={3} spacing={1}>
+              <Text color={primaryTextColor}>{name}</Text>
+              <Flex gap={2} alignItems={'center'} flexWrap={'wrap'}>
+                {isPart && (
+                  <Tooltip label={<PartInfo data={occurrences} />}>
+                    <chakra.span>
+                      <LynkBadge color='blue' title='Part' />
+                    </chakra.span>
+                  </Tooltip>
                 )}
-              </chakra.span>
-            </Text>
+                <Text
+                  color={secondaryTextColor}
+                  hidden={!isPart || !componentSupportLevel?.updatedAt}
+                >
+                  •
+                </Text>
+                {componentSupportLevel?.updatedAt && (
+                  <Tooltip
+                    placement={'top'}
+                    label={getFullDate(componentSupportLevel?.updatedAt)}
+                  >
+                    <Text color={secondaryTextColor}>
+                      {timeSince(componentSupportLevel?.updatedAt)}
+                    </Text>
+                  </Tooltip>
+                )}
+              </Flex>
+            </Stack>
           )
+        },
+        sortFunction: (a, b) => {
+          const dateA = new Date(a[0]?.componentSupportLevel?.updatedAt)
+          const dateB = new Date(b[0]?.componentSupportLevel?.updatedAt)
+          return dateA - dateB
         }
       },
       {
@@ -61,10 +89,11 @@ const SupportColumns = ({ action }) => {
         name: 'ASSESSMENT',
         wrap: true,
         selector: (row) => {
-          const { componentSupportLevel: manual } = row || {}
+          const { occurrences } = row || {}
+          const { componentSupportLevel } = occurrences[0] || {}
           return (
             <Text color={primaryTextColor}>
-              {manual?.user ? 'Manual' : 'Automatic'}
+              {componentSupportLevel?.user ? 'Manual' : 'Automatic'}
             </Text>
           )
         }
@@ -75,7 +104,8 @@ const SupportColumns = ({ action }) => {
         sortable: true,
         width: '18%',
         selector: (row) => {
-          const { duplicates, componentSupportLevel } = row || {}
+          const { occurrences } = row || {}
+          const { componentSupportLevel } = occurrences[0] || {}
           const { level } = componentSupportLevel || {}
           const supportLevel = level ? level?.replaceAll('_', ' ') : 'N/A'
 
@@ -87,14 +117,14 @@ const SupportColumns = ({ action }) => {
                     {supportLevel?.replaceAll('_', ' ')}{' '}
                   </TagLabel>
                 </Tag>
-                {duplicates?.length > 0 && (
-                  <Text color={primaryTextColor}>+{duplicates?.length}</Text>
+                {occurrences?.length > 1 && (
+                  <Text color={primaryTextColor}>+{occurrences?.length}</Text>
                 )}
               </Flex>
             )
           }
           return (
-            <Tag w={'184px'}>
+            <Tag>
               <TagLabel mx={'auto'}>N/A</TagLabel>
             </Tag>
           )
@@ -108,7 +138,9 @@ const SupportColumns = ({ action }) => {
         right: 'true',
         width: '14%',
         selector: (row) => {
-          const { endDate } = row?.componentSupportLevel || {}
+          const { occurrences } = row || {}
+          const { componentSupportLevel } = occurrences[0] || {}
+          const { endDate } = componentSupportLevel || {}
           if (endDate) {
             return (
               <Text color={primaryTextColor}>
@@ -124,42 +156,11 @@ const SupportColumns = ({ action }) => {
           return dateA - dateB
         }
       },
-      {
-        id: 'COMPONENT_SUPPORT_LEVELS_UPDATED_AT',
-        name: 'UPDATED',
-        selector: (row) => {
-          const { componentSupportLevel } = row || {}
-
-          if (!componentSupportLevel)
-            return <Text color={primaryTextColor}>N/A</Text>
-
-          return (
-            <Tooltip
-              placement={'top'}
-              label={getFullDate(componentSupportLevel?.updatedAt)}
-            >
-              <Text color={primaryTextColor}>
-                {timeSince(componentSupportLevel?.updatedAt)}
-              </Text>
-            </Tooltip>
-          )
-        },
-        sortable: true,
-        sortFunction: (a, b) => {
-          const dateA = new Date(a?.componentSupportLevel?.updatedAt)
-          const dateB = new Date(b?.componentSupportLevel?.updatedAt)
-          return dateA - dateB
-        },
-        right: 'true',
-        wrap: true
-      },
       // ACTIONS
       {
         id: 'ACTION',
         name: 'ACTION',
         selector: (row) => {
-          const { sbom } = row || {}
-          const isPart = params?.sbomid !== sbom?.id
           return (
             <Menu>
               <MenuButton
@@ -173,8 +174,8 @@ const SupportColumns = ({ action }) => {
                 <MenuList fontSize={'sm'}>
                   <MenuItem
                     hidden={isFreeTier}
+                    isDisabled={!updateComponent}
                     data-testid='edit_component_support'
-                    isDisabled={!updateComponent || isPart}
                     onClick={() => action('view_support_drawer', row)}
                   >
                     Edit Support Status
@@ -192,7 +193,6 @@ const SupportColumns = ({ action }) => {
   }, [
     action,
     isFreeTier,
-    params?.sbomid,
     primaryTextColor,
     secondaryTextColor,
     updateComponent

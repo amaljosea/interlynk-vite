@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useState } from 'react'
-import { getTotalDays } from 'utils'
+import { getTotalDays, splitBySupportLevel } from 'utils'
 import { assessmentExpiryWarning } from 'variables/general'
 
 import { FormErrorMessage, Input, Stack } from '@chakra-ui/react'
@@ -23,19 +23,13 @@ const SupportStatus = ({
   isOpen,
   onClose,
   selectedItems,
-  setSelectedItems,
-  setToggleClear
+  setToggleClear,
+  handleClear
 }) => {
   const { isCustomerView } = useRouteFlags()
   const { showToast } = useCustomToast()
 
   const inputStyle = { size: 'md' }
-
-  const handleClear = () => {
-    setSelectedItems([])
-    setToggleClear(true)
-    onClose()
-  }
 
   const [createSupport, { loading: createLoading }] = useMutation(
     componentSupportLevelBulkCreate,
@@ -45,13 +39,6 @@ const SupportStatus = ({
     ComponentSupportLevelBulkUpdate,
     { onCompleted: () => handleClear() }
   )
-
-  const componentIds = selectedItems
-    ?.filter((item) => item?.componentSupportLevel === null)
-    ?.map((comp) => comp?.id)
-  const supportIds = selectedItems
-    ?.filter((item) => item?.componentSupportLevel !== null)
-    ?.map((sup) => sup?.componentSupportLevel?.id)
 
   const defaultDate = new Date()
   defaultDate.setDate(defaultDate.getDate() + 365)
@@ -101,12 +88,15 @@ const SupportStatus = ({
     }))
   }
 
-  const handleUpdate = (data) => {
+  const occurrenceIds = selectedItems?.flatMap((group) =>
+    group?.occurrences.map((occurrence) => occurrence?.id)
+  )
+
+  const handleUpdate = () => {
     setToggleClear(false)
-    const ids = data?.length > 0 ? data?.map((item) => item) : []
     updateSupport({
       variables: {
-        ids: ids,
+        ids: occurrenceIds,
         level: formData?.supportLevel || undefined,
         notes: formData?.explanation || undefined,
         retainManualOverrideFor: totalDays > 0 ? totalDays : 0,
@@ -115,7 +105,7 @@ const SupportStatus = ({
           : undefined
       }
     }).then((res) => {
-      const { errors } = res?.data?.componentSupportLevelBulkUpdate || {}
+      const { errors } = res?.data?.supportLevelsUpdate || {}
       if (errors?.length > 0) {
         showToast({
           description: errors[0],
@@ -130,13 +120,11 @@ const SupportStatus = ({
     })
   }
 
-  const handleCreate = (data) => {
-    setToggleClear(false)
-    const ids = data?.length > 0 ? data?.map((item) => item) : []
+  const handleCreate = () => {
     createSupport({
       variables: {
-        ids: ids,
-        level: formData?.supportLevel || undefined,
+        componentIds: occurrenceIds,
+        supportLevel: formData?.supportLevel || undefined,
         notes: formData?.explanation || undefined,
         retainManualOverrideFor: totalDays > 0 ? totalDays : 0,
         endDate: formData?.endOfSupport
@@ -144,7 +132,7 @@ const SupportStatus = ({
           : undefined
       }
     }).then((res) => {
-      const { errors } = res?.data?.componentSupportLevelBulkCreate || {}
+      const { errors } = res?.data?.supportLevelsCreate || {}
       if (errors?.length > 0) {
         showToast({
           description: errors[0],
@@ -159,11 +147,14 @@ const SupportStatus = ({
     })
   }
 
+  const { withSupport, withoutSupport } = splitBySupportLevel(selectedItems)
+  const hasNoSupport = withSupport?.length === 0 && withoutSupport?.length > 0
+
   const handleSubmit = () => {
-    if (supportIds?.length > 0) {
-      handleUpdate(supportIds)
+    if (hasNoSupport) {
+      handleCreate()
     } else {
-      handleCreate(componentIds)
+      handleUpdate()
     }
   }
 
@@ -183,8 +174,8 @@ const SupportStatus = ({
       title={'Add Status'}
       disabled={isDisabled}
       onSubmit={handleSubmit}
-      isLoading={createLoading || updateLoading}
-      buttonText={supportIds?.length > 0 ? 'Update' : 'Save'}
+      isLoading={updateLoading || createLoading}
+      buttonText={hasNoSupport ? 'Create' : 'Update'}
     >
       <Stack spacing={4}>
         {/* SUPPRT LEVEL */}

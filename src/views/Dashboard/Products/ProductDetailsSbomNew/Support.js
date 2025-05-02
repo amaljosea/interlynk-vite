@@ -195,6 +195,13 @@ const Support = () => {
     }
   }
 
+  const handleReset = () => {
+    setSelectedItems([])
+    setToggleClear(true)
+    BULK_UPDATE.onClose()
+    reset()
+  }
+
   // SUB HEADER
   const subHeader = SupportSubHeader({
     reset,
@@ -228,7 +235,7 @@ const Support = () => {
           onSelectedRowsChange={handleChange}
           data={enableSupportLevel ? nodes : []}
           expandableRowsComponent={SupportExpanded}
-          selectableRowDisabled={(row) => row?.sbom?.id !== sbomId}
+          // selectableRowDisabled={(row) => row?.sbom?.id !== sbomId}
         />
 
         {/* PAGINATION */}
@@ -237,6 +244,7 @@ const Support = () => {
 
       {UPDATE_STATUS.isOpen && (
         <CompSupport
+          reset={reset}
           data={activeRow}
           isOpen={UPDATE_STATUS.isOpen}
           onClose={UPDATE_STATUS.onClose}
@@ -246,11 +254,11 @@ const Support = () => {
 
       {BULK_UPDATE.isOpen && selectedItems?.length > 0 && (
         <SupportStatus
+          handleClear={handleReset}
           isOpen={BULK_UPDATE.isOpen}
           onClose={BULK_UPDATE.onClose}
           selectedItems={selectedItems}
           setToggleClear={setToggleClear}
-          setSelectedItems={setSelectedItems}
         />
       )}
     </>

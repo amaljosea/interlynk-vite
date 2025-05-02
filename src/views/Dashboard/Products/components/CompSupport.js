@@ -1,9 +1,10 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { formatDate, getDate, getTotalDays } from 'utils'
 import { assessmentExpiryWarning } from 'variables/general'
 
 import {
+  Box,
   Flex,
   FormErrorMessage,
   Input,
@@ -15,7 +16,6 @@ import {
 import { Button, ButtonGroup } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import DeleteButton from 'components/Icons/DeleteButton'
 import EditButton from 'components/Icons/EditButton'
 import LynkDate from 'components/LynkDate'
@@ -28,26 +28,24 @@ import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
-  componentSupportLevelCreate,
-  componentSupportLevelDelete,
-  componentSupportLevelUpdate
+  ComponentSupportLevelBulkDelete,
+  ComponentSupportLevelBulkUpdate,
+  componentSupportLevelBulkCreate
 } from 'graphQL/Mutation'
-import { GetComponentSupportLevels } from 'graphQL/Queries'
 
-const CompSupport = ({ data, isOpen, onClose, enableSupportLevel }) => {
+const CompSupport = ({ data, reset, isOpen, onClose, enableSupportLevel }) => {
   const [edit, setEdit] = useState(false)
+  const supports = data?.occurrences[0] || {}
+  const { internal } = supports || {}
 
-  const { data: supports, loading } = useQuery(GetComponentSupportLevels, {
-    skip: isOpen ? false : true,
-    variables: { id: data?.id, sbomId: data?.sbom?.id }
-  })
+  const { primaryErrorColor } = useThemeColor(['primaryErrorColor'])
 
   const Header = () => {
-    if (!data) return null
+    if (!supports) return null
     return (
       <Flex gap={2}>
-        <CompInfo data={data} />
-        {data?.internal && (
+        <CompInfo data={supports} />
+        {internal && (
           <Tag w={'fit-content'} colorScheme='blue'>
             Internal
           </Tag>
@@ -64,42 +62,58 @@ const CompSupport = ({ data, isOpen, onClose, enableSupportLevel }) => {
       subtitle={<Header />}
       title={'Edit Support Status'}
     >
-      {loading ? (
-        <CustomLoader />
-      ) : (
-        <Stack>
-          {edit ? (
-            <SupportForm
-              setEdit={setEdit}
-              handleClose={onClose}
-              data={data}
-              component={{
-                id: data?.id,
-                name: data?.name,
-                internal: data?.internal
-              }}
-            />
-          ) : (
+      <Stack w={'100%'}>
+        {edit ? (
+          <SupportForm
+            data={data}
+            reset={reset}
+            setEdit={setEdit}
+            handleClose={onClose}
+          />
+        ) : (
+          <Stack spacing={4} mt={3}>
+            <Flex
+              gap={2}
+              alignItems={'center'}
+              justifyContent={'space-between'}
+            >
+              <Box>
+                {!enableSupportLevel && (
+                  <Text fontSize={'sm'} color={primaryErrorColor}>
+                    Component support level analysis is not enabled for this
+                    product
+                  </Text>
+                )}
+              </Box>
+              <EditButton
+                size={'md'}
+                type={'primary'}
+                aria-label='Edit'
+                onClick={() => setEdit(true)}
+              />
+            </Flex>
             <SupportCard
               setEdit={setEdit}
-              data={supports?.component}
+              data={supports}
               enableSupportLevel={enableSupportLevel}
             />
-          )}
-        </Stack>
-      )}
+          </Stack>
+        )}
+      </Stack>
     </LynkDrawer>
   )
 }
 
-const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
+const SupportCard = ({ data }) => {
   const {
     componentSupportLevel: manual,
     componentSupportLevelAutomatic: automatic
   } = data || {}
 
-  const { sameSecondaryText, grayBorderColor, primaryErrorColor } =
-    useThemeColor(['sameSecondaryText', 'grayBorderColor', 'primaryErrorColor'])
+  const { sameSecondaryText, grayBorderColor } = useThemeColor([
+    'sameSecondaryText',
+    'grayBorderColor'
+  ])
 
   const labelStyle = { fontSize: 12, color: sameSecondaryText }
   const infoStyle = { fontSize: 14 }
@@ -122,93 +136,73 @@ const SupportCard = ({ setEdit, data, enableSupportLevel }) => {
   const lastAssessed = formatDate(manual?.updatedAt)
 
   return (
-    <Stack spacing={4} mt={3}>
-      <Flex
-        gap={2}
-        alignItems={'center'}
-        justifyContent={!enableSupportLevel ? 'space-between' : 'flex-end'}
-      >
-        {!enableSupportLevel && (
-          <Text fontSize={'sm'} color={primaryErrorColor}>
-            Component support level analysis is not enabled for this product
-          </Text>
-        )}
-        <EditButton
-          size={'md'}
-          aria-label='Edit'
-          alignSelf='end'
-          onClick={() => setEdit(true)}
-          tooltip={'Edit'}
-          type={'primary'}
-        />
-      </Flex>
-
-      <Stack spacing={3}>
-        <Stack {...containerStyle}>
-          <Text {...labelStyle}>Assessment</Text>
-          <Text {...infoStyle}>{assessment}</Text>
-        </Stack>
-        <Stack {...containerStyle}>
-          <Text {...labelStyle}>{`Level`}</Text>
-          <Text {...infoStyle} textTransform={'capitalize'}>
-            {supportLevel?.replaceAll('_', ' ') || 'N/A'}
-          </Text>
-        </Stack>
-        <Stack {...containerStyle}>
-          <Text {...labelStyle}>End of Support</Text>
-          <Text {...infoStyle}>{endOfSupport}</Text>
-        </Stack>
-        <Stack
-          {...containerStyle}
-          hidden={supportLevel === 'no_longer_maintained'}
-        >
-          <Text {...labelStyle}>Assessment Expires On</Text>
-          <Text {...infoStyle}>{assessmentExpiresOn}</Text>
-        </Stack>
-        <Stack {...containerStyle}>
-          <Text {...labelStyle}>{`Explanation`}</Text>
-          <Text {...infoStyle}>{explanation}</Text>
-        </Stack>
-        <Stack {...containerStyle}>
-          <Text {...labelStyle}>Last Assessed By</Text>
-          <Text {...infoStyle} textTransform={'capitalize'}>
-            {assessedBy}
-          </Text>
-        </Stack>
-        <Stack {...containerStyle}>
-          <Text {...labelStyle}>Last Assessed</Text>
-          <Text {...infoStyle}>{lastAssessed}</Text>
-        </Stack>
-        {manual?.user && (
-          <Stack {...containerStyle}>
-            <Text {...labelStyle}>{`Level (System)`}</Text>
-            <Text {...infoStyle} textTransform={'capitalize'}>
-              {automatic?.level?.replaceAll('_', ' ') || 'N/A'}
-            </Text>
-          </Stack>
-        )}
-        {manual?.user && (
-          <Stack {...containerStyle}>
-            <Text {...labelStyle}>{`Explanation (System)`}</Text>
-            <Text {...infoStyle}>{automatic?.notes || 'N/A'}</Text>
-          </Stack>
-        )}
+    <Stack spacing={3} mt={3}>
+      <Stack {...containerStyle}>
+        <Text {...labelStyle}>Assessment</Text>
+        <Text {...infoStyle}>{assessment}</Text>
       </Stack>
+      <Stack {...containerStyle}>
+        <Text {...labelStyle}>{`Level`}</Text>
+        <Text {...infoStyle} textTransform={'capitalize'}>
+          {supportLevel?.replaceAll('_', ' ') || 'N/A'}
+        </Text>
+      </Stack>
+      <Stack {...containerStyle}>
+        <Text {...labelStyle}>End of Support</Text>
+        <Text {...infoStyle}>{endOfSupport}</Text>
+      </Stack>
+      <Stack
+        {...containerStyle}
+        hidden={supportLevel === 'no_longer_maintained'}
+      >
+        <Text {...labelStyle}>Assessment Expires On</Text>
+        <Text {...infoStyle}>{assessmentExpiresOn}</Text>
+      </Stack>
+      <Stack {...containerStyle}>
+        <Text {...labelStyle}>{`Explanation`}</Text>
+        <Text {...infoStyle}>{explanation}</Text>
+      </Stack>
+      <Stack {...containerStyle}>
+        <Text {...labelStyle}>Last Assessed By</Text>
+        <Text {...infoStyle} textTransform={'capitalize'}>
+          {assessedBy}
+        </Text>
+      </Stack>
+      <Stack {...containerStyle}>
+        <Text {...labelStyle}>Last Assessed</Text>
+        <Text {...infoStyle}>{lastAssessed}</Text>
+      </Stack>
+      {manual?.user && (
+        <Stack {...containerStyle}>
+          <Text {...labelStyle}>{`Level (System)`}</Text>
+          <Text {...infoStyle} textTransform={'capitalize'}>
+            {automatic?.level?.replaceAll('_', ' ') || 'N/A'}
+          </Text>
+        </Stack>
+      )}
+      {manual?.user && (
+        <Stack {...containerStyle}>
+          <Text {...labelStyle}>{`Explanation (System)`}</Text>
+          <Text {...infoStyle}>{automatic?.notes || 'N/A'}</Text>
+        </Stack>
+      )}
     </Stack>
   )
 }
 
-const SupportForm = ({ component, data, setEdit, handleClose }) => {
+const SupportForm = ({ data, reset, setEdit, handleClose }) => {
   const { isCustomerView } = useRouteFlags()
   const { showToast } = useCustomToast()
 
-  const defaultDate = new Date()
-  defaultDate.setDate(defaultDate.getDate() + 365)
-
   const {
+    name,
+    internal,
     componentSupportLevel: manual,
     componentSupportLevelAutomatic: automatic
-  } = data || {}
+  } = data?.occurrences[0] || {}
+
+  const defaultDate = new Date()
+  defaultDate.setDate(defaultDate.getDate() + 365)
 
   const { endDate, retainManualOverrideFor } = manual || {}
 
@@ -231,8 +225,8 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
 
   const isDisabled =
     formData?.supportLevel === '' ||
-    (isAbandoned && !component?.internal && totalDays < 1) ||
-    (isAbandoned && !component?.internal && totalDays > 365)
+    (isAbandoned && !internal && totalDays < 1) ||
+    (isAbandoned && !internal && totalDays > 365)
 
   const noLongerMaintained = formData?.supportLevel === 'no_longer_maintained'
 
@@ -266,13 +260,16 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
   }
 
   const [createSupport, { loading: createLoading }] = useMutation(
-    componentSupportLevelCreate
+    componentSupportLevelBulkCreate,
+    { onCompleted: () => reset() }
   )
   const [updateSupport, { loading: updateLoading }] = useMutation(
-    componentSupportLevelUpdate
+    ComponentSupportLevelBulkUpdate,
+    { onCompleted: () => reset() }
   )
   const [deleteSupport, { loading: deleteLoading }] = useMutation(
-    componentSupportLevelDelete
+    ComponentSupportLevelBulkDelete,
+    { onCompleted: () => reset() }
   )
 
   const handleDateChange = (newDate, field) => {
@@ -283,9 +280,10 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
   }
 
   const handleUpdate = () => {
+    const ids = data?.occurrences?.map((item) => item?.id) || []
     updateSupport({
       variables: {
-        id: manual?.id,
+        ids: ids,
         level: formData?.supportLevel || undefined,
         notes: formData?.explanation || undefined,
         retainManualOverrideFor: totalDays > 0 ? totalDays : 0,
@@ -295,7 +293,7 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
       }
     })
       .then((res) => {
-        const { errors } = res?.data?.componentSupportLevelUpdate || {}
+        const { errors } = res?.data?.componentSupportLevelBulkUpdate || {}
         if (errors?.length > 0) {
           showToast({
             description: errors[0],
@@ -312,10 +310,11 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
   }
 
   const handleSubmit = () => {
+    const ids = data?.occurrences?.map((item) => item?.id) || []
     createSupport({
       variables: {
-        id: data?.id,
-        level: formData?.supportLevel || undefined,
+        componentIds: ids,
+        supportLevel: formData?.supportLevel || undefined,
         notes: formData?.explanation || undefined,
         retainManualOverrideFor: totalDays > 0 ? totalDays : 0,
         endDate: formData?.endOfSupport
@@ -324,7 +323,7 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
       }
     })
       .then((res) => {
-        const { errors } = res?.data?.componentSupportLevelCreate || {}
+        const { errors } = res?.data?.supportLevelsCreate || {}
         if (errors?.length > 0) {
           showToast({
             description: errors[0],
@@ -341,9 +340,10 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
   }
 
   const handleRemove = () => {
-    deleteSupport({ variables: { id: manual?.id } })
+    const ids = data?.occurrences?.map((group) => group?.id) || []
+    deleteSupport({ variables: { ids: ids } })
       .then((res) => {
-        const { errors } = res?.data?.componentSupportLevelDelete || {}
+        const { errors } = res?.data?.supportLevelsDelete || {}
         if (errors?.length > 0) {
           showToast({
             description: errors[0],
@@ -387,7 +387,7 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
   if (isOpen)
     return (
       <Stack spacing={4} mt={2}>
-        <Text>{`You are about to delete the support : ${component?.name} from this component.`}</Text>
+        <Text>{`You are about to delete the support : ${name} from this component.`}</Text>
         <Text fontWeight={500}>Are you sure you want to proceed?</Text>
         <ButtonGroup>
           <Button onClick={onClose}>Cancel</Button>
@@ -445,9 +445,7 @@ const SupportForm = ({ component, data, setEdit, handleClose }) => {
       {/* RETAIN MANNUAL OVERRIDE */}
       <FormControl
         hidden={noLongerMaintained}
-        isRequired={
-          !component?.internal && formData?.supportLevel !== 'abandoned'
-        }
+        isRequired={!internal && formData?.supportLevel !== 'abandoned'}
         isInvalid={totalDays > 365}
       >
         <FormLabel htmlFor='assessmentExpiresOn'>

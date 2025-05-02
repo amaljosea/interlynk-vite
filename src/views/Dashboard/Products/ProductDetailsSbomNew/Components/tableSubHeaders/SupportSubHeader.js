@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { splitBySupportLevel } from 'utils'
 import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -30,17 +31,9 @@ const SupportSubHeader = ({
     childKey: 'update_sbom_components'
   })
 
-  const withSupport = selectedItems?.filter(
-    (component) => component?.componentSupportLevel !== null
-  )
-  const withoutSupport = selectedItems?.filter(
-    (component) => component?.componentSupportLevel === null
-  )
-
+  const { withSupport, withoutSupport } = splitBySupportLevel(selectedItems)
   const notAllowed = withSupport?.length > 0 && withoutSupport?.length > 0
-  const info = notAllowed
-    ? 'Create and update at the same time is not allowed'
-    : 'Set Status'
+  const info = notAllowed ? 'Not allowed' : 'Set Status'
 
   const subHeader = useMemo(() => {
     return (

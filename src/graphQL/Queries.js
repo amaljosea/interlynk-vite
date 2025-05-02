@@ -3311,42 +3311,36 @@ export const GetSbomSupportTab = gql`
 
 export const GetCompSupportData = gql`
   query GetComponentSupportData(
-    $projectId: Uuid!
-    $sbomId: Uuid!
+    $sbomId: Uuid
+    $projectId: Uuid
     $first: Int
-    $last: Int
     $after: String
-    $before: String
-    $search: String
     $includeParts: Boolean
+    $orderBy: ComponentSupportLevelOrderByInput
     $supportLevel: [String!]
-    $orderBy: ComponentOrderByInput
+    $search: String
   ) {
-    sbom(projectId: $projectId, sbomId: $sbomId) {
-      components(
-        sbomId: $sbomId
-        first: $first
-        last: $last
-        after: $after
-        before: $before
-        search: $search
-        orderBy: $orderBy
-        includeParts: $includeParts
-        supportLevel: $supportLevel
-      ) {
-        totalCount
-        pageInfo {
-          endCursor
-          hasNextPage
-          hasPreviousPage
-          startCursor
-        }
-        nodes {
+    componentSupportLevel(
+      sbomId: $sbomId
+      projectId: $projectId
+      first: $first
+      after: $after
+      includeParts: $includeParts
+      orderBy: $orderBy
+      supportLevel: $supportLevel
+      search: $search
+    ) {
+      totalCount
+      nodes {
+        name
+        version
+        occurrences {
           id
           name
           version
           internal
           updatedAt
+          isPart
           sbom {
             id
             project {
@@ -3375,6 +3369,12 @@ export const GetCompSupportData = gql`
             notes
           }
         }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+        hasPreviousPage
+        startCursor
       }
     }
   }

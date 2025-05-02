@@ -9,6 +9,8 @@ import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 
 import ChangelogTable from 'components/Tables/ChangelogTable'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
+import PolicyTable from 'components/Tables/PolicyTable'
+import SupportStatusTable from 'components/Tables/SupportStatusTable'
 import VersionsTable from 'components/Tables/VersionsTable'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -17,11 +19,11 @@ import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { GetGlobalVulns, GetOrgMfc } from 'graphQL/Queries'
-import PolicyTable from 'components/Tables/PolicyTable'
 
 const tabs = [
   'versions',
   'vulnerabilities',
+  'support status',
   'automation rules',
   'settings',
   'policies',
@@ -49,7 +51,8 @@ const ProductTabs = (props) => {
 
   const getDisplay = (item) => {
     const conditions = {
-      'automation rules': isFreeTier
+      'automation rules': isFreeTier,
+      'support status': isFreeTier
     }
     return conditions[item] ? 'none' : 'block'
   }
@@ -136,6 +139,10 @@ const ProductTabs = (props) => {
             loading={globalVulnloading}
             paginationProps={paginationProps}
           />
+        </TabPanel>
+        {/* VULNERABILITIES */}
+        <TabPanel px={0}>
+          <SupportStatusTable />
         </TabPanel>
         {/* AUTOMATIONS */}
         <TabPanel px={0}>
