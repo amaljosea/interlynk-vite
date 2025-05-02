@@ -114,8 +114,8 @@ const useExportCsvQueryInfo = (
             includeParts: partsFilter ? true : undefined
           },
           skip: !sbomId,
-          selector: 'sbom.components.nodes',
-          pageInfoSelector: 'sbom.components.pageInfo'
+          selector: 'componentSupportLevel.nodes',
+          pageInfoSelector: 'componentSupportLevel.pageInfo'
         }
 
       case 'Users':

@@ -88,7 +88,7 @@ const Support = () => {
     GetCompSupportData,
     {
       skip: activeTab === 'support' && enableSupportLevel ? false : true,
-      selector: 'sbom.components',
+      selector: 'componentSupportLevel',
       variables: {
         ...supportData,
         sbomId: sbomId,
