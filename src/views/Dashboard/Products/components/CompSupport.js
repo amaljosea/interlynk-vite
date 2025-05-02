@@ -418,6 +418,7 @@ const SupportForm = ({ data, reset, setEdit, handleClose }) => {
         <FormLabel htmlFor='supportLevel'>Support Level</FormLabel>
         <LynkSelect
           name='supportLevel'
+          aria-label='supportLevel'
           value={
             supportLevelOptions.find(
               (opt) => opt.value === formData?.supportLevel

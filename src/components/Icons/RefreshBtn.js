@@ -5,7 +5,7 @@ import { IconButton, Spinner, Tooltip } from '@chakra-ui/react'
 
 import useCustomToast from 'hooks/useCustomToast'
 
-import { TbRefresh } from 'react-icons/tb'
+import { LuRefreshCw } from 'react-icons/lu'
 
 const RefreshBtn = ({ onClick }) => {
   const [loading, setLoading] = useState(false)
@@ -23,6 +23,7 @@ const RefreshBtn = ({ onClick }) => {
       setLoading(false)
     }
   }
+
   return (
     <Tooltip label='Refresh'>
       <IconButton
@@ -34,7 +35,7 @@ const RefreshBtn = ({ onClick }) => {
         }}
         aria-label='refresh'
         colorScheme='blue'
-        icon={loading ? <Spinner size='sm' /> : <TbRefresh fontSize={20} />}
+        icon={loading ? <Spinner size={'sm'} /> : <LuRefreshCw size={18} />}
       ></IconButton>
     </Tooltip>
   )

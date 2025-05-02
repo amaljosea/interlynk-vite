@@ -10,8 +10,7 @@ import RefreshBtn from 'components/Icons/RefreshBtn'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useRouteFlags } from 'hooks/useRouteFlags'
 
-import { FaPen } from 'react-icons/fa6'
-import { TbActivity } from 'react-icons/tb'
+import { LuActivity, LuSquarePen } from 'react-icons/lu'
 
 import SupportFilters from '../../SupportFilters'
 
@@ -53,7 +52,7 @@ const SupportSubHeader = ({
           {!isCustomerView && (
             <Tooltip placement='left' label={'Rerun Support Analysis'}>
               <IconButton
-                icon={<TbActivity size={20} />}
+                icon={<LuActivity size={18} />}
                 colorScheme='blue'
                 isDisabled={!editComponent}
                 data-testid='rerun_support_analysis'
@@ -64,7 +63,7 @@ const SupportSubHeader = ({
           {!isCustomerView && selectedItems?.length > 0 && (
             <Tooltip placement='left' label={info}>
               <IconButton
-                icon={<FaPen />}
+                icon={<LuSquarePen size={18} />}
                 colorScheme='blue'
                 isDisabled={notAllowed || !editComponent}
                 onClick={() => action('view_support_modal', null)}

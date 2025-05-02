@@ -1,9 +1,10 @@
 import React from 'react'
 
-import { EditIcon } from '@chakra-ui/icons'
 import { Icon, IconButton, Tooltip } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
+
+import { LuSquarePen } from 'react-icons/lu'
 
 const EditButton = ({
   onClick,
@@ -22,8 +23,6 @@ const EditButton = ({
   const iconColor = type === 'primary' ? mainContrastBgColor : primaryTextColor
   const buttonColor = type === 'primary' ? 'blue' : undefined
 
-  const iconSize = size === 'sm' ? 3.5 : 4
-
   return (
     <Tooltip placement={tooltipPlacement} label={tooltip}>
       <IconButton
@@ -32,9 +31,7 @@ const EditButton = ({
         hidden={hidden}
         onClick={onClick}
         colorScheme={buttonColor}
-        icon={
-          <Icon as={EditIcon} w={iconSize} h={iconSize} color={iconColor} />
-        }
+        icon={<Icon as={LuSquarePen} fontSize={18} color={iconColor} />}
         {...props}
       />
     </Tooltip>

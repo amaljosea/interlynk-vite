@@ -9,7 +9,7 @@ import LynkModal from 'components/LynkModal'
 
 import { CreateProjectGroup, UpdateProjectGroup } from 'graphQL/Mutation'
 
-import { BiSolidLayerPlus } from 'react-icons/bi'
+import { LuBox } from 'react-icons/lu'
 
 const ProductModal = ({ isOpen, onClose, data }) => {
   const { id, name, description } = data || ''
@@ -69,7 +69,7 @@ const ProductModal = ({ isOpen, onClose, data }) => {
     <LynkModal
       isOpen={isOpen}
       onClose={onClose}
-      Icon={BiSolidLayerPlus}
+      Icon={LuBox}
       disabled={error !== ''}
       buttonText={data ? 'Update' : 'Save'}
       isLoading={data ? upLoading : crLoading}

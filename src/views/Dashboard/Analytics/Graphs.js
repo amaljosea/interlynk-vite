@@ -15,7 +15,7 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaChartArea } from 'react-icons/fa6'
+import { LuChartArea } from 'react-icons/lu'
 
 export const Graphs = () => {
   const { orgView } = useGlobalQueryContext()
@@ -78,7 +78,7 @@ export const Graphs = () => {
             <CardBody py={16} alignItems='center' justifyContent='center'>
               <Icon
                 boxSize={32}
-                as={FaChartArea}
+                as={LuChartArea}
                 color={headingTextSecondary}
               />
             </CardBody>

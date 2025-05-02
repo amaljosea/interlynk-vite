@@ -1,10 +1,9 @@
-import { AddIcon } from '@chakra-ui/icons'
 import { Button } from '@chakra-ui/react'
 
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useRouteFlags } from 'hooks/useRouteFlags'
 
-import { FaPen } from 'react-icons/fa6'
+import { LuCirclePlus, LuSquarePen } from 'react-icons/lu'
 
 const ActiveBtn = ({ title, label, color, onClick, isArchived, editable }) => {
   const { isCustomerView } = useRouteFlags()
@@ -27,8 +26,8 @@ const ActiveBtn = ({ title, label, color, onClick, isArchived, editable }) => {
         display: 'flex',
         alignItems: 'center'
       }}
-      leftIcon={editable ? <FaPen /> : <AddIcon />}
       hidden={isArchived || isCustomerView || !editSboms}
+      leftIcon={editable ? <LuSquarePen size={18} /> : <LuCirclePlus size={18} />}
     >
       {title}
     </Button>

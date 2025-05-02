@@ -24,7 +24,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { SwitchOrganization } from 'graphQL/Mutation'
 import { AllOrganizations, MyOrganizations } from 'graphQL/Queries'
 
-import { FaBuilding } from 'react-icons/fa'
+import { LuBuilding } from 'react-icons/lu'
 
 const Organizations = () => {
   const navigate = useNavigate()
@@ -102,14 +102,16 @@ const Organizations = () => {
     <>
       <Menu placement='bottom-end'>
         <MenuButton
+          px={2}
           size='sm'
           as={Button}
           fontSize='sm'
+          variant={'outline'}
+          data-testid='org_menu'
           onClick={handleFetch}
-          leftIcon={<FaBuilding color={secondaryTextColor} />}
           isLoading={!organization?.name}
           rightIcon={<ChevronDownIcon />}
-          data-testid='org_menu'
+          leftIcon={<LuBuilding fontSize={20} color={secondaryTextColor} />}
         >
           {truncatedValue(organization?.name, 20)}
         </MenuButton>

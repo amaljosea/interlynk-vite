@@ -31,7 +31,8 @@ import { useSbomScores } from 'hooks/useSbomScores'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaCubes, FaLongArrowAltRight } from 'react-icons/fa'
+import { FaLongArrowAltRight } from 'react-icons/fa'
+import { LuPackage } from 'react-icons/lu'
 
 import LifecycleModal from '../../components/LifecycleModal'
 
@@ -109,7 +110,7 @@ const SbomDetails = ({ sbomData }) => {
     <>
       <Flex direction={'row'} alignItems={'flex-start'} gap={5} width={'100%'}>
         <Icon
-          as={FaCubes}
+          as={LuPackage}
           sx={{ w: '64px', h: '64px', color: secondaryBlueText }}
         />
         <Flex width={'100%'} flexDir={'column'} gap={5}>

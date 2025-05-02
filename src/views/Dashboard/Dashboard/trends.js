@@ -77,8 +77,6 @@ function VulnerabilityTrendsGroup() {
     }
   ])
 
-  const [isGridLayout, setIsGridLayout] = useState(true)
-
   const filteredTrendCards = useMemo(() => {
     return trendCards.filter((card) => selectedTrends?.includes(card.type))
   }, [trendCards, selectedTrends])
@@ -122,10 +120,7 @@ function VulnerabilityTrendsGroup() {
           items={filteredTrendCards}
           strategy={rectSortingStrategy}
         >
-          <SimpleGrid
-            columns={isGridLayout ? { base: 1, md: 2, lg: 3 } : 1}
-            spacing={5}
-          >
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={5}>
             {filteredTrendCards?.map((card) => (
               <DashboardCard
                 key={card.id}
@@ -135,7 +130,6 @@ function VulnerabilityTrendsGroup() {
                 desc={card.desc}
                 content={card.content}
                 onDelete={handleDeleteCard}
-                isGridLayout={isGridLayout}
               />
             ))}
           </SimpleGrid>

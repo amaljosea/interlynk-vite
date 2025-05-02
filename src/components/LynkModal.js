@@ -80,7 +80,7 @@ const LynkModal = ({
         <form onSubmit={handleSubmit}>
           <ModalHeader paddingInline={'16px'}>
             <Flex alignItems='center' gap={3}>
-              {Icon && <Icon color={headingTextColor} />}
+              {Icon && <Icon color={headingTextColor} fontSize={20} />}
               {title && (
                 <Text
                   aria-label='modal_header'

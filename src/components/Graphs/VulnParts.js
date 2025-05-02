@@ -2,6 +2,7 @@
 import { gql, useQuery } from '@apollo/client'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getSignedUrlParams } from 'utils'
+import { truncatedValue } from 'utils'
 import { COLORS } from 'utils/styleUtils'
 
 import {
@@ -24,7 +25,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
-import { FaBug } from 'react-icons/fa6'
+import { LuBug } from 'react-icons/lu'
 
 const GetPartVulns = gql`
   query GetSbomParts($projectId: Uuid!, $sbomId: Uuid!) {
@@ -216,7 +217,7 @@ const VulnParts = () => {
             justify='space-between'
           >
             <HStack spacing='3'>
-              <Icon as={FaBug} color='gray.500' boxSize={5} />
+              <Icon as={LuBug} color='gray.500' fontSize={24} />
               <Text fontWeight='bold'>Vulnerabilities</Text>
             </HStack>
             {sbomParts?.length > 0 ? (
@@ -246,7 +247,7 @@ const VulnParts = () => {
               <HStack key={index} w='full' justify='space-between'>
                 <HStack>
                   <Circle size='2' bg={color} />
-                  <Text fontSize='sm'>{group}</Text>
+                  <Text fontSize='sm'>{truncatedValue(group, 15)}</Text>
                 </HStack>
                 <VulnTypes data={part} />
               </HStack>

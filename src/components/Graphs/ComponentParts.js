@@ -18,7 +18,8 @@ import {
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 
-import { FaCube } from 'react-icons/fa'
+import { LuComponent } from 'react-icons/lu'
+import { truncatedValue } from 'utils'
 
 const GetPartComponents = gql`
   query GetSbomParts($projectId: Uuid!, $sbomId: Uuid!) {
@@ -88,7 +89,7 @@ const ComponentPart = () => {
             justify='space-between'
           >
             <HStack spacing='3'>
-              <Icon as={FaCube} color='gray.500' boxSize={5} />
+              <Icon as={LuComponent} color='gray.500' fontSize={24} />
               <Text fontWeight='bold'>Components</Text>
             </HStack>
             <Text
@@ -116,7 +117,7 @@ const ComponentPart = () => {
               <HStack key={index} w='full' justify='space-between'>
                 <HStack>
                   <Circle size='2' bg={color} />
-                  <Text fontSize='sm'>{group}</Text>
+                  <Text fontSize='sm'>{truncatedValue(group, 15)}</Text>
                 </HStack>
                 <Text fontSize='sm'>{count || 0}</Text>
               </HStack>

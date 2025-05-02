@@ -37,7 +37,6 @@ function PolicyGroup() {
       content: <PolicyGraphs />
     }
   ])
-  const [isGridLayout, setIsGridLayout] = useState(true)
 
   const filteredPolicyCards = useMemo(() => {
     return policyCards.filter((card) => selectedPolicies?.includes(card.type))
@@ -82,10 +81,7 @@ function PolicyGroup() {
           items={filteredPolicyCards}
           strategy={rectSortingStrategy}
         >
-          <SimpleGrid
-            columns={isGridLayout ? { base: 1, md: 2, lg: 3 } : 1}
-            spacing={5}
-          >
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={5}>
             {filteredPolicyCards?.map((card) => (
               <DashboardCard
                 key={card.id}
@@ -94,7 +90,6 @@ function PolicyGroup() {
                 title={card.title}
                 content={card.content}
                 onDelete={handleDeleteCard}
-                isGridLayout={isGridLayout}
               />
             ))}
           </SimpleGrid>

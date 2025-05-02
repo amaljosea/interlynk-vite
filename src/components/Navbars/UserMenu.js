@@ -18,8 +18,7 @@ import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaBuilding, FaSignOutAlt } from 'react-icons/fa'
-import { FaLocationArrow, FaUser } from 'react-icons/fa6'
+import { LuBuilding, LuLogOut, LuNavigation, LuUser } from 'react-icons/lu'
 
 const SERVER_URL = process.env.REACT_APP_SERVER
 
@@ -70,7 +69,7 @@ export const UserMenu = ({ handleLogout }) => {
           <MenuItem hidden={!currentUser}>
             <Link to={`/vendor/settings?tab=security tokens`}>
               <Flex flexDirection='row' alignItems='flex-start' gap={3}>
-                <Icon as={FaUser} width={2.5} mt={1} />
+                <Icon as={LuUser} fontSize={18} />
                 <Stack spacing={0}>
                   {currentUser?.name && <Text>{userName}</Text>}
                   <Text fontSize='sm' color={sameSecondaryText}>
@@ -84,7 +83,7 @@ export const UserMenu = ({ handleLogout }) => {
           {(isDashboardView || isProductsPage) && (
             <MenuItem
               onClick={onStartDashTour}
-              icon={<FaLocationArrow />}
+              icon={<LuNavigation size={18} />}
               hidden={!shouldShowDemoFeatures || productId}
             >
               Start {isProductsPage ? 'Product' : ''} Tour
@@ -92,14 +91,14 @@ export const UserMenu = ({ handleLogout }) => {
           )}
           <Link to={`/vendor/settings?tab=users`}>
             <MenuItem
-              icon={<FaBuilding />}
+              icon={<LuBuilding size={18} />}
               display={organization ? 'flex' : 'none'}
             >
               Organizations
             </MenuItem>
           </Link>
           <MenuDivider hidden={!organization} />
-          <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>
+          <MenuItem icon={<LuLogOut size={18} />} onClick={handleLogout}>
             Logout
           </MenuItem>
         </MenuGroup>

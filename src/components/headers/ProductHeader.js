@@ -14,7 +14,7 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
-import { FaBitbucket, FaGithub, FaTag } from 'react-icons/fa6'
+import { LuGithub, LuPaintBucket, LuTags } from 'react-icons/lu'
 
 const ProductHeader = (props) => {
   const {
@@ -72,7 +72,7 @@ const ProductHeader = (props) => {
           {shouldShowDemoFeatures && isGithubConfigSaved && (
             <Tooltip label='Add GitHub Project'>
               <IconButton
-                icon={<FaGithub />}
+                icon={<LuGithub size={18} />}
                 variant='outline'
                 onClick={() => action('import_github', null)}
               />
@@ -82,7 +82,7 @@ const ProductHeader = (props) => {
           <Tooltip label='Manage Labels'>
             <IconButton
               aria-label='Manage Labels'
-              icon={<FaTag />}
+              icon={<LuTags size={18} />}
               variant='outline'
               onClick={() => action('create_labels', null)}
               isDisabled={!canAddProduct}
@@ -93,7 +93,7 @@ const ProductHeader = (props) => {
             <Tooltip label='Import from Bitbucket'>
               <IconButton
                 colorScheme='blue'
-                icon={<FaBitbucket />}
+                icon={<LuPaintBucket size={18} />}
                 aria-label='import_bitbucket_projects'
                 onClick={() => action('import_bitbucket', null)}
               />

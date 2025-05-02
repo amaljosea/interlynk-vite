@@ -101,7 +101,8 @@ const CompInsights = ({ isOpen, onClose, data }) => {
 
   const { data: insights, loading } = useQuery(GetEnrichedData, {
     skip: isOpen ? false : true,
-    variables: { id: id, sbomId: data?.sbomId }
+    variables: { id: id, sbomId: data?.sbomId },
+    errorPolicy: 'all'
   })
 
   const { enrichedContent } = insights?.component || ''

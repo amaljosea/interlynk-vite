@@ -32,15 +32,8 @@ import SwiftIcon from 'assets/svg/swift.png'
 import { toLower } from 'lodash'
 import { sbomOrigin } from 'variables/general'
 
-import { useColorModeValue } from '@chakra-ui/system'
-
 import { BsBack } from 'react-icons/bs'
 import {
-  FaBalanceScale,
-  FaBox,
-  FaBug,
-  FaCube,
-  FaCubes,
   FaDownload,
   FaEdit,
   FaHammer,
@@ -64,6 +57,21 @@ import {
   FaScrewdriverWrench,
   FaUserAstronaut
 } from 'react-icons/fa6'
+import {
+  LuArchive,
+  LuArchiveX,
+  LuBan,
+  LuBox,
+  LuBug,
+  LuComponent,
+  LuPackage,
+  LuPackageSearch,
+  LuPower,
+  LuPowerOff,
+  LuScale,
+  LuSquarePlay,
+  LuTrash
+} from 'react-icons/lu'
 import { MdDelete, MdOutlineArchive, MdOutlineUnarchive } from 'react-icons/md'
 import { VscDebugRerun } from 'react-icons/vsc'
 
@@ -260,23 +268,23 @@ export const getChangelogColor = (type) => {
 
 export const getIcon = (subject) => {
   const sub = String(subject).toUpperCase()
-  if (sub.startsWith('VULNERABILITY')) return FaBug
-  if (sub.startsWith('LICENSE')) return FaBalanceScale
-  if (sub.startsWith('COMPONENT')) return FaCube
-  if (sub.startsWith('SBOM') || sub.startsWith('VERSION')) return FaCubes
-  return FaBox
+  if (sub.startsWith('VULNERABILITY')) return LuBug
+  if (sub.startsWith('LICENSE')) return LuScale
+  if (sub.startsWith('COMPONENT')) return LuComponent
+  if (sub.startsWith('SBOM') || sub.startsWith('VERSION')) return LuPackage
+  return LuBox
 }
 
 //Icon for confirmationModal
 export const getConfirmatonModalIcon = (title) => {
-  if (title.includes('Archive')) return MdOutlineArchive
-  if (title.includes('Restore')) return MdOutlineUnarchive
-  if (title.includes('Disable')) return FaToggleOff
-  if (title.includes('Enable')) return FaToggleOn
-  if (title.includes('Delete') || title.includes('Remove')) return MdDelete
-  if (title.includes('Reprocess')) return FaArrowRotateRight
-  if (title.includes('Cancel')) return FaBan
-  if (title.includes('Rerun')) return VscDebugRerun
+  if (title.includes('Archive')) return LuArchive
+  if (title.includes('Restore')) return LuArchiveX
+  if (title.includes('Disable')) return LuPowerOff
+  if (title.includes('Enable')) return LuPower
+  if (title.includes('Delete') || title.includes('Remove')) return LuTrash
+  if (title.includes('Reprocess')) return LuPackageSearch
+  if (title.includes('Cancel')) return LuBan
+  if (title.includes('Rerun')) return LuSquarePlay
   return null
 }
 

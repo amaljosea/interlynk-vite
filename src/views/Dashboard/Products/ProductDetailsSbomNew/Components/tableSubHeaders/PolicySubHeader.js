@@ -4,7 +4,7 @@ import { Flex, IconButton, Tooltip } from '@chakra-ui/react'
 
 import RefreshBtn from 'components/Icons/RefreshBtn'
 
-import { MdOutlinePolicy } from 'react-icons/md'
+import { LuTextSearch } from 'react-icons/lu'
 
 const PolicySubHeader = (reset, isArchived, handleRefresh, policyRun) => {
   const subHeader = useMemo(() => {
@@ -21,7 +21,7 @@ const PolicySubHeader = (reset, isArchived, handleRefresh, policyRun) => {
             hidden={isArchived}
             onClick={handleRefresh}
             isDisabled={!policyRun}
-            icon={<MdOutlinePolicy size={20} />}
+            icon={<LuTextSearch size={18} />}
           />
         </Tooltip>
         <RefreshBtn onClick={reset} />

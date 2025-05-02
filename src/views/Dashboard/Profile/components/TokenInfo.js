@@ -2,7 +2,6 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useMemo, useRef, useState } from 'react'
 import { getFullDate, truncatedValue } from 'utils'
 
-import { AddIcon } from '@chakra-ui/icons'
 import {
   Flex,
   IconButton,
@@ -14,6 +13,7 @@ import {
 import { Tag, TagLabel } from '@chakra-ui/react'
 import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 
+import LynkTable from 'components/LynkTable'
 import LynkAction from 'components/Misc/LynkAction'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -23,8 +23,9 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { deleteApiToken, updateApiToken } from 'graphQL/Mutation'
 import { GetApiKeys } from 'graphQL/Queries'
 
+import { LuCirclePlus } from 'react-icons/lu'
+
 import TokenModal from './TokenModal'
-import LynkTable from 'components/LynkTable'
 
 const TokenInfo = () => {
   const activetab = useQueryParam('tab')
@@ -102,7 +103,7 @@ const TokenInfo = () => {
             ref={tokenRef}
             onClick={onCreate}
             data-testid='new_token'
-            icon={<AddIcon />}
+            icon={<LuCirclePlus size={18} />}
             colorScheme='blue'
             variant='solid'
             fontWeight='normal'

@@ -11,7 +11,7 @@ import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
 
-import { FaLifeRing } from 'react-icons/fa6'
+import { LuLifeBuoy } from 'react-icons/lu'
 
 const UpdateLifecycle = gql`
   mutation sbomUpdate(
@@ -141,7 +141,7 @@ const LifecycleModal = ({ data, isOpen, onClose }) => {
   return (
     <LynkModal
       isOpen={isOpen}
-      Icon={FaLifeRing}
+      Icon={LuLifeBuoy}
       onClose={closeModal}
       isLoading={loading}
       buttonText={'Save'}

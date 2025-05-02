@@ -44,7 +44,6 @@ function Activities() {
       content: <ActivitiesOverview />
     }
   ])
-  const [isGridLayout, setIsGridLayout] = useState(true)
 
   const filteredActivityCards = useMemo(() => {
     return activityCards.filter((card) =>
@@ -105,7 +104,6 @@ function Activities() {
                   title={card.title}
                   content={card.content}
                   onDelete={handleDeleteCard}
-                  isGridLayout={isGridLayout}
                 />
               </GridItem>
             ))}

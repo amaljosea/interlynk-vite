@@ -19,7 +19,8 @@ import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import VulnBadge from 'components/Misc/VulnBadge'
 
-import { MdPolicy } from 'react-icons/md'
+import { LuShieldCheck } from 'react-icons/lu'
+import { truncatedValue } from 'utils'
 
 const GetPartPolicies = gql`
   query GetSbomParts($projectId: Uuid!, $sbomId: Uuid!) {
@@ -146,7 +147,7 @@ const PolicyParts = () => {
             justify='space-between'
           >
             <HStack spacing='3'>
-              <Icon as={MdPolicy} color='gray.500' boxSize={6} />
+              <Icon as={LuShieldCheck} color='gray.500' fontSize={24} />
               <Text fontWeight='bold'>Policies</Text>
             </HStack>
             {sbomParts?.length > 0 ? (
@@ -176,7 +177,7 @@ const PolicyParts = () => {
               <HStack key={index} w='full' justify='space-between'>
                 <HStack>
                   <Circle size='2' bg={color} />
-                  <Text fontSize='sm'>{group}</Text>
+                  <Text fontSize='sm'>{truncatedValue(group, 15)}</Text>
                 </HStack>
                 <PolicyTypes policy={stats} />
               </HStack>

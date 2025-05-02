@@ -77,11 +77,18 @@ const Support = () => {
     }
   }, [direction, field, include, isSortable, level, searchInput])
 
+  const { data: settings } = useQuery(GetSupportSettings, {
+    variables: { id: params?.productid },
+    skip: activeTab === 'support' ? false : true
+  })
+  const { sboms, projectSetting } = settings?.project || {}
+  const { enableSupportLevel } = projectSetting || {}
+
   const { nodes, paginationProps, loading, reset } = usePaginatedQuery(
     GetCompSupportData,
     {
-      skip: activeTab === 'support' ? false : true,
-      selector: 'componentSupportLevel',
+      skip: activeTab === 'support' && enableSupportLevel ? false : true,
+      selector: 'sbom.components',
       variables: {
         ...supportData,
         sbomId: sbomId,
@@ -94,13 +101,6 @@ const Support = () => {
   const [updateSettings] = useMutation(ProjectSettingUpdate, {
     onCompleted: () => reset()
   })
-
-  const { data: settings } = useQuery(GetSupportSettings, {
-    variables: { id: params?.productid },
-    skip: activeTab === 'support' ? false : true
-  })
-  const { sboms, projectSetting } = settings?.project || {}
-  const { enableSupportLevel } = projectSetting || {}
 
   const activeSbom = sboms?.find((sbom) => sbom?.id === sbomId)
 
