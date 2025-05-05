@@ -79,7 +79,7 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
     const columns = [
       // COMPONENT
       {
-        id: 'COMPONENTS_NAME',
+        id: 'COMPONENTS_UPDATED_AT',
         name: 'NAME',
         selector: (row) => {
           const { purl, name, primary, internal, sbomId: bomId, sbom } = row
