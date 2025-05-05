@@ -163,7 +163,6 @@ const RuleConditions = ({
               {/* SUBJECT */}
               <FormControl isInvalid={item?.subError !== ''}>
                 <LynkSelect
-                  isDisabled={isSystem}
                   onChange={(selected) =>
                     onCondtionChange(selected?.value, item?.id, 'subject')
                   }
@@ -207,7 +206,6 @@ const RuleConditions = ({
                   }
                   placeholder='-- Operator --'
                   onBlur={() => onOperatorBlur(item)}
-                  isDisabled={isSystem}
                   id={`auto_conditon_operator_${index}`}
                   options={[
                     { label: '-- Operator --', value: '' },
