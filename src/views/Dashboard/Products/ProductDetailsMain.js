@@ -66,6 +66,10 @@ const ProductDetailsMain = () => {
 
   const ENV = useDisclosure()
 
+  const matchingProject = projects?.find((project) => project?.name === envName)
+
+  const sbomsCount = matchingProject ? matchingProject?.sbomsCount : 0
+
   useEffect(() => {
     if (sbomId === null) {
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
@@ -153,7 +157,7 @@ const ProductDetailsMain = () => {
           </CardBody>
         </Card>
         {/* PRODUCT GRAPHS */}
-        {shouldShowDemoFeatures && <ProductGraphs />}
+        {shouldShowDemoFeatures && sbomsCount >= 3 && <ProductGraphs />}
         {/* TAB SECTION */}
         <Card display={data ? 'block' : 'none'}>
           <CardBody>
