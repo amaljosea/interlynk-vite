@@ -1,5 +1,5 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { timeSince } from 'utils'
 
 import { AddIcon } from '@chakra-ui/icons'
@@ -178,14 +178,13 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
     noteForm?.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
-  const filterData =
-    annotations?.length > 0
-      ? [...annotations]?.sort((a, b) => {
-          const dateA = new Date(a?.updatedAt)
-          const dateB = new Date(b?.updatedAt)
-          return dateB - dateA
-        })
+  const filterData = useMemo(() => {
+    return annotations?.length
+      ? [...annotations].sort(
+          (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+        )
       : []
+  }, [annotations])
 
   useEffect(() => {
     if (edit && noteId) scrollToSection()
@@ -211,6 +210,7 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
                   maxLength={512}
                   placeholder={'Add some comment'}
                   onChange={(e) => setComment(e.target.value)}
+                  isDisabled={createLoading || updateLoading || deleteLoading}
                 />
               </FormControl>
               {error !== '' && <LynkAlert msg={error} />}
@@ -263,7 +263,7 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
                   {filterData?.map((note, index) => (
                     <Flex
                       gap={8}
-                      key={index}
+                      key={note.id}
                       alignItems={'flex-start'}
                       justify='space-between'
                     >

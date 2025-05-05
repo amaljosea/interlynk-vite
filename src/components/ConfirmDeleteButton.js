@@ -79,7 +79,13 @@ const ConfirmDeleteButton = ({
     </Flex>
   ) : (
     <Flex gap={2} alignItems='center'>
-      {editBtnProps && <EditButton size={buttonSize} {...editBtnProps} />}
+      {editBtnProps && (
+        <EditButton
+          hidden={deletingId === itemId && loading}
+          size={buttonSize}
+          {...editBtnProps}
+        />
+      )}
       <DeleteButton
         isLoading={deletingId === itemId && loading}
         variant='solid'
