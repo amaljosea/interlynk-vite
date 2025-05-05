@@ -12,7 +12,7 @@ const RuleActions = ({
   actions,
   setActions,
   conditions,
-  isSystem,
+  // isSystem,
   setError,
   conditionErrorMessage,
   categories,
@@ -69,13 +69,11 @@ const RuleActions = ({
     }
   }
 
-  console.warn('actions', actions)
-
   const SingleValue = ({ data, ...props }) => {
     return (
       <components.SingleValue {...props}>
         <Flex display='flex' alignItems='center' gap={'7px'}>
-          <SubjectIcon subject={data?.value} isSystem={isSystem} />
+          <SubjectIcon subject={data?.value} isSystem={false} />
           <Text>{data.label}</Text>
         </Flex>
       </components.SingleValue>

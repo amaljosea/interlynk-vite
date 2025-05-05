@@ -354,8 +354,6 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
     }
   }, [data, automationConditionSubjectFieldMapping])
 
-  console.warn('actions', actions)
-
   return (
     <LynkModal
       isOpen={isOpen}
