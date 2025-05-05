@@ -5,7 +5,6 @@ import { infoData } from 'variables/general'
 import { InfoIcon } from '@chakra-ui/icons'
 import {
   Flex,
-  Select,
   SimpleGrid,
   Stack,
   Text,
@@ -173,6 +172,19 @@ const Settings = ({ enabled, data, mfc }) => {
     </Flex>
   )
 
+  const dataRetentionOptions = [1, 30, 90, 365, 0].map((item) => ({
+    value: item,
+    label: item === 0 ? 'Forever' : `${item} Days`
+  }))
+
+  const manufacturerOptions = [
+    { value: '', label: '-- Select --' },
+    ...(mfc?.nodes || []).map((item) => ({
+      value: item?.id,
+      label: item?.organizationName
+    }))
+  ]
+
   return (
     <>
       <CardBody py={4}>
@@ -232,18 +244,18 @@ const Settings = ({ enabled, data, mfc }) => {
                   <InfoIcon ml={2} color={primaryBlueText} />
                 </Tooltip>
               </FormLabel>
-              <Select
+              <LynkSelect
                 id='dataRetention'
-                value={Number(dataRetentionDays) || 0}
-                onChange={(e) => onUpdate(e.target.value, 'dataRetention')}
+                value={dataRetentionOptions.find(
+                  (opt) => opt.value === Number(dataRetentionDays) || 0
+                )}
+                onChange={(selected) =>
+                  onUpdate(selected?.value, 'dataRetention')
+                }
+                options={dataRetentionOptions}
                 isDisabled={!enabled || !editControls}
-              >
-                {[1, 30, 90, 365, 0].map((item, index) => (
-                  <option key={index} value={item}>
-                    {item !== 0 && item} {item === 0 ? 'Forever' : 'Days'}
-                  </option>
-                ))}
-              </Select>
+                dropDown
+              />
             </FormControl>
             {/* MANUFACTURER */}
             <FormControl width={'400px'}>
@@ -253,18 +265,18 @@ const Settings = ({ enabled, data, mfc }) => {
                   <InfoIcon ml={2} color={primaryBlueText} />
                 </Tooltip>
               </FormLabel>
-              <Select
-                value={organizationManufacturer?.id || ''}
-                onChange={(e) => onUpdate(e.target.value, 'manufacturer')}
+              <LynkSelect
+                value={manufacturerOptions.find(
+                  (opt) => opt.value === (organizationManufacturer?.id || '')
+                )}
+                onChange={(selected) =>
+                  onUpdate(selected?.value, 'manufacturer')
+                }
+                options={manufacturerOptions}
                 isDisabled={!enabled || !editControls}
-              >
-                <option value={''}>-- Select --</option>
-                {mfc?.nodes?.map((item, index) => (
-                  <option key={index} value={item?.id}>
-                    {item?.organizationName}
-                  </option>
-                ))}
-              </Select>
+                dropDown
+                placeholder='Select manufacturer'
+              />
             </FormControl>
             {/* JIRE DEFAULT PROJECT */}
             <FormControl width={'400px'} hidden={isFreeTier}>
