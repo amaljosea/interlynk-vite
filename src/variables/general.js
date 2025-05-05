@@ -1324,7 +1324,10 @@ export const exportCsvTableConfig = {
       'NVD Alias ID',
       'EPSS Percentile',
       'KEV',
-      'Links'
+      'Links',
+      'Internal Notes',
+      'Advisories',
+      'CWEs'
     ],
     mapDataForExport: (data) =>
       data.map((row) => ({
@@ -1354,6 +1357,27 @@ export const exportCsvTableConfig = {
           ? `${(row?.vuln?.vulnInfo?.epssPercentile * 100).toFixed()} %`
           : '0 %',
         KEV: row?.vuln?.vulnInfo?.kev ? 'True' : 'False',
+        'Internal Notes': (() => {
+          const notes =
+            row?.componentVulnLogs?.length > 0
+              ? row?.componentVulnLogs?.map((item) => item?.note)
+              : []
+          return notes?.length > 0 ? notes.join('; ') : 'N/A'
+        })(),
+        Advisories: (() => {
+          const advisories =
+            row?.vuln?.vulnInfo?.advisories?.length > 0
+              ? row?.vuln?.vulnInfo?.advisories?.map((item) => item)
+              : []
+          return advisories?.length > 0 ? advisories.join('; ') : 'N/A'
+        })(),
+        CWEs: (() => {
+          const cwes =
+            row?.vuln?.vulnInfo?.cwes?.length > 0
+              ? row?.vuln?.vulnInfo?.cwes?.map((item) => item)
+              : []
+          return cwes?.length > 0 ? cwes.join('; ') : 'N/A'
+        })(),
         Links: (() => {
           const advisories = row?.isPart
             ? row?.currentExternalUrls?.find(
