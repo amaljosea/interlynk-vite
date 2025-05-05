@@ -41,7 +41,7 @@ import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { HiOutlineDuplicate } from 'react-icons/hi'
-import { IoMdWarning } from 'react-icons/io'
+import { LuOctagonAlert } from 'react-icons/lu'
 
 const StatusInfo = ({ data }) => {
   return (
@@ -172,8 +172,9 @@ const VersionColumns = (props) => {
                       >
                         <IconButton
                           size='xs'
-                          icon={<IoMdWarning size={16} />}
-                          sx={{ color: primaryErrorColor, bg: 'transparent' }}
+                          variant={'unstyled'}
+                          color={primaryErrorColor}
+                          icon={<LuOctagonAlert size={16} />}
                         />
                       </Tooltip>
                     )}
