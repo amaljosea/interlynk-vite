@@ -10,6 +10,8 @@ const CweList = ({ data }) => {
     'primaryBlueText'
   ])
 
+  if (!data) return 'N/A'
+
   return (
     <Flex gap={2} flexWrap={'wrap'}>
       {data.map((item, index) => {
