@@ -374,7 +374,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
             value={ruleName}
             onChange={onNameChange}
             placeholder='Enter rule name'
-            sx={{ fontSize: 'sm', pointerEvents: isSystem ? 'none' : 'auto' }}
+            sx={{ fontSize: 'sm' }}
           />
         </FormControl>
         {/* CONDITIONS */}
