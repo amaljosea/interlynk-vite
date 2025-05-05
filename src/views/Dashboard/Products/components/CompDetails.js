@@ -9,7 +9,6 @@ import { InfoIcon } from '@chakra-ui/icons'
 import {
   Checkbox,
   Input,
-  Select,
   Stack,
   Textarea,
   Tooltip,
@@ -200,6 +199,13 @@ const CompDetails = ({ data, primaryComp }) => {
     }
   }, [data, matchedLicense?.type, setTabData])
 
+  const scopeOptions = [
+    { value: '', label: '-- Select --' },
+    { value: 'excluded', label: 'Excluded' },
+    { value: 'optional', label: 'Optional' },
+    { value: 'required', label: 'Required' }
+  ]
+
   return (
     <>
       <Stack
@@ -335,18 +341,16 @@ const CompDetails = ({ data, primaryComp }) => {
             htmlFor='compScope'
             info={onCheck(`Component Scope`)}
           />
-          <Select
+          <LynkSelect
             name='scope'
-            value={details?.scope}
-            onChange={(e) => handleChange('details', 'scope', e.target.value)}
-          >
-            <option value='' style={{ background: 'lightgray' }}>
-              -- Select --
-            </option>
-            <option value='excluded'>Excluded</option>
-            <option value='optional'>Optional</option>
-            <option value='required'>Required</option>
-          </Select>
+            value={scopeOptions.find((opt) => opt.value === details?.scope)}
+            onChange={(selected) =>
+              handleChange('details', 'scope', selected?.value || '')
+            }
+            options={scopeOptions}
+            placeholder='Select scope'
+            dropDown
+          />
         </FormControl>
         {/* PRIMARY COMPONENT */}
         <FormControl isDisabled={isCustomerView}>
