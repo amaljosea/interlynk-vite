@@ -91,7 +91,7 @@ const PartsColumns = (
                   </Link>
                   <Text color={primaryTextColor}>{projectVersion}</Text>
                   {suppliers?.map((item, index) => (
-                    <Text key={index} color={primaryTextColor}>
+                    <Text hidden key={index} color={primaryTextColor}>
                       {item?.name}
                     </Text>
                   ))}
