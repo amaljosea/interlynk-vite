@@ -183,7 +183,7 @@ const PolicyParts = () => {
                     ) : (
                       <LuGitMerge size={14} color={primaryBlueText} />
                     )}
-                    <Text fontSize='sm'>{truncatedValue(group, 15)}</Text>
+                    <Text fontSize='sm'>{truncatedValue(group, 20)}</Text>
                   </HStack>
                 </Tooltip>
                 <PolicyTypes policy={stats} />
