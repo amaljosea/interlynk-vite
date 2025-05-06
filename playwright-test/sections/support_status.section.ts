@@ -60,7 +60,8 @@ export default class SupportStatusSection {
 
           await this.page.locator("//button[@aria-label='refresh']").click()
           await this.page.waitForTimeout(2000)
-
+          await this.page.reload()
+          await this.page.waitForTimeout(2000)
           await this.page.getByTestId('support-actions').first().click()
           await this.page.getByTestId('edit_component_support').first().click()
           await this.page.waitForTimeout(2000)
@@ -73,7 +74,7 @@ export default class SupportStatusSection {
             .click()
           await this.page.keyboard.type('abandon')
           await this.page.keyboard.press('Enter')
-          await this.page.getByRole('button', { name: 'Save' }).click()
+          await this.page.getByRole('button', { name: 'Update' }).click()
           await this.page.waitForTimeout(2000)
 
           await this.page.locator("//a[@aria-label='products']").click()
