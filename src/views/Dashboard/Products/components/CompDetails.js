@@ -350,6 +350,8 @@ const CompDetails = ({ data, primaryComp }) => {
             options={scopeOptions}
             placeholder='Select scope'
             dropDown
+            menuPlacement={'top'}
+            isDisabled={isCustomerView}
           />
         </FormControl>
         {/* PRIMARY COMPONENT */}
