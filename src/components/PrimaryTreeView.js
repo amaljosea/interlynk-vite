@@ -42,12 +42,8 @@ const PrimaryTreeView = ({ updateSboms, status, noPrimaryComp }) => {
         />
       </Tooltip>
 
-      {isOpen && (
-        <TreeView
-          isOpen={isOpen}
-          onClose={onClose}
-          component={nodes?.length > 0 ? nodes[0] : null}
-        />
+      {isOpen && nodes?.length > 0 && (
+        <TreeView isOpen={isOpen} onClose={onClose} component={nodes[0]} />
       )}
     </>
   )
