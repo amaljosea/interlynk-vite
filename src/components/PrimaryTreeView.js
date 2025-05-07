@@ -17,7 +17,7 @@ const PrimaryTreeView = ({ updateSboms, status, noPrimaryComp }) => {
 
   const [getPrimaryComp, { data, loading }] = useLazyQuery(GetPrimaryComponent)
 
-  const { nodes } = data?.sbom?.components || ''
+  const { nodes } = data?.sbom?.components || {}
 
   const handleClick = async () => {
     await getPrimaryComp({
@@ -42,10 +42,9 @@ const PrimaryTreeView = ({ updateSboms, status, noPrimaryComp }) => {
         />
       </Tooltip>
 
-      {isOpen && data && (
+      {isOpen && (
         <TreeView
           isOpen={isOpen}
-          isPrimary={true}
           onClose={onClose}
           component={nodes?.length > 0 ? nodes[0] : null}
         />
