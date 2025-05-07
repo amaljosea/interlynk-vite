@@ -1728,6 +1728,7 @@ export const GetPrimaryComponent = gql`
         nodes {
           id
           name
+          primary
           internal
           kind
           copyright
