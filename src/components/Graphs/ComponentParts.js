@@ -2,6 +2,7 @@
 import { gql, useQuery } from '@apollo/client'
 import { useParams } from 'react-router-dom'
 import { truncatedValue } from 'utils'
+import { partsInfoTabs } from 'utils'
 
 import {
   Divider,
@@ -18,6 +19,7 @@ import {
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 
+import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { LuCircleDot, LuComponent, LuGitMerge } from 'react-icons/lu'
@@ -54,6 +56,7 @@ const GetPartComponents = gql`
 
 const ComponentPart = () => {
   const params = useParams()
+  const activeTab = useQueryParam('tab')
 
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
@@ -76,6 +79,8 @@ const ComponentPart = () => {
     })
   })
   const total = list.reduce((acc, { count }) => acc + count, 0)
+
+  const hidden = !partsInfoTabs.includes(activeTab) || sbomParts?.length === 0
 
   if (loading)
     return (
@@ -105,13 +110,8 @@ const ComponentPart = () => {
               {total}
             </Text>
           </Flex>
-          <Divider hidden={sbomParts?.length === 0} />
-          <VStack
-            mt={1}
-            align='start'
-            spacing={3}
-            hidden={sbomParts?.length === 0}
-          >
+          <Divider hidden={hidden} />
+          <VStack mt={1} align='start' spacing={3} hidden={hidden}>
             {list?.map(({ group, count }, index) => (
               <HStack key={index} w='full' justify='space-between'>
                 <Tooltip label={group}>
