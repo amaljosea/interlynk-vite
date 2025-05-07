@@ -1318,7 +1318,6 @@ export const exportCsvTableConfig = {
       'Description',
       'Published',
       'Last Modified',
-      'Fixed Versions',
       'Last Affected Version',
       'CVSS Vector',
       'NVD Alias ID',
@@ -1327,7 +1326,12 @@ export const exportCsvTableConfig = {
       'Links',
       'Internal Notes',
       'Advisories',
-      'CWEs'
+      'CWEs',
+      'Justification',
+      'Action Statement',
+      'Impact Statement',
+      'Response',
+      'Fixed Version'
     ],
     mapDataForExport: (data) =>
       data.map((row) => ({
@@ -1349,7 +1353,6 @@ export const exportCsvTableConfig = {
         Description: row?.vuln?.desc || '',
         Published: `"${getFullDate(row?.vuln?.publishedAt)}"` || '',
         'Last Modified': `"${getFullDate(row?.vuln?.lastModifiedAt)}"` || '',
-        'Fixed Versions': `"${row?.fixedVersions}"` || '',
         'Last Affected Version': `"${row?.lastAffectedVersions}"` || 'N/A',
         'CVSS Vector': row?.vuln?.cvssVector || '',
         'NVD Alias ID': row?.vuln?.nvdAliasId || '',
@@ -1357,6 +1360,41 @@ export const exportCsvTableConfig = {
           ? `${(row?.vuln?.vulnInfo?.epssPercentile * 100).toFixed()} %`
           : '0 %',
         KEV: row?.vuln?.vulnInfo?.kev ? 'True' : 'False',
+        Justification: (() => {
+          const justification =
+            row?.componentVulnLogs?.length > 0
+              ? row?.componentVulnLogs?.map((item) => item?.justification)
+              : []
+          return justification?.length > 0 ? justification.join('; ') : 'N/A'
+        })(),
+        'Action Statement': (() => {
+          const actionStmt =
+            row?.componentVulnLogs?.length > 0
+              ? row?.componentVulnLogs?.map((item) => item?.actionStmt)
+              : []
+          return actionStmt?.length > 0 ? actionStmt.join('; ') : 'N/A'
+        })(),
+        'Impact Statement': (() => {
+          const impact =
+            row?.componentVulnLogs?.length > 0
+              ? row?.componentVulnLogs?.map((item) => item?.impact)
+              : []
+          return impact?.length > 0 ? impact.join('; ') : 'N/A'
+        })(),
+        Response: (() => {
+          const response =
+            row?.componentVulnLogs?.length > 0
+              ? row?.componentVulnLogs?.map((item) => item?.response)
+              : []
+          return response?.length > 0 ? response.join('; ') : 'N/A'
+        })(),
+        'Fixed Version': (() => {
+          const fixedIn =
+            row?.componentVulnLogs?.length > 0
+              ? row?.componentVulnLogs?.map((item) => item?.fixedIn)
+              : []
+          return fixedIn?.length > 0 ? fixedIn.join('; ') : 'N/A'
+        })(),
         'Internal Notes': (() => {
           const notes =
             row?.componentVulnLogs?.length > 0
