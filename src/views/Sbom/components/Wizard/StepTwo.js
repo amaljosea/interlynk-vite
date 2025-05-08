@@ -115,7 +115,7 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
         return (
           <Tag
             size='md'
-            variant='solid'
+            variant='subtle'
             width={'130px'}
             colorScheme={statusColor(toVuln?.vexStatus?.name || 'Unspecified')}
           >
@@ -136,19 +136,13 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
         return (
           <Tag
             size='md'
-            variant='solid'
+            variant='subtle'
             width={'130px'}
             colorScheme={statusColor(
               fromVuln?.vexStatus?.name || 'Unspecified'
             )}
           >
-            <TagLabel
-              mx={'auto'}
-              as={Flex}
-              gap={2}
-              alignItems='center'
-              style={{ textTransform: 'capitalize' }}
-            >
+            <TagLabel gap={2} mx={'auto'} display={'flex'} alignItems='center'>
               {fromVuln?.isComplete === false && <BsCircleHalf />}{' '}
               {fromVuln?.vexStatus?.name || 'Unspecified'}
             </TagLabel>
