@@ -249,6 +249,7 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
                 setComment('')
                 setEdit(true)
               }}
+              data-testid='add_notes'
             >
               Add Note
             </Button>
@@ -286,7 +287,11 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
                         itemId={note?.id}
                         handleDelete={handleDeleteNote}
                         loading={deleteLoading}
+                        deleteBtnProps={{
+                          'data-testid': 'delete_note'
+                        }}
                         editBtnProps={{
+                          'data-testid': 'edit_note',
                           onClick: () => {
                             setEdit(true)
                             setNoteId(note?.id)

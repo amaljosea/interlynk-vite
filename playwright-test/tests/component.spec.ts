@@ -132,6 +132,28 @@ test('Component relationship should render correctly', async ({ page }) => {
   }
 })
 
+test('Component licesne status', async ({ page }) => {
+  test.setTimeout(120000)
+  const pp = new ComponentPage(page)
+  try {
+    await pp.editLicenseStatus()
+  } catch (error) {
+    console.error('Component licesne status test failed:', error)
+    throw error
+  }
+})
+
+test('Component notes CRUD functionality', async ({ page }) => {
+  test.setTimeout(120000)
+  const pp = new ComponentPage(page)
+  try {
+    await pp.editNotes()
+  } catch (error) {
+    console.error('Component notes test failed:', error)
+    throw error
+  }
+})
+
 test('Component insights should render correctly', async ({ page }) => {
   test.setTimeout(120000)
   const pp = new ComponentPage(page)

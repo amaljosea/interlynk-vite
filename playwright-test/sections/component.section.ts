@@ -706,6 +706,140 @@ export default class ComponentSection {
     }
   }
 
+  // EDIT LICENSE STATUS
+  public async editLicenseStatus() {
+    try {
+      await this.page.locator("//a[@aria-label='products']").click()
+      const product = this.page.getByTestId(`product_Test`)
+
+      if (product.isVisible()) {
+        await product.click()
+        await this.page.waitForTimeout(2000)
+
+        const version = this.page.getByTestId('version').nth(0)
+
+        if (version.isVisible()) {
+          await version.click()
+          await this.page.waitForTimeout(2000)
+
+          await this.page.getByRole('tab', { name: 'components' }).click()
+
+          await this.page.waitForTimeout(5000)
+          await this.page.getByTestId('filter_Include').click()
+          await this.page
+            .getByRole('menuitemcheckbox', { name: 'Parts' })
+            .click()
+          await this.page.waitForTimeout(5000)
+
+          await this.page.getByTestId('component-actions').first().click()
+          await this.page.getByTestId('edit_license_status').first().click()
+
+          const parentComp = this.page
+            .locator("//p[@aria-label='comp_name']")
+            .isVisible()
+
+          if (parentComp) {
+            await this.page.getByTestId('update_status').click()
+            await this.page
+              .getByRole('combobox', { name: 'licenseStatus' })
+              .click()
+            await this.page.keyboard.type('app')
+            await this.page.keyboard.press('Enter')
+            await this.page
+              .getByRole('textbox', { name: 'Add some notes' })
+              .fill('Test')
+            await this.page.getByRole('button', { name: 'Save' }).click()
+            await this.page.waitForTimeout(3000)
+
+            await this.page.getByRole('button', { name: 'comp_close' }).click()
+          } else {
+            errors.push('component name tag not found')
+          }
+
+          await this.page.waitForTimeout(3000)
+        } else {
+          errors.push('Version not found')
+        }
+      } else {
+        errors.push('Product not found')
+      }
+
+      expect(errors.length).toBe(0)
+    } catch (error) {
+      throw error
+    }
+  }
+
+  // EDIT NOTES
+  public async editNotes() {
+    try {
+      await this.page.locator("//a[@aria-label='products']").click()
+      const product = this.page.getByTestId(`product_Test`)
+
+      if (product.isVisible()) {
+        await product.click()
+        await this.page.waitForTimeout(2000)
+
+        const version = this.page.getByTestId('version').nth(0)
+
+        if (version.isVisible()) {
+          await version.click()
+          await this.page.waitForTimeout(2000)
+
+          await this.page.getByRole('tab', { name: 'components' }).click()
+
+          await this.page.waitForTimeout(5000)
+          await this.page.getByTestId('filter_Include').click()
+          await this.page
+            .getByRole('menuitemcheckbox', { name: 'Parts' })
+            .click()
+          await this.page.waitForTimeout(5000)
+
+          await this.page.getByTestId('component-actions').first().click()
+          await this.page.getByTestId('edit_notes').first().click()
+
+          const parentComp = this.page
+            .locator("//p[@aria-label='comp_name']")
+            .isVisible()
+
+          if (parentComp) {
+            await this.page.getByTestId('add_notes').click()
+            await this.page
+              .getByRole('textbox', { name: 'Comment' })
+              .fill('Testing')
+            await this.page.getByRole('button', { name: 'Save' }).click()
+            await this.page.waitForTimeout(3000)
+
+            await this.page.getByTestId('edit_note').click()
+            await this.page
+              .getByRole('textbox', { name: 'Comment' })
+              .fill('Testing 1')
+            await this.page.getByRole('button', { name: 'Save' }).click()
+            await this.page.waitForTimeout(3000)
+
+            await this.page.getByTestId('delete_note').click()
+            await this.page.getByTestId('confirm_delete').click()
+            await this.page.waitForTimeout(3000)
+
+            await this.page.getByRole('button', { name: 'comp_close' }).click()
+          } else {
+            errors.push('component name tag not found')
+          }
+
+          await this.page.waitForTimeout(2000)
+        } else {
+          errors.push('Version not found')
+        }
+      } else {
+        errors.push('Product not found')
+      }
+
+      expect(errors.length).toBe(0)
+    } catch (error) {
+      throw error
+    }
+  }
+
   // COMPONENT INSIGHTS
   public async insights() {
     try {
