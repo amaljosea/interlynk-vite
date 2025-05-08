@@ -1523,46 +1523,36 @@ export const exportCsvTableConfig = {
     ],
     mapDataForExport: (data, filters) =>
       data.map((row) => {
+        const { name, version, occurrences } = row || {}
         const {
-          name,
-          version,
           sbom,
           componentSupportLevel: manual,
           componentSupportLevelAutomatic: automatic
-        } = row || {}
+        } = occurrences[0] || {}
+        const { projectVersion, project } = sbom || {}
 
         const {
-          endDate,
           user,
-          notes,
-          updatedAt,
           retainManualOverrideFor,
-          level: manualLevel
+          updatedAt,
+          endOfSupport: endDate
         } = manual || {}
-
-        const { projectVersion, project } = sbom || {}
-        const { projectGroup } = project || {}
-
-        const supportLevel = manualLevel || automatic?.level
-        const formattedSupportLevel = supportLevel
-          ? capitalizeFirstLetter(supportLevel.replaceAll('_', ' '))
-          : 'N/A'
+        const supportLevel = manual?.level || automatic?.level
+        const explanation = manual?.notes || automatic?.notes
 
         return {
           Name: name || 'N/A',
           Version: version || 'N/A',
           Part: filters?.includeParts
-            ? `${projectGroup?.name || ''}${
-                projectVersion ? `: ${projectVersion}` : ''
-              }`
+            ? `${project?.projectGroup?.name} : ${projectVersion || 'N/A'}`
             : 'N/A',
           Assessment: user?.name ? 'Manual' : 'Automatic',
-          'Support Level': formattedSupportLevel,
-          'End Of Support': formatDate(endDate),
-          'Last Assessed': formatDate(updatedAt),
+          'Support Level': supportLevel?.replaceAll('_', ' '),
+          'End Of Support': endDate ? formatDate(endDate) : 'N/A',
+          'Last Assessed': updatedAt ? formatDate(updatedAt) : 'N/A',
           'Last Assessed By': user?.name || 'N/A',
-          'Support Explanation': notes || 'N/A',
-          Updated: formatDate(updatedAt),
+          'Support Explanation': explanation || 'N/A',
+          Updated: updatedAt ? formatDate(updatedAt) : 'N/A',
           'Assessment Expires On': calculateExpiryDate(retainManualOverrideFor)
         }
       })
