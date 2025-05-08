@@ -12,7 +12,7 @@ const RuleActions = ({
   actions,
   setActions,
   conditions,
-  isSystem,
+  // isSystem,
   setError,
   conditionErrorMessage,
   categories,
@@ -32,8 +32,17 @@ const RuleActions = ({
             [field]: value,
             subject: isComponent ? 'component' : 'version'
           }
+        } else if (field === 'operator') {
+          return {
+            ...item,
+            [field]: value,
+            value: value === 'set' ? '' : 'primary_component.version'
+          }
         } else {
-          return { ...item, [field]: value }
+          return {
+            ...item,
+            [field]: value
+          }
         }
       }
       return item
@@ -64,7 +73,7 @@ const RuleActions = ({
     return (
       <components.SingleValue {...props}>
         <Flex display='flex' alignItems='center' gap={'7px'}>
-          <SubjectIcon subject={data?.value} isSystem={isSystem} />
+          <SubjectIcon subject={data?.value} isSystem={false} />
           <Text>{data.label}</Text>
         </Flex>
       </components.SingleValue>
@@ -111,6 +120,11 @@ const RuleActions = ({
     { label: 'Abandoned', value: 'ABANDONED' }
   ]
 
+  const operatorsOptions = [
+    { label: 'Copy', value: 'copy' },
+    { label: 'Set', value: 'set' }
+  ]
+
   return (
     <>
       {actions?.length > 0 &&
@@ -118,16 +132,13 @@ const RuleActions = ({
           <Box key={index}>
             <Flex
               key={index}
+              flexWrap={'wrap'}
               sx={{ w: '100%', gap: 2, mt: 1.5, alignItems: 'flex-start' }}
             >
               {/* SUBJECT */}
               <FormControl>
                 <LynkSelect
-                  isDisabled={
-                    conditionErrorMessage ||
-                    conditions?.length === 0 ||
-                    isSystem
-                  }
+                  isDisabled={conditionErrorMessage || conditions?.length === 0}
                   onChange={(selected) =>
                     onActionChange(selected?.value, item?.id, 'field')
                   }
@@ -144,13 +155,19 @@ const RuleActions = ({
                 />
               </FormControl>
               {/* OPERATOR */}
-              <Input
-                textTransform={'capitalize'}
-                defaultValue={item?.operator}
-                isDisabled={
-                  conditionErrorMessage || conditions?.length === 0 || isSystem
+              <LynkSelect
+                type='text'
+                onChange={(selected) =>
+                  onActionChange(selected?.value, item.id, 'operator')
                 }
-                sx={{ fontSize: 'sm', pointerEvents: 'none', w: 170 }}
+                placeholder='-- Select --'
+                options={operatorsOptions}
+                value={
+                  operatorsOptions.find(
+                    (option) => option.value === item?.operator
+                  ) || null
+                }
+                dropDown
               />
               {/* VALUE */}
               {item?.field === 'component_internal' ? (
@@ -174,9 +191,9 @@ const RuleActions = ({
               ) : item?.field === 'component_support_level' ? (
                 <LynkSelect
                   type='text'
-                  onChange={(selected) =>
+                  onChange={(selected) => {
                     onActionChange(selected?.value, item.id, 'value')
-                  }
+                  }}
                   placeholder='-- Select --'
                   options={supportOptions}
                   value={
@@ -201,12 +218,10 @@ const RuleActions = ({
                     onChange={(e) =>
                       onActionChange(e.target.value, item.id, 'value')
                     }
+                    isReadOnly={item?.operator === 'copy'}
                     isDisabled={
-                      conditionErrorMessage ||
-                      conditions?.length === 0 ||
-                      isSystem
+                      conditionErrorMessage || conditions?.length === 0
                     }
-                    sx={{ minW: 140, fontSize: 'sm' }}
                   />
                   <Flex gap={4} justifyContent={'space-between'}>
                     {index !== 0 && (

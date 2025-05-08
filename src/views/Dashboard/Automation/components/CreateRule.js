@@ -62,7 +62,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
       value: '',
       subject: '',
       status: 'CREATED',
-      operator: 'set',
+      operator: '',
       field: ''
     }
   ])
@@ -224,7 +224,8 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
         id: item?.status === 'CREATED' ? undefined : item?.id,
         subject: item?.subject,
         field: item?.field,
-        value: item?.value
+        value: item?.value,
+        operator: item?.operator === 'copy' ? 'copy' : undefined
       })
     )
 
@@ -358,7 +359,6 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
       isOpen={isOpen}
       Icon={EditIcon}
       onClose={onClose}
-      noFooter={isSystem}
       disabled={submitError}
       buttonText={data ? 'Update' : 'Create'}
       title={`${data ? 'Edit' : 'Create'} Rule`}
@@ -374,7 +374,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
             value={ruleName}
             onChange={onNameChange}
             placeholder='Enter rule name'
-            sx={{ fontSize: 'sm', pointerEvents: isSystem ? 'none' : 'auto' }}
+            sx={{ fontSize: 'sm' }}
           />
         </FormControl>
         {/* CONDITIONS */}
@@ -403,7 +403,6 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
           fontWeight={'medium'}
           leftIcon={<FaPlus />}
           onClick={onAddCondtion}
-          isDisabled={isSystem}
           title='Add automation condition'
         >
           Add condition
@@ -432,7 +431,6 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
           colorScheme='blue'
           leftIcon={<FaPlus />}
           onClick={onAddAction}
-          isDisabled={isSystem}
           title='Add automation action'
           sx={{ fontSize: 'sm', fontWeight: 'medium', marginBottom: 1 }}
         >
