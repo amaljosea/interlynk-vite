@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
-import { Flex, Text, useDisclosure } from '@chakra-ui/react'
+import { Flex, Text, useColorMode, useDisclosure } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 
@@ -14,13 +14,13 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetOrgConnections, GetPersonalConnections } from 'graphQL/Queries'
 
-import { FaGithub } from 'react-icons/fa'
-
 import bitbucketPng from '../../assets/img/BitBucket.png'
 import jiraPng from '../../assets/img/Jira.png'
 import mailPng from '../../assets/img/Mail.png'
 import slackPng from '../../assets/img/Slack.png'
 import teamsPng from '../../assets/img/Teams.png'
+import githubBlackPng from '../../assets/img/github-black.png'
+import githubWhitePng from '../../assets/img/github-white.png'
 import Card from '../Card/Card'
 import CardBody from '../Card/CardBody'
 import CardHeader from '../Card/CardHeader'
@@ -34,6 +34,7 @@ import TeamsConfigModal from './TeamsConfigModal'
 
 const Connections = ({ org }) => {
   const activetab = useQueryParam('tab')
+  const { colorMode } = useColorMode()
   const isGithubConfigSaved = useGithubConfigSaved()
   const { orgView, isFreeTier } = useGlobalQueryContext()
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
@@ -219,13 +220,15 @@ const Connections = ({ org }) => {
             />
             {org && shouldShowDemoFeatures && (
               <ConnectionCard
-                icon={FaGithub}
                 name='Github'
                 onConfigure={GITHUB.onOpen}
                 isConnected={greenCheck.github}
                 isDisabled={!updateCon}
                 color={primaryTextColor}
                 description={getDescription('Github')}
+                iconSrc={
+                  colorMode === 'light' ? githubBlackPng : githubWhitePng
+                }
               />
             )}
           </Flex>
