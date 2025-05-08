@@ -57,7 +57,6 @@ const ComponentVulns = ({ data, isOpen, onClose }) => {
         }
         return (
           <Flex alignItems={'center'} gap={2} my={3}>
-            <ExternalNavIcon href={linkURl(vuln.source, vuln.vulnId)} />
             <Text
               my={2}
               cursor={'pointer'}
@@ -66,17 +65,19 @@ const ComponentVulns = ({ data, isOpen, onClose }) => {
             >
               {vuln?.vulnId || ''}
             </Text>
+            <ExternalNavIcon href={linkURl(vuln.source, vuln.vulnId)} />
           </Flex>
         )
       },
+      width: '40%',
       wrap: true
     },
     {
       id: 'VULNS_SEV',
       name: 'SEVERITY',
       selector: (row) => <SeverityTag value={row?.vuln?.sev} />,
-      sortable: true,
-      wrap: true
+      wrap: true,
+      width: '25%'
     },
     {
       id: 'VEX_STATUSES_NAME',
@@ -87,7 +88,6 @@ const ComponentVulns = ({ data, isOpen, onClose }) => {
           <Tag
             size='md'
             variant='solid'
-            width={'160px'}
             colorScheme={statusColor(
               vexStatus ? vexStatus?.name : 'Unspecified'
             )}

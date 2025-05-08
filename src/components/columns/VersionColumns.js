@@ -1,28 +1,15 @@
 import { addDays, differenceInDays, parseISO } from 'date-fns'
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import {
-  getFormat,
-  getFullDate,
-  getLink,
-  getSignedUrlParams,
-  timeSince,
-  truncatedValue
-} from 'utils'
-import { getType } from 'utils/styleUtils'
+import { getFullDate, getSignedUrlParams, timeSince } from 'utils'
 
 import {
-  Box,
   Divider,
   Flex,
-  Grid,
-  GridItem,
-  Icon,
   IconButton,
   Menu,
   MenuItem,
   MenuList,
-  Link as Olink,
   Portal,
   Stack,
   Tag,
@@ -37,11 +24,9 @@ import VulnBadge from 'components/Misc/VulnBadge'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
-import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { HiOutlineDuplicate } from 'react-icons/hi'
-import { LuOctagonAlert } from 'react-icons/lu'
+import { LuMessageCircleOff, LuRepeat } from 'react-icons/lu'
 
 const StatusInfo = ({ data }) => {
   return (
@@ -61,11 +46,19 @@ const VersionColumns = (props) => {
 
   const signedUrlParams = getSignedUrlParams()
   const { isFreeTier } = useGlobalQueryContext()
-  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
-  const { primaryTextColor, primaryErrorColor, primaryBlueText } =
-    useThemeColor(['primaryTextColor', 'primaryErrorColor', 'primaryBlueText'])
+  const {
+    primaryTextColor,
+    primaryErrorColor,
+    primaryBlueText,
+    secondaryTextColor
+  } = useThemeColor([
+    'primaryTextColor',
+    'primaryErrorColor',
+    'primaryBlueText',
+    'secondaryTextColor'
+  ])
   const canReprocessSbom = useHasPermission({
     parentKey: 'view_sbom',
     childKey: 'reprocess_sbom'
@@ -87,7 +80,7 @@ const VersionColumns = (props) => {
     const columns = [
       // VERSION
       {
-        id: 'SBOMS_PROJECT_VERSION',
+        id: 'SBOMS_UPDATED_AT',
         name: 'VERSION',
         selector: (row, index) => {
           const {
@@ -110,93 +103,60 @@ const VersionColumns = (props) => {
             }
           })
           const showIcon = alternatives?.length > 0
+          const lifestage = String(productLifeCycleStage)?.replaceAll(/_/g, ' ')
 
           return (
-            <Grid
-              justifyContent={'center'}
-              templateColumns='repeat(7, 1fr)'
-              className={index === 0 ? 'versions' : ''}
-              sx={{ my: 3, gap: 2, alignItems: 'center' }}
-            >
-              {shouldShowDemoFeatures && (
-                <GridItem colSpan={1} width={'20px'}>
-                  <Tooltip label={getFormat(projectVersion)} placement='top'>
-                    <Olink
-                      href={getLink(projectVersion)}
-                      isExternal={
-                        getLink(projectVersion) === '#' ? false : true
-                      }
-                    >
-                      <IconButton
-                        size='xs'
-                        isRound={true}
-                        color={primaryTextColor}
-                        icon={getType(projectVersion)}
-                        background='transparent'
-                      />
-                    </Olink>
-                  </Tooltip>
-                </GridItem>
-              )}
-              <GridItem w={'100%'} colSpan={shouldShowDemoFeatures ? 6 : 7}>
-                <Stack spacing={1}>
-                  <Flex gap={2} alignItems={'center'}>
-                    <Tooltip label={projectVersion}>
-                      <Link
-                        to={link}
-                        onClick={onStartTour}
-                        data-testid={`version`}
-                      >
-                        <Text color={primaryBlueText} fontSize={14}>
-                          {truncatedValue(projectVersion, 20)}
-                        </Text>
-                      </Link>
-                    </Tooltip>
-                    {!isReprocess && showIcon && (
-                      <Tooltip label={ignoreMsg}>
-                        <Box>
-                          <Icon
-                            as={HiOutlineDuplicate}
-                            sx={{
-                              mt: 1,
-                              fontSize: 18,
-                              color: primaryTextColor
-                            }}
-                          />
-                        </Box>
-                      </Tooltip>
-                    )}
-                    {daysUntilDeletion && !signedUrlParams && (
-                      <Tooltip
-                        label={`Marked for deletion on ${endDate ? new Date(endDate).toLocaleDateString() : ''}`}
-                      >
-                        <IconButton
-                          size='xs'
-                          variant={'unstyled'}
-                          color={primaryErrorColor}
-                          icon={<LuOctagonAlert size={16} />}
-                        />
-                      </Tooltip>
-                    )}
-                  </Flex>
+            <Stack my={3} spacing={1} className={index === 0 ? 'versions' : ''}>
+              <Link to={link} onClick={onStartTour} data-testid={`version`}>
+                <Text w={'fit-content'} color={primaryBlueText} fontSize={14}>
+                  {projectVersion}
+                </Text>
+              </Link>
+              <Flex gap={2} alignItems={'center'} flexWrap={'wrap'}>
+                {productLifeCycleStage && (
                   <Tag
-                    hidden={!productLifeCycleStage}
-                    size={'sm'}
-                    variant='solid'
-                    colorScheme='blue'
+                    fontSize={12}
+                    variant='subtle'
                     w={'fit-content'}
-                    cursor={'pointer'}
+                    colorScheme='blue'
+                    textTransform={'capitalize'}
                   >
-                    <TagLabel textTransform={'capitalize'}>
-                      {String(productLifeCycleStage)?.replaceAll(/_/g, ' ')}
-                    </TagLabel>
+                    {lifestage}
                   </Tag>
-                </Stack>
-              </GridItem>
-            </Grid>
+                )}
+                <Text color={secondaryTextColor} hidden={!daysUntilDeletion}>
+                  •
+                </Text>
+                {daysUntilDeletion && !signedUrlParams && (
+                  <Tooltip
+                    label={`Marked for deletion on ${endDate ? new Date(endDate).toLocaleDateString() : ''}`}
+                  >
+                    <IconButton
+                      size={'xs'}
+                      icon={<LuMessageCircleOff size={16} />}
+                    />
+                  </Tooltip>
+                )}
+                <Text
+                  color={secondaryTextColor}
+                  hidden={alternatives?.length === 0}
+                >
+                  •
+                </Text>
+                {!isReprocess && showIcon && (
+                  <Tooltip label={ignoreMsg}>
+                    <IconButton size={'xs'} icon={<LuRepeat size={16} />} />
+                  </Tooltip>
+                )}
+                <Text color={secondaryTextColor}>•</Text>
+                <Tooltip label={getFullDate(createdAt)} placement='top'>
+                  <Text color={secondaryTextColor}>{timeSince(createdAt)}</Text>
+                </Tooltip>
+              </Flex>
+            </Stack>
           )
         },
-        width: '14%',
+        width: '30%',
         wrap: true,
         sortable: true
       },
@@ -220,7 +180,8 @@ const VersionColumns = (props) => {
               </Tag>
             </Link>
           )
-        }
+        },
+        width: '10%'
       },
       // LICENSES
       {
@@ -239,7 +200,8 @@ const VersionColumns = (props) => {
               <TagLabel mx={'auto'}>{stats?.compLicenseCount}</TagLabel>
             </Tag>
           )
-        }
+        },
+        width: '8%'
       },
       // VULNERABILITIES
       {
@@ -344,25 +306,6 @@ const VersionColumns = (props) => {
         right: 'true',
         sortable: true
       },
-      // UPDATED AT
-      {
-        id: 'SBOMS_UPDATED_AT',
-        name: 'UPDATED',
-        selector: (row) => {
-          const { updatedAt } = row
-          return (
-            <Tooltip label={getFullDate(updatedAt)} placement='top'>
-              <Text color={primaryTextColor} textAlign={'right'}>
-                {timeSince(updatedAt)}
-              </Text>
-            </Tooltip>
-          )
-        },
-        wrap: true,
-        width: '12%',
-        sortable: true,
-        right: 'true'
-      },
       // ACTIONS
       {
         id: 'ACTION',
@@ -461,7 +404,7 @@ const VersionColumns = (props) => {
     primaryErrorColor,
     primaryTextColor,
     retention,
-    shouldShowDemoFeatures,
+    secondaryTextColor,
     signedUrlParams,
     updateSbom
   ])

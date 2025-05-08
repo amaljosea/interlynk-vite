@@ -10,6 +10,7 @@ const LynkBadge = ({ color, title, action }) => {
       w={'fit-content'}
       colorScheme={color}
       fontWeight={'normal'}
+      textTransform={'capitalize'}
     >
       {title}
     </Badge>
