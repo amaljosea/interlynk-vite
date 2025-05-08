@@ -54,6 +54,13 @@ export default class ComponentPage {
   public async checkRelations() {
     await this.componentSection.relationship()
   }
+  
+  public async editLicenseStatus() {
+    await this.componentSection.editLicenseStatus()
+  }
+  public async editNotes() {
+    await this.componentSection.editNotes()
+  }
 
   public async checkInsights() {
     await this.componentSection.insights()

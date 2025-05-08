@@ -367,14 +367,14 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
                       </MenuItem>
                       <MenuItem
                         hidden={isFreeTier || isPart}
-                        data-testid='view_license_status'
+                        data-testid='edit_license_status'
                         onClick={() => action(editLicenseStatus, row)}
                         isDisabled={status === 'signed' || !updateComponent}
                       >
                         Edit License Status
                       </MenuItem>
                       <MenuItem
-                        data-testid='view_notes'
+                        data-testid='edit_notes'
                         hidden={isFreeTier || isPart}
                         onClick={() => action(editNotes, row)}
                         isDisabled={status === 'signed' || !updateComponent}

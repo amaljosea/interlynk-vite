@@ -105,9 +105,10 @@ const LicenseStatus = ({ data, isOpen, onClose }) => {
           <Stack spacing={4} ref={noteForm}>
             {/* STATUS */}
             <FormControl>
-              <FormLabel htmlFor='licenseStatus'>Note</FormLabel>
+              <FormLabel htmlFor='licenseStatus'>Status</FormLabel>
               <LynkSelect
                 name='licenseStatus'
+                aria-label='licenseStatus'
                 onChange={(selectedOption) =>
                   handleChange({
                     target: {
@@ -167,6 +168,7 @@ const LicenseStatus = ({ data, isOpen, onClose }) => {
             fontSize={'sm'}
             leftIcon={<AddIcon />}
             onClick={handleUpdate}
+            data-testid='update_status'
           >
             Update Status
           </Button>
