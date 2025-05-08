@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client'
+import { gql, useQuery } from '@apollo/client'
 import { client } from 'context/ApolloWrapper'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
@@ -34,8 +34,27 @@ import { GetCustomFields } from 'graphQL/Queries'
 
 import { GrDocumentCsv } from 'react-icons/gr'
 
+export const GetSupportSettings = gql`
+  query GetSupportSettings($id: Uuid!) {
+    project(id: $id) {
+      projectSetting {
+        id
+        enableSupportLevel
+      }
+    }
+  }
+`
+
 const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
+  const activeTab = useQueryParam('tab')
   const params = useParams()
+  const { data: settings } = useQuery(GetSupportSettings, {
+    variables: { id: params?.productid },
+    skip: activeTab === 'support' ? false : true
+  })
+  const { projectSetting } = settings?.project || {}
+  const { enableSupportLevel } = projectSetting || {}
+
   const { showToast } = useCustomToast()
   const { organization } = useGlobalState()
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
@@ -129,6 +148,15 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
       let allFetchedData = []
       let hasNextPage = true
       let endCursor = null
+
+      if (tableType === 'Support Status View' && !enableSupportLevel) {
+        setIsLoading(false)
+        showToast({
+          description: 'Please enable Component Support Analysis to download',
+          status: 'warning'
+        })
+        return
+      }
 
       if (rowsToExport === '200') {
         while (hasNextPage) {
