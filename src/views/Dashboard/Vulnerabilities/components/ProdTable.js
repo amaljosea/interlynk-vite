@@ -196,14 +196,14 @@ const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
         const { vexStatus, isComplete } = row
         return (
           <Tag
-            variant='solid'
+            variant={'subtle'}
             colorScheme={statusColor(vexStatus?.name || 'Unspecified')}
           >
             <TagLabel
               gap={2}
-              as={Flex}
               mx={'auto'}
               fontSize={14}
+              display={'flex'}
               alignItems='center'
             >
               {isComplete === false && <BsCircleHalf />}{' '}
