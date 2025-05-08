@@ -1537,7 +1537,7 @@ export const exportCsvTableConfig = {
           updatedAt,
           endOfSupport: endDate
         } = manual || {}
-        const supportLevel = manual?.level || automatic?.level
+        const supportLevel = manual?.level?.replaceAll('_', ' ')
         const explanation = manual?.notes || automatic?.notes
 
         return {
@@ -1547,7 +1547,7 @@ export const exportCsvTableConfig = {
             ? `${project?.projectGroup?.name} : ${projectVersion || 'N/A'}`
             : 'N/A',
           Assessment: user?.name ? 'Manual' : 'Automatic',
-          'Support Level': supportLevel?.replaceAll('_', ' '),
+          'Support Level': supportLevel || 'N/A',
           'End Of Support': endDate ? formatDate(endDate) : 'N/A',
           'Last Assessed': updatedAt ? formatDate(updatedAt) : 'N/A',
           'Last Assessed By': user?.name || 'N/A',
