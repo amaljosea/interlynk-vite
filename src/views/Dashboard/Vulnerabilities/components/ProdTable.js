@@ -1,6 +1,6 @@
 import { useLazyQuery } from '@apollo/client'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { areArraysEqual, getFullDate, timeSince } from 'utils'
 import { statusColor } from 'utils/styleUtils'
 import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
@@ -23,6 +23,7 @@ import Pagination from 'components/Pagination'
 
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
+import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetCompVulnData, GetConnectedSbom } from 'graphQL/Queries'
@@ -37,10 +38,8 @@ import VulnFilters from './VulnsFilter'
 const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
   const params = useParams()
   const productGroupId = params?.productgroupid
-  const { primaryTextColor, secondaryTextColor } = useThemeColor([
-    'primaryTextColor',
-    'secondaryTextColor'
-  ])
+  const { primaryTextColor, secondaryTextColor, primaryBlueText } =
+    useThemeColor(['primaryTextColor', 'secondaryTextColor', 'primaryBlueText'])
 
   const { id, vulnId } = vuln || ''
 
@@ -75,6 +74,9 @@ const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
   const [checkEquals, setCheckEquals] = useState(false)
   const [toggleClear, setToggleClear] = useState(false)
 
+  const { generateProductVersionDetailPageUrlFromCurrentUrl } =
+    useProductUrlContext()
+
   const handlePreview = async (row) => {
     const { id, component } = row
     await getSboms({
@@ -106,9 +108,21 @@ const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
                 isDisabled={!component?.sbom?.hasConnectedSboms}
               />
             </Tooltip>
-            <Text fontSize={14} color={primaryTextColor}>
-              {component?.sbom?.project?.projectGroup?.name || 'N/A'}
-            </Text>
+            <Link
+              to={generateProductVersionDetailPageUrlFromCurrentUrl({
+                productgroupid: component?.sbom?.project?.projectGroup?.id,
+                productid: component?.sbom?.project?.id,
+                sbomid: component?.sbom?.id,
+                paramsObj: {
+                  tab: 'components'
+                },
+                replaceParams: true
+              })}
+            >
+              <Text fontSize={14} color={primaryBlueText}>
+                {component?.sbom?.project?.projectGroup?.name || 'N/A'}
+              </Text>
+            </Link>
           </Flex>
         )
       },
