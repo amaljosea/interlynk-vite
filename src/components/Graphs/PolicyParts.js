@@ -1,17 +1,18 @@
 /* eslint-disable no-restricted-syntax */
 import { gql, useQuery } from '@apollo/client'
 import { useParams } from 'react-router-dom'
-import { COLORS } from 'utils/styleUtils'
+import { truncatedValue } from 'utils'
 
 import {
   Box,
-  Circle,
+  Divider,
   Flex,
   HStack,
   Icon,
   SkeletonText,
   Stack,
   Text,
+  Tooltip,
   VStack
 } from '@chakra-ui/react'
 
@@ -19,13 +20,19 @@ import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import VulnBadge from 'components/Misc/VulnBadge'
 
-import { LuShieldCheck } from 'react-icons/lu'
-import { truncatedValue } from 'utils'
+import { useThemeColor } from 'hooks/useThemeColors'
+
+import { LuCircleDot, LuGitMerge, LuShieldCheck } from 'react-icons/lu'
 
 const GetPartPolicies = gql`
   query GetSbomParts($projectId: Uuid!, $sbomId: Uuid!) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       projectVersion
+      project {
+        projectGroup {
+          name
+        }
+      }
       policyResultMetrics {
         skippedCount
         failedCount
@@ -37,6 +44,7 @@ const GetPartPolicies = gql`
       sbomParts {
         id
         part {
+          projectVersion
           project {
             projectGroup {
               name
@@ -82,11 +90,14 @@ const PolicyTypes = ({ policy }) => {
 const PolicyParts = () => {
   const params = useParams()
 
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+
   const { data, loading } = useQuery(GetPartPolicies, {
     skip: !params.productid || !params.sbomid,
     variables: { projectId: params.productid, sbomId: params.sbomid }
   })
-  const { projectVersion, policyResultMetrics, sbomParts } = data?.sbom || {}
+  const { project, projectVersion, policyResultMetrics, sbomParts } =
+    data?.sbom || {}
   const { policyResults } = data || {}
 
   const filteredData = sbomParts?.map((item) => {
@@ -103,32 +114,28 @@ const PolicyParts = () => {
     return {
       id: item?.id,
       total: total,
-      projectGroup: item?.part?.project?.projectGroup?.name,
+      projectGroup: `${item?.part?.project?.projectGroup?.name} : ${item?.part?.projectVersion}`,
       metrics: item?.part?.policyResultMetrics
     }
   })
 
   const list = [
     {
-      color: COLORS[0],
-      group: projectVersion,
+      group: `${project?.projectGroup?.name} : ${projectVersion}`,
       count: policyResults?.totalCount || 0,
       stats: policyResultMetrics
     }
   ]
 
-  filteredData?.forEach(({ total, projectGroup, metrics }, index) => {
+  filteredData?.forEach(({ total, projectGroup, metrics }) => {
     list.push({
       count: total || 0,
-      color: COLORS[index + 1],
       group: projectGroup,
       stats: metrics
     })
   })
 
   const total = list.reduce((acc, { count }) => acc + count, 0)
-
-  const percent = (value) => `${(value / total) * 100}%`
 
   if (loading)
     return (
@@ -160,25 +167,25 @@ const PolicyParts = () => {
               </Box>
             )}
           </Flex>
-          <Flex
+          <Divider  hidden={sbomParts?.length === 0} />
+          <VStack
+            mt={1}
+            align='start'
+            spacing={2}
             hidden={sbomParts?.length === 0}
-            height='8px'
-            borderRadius='full'
-            overflow='hidden'
-            w='100%'
-            my='2'
           >
-            {list?.map(({ color, count }, index) => (
-              <Box key={index} bg={color} width={percent(count || 0)} />
-            ))}
-          </Flex>
-          <VStack align='start' spacing={2} hidden={sbomParts?.length === 0}>
-            {list?.map(({ color, group, stats }, index) => (
+            {list?.map(({ group, stats }, index) => (
               <HStack key={index} w='full' justify='space-between'>
-                <HStack>
-                  <Circle size='2' bg={color} />
-                  <Text fontSize='sm'>{truncatedValue(group, 15)}</Text>
-                </HStack>
+                <Tooltip label={group}>
+                  <HStack cursor={'pointer'}>
+                    {index === 0 ? (
+                      <LuCircleDot size={14} color={primaryBlueText} />
+                    ) : (
+                      <LuGitMerge size={14} color={primaryBlueText} />
+                    )}
+                    <Text fontSize='sm'>{truncatedValue(group, 20)}</Text>
+                  </HStack>
+                </Tooltip>
                 <PolicyTypes policy={stats} />
               </HStack>
             ))}

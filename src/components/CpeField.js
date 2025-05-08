@@ -99,7 +99,7 @@ const CpeField = ({ isOpen, onOpen, onClose }) => {
         onOpen={onOpen}
         onClose={onClose}
       />
-      <InputGroup gap={1} zIndex={9999}>
+      <InputGroup gap={1} zIndex={999}>
         <LynkSelect
           id='cpe'
           name='cpe'

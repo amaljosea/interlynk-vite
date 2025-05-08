@@ -106,20 +106,39 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
   })
 
   useEffect(() => {
-    const config = exportCsvTableConfig[tableType]
+    // Applies the selected and available columns based on provided config
+    const applyConfig = (config) => {
+      const defaultSelected = config?.defaultSelectedColumns || []
+      const existingAvailable = config?.additionalColumns || []
 
-    if (config) {
-      setSelectedColumns(config.defaultSelectedColumns)
-      if (
-        customFieldNodes?.length > 0 &&
-        tableType === 'SBOM Vulnerability View'
-      ) {
-        const customFields =
-          customFieldNodes?.map((node) => node?.displayName) || []
+      setSelectedColumns(defaultSelected)
 
-        setAvailableColumns([...config.additionalColumns, ...customFields])
-      } else {
-        setAvailableColumns(config.additionalColumns)
+      // Determine if custom fields should be appended (only for Vuln CSV view)
+      const shouldAddCustomFields =
+        customFieldNodes?.length > 0 && tableType === 'SBOM Vulnerability View'
+
+      const customFields = shouldAddCustomFields
+        ? customFieldNodes.map((node) => node?.displayName)
+        : []
+
+      // Avoid adding duplicates to available columns
+      const filteredCustomFields = customFields.filter(
+        (field) =>
+          !existingAvailable.includes(field) && !defaultSelected.includes(field)
+      )
+
+      setAvailableColumns([...existingAvailable, ...filteredCustomFields])
+    }
+
+    const storedCsvCnfigs = sessionStorage.getItem(tableType)
+
+    if (storedCsvCnfigs) {
+      const parsed = JSON.parse(storedCsvCnfigs)
+      applyConfig(parsed)
+    } else {
+      const fallbackConfig = exportCsvTableConfig[tableType]
+      if (fallbackConfig) {
+        applyConfig(fallbackConfig)
       }
     }
   }, [tableType, customFieldNodes])
@@ -225,23 +244,53 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
     }
   }
 
+  const saveTableConfigToSession = (tableType, selected, available) => {
+    sessionStorage.setItem(
+      tableType,
+      JSON.stringify({
+        defaultSelectedColumns: selected,
+        additionalColumns: available
+      })
+    )
+  }
+
   const removeColumn = (column) => {
-    setSelectedColumns(selectedColumns.filter((item) => item !== column))
-    setAvailableColumns((prev) => [...prev, column])
+    const updatedSelected = selectedColumns.filter((item) => item !== column)
+    const updatedAvailable = [...availableColumns, column]
+
+    setSelectedColumns(updatedSelected)
+    setAvailableColumns(updatedAvailable)
+
+    saveTableConfigToSession(tableType, updatedSelected, updatedAvailable)
   }
 
   const addColumn = (column) => {
-    setAvailableColumns(availableColumns.filter((item) => item !== column))
-    setSelectedColumns((prev) => [...prev, column])
+    const updatedAvailable = availableColumns.filter((item) => item !== column)
+    const updatedSelected = [...selectedColumns, column]
+
+    setAvailableColumns(updatedAvailable)
+    setSelectedColumns(updatedSelected)
+
+    saveTableConfigToSession(tableType, updatedSelected, updatedAvailable)
+  }
+  const addAll = () => {
+    const updatedSelected = [...selectedColumns, ...availableColumns]
+    const updatedAvailable = []
+
+    setSelectedColumns(updatedSelected)
+    setAvailableColumns(updatedAvailable)
+
+    saveTableConfigToSession(tableType, updatedSelected, updatedAvailable)
   }
 
-  const addAll = () => {
-    setSelectedColumns([...selectedColumns, ...availableColumns])
-    setAvailableColumns([])
-  }
   const removeAll = () => {
-    setSelectedColumns([])
-    setAvailableColumns([...selectedColumns, ...availableColumns])
+    const updatedSelected = []
+    const updatedAvailable = [...selectedColumns, ...availableColumns]
+
+    setSelectedColumns(updatedSelected)
+    setAvailableColumns(updatedAvailable)
+
+    saveTableConfigToSession(tableType, updatedSelected, updatedAvailable)
   }
 
   return (

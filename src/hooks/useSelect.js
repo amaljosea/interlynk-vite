@@ -70,6 +70,7 @@ export const useSelect = (type, category) => {
     menu: (provided) => ({
       ...provided,
       backgroundColor: primaryBgColor,
+      zIndex: 1111,
       width: '100%'
     }),
     menuList: (provided) => ({

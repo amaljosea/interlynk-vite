@@ -91,7 +91,7 @@ const PartsColumns = (
                   </Link>
                   <Text color={primaryTextColor}>{projectVersion}</Text>
                   {suppliers?.map((item, index) => (
-                    <Text key={index} color={primaryTextColor}>
+                    <Text hidden key={index} color={primaryTextColor}>
                       {item?.name}
                     </Text>
                   ))}
@@ -100,7 +100,7 @@ const PartsColumns = (
             </Grid>
           )
         },
-        width: '20%',
+        width: '25%',
         wrap: true
       },
       {
@@ -132,7 +132,7 @@ const PartsColumns = (
             </Link>
           )
         },
-        width: '11%'
+        width: '10%'
       },
       {
         id: 'LICENSES',
@@ -158,7 +158,7 @@ const PartsColumns = (
             </Link>
           )
         },
-        width: '8%'
+        width: '10%'
       },
       {
         id: 'VULNERABILITIES',
@@ -216,7 +216,7 @@ const PartsColumns = (
             </Flex>
           )
         },
-        width: '26.8%'
+        width: '28%'
       },
       {
         id: 'STATUS',
@@ -228,7 +228,8 @@ const PartsColumns = (
               <TagLabel mx={'auto'}>{part.lifecycle}</TagLabel>
             </Tag>
           )
-        }
+        },
+        width: '10%'  
       },
       {
         id: 'ACTION',

@@ -105,7 +105,7 @@ const CompDetails = ({ data, primaryComp }) => {
         internal: details?.internal,
         kind: details?.kind || undefined,
         name: details?.name || undefined,
-        scope: details?.scope || undefined,
+        scope: details?.scope || '',
         group: details?.group || undefined,
         version: details?.version || undefined,
         description: details?.description || '',
@@ -350,6 +350,8 @@ const CompDetails = ({ data, primaryComp }) => {
             options={scopeOptions}
             placeholder='Select scope'
             dropDown
+            menuPlacement={'top'}
+            isDisabled={isCustomerView}
           />
         </FormControl>
         {/* PRIMARY COMPONENT */}

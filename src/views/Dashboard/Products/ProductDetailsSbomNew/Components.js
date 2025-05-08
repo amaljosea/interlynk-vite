@@ -296,7 +296,7 @@ const Components = ({ sbomData }) => {
       {/* PAGINATION */}
       <Pagination {...paginationProps} />
 
-      {GRAPH.isOpen && (
+      {GRAPH.isOpen && activeRow && (
         <TreeView
           isOpen={GRAPH.isOpen}
           component={activeRow}
