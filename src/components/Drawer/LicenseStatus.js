@@ -122,6 +122,7 @@ const LicenseStatus = ({ data, isOpen, onClose }) => {
                 options={selectOptions}
                 placeholder='-- Select --'
                 dropDown
+                isDisabled={updateLoading}
               />
             </FormControl>
             {/* NOTE */}
@@ -133,6 +134,7 @@ const LicenseStatus = ({ data, isOpen, onClose }) => {
                 onChange={handleChange}
                 value={formData?.licenseNotes}
                 placeholder={'Add some notes'}
+                isDisabled={updateLoading}
               />
             </FormControl>
             {error !== '' && <LynkAlert msg={error} />}
