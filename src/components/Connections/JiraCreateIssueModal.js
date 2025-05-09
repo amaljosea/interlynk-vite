@@ -11,11 +11,14 @@ import LynkSelect from 'components/LynkSelect'
 import useCustomToast from 'hooks/useCustomToast'
 
 import { CreateJiraIssue } from 'graphQL/Mutation'
-import { GetJiraOptions, GetJiraProjects } from 'graphQL/Queries'
-import { GetDefaultJiraProduct } from 'graphQL/Queries'
-import { GetJiraProjectFields } from 'graphQL/Queries'
+import {
+  GetDefaultJiraProduct,
+  GetJiraOptions,
+  GetJiraProjectFields,
+  GetJiraProjects
+} from 'graphQL/Queries'
 
-import { FaJira } from 'react-icons/fa6'
+import { LuBolt } from 'react-icons/lu'
 
 const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
   const params = useParams()
@@ -343,7 +346,7 @@ ${customFields}
 
   return (
     <LynkModal
-      Icon={FaJira}
+      Icon={LuBolt}
       isOpen={isOpen}
       onClose={onClose}
       isLoading={loading}
