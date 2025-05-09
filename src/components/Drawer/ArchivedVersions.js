@@ -25,7 +25,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetArchivedVersions, GetVersions } from 'graphQL/Queries'
 
-import { LuArchive, LuEye } from 'react-icons/lu'
+import { LuArchiveRestore, LuEye } from 'react-icons/lu'
 
 const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
   const navigate = useNavigate()
@@ -137,7 +137,7 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
             colorScheme='blue'
             isDisabled={!updateSbom || loading}
             onClick={() => handleRestore(item)}
-            icon={<LuArchive size={18} />}
+            icon={<LuArchiveRestore size={18} />}
             aria-label={`sbom-${item?.projectVersion}-restore`}
           />
         </Tooltip>
