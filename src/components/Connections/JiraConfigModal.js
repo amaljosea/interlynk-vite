@@ -13,6 +13,7 @@ import {
   Text
 } from '@chakra-ui/react'
 
+import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 import ToggleVisibilityButton from 'components/Misc/ToggleVisibilityButton'
 
@@ -26,7 +27,7 @@ import {
 } from 'graphQL/Mutation'
 import { VerifyJiraToken } from 'graphQL/Queries'
 
-import { IoSettingsOutline } from 'react-icons/io5'
+import { LuSettings } from 'react-icons/lu'
 
 const JiraConfigModal = ({
   isOpen,
@@ -56,7 +57,8 @@ const JiraConfigModal = ({
 
   const [updateJiraSecret] = useMutation(UpdateJiraConnection)
   const [createJiraSecret] = useMutation(CreateJiraConnection)
-  const [deleteJiraSecret] = useMutation(DeleteJiraConnection)
+  const [deleteJiraSecret, { loading: deleteLoading }] =
+    useMutation(DeleteJiraConnection)
   const [verifyJiraToken, { loading: verifyLoading }] = useLazyQuery(
     VerifyJiraToken,
     {
@@ -64,15 +66,8 @@ const JiraConfigModal = ({
     }
   )
 
-  const {
-    primaryBgColor,
-    primaryErrorColor,
-    primarySuccessColor,
-    grayBorderColor
-  } = useThemeColor([
+  const { primaryBgColor, grayBorderColor } = useThemeColor([
     'primaryBgColor',
-    'primaryErrorColor',
-    'primarySuccessColor',
     'grayBorderColor'
   ])
 
@@ -81,6 +76,10 @@ const JiraConfigModal = ({
       setJiraApiToken(data.connection?.apiToken)
       setJiraHost(data.connection?.url)
       setJiraUsername(data.connection?.userName)
+    } else {
+      setJiraApiToken('')
+      setJiraHost('')
+      setJiraUsername('')
     }
   }, [data])
 
@@ -213,32 +212,23 @@ const JiraConfigModal = ({
 
   return (
     <LynkModal
+      hidden={data}
       isOpen={isOpen}
-      onClose={onClose}
-      title={'Jira Configuration'}
-      onSubmit={saveOrVerify ? handleVerify : data ? handleUpdate : handleSave}
-      buttonText={saveOrVerify ? 'Verify' : data ? 'Update' : 'Save'}
-      buttonColor={saveOrVerify ? 'blue' : isSaveDisabled ? 'blue' : 'green'}
-      isLoading={saveOrVerify && (isLoading || verifyLoading)}
-      disabled={saveOrVerify ? !updateCon : isSaveDisabled || !updateCon}
-      Icon={IoSettingsOutline}
       hideCancelButton
-      leftFooterContent={
-        (success || failure) && (
-          <Text
-            color={success ? primarySuccessColor : primaryErrorColor}
-            fontSize='sm'
-          >
-            {success ? 'Verified successfully!' : 'Verification failed!'}
-          </Text>
-        )
-      }
+      onClose={onClose}
+      Icon={LuSettings}
+      title={'Jira Configuration'}
+      isLoading={isLoading || verifyLoading}
+      buttonText={saveOrVerify ? 'Verify' : data ? 'Update' : 'Save'}
+      disabled={saveOrVerify ? !updateCon : isSaveDisabled || !updateCon}
+      onSubmit={saveOrVerify ? handleVerify : data ? handleUpdate : handleSave}
       rightFooterContent={
         data && (
           <Button
             colorScheme='red'
             onClick={handleDelete}
             isDisabled={!updateCon}
+            isLoading={deleteLoading}
             title='Delete Jira Configuration'
           >
             Delete
@@ -253,6 +243,7 @@ const JiraConfigModal = ({
             value={jiraHost}
             placeholder='Enter Jira Host URL'
             onChange={(e) => {
+              setFailure(false)
               setJiraHost(e.target.value)
               setIsJiraHostChanged(true)
             }}
@@ -291,9 +282,10 @@ const JiraConfigModal = ({
             </InputRightElement>
           </InputGroup>
         </FormControl>
+        {success && <LynkAlert status='success' msg='Verified successfully!' />}
+        {failure && <LynkAlert status='error' msg='Verification failed!' />}
         {verificationDetails && (
           <Box
-            mt={4}
             p={4}
             border='1px'
             borderColor={grayBorderColor}
