@@ -2261,6 +2261,9 @@ export const CreateJiraIssue = gql`
     $issueTypeId: String!
     $reporter: String!
     $assignee: String
+    $labels: [String!]
+    $priority: String
+    $customFields: JSON
   ) {
     jiraIssueCreate(
       input: {
@@ -2271,6 +2274,9 @@ export const CreateJiraIssue = gql`
         issueTypeId: $issueTypeId
         reporter: $reporter
         assignee: $assignee
+        customFields: $customFields
+        labels: $labels
+        priority: $priority
       }
     ) {
       jiraIssueUrl

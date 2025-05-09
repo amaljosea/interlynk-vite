@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom'
 
 import { FormControl, FormLabel, Grid, Input, Textarea } from '@chakra-ui/react'
 
+import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
 import LynkSelect from 'components/LynkSelect'
 
@@ -12,6 +13,7 @@ import useCustomToast from 'hooks/useCustomToast'
 import { CreateJiraIssue } from 'graphQL/Mutation'
 import { GetJiraOptions, GetJiraProjects } from 'graphQL/Queries'
 import { GetDefaultJiraProduct } from 'graphQL/Queries'
+import { GetJiraProjectFields } from 'graphQL/Queries'
 
 import { FaJira } from 'react-icons/fa6'
 
@@ -41,27 +43,134 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
   const [summary, setSummary] = useState('')
 
   const [projects, setProjects] = useState([])
-  const [project, setProject] = useState('')
+  const [project, setProject] = useState(null)
 
   const [issueTypes, setIssueTypes] = useState([])
-  const [issueType, setIssueType] = useState('')
+  const [issueType, setIssueType] = useState(null)
 
   const [assignees, setAssignees] = useState([])
-  const [assignee, setAssignee] = useState('')
+  const [assignee, setAssignee] = useState(null)
 
   const [reporters, setReporters] = useState([])
-  const [reporter, setReporter] = useState('')
+  const [reporter, setReporter] = useState(null)
 
-  const label = []
+  const [priorities, setPriorities] = useState([])
+  const [priority, setPriority] = useState(null)
 
-  const priority = [
-    { value: 'Medium', label: 'Medium' },
-    { value: 'High', label: 'High' },
-    { value: 'Low', label: 'Low' }
-  ]
+  const [labels, setLabels] = useState([])
+  const [label, setLabel] = useState(null)
 
   const [description, setDescription] = useState('')
   const [isCreateDisabled, setIsCreateDisabled] = useState(true)
+
+  const [formValues, setFormValues] = useState({})
+
+  const { data } = useQuery(GetJiraProjectFields, {
+    fetchPolicy: 'network-only',
+    skip: issueType ? false : true,
+    variables: {
+      projectKey: project?.value,
+      issueTypeId: issueType?.value
+    }
+  })
+  const { projectFields } = data || {}
+  const customFields = projectFields?.filter((item) => item?.custom === true)
+  const componentField = customFields?.find(
+    (item) => item?.name === 'Components'
+  )
+
+  const handleClear = () => {
+    setReporter(null)
+    setAssignee(null)
+    setLabel([])
+    setPriority(null)
+    setFormValues({})
+  }
+
+  const handleChangeProject = (project) => {
+    project && getOptions({ variables: { pKey: project.value } })
+    setProject(project)
+    setIssueType(null)
+    handleClear()
+  }
+
+  const handleChangeIssue = (issue) => {
+    setIssueType(issue)
+    handleClear()
+  }
+
+  const handleChange = (name, value) => {
+    setFormValues((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const renderField = (field) => {
+    const value = formValues[field?.name] || ''
+
+    switch (field?.type) {
+      case 'array': {
+        const options =
+          field?.allowedValues?.map((opt) => ({
+            label: opt?.value,
+            value: opt?.value
+          })) || []
+
+        const selected = Array.isArray(value)
+          ? value.map((v) => ({ label: v, value: v }))
+          : []
+
+        return (
+          <LynkSelect
+            isCreatable
+            isMulti={true}
+            value={selected}
+            options={options}
+            isClearable={true}
+            isSearchable={true}
+            onChange={(vals) =>
+              handleChange(
+                field?.name,
+                vals.map((v) => v.value)
+              )
+            }
+          />
+        )
+      }
+      case 'option': {
+        const options =
+          field?.allowedValues?.map((opt) => ({
+            label: opt?.value,
+            value: opt?.id
+          })) || []
+
+        const selected = options?.find((item) => item?.value === value) || null
+
+        return (
+          <LynkSelect
+            dropDown
+            value={selected}
+            options={options}
+            isClearable={true}
+            onChange={(item) => handleChange(field?.name, item?.value)}
+          />
+        )
+      }
+      case 'date':
+        return (
+          <LynkDate
+            value={value}
+            onChange={(value) => handleChange(field?.name, value?._d)}
+          />
+        )
+      default:
+        return (
+          <Input
+            value={value}
+            placeholder='Enter value'
+            onChange={(e) => handleChange(field?.name, e.target.value)}
+          />
+        )
+    }
+  }
 
   const formatCustomVulnFields = (customFields) => {
     if (customFields.length === 0) return ''
@@ -120,13 +229,9 @@ ${customFields}
     )
     setSummary(`[Vulnerability]: ${vulnId}`)
 
-    setProject({
-      value: jiraProject,
-      label: jiraProject
-    })
-
     if (jiraProject) {
       getOptions({ variables: { pKey: jiraProject } })
+      setProject({ value: jiraProject, label: jiraProject })
     }
   }, [jiraProject, getOptions, row])
 
@@ -172,19 +277,50 @@ ${customFields}
     }
   }, [projectOptions])
 
+  useEffect(() => {
+    if (projectFields?.length > 0) {
+      const priorityList = projectFields?.find(
+        (item) => item?.type === 'priority'
+      )
+      if (priorityList) {
+        const result = priorityList?.allowedValues?.map((item) => ({
+          value: item?.name,
+          label: item?.name
+        }))
+        setPriorities(result)
+      }
+    }
+  }, [projectFields])
+
+  const getComponentValue = (value) => {
+    switch (componentField?.type) {
+      case 'array':
+        return value
+      case 'option':
+        return { id: value }
+      default:
+        return value
+    }
+  }
+
   const handleCreate = () => {
     setIsCreateDisabled(true)
+    const filteredLabels = label?.map((item) => item?.value)
+    const components = formValues?.Components || null
     createJiraIssue({
       variables: {
         summary,
+        description,
         componentVulnId: row?.id,
         projectKey: project?.value,
         issueTypeId: issueType?.value,
         assignee: assignee?.value,
         reporter: reporter?.value,
-        labels: label?.map((l) => l?.value),
-        priority: priority?.value,
-        description
+        labels: filteredLabels?.length > 0 ? filteredLabels : undefined,
+        priority: priority?.value || undefined,
+        customFields: {
+          components: components ? getComponentValue(components) : undefined
+        }
       }
     }).then((res) => {
       if (res?.data?.jiraIssueCreate?.errors?.length === 0) {
@@ -227,33 +363,36 @@ ${customFields}
 
       <Grid pt='15px' pb='15px' templateColumns='repeat(2, 1fr)' gap={4}>
         <FormControl isRequired>
-          <FormLabel>Project (Default Selected)</FormLabel>
+          <FormLabel>Project</FormLabel>
           <LynkSelect
+            dropDown
             value={project}
-            placeholder='Project'
             options={projects}
-            onChange={(e) => {
-              getOptions({ variables: { pKey: e.value } })
-              setProject(e)
-            }}
+            isClearable={true}
+            placeholder='Select Project'
+            onChange={(value) => handleChangeProject(value)}
           />
         </FormControl>
 
         <FormControl isRequired>
           <FormLabel>Issue Type</FormLabel>
           <LynkSelect
+            dropDown
             value={issueType}
-            placeholder='Issue Type'
+            isClearable={true}
+            placeholder='Select Issue Type'
             options={issueTypes}
-            onChange={(e) => setIssueType(e)}
+            onChange={(value) => handleChangeIssue(value)}
           />
         </FormControl>
 
         <FormControl isRequired>
           <FormLabel>Reporter</FormLabel>
           <LynkSelect
+            dropDown
             value={reporter}
-            placeholder='Reporter'
+            isClearable={true}
+            placeholder='Select Reporter'
             options={reporters}
             onChange={(e) => setReporter(e)}
           />
@@ -262,15 +401,52 @@ ${customFields}
         <FormControl isRequired>
           <FormLabel>Assignee</FormLabel>
           <LynkSelect
+            dropDown
             value={assignee}
-            placeholder='Assignee'
+            isClearable={true}
+            placeholder='Select Assignee'
             options={assignees}
             onChange={(e) => setAssignee(e)}
           />
         </FormControl>
+
+        <FormControl>
+          <FormLabel>Label</FormLabel>
+          <LynkSelect
+            isCreatable
+            value={label}
+            isMulti={true}
+            isClearable={true}
+            isSearchable={true}
+            placeholder='Add Labels'
+            options={labels}
+            onChange={(e) => setLabel(e)}
+          />
+        </FormControl>
+
+        <FormControl>
+          <FormLabel>Priority</FormLabel>
+          <LynkSelect
+            dropDown
+            value={priority}
+            isClearable={true}
+            placeholder='Select Priority'
+            options={priorities}
+            onChange={(e) => setPriority(e)}
+          />
+        </FormControl>
       </Grid>
 
-      <FormControl mt={1} isReadOnly>
+      <Grid templateColumns='repeat(2, 1fr)' gap={4}>
+        {customFields?.map((field) => (
+          <FormControl key={field?.id} isRequired={field?.required} mb={4}>
+            <FormLabel>{field.name}</FormLabel>
+            {renderField(field)}
+          </FormControl>
+        ))}
+      </Grid>
+
+      <FormControl isReadOnly>
         <FormLabel>Description</FormLabel>
         <Textarea
           rows={'12'}
