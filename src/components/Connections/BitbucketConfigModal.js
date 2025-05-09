@@ -19,7 +19,7 @@ import {
 } from 'graphQL/Mutation'
 import { BitbucketWorkspace } from 'graphQL/Queries'
 
-import { IoSettingsOutline } from 'react-icons/io5'
+import { LuSettings } from 'react-icons/lu'
 
 const BitbucketConfigModal = (props) => {
   const { isOpen, onClose, setGreenCheck, data, updateCon } = props
@@ -181,7 +181,7 @@ const BitbucketConfigModal = (props) => {
       hideCancelButton
       disabled={disabled}
       onSubmit={handleSubmit}
-      Icon={IoSettingsOutline}
+      Icon={LuSettings}
       title={'Bitbucket Configuration'}
       buttonText={connection ? 'Save' : 'Verify'}
       isLoading={isLoading}
