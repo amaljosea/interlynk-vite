@@ -114,7 +114,7 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
         const options =
           field?.allowedValues?.map((opt) => ({
             label: opt?.value,
-            value: opt?.value
+            value: opt?.id
           })) || []
 
         const selected = Array.isArray(value)
@@ -299,11 +299,11 @@ ${customFields}
   const getComponentValue = (value) => {
     switch (componentField?.type) {
       case 'array':
-        return value
+        return value?.map((item) => ({ id: item }))
       case 'option':
-        return { id: value }
+        return [{ id: value }]
       default:
-        return value
+        return [{ id: value }]
     }
   }
 
@@ -322,9 +322,7 @@ ${customFields}
         reporter: reporter?.value,
         labels: filteredLabels?.length > 0 ? filteredLabels : undefined,
         priority: priority?.value || undefined,
-        customFields: {
-          components: components ? getComponentValue(components) : undefined
-        }
+        components: components ? getComponentValue(components) : undefined
       }
     }).then((res) => {
       if (res?.data?.jiraIssueCreate?.errors?.length === 0) {
@@ -441,16 +439,18 @@ ${customFields}
         </FormControl>
       </Grid>
 
-      <Grid templateColumns='repeat(2, 1fr)' gap={4}>
-        <FormControl
-          mb={4}
-          key={componentField?.id}
-          isRequired={componentField?.required}
-        >
-          <FormLabel>{componentField.name}</FormLabel>
-          {renderField(componentField)}
-        </FormControl>
-      </Grid>
+      {componentField && (
+        <Grid templateColumns='repeat(2, 1fr)' gap={4}>
+          <FormControl
+            mb={4}
+            key={componentField?.id}
+            isRequired={componentField?.required}
+          >
+            <FormLabel>{componentField?.name}</FormLabel>
+            {renderField(componentField)}
+          </FormControl>
+        </Grid>
+      )}
 
       <FormControl isReadOnly>
         <FormLabel>Description</FormLabel>
