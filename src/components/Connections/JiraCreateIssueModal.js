@@ -135,6 +135,7 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
                 vals.map((v) => v.value)
               )
             }
+            placeholder='Add value'
           />
         )
       }
@@ -441,12 +442,14 @@ ${customFields}
       </Grid>
 
       <Grid templateColumns='repeat(2, 1fr)' gap={4}>
-        {customFields?.map((field) => (
-          <FormControl key={field?.id} isRequired={field?.required} mb={4}>
-            <FormLabel>{field.name}</FormLabel>
-            {renderField(field)}
-          </FormControl>
-        ))}
+        <FormControl
+          mb={4}
+          key={componentField?.id}
+          isRequired={componentField?.required}
+        >
+          <FormLabel>{componentField.name}</FormLabel>
+          {renderField(componentField)}
+        </FormControl>
       </Grid>
 
       <FormControl isReadOnly>
