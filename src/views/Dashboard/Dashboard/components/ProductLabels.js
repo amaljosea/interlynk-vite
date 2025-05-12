@@ -85,7 +85,13 @@ const ProductLabels = () => {
     )
 
   return (
-    <Grid w={'100%'} templateColumns='repeat(12, 1fr)' gap={6}>
+    <Grid
+      gap={6}
+      w={'100%'}
+      h={'100%'}
+      justifyContent={'center'}
+      templateColumns='repeat(12, 1fr)'
+    >
       <GridItem colSpan={4}>
         <StatGroup
           pr={4}
@@ -101,7 +107,7 @@ const ProductLabels = () => {
         </StatGroup>
       </GridItem>
       <GridItem colSpan={8}>
-        <Stack>
+        <Stack h={'100%'} justifyContent={'center'}>
           {filterLabels?.map((item, index) => (
             <SimpleGrid key={index} w={'100%'} columns={2} spacing={2}>
               <Text
