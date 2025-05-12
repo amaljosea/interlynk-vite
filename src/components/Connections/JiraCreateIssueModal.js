@@ -76,8 +76,8 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
       issueTypeId: issueType?.value
     }
   })
-  const { projectFields } = data || {}
-  const customFields = projectFields?.filter((item) => item?.custom === true)
+  const { fields } = data?.jira?.project || {}
+  const customFields = fields?.filter((item) => item?.custom === true)
   const componentField = customFields?.find(
     (item) => item?.name === 'Components'
   )
@@ -282,8 +282,8 @@ ${customFields}
   }, [projectOptions])
 
   useEffect(() => {
-    if (projectFields?.length > 0) {
-      const priorityList = projectFields?.find(
+    if (fields?.length > 0) {
+      const priorityList = fields?.find(
         (item) => item?.type === 'priority'
       )
       if (priorityList) {
@@ -294,7 +294,7 @@ ${customFields}
         setPriorities(result)
       }
     }
-  }, [projectFields])
+  }, [fields])
 
   const getComponentValue = (value) => {
     switch (componentField?.type) {
