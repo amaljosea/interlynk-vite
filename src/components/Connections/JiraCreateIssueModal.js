@@ -2,7 +2,14 @@ import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { FormControl, FormLabel, Grid, Input, Textarea } from '@chakra-ui/react'
+import {
+  FormControl,
+  FormLabel,
+  Grid,
+  Input,
+  Stack,
+  Textarea
+} from '@chakra-ui/react'
 
 import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
@@ -283,9 +290,7 @@ ${customFields}
 
   useEffect(() => {
     if (fields?.length > 0) {
-      const priorityList = fields?.find(
-        (item) => item?.type === 'priority'
-      )
+      const priorityList = fields?.find((item) => item?.type === 'priority')
       if (priorityList) {
         const result = priorityList?.allowedValues?.map((item) => ({
           value: item?.name,
@@ -411,7 +416,9 @@ ${customFields}
             onChange={(e) => setAssignee(e)}
           />
         </FormControl>
+      </Grid>
 
+      <Stack spacing={4}>
         <FormControl>
           <FormLabel>Label</FormLabel>
           <LynkSelect
@@ -437,32 +444,29 @@ ${customFields}
             onChange={(e) => setPriority(e)}
           />
         </FormControl>
-      </Grid>
 
-      {componentField && (
-        <Grid templateColumns='repeat(2, 1fr)' gap={4}>
+        {componentField && (
           <FormControl
-            mb={4}
             key={componentField?.id}
             isRequired={componentField?.required}
           >
             <FormLabel>{componentField?.name}</FormLabel>
             {renderField(componentField)}
           </FormControl>
-        </Grid>
-      )}
+        )}
 
-      <FormControl isReadOnly>
-        <FormLabel>Description</FormLabel>
-        <Textarea
-          rows={'12'}
-          id='description'
-          name='description'
-          value={description}
-          placeholder='Description'
-          onChange={(e) => setDescription(e.target.value)}
-        />
-      </FormControl>
+        <FormControl isReadOnly>
+          <FormLabel>Description</FormLabel>
+          <Textarea
+            rows={'12'}
+            id='description'
+            name='description'
+            value={description}
+            placeholder='Description'
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </FormControl>
+      </Stack>
     </LynkModal>
   )
 }
