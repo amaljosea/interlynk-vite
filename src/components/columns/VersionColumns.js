@@ -86,6 +86,7 @@ const VersionColumns = (props) => {
           const {
             projectVersion,
             createdAt,
+            updatedAt,
             alternatives,
             isReprocess,
             productLifeCycleStage
@@ -154,8 +155,8 @@ const VersionColumns = (props) => {
                 <Text color={secondaryTextColor} hidden={signedUrlParams}>
                   •
                 </Text>
-                <Tooltip label={getFullDate(createdAt)} placement='top'>
-                  <Text color={secondaryTextColor}>{timeSince(createdAt)}</Text>
+                <Tooltip label={getFullDate(updatedAt)} placement='top'>
+                  <Text color={secondaryTextColor}>{timeSince(updatedAt)}</Text>
                 </Tooltip>
               </Flex>
             </Stack>
