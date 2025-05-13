@@ -951,7 +951,6 @@ export const GetVersionsTable = gql`
           id
           spec
           phases
-
           creationAt
           createdAt
           updatedAt

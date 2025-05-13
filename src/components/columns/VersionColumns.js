@@ -86,6 +86,7 @@ const VersionColumns = (props) => {
           const {
             projectVersion,
             createdAt,
+            updatedAt,
             alternatives,
             isReprocess,
             productLifeCycleStage
@@ -124,7 +125,10 @@ const VersionColumns = (props) => {
                     {lifestage}
                   </Tag>
                 )}
-                <Text color={secondaryTextColor} hidden={!daysUntilDeletion}>
+                <Text
+                  color={secondaryTextColor}
+                  hidden={!daysUntilDeletion || signedUrlParams}
+                >
                   •
                 </Text>
                 {daysUntilDeletion && !signedUrlParams && (
@@ -139,7 +143,7 @@ const VersionColumns = (props) => {
                 )}
                 <Text
                   color={secondaryTextColor}
-                  hidden={alternatives?.length === 0}
+                  hidden={alternatives?.length === 0 || signedUrlParams}
                 >
                   •
                 </Text>
@@ -148,9 +152,11 @@ const VersionColumns = (props) => {
                     <IconButton size={'xs'} icon={<LuRepeat size={16} />} />
                   </Tooltip>
                 )}
-                <Text color={secondaryTextColor}>•</Text>
-                <Tooltip label={getFullDate(createdAt)} placement='top'>
-                  <Text color={secondaryTextColor}>{timeSince(createdAt)}</Text>
+                <Text color={secondaryTextColor} hidden={signedUrlParams}>
+                  •
+                </Text>
+                <Tooltip label={getFullDate(updatedAt)} placement='top'>
+                  <Text color={secondaryTextColor}>{timeSince(updatedAt)}</Text>
                 </Tooltip>
               </Flex>
             </Stack>
@@ -302,7 +308,7 @@ const VersionColumns = (props) => {
           )
         },
         wrap: true,
-        width: '12%',
+        width: signedUrlParams ? 'auto' : '12%',
         right: 'true',
         sortable: true
       },
@@ -317,7 +323,6 @@ const VersionColumns = (props) => {
               <Portal>
                 <MenuList fontSize={'sm'}>
                   <MenuItem
-                    hidden={signedUrlParams}
                     isDisabled={!updateSbom}
                     onClick={() => action('set_lifecycle', row)}
                     aria-label={`sbom-${row?.projectVersion}-lifecycle`}
@@ -327,7 +332,6 @@ const VersionColumns = (props) => {
                   <MenuItem
                     aria-label={`sbom-${row?.projectVersion}-reprocess`}
                     onClick={() => action('rerun_import', row)}
-                    hidden={signedUrlParams}
                     isDisabled={!canReprocessSbom}
                   >
                     Rerun Import
@@ -335,7 +339,7 @@ const VersionColumns = (props) => {
                   <MenuItem
                     aria-label={`sbom-${row?.projectVersion}-automation`}
                     onClick={() => action('rerun_automation', row)}
-                    hidden={signedUrlParams || isFreeTier}
+                    hidden={isFreeTier}
                     isDisabled={!canReprocessSbom}
                   >
                     Rerun Automation
@@ -343,21 +347,19 @@ const VersionColumns = (props) => {
                   <MenuItem
                     aria-label={`sbom-${row?.projectVersion}-support-analysis`}
                     onClick={() => action('rerun_support_analysis', row)}
-                    hidden={signedUrlParams || isFreeTier}
+                    hidden={isFreeTier}
                     isDisabled={!canReprocessSbom}
                   >
                     Rerun Support Analysis
                   </MenuItem>
                   <MenuItem
                     isDisabled={!updateSbom}
-                    hidden={signedUrlParams}
                     onClick={() => action('switch_environment', row)}
                     aria-label={`sbom-${row?.projectVersion}-transfer`}
                   >
                     Switch Environment
                   </MenuItem>
                   <MenuItem
-                    hidden={signedUrlParams}
                     onClick={() => action('view_alternates', row)}
                     aria-label={`sbom-${row?.projectVersion}-list`}
                   >
@@ -366,7 +368,7 @@ const VersionColumns = (props) => {
                   <Divider />
                   <MenuItem
                     aria-label={`sbom-${row?.projectVersion}-archive`}
-                    isDisabled={!archiveSbom || signedUrlParams}
+                    isDisabled={!archiveSbom}
                     onClick={() => action('archive_sbom', row)}
                   >
                     Archive
@@ -376,7 +378,7 @@ const VersionColumns = (props) => {
                     aria-label={`sbom-${row?.projectVersion}-delete`}
                     color={primaryErrorColor}
                     onClick={() => action('delete_sbom', row)}
-                    isDisabled={!archiveSbom || signedUrlParams}
+                    isDisabled={!archiveSbom}
                   >
                     Delete
                   </MenuItem>
@@ -385,7 +387,8 @@ const VersionColumns = (props) => {
             </Menu>
           )
         },
-        right: 'true'
+        right: 'true',
+        omit: signedUrlParams
       }
     ]
 
