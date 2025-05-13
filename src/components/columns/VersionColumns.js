@@ -24,7 +24,6 @@ import VulnBadge from 'components/Misc/VulnBadge'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
-import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { LuMessageCircleOff, LuRepeat } from 'react-icons/lu'
@@ -45,7 +44,6 @@ const VersionColumns = (props) => {
   const { action, retentionTime, onFilterSev, onSelectLicenses, onStartTour } =
     props
 
-  const { isCustomerView } = useRouteFlags()
   const signedUrlParams = getSignedUrlParams()
   const { isFreeTier } = useGlobalQueryContext()
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
@@ -128,7 +126,7 @@ const VersionColumns = (props) => {
                 )}
                 <Text
                   color={secondaryTextColor}
-                  hidden={!daysUntilDeletion || isCustomerView}
+                  hidden={!daysUntilDeletion || signedUrlParams}
                 >
                   •
                 </Text>
@@ -144,7 +142,7 @@ const VersionColumns = (props) => {
                 )}
                 <Text
                   color={secondaryTextColor}
-                  hidden={alternatives?.length === 0 || isCustomerView}
+                  hidden={alternatives?.length === 0 || signedUrlParams}
                 >
                   •
                 </Text>
@@ -153,7 +151,7 @@ const VersionColumns = (props) => {
                     <IconButton size={'xs'} icon={<LuRepeat size={16} />} />
                   </Tooltip>
                 )}
-                <Text color={secondaryTextColor} hidden={isCustomerView}>
+                <Text color={secondaryTextColor} hidden={signedUrlParams}>
                   •
                 </Text>
                 <Tooltip label={getFullDate(createdAt)} placement='top'>
@@ -309,7 +307,7 @@ const VersionColumns = (props) => {
           )
         },
         wrap: true,
-        width: '12%',
+        width: signedUrlParams ? 'auto' : '12%',
         right: 'true',
         sortable: true
       },
@@ -324,7 +322,6 @@ const VersionColumns = (props) => {
               <Portal>
                 <MenuList fontSize={'sm'}>
                   <MenuItem
-                    hidden={signedUrlParams}
                     isDisabled={!updateSbom}
                     onClick={() => action('set_lifecycle', row)}
                     aria-label={`sbom-${row?.projectVersion}-lifecycle`}
@@ -334,7 +331,6 @@ const VersionColumns = (props) => {
                   <MenuItem
                     aria-label={`sbom-${row?.projectVersion}-reprocess`}
                     onClick={() => action('rerun_import', row)}
-                    hidden={signedUrlParams}
                     isDisabled={!canReprocessSbom}
                   >
                     Rerun Import
@@ -342,7 +338,7 @@ const VersionColumns = (props) => {
                   <MenuItem
                     aria-label={`sbom-${row?.projectVersion}-automation`}
                     onClick={() => action('rerun_automation', row)}
-                    hidden={signedUrlParams || isFreeTier}
+                    hidden={isFreeTier}
                     isDisabled={!canReprocessSbom}
                   >
                     Rerun Automation
@@ -350,21 +346,19 @@ const VersionColumns = (props) => {
                   <MenuItem
                     aria-label={`sbom-${row?.projectVersion}-support-analysis`}
                     onClick={() => action('rerun_support_analysis', row)}
-                    hidden={signedUrlParams || isFreeTier}
+                    hidden={isFreeTier}
                     isDisabled={!canReprocessSbom}
                   >
                     Rerun Support Analysis
                   </MenuItem>
                   <MenuItem
                     isDisabled={!updateSbom}
-                    hidden={signedUrlParams}
                     onClick={() => action('switch_environment', row)}
                     aria-label={`sbom-${row?.projectVersion}-transfer`}
                   >
                     Switch Environment
                   </MenuItem>
                   <MenuItem
-                    hidden={signedUrlParams}
                     onClick={() => action('view_alternates', row)}
                     aria-label={`sbom-${row?.projectVersion}-list`}
                   >
@@ -373,7 +367,7 @@ const VersionColumns = (props) => {
                   <Divider />
                   <MenuItem
                     aria-label={`sbom-${row?.projectVersion}-archive`}
-                    isDisabled={!archiveSbom || signedUrlParams}
+                    isDisabled={!archiveSbom}
                     onClick={() => action('archive_sbom', row)}
                   >
                     Archive
@@ -383,7 +377,7 @@ const VersionColumns = (props) => {
                     aria-label={`sbom-${row?.projectVersion}-delete`}
                     color={primaryErrorColor}
                     onClick={() => action('delete_sbom', row)}
-                    isDisabled={!archiveSbom || signedUrlParams}
+                    isDisabled={!archiveSbom}
                   >
                     Delete
                   </MenuItem>
@@ -392,7 +386,8 @@ const VersionColumns = (props) => {
             </Menu>
           )
         },
-        right: 'true'
+        right: 'true',
+        omit: signedUrlParams
       }
     ]
 
@@ -403,7 +398,6 @@ const VersionColumns = (props) => {
     canReprocessSbom,
     generateProductVersionDetailPageUrlFromCurrentUrl,
     ignoreMsg,
-    isCustomerView,
     isFreeTier,
     onFilterSev,
     onSelectLicenses,
