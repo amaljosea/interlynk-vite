@@ -155,6 +155,7 @@ const LifecycleModal = ({ data, isOpen, onClose }) => {
           <FormLabel htmlFor='stage'>Stage</FormLabel>
           <LynkSelect
             name='stage'
+            aria-label='stage'
             value={
               stageOptions.find((opt) => opt.value === formData?.stage) || null
             }

@@ -22,6 +22,17 @@ test('SBOM build functionality', async ({ page }) => {
   }
 })
 
+test('Update SBOM lifestage', async ({ page }) => {
+  test.setTimeout(120000)
+  const pp = new SbomPage(page)
+  try {
+    await pp.updateLifestage()
+  } catch (error) {
+    console.error('Lifestage update test failed:', error)
+    throw error
+  }
+})
+
 test('SBOM list functionality', async ({ page }) => {
   test.setTimeout(120000)
   const pp = new SbomPage(page)
