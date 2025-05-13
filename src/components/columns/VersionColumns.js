@@ -24,6 +24,7 @@ import VulnBadge from 'components/Misc/VulnBadge'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { LuMessageCircleOff, LuRepeat } from 'react-icons/lu'
@@ -44,6 +45,7 @@ const VersionColumns = (props) => {
   const { action, retentionTime, onFilterSev, onSelectLicenses, onStartTour } =
     props
 
+  const { isCustomerView } = useRouteFlags()
   const signedUrlParams = getSignedUrlParams()
   const { isFreeTier } = useGlobalQueryContext()
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
@@ -124,7 +126,10 @@ const VersionColumns = (props) => {
                     {lifestage}
                   </Tag>
                 )}
-                <Text color={secondaryTextColor} hidden={!daysUntilDeletion}>
+                <Text
+                  color={secondaryTextColor}
+                  hidden={!daysUntilDeletion || isCustomerView}
+                >
                   •
                 </Text>
                 {daysUntilDeletion && !signedUrlParams && (
@@ -139,7 +144,7 @@ const VersionColumns = (props) => {
                 )}
                 <Text
                   color={secondaryTextColor}
-                  hidden={alternatives?.length === 0}
+                  hidden={alternatives?.length === 0 || isCustomerView}
                 >
                   •
                 </Text>
@@ -148,7 +153,9 @@ const VersionColumns = (props) => {
                     <IconButton size={'xs'} icon={<LuRepeat size={16} />} />
                   </Tooltip>
                 )}
-                <Text color={secondaryTextColor}>•</Text>
+                <Text color={secondaryTextColor} hidden={isCustomerView}>
+                  •
+                </Text>
                 <Tooltip label={getFullDate(createdAt)} placement='top'>
                   <Text color={secondaryTextColor}>{timeSince(createdAt)}</Text>
                 </Tooltip>
@@ -396,6 +403,7 @@ const VersionColumns = (props) => {
     canReprocessSbom,
     generateProductVersionDetailPageUrlFromCurrentUrl,
     ignoreMsg,
+    isCustomerView,
     isFreeTier,
     onFilterSev,
     onSelectLicenses,
