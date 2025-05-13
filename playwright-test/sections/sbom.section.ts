@@ -2,8 +2,6 @@ import * as dotenv from 'dotenv'
 import * as path from 'path'
 import { Page, expect } from '@playwright/test'
 
-import { getFileNamesFromResource } from '../utils/utils'
-
 dotenv.config({ path: '.env' })
 
 const errors: string[] = []
@@ -59,6 +57,56 @@ export default class SbomSection {
 
         if (SBOM.isVisible()) {
           await this.page.locator("//a[@aria-label='products']").click()
+        } else {
+          errors.push('Version not found')
+        }
+      } else {
+        errors.push('Product not found')
+      }
+
+      await this.page.waitForTimeout(2000)
+      expect(errors.length).toBe(0)
+    } catch (error) {
+      throw error
+    }
+  }
+
+  // LIFESTAGE
+  public async lifestage() {
+    try {
+      await this.page.locator("//a[@aria-label='products']").click()
+
+      const product = this.page
+        .locator(`//p[@aria-label='product_name']`)
+        .nth(0)
+
+      if (product.isVisible()) {
+        await product.click()
+        await this.page.waitForTimeout(2000)
+
+        const version = this.page.getByTestId('version').nth(0)
+
+        if (version.isVisible()) {
+          await this.page
+            .locator(`//button[@aria-label='sbom-${sbomVersion}-actions']`)
+            .click()
+          await this.page
+            .locator(`//button[@aria-label='sbom-${sbomVersion}-lifecycle']`)
+            .click()
+          await this.page.waitForTimeout(3000)
+
+          await this.page.getByRole('combobox', { name: 'stage' }).click()
+          await this.page.keyboard.type('develop')
+          await this.page.keyboard.press('Enter')
+
+          await this.page.locator("button[type='submit']").click()
+          await this.page.waitForTimeout(3000)
+
+          await this.page.getByTestId('filter_Lifestage').click()
+          await this.page
+            .getByRole('menuitemcheckbox', { name: 'Development' })
+            .click()
+          await this.page.waitForTimeout(3000)
         } else {
           errors.push('Version not found')
         }

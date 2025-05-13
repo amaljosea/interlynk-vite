@@ -30,4 +30,8 @@ export default class SbomPage {
   public async deleteSbom() {
     await this.sbomSection.delete()
   }
+
+  public async updateLifestage() {
+    await this.sbomSection.lifestage()
+  }
 }
