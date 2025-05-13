@@ -1,6 +1,10 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { validateEmail } from 'utils/formValidationUtils'
+import {
+  isValidSlackWebhookUrl,
+  isValidTeamsWebhookUrl,
+  validateEmail
+} from 'utils/formValidationUtils'
 
 import { Box, Button, HStack, Input, Stack } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage } from '@chakra-ui/react'
@@ -13,7 +17,6 @@ import LynkSelect from 'components/LynkSelect'
 import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
 
-import { FaPlus } from 'react-icons/fa6'
 import { IoSettingsOutline } from 'react-icons/io5'
 import { LuCirclePlus } from 'react-icons/lu'
 
@@ -60,11 +63,25 @@ const ConfigModal = ({
     childKey: 'create_update_connection'
   })
 
-  const handleCheckEmail = (e) => {
+  const handleBlur = (e) => {
     const { value } = e.target
     const isInvalidEmail = value !== '' && !validateEmail(value)
-    if (isInvalidEmail) {
-      setErrorMessage('Please enter a valid email')
+    const isInvalidTeamURL = value !== '' && !isValidTeamsWebhookUrl(value)
+    const isInvalidAddress = value !== '' && !isValidSlackWebhookUrl(value)
+    switch (title) {
+      case 'Email Configuration':
+        isInvalidEmail && setErrorMessage('Please enter a valid email')
+        break
+      case 'Slack Configuration':
+        isInvalidAddress &&
+          setErrorMessage('Please enter a valid slack webhook address')
+        break
+      case 'Teams Configuration':
+        isInvalidTeamURL &&
+          setErrorMessage('Please enter a valid team webhook address')
+        break
+      default:
+        setErrorMessage('')
     }
   }
 
@@ -300,11 +317,7 @@ const ConfigModal = ({
                     onChange={(e) =>
                       handleChange(index, 'address', e.target.value)
                     }
-                    onBlur={(e) => {
-                      if (title === 'Email Configuration') {
-                        handleCheckEmail(e)
-                      }
-                    }}
+                    onBlur={handleBlur}
                   />
                   <FormErrorMessage>{config?.error}</FormErrorMessage>
                 </Box>
