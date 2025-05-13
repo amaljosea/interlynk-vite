@@ -37,3 +37,9 @@ export const validScore = (value) => {
   const scoreRegex = /^(?:0|[1-9][0-9]?|100)$/
   return scoreRegex.test(value)
 }
+
+export function isValidSlackWebhookUrl(url) {
+  const regex =
+    /^https:\/\/hooks\.slack\.com\/services\/[A-Z0-9]{9,}\/[A-Z0-9]{9,}\/[a-zA-Z0-9]{24,}$/
+  return regex.test(url)
+}
