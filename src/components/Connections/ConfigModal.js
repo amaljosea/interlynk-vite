@@ -1,7 +1,10 @@
 import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { validateEmail } from 'utils/formValidationUtils'
-import { isValidSlackWebhookUrl } from 'utils/formValidationUtils'
+import {
+  isValidSlackWebhookUrl,
+  isValidTeamsWebhookUrl,
+  validateEmail
+} from 'utils/formValidationUtils'
 
 import { Box, Button, HStack, Input, Stack } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage } from '@chakra-ui/react'
@@ -55,8 +58,6 @@ const ConfigModal = ({
     }
   ])
 
-  console.warn('configs', configs)
-
   const updateCon = useHasPermission({
     parentKey: 'view_connections',
     childKey: 'create_update_connection'
@@ -65,13 +66,19 @@ const ConfigModal = ({
   const handleBlur = (e) => {
     const { value } = e.target
     const isInvalidEmail = value !== '' && !validateEmail(value)
+    const isInvalidTeamURL = value !== '' && !isValidTeamsWebhookUrl(value)
     const isInvalidAddress = value !== '' && !isValidSlackWebhookUrl(value)
     switch (title) {
       case 'Email Configuration':
         isInvalidEmail && setErrorMessage('Please enter a valid email')
         break
       case 'Slack Configuration':
-        isInvalidAddress && setErrorMessage('Please enter a valid address')
+        isInvalidAddress &&
+          setErrorMessage('Please enter a valid slack webhook address')
+        break
+      case 'Teams Configuration':
+        isInvalidTeamURL &&
+          setErrorMessage('Please enter a  team webhook address')
         break
       default:
         setErrorMessage('')
