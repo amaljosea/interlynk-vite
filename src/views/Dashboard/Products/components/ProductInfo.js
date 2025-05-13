@@ -25,7 +25,7 @@ import {
   LuBot,
   LuBox,
   LuBug,
-  LuMessageCircleWarning,
+  LuOctagonAlert,
   LuSearch,
   LuTag
 } from 'react-icons/lu'
@@ -41,10 +41,7 @@ const ProductInfo = ({ settings, data }) => {
 
   const { name, description } = data || ''
 
-  const { primaryErrorColor, secondaryBlueText } = useThemeColor([
-    'primaryErrorColor',
-    'secondaryBlueText'
-  ])
+  const { secondaryBlueText } = useThemeColor(['secondaryBlueText'])
 
   const [warning, setWarning] = useState(false)
   const [exceedingCount, setExceedingCount] = useState(0)
@@ -157,10 +154,9 @@ const ProductInfo = ({ settings, data }) => {
             >
               <IconButton
                 size='xs'
-                color={primaryErrorColor}
-                icon={<LuMessageCircleWarning size={14} />}
+                colorScheme='red'
+                icon={<LuOctagonAlert size={14} />}
                 onClick={() => handleSort({ id: 'SBOMS_CREATED_AT' }, 'desc')}
-                bg='transparent'
               />
             </Tooltip>
           )}

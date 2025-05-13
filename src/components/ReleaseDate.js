@@ -3,7 +3,7 @@ import { getSignedUrlParams } from 'utils'
 
 import { Box, IconButton, Tooltip } from '@chakra-ui/react'
 
-import { FaCalendarAlt } from 'react-icons/fa'
+import { LuCalendar } from 'react-icons/lu'
 
 import LynkDate from './LynkDate'
 
@@ -45,7 +45,7 @@ const ReleaseDate = ({ status, updateSboms, noPrimaryComp }) => {
       <Tooltip label={'Release Date'}>
         <IconButton
           colorScheme='blue'
-          icon={<FaCalendarAlt />}
+          icon={<LuCalendar size={20} />}
           display={signedUrlParams ? 'none' : 'flex'}
           onClick={() => setPickerOpen(!isPickerOpen)}
           isDisabled={status === 'signed' || !updateSboms || noPrimaryComp}

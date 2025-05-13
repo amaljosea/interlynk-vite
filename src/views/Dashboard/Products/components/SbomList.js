@@ -17,6 +17,7 @@ import { sbomUpdate } from 'graphQL/Mutation'
 import { GetSbomAlternatives } from 'graphQL/Queries'
 
 import { FaArrowUp } from 'react-icons/fa6'
+import { LuArrowUp } from 'react-icons/lu'
 
 import ConfirmationModal from './ConfirmationModal'
 
@@ -167,7 +168,7 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
           <IconButton
             size='sm'
             colorScheme='blue'
-            icon={<FaArrowUp />}
+            icon={<LuArrowUp size={20} />}
             isDisabled={!editSbom}
             onClick={() => handleWarning(row)}
           />

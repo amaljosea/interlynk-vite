@@ -25,8 +25,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetArchivedVersions, GetVersions } from 'graphQL/Queries'
 
-import { FaEye } from 'react-icons/fa6'
-import { MdOutlineUnarchive } from 'react-icons/md'
+import { LuArchiveRestore, LuEye } from 'react-icons/lu'
 
 const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
   const navigate = useNavigate()
@@ -129,7 +128,7 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
             colorScheme='blue'
             title='View archived version'
             onClick={() => handleView(item)}
-            icon={<FaEye size={16} />}
+            icon={<LuEye size={18} />}
           />
         </Tooltip>
         <Tooltip label='Restore' placement='top'>
@@ -138,7 +137,7 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
             colorScheme='blue'
             isDisabled={!updateSbom || loading}
             onClick={() => handleRestore(item)}
-            icon={<MdOutlineUnarchive size={20} />}
+            icon={<LuArchiveRestore size={18} />}
             aria-label={`sbom-${item?.projectVersion}-restore`}
           />
         </Tooltip>

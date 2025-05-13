@@ -10,6 +10,7 @@ import {
 import { Box, Button, Flex, Icon, Text, useToast } from '@chakra-ui/react'
 
 import { FaCircleXmark } from 'react-icons/fa6'
+import { LuCircleX } from 'react-icons/lu'
 
 const ICON_COLORS = {
   success: '#38A169',
@@ -36,7 +37,7 @@ const ICON_COMPONENTS = {
   success: <CheckCircleIcon color={ICON_COLORS.success} fontSize='20px' />,
   error: (
     <Icon>
-      <FaCircleXmark color={ICON_COLORS.error} fontSize='24px' />
+      <LuCircleX color={ICON_COLORS.error} size={2} />
     </Icon>
   ),
   warning: <WarningTwoIcon color={ICON_COLORS.warning} fontSize='20px' />,

@@ -14,7 +14,6 @@ import { truncatedValue } from 'utils'
 import { detectOS } from 'utils'
 import { allDefaultActions, settingActions } from 'variables/general'
 
-import { SearchIcon } from '@chakra-ui/icons'
 import { Kbd, useColorMode } from '@chakra-ui/react'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -25,10 +24,16 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetProjectGroupAndVersionDetails } from 'graphQL/Queries'
 
-import { FaRegWindowMaximize } from 'react-icons/fa'
-import { FaDesktop, FaDisplay, FaMoon, FaSun } from 'react-icons/fa6'
-import { FaRegFile } from 'react-icons/fa6'
-import { FaScrewdriverWrench } from 'react-icons/fa6'
+import {
+  LuBox,
+  LuFile,
+  LuMonitor,
+  LuMoon,
+  LuPackage,
+  LuSearch,
+  LuSun,
+  LuSwatchBook
+} from 'react-icons/lu'
 
 const Kbar = () => {
   const { isFreeTier } = useGlobalQueryContext()
@@ -123,7 +128,7 @@ const Kbar = () => {
       id: item?.name,
       name: item?.name,
       section: `${item?.section}`,
-      icon: <FaRegFile color={sameSecondaryText} />,
+      icon: <LuFile size={20} color={sameSecondaryText} />,
       perform: () => navigate(item?.path)
     })
   )
@@ -136,7 +141,7 @@ const Kbar = () => {
         id: item?.name,
         name: truncatedValue(item?.name, 30),
         section: 'products',
-        icon: <FaRegWindowMaximize color={sameSecondaryText} />,
+        icon: <LuBox size={20} color={sameSecondaryText} />,
         perform: () => {
           const link = generateProductDetailPageUrlFromCurrentUrl({
             productgroupid: item?.id,
@@ -155,7 +160,7 @@ const Kbar = () => {
                 id: version?.id,
                 name: `${truncatedValue(item?.name, 20)} - ${truncatedValue(version?.projectVersion, 20)} (${project?.name})`,
                 section: 'product versions',
-                icon: <FaScrewdriverWrench color={sameSecondaryText} />,
+                icon: <LuPackage size={20} color={sameSecondaryText} />,
                 perform: () => {
                   const link =
                     generateProductVersionDetailPageUrlFromCurrentUrl({
@@ -178,7 +183,7 @@ const Kbar = () => {
           id: item?.name,
           name: item?.name,
           section: item?.section,
-          icon: <FaRegFile color={sameSecondaryText} />,
+          icon: <LuFile size={20} color={sameSecondaryText} />,
           perform: () => navigate(item?.path)
         })
       )
@@ -192,7 +197,7 @@ const Kbar = () => {
     name: '.. Go back a level',
     keywords: ['..'],
     section: 'shortcuts',
-    icon: <FaRegFile color={sameSecondaryText} />,
+    icon: <LuFile size={20} color={sameSecondaryText} />,
     perform: () => {
       if (isVulnerabilityDetailsPage) {
         const link = generateProductDetailPageUrlFromCurrentUrl({
@@ -233,7 +238,7 @@ const Kbar = () => {
     name: '/  Go Back to first level',
     section: 'shortcuts',
     keywords: ['/'],
-    icon: <FaRegFile color={sameSecondaryText} />,
+    icon: <LuFile size={20} color={sameSecondaryText} />,
     perform: () => {
       if (isGlobalVulnerabilitiesPage) {
         const link = '/vendor/vulnerabilities'
@@ -256,14 +261,14 @@ const Kbar = () => {
       id: 'theme',
       name: 'Change Theme',
       section: 'Preferences',
-      icon: <FaDisplay color={secondaryTextInverse} />
+      icon: <LuSwatchBook size={20} color={secondaryTextInverse} />
     },
     {
       id: 'darkTheme',
       name: 'Dark',
       keywords: 'dark theme',
       section: 'Theme',
-      icon: <FaMoon color={secondaryTextInverse} />,
+      icon: <LuMoon size={20} color={secondaryTextInverse} />,
       perform: () => setColorMode('dark'),
       parent: 'theme'
     },
@@ -272,7 +277,7 @@ const Kbar = () => {
       name: 'Light',
       keywords: 'light theme',
       section: 'Theme',
-      icon: <FaSun color={secondaryTextInverse} />,
+      icon: <LuSun size={20} color={secondaryTextInverse} />,
       perform: () => setColorMode('light'),
       parent: 'theme'
     },
@@ -281,7 +286,7 @@ const Kbar = () => {
       name: 'System',
       keywords: 'system theme',
       section: 'Theme',
-      icon: <FaDesktop color={secondaryTextInverse} />,
+      icon: <LuMonitor size={20} color={secondaryTextInverse} />,
       perform: () => setColorMode('system'),
       parent: 'theme'
     }
@@ -379,7 +384,7 @@ const Kbar = () => {
         >
           <div className='kbar_search_container'>
             {/* search icon */}
-            <SearchIcon color={sameSecondaryText} />
+            <LuSearch fontSize={24} color={sameSecondaryText} />
             {/* search input */}
             <KBarSearch className='kbar_search' />
             <Kbd>{os?.startsWith('Windows') ? 'Ctrl' : 'Cmd'}</Kbd> +

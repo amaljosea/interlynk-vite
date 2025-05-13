@@ -21,6 +21,7 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaScaleBalanced } from 'react-icons/fa6'
+import { LuScale } from 'react-icons/lu'
 
 import Pagination from '../Pagination'
 import LicenseModal from './LicenseModal'
@@ -69,9 +70,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
                 isRound={true}
                 variant='solid'
                 colorScheme='gray'
-                icon={
-                  <FaScaleBalanced color={primaryTextColor} fontSize={16} />
-                }
+                icon={<LuScale color={primaryTextColor} fontSize={18} />}
               />
             </GridItem>
             <GridItem

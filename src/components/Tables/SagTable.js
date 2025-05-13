@@ -8,11 +8,10 @@ import { Badge, Button, Flex, IconButton, Stack, Text } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import LynkTable from 'components/LynkTable'
 
-
 import { FaEnvelope } from 'react-icons/fa6'
+import { LuMail } from 'react-icons/lu'
 
 const SagTable = ({ data }) => {
-
   const [searchInput, setSearchInput] = useState('')
   const [filterText, setFilterText] = useState(searchInput)
   const [supplier, setSupplier] = useState('')
@@ -124,7 +123,11 @@ const SagTable = ({ data }) => {
         if (row?.link) {
           return (
             <Link to={row.link} target='_blank'>
-              <IconButton colorScheme='blue' size='sm' icon={<FaEnvelope />} />
+              <IconButton
+                colorScheme='blue'
+                size='sm'
+                icon={<LuMail size={18} />}
+              />
             </Link>
           )
         } else {
