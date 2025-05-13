@@ -7,6 +7,7 @@ const ToggleVisibilityButton = ({ onClick, showPassword, ...props }) => {
       size='sm'
       right='2'
       h='1.75rem'
+      variant='unstyled'
       position='absolute'
       onClick={onClick}
       icon={!showPassword ? <ViewIcon /> : <ViewOffIcon />}

@@ -33,6 +33,7 @@ import {
   FaCube,
   FaCubes
 } from 'react-icons/fa'
+import { LuCircleArrowLeft } from 'react-icons/lu'
 
 const SbomDetails = () => {
   const partsContext = usePartsContext()
@@ -116,7 +117,7 @@ const SbomDetails = () => {
             {projectId && partsContext.latestPart && (
               <Link to={partsContext.latestPart.url} onClick={handlePart}>
                 <HStack>
-                  <FaAngleLeft size={18} color={primaryBlueText} />
+                  <LuCircleArrowLeft size={18} color={primaryBlueText} />
                   <Text
                     width={'fit-content'}
                     fontWeight={'semibold'}

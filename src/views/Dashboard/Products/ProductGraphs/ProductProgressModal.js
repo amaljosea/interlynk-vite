@@ -18,12 +18,12 @@ import LynkDrawer from 'components/LynkDrawer'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaCode, FaDesktop, FaInbox } from 'react-icons/fa6'
+import { LuFilter, LuInbox, LuPackage, LuShapes } from 'react-icons/lu'
 
 import { defaultData } from './ProductProgressData'
 import { developmentData } from './ProductProgressData'
 import { productionData } from './ProductProgressData'
 import Tree from './Tree'
-import { LuFilter } from 'react-icons/lu'
 
 const LegendItem = ({ color, label }) => {
   const { primaryTextColorWithOpacity } = useThemeColor([
@@ -159,11 +159,11 @@ const ProductProgressModal = ({ isOpen, onClose, name }) => {
   const envIcon = (env) => {
     switch (env) {
       case 'default':
-        return <FaInbox />
+        return <LuInbox size={18} />
       case 'development':
-        return <FaCode />
+        return <LuShapes size={18} />
       case 'production':
-        return <FaDesktop />
+        return <LuPackage size={18} />
     }
   }
 

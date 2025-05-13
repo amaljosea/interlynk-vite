@@ -21,6 +21,7 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaEllipsisV } from 'react-icons/fa'
+import { LuEllipsisVertical } from 'react-icons/lu'
 
 const SupportColumns = ({ action }) => {
   const { isFreeTier } = useGlobalQueryContext()
@@ -165,7 +166,7 @@ const SupportColumns = ({ action }) => {
             <Menu>
               <MenuButton
                 as={IconButton}
-                icon={<FaEllipsisV />}
+                icon={<LuEllipsisVertical size={20} />}
                 variant='none'
                 color={secondaryTextColor}
                 data-testid='support-actions'

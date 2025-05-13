@@ -17,7 +17,7 @@ import ToggleVisibilityButton from 'components/Misc/ToggleVisibilityButton'
 import useCustomToast from 'hooks/useCustomToast'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { IoSettingsOutline } from 'react-icons/io5'
+import { LuSettings } from 'react-icons/lu'
 
 const GithubConfigModal = ({ isOpen, onClose, setGreenCheck, data }) => {
   const { showToast } = useCustomToast()
@@ -101,7 +101,7 @@ const GithubConfigModal = ({ isOpen, onClose, setGreenCheck, data }) => {
       buttonColor={saveOrVerify ? 'blue' : isSaveDisabled ? 'blue' : 'green'}
       isLoading={saveOrVerify && isLoading}
       disabled={!saveOrVerify && isSaveDisabled}
-      Icon={IoSettingsOutline}
+      Icon={LuSettings}
       hideCancelButton
       leftFooterContent={
         success && (

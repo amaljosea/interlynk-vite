@@ -13,7 +13,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetPolicyRules } from 'graphQL/Queries'
 
-import { FaEye } from 'react-icons/fa'
+import { LuEye } from 'react-icons/lu'
 
 const ExpandedComponent = ({ data, onCheckViolations }) => {
   const { policy, sbom } = data || {}
@@ -69,6 +69,7 @@ const ExpandedComponent = ({ data, onCheckViolations }) => {
                       >
                         <Flex>
                           <Icon
+                            fontSize={18}
                             color={primaryBlueText}
                             as={getIcon(item?.subject)}
                           />
@@ -121,10 +122,10 @@ const ExpandedComponent = ({ data, onCheckViolations }) => {
                   <Tooltip label={'View Violations'}>
                     <IconButton
                       size='sm'
-                      icon={<FaEye />}
                       w={'fit-content'}
                       colorScheme='blue'
                       fontWeight={'medium'}
+                      icon={<LuEye size={18} />}
                       onClick={() => onCheckViolations(data, item)}
                     />
                   </Tooltip>

@@ -21,6 +21,7 @@ import { GetLabels } from 'graphQL/Queries'
 
 import { FaCheck } from 'react-icons/fa6'
 import { RxDotFilled } from 'react-icons/rx'
+import { LuCheck, LuDot } from 'react-icons/lu'
 
 const stages = [
   'all',
@@ -157,9 +158,9 @@ const ProdFilterMenu = (props) => {
                   onClick={(e) => handleMenuClick(e, item?.name)}
                   icon={
                     filterMode === 'AND' ? (
-                      <RxDotFilled size={16} color={inverseSecondaryBgColor} />
+                      <LuDot size={18} color={inverseSecondaryBgColor} />
                     ) : (
-                      <FaCheck size={14} color={inverseSecondaryBgColor} />
+                      <LuCheck size={18} color={inverseSecondaryBgColor} />
                     )
                   }
                 >

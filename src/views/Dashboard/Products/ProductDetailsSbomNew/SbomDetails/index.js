@@ -31,8 +31,7 @@ import { useSbomScores } from 'hooks/useSbomScores'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaLongArrowAltRight } from 'react-icons/fa'
-import { LuPackage } from 'react-icons/lu'
+import { LuArrowRight, LuPackage } from 'react-icons/lu'
 
 import LifecycleModal from '../../components/LifecycleModal'
 
@@ -123,7 +122,9 @@ const SbomDetails = ({ sbomData }) => {
             <GridItem colSpan={8}>
               <Breadcrumb
                 fontSize={'sm'}
-                separator={<FaLongArrowAltRight color={secondaryTextInverse} />}
+                separator={
+                  <LuArrowRight size={18} color={secondaryTextInverse} />
+                }
               >
                 {!loading &&
                   partsContext.isParts &&

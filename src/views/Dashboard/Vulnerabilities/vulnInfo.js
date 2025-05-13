@@ -22,8 +22,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetGlobalVulnData } from 'graphQL/Queries'
 
-import { FaBug, FaCube, FaCubes } from 'react-icons/fa'
-import { FaCodeMerge } from 'react-icons/fa6'
+import { LuBox, LuBug, LuComponent, LuPackage } from 'react-icons/lu'
 
 import VulnProdTable from './components/ProdTable'
 
@@ -165,7 +164,7 @@ const VulnInfo = () => {
               alignItems={'flex-start'}
             >
               <Icon
-                as={FaBug}
+                as={LuBug}
                 h={'64px'}
                 w={'64px'}
                 color={secondaryBlueText}
@@ -268,17 +267,20 @@ const VulnInfo = () => {
           templateColumns='repeat(12, 1fr)'
         >
           <GridItem colSpan={4}>
-            <StatsContainer icon={<FaCubes size={22} />} title={'Products'}>
+            <StatsContainer icon={<LuBox size={24} />} title={'Products'}>
               {params?.productid ? 1 : projectGroupsCount}
             </StatsContainer>
           </GridItem>
           <GridItem colSpan={4}>
-            <StatsContainer icon={<FaCodeMerge size={18} />} title={'Versions'}>
+            <StatsContainer icon={<LuPackage size={24} />} title={'Versions'}>
               {params?.productid ? productVersions?.length : sbomVersionsCount}
             </StatsContainer>
           </GridItem>
           <GridItem colSpan={4}>
-            <StatsContainer icon={<FaCube size={18} />} title={'Components'}>
+            <StatsContainer
+              icon={<LuComponent size={24} />}
+              title={'Components'}
+            >
               {params?.productid ? totalCount : componentCount}
             </StatsContainer>
           </GridItem>

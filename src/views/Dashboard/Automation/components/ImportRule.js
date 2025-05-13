@@ -10,7 +10,7 @@ import LynkModal from 'components/LynkModal'
 import useCustomToast from 'hooks/useCustomToast'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaFileImport } from 'react-icons/fa6'
+import { LuImport } from 'react-icons/lu'
 
 const AutomationRulesImport = gql`
   mutation AutomationRulesImport($file: Upload!, $projectId: Uuid!) {
@@ -136,7 +136,7 @@ const ImportRule = (props) => {
     <LynkModal
       isOpen={isOpen}
       onClose={onClose}
-      Icon={FaFileImport}
+      Icon={LuImport}
       buttonText={'Import'}
       title={`Import Rules`}
       onSubmit={handleSubmit}

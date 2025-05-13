@@ -27,6 +27,7 @@ import { UpdateCompLinks } from 'graphQL/Mutation'
 import { FaPlus } from 'react-icons/fa6'
 
 import ActionButton from './ActionButton'
+import { LuCirclePlus } from 'react-icons/lu'
 
 const GetCompUrls = gql`
   query GetCompUrls($id: Uuid!, $sbomId: Uuid!) {
@@ -241,7 +242,7 @@ const CompLinks = ({ data }) => {
           title={'Add Link'}
           isDisabled={isInvalid}
           onClick={alert ? handleLinkAdd : handleSubmit}
-          icon={<FaPlus />}
+          icon={<LuCirclePlus size={18} />}
         />
         <Divider />
         {/* TABLE */}

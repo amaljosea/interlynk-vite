@@ -37,6 +37,7 @@ import {
 
 import { FaTimes } from 'react-icons/fa'
 import { FaPenToSquare } from 'react-icons/fa6'
+import { LuCheck, LuX } from 'react-icons/lu'
 
 const VexModal = ({
   vulnId,
@@ -361,7 +362,7 @@ const VexModal = ({
             <IconButton
               size='xs'
               colorScheme={stagOne}
-              icon={<CheckIcon />}
+              icon={<LuCheck size={18} />}
               isRound={true}
             />
             <Box w={'1px'} h={10} bg={headingTextSecondary} />
@@ -369,7 +370,9 @@ const VexModal = ({
               size='xs'
               isRound={true}
               colorScheme={stagTwo}
-              icon={stagTwo === 'red' ? <FaTimes /> : <CheckIcon />}
+              icon={
+                stagTwo === 'red' ? <LuX size={18} /> : <LuCheck size={18} />
+              }
             />
             <Box
               w={'1px'}
@@ -379,7 +382,7 @@ const VexModal = ({
             />
             <IconButton
               size='xs'
-              icon={<CheckIcon />}
+              icon={<LuCheck size={18} />}
               isRound={true}
               colorScheme={stagThree}
               hidden={!statusTitle || statusName === 'Fixed'}
@@ -395,7 +398,9 @@ const VexModal = ({
               isRound={true}
               colorScheme={stagCustom}
               hidden={!statusTitle || nodes?.length === 0}
-              icon={stagCustom === 'red' ? <FaTimes /> : <CheckIcon />}
+              icon={
+                stagCustom === 'red' ? <LuX size={18} /> : <LuCheck size={18} />
+              }
             />
           </Stack>
         </GridItem>

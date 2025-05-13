@@ -55,46 +55,39 @@ const SbomProcess = ({ hasFinished }) => {
       <SettingsTag
         label={`Imported Successfully`}
         icon={<LuDownload size={14} />}
-        rounded
       />
       <Divider width={3} borderColor={sameSecondaryText} />
       <SettingsTag
         label={`Checks ${checksEnabled ? 'Completed' : 'Skipped'}`}
         icon={<LuSearch size={14} />}
         isDisabled={!checksEnabled}
-        rounded
       />
       <Divider width={3} borderColor={sameSecondaryText} />
       <SettingsTag
         label={`Internal Labeling ${internalComp ? 'Completed' : 'Skipped'}`}
         icon={<LuTag size={14} />}
         isDisabled={!internalComp}
-        rounded
       />
       <Divider width={3} borderColor={sameSecondaryText} />
       <SettingsTag
         label={`Auto Archive ${!enableAutoArchive ? 'Disabled' : hasFinished ? 'Completed' : 'Skipped'}`}
         icon={<LuArchive size={14} />}
         isDisabled={!enableAutoArchive}
-        rounded
       />
       <Divider width={3} borderColor={sameSecondaryText} />
       <SettingsTag
         label={`Automation ${automatedFixesEnabled ? 'Completed' : 'Skipped'}`}
         icon={<LuBot size={14} />}
         isDisabled={!automatedFixesEnabled}
-        rounded
       />
       <Divider width={3} borderColor={sameSecondaryText} />
       <SettingsTag
         label={`Vulnerability Scan ${!vulnScan ? 'Disabled' : hasFinished ? 'Completed' : 'Pending'}`}
         icon={<LuBug size={14} />}
         isDisabled={!hasFinished || !vulnScan}
-        rounded
       />
       <Divider width={3} hidden={isFreeTier} borderColor={sameSecondaryText} />
       <SettingsTag
-        rounded
         hidden={isFreeTier}
         label={`Component Support Analysis ${!enableSupportLevel ? 'Disabled' : hasFinished ? 'Completed' : 'Skipped'}`}
         icon={<LuActivity size={14} />}
@@ -105,7 +98,6 @@ const SbomProcess = ({ hasFinished }) => {
         label={`SBOM ${!isSbomPending ? 'Ready' : 'not ready'}`}
         icon={<LuCheck size={14} />}
         isDisabled={isSbomPending}
-        rounded
       />
     </Flex>
   )

@@ -27,6 +27,8 @@ const GetProjectGroupsWithVulnerability = gql`
         before: $before
         first: $first
         last: $last
+        vulnerabilityId: $vulnId
+        environment: $environment
       ) {
         totalCount
         pageInfo {
@@ -39,13 +41,6 @@ const GetProjectGroupsWithVulnerability = gql`
           id
           name
           updatedAt
-          projects(vulnerabilityId: $vulnId, environment: $environment) {
-            id
-            name
-            description
-            enabled
-            updatedAt
-          }
         }
       }
     }
@@ -66,10 +61,6 @@ const VulnProductsDrawer = ({ isOpen, onClose, data }) => {
       selector: 'organization.projectGroups'
     }
   )
-
-  const filteredNodes = useMemo(() => {
-    return nodes?.filter((group) => group?.projects?.length > 0)
-  }, [nodes])
 
   const columns = [
     // PRODUCTS
@@ -115,13 +106,10 @@ const VulnProductsDrawer = ({ isOpen, onClose, data }) => {
       <LynkTable
         columns={columns}
         progressPending={loading}
-        data={filteredNodes}
+        data={nodes}
         className='data-table-container'
       />
-      <Pagination
-        {...paginationProps}
-        totalCount={filteredNodes?.length || 0}
-      />
+      <Pagination {...paginationProps} />
     </LynkDrawer>
   )
 }

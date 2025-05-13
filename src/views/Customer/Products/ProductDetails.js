@@ -18,6 +18,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { ShareLynkProjectGroup } from 'graphQL/Queries'
 
 import { FaLock, FaWindowMaximize } from 'react-icons/fa6'
+import { LuLock } from 'react-icons/lu'
 
 const ProductDetails = () => {
   const params = useParams()
@@ -156,7 +157,8 @@ const ProductDetails = () => {
                   isDisabled={item === 'versions' ? false : true}
                 >
                   {item !== 'versions' && (
-                    <FaLock
+                    <LuLock
+                      size={18}
                       color={secondaryTextInverse}
                       style={{ marginRight: '6px' }}
                     />

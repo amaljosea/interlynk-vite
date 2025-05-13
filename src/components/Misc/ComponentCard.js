@@ -23,6 +23,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { BiLayer } from 'react-icons/bi'
 import { FaCube } from 'react-icons/fa6'
+import { LuComponent } from 'react-icons/lu'
 import { PiTreeStructure } from 'react-icons/pi'
 
 export const GetComponentData = gql`
@@ -147,7 +148,11 @@ const ComponentCard = ({ value, isOpen, onClose }) => {
       ) : (
         <Stack spacing={6}>
           <Flex alignItems={'center'} gap={3}>
-            <IconButton size='sm' colorScheme='blue' icon={<FaCube />} />
+            <IconButton
+              size='sm'
+              colorScheme='blue'
+              icon={<LuComponent size={20} />}
+            />
             <Text
               fontSize={17}
               lineHeight={'5'}

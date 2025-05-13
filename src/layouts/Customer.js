@@ -18,6 +18,7 @@ import { useRoutes } from 'hooks/useRoutes'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6'
+import { LuArrowLeft, LuArrowRight } from 'react-icons/lu'
 
 // Custom components
 import { getActiveNavbar, getActiveRoute, isMobileOrTablet } from '../utils'
@@ -317,12 +318,20 @@ export default function Customer() {
             Done
           </Text>
         ) : (
-          <FaArrowRight cursor={'pointer'} onClick={() => onClickNext(props)} />
+          <LuArrowRight
+            size={18}
+            cursor={'pointer'}
+            onClick={() => onClickNext(props)}
+          />
         )
       }
       prevButton={(props) =>
         sbomId && props?.currentStep === 3 ? null : (
-          <FaArrowLeft cursor={'pointer'} onClick={() => onClickPrev(props)} />
+          <LuArrowLeft
+            size={18}
+            cursor={'pointer'}
+            onClick={() => onClickPrev(props)}
+          />
         )
       }
       onClickClose={(value) => onTourUpdate(value)}

@@ -15,6 +15,7 @@ import { useHasPermission } from 'hooks/useHasPermission'
 
 import { FaPlus } from 'react-icons/fa6'
 import { IoSettingsOutline } from 'react-icons/io5'
+import { LuCirclePlus } from 'react-icons/lu'
 
 const options = [
   { value: 'All', label: 'All' },
@@ -348,7 +349,7 @@ const ConfigModal = ({
             colorScheme='blue'
             variant='link'
             fontWeight={'medium'}
-            leftIcon={<FaPlus />}
+            leftIcon={<LuCirclePlus size={18} />}
           >
             Add New
           </Button>
