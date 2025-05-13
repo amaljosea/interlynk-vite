@@ -4,6 +4,8 @@ import { format as formatWithTZ, toZonedTime } from 'date-fns-tz'
 import { PackageURL } from 'packageurl-js'
 import { sbomOrigin } from 'variables/general'
 
+export const partsInfoTabs = ['components', 'vulnerabilities', 'support']
+
 export const csvToJson = (csvContent) => {
   const rows = csvContent.trim().split('\n')
   const headers = rows[0].split(',')
