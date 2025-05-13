@@ -78,7 +78,7 @@ const ConfigModal = ({
         break
       case 'Teams Configuration':
         isInvalidTeamURL &&
-          setErrorMessage('Please enter a  team webhook address')
+          setErrorMessage('Please enter a valid team webhook address')
         break
       default:
         setErrorMessage('')
