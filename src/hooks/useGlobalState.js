@@ -215,7 +215,7 @@ const GlobalStateProvider = ({ children }) => {
   // COMPONENT SUPPORT
   const [supportState, supportDispatch] = useReducer(supportReducer, {
     level: [],
-    include: [],
+    include: ['parts'],
     field: 'COMPONENT_SUPPORT_LEVELS_UPDATED_AT',
     direction: 'ASC',
     searchInput: ''

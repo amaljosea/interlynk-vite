@@ -20,7 +20,6 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaEllipsisV } from 'react-icons/fa'
 import { LuEllipsisVertical } from 'react-icons/lu'
 
 const SupportColumns = ({ action }) => {
