@@ -95,7 +95,7 @@ const ComponentPart = () => {
         <Stack w={'100%'}>
           <Flex
             gap={2}
-            flexDir={sbomParts?.length > 0 ? 'row' : 'column'}
+            flexDir={sbomParts?.length > 0 && !hidden ? 'row' : 'column'}
             justify='space-between'
           >
             <HStack spacing='3'>
@@ -103,7 +103,7 @@ const ComponentPart = () => {
               <Text fontWeight='bold'>Components</Text>
             </HStack>
             <Text
-              pl={sbomParts?.length > 0 ? 0 : 8}
+              pl={sbomParts?.length > 0 && !hidden ? 0 : 9}
               fontWeight='bold'
               fontSize='lg'
             >
