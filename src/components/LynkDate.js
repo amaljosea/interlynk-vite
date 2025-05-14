@@ -11,14 +11,14 @@ const LynkDate = (props) => {
   // const params = useParams()
   const { colorMode } = useColorMode()
   const [focus, setFocus] = useState(false)
-  const { primaryBlueBorder, grayBorderColor } = useThemeColor([
-    'primaryBlueBorder',
+  const { primaryBlueText, grayBorderColor } = useThemeColor([
+    'primaryBlueText',
     'grayBorderColor'
   ])
   // ${params?.sbomid && 'picker_top'}
   const react_datatime = `${colorMode === 'light' ? 'light_picker' : 'dark_picker'}`
   const border = focus
-    ? `2px solid ${primaryBlueBorder}`
+    ? `2px solid ${primaryBlueText}`
     : `1px solid ${grayBorderColor}`
 
   return (
@@ -36,8 +36,9 @@ const LynkDate = (props) => {
         onCopy: (e) => e.preventDefault(),
         onPaste: (e) => e.preventDefault(),
         style: {
-          border: border,
-          outline: 'none',
+          marginTop: '0.5px',
+          border: 'none',
+          outline: border,
           fontSize: '14px',
           boxShadow: 'none',
           background: 'none'
