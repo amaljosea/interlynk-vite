@@ -1,16 +1,15 @@
 /* eslint-disable */
-import {
-  CheckCircleIcon,
-  CloseIcon,
-  InfoIcon,
-  WarningTwoIcon
-} from '@chakra-ui/icons'
 // only allowed to import useToast here
 // eslint-disable-next-line no-restricted-imports
-import { Box, Button, Flex, Icon, Text, useToast } from '@chakra-ui/react'
+import { Box, Button, Flex, Text, useToast } from '@chakra-ui/react'
 
-import { FaCircleXmark } from 'react-icons/fa6'
-import { LuCircleX } from 'react-icons/lu'
+import {
+  LuCircleAlert,
+  LuCircleCheck,
+  LuCircleX,
+  LuInfo,
+  LuX
+} from 'react-icons/lu'
 
 const ICON_COLORS = {
   success: '#38A169',
@@ -34,14 +33,10 @@ const TITLE = {
 }
 
 const ICON_COMPONENTS = {
-  success: <CheckCircleIcon color={ICON_COLORS.success} fontSize='20px' />,
-  error: (
-    <Icon>
-      <LuCircleX color={ICON_COLORS.error} size={2} />
-    </Icon>
-  ),
-  warning: <WarningTwoIcon color={ICON_COLORS.warning} fontSize='20px' />,
-  info: <InfoIcon color={ICON_COLORS.info} fontSize='20px' />
+  success: <LuCircleCheck color={ICON_COLORS.success} size={20} />,
+  error: <LuCircleX color={ICON_COLORS.error} size={20} />,
+  warning: <LuCircleAlert color={ICON_COLORS.warning} size={20} />,
+  info: <LuInfo color={ICON_COLORS.info} size={20} />
 }
 
 const getToastStyles = (status) => ({
@@ -72,7 +67,7 @@ const useCustomToast = () => {
         <Box
           boxSizing='border-box'
           display='flex'
-          alignItems={title && description ? 'baseline' : 'center'}
+          alignItems={title && description ? 'flex-start' : 'center'}
           justifyContent='space-between'
           padding='10px 12px'
           minWidth='500px'
@@ -102,12 +97,13 @@ const useCustomToast = () => {
             </Box>
           </Flex>
           <Button
+            size={'xs'}
             variant='link'
             title='Close toast'
             color={'#1A202C99'}
             onClick={() => toast.closeAll()}
           >
-            <CloseIcon fontSize='11px' />
+            <LuX size={18} />
           </Button>
         </Box>
       )

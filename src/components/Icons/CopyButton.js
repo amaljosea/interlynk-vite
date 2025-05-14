@@ -2,7 +2,7 @@ import React from 'react'
 
 import { IconButton } from '@chakra-ui/react'
 
-import { LuCircleCheck, LuCopy } from 'react-icons/lu'
+import { LuCheck, LuCopy } from 'react-icons/lu'
 
 const CopyButton = ({
   isDisabled,
@@ -19,7 +19,7 @@ const CopyButton = ({
       isDisabled={isDisabled}
       onClick={onCopy}
       colorScheme={hasCopied ? colorScheme.copied : colorScheme.default}
-      icon={hasCopied ? <LuCircleCheck size={18} /> : icon}
+      icon={hasCopied ? <LuCheck size={18} /> : icon}
       {...props}
     />
   )
