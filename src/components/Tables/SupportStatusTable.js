@@ -31,7 +31,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetCompSupportData } from 'graphQL/Queries'
 
-import { FaPen } from 'react-icons/fa6'
+import { LuSquarePen } from 'react-icons/lu'
 
 const SupportStatusTable = () => {
   const params = useParams()
@@ -312,7 +312,7 @@ const SupportStatusTable = () => {
           {!isCustomerView && selectedItems?.length > 0 && (
             <Tooltip label={'Set Status'}>
               <IconButton
-                icon={<FaPen />}
+                icon={<LuSquarePen />}
                 colorScheme='blue'
                 onClick={handleStatus}
               />

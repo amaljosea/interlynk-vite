@@ -43,13 +43,7 @@ import {
   FaTimesCircle,
   FaUpload
 } from 'react-icons/fa'
-import {
-  FaArrowRotateRight,
-  FaArrowsRotate,
-  FaBan,
-  FaToggleOff,
-  FaToggleOn
-} from 'react-icons/fa6'
+import { FaArrowsRotate } from 'react-icons/fa6'
 import {
   FaA,
   FaFileImport,

@@ -2,7 +2,6 @@ import { Box, Heading, Stack } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaCheckCircle } from 'react-icons/fa'
 import { LuCircleCheck } from 'react-icons/lu'
 
 const StepThree = () => {

@@ -9,7 +9,6 @@ import {
 // eslint-disable-next-line no-restricted-imports
 import { Box, Button, Flex, Icon, Text, useToast } from '@chakra-ui/react'
 
-import { FaCircleXmark } from 'react-icons/fa6'
 import { LuCircleX } from 'react-icons/lu'
 
 const ICON_COLORS = {

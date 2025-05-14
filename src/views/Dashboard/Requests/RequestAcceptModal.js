@@ -16,8 +16,8 @@ import { useSelect } from 'hooks/useSelect'
 
 import { RequestAccept } from 'graphQL/Mutation'
 import { GetProductNamesForRequest } from 'graphQL/Queries'
+import { LuCheckCheck } from 'react-icons/lu'
 
-import { FaCheckToSlot } from 'react-icons/fa6'
 
 const RequestAcceptModal = ({ data, isOpen, onClose }) => {
   const { showToast } = useCustomToast()
@@ -103,7 +103,7 @@ const RequestAcceptModal = ({ data, isOpen, onClose }) => {
       buttonText='Accept'
       isLoading={loading}
       onSubmit={handleAccept}
-      Icon={FaCheckToSlot}
+      Icon={LuCheckCheck}
       disabled={projectId === ''}
     >
       <Flex width={'100%'} direction={'column'} gap={4}>

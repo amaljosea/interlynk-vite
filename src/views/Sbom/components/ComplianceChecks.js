@@ -25,7 +25,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { recheckHealth } from 'graphQL/Mutation'
 
-import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
 import { LuCircleCheck, LuCircleX } from 'react-icons/lu'
 
 const sbomCategory = ['Timestamp', 'Supplier Name', 'Unique ID', 'Author']

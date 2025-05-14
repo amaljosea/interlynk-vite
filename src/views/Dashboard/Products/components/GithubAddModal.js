@@ -9,8 +9,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CreateProjectGroup } from 'graphQL/Mutation'
 
-import { FaCodeBranch, FaGithub } from 'react-icons/fa'
-import { LuGitBranch } from 'react-icons/lu'
+import { LuGitBranch, LuGithub } from 'react-icons/lu'
 
 const projects = [
   {
@@ -176,7 +175,7 @@ const GithubAddModal = ({ isOpen, onClose }) => {
       isLoading={buttonLoading}
       disabled={isButtonDisabled}
       onSubmit={handleFinish}
-      Icon={FaGithub}
+      Icon={LuGithub}
     >
       {initialLoading ? (
         <LoadingSkeleton />

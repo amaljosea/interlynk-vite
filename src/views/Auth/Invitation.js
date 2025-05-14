@@ -15,7 +15,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { AcceptInvitation, DeclineInvitation } from 'graphQL/Mutation'
 import { OrgUserInvitationInfo } from 'graphQL/Queries'
 
-import { FaTimesCircle } from 'react-icons/fa'
+import { LuCircleX } from 'react-icons/lu'
 
 const Invitation = () => {
   const { showToast } = useCustomToast()
@@ -119,12 +119,7 @@ const Invitation = () => {
       justifyContent={'center'}
     >
       {isRejected && (
-        <Icon
-          mb={6}
-          color={primaryErrorColor}
-          boxSize={16}
-          as={FaTimesCircle}
-        />
+        <Icon mb={6} color={primaryErrorColor} boxSize={18} as={LuCircleX} />
       )}
       <Text fontSize={'20px'} fontWeight={'semibold'}>
         {isRejected

@@ -29,7 +29,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { GetCompVulnData, GetConnectedSbom } from 'graphQL/Queries'
 
 import { BsCircleHalf } from 'react-icons/bs'
-import { FaPen } from 'react-icons/fa'
 import { LuFolderTree, LuSquarePen } from 'react-icons/lu'
 
 import VexModal from './VexModal'

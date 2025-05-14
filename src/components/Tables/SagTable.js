@@ -8,7 +8,6 @@ import { Badge, Button, Flex, IconButton, Stack, Text } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import LynkTable from 'components/LynkTable'
 
-import { FaEnvelope } from 'react-icons/fa6'
 import { LuMail } from 'react-icons/lu'
 
 const SagTable = ({ data }) => {

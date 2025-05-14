@@ -9,7 +9,7 @@ import LynkModal from 'components/LynkModal'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaCircleInfo } from 'react-icons/fa6'
+import { LuInfo } from 'react-icons/lu'
 
 import InfoTag from './InfoTag'
 
@@ -65,7 +65,7 @@ const PurlCard = ({ value, isOpen, onClose }) => {
       isOpen={isOpen}
       onClose={onClose}
       title={'PURL Details'}
-      Icon={FaCircleInfo}
+      Icon={LuInfo}
       noFooter
     >
       <Stack spacing={1}>

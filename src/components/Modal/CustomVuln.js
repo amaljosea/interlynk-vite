@@ -33,7 +33,7 @@ import {
   GetTotalComponents
 } from 'graphQL/Queries'
 
-import { FaBug } from 'react-icons/fa6'
+import { LuBug } from 'react-icons/lu'
 
 const CustomVuln = ({ isOpen, onClose }) => {
   const params = useParams()
@@ -229,7 +229,7 @@ const CustomVuln = ({ isOpen, onClose }) => {
 
   return (
     <LynkModal
-      Icon={FaBug}
+      Icon={LuBug}
       isOpen={isOpen}
       onClose={onClose}
       buttonText={'Save'}

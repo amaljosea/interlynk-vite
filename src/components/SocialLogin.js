@@ -1,7 +1,7 @@
 import { Button, ButtonGroup } from '@chakra-ui/react'
 
-import { FaGithub } from 'react-icons/fa6'
 import { FcGoogle } from 'react-icons/fc'
+import { LuGithub } from 'react-icons/lu'
 
 const SocialLogin = () => {
   const serverURL = process.env.REACT_APP_SERVER
@@ -69,7 +69,7 @@ const SocialLogin = () => {
         title='Github'
         variant='outline'
         colorScheme='blue'
-        leftIcon={<FaGithub />}
+        leftIcon={<LuGithub />}
         onClick={() => onAuth('github')}
       >
         Github

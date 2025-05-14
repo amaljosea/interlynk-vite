@@ -11,8 +11,7 @@ import LynkSelect from 'components/LynkSelect'
 import useCustomToast from 'hooks/useCustomToast'
 
 import { GetCustomFields } from 'graphQL/Queries'
-
-import { FaRegPenToSquare } from 'react-icons/fa6'
+import { LuSquarePen } from 'react-icons/lu'
 
 const CreateField = gql`
   mutation CreateField(
@@ -190,7 +189,7 @@ const FieldModal = ({ data, isOpen, onClose }) => {
       isOpen={isOpen}
       onClose={onClose}
       disabled={isInvalid}
-      Icon={FaRegPenToSquare}
+      Icon={LuSquarePen}
       isLoading={crLoading || upLoading}
       buttonText={data?.id ? 'Update' : 'Save'}
       onSubmit={data?.id ? handleUpdate : handleCreate}

@@ -16,9 +16,8 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { sbomUpdate } from 'graphQL/Mutation'
 
-import { FaScaleBalanced } from 'react-icons/fa6'
-
 import ConfirmationModal from '../../components/ConfirmationModal'
+import { LuScale } from 'react-icons/lu'
 
 const License = ({ data, permission }) => {
   const { isCustomerView } = useRouteFlags()
@@ -138,7 +137,7 @@ const License = ({ data, permission }) => {
       {LICENSE?.isOpen && (
         <LynkModal
           isLoading={loading}
-          Icon={FaScaleBalanced}
+          Icon={LuScale}
           isOpen={LICENSE?.isOpen}
           onClose={LICENSE?.onClose}
           onSubmit={onUpdateLicense}
