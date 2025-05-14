@@ -55,7 +55,7 @@ const Support = () => {
   })
 
   const { supportState, dispatch } = useGlobalState()
-  const { level, include, field, direction, searchInput } = supportState
+  const { level, exclude, field, direction, searchInput } = supportState
   const { supportDispatch } = dispatch
 
   const [activeRow, setActiveRow] = useState(null)
@@ -73,9 +73,9 @@ const Support = () => {
       supportLevel: getUndefinedIfEmptyOrAll(level),
       search: searchInput !== '' ? searchInput : undefined,
       orderBy: isSortable ? { field, direction } : undefined,
-      includeParts: include?.includes('parts') ? true : undefined
+      includeParts: exclude?.includes('parts') ? undefined : true
     }
-  }, [direction, field, include, isSortable, level, searchInput])
+  }, [direction, field, exclude, isSortable, level, searchInput])
 
   const { data: settings } = useQuery(GetSupportSettings, {
     variables: { id: params?.productid },

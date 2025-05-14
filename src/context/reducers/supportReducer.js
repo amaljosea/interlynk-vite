@@ -1,7 +1,7 @@
 const supportReducer = (state, action) => {
   const { type, payload } = action
   switch (type) {
-    case 'CLEAR_GLOBAL_VULN':
+    case 'CLEAR_COMP_SUPPORT':
       return {
         ...state,
         level: [],
@@ -30,10 +30,10 @@ const supportReducer = (state, action) => {
         ...state,
         level: [...payload]?.includes('all') ? [] : payload
       }
-    case 'FILTER_INCLUDE':
+    case 'FILTER_EXCLUDE':
       return {
         ...state,
-        include: payload
+        exclude: payload
       }
     default:
       return state

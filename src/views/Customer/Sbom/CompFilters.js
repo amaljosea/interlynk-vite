@@ -72,7 +72,7 @@ const CompFilters = ({ reset }) => {
   const params = useParams()
   const sbomId = params?.sbomid
   const { prodCompState, dispatch } = useGlobalState()
-  const { ecosystems, kinds, licenses, suppliers, scope, direct, include } =
+  const { ecosystems, kinds, licenses, suppliers, scope, direct, exclude } =
     prodCompState
   const { prodCompDispatch } = dispatch
 
@@ -99,8 +99,8 @@ const CompFilters = ({ reset }) => {
     reset()
   }
 
-  const onFilterInclude = (value) => {
-    prodCompDispatch({ type: 'FILTER_INCLUDE', payload: value })
+  const onFilterExclude = (value) => {
+    prodCompDispatch({ type: 'FILTER_EXCLUDE', payload: value })
     reset()
   }
 
@@ -259,12 +259,12 @@ const CompFilters = ({ reset }) => {
       {/* INCLUDE */}
       <Box width={'fit-content'}>
         <Menu closeOnSelect={false}>
-          <MenuHeading title={'Include'} active={include.length !== 0} />
+          <MenuHeading title={'Include'} active={exclude.length !== 0} />
           <MenuList fontSize={'sm'}>
             <MenuOptionGroup
               type='checkbox'
-              value={include}
-              onChange={onFilterInclude}
+              value={exclude}
+              onChange={onFilterExclude}
             >
               <MenuItemOption value={'parts'} fontSize={'sm'}>
                 Parts
