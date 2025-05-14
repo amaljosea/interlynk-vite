@@ -93,7 +93,6 @@ const ProductsOverview = () => {
 
   const onFilterSev = (value, link) => {
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
-    prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
     navigate(link)
   }
 

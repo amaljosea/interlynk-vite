@@ -88,7 +88,6 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
   const [selectedColumns, setSelectedColumns] = useState([])
   const [availableColumns, setAvailableColumns] = useState([])
   const [applyFilters, setApplyFilters] = useState(true)
-  const [partsFilter, setPartsFilter] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   const searchFilters = applyFilters ? filters : {}
@@ -96,8 +95,7 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
   const queryInfo = useExportCsvQueryInfo(
     tableType,
     rowsToExport,
-    searchFilters,
-    partsFilter
+    searchFilters
   )
 
   const { sbomHookData } = useGlobalQueryContext()
@@ -320,18 +318,6 @@ const ExportCsvModal = ({ isOpen, onClose, tableType, filters }) => {
             >
               <Text fontSize='14px' fontWeight='500' color={primaryTextColor}>
                 Apply search and filters
-              </Text>
-            </Checkbox>
-          )}
-          {tableType === 'Support Status View' && filters?.includeParts && (
-            <Checkbox
-              size='md'
-              colorScheme='blue'
-              isChecked={partsFilter}
-              onChange={() => setPartsFilter(!partsFilter)}
-            >
-              <Text fontSize='14px' fontWeight='500' color={primaryTextColor}>
-                Part
               </Text>
             </Checkbox>
           )}

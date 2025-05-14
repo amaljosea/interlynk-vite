@@ -208,7 +208,6 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
       .then((res) => {
         if (res.data) {
           prodVulnDispatch({ type: 'FILTER_SOURCE', payload: true })
-          prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
         }
       })
       .finally(() => {

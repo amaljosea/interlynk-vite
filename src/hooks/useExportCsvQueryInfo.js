@@ -14,12 +14,7 @@ import {
 import { useGlobalState } from './useGlobalState'
 import useQueryParam from './useQueryParam'
 
-const useExportCsvQueryInfo = (
-  tableType,
-  rowsToExport,
-  searchFilters,
-  partsFilter
-) => {
+const useExportCsvQueryInfo = (tableType, rowsToExport, searchFilters) => {
   const params = useParams()
   const activetab = useQueryParam('tab')
   const { organization } = useGlobalState()
@@ -110,8 +105,7 @@ const useExportCsvQueryInfo = (
             sbomId,
             projectId: productId,
             first: parseInt(rowsToExport, 10) || 0,
-            ...searchFilters,
-            includeParts: partsFilter ? true : undefined
+            ...searchFilters
           },
           skip: !sbomId,
           selector: 'componentSupportLevel.nodes',
@@ -138,7 +132,6 @@ const useExportCsvQueryInfo = (
     searchFilters,
     vulnId,
     productGroupId,
-    partsFilter,
     organization,
     activetab
   ])

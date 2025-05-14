@@ -151,11 +151,7 @@ const VersionsTable = (props) => {
   })
 
   const onFilterSev = async (value, id, link) => {
-    const selectedSBOM = nodes?.find((item) => item?.id === id)
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
-    if (selectedSBOM?.sbomParts?.length > 0) {
-      prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
-    }
     navigate(link)
   }
 

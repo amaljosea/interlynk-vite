@@ -84,7 +84,6 @@ const Parts = ({ data }) => {
   const onFilterSev = (part, value, link) => {
     prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
-    prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
     onSelectPart(part)
     navigate(link)
   }

@@ -150,7 +150,7 @@ const GlobalStateProvider = ({ children }) => {
     isCpeValid: true,
     expandedRows: [],
     purlString: '',
-    include: ['parts'],
+    exclude: [],
     selectedComp: null
   })
   const [prodVulnState, prodVulnDispatch] = useReducer(prodVulnReducer, {
@@ -164,7 +164,7 @@ const GlobalStateProvider = ({ children }) => {
     severities: [],
     components: [],
     statues: [],
-    include: ['parts', 'retracted'],
+    exclude: [],
     source: false,
     kev: '',
     epss: '',
@@ -215,7 +215,7 @@ const GlobalStateProvider = ({ children }) => {
   // COMPONENT SUPPORT
   const [supportState, supportDispatch] = useReducer(supportReducer, {
     level: [],
-    include: ['parts'],
+    exclude: [],
     field: 'COMPONENT_SUPPORT_LEVELS_UPDATED_AT',
     direction: 'ASC',
     searchInput: ''

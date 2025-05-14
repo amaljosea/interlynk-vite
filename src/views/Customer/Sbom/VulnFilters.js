@@ -27,7 +27,7 @@ const VulnFilters = ({ reset }) => {
     severities,
     components,
     statues,
-    include,
+    exclude,
     kev,
     epss,
     filters,
@@ -93,8 +93,8 @@ const VulnFilters = ({ reset }) => {
     reset()
   }
 
-  const onFilterInclude = (value) => {
-    prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: value })
+  const onFilterExclude = (value) => {
+    prodVulnDispatch({ type: 'FILTER_EXCLUDE', payload: value })
     reset()
   }
 
@@ -334,12 +334,12 @@ const VulnFilters = ({ reset }) => {
       </Menu>
       {/* INCLUDE */}
       <Menu closeOnSelect={false}>
-        <MenuHeading title={'Include'} active={include.length !== 0} />
+        <MenuHeading title={'Include'} active={exclude.length !== 0} />
         <MenuList fontSize={'sm'}>
           <MenuOptionGroup
             type='checkbox'
-            value={include}
-            onChange={onFilterInclude}
+            value={exclude}
+            onChange={onFilterExclude}
           >
             {['parts', 'retracted'].map((item, index) => (
               <MenuItemOption

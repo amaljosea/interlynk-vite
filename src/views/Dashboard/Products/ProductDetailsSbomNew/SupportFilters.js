@@ -14,7 +14,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 
 const SupportFilters = ({ reset }) => {
   const { supportState, dispatch } = useGlobalState()
-  const { level, include } = supportState
+  const { level, exclude } = supportState
   const { supportDispatch } = dispatch
 
   const onFilterSupport = (value) => {
@@ -22,8 +22,8 @@ const SupportFilters = ({ reset }) => {
     reset()
   }
 
-  const onFilterInclude = (value) => {
-    supportDispatch({ type: 'FILTER_INCLUDE', payload: value })
+  const onFilterExclude = (value) => {
+    supportDispatch({ type: 'FILTER_EXCLUDE', payload: value })
     reset()
   }
 
@@ -59,12 +59,12 @@ const SupportFilters = ({ reset }) => {
         </MenuList>
       </Menu>
       <Menu closeOnSelect={false}>
-        <MenuHeading title={'Exclude'} active={include?.length !== 0} />
+        <MenuHeading title={'Exclude'} active={exclude?.length !== 0} />
         <MenuList fontSize={'sm'}>
           <MenuOptionGroup
             type='checkbox'
-            value={include}
-            onChange={onFilterInclude}
+            value={exclude}
+            onChange={onFilterExclude}
           >
             <MenuItemOption value={'parts'} fontSize={'sm'}>
               Parts
