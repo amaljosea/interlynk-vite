@@ -539,6 +539,7 @@ export const UpdateComponent = gql`
     $scope: String
     $supportLevel: ComponentSupportLevelEnum
     $endOfSupport: DateOrEmptyString
+    $notice: String
   ) {
     componentUpdate(
       input: {
@@ -559,11 +560,13 @@ export const UpdateComponent = gql`
         supportLevel: $supportLevel
         endOfSupport: $endOfSupport
         generateUniqueId: $uniqueId
+        notice: $notice
       }
     ) {
       component {
         id
         name
+        notice
         copyright
         version
         primary

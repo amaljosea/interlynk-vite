@@ -7,6 +7,7 @@ import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationM
 
 import { Flex, IconButton, Tooltip, useDisclosure } from '@chakra-ui/react'
 
+import AttributionReportsDrawer from 'components/Drawer/AttributionReport/AttributionReportsDrawer'
 import SystemLogs from 'components/Drawer/SystemLogs'
 import DeleteButton from 'components/Icons/DeleteButton'
 import EditButton from 'components/Icons/EditButton'
@@ -31,6 +32,7 @@ import {
 } from 'graphQL/Queries'
 
 import { LuCircleCheckBig } from 'react-icons/lu'
+import { MdAssignment } from 'react-icons/md'
 
 import CheckModal from './CheckModal'
 import CopyModal from './CopyModal'
@@ -67,6 +69,7 @@ const SbomActions = ({ sbom }) => {
   const PRIMARY = useDisclosure()
   const VERIFY = useDisclosure()
   const DELETE = useDisclosure()
+  const ATTRIBUTION = useDisclosure()
 
   const [status, setStatus] = useState('created')
   const [checks, setChecks] = useState(false)
@@ -232,6 +235,15 @@ const SbomActions = ({ sbom }) => {
             display={signedUrlParams || isFreeTier ? 'none' : 'flex'}
           />
         </Tooltip>
+        {/* Create Attribution Reports */}
+        <Tooltip label='Create Attribution Reports'>
+          <IconButton
+            colorScheme='blue'
+            icon={<MdAssignment size={18} />}
+            onClick={ATTRIBUTION.onOpen}
+            display={signedUrlParams ? 'none' : 'flex'}
+          />
+        </Tooltip>
         {/* DELETE SBOM */}
         <DeleteButton
           variant={'solid'}
@@ -309,6 +321,14 @@ const SbomActions = ({ sbom }) => {
             'Remove this versions and its SBOM',
             'Remove access to this version for all users'
           ]}
+        />
+      )}
+
+      {/* Attribution Reports Drawer */}
+      {ATTRIBUTION.isOpen && (
+        <AttributionReportsDrawer
+          isOpen={ATTRIBUTION.isOpen}
+          onClose={ATTRIBUTION.onClose}
         />
       )}
     </>
