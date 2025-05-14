@@ -1,8 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { getFullDate, timeSince } from 'utils'
-import { truncatedValue } from 'utils'
+import { getFullDate, timeSince, truncatedValue } from 'utils'
 
 import {
   Flex,
@@ -26,13 +25,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetShareProductData } from 'graphQL/Queries'
 
-import {
-  FaAngleLeft,
-  FaBalanceScale,
-  FaBug,
-  FaCube,
-  FaCubes
-} from 'react-icons/fa'
+import { FaBalanceScale, FaBug, FaCube, FaCubes } from 'react-icons/fa'
 import { LuCircleArrowLeft } from 'react-icons/lu'
 
 const SbomDetails = () => {

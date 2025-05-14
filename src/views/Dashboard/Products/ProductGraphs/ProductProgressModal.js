@@ -17,7 +17,6 @@ import LynkDrawer from 'components/LynkDrawer'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaCode, FaDesktop, FaInbox } from 'react-icons/fa6'
 import { LuFilter, LuInbox, LuPackage, LuShapes } from 'react-icons/lu'
 
 import { defaultData } from './ProductProgressData'

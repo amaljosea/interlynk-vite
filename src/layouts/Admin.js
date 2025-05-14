@@ -27,7 +27,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetOrganization } from 'graphQL/Queries'
 
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6'
 import { LuArrowLeft, LuArrowRight } from 'react-icons/lu'
 
 import { getActiveNavbar, getActiveRoute, isMobileOrTablet } from '../utils'

@@ -17,7 +17,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ShareLynkProjectGroup } from 'graphQL/Queries'
 
-import { FaLock, FaWindowMaximize } from 'react-icons/fa6'
+import { FaWindowMaximize } from 'react-icons/fa6'
 import { LuLock } from 'react-icons/lu'
 
 const ProductDetails = () => {

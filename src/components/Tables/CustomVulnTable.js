@@ -33,7 +33,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { CustomVulnDelete } from 'graphQL/Mutation'
 import { GetCustomVulns } from 'graphQL/Queries'
 
-import { FaPlus } from 'react-icons/fa6'
 import { LuCirclePlus } from 'react-icons/lu'
 
 const CustomVulnTable = () => {

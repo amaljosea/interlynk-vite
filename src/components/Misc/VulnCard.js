@@ -8,8 +8,7 @@ import LynkModal from 'components/LynkModal'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaBug, FaCircleInfo } from 'react-icons/fa6'
-import { LuBug } from 'react-icons/lu'
+import { LuBug, LuInfo } from 'react-icons/lu'
 
 export const GetVulnData = gql`
   query GetVulnData(
@@ -83,7 +82,7 @@ const VulnCard = ({ value, isOpen, onClose }) => {
       isOpen={isOpen}
       onClose={onClose}
       title={'Vulnerability Details'}
-      Icon={FaCircleInfo}
+      Icon={LuInfo}
       noFooter
     >
       {loading ? (

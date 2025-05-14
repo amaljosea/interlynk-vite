@@ -32,9 +32,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetActivities } from 'graphQL/Queries'
 
-import { FaRegCalendar, FaRegClock } from 'react-icons/fa6'
-import { LuCalendar, LuClock } from 'react-icons/lu'
-import { MdCheckCircle, MdSettings } from 'react-icons/md'
+import { LuCalendar, LuCircleCheck, LuClock, LuSettings } from 'react-icons/lu'
 
 const runType = {
   vuln_scan: 'Vulnerability Scan',
@@ -159,18 +157,18 @@ const ExpandedComponent = ({ data }) => {
   return (
     <List spacing={2} fontSize={'xs'} color={headingTextColor}>
       <ListItem>
-        <ListIcon as={MdSettings} color={sameSecondaryText} />
+        <ListIcon as={LuSettings} color={sameSecondaryText} />
         Started at {data?.startTime ? getFullDateTime(data?.startTime) : ''}
       </ListItem>
       {sbomActivityDetails?.map((item, index) => (
         <ListItem key={index}>
-          <ListIcon as={MdSettings} color={sameSecondaryText} />
+          <ListIcon as={LuSettings} color={sameSecondaryText} />
           {`[${item?.subject?.name}:${item?.subject?.version}]`} {'>'}{' '}
           {setAction(item?.action, item?.subject)} {'>'} {item?.result}
         </ListItem>
       ))}
       <ListItem hidden={!data?.endTime}>
-        <ListIcon as={MdSettings} color={sameSecondaryText} />
+        <ListIcon as={LuSettings} color={sameSecondaryText} />
         Ended at {data?.endTime ? getFullDateTime(data?.endTime) : ''}
       </ListItem>
     </List>
@@ -188,7 +186,7 @@ const LogInfo = ({ row }) => {
   return (
     <Flex gap={2} alignItems={'flex-start'} my={3}>
       {row?.endTime ? (
-        <MdCheckCircle fontSize={20} color={primarySuccessColor} />
+        <LuCircleCheck size={20} color={primarySuccessColor} />
       ) : (
         <Spinner size='sm' mt={1} />
       )}

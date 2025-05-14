@@ -24,8 +24,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UpdateCompLinks } from 'graphQL/Mutation'
 
-import { FaPlus } from 'react-icons/fa6'
-
 import ActionButton from './ActionButton'
 import { LuCirclePlus } from 'react-icons/lu'
 
