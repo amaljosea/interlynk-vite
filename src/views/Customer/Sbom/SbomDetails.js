@@ -25,8 +25,13 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetShareProductData } from 'graphQL/Queries'
 
-import { FaBalanceScale, FaBug, FaCube, FaCubes } from 'react-icons/fa'
-import { LuCircleArrowLeft } from 'react-icons/lu'
+import {
+  LuBug,
+  LuCircleArrowLeft,
+  LuComponent,
+  LuPackage,
+  LuScale
+} from 'react-icons/lu'
 
 const SbomDetails = () => {
   const partsContext = usePartsContext()
@@ -103,7 +108,7 @@ const SbomDetails = () => {
   return (
     <>
       <Flex direction={'row'} alignItems={'flex-start'} gap={5} width={'100%'}>
-        <Icon as={FaCubes} h={'64px'} w={'64px'} color={secondaryBlueText} />
+        <Icon as={LuPackage} h={'64px'} w={'64px'} color={secondaryBlueText} />
         <Flex direction={'column'} gap={0.5}>
           {/* PRODUCT TITLE */}
           <Stack spacing={1} direction={'column'} alignItems={'left'}>
@@ -165,11 +170,9 @@ const SbomDetails = () => {
             {/* COMPONENTS */}
             <Stack direction={'row'} alignItems={'flex-start'} spacing={2}>
               <Icon
-                h={4}
-                w={4}
-                mt={1}
+                fontSize={18}
                 color={secondaryTextInverse}
-                as={FaCube}
+                as={LuComponent}
               />
               <Flex flexDir={'column'} alignItems={'center'}>
                 <Tag
@@ -195,13 +198,7 @@ const SbomDetails = () => {
             </Stack>
             {/* LICENSES */}
             <Stack direction={'row'} alignItems={'flex-start'} spacing={2}>
-              <Icon
-                mt={1}
-                h={'20px'}
-                w={'20px'}
-                color={secondaryTextInverse}
-                as={FaBalanceScale}
-              />
+              <Icon fontSize={18} color={secondaryTextInverse} as={LuScale} />
               <Flex flexDir={'column'} alignItems={'center'}>
                 <Tag
                   cursor={'pointer'}
@@ -226,13 +223,7 @@ const SbomDetails = () => {
             </Stack>
             {/* VULNERABILITIES */}
             <Stack direction={'row'} alignItems={'flex-start'} spacing={2}>
-              <Icon
-                mt={1}
-                h={4}
-                w={4}
-                color={secondaryTextInverse}
-                as={FaBug}
-              />
+              <Icon fontSize={18} color={secondaryTextInverse} as={LuBug} />
               <Flex flexDir={'column'} alignItems={'center'}>
                 <SimpleGrid
                   gap={1}

@@ -17,8 +17,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ShareLynkProjectGroup } from 'graphQL/Queries'
 
-import { FaWindowMaximize } from 'react-icons/fa6'
-import { LuLock } from 'react-icons/lu'
+import { LuBox, LuLock } from 'react-icons/lu'
 
 const ProductDetails = () => {
   const params = useParams()
@@ -119,7 +118,7 @@ const ProductDetails = () => {
                   h={'64px'}
                   w={'64px'}
                   color={secondaryBlueText}
-                  as={FaWindowMaximize}
+                  as={LuBox}
                 />
                 <Flex gap={0.5} direction={'column'}>
                   {/* PRODUCT TITLE */}
