@@ -144,18 +144,9 @@ const Compliance = ({ sbomData }) => {
                 {getTitle(item?.complianceType) || ''}
               </Text>
             </Flex>
-            <Text
-              height={28}
-              fontSize={'14px'}
-              fontWeight={'light'}
-              color={headingTextColor}
-            >
+            <Text height={28} fontSize={'14px'} color={headingTextColor}>
               {getDesc(item?.complianceType) || ''}
-              <chakra.span
-                fontSize={'14px'}
-                fontWeight={'light'}
-                color={headingTextColor}
-              >
+              <chakra.span fontSize={'14px'} color={headingTextColor}>
                 <Link
                   href={getLink(item?.complianceType)}
                   isExternal
