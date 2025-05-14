@@ -1,7 +1,7 @@
 const supportReducer = (state, action) => {
   const { type, payload } = action
   switch (type) {
-    case 'CLEAR_GLOBAL_VULN':
+    case 'CLEAR_COMP_SUPPORT':
       return {
         ...state,
         level: [],

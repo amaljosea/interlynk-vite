@@ -266,7 +266,7 @@ const CompFilters = ({ reset }) => {
       </Menu>
       {/* INCLUDE */}
       <Menu closeOnSelect={false}>
-        <MenuHeading title={'Include'} active={include.length !== 0} />
+        <MenuHeading title={'Exclude'} active={include.length !== 0} />
         <MenuList fontSize={'sm'}>
           <MenuOptionGroup
             type='checkbox'

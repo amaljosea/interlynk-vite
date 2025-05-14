@@ -13,7 +13,7 @@ const prodVulnReducer = (state, action) => {
         severities: [],
         components: [],
         statues: [],
-        include: ['parts'],
+        include: ['parts', 'retracted'],
         source: false,
         kev: '',
         epss: '',
@@ -150,7 +150,7 @@ const prodVulnReducer = (state, action) => {
     case 'FILTER_INCLUDE':
       return {
         ...state,
-        include: [...payload]?.includes('all') ? [] : payload,
+        include: payload,
         source: [...payload]?.includes('parts') ? true : false,
         retracted: [...payload]?.includes('retracted') ? true : false,
         pageIndex: 1,

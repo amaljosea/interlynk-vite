@@ -49,12 +49,6 @@ const Vulnerabilities = ({ sbomData }) => {
   const [activeRow, setActiveRow] = useState(null)
   const [vulnSearch, setVulnSearch] = useState(searchInput)
 
-  useEffect(() => {
-    if (sbomData?.sbom?.sbomParts?.length > 0) {
-      prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
-    }
-  }, [prodVulnDispatch, sbomData?.sbom?.sbomParts?.length])
-
   /*   getEpssRangeArray */
   const epssRange = parseEpssRange(epss)
 

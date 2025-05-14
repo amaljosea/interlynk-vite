@@ -26,22 +26,12 @@ const ProductDetailsSbomNew = () => {
   const sbomId = params.sbomid
   const activeTour = localStorage.getItem('activeTour')
 
-  const { dispatch } = useGlobalState()
-  const { prodVulnDispatch } = dispatch
-
   const { setIsOpen, setCurrentStep } = useTour()
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
   const { data, loading, error, startPolling, stopPolling } = useQuery(
     GetProductData,
-    {
-      variables: { projectId: productId, sbomId: sbomId },
-      onCompleted: (data) => {
-        if (data?.sbom?.sbomParts?.length > 0) {
-          prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
-        }
-      }
-    }
+    { variables: { projectId: productId, sbomId: sbomId } }
   )
 
   const { vulnRunStatus } = data?.sbom || {}
