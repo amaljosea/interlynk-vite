@@ -11,7 +11,7 @@ const VulnBadge = ({ color, children, label, status, onClick }) => {
   return (
     <Tooltip label={label} placement='top'>
       <Tag
-        width={'60px'}
+        minWidth={'45px'}
         onClick={onClick}
         cursor={'pointer'}
         colorScheme={color}

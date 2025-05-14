@@ -16,13 +16,13 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetComponentPath } from 'graphQL/Queries'
 
+import { LuMessageCircleWarning } from 'react-icons/lu'
 
 import CompDetails from './CompDetails'
 import CompIdentifiers from './CompIdentifiers'
 import CompLinks from './CompLinks'
 import CompRelations from './CompRelations'
 import CompSupplier from './CompSupplier'
-import { LuMessageCircleWarning } from 'react-icons/lu'
 
 const Warning = ({ type }) => {
   const label = `The component version does not match the ${type === 'purl' ? 'PURL' : 'CPE'} version under Identifiers`

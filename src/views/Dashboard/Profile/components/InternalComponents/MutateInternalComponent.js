@@ -20,9 +20,9 @@ import useCustomToast from 'hooks/useCustomToast'
 
 import { createOrgComp, updateOrgComp } from 'graphQL/Mutation'
 
+import { LuPackage2 } from 'react-icons/lu'
 
 import { TextRegex } from './TestRegex'
-import { LuPackage2 } from 'react-icons/lu'
 
 const checkIfRegexError = (text) => text.includes('not a valid regex')
 const checkIfDuplicateError = (text) =>

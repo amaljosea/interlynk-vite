@@ -229,7 +229,7 @@ const PartsColumns = (
             </Tag>
           )
         },
-        width: '10%'  
+        width: '10%'
       },
       {
         id: 'ACTION',

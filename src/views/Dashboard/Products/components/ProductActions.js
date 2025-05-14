@@ -68,13 +68,7 @@ const ProductActions = ({ data }) => {
     <>
       <Flex alignItems={'flex-end'} flexDir={'column'} gap={3}>
         <EnvList data={data} />
-        <Flex
-          direction={'row'}
-          gap={2}
-          justifyContent='flex-end'
-          ml={'auto'}
-          flexWrap={'wrap'}
-        >
+        <Flex direction={'row'} gap={2} justifyContent='flex-end' ml={'auto'}>
           {/* VIEW PRODUCT PROGRESS */}
           {shouldShowDemoFeatures && (
             <Tooltip label='View Product TrailLynk'>

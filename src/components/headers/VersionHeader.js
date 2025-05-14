@@ -88,12 +88,12 @@ const VersionHeader = (props) => {
             </MenuList>
           </Menu>
           {selectedSbom?.length === 1 && (
-            <Text color={primaryBlueText}>
+            <Text fontSize={12} color={primaryBlueText} textAlign={'left'}>
               ** Select one more version to enable comparison
             </Text>
           )}
           {selectedSbom?.length > 2 && (
-            <Text color={primaryBlueText}>
+            <Text fontSize={12} color={primaryBlueText} textAlign={'left'}>
               ** Comparison is permitted with only two versions
             </Text>
           )}

@@ -1,16 +1,26 @@
 import { useThemeColor } from './useThemeColors'
 
 export const useDataTableStyles = () => {
-  const { headingTextColor, hoverBgColor, semiTransparentBorder } =
-    useThemeColor(['headingTextColor', 'hoverBgColor', 'semiTransparentBorder'])
+  const {
+    headingTextColor,
+    hoverBgColor,
+    semiTransparentBorder,
+    grayHeaderColor
+  } = useThemeColor([
+    'headingTextColor',
+    'hoverBgColor',
+    'semiTransparentBorder',
+    'grayHeaderColor'
+  ])
 
   return {
     headCells: {
       style: {
         fontFamily: 'inherit',
-        fontWeight: 700,
+        fontWeight: 600,
+        fontSize: 11,
         backgroundColor: 'transparent', // change this to the desired color
-        color: headingTextColor // change this to the desired text color
+        color: grayHeaderColor // change this to the desired text color
         // padding: paddingHeadCell
       }
     },

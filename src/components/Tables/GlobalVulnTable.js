@@ -115,7 +115,7 @@ const GlobalVulnTable = (props) => {
           </Flex>
         )
       },
-      width: '22%',
+      width: params?.productgroupid ? '34%' : '22%',
       sortable: true,
       sortFunction: (a, b) => {
         const dateA = new Date(a?.lastModifiedAt)
@@ -130,7 +130,8 @@ const GlobalVulnTable = (props) => {
       selector: (row) => <SeverityTag value={row?.sev} />,
       sortable: true,
       width: '10%',
-      wrap: true
+      wrap: true,
+      omit: params?.productgroupid
     },
     // STATUSES
     {
@@ -158,7 +159,7 @@ const GlobalVulnTable = (props) => {
           </Flex>
         )
       },
-      width: '30%',
+      width: '32%',
       wrap: true
     },
     // CVSS
@@ -166,7 +167,7 @@ const GlobalVulnTable = (props) => {
       id: 'VULNS_CVSS_SCORE',
       name: 'CVSS',
       selector: (row) => <CvssTag value={row?.cvssScore} />,
-      width: '7%',
+      width: '10%',
       wrap: true,
       sortable: true
     },
@@ -181,7 +182,7 @@ const GlobalVulnTable = (props) => {
         return <EpssTag value={epssScores} />
       },
       sortable: true,
-      width: '8%',
+      width: '10%',
       wrap: true
     },
     // PUBLISHED AT

@@ -15,6 +15,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@react-pdf/renderer": "^4.3.0",
     "@reactour/tour": "^3.7.0",
     "@sentry/cli": "^2.42.5",
     "@sentry/react": "^7.120.3",

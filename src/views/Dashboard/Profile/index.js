@@ -16,6 +16,7 @@ import useQueryParam from 'hooks/useQueryParam'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { FaBuilding, FaUserCircle } from 'react-icons/fa'
+import { LuBuilding, LuCircleUser } from 'react-icons/lu'
 
 import Connections from '../../../components/Connections/Connections'
 import Checks from './components/Checks'
@@ -27,7 +28,6 @@ import { InternalComponents } from './components/InternalComponents'
 import RiskFields from './components/RiskFields'
 import TokenInfo from './components/TokenInfo'
 import WeightControl from './components/WeightControl'
-import { LuBuilding, LuCircleUser } from 'react-icons/lu'
 
 function Profile() {
   const { organization } = useGlobalState()

@@ -54,7 +54,7 @@ export default class ComponentPage {
   public async checkRelations() {
     await this.componentSection.relationship()
   }
-  
+
   public async editLicenseStatus() {
     await this.componentSection.editLicenseStatus()
   }
