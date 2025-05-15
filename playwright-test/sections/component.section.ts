@@ -725,7 +725,7 @@ export default class ComponentSection {
           await this.page.getByRole('tab', { name: 'components' }).click()
 
           await this.page.waitForTimeout(5000)
-          await this.page.getByTestId('filter_Include').click()
+          await this.page.getByTestId('filter_Exclude').click()
           await this.page
             .getByRole('menuitemcheckbox', { name: 'Parts' })
             .click()
@@ -789,7 +789,7 @@ export default class ComponentSection {
           await this.page.getByRole('tab', { name: 'components' }).click()
 
           await this.page.waitForTimeout(5000)
-          await this.page.getByTestId('filter_Include').click()
+          await this.page.getByTestId('filter_Exclude').click()
           await this.page
             .getByRole('menuitemcheckbox', { name: 'Parts' })
             .click()

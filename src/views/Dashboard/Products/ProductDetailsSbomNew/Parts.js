@@ -9,6 +9,7 @@ import { Flex, Text } from '@chakra-ui/react'
 import { useColorMode, useDisclosure } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
+import LynkTable from 'components/LynkTable'
 import CreateParts from 'components/Modal/CreateParts'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -24,7 +25,6 @@ import { GetSbomParts } from 'graphQL/Queries'
 import ConfirmationModal from '../components/ConfirmationModal'
 import PartsColumns from './Components/tableColumns/PartsColumns'
 import PartsSubHeader from './Components/tableSubHeaders/PartsSubHeader'
-import LynkTable from 'components/LynkTable'
 
 const Parts = ({ data }) => {
   const params = useParams()
@@ -84,7 +84,6 @@ const Parts = ({ data }) => {
   const onFilterSev = (part, value, link) => {
     prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
-    prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: ['parts'] })
     onSelectPart(part)
     navigate(link)
   }

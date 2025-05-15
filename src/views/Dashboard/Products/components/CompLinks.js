@@ -24,8 +24,9 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UpdateCompLinks } from 'graphQL/Mutation'
 
-import ActionButton from './ActionButton'
 import { LuCirclePlus } from 'react-icons/lu'
+
+import ActionButton from './ActionButton'
 
 const GetCompUrls = gql`
   query GetCompUrls($id: Uuid!, $sbomId: Uuid!) {

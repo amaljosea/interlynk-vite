@@ -155,19 +155,19 @@ const PolicyParts = () => {
         <Stack w={'100%'}>
           <Flex
             gap={2}
-            flexDir={sbomParts?.length > 0 ? 'row' : 'column'}
+            flexDir={sbomParts?.length > 0 && !hidden ? 'row' : 'column'}
             justify='space-between'
           >
             <HStack spacing='3'>
               <Icon as={LuShieldCheck} color='gray.500' fontSize={24} />
               <Text fontWeight='bold'>Policies</Text>
             </HStack>
-            {sbomParts?.length > 0 ? (
+            {sbomParts?.length > 0 && !hidden ? (
               <Text fontWeight='bold' fontSize='lg'>
                 {total}
               </Text>
             ) : (
-              <Box pl={8}>
+              <Box pl={9}>
                 <PolicyTypes policy={policyResultMetrics} />
               </Box>
             )}

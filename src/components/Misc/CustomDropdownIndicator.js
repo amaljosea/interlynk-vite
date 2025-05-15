@@ -3,7 +3,6 @@ import { components } from 'react-select'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-
 import { LuChevronDown } from 'react-icons/lu'
 
 const CustomDropdownIndicator = (props) => {

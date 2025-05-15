@@ -57,7 +57,7 @@ const Components = ({ sbomData }) => {
     direct,
     totalComp,
     expandedRows,
-    include,
+    exclude,
     selectedComp
   } = prodCompState
   const { prodCompDispatch } = dispatch
@@ -75,12 +75,12 @@ const Components = ({ sbomData }) => {
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
       supportLevel: getUndefinedIfEmptyOrAll(supportLevel),
-      includeParts: include?.includes('parts') ? true : undefined
+      includeParts: exclude?.includes('parts') ? undefined : true
     }
   }, [
     direct,
     ecosystems,
-    include,
+    exclude,
     kinds,
     licenses,
     scope,

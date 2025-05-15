@@ -36,7 +36,7 @@ export const SBOM_LIST_WITH_DATA_QUERY = gql`
   }
 `
 
-const tooltipCustom = (
+export const tooltipCustom = (
   <Tooltip
     position={{ x: 0, y: 70 }}
     // eslint-disable-next-line

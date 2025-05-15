@@ -10,6 +10,7 @@ import LynkSelect from 'components/LynkSelect'
 
 import { UpdateOrganizationUserRole } from 'graphQL/Mutation'
 import { GetRoles } from 'graphQL/Queries'
+
 import { LuUserPen } from 'react-icons/lu'
 
 const RoleModal = ({ isOpen, onClose, data }) => {

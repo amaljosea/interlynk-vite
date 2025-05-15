@@ -154,7 +154,25 @@ const Settings = ({ enabled, data, mfc }) => {
   }
 
   const ProductSetting = ({ id, label, value }) => (
-    <Flex align='center' hidden={id === 'enableSupportLevel' && isFreeTier}>
+    <Flex
+      align='center'
+      justifyContent={'space-between'}
+      hidden={id === 'enableSupportLevel' && isFreeTier}
+    >
+      <Flex align='center'>
+        <Text
+          noOfLines={1}
+          color={sameSecondaryText}
+          fontSize={14}
+          fontWeight='400'
+        >
+          {label}
+        </Text>
+        <Tooltip label={onCheck(`${label}`)}>
+          <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
+        </Tooltip>
+      </Flex>
+
       <LynkSwitch
         id={id}
         size='md'
@@ -163,12 +181,6 @@ const Settings = ({ enabled, data, mfc }) => {
         isDisabled={!enabled || !editControls}
         onChange={(e) => onUpdate(e.target.checked, id)}
       />
-      <Text noOfLines={1} color={sameSecondaryText} fontWeight='400'>
-        {label}
-      </Text>
-      <Tooltip label={onCheck(`${label}`)}>
-        <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
-      </Tooltip>
     </Flex>
   )
 
@@ -190,7 +202,10 @@ const Settings = ({ enabled, data, mfc }) => {
       <CardBody py={4}>
         <SimpleGrid w={'100%'} columns={2} gap={6}>
           {/* COLUMNS 1 */}
-          <Stack spacing={4}>
+          <Stack spacing={5}>
+            <Text fontSize={14} fontWeight={'semibold'}>
+              Advisory Feeds
+            </Text>
             {/* APPLY CHECK */}
             <ProductSetting
               id={'checks'}
@@ -235,9 +250,9 @@ const Settings = ({ enabled, data, mfc }) => {
             />
           </Stack>
           {/* COLUMN 2 */}
-          <Stack spacing={4}>
+          <Stack spacing={4} ml={20}>
             {/* DATE RENTATION */}
-            <FormControl width={'400px'}>
+            <FormControl>
               <FormLabel>
                 Retain Data For
                 <Tooltip label={onCheck(`Data Retaintion`)}>
@@ -258,7 +273,7 @@ const Settings = ({ enabled, data, mfc }) => {
               />
             </FormControl>
             {/* MANUFACTURER */}
-            <FormControl width={'400px'}>
+            <FormControl>
               <FormLabel>
                 Manufacturer
                 <Tooltip label={onCheck(`Manufacturer`)}>
@@ -279,7 +294,7 @@ const Settings = ({ enabled, data, mfc }) => {
               />
             </FormControl>
             {/* JIRE DEFAULT PROJECT */}
-            <FormControl width={'400px'} hidden={isFreeTier}>
+            <FormControl hidden={isFreeTier}>
               <FormLabel>
                 Jira Default Project
                 <Tooltip label={onCheck(`Jira Default Project`)}>

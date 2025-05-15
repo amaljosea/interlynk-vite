@@ -13,7 +13,6 @@ import {
   Portal,
   Stack,
   Tag,
-  TagLabel,
   Text,
   Tooltip
 } from '@chakra-ui/react'
@@ -86,10 +85,10 @@ const VersionColumns = (props) => {
           const {
             projectVersion,
             createdAt,
-            updatedAt,
             alternatives,
             isReprocess,
-            productLifeCycleStage
+            productLifeCycleStage,
+            updatedAt
           } = row
           const currentDate = new Date()
           const parsedCreatedDate = parseISO(createdAt)
@@ -162,9 +161,14 @@ const VersionColumns = (props) => {
             </Stack>
           )
         },
-        width: '30%',
+        width: '20%',
         wrap: true,
-        sortable: true
+        sortable: true,
+        sortFunction: (a, b) => {
+          const dateA = new Date(a.updatedAt)
+          const dateB = new Date(b.updatedAt)
+          return dateA - dateB
+        }
       },
       // COMPONENTS
       {
@@ -181,9 +185,7 @@ const VersionColumns = (props) => {
                 }
               })}
             >
-              <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
-                <TagLabel mx={'auto'}>{stats?.compCount}</TagLabel>
-              </Tag>
+              <Text color={primaryTextColor}>{stats?.compCount}</Text>
             </Link>
           )
         },
@@ -196,15 +198,12 @@ const VersionColumns = (props) => {
         selector: (row) => {
           const { stats } = row
           return (
-            <Tag
-              size='md'
-              variant='subtle'
-              colorScheme={'blue'}
-              sx={{ w: 16, cursor: 'pointer' }}
+            <Text
               onClick={() => onSelectLicenses(row)}
+              color={primaryTextColor}
             >
-              <TagLabel mx={'auto'}>{stats?.compLicenseCount}</TagLabel>
-            </Tag>
+              {stats?.compLicenseCount}
+            </Text>
           )
         },
         width: '8%'
@@ -213,7 +212,7 @@ const VersionColumns = (props) => {
       {
         id: 'VULNERABILITIES',
         name: 'VULNERABILITIES',
-        width: '20%',
+        width: '30%',
         selector: (row) => {
           const { stats, id, vulnRunStatus } = row
           const notStarted = vulnRunStatus === 'NOT_STARTED'
@@ -285,9 +284,7 @@ const VersionColumns = (props) => {
           )
           return (
             <Tooltip label={<StatusInfo data={vulnerabilityMetrics} />}>
-              <Tag w={'80px'} cursor={'pointer'} colorScheme='blue'>
-                <TagLabel mx={'auto'}>{total}</TagLabel>
-              </Tag>
+              <Text color={primaryTextColor}>{total}</Text>
             </Tooltip>
           )
         },
@@ -301,7 +298,11 @@ const VersionColumns = (props) => {
           const { createdAt } = row
           return (
             <Tooltip label={getFullDate(createdAt)} placement='top'>
-              <Text color={primaryTextColor} textAlign={'right'}>
+              <Text
+                color={secondaryTextColor}
+                textAlign={'right'}
+                fontSize={12}
+              >
                 {timeSince(createdAt)}
               </Text>
             </Tooltip>
@@ -315,7 +316,7 @@ const VersionColumns = (props) => {
       // ACTIONS
       {
         id: 'ACTION',
-        name: 'ACTION',
+        name: '',
         selector: (row) => {
           return (
             <Menu>

@@ -4378,6 +4378,25 @@ export const GetJiraProjects = gql`
   }
 `
 
+export const GetJiraProjectFields = gql`
+  query GetJiraProjectFields($projectKey: String!, $issueTypeId: String) {
+    jira {
+      project(projectKey: $projectKey) {
+        key
+        name
+        fields(issueTypeId: $issueTypeId) {
+          id
+          name
+          type
+          required
+          custom
+          allowedValues
+        }
+      }
+    }
+  }
+`
+
 export const GetJiraOptions = gql`
   query JiraInformation($pKey: ID!) {
     jira(projectKey: $pKey) {

@@ -83,7 +83,7 @@ const Vulnerabilities = ({ sbomData }) => {
     severities,
     components,
     statues,
-    include,
+    exclude,
     kev,
     epss,
     direct,
@@ -122,10 +122,10 @@ const Vulnerabilities = ({ sbomData }) => {
         direct: direct ? true : undefined,
         search: searchInput !== '' ? searchInput.trim() : undefined,
         severity: severities.length > 0 ? severities : undefined,
-        source: include.includes('parts') ? undefined : 'COMPONENT',
+        source: exclude?.includes('parts') ? 'COMPONENT' : undefined,
         componentName: components.length > 0 ? components : undefined,
         status: statues.length > 0 ? statues : undefined,
-        includeRetracted: include.includes('retracted') ? true : false,
+        includeRetracted: exclude?.includes('retracted') ? false : true,
         vexComplete: vexComplete === 'all' ? undefined : false
       }
     }

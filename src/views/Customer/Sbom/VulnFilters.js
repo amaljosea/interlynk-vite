@@ -1,5 +1,6 @@
 import { useRef } from 'react'
 import { vulnStatusTypes } from 'variables/general'
+import { severityList } from 'variables/general'
 
 import { Button, Flex, Stack, useDisclosure } from '@chakra-ui/react'
 import {
@@ -19,7 +20,6 @@ import {
 import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
-import { severityList } from 'variables/general'
 
 const VulnFilters = ({ reset }) => {
   const { prodVulnState, dispatch } = useGlobalState()
@@ -27,7 +27,7 @@ const VulnFilters = ({ reset }) => {
     severities,
     components,
     statues,
-    include,
+    exclude,
     kev,
     epss,
     filters,
@@ -93,8 +93,8 @@ const VulnFilters = ({ reset }) => {
     reset()
   }
 
-  const onFilterInclude = (value) => {
-    prodVulnDispatch({ type: 'FILTER_INCLUDE', payload: value })
+  const onFilterExclude = (value) => {
+    prodVulnDispatch({ type: 'FILTER_EXCLUDE', payload: value })
     reset()
   }
 
@@ -224,18 +224,16 @@ const VulnFilters = ({ reset }) => {
             <MenuItemOption value={'all'} fontSize={'sm'}>
               All
             </MenuItemOption>
-            {severityList?.map(
-              (item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
-                  {item}
-                </MenuItemOption>
-              )
-            )}
+            {severityList?.map((item, index) => (
+              <MenuItemOption
+                key={index}
+                value={item}
+                fontSize={'sm'}
+                textTransform={'capitalize'}
+              >
+                {item}
+              </MenuItemOption>
+            ))}
           </MenuOptionGroup>
         </MenuList>
       </Menu>
@@ -334,12 +332,12 @@ const VulnFilters = ({ reset }) => {
       </Menu>
       {/* INCLUDE */}
       <Menu closeOnSelect={false}>
-        <MenuHeading title={'Include'} active={include.length !== 0} />
+        <MenuHeading title={'Include'} active={exclude.length !== 0} />
         <MenuList fontSize={'sm'}>
           <MenuOptionGroup
             type='checkbox'
-            value={include}
-            onChange={onFilterInclude}
+            value={exclude}
+            onChange={onFilterExclude}
           >
             {['parts', 'retracted'].map((item, index) => (
               <MenuItemOption

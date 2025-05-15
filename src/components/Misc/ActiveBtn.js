@@ -27,7 +27,9 @@ const ActiveBtn = ({ title, label, color, onClick, isArchived, editable }) => {
         alignItems: 'center'
       }}
       hidden={isArchived || isCustomerView || !editSboms}
-      leftIcon={editable ? <LuSquarePen size={18} /> : <LuCirclePlus size={18} />}
+      leftIcon={
+        editable ? <LuSquarePen size={18} /> : <LuCirclePlus size={18} />
+      }
     >
       {title}
     </Button>

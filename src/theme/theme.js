@@ -167,6 +167,10 @@ const colors = {
     light: '#EDF2F7',
     dark: '#1A202C'
   },
+  grayHeaderColor: {
+    light: '#1A202C66',
+    dark: '#718096'
+  },
 
   // Brand Colors
   lynkRedColor: {
@@ -184,6 +188,14 @@ const colors = {
   lynkGreenColor: {
     light: '#0E8A16',
     dark: '#95DE64'
+  },
+  graphRedColor: {
+    light: '#e53e3e99',
+    dark: '#e53e3e99'
+  },
+  graphGreenColor: {
+    light: '#38a169',
+    dark: '#38a169'
   }
 }
 

@@ -22,9 +22,9 @@ import {
   SupportLevelCSV
 } from 'graphQL/Queries'
 
+import { LuDownload } from 'react-icons/lu'
 
 import Loading from './Misc/Loading'
-import { LuDownload } from 'react-icons/lu'
 
 const SbomDownload = ({ sbom, primaryLoading }) => {
   const params = useParams()

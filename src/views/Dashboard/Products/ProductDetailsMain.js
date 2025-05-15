@@ -15,7 +15,8 @@ import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { GetProjectSettings } from 'graphQL/Queries'
 
-import { ProductGraphs } from './ProductGraphs'
+// import { ProductGraphs } from './ProductGraphs'
+import ProgressOverviewCard from './ProductGraphs/ProgressOverviewCard'
 import ProductActions from './components/ProductActions'
 import ProductInfo from './components/ProductInfo'
 import ProductTabs from './components/ProductTabs'
@@ -66,10 +67,6 @@ const ProductDetailsMain = () => {
 
   const ENV = useDisclosure()
 
-  const matchingProject = projects?.find((project) => project?.name === envName)
-
-  const sbomsCount = matchingProject ? matchingProject?.sbomsCount : 0
-
   useEffect(() => {
     if (sbomId === null) {
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
@@ -107,6 +104,12 @@ const ProductDetailsMain = () => {
 
   const { projectSetting } = settings?.project || ''
 
+  const matchingProject = projects?.find((project) => project?.name === envName)
+
+  const sbomsCount = matchingProject ? matchingProject?.sbomsCount : 0
+
+  const showProductProgress = sbomsCount >= 2
+
   if (loading) {
     return (
       <Card>
@@ -128,47 +131,63 @@ const ProductDetailsMain = () => {
 
   return (
     <>
-      <Flex flexDirection={'column'} alignItems={'flex-start'} gap={6}>
-        {/* INFO SECTION */}
-        <Card
-          display={data ? 'block' : 'none'}
-          className='product-details'
-          minH={'100px'}
+      <Flex gap={6}>
+        <Flex
+          flexDirection={'column'}
+          alignItems={'flex-start'}
+          gap={6}
+          width={'100%'}
         >
-          <CardBody>
-            <Grid
-              width={'100%'}
-              templateColumns='repeat(12, 1fr)'
-              alignItems={'top'}
-              gap={10}
-            >
-              {/* PRODUCT INFORMATIONS */}
-              <GridItem colSpan={8}>
-                <ProductInfo
-                  settings={projectSetting}
-                  data={{ name, description }}
-                />
-              </GridItem>
-              {/* PRODUCT ACTIONS */}
-              <GridItem colSpan={4}>
-                <ProductActions data={data?.projectGroup} />
-              </GridItem>
-            </Grid>
-          </CardBody>
-        </Card>
-        {/* PRODUCT GRAPHS */}
-        {shouldShowDemoFeatures && sbomsCount >= 3 && <ProductGraphs />}
-        {/* TAB SECTION */}
-        <Card display={data ? 'block' : 'none'}>
-          <CardBody>
-            <ProductTabs
-              activeEnv={activeEnv}
-              data={data?.projectGroup}
-              settings={projectSetting}
-              settingsLoading={settingsLoading}
-            />
-          </CardBody>
-        </Card>
+          {/* INFO SECTION */}
+          <Card
+            display={data ? 'block' : 'none'}
+            className='product-details'
+            minH={'100px'}
+          >
+            <CardBody>
+              <Grid
+                width={'100%'}
+                templateColumns='repeat(12, 1fr)'
+                alignItems={'top'}
+                gap={10}
+              >
+                {/* PRODUCT INFORMATIONS */}
+                <GridItem colSpan={8}>
+                  <ProductInfo
+                    settings={projectSetting}
+                    data={{ name, description }}
+                  />
+                </GridItem>
+                {/* PRODUCT ACTIONS */}
+                <GridItem colSpan={4}>
+                  <ProductActions data={data?.projectGroup} />
+                </GridItem>
+              </Grid>
+            </CardBody>
+          </Card>
+          {/* PRODUCT GRAPHS */}
+          {/* {shouldShowDemoFeatures && <ProductGraphs />} */}
+          {/* TAB SECTION */}
+          <Card
+            display={data ? 'block' : 'none'}
+            minHeight={showProductProgress && 'calc(100vh - 260px)'}
+          >
+            <CardBody>
+              <ProductTabs
+                activeEnv={activeEnv}
+                data={data?.projectGroup}
+                settings={projectSetting}
+                settingsLoading={settingsLoading}
+              />
+            </CardBody>
+          </Card>
+        </Flex>
+        {/* PRODUCT PROGRESS OVERVIEW */}
+        {showProductProgress && (
+          <Flex minHeight={'calc(100vh - 110px)'}>
+            <ProgressOverviewCard />
+          </Flex>
+        )}
       </Flex>
 
       {/* ENV LIST */}

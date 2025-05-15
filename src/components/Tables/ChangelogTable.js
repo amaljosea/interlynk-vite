@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import { getFullDate, timeSince } from 'utils'
+import { truncatedValue } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import { getChangelogColor } from 'utils/styleUtils'
 import ChangelogFilterMenu from 'views/Sbom/components/ChangelogFilterMenu'
@@ -20,7 +21,10 @@ import { GetProjectLogs } from 'graphQL/Queries'
 import Pagination from '../Pagination'
 
 const ChangelogTable = ({ activeEnv }) => {
-  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
+  const { primaryTextColor, secondaryTextColor } = useThemeColor([
+    'primaryTextColor',
+    'secondaryTextColor'
+  ])
 
   const [prodLogState, setProdLogState] = useState({
     field: 'ACTIVITY_LOGS_CREATED_AT',
@@ -52,27 +56,66 @@ const ChangelogTable = ({ activeEnv }) => {
     }
   )
 
+  const getChangelog = (event) => {
+    switch (event) {
+      case 'sbom':
+        return 'SBOM'
+      case 'automation_rule':
+        return 'Automation rule'
+      case 'jira_project':
+        return 'Jira project'
+      case 'organization_manufacturer_id':
+        return 'Manufacturer ID'
+      case 'data_retention_days':
+        return 'Data retention'
+      case 'flags':
+        return 'Flags'
+      default:
+        return event
+          .split('_')
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ')
+    }
+  }
+
   // COLUMNS
   const columns = [
     // CHANGE TYPE
     {
-      id: 'ACTIVITY_LOGS_ACTION',
-      name: 'TYPE',
+      id: 'ACTIVITY_LOGS_CREATED_AT',
+      name: 'ACTIVITY',
       selector: (row) => {
-        const { action } = row
+        const { action, updatedAt, event } = row
+        const eventType = getChangelog(event)
         return (
-          <Tooltip placement='top' label={action} textTransform={'capitalize'}>
-            <Tag
-              variant='solid'
-              colorScheme={getChangelogColor(action)}
+          <Flex alignItems={'center'} gap={3}>
+            <Tooltip
+              placement='top'
+              label={action}
               textTransform={'capitalize'}
             >
-              {action.slice(0, 1)}
-            </Tag>
-          </Tooltip>
+              <Tag
+                variant='solid'
+                colorScheme={getChangelogColor(action)}
+                textTransform={'capitalize'}
+              >
+                {action.slice(0, 1)}
+              </Tag>
+            </Tooltip>
+            <Flex direction={'column'} alignItems={'start'} gap={1}>
+              <Text color={primaryTextColor}>
+                {truncatedValue(eventType, 20)}
+              </Text>
+              <Tooltip label={getFullDate(updatedAt)} placement='top'>
+                <Text color={secondaryTextColor} textAlign={'right'}>
+                  {timeSince(updatedAt)}
+                </Text>
+              </Tooltip>
+            </Flex>
+          </Flex>
         )
       },
-      width: '8%',
+      width: '35%',
       sortable: true
     },
     // PRIOR VALUE
@@ -130,7 +173,7 @@ const ChangelogTable = ({ activeEnv }) => {
     },
     // CHANGED ON
     {
-      id: 'ACTIVITY_LOGS_CREATED_AT',
+      id: '',
       name: 'CHANGED',
       selector: (row) => (
         <Tooltip label={getFullDate(row.updatedAt)} placement={'top'}>
@@ -144,7 +187,8 @@ const ChangelogTable = ({ activeEnv }) => {
         return dateA - dateB // Sort in descending order
       },
       width: '12%',
-      right: 'true'
+      right: 'true',
+      omit: true
     }
   ]
 

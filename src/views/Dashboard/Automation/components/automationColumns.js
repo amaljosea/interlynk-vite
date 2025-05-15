@@ -4,8 +4,8 @@ import { timeSince, updatedValue } from 'utils'
 import { capitalizeFirstLetter, getFullDate } from 'utils'
 import { formatFieldValue } from 'utils'
 
-import { List, ListItem } from '@chakra-ui/react'
-import { Portal, Tag, Text, Tooltip } from '@chakra-ui/react'
+import { Flex, IconButton, List, ListItem } from '@chakra-ui/react'
+import { Portal, Text, Tooltip } from '@chakra-ui/react'
 import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 
 import LynkAction from 'components/Misc/LynkAction'
@@ -17,6 +17,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { AutomationRuleUpdate } from 'graphQL/Mutation'
 
+import { BiCube, BiLayer } from 'react-icons/bi'
 import { LuGripVertical } from 'react-icons/lu'
 
 export const useAutomationColumns = (
@@ -43,7 +44,10 @@ export const useAutomationColumns = (
     childKey: 'edit_product_automations'
   })
 
-  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
+  const { primaryTextColor, secondaryTextColor } = useThemeColor([
+    'primaryTextColor',
+    'secondaryTextColor'
+  ])
 
   const filterProjects = projects?.filter((item) => item?.id !== productId)
 
@@ -66,83 +70,62 @@ export const useAutomationColumns = (
       })
     }
   }
+
+  const automationIcon = {
+    component: <BiCube fontSize={18} />,
+    version: <BiLayer fontSize={18} />
+  }
   return [
-    // ACTIVE
-    {
-      id: 'priority',
-      name: '',
-      selector: (row) => {
-        return (
-          <div
-            draggable={editAutomations}
-            style={{ padding: '1rem' }}
-            onDrag={() => setActiveRow(row)}
-            onDrop={(e) => moveRow(e, row)}
-          >
-            <LuGripVertical size={20} cursor={'move'} color='darkgray' />
-          </div>
-        )
-      },
-      width: '5%',
-      omit: !editAutomations
-    },
-    // ACTIVE
-    {
-      id: 'active',
-      name: 'ACTIVE',
-      selector: (row) => {
-        return (
-          <LynkSwitch
-            isChecked={row?.active}
-            isDisabled={!editAutomations}
-            onChange={() => {
-              setActiveRow(row)
-              RULE_ACTIVE.onOpen()
-            }}
-          />
-        )
-      },
-      width: '6.5%',
-      wrap: true
-    },
     // RULE
     {
-      id: 'rule',
+      id: 'priority',
       name: 'RULE',
       selector: (row) => {
-        return (
-          <Text color={primaryTextColor} my={3}>
-            {row?.name}
-          </Text>
-        )
-      },
-      width: '12%',
-      wrap: true
-    },
-    // SUBJECT
-    {
-      id: 'SUBJECT',
-      name: 'SUBJECT',
-      width: '10%',
-      selector: (row) => {
-        const { automationConditions } = row
+        const { automationConditions, createdAt } = row
         const actionField =
           subOperators?.automationConditionSubjectFieldMapping?.find(
             (item) => item?.key === automationConditions[0]?.field
           )
-        const tagColor = actionField?.subject === 'component' ? 'blue' : 'green'
         return (
-          <Tooltip
-            label={actionField?.subject}
-            textTransform={'capitalize'}
-            placement={'top'}
-          >
-            <Tag size='md' variant='solid' colorScheme={tagColor}>
-              {actionField?.subject === 'component' ? 'C' : 'V'}
-            </Tag>
-          </Tooltip>
+          <Flex alignItems={'center'} gap={3}>
+            <div
+              draggable={editAutomations}
+              onDrag={() => setActiveRow(row)}
+              onDrop={(e) => moveRow(e, row)}
+            >
+              <LuGripVertical size={20} cursor={'move'} color='darkgray' />
+            </div>
+            <LynkSwitch
+              isChecked={row?.active}
+              isDisabled={!editAutomations}
+              onChange={() => {
+                setActiveRow(row)
+                RULE_ACTIVE.onOpen()
+              }}
+            />
+            <Tooltip
+              label={actionField?.subject}
+              textTransform={'capitalize'}
+              placement={'top'}
+            >
+              <IconButton
+                icon={automationIcon[actionField?.subject]}
+                size={'sm'}
+              />
+            </Tooltip>
+
+            <Flex direction={'column'} alignItems={'start'} gap={1}>
+              <Text color={primaryTextColor}>{row?.name}</Text>
+              <Tooltip label={getFullDate(createdAt)} placement='top'>
+                <Text color={secondaryTextColor} textAlign={'right'}>
+                  {timeSince(createdAt)}
+                </Text>
+              </Tooltip>
+            </Flex>
+          </Flex>
         )
       },
+      width: '50%',
       wrap: true
     },
     // CONDITION
@@ -217,7 +200,8 @@ export const useAutomationColumns = (
         const dateA = new Date(a.createdAt)
         const dateB = new Date(b.createdAt)
         return dateA - dateB
-      }
+      },
+      omit: true
     },
     // UPDATED AT
     {
@@ -246,7 +230,7 @@ export const useAutomationColumns = (
     // ACTIONS
     {
       id: 'actions',
-      name: 'ACTIONS',
+      name: '',
       selector: (row) => {
         const { isSystem, name } = row
         return (

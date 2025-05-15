@@ -45,12 +45,12 @@ const GlobalPolicyColumns = ({ action, handleApply }) => {
     primaryBlueText,
     primaryTextColor,
     primaryErrorColor,
-    secondaryTextInverse
+    secondaryTextColor
   } = useThemeColor([
     'primaryBlueText',
     'primaryTextColor',
     'primaryErrorColor',
-    'secondaryTextInverse'
+    'secondaryTextColor'
   ])
 
   return useMemo(() => {
@@ -82,12 +82,12 @@ const GlobalPolicyColumns = ({ action, handleApply }) => {
                 {row?.name}
               </Text>
             </Link>
-            <Text size='sm' color={secondaryTextInverse}>
-              {row?.description}
+            <Text fontSize={12} color={secondaryTextColor}>
+              {timeSince(row?.updatedAt)}
             </Text>
           </Stack>
         ),
-        width: '32%',
+        width: productId ? '50%' : '32%',
         wrap: true
       },
       {
@@ -130,7 +130,7 @@ const GlobalPolicyColumns = ({ action, handleApply }) => {
             </TagLabel>
           </Tag>
         ),
-        width: '10%',
+        width: '15%',
         wrap: true
       },
       {
@@ -155,19 +155,7 @@ const GlobalPolicyColumns = ({ action, handleApply }) => {
             </Tag>
           )
         },
-        width: '10%',
-        wrap: true
-      },
-      // UPDATED AT
-      {
-        id: 'UPDATED',
-        name: 'UPDATED',
-        selector: (row) => (
-          <Tooltip label={getFullDate(row?.updatedAt)} placement={'top'}>
-            <Text color={primaryTextColor}>{timeSince(row?.updatedAt)}</Text>
-          </Tooltip>
-        ),
-        right: 'true',
+        width: '15%',
         wrap: true
       },
       // EXCLUSION
@@ -244,7 +232,7 @@ const GlobalPolicyColumns = ({ action, handleApply }) => {
     primaryTextColor,
     productId,
     removePolicy,
-    secondaryTextInverse,
+    secondaryTextColor,
     updatePolicy
   ])
 }

@@ -539,6 +539,7 @@ export const UpdateComponent = gql`
     $scope: String
     $supportLevel: ComponentSupportLevelEnum
     $endOfSupport: DateOrEmptyString
+    $notice: String
   ) {
     componentUpdate(
       input: {
@@ -559,11 +560,13 @@ export const UpdateComponent = gql`
         supportLevel: $supportLevel
         endOfSupport: $endOfSupport
         generateUniqueId: $uniqueId
+        notice: $notice
       }
     ) {
       component {
         id
         name
+        notice
         copyright
         version
         primary
@@ -2261,6 +2264,9 @@ export const CreateJiraIssue = gql`
     $issueTypeId: String!
     $reporter: String!
     $assignee: String
+    $labels: [String!]
+    $priority: String
+    $components: [JSON!]
   ) {
     jiraIssueCreate(
       input: {
@@ -2271,6 +2277,9 @@ export const CreateJiraIssue = gql`
         issueTypeId: $issueTypeId
         reporter: $reporter
         assignee: $assignee
+        components: $components
+        labels: $labels
+        priority: $priority
       }
     ) {
       jiraIssueUrl

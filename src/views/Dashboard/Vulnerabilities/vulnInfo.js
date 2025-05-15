@@ -219,7 +219,7 @@ const VulnInfo = () => {
                   {/*   EPSS Percentile */}
                   <Stack spacing={1} fontSize={'sm'}>
                     <CustomText>EPSS :</CustomText>
-                    <Text>{epssScore}</Text>
+                    <Text>{epssScore || 'N/A'}</Text>
                   </Stack>
                   {/*   EPSS Percentile */}
                   <Stack spacing={1} fontSize={'sm'}>
@@ -236,7 +236,7 @@ const VulnInfo = () => {
                   {/* cvssScore */}
                   <Stack spacing={1} fontSize={'sm'} whiteSpace='break-words'>
                     <CustomText>CVSS :</CustomText>
-                    <Text>{cvssScore}</Text>
+                    <Text>{cvssScore || 'N/A'}</Text>
                   </Stack>
                   {/* CEWS */}
                   <Stack spacing={1} fontSize={'sm'} whiteSpace='break-words'>
