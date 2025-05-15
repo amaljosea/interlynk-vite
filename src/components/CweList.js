@@ -10,7 +10,7 @@ const CweList = ({ data }) => {
     'primaryBlueText'
   ])
 
-  if (!data) return 'N/A'
+  if (!data || data?.length === 0) return 'N/A'
 
   return (
     <Flex gap={2} flexWrap={'wrap'}>
