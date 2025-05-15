@@ -79,21 +79,21 @@ export default class ProductDetailsSection {
                   errors.push('product is not visible')
                 } else {
                   await this.page.locator(ds.getProduct(productName)).click()
-                  await waitForSelectorWithMinTime(this.page, ds.uploadBtn)
+                  const uploadBtn = this.page.getByTestId('upload_sbom')
+                  await waitForSelectorWithMinTime(this.page, uploadBtn)
                   const productNameHeader = await this.page
-                    .locator(ds.pNameHeader(productName))
-                    .nth(0)
+                    .getByText(productName)
                     .isVisible()
                   if (!productNameHeader) {
                     errors.push('product name header verified failed!')
                   } else {
                     const uploadButton = await this.page
-                      .locator(ds.uploadBtn)
+                      .getByTestId('upload_sbom')
                       .isVisible()
                     if (!uploadButton) {
                       errors.push('upload button is not visible!')
                     } else {
-                      await this.page.locator(ds.uploadBtn).click()
+                      await this.page.getByTestId('upload_sbom').click()
                       await waitForSelectorWithMinTime(
                         this.page,
                         ds.uplaodPopup

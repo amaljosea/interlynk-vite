@@ -97,6 +97,7 @@ const ProductActions = ({ data }) => {
               isDisabled={!enabled || signedUrlParams || !canCreateSBOM}
               colorScheme='blue'
               onClick={UPLOAD.onOpen}
+              data-testid='upload_sbom'
               icon={<LuUpload fontSize={18} />}
             />
           </Tooltip>
