@@ -84,10 +84,8 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
     }
   })
   const { fields } = data?.jira?.project || {}
-  const customFields = fields?.filter((item) => item?.custom === true)
-  const componentField = customFields?.find(
-    (item) => item?.name === 'Components'
-  )
+  // const customFields = fields?.filter((item) => item?.custom === true)
+  const componentField = fields?.find((item) => item?.name === 'Components')
 
   const handleClear = () => {
     setReporter(null)
@@ -393,7 +391,7 @@ ${customFields}
           />
         </FormControl>
 
-        <FormControl isRequired>
+        <FormControl isRequired hidden={!issueType}>
           <FormLabel>Reporter</FormLabel>
           <LynkSelect
             dropDown
@@ -405,7 +403,7 @@ ${customFields}
           />
         </FormControl>
 
-        <FormControl isRequired>
+        <FormControl isRequired hidden={!issueType}>
           <FormLabel>Assignee</FormLabel>
           <LynkSelect
             dropDown
@@ -419,8 +417,8 @@ ${customFields}
       </Grid>
 
       <Stack spacing={4}>
-        <FormControl>
-          <FormLabel>Label</FormLabel>
+        <FormControl hidden={!issueType}>
+          <FormLabel>Create/Assign Label</FormLabel>
           <LynkSelect
             isCreatable
             value={label}
@@ -433,7 +431,7 @@ ${customFields}
           />
         </FormControl>
 
-        <FormControl>
+        <FormControl hidden={!issueType}>
           <FormLabel>Priority</FormLabel>
           <LynkSelect
             dropDown
@@ -447,6 +445,7 @@ ${customFields}
 
         {componentField && (
           <FormControl
+            hidden={!issueType}
             key={componentField?.id}
             isRequired={componentField?.required}
           >
