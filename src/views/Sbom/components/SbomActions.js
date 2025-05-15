@@ -31,8 +31,7 @@ import {
   ShareProject
 } from 'graphQL/Queries'
 
-import { LuCircleCheckBig } from 'react-icons/lu'
-import { MdAssignment } from 'react-icons/md'
+import { LuCircleCheckBig, LuClipboardList } from 'react-icons/lu'
 
 import CheckModal from './CheckModal'
 import CopyModal from './CopyModal'
@@ -243,7 +242,7 @@ const SbomActions = ({ sbom }) => {
           <Tooltip label='Create Attribution Reports'>
             <IconButton
               colorScheme='blue'
-              icon={<MdAssignment size={18} />}
+              icon={<LuClipboardList size={18} />}
               onClick={ATTRIBUTION.onOpen}
               display={signedUrlParams ? 'none' : 'flex'}
             />
