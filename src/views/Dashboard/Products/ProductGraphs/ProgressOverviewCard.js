@@ -371,6 +371,10 @@ const ProgressOverviewCard = () => {
         version2Metrics={version2Metrics}
         support1={support1}
         support2={support2}
+        supportPieChartData={supportPieChartData}
+        vulnPieChartData={vulnPieChartData}
+        visibleLines={visibleLines}
+        chartData={chartData}
       />
     ).toBlob()
 
