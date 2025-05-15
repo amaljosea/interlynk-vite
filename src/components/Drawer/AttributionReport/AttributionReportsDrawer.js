@@ -78,15 +78,21 @@ export const GetComponentData = gql`
   }
 `
 
-const AttributionReportsDrawer = ({ isOpen, onClose }) => {
+const AttributionReportsDrawer = ({
+  isOpen,
+  onClose,
+  productName,
+  productVersion
+}) => {
   const params = useParams()
   const productId = params.productid
   const sbomId = params.sbomid
 
-  const { prodCompState } = useGlobalState()
-  const { field, direction } = prodCompState
+  const { prodCompState, dispatch } = useGlobalState()
+  const { field, direction, searchInput } = prodCompState
+  const { prodCompDispatch } = dispatch
 
-  const [searchInput, setSearchInput] = useState('')
+  const [compSearch, setCompSearch] = useState(searchInput || '')
   const [internal, setInternal] = useState(false)
   const [editingRow, setEditingRow] = useState({
     id: null,
@@ -99,7 +105,7 @@ const AttributionReportsDrawer = ({ isOpen, onClose }) => {
 
   const isSortable = field !== '' && direction !== ''
 
-  const { nodes, error, paginationProps, loading } = usePaginatedQuery(
+  const { nodes, error, paginationProps, loading, reset } = usePaginatedQuery(
     GetComponentData,
     {
       selector: 'sbom.components',
@@ -109,6 +115,12 @@ const AttributionReportsDrawer = ({ isOpen, onClose }) => {
         search: searchInput !== '' ? searchInput : undefined,
         orderBy: isSortable ? { field, direction } : undefined,
         internal: internal ? !internal : undefined
+      },
+      onCompleted: (data) => {
+        prodCompDispatch({
+          type: 'SET_TOTAL_COMP',
+          payload: data?.sbom?.components?.totalCount
+        })
       }
     }
   )
@@ -123,19 +135,40 @@ const AttributionReportsDrawer = ({ isOpen, onClose }) => {
     setSelectedRowData(state?.selectedRows)
   }
 
-  const handleSearch = useCallback(async (event) => {
-    const { value } = event.target
-    setSearchInput(value)
-  }, [])
+  const onSearchInputChange = useCallback(
+    (e) => {
+      const { value } = e.target
+      if (value === '') {
+        handleClear()
+      } else {
+        setCompSearch(value)
+      }
+    },
+    [handleClear]
+  )
 
-  const handleClear = () => {
-    setSearchInput('')
-  }
+  const handleClear = useCallback(async () => {
+    setCompSearch('')
+    prodCompDispatch({ type: 'CLEAR_SEARCH_INPUT' })
+    reset()
+  }, [prodCompDispatch, reset])
+
+  const handleSearch = useCallback(
+    async (event) => {
+      const { value } = event.target
+      if (event.key === 'Enter' && value !== '') {
+        prodCompDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+        reset()
+      }
+    },
+    [prodCompDispatch, reset]
+  )
 
   const subHeader = AttributionReportsSubHeader({
-    searchInput,
+    compSearch,
+    handleSearch,
     handleClear,
-    onSearchInputChange: handleSearch,
+    onSearchInputChange,
     setInternal,
     internal,
     query: GetComponentData,
@@ -145,7 +178,9 @@ const AttributionReportsDrawer = ({ isOpen, onClose }) => {
       internal: internal ? !internal : undefined,
       orderBy: isSortable ? { field, direction } : undefined
     },
-    selectedRowData
+    selectedRowData,
+    productName,
+    productVersion
   })
 
   const handleEdit = (row, field) => {
@@ -169,12 +204,17 @@ const AttributionReportsDrawer = ({ isOpen, onClose }) => {
     })
   }
 
+  const onModalClose = () => {
+    handleClear()
+    onClose()
+  }
+
   return (
     <>
       <LynkDrawer
         title='Attribution Reports'
         isOpen={isOpen}
-        onClose={onClose}
+        onClose={onModalClose}
         size='full'
         placement={'bottom'}
         noFooter

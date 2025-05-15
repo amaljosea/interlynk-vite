@@ -1,4 +1,8 @@
-export const downloadAttributionHtml = async (components) => {
+export const downloadAttributionHtml = async (
+  components,
+  productName,
+  productVersion
+) => {
   // Build the HTML content as a string
   const htmlContent = `
 <!DOCTYPE html>
@@ -45,12 +49,29 @@ export const downloadAttributionHtml = async (components) => {
 </html>
   `
 
+  const formatFilename = (name, version) => {
+    // Get current date
+    const now = new Date()
+    const month = now
+      .toLocaleString('default', { month: 'short' })
+      .toLowerCase()
+    const year = now.getFullYear()
+
+    // Format name and version
+    const formattedName = name.replace(/[.\s]/g, '_')
+    const formattedVersion = version.replace(/[.\s]/g, '_')
+
+    return `${formattedName}_${formattedVersion}_${month}_${year}`
+  }
+
+  const filename = formatFilename(productName, productVersion)
+
   // Create a Blob and trigger download
   const blob = new Blob([htmlContent], { type: 'text/html' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = 'attribution-report.html'
+  a.download = `${filename}.html`
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)

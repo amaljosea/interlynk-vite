@@ -153,7 +153,7 @@ const AttributionReportsEditModal = ({
           <span style={{ fontStyle: 'italic' }}>{rowData?.name}</span>
         </Text>
         {editingField === 'license' && (
-          <LicenseField sbomView={false} license={rowData?.licensesExp} />
+          <LicenseField sbomView={false} license={rowData?.license} />
         )}
         {(editingField === 'copyright' || editingField === 'notice') && (
           <FormControl>

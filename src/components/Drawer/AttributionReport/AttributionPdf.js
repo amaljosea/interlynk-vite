@@ -1,7 +1,29 @@
 import html2pdf from 'html2pdf.js'
 
-export const downloadAttributionPdf = async (components) => {
+export const downloadAttributionPdf = async (
+  components,
+  productName,
+  productVersion
+) => {
   try {
+    // Format the filename
+    const formatFilename = (name, version) => {
+      // Get current date
+      const now = new Date()
+      const month = now
+        .toLocaleString('default', { month: 'short' })
+        .toLowerCase()
+      const year = now.getFullYear()
+
+      // Format name and version
+      const formattedName = name.replace(/[.\s]/g, '_')
+      const formattedVersion = version.replace(/[.\s]/g, '_')
+
+      return `${formattedName}_${formattedVersion}_${month}_${year}`
+    }
+
+    const filename = formatFilename(productName, productVersion)
+
     let logoImg = null
     try {
       const logoBase64 = await getBase64Logo()
@@ -108,11 +130,16 @@ export const downloadAttributionPdf = async (components) => {
     `
 
     const opt = {
-      margin: [20, 20, 30, 20],
-      filename: 'attribution-report.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      margin: [20, 20, 20, 20],
+      filename: `${filename}.pdf`,
+      image: { type: 'jpeg', quality: 0.7 },
+      html2canvas: { scale: 1.5 },
+      jsPDF: {
+        unit: 'mm',
+        format: 'a4',
+        orientation: 'portrait',
+        compress: true
+      }
     }
 
     const pdfPromise = html2pdf().from(htmlContent).set(opt)

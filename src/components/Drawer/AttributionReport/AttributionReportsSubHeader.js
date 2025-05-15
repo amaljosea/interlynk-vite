@@ -21,14 +21,17 @@ import { downloadAttributionHtml } from './AttributionHtml'
 import { downloadAttributionPdf } from './AttributionPdf'
 
 const AttributionReportsSubHeader = ({
-  searchInput,
+  compSearch,
+  handleSearch,
   handleClear,
   onSearchInputChange,
   setInternal,
   internal,
   query,
   variables,
-  selectedRowData
+  selectedRowData,
+  productName,
+  productVersion
 }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [downloadType, setDownloadType] = useState('pdf')
@@ -51,9 +54,9 @@ const AttributionReportsSubHeader = ({
         })
 
         if (downloadType === 'pdf') {
-          downloadAttributionPdf(sortedData)
+          downloadAttributionPdf(sortedData, productName, productVersion)
         } else {
-          downloadAttributionHtml(sortedData)
+          downloadAttributionHtml(sortedData, productName, productVersion)
         }
         setIsLoading(false)
         return
@@ -85,9 +88,9 @@ const AttributionReportsSubHeader = ({
         }
 
         if (downloadType === 'pdf') {
-          downloadAttributionPdf(allComponents)
+          downloadAttributionPdf(allComponents, productName, productVersion)
         } else {
-          downloadAttributionHtml(allComponents)
+          downloadAttributionHtml(allComponents, productName, productVersion)
         }
 
         setIsLoading(false)
@@ -106,7 +109,8 @@ const AttributionReportsSubHeader = ({
           {/* SEARCH */}
           <SearchFilter
             id='attribution'
-            filterText={searchInput}
+            filterText={compSearch}
+            onFilter={handleSearch}
             onClear={handleClear}
             onChange={onSearchInputChange}
           />
@@ -142,7 +146,8 @@ const AttributionReportsSubHeader = ({
       </Flex>
     )
   }, [
-    searchInput,
+    compSearch,
+    handleSearch,
     handleClear,
     onSearchInputChange,
     internal,
@@ -152,7 +157,9 @@ const AttributionReportsSubHeader = ({
     variables,
     isLoading,
     selectedRowData,
-    downloadType
+    downloadType,
+    productName,
+    productVersion
   ])
 }
 
