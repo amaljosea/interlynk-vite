@@ -24,8 +24,12 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { GetCompDependency } from 'graphQL/Queries'
 import { GetComponentPath } from 'graphQL/Queries'
 
-import { BiZoomIn, BiZoomOut } from 'react-icons/bi'
-import { LuMoveHorizontal, LuMoveVertical } from 'react-icons/lu'
+import {
+  LuMoveHorizontal,
+  LuMoveVertical,
+  LuZoomIn,
+  LuZoomOut
+} from 'react-icons/lu'
 
 import LynkDrawer from './LynkDrawer'
 import CompInfo from './Misc/CompInfo'
@@ -385,7 +389,7 @@ const TreeView = ({ isOpen, onClose, component }) => {
                         variant='outline'
                         onClick={handleZoomIn}
                         isDisabled={zoom > 0.8}
-                        icon={<BiZoomIn size={20} />}
+                        icon={<LuZoomIn size={20} />}
                       />
                     </Tooltip>
                     <Tooltip label='Zoom Out'>
@@ -393,7 +397,7 @@ const TreeView = ({ isOpen, onClose, component }) => {
                         variant='outline'
                         onClick={handleZoomOut}
                         isDisabled={zoom < 0.2}
-                        icon={<BiZoomOut size={20} />}
+                        icon={<LuZoomOut size={20} />}
                       />
                     </Tooltip>
                   </Flex>

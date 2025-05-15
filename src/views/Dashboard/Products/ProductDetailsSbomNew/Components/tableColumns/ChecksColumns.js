@@ -20,8 +20,8 @@ import { UpdateComponent } from 'graphQL/Mutation'
 import { sbomUpdate } from 'graphQL/Mutation'
 import { GetExistingRules } from 'graphQL/Queries'
 
-import { BiSolidWrench } from 'react-icons/bi'
 import { GoSkip } from 'react-icons/go'
+import { LuWrench } from 'react-icons/lu'
 
 const ChecksColumns = (
   setActiveRow,
@@ -257,7 +257,7 @@ const ChecksColumns = (
                       variant='solid'
                       colorScheme='blue'
                       fontWeight='normal'
-                      icon={<BiSolidWrench size={18} />}
+                      icon={<LuWrench size={18} />}
                       onClick={() => onCheckOpen(row)}
                       disabled={isCustomerView || !isEditable || isArchived}
                     />

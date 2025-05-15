@@ -26,7 +26,7 @@ import {
   componentSupportLevelUpdate
 } from 'graphQL/Mutation'
 
-import { BiWrench } from 'react-icons/bi'
+import { LuWrench } from 'react-icons/lu'
 
 const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
   const navigate = useNavigate()
@@ -316,7 +316,7 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
   return (
     <LynkModal
       isOpen={isOpen}
-      Icon={BiWrench}
+      Icon={LuWrench}
       onClose={onClose}
       disabled={disabled}
       buttonText={'Save'}

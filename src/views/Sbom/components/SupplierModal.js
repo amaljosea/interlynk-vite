@@ -19,7 +19,7 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { AutomationRuleCreate, addComSupplier } from 'graphQL/Mutation'
 import { updateComSupplier } from 'graphQL/Mutation'
 
-import { BiCube } from 'react-icons/bi'
+import { LuContainer } from 'react-icons/lu'
 
 const SupplierModal = (props) => {
   const { isOpen, onClose, activeRow, ruleExists, recheck } = props
@@ -303,9 +303,9 @@ const SupplierModal = (props) => {
   return (
     <>
       <LynkModal
-        Icon={BiCube}
         isOpen={isOpen}
         onClose={onClose}
+        Icon={LuContainer}
         disabled={isInvalid}
         title={`Add Supplier`}
         onSubmit={handleSubmit}

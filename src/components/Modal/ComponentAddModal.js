@@ -35,7 +35,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { CreateCompRelation, CreateComponent } from 'graphQL/Mutation'
 import { GetAllComponents } from 'graphQL/Queries'
 
-import { BiLayer } from 'react-icons/bi'
+import { LuComponent } from 'react-icons/lu'
 
 function ComponentAddModal(props) {
   const navigate = useNavigate()
@@ -262,8 +262,8 @@ function ComponentAddModal(props) {
   return (
     <>
       <LynkModal
-        Icon={BiLayer}
         isOpen={isOpen}
+        Icon={LuComponent}
         isLoading={loading}
         title='Add Component'
         onClose={onModalClose}

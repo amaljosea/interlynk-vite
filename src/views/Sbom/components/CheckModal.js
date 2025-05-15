@@ -27,7 +27,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
 import { GetComponentData } from 'graphQL/Queries'
 
-import { BiWrench } from 'react-icons/bi'
+import { LuWrench } from 'react-icons/lu'
 
 const CheckModal = (props) => {
   const { isOpen, onClose, activeRow, ruleExists, recheck } = props
@@ -357,7 +357,7 @@ const CheckModal = (props) => {
   return (
     <LynkModal
       isOpen={isOpen}
-      Icon={BiWrench}
+      Icon={LuWrench}
       onClose={onClose}
       disabled={disabled}
       buttonText={'Save'}

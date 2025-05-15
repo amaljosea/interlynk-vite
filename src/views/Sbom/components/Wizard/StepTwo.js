@@ -9,6 +9,7 @@ import {
   Heading,
   Link,
   Stack,
+  TagLeftIcon,
   Text,
   useColorMode
 } from '@chakra-ui/react'
@@ -23,7 +24,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { IntersectingVulns } from 'graphQL/Queries'
 
-import { BsCircleHalf } from 'react-icons/bs'
+import { LuBan } from 'react-icons/lu'
 
 const StepTwo = ({ sbomId, currentSbomId }) => {
   const { primaryTextColor, primaryErrorColor } = useThemeColor([
@@ -142,10 +143,10 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
               fromVuln?.vexStatus?.name || 'Unspecified'
             )}
           >
-            <TagLabel gap={2} mx={'auto'} display={'flex'} alignItems='center'>
-              {fromVuln?.isComplete === false && <BsCircleHalf />}{' '}
-              {fromVuln?.vexStatus?.name || 'Unspecified'}
-            </TagLabel>
+            {fromVuln?.isComplete === false && (
+              <TagLeftIcon boxSize='14px' as={LuBan} />
+            )}
+            <TagLabel>{fromVuln?.vexStatus?.name || 'Unspecified'}</TagLabel>
           </Tag>
         )
       },

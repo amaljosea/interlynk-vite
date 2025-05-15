@@ -30,7 +30,7 @@ import {
   GetSbomParts
 } from 'graphQL/Queries'
 
-import { BiLayerPlus } from 'react-icons/bi'
+import { LuPuzzle } from 'react-icons/lu'
 
 //Function to find the array to be displayed for versions option, filters out already added version from current env
 function getActualVersion(versions = [], parts = []) {
@@ -255,7 +255,7 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
       isOpen={isOpen}
       buttonText='Add'
       onClose={onClose}
-      Icon={BiLayerPlus}
+      Icon={LuPuzzle}
       title={'Add Parts'}
       isLoading={loading}
       onSubmit={handleSubmit}

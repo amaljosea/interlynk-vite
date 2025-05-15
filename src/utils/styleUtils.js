@@ -32,42 +32,37 @@ import SwiftIcon from 'assets/svg/swift.png'
 import { toLower } from 'lodash'
 import { sbomOrigin } from 'variables/general'
 
-import { BsBack } from 'react-icons/bs'
-import {
-  FaDownload,
-  FaEdit,
-  FaHammer,
-  FaMinus,
-  FaPlus,
-  FaRobot,
-  FaTimesCircle,
-  FaUpload
-} from 'react-icons/fa'
-import { FaArrowsRotate } from 'react-icons/fa6'
-import {
-  FaA,
-  FaFileImport,
-  FaGithub,
-  FaScrewdriverWrench,
-  FaUserAstronaut
-} from 'react-icons/fa6'
 import {
   LuArchive,
   LuArchiveX,
   LuBan,
+  LuBolt,
+  LuBot,
   LuBox,
   LuBug,
+  LuCircleX,
   LuComponent,
+  LuDownload,
+  LuGithub,
+  LuHammer,
+  LuImport,
+  LuMinus,
   LuPackage,
   LuPackageSearch,
+  LuPenTool,
+  LuPlus,
   LuPower,
   LuPowerOff,
+  LuRotateCcwSquare,
   LuScale,
+  LuSendToBack,
+  LuSquarePen,
   LuSquarePlay,
-  LuTrash
+  LuTelescope,
+  LuTrash,
+  LuUpload,
+  LuWorkflow
 } from 'react-icons/lu'
-import { MdDelete, MdOutlineArchive, MdOutlineUnarchive } from 'react-icons/md'
-import { VscDebugRerun } from 'react-icons/vsc'
 
 export const sevColor = (severity) => {
   switch (toLower(severity)) {
@@ -354,30 +349,30 @@ export const valueToColor = (action, event, orig, updated) => {
 export const valueToIcon = (action, event, orig, updated) => {
   if (action == 'updated') {
     if (updated == '[]') {
-      return FaMinus
+      return LuMinus
     } else if (orig == '[]') {
-      return FaPlus
+      return LuPlus
     } else {
-      return FaEdit
+      return LuSquarePen
     }
   } else if (action == 'created') {
-    return FaHammer
+    return LuHammer
   } else if (action == 'replaced') {
-    return FaArrowsRotate
+    return LuRotateCcwSquare
   } else if (action == 'retracted' || action == 'restored') {
-    return BsBack
+    return LuSendToBack
   } else if (action == 'tool') {
-    return FaHammer
+    return LuPenTool
   } else if (action == 'auto_check') {
-    return FaRobot
+    return LuBot
   } else if (action == 'download') {
-    return FaDownload
+    return LuDownload
   } else if (action == 'uploaded') {
-    return FaUpload
+    return LuUpload
   } else if (action == 'failed') {
-    return FaTimesCircle
+    return LuCircleX
   } else if (action == 'destroyed') {
-    return FaMinus
+    return LuMinus
   }
 }
 
@@ -415,15 +410,15 @@ export const getType = (name) => {
   const result = sbomOrigin?.find((item) => item.value === name)
   const { origin } = result || ''
   if (origin === 'github') {
-    return <FaGithub />
+    return <LuGithub />
   } else if (origin === 'external') {
-    return <FaFileImport />
+    return <LuImport />
   } else if (origin === 'actions') {
-    return <FaA />
+    return <LuWorkflow />
   } else if (origin === 'jenkins') {
-    return <FaUserAstronaut />
+    return <LuTelescope />
   } else {
-    return <FaScrewdriverWrench />
+    return <LuBolt />
   }
 }
 

@@ -8,7 +8,7 @@ import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 
-import { BiTrash } from 'react-icons/bi'
+import { LuTrash } from 'react-icons/lu'
 
 const DeleteField = gql`
   mutation DeleteField($id: Uuid!) {
@@ -45,7 +45,7 @@ const FieldWarning = ({ data, isOpen, onClose }) => {
 
   return (
     <LynkModal
-      Icon={BiTrash}
+      Icon={LuTrash}
       isOpen={isOpen}
       onClose={onClose}
       buttonColor='red'
