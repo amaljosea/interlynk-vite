@@ -283,7 +283,9 @@ const ProgressOverviewCard = () => {
     }
   ]
 
-  const chartData = apiData.map((node) => {
+  const top7Versions = finishedData.slice(0, 7)
+
+  const chartData = top7Versions.map((node) => {
     const {
       affectedCount = 0,
       fixedCount = 0,
@@ -366,14 +368,26 @@ const ProgressOverviewCard = () => {
         productName={productName}
         selectedVersions={selectedVersions}
         version1Metrics={version1Metrics}
+        version2Metrics={version2Metrics}
         support1={support1}
+        support2={support2}
       />
     ).toBlob()
+
+    const formattedProductName = productName.toLowerCase().replace(/\s+/g, '_')
+
+    const date = new Date()
+    const month = date
+      .toLocaleString('default', { month: 'long' })
+      .toLowerCase()
+    const year = date.getFullYear()
+
+    const fileName = `${formattedProductName}_report_${month}_${year}.pdf`
 
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `Product_Report_${selectedVersions.version1?.projectVersion}.pdf`
+    link.download = fileName
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -495,18 +509,14 @@ const ProgressOverviewCard = () => {
               />
               <XAxis dataKey='version' tick={{ fontSize: 10 }}>
                 <Label
-                  value='Versions'
+                  value='versions'
                   offset={0}
                   position='insideBottom'
                   fontSize={13}
                 />
               </XAxis>
               <YAxis tick={{ fontSize: 12 }}>
-                <Label
-                  value='Vulnerabilities count'
-                  fontSize={13}
-                  angle={-90}
-                />
+                <Label value='vulns' fontSize={13} angle={-90} />
               </YAxis>
               {tooltipCustom}
               {visibleLines['Total'] && (

@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     color: '#3d71ee'
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 14,
     marginTop: 20,
     marginBottom: 10,
     color: '#3d71ee'
@@ -53,11 +53,11 @@ const styles = StyleSheet.create({
   productName: {
     fontSize: 26,
     color: '#3d71ee',
-    marginBottom: 10
+    marginBottom: 20
   },
   versionName: {
     fontSize: 16,
-    marginTop: 10,
+    marginBottom: 10,
     color: '#3d71ee'
   },
   textItem: {
@@ -74,52 +74,107 @@ const ProductComparisonPDF = ({
   productName,
   selectedVersions,
   version1Metrics,
-  support1
+  version2Metrics,
+  support1,
+  support2
 }) => (
   <Document>
     <Page size='A4' style={styles.page}>
-      {/* Header with Logo and Interlynk */}
+      {/* Header */}
       <View style={styles.header}>
         <View style={styles.logoArea}>
           <Image style={styles.logo} src={InterlynkLogo} />
           <Text style={styles.interlynkText}>Interlynk</Text>
         </View>
-
-        {/* Title */}
         <Text style={styles.title}>Progress Overview Report</Text>
       </View>
 
-      {/* Product Info */}
+      {/* Product Name */}
       <Text style={styles.productName}>{productName}</Text>
+
+      {/* Versions */}
       <Text style={styles.versionName}>
-        {selectedVersions.version1?.projectVersion}
+        Comparing: {selectedVersions.version1?.projectVersion} vs.{' '}
+        {selectedVersions.version2?.projectVersion}
       </Text>
 
-      {/* Divider */}
       <View style={styles.divider} />
 
-      {/* Vulnerabilities */}
-      <Text style={styles.sectionTitle}>Vulnerabilities Summary:</Text>
-      <Text style={styles.textItem}>
-        Affected: {version1Metrics.affectedCount}
-      </Text>
-      <Text style={styles.textItem}>
-        Fixed + Not Affected:{' '}
-        {version1Metrics.fixedCount + version1Metrics.notAffectedCount}
-      </Text>
-      <Text style={styles.textItem}>
-        Unspecified: {version1Metrics.unspecifiedCount}
-      </Text>
+      {/* Support Summary */}
+      <Text style={styles.sectionTitle}>Support Summary</Text>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <View>
+          <Text style={styles.versionName}>
+            {selectedVersions.version1?.projectVersion}
+          </Text>
+          <Text style={styles.textItem}>
+            Actively Maintained: {support1.activelyMaintainedCount}
+          </Text>
+          <Text style={styles.textItem}>
+            No Longer Maintained: {support1.noLongerMaintainedCount}
+          </Text>
+          <Text style={styles.textItem}>
+            Abandoned: {support1.abandonedCount}
+          </Text>
+          <Text style={styles.textItem}>
+            Unspecified: {support1.unspecifiedCount}
+          </Text>
+        </View>
+        <View>
+          <Text style={styles.versionName}>
+            {selectedVersions.version2?.projectVersion}
+          </Text>
+          <Text style={styles.textItem}>
+            Actively Maintained: {support2.activelyMaintainedCount}
+          </Text>
+          <Text style={styles.textItem}>
+            No Longer Maintained: {support2.noLongerMaintainedCount}
+          </Text>
+          <Text style={styles.textItem}>
+            Abandoned: {support2.abandonedCount}
+          </Text>
+          <Text style={styles.textItem}>
+            Unspecified: {support2.unspecifiedCount}
+          </Text>
+        </View>
+      </View>
 
-      {/* Support */}
-      <Text style={styles.sectionTitle}>Support Summary:</Text>
-      <Text style={styles.textItem}>
-        Actively Maintained: {support1.activelyMaintainedCount}
-      </Text>
-      <Text style={styles.textItem}>
-        No Longer Maintained: {support1.noLongerMaintainedCount}
-      </Text>
-      <Text style={styles.textItem}>Abandoned: {support1.abandonedCount}</Text>
+      {/* Vulnerabilities Summary */}
+      <Text style={styles.sectionTitle}>Vulnerabilities Summary</Text>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <View>
+          <Text style={styles.versionName}>
+            {selectedVersions.version1?.projectVersion}
+          </Text>
+          <Text style={styles.textItem}>
+            Affected: {version1Metrics.affectedCount}
+          </Text>
+          <Text style={styles.textItem}>
+            Fixed + Not Affected:{' '}
+            {version1Metrics.fixedCount + version1Metrics.notAffectedCount}
+          </Text>
+          <Text style={styles.textItem}>
+            Unspecified: {version1Metrics.unspecifiedCount}
+          </Text>
+        </View>
+        <View>
+          <Text style={styles.versionName}>
+            {selectedVersions.version2?.projectVersion}
+          </Text>
+          <Text style={styles.textItem}>
+            Affected: {version2Metrics.affectedCount}
+          </Text>
+          <Text style={styles.textItem}>
+            Fixed + Not Affected:{' '}
+            {version2Metrics.fixedCount + version2Metrics.notAffectedCount}
+          </Text>
+          <Text style={styles.textItem}>
+            Unspecified: {version2Metrics.unspecifiedCount}
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.divider} />
     </Page>
   </Document>
 )

@@ -108,7 +108,7 @@ const ProductDetailsMain = () => {
 
   const sbomsCount = matchingProject ? matchingProject?.sbomsCount : 0
 
-  const showProductProgress = shouldShowDemoFeatures && sbomsCount >= 2
+  const showProductProgress = sbomsCount >= 2
 
   if (loading) {
     return (
