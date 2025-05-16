@@ -26,8 +26,7 @@ export const formatFilename = (name, version) => {
   const month = now.toLocaleString('default', { month: 'short' }).toLowerCase()
   const year = now.getFullYear()
   const formattedName = name.toLowerCase().replace(/[.\s]/g, '_')
-  const formattedVersion = version.toLowerCase().replace(/[.\s]/g, '_')
-  return `${formattedName}_${formattedVersion}_${month}_${year}.pdf`
+  return `${formattedName}_${version}_${month}_${year}.pdf`
 }
 
 export const generateAttributionPdf = async (
@@ -47,21 +46,30 @@ export const generateAttributionPdf = async (
 
   // Add the first page content
   if (logoBase64) {
-    pdfDoc.addImage(logoBase64, 'PNG', margin, yPosition, 20, 20)
+    pdfDoc.addImage(logoBase64, 'PNG', margin - 3, yPosition, 20, 20)
   }
-  pdfDoc.setFontSize(20)
+  pdfDoc.setFontSize(24)
   pdfDoc.setTextColor('#3d71ee')
-  const titleText = 'Interlynk Attribution Report'
-  pdfDoc.text(titleText, margin + 25, yPosition + 15)
+  pdfDoc.text('Interlynk', margin + 20, yPosition + 15)
+  const reportText = 'Attribution Report'
+  const reportTextWidth = pdfDoc.getTextWidth(reportText, null, null)
+  const xPositionForReport = pageWidth - margin - reportTextWidth
+  pdfDoc.text(reportText, xPositionForReport, yPosition + 15)
   yPosition += 25
 
-  pdfDoc.setFontSize(11)
-  pdfDoc.setTextColor('#323232')
+  pdfDoc.setFontSize(16)
   pdfDoc.text(`${productName} - ${productVersion}`, margin, yPosition)
-  yPosition += 15
+
+  yPosition += 5
+
+  pdfDoc.setLineWidth(0.1)
+  pdfDoc.setDrawColor('#000000')
+  pdfDoc.line(margin, yPosition, pageWidth - margin, yPosition)
+
+  yPosition += 10
 
   finalItems.forEach((comp) => {
-    yPosition += 10 // Add some space before each component
+    yPosition += 10
 
     pdfDoc.setFontSize(14)
     pdfDoc.setFont('helvetica', 'bold')
@@ -122,33 +130,8 @@ export const generateAttributionPdf = async (
       licenseExpText,
       pageWidth - 2 * margin
     )
-    licenseExpLines.forEach((line) => {
-      if (yPosition > pageHeight - 30) {
-        pdfDoc.text(`Page ${pageNumber}`, pageWidth / 2, pageHeight - 10, {
-          align: 'center'
-        })
-        pageNumber++
-        pdfDoc.addPage()
-        yPosition = margin
-      }
-      pdfDoc.text(line, margin + 20, yPosition)
-      yPosition += 5
-    })
-    yPosition += 8
-
-    pdfDoc.setFontSize(11)
-    pdfDoc.setFont('helvetica', 'bold')
-    pdfDoc.setTextColor('#000000')
-    pdfDoc.text('License Text:', margin, yPosition)
-    pdfDoc.setFont('helvetica', 'normal')
-    pdfDoc.setTextColor('#323232')
-    const licenseText = comp.licenseText || 'N/A'
-    const licenseLines = pdfDoc.splitTextToSize(
-      licenseText,
-      pageWidth - 2 * margin
-    )
     yPosition += 5
-    licenseLines.forEach((line) => {
+    licenseExpLines.forEach((line) => {
       if (yPosition > pageHeight - 30) {
         pdfDoc.text(`Page ${pageNumber}`, pageWidth / 2, pageHeight - 10, {
           align: 'center'
@@ -160,6 +143,78 @@ export const generateAttributionPdf = async (
       pdfDoc.text(line, margin, yPosition)
       yPosition += 5
     })
+    yPosition += 8
+
+    pdfDoc.setFontSize(11)
+    pdfDoc.setFont('helvetica', 'bold')
+    pdfDoc.setTextColor('#000000')
+    pdfDoc.text('License Text:', margin, yPosition)
+    yPosition += 5
+
+    if (Array.isArray(comp.licenseText) && comp.licenseText.length > 0) {
+      const validLicenses = comp.licenseText.filter(
+        (item) => item?.content?.text
+      )
+
+      if (validLicenses.length > 0) {
+        pdfDoc.setFont('helvetica', 'normal')
+        pdfDoc.setTextColor('#323232')
+        validLicenses.forEach((licenseItem) => {
+          if (yPosition > pageHeight - 30) {
+            pdfDoc.text(`Page ${pageNumber}`, pageWidth / 2, pageHeight - 10, {
+              align: 'center'
+            })
+            pageNumber++
+            pdfDoc.addPage()
+            yPosition = margin
+          }
+          pdfDoc.setTextColor('#000000')
+          pdfDoc.setFont('helvetica', 'bold')
+          pdfDoc.setFontSize(12)
+          pdfDoc.text(
+            `${licenseItem?.content?.shortId || 'N/A'}:`,
+            margin,
+            yPosition
+          )
+          pdfDoc.setFontSize(11)
+          pdfDoc.setFont('helvetica', 'normal')
+          yPosition += 10
+          pdfDoc.setTextColor('#323232')
+          const licenseTextLines = pdfDoc.splitTextToSize(
+            licenseItem?.content?.text || 'N/A',
+            pageWidth - 2 * margin - 20
+          )
+          licenseTextLines.forEach((line) => {
+            if (yPosition > pageHeight - 30) {
+              pdfDoc.text(
+                `Page ${pageNumber}`,
+                pageWidth / 2,
+                pageHeight - 10,
+                {
+                  align: 'center'
+                }
+              )
+              pageNumber++
+              pdfDoc.addPage()
+              yPosition = margin
+            }
+            pdfDoc.text(`${line}`, margin, yPosition)
+            yPosition += 5
+          })
+          yPosition += 5
+        })
+      } else {
+        pdfDoc.setFont('helvetica', 'normal')
+        pdfDoc.setTextColor('#323232')
+        pdfDoc.text('N/A', margin, yPosition)
+        yPosition += 5
+      }
+    } else {
+      pdfDoc.setFont('helvetica', 'normal')
+      pdfDoc.setTextColor('#323232')
+      pdfDoc.text('N/A', margin, yPosition)
+      yPosition += 5
+    }
     yPosition += 5
 
     pdfDoc.setFontSize(11)
@@ -173,6 +228,7 @@ export const generateAttributionPdf = async (
       copyrightText,
       pageWidth - 2 * margin
     )
+    yPosition += 5
     copyrightLines.forEach((line) => {
       if (yPosition > pageHeight - 30) {
         pdfDoc.text(`Page ${pageNumber}`, pageWidth / 2, pageHeight - 10, {
@@ -182,7 +238,7 @@ export const generateAttributionPdf = async (
         pdfDoc.addPage()
         yPosition = margin
       }
-      pdfDoc.text(line, margin + 20, yPosition)
+      pdfDoc.text(line, margin, yPosition)
       yPosition += 5
     })
     yPosition += 15

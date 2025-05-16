@@ -31,6 +31,7 @@ export const GetLicensesTable = gql`
     $search: String
     $licenseType: [String!]
     $orderBy: OrganizationLicenseOrderByInput
+    $expression: String
   ) {
     organization {
       licenses(
@@ -42,6 +43,7 @@ export const GetLicensesTable = gql`
         search: $search
         licenseType: $licenseType
         orderBy: $orderBy
+        expression: $expression
       ) {
         totalCount
         pageInfo {
@@ -61,6 +63,7 @@ export const GetLicensesTable = gql`
               text
               comment
               url
+              __typename
             }
             ... on LicenseCustom {
               id
@@ -69,6 +72,7 @@ export const GetLicensesTable = gql`
               url
               comment
               spdxId
+              __typename
             }
           }
           __typename
@@ -123,7 +127,7 @@ const AttributionReportsSubHeader = ({
           while (hasNext) {
             const res = await client.query({
               query,
-              variables: { ...variables, after: cursor }
+              variables: { ...variables, first: 200, after: cursor }
             })
             const nodes = res.data.sbom.components.nodes || []
             const pageInfo = res.data.sbom.components.pageInfo
@@ -144,11 +148,11 @@ const AttributionReportsSubHeader = ({
             try {
               const { data } = await client.query({
                 query: GetLicensesTable,
-                variables: { search: c.licensesExp, first: 1 }
+                variables: { expression: c.licensesExp, first: 100 }
               })
-              const licNode = data.organization.licenses.nodes[0]?.content
+              const licenseNodes = data.organization.licenses.nodes || []
 
-              return { ...c, licenseText: licNode?.text || '' }
+              return { ...c, licenseText: licenseNodes || [] }
             } catch (err) {
               return { ...c, licenseText: '' }
             }
