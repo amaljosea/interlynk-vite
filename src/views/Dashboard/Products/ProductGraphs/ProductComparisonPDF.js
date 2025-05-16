@@ -29,30 +29,34 @@ const styles = StyleSheet.create({
     lineHeight: 1.5
   },
   header: {
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  interlynk: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 20
-  },
-  logoArea: {
-    flexDirection: 'row',
-    alignItems: 'center'
+    justifyContent: 'center'
   },
   logo: {
-    width: 40,
-    height: 40,
-    marginTop: 14
+    width: 50,
+    height: 50,
+    marginTop: 10
   },
-  interlynkText: {
-    fontSize: 30,
-    marginLeft: 6,
-    color: '#3d71ee'
+  companyName: {
+    fontSize: 32,
+    color: '#3d71ee',
+    marginBottom: 4
   },
-  title: {
-    textAlign: 'center',
-    fontSize: 16,
-    marginTop: 20,
-    color: '#3d71ee'
+  reportTitle: {
+    fontSize: 20,
+    color: '#3d71ee',
+    marginBottom: 4
+  },
+  versionComparison: {
+    fontSize: 14,
+    color: '#3d71ee',
+    marginBottom: 25,
+    textAlign: 'center'
   },
   sectionTitle: {
     fontSize: 14,
@@ -60,9 +64,9 @@ const styles = StyleSheet.create({
     color: '#3d71ee'
   },
   productName: {
-    fontSize: 26,
+    fontSize: 18,
     color: '#3d71ee',
-    marginBottom: 20
+    marginTop: 15
   },
   versionName: {
     fontSize: 16,
@@ -81,7 +85,8 @@ const styles = StyleSheet.create({
     marginVertical: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    marginRight: 10
   }
 })
 
@@ -141,7 +146,7 @@ const ProductComparisonPDF = ({
 
   const RenderVulnLineChart = () => (
     <ReactPDFChart>
-      <LineChart data={chartData} height={250} width={400}>
+      <LineChart data={chartData} height={200} width={400}>
         <CartesianGrid stroke='#0000001f' strokeDasharray='3 3' />
         <XAxis dataKey='version' tick={{ fontSize: 10 }}>
           <Label
@@ -152,7 +157,7 @@ const ProductComparisonPDF = ({
           />
         </XAxis>
         <YAxis tick={{ fontSize: 12 }}>
-          <Label value='vulns' fontSize={13} angle={-90} />
+          <Label value='vulns' offset={0} position='insideLeft' fontSize={13} />
         </YAxis>
         {visibleLines['Total'] && (
           <Line
@@ -168,7 +173,7 @@ const ProductComparisonPDF = ({
             type='monotone'
             dataKey='Fixed & Not Affected'
             stroke='#38a169'
-            strokeOpacity={0.3}
+            strokeOpacity={0.8}
             strokeWidth={2}
             isAnimationActive={false}
           />
@@ -178,7 +183,7 @@ const ProductComparisonPDF = ({
             type='monotone'
             dataKey='Affected'
             stroke='#ed7b7b'
-            strokeOpacity={0.3}
+            strokeOpacity={0.8}
             strokeWidth={2}
             isAnimationActive={false}
           />
@@ -188,7 +193,7 @@ const ProductComparisonPDF = ({
             type='monotone'
             dataKey='Unspecified'
             stroke='#718096'
-            strokeOpacity={0.3}
+            strokeOpacity={0.8}
             strokeWidth={2}
             isAnimationActive={false}
           />
@@ -202,26 +207,29 @@ const ProductComparisonPDF = ({
       <Page size='A4' style={styles.page}>
         {/* Header */}
         <View style={styles.header}>
-          <View style={styles.logoArea}>
+          <View style={styles.interlynk}>
             <Image style={styles.logo} src={InterlynkLogo} />
-            <Text style={styles.interlynkText}>Interlynk</Text>
+            <Text style={styles.companyName}>Interlynk</Text>
           </View>
-          <Text style={styles.title}>Progress Overview Report</Text>
+
+          <Text style={styles.reportTitle}>
+            Product Progress Overview Report
+          </Text>
+
+          {/* Product Name */}
+          <Text style={styles.productName}>{productName}</Text>
         </View>
-
-        {/* Product Name */}
-        <Text style={styles.productName}>{productName}</Text>
-
-        {/* Versions */}
-        <Text style={styles.versionName}>
-          Comparing: {selectedVersions.version1?.projectVersion} vs.{' '}
-          {selectedVersions.version2?.projectVersion}
-        </Text>
 
         <View style={styles.divider} />
 
+        <Text style={styles.versionComparison}>
+          Comparison between versions{' '}
+          {selectedVersions.version1?.projectVersion} and{' '}
+          {selectedVersions.version2?.projectVersion}
+        </Text>
+
         {/* Support Summary */}
-        <Text style={styles.sectionTitle}>Support Summary</Text>
+        <Text style={styles.sectionTitle}>Support Status Summary</Text>
         <View
           style={{
             flexDirection: 'row',
@@ -271,7 +279,13 @@ const ProductComparisonPDF = ({
 
         {/* Vulnerabilities Summary */}
         <Text style={styles.sectionTitle}>Vulnerabilities Summary</Text>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginBottom: 20
+          }}
+        >
           <RenderVulnPieChart />
 
           {/* Version 1 */}
@@ -309,6 +323,10 @@ const ProductComparisonPDF = ({
           </View>
         </View>
 
+        <Text style={{ fontSize: 14, color: '#3d71ee', textAlign: 'center' }}>
+          Vulnerabilities Trend
+        </Text>
+
         <View style={styles.chartArea}>
           <RenderVulnLineChart />
         </View>
@@ -316,7 +334,7 @@ const ProductComparisonPDF = ({
           style={{
             flexDirection: 'row',
             justifyContent: 'center',
-            marginTop: 10,
+            marginTop: 5,
             flexWrap: 'wrap',
             gap: 10
           }}
@@ -351,7 +369,7 @@ const ProductComparisonPDF = ({
                 width: 12,
                 height: 12,
                 backgroundColor: '#38a169',
-                opacity: 0.3,
+                opacity: 0.8,
                 marginRight: 6
               }}
             />
@@ -372,7 +390,7 @@ const ProductComparisonPDF = ({
                 width: 12,
                 height: 12,
                 backgroundColor: '#ed7b7b',
-                opacity: 0.3,
+                opacity: 0.8,
                 marginRight: 6
               }}
             />
@@ -385,7 +403,7 @@ const ProductComparisonPDF = ({
                 width: 12,
                 height: 12,
                 backgroundColor: '#718096',
-                opacity: 0.3,
+                opacity: 0.8,
                 marginRight: 6
               }}
             />
