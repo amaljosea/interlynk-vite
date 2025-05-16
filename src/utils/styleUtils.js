@@ -43,13 +43,7 @@ import {
   FaTimesCircle,
   FaUpload
 } from 'react-icons/fa'
-import {
-  FaArrowRotateRight,
-  FaArrowsRotate,
-  FaBan,
-  FaToggleOff,
-  FaToggleOn
-} from 'react-icons/fa6'
+import { FaArrowsRotate } from 'react-icons/fa6'
 import {
   FaA,
   FaFileImport,
@@ -72,8 +66,6 @@ import {
   LuSquarePlay,
   LuTrash
 } from 'react-icons/lu'
-import { MdDelete, MdOutlineArchive, MdOutlineUnarchive } from 'react-icons/md'
-import { VscDebugRerun } from 'react-icons/vsc'
 
 export const sevColor = (severity) => {
   switch (toLower(severity)) {
@@ -90,6 +82,7 @@ export const sevColor = (severity) => {
     case 'negligible':
       return { bg: '#48BB78', text: '#22543D', btn: 'green' }
     case 'unknown':
+    case 'none':
       return { bg: '#A0AEC0', text: '#1A202C', btn: 'gray' }
   }
 }
