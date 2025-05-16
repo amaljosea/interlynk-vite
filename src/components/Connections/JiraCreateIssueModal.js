@@ -112,7 +112,7 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
   }
 
   const renderField = (field) => {
-    const value = formValues[field?.name] || ''
+    const value = formValues[field?.name] || []
 
     switch (field?.type) {
       case 'array': {
