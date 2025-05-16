@@ -22,6 +22,24 @@ export const downloadAttributionHtml = async (
     .label { color: #888; min-width: 80px; display: inline-block; font-weight: bold; color: #323232; font-size: 1.1em; }
     .value { color: #323232; line-height: 26pt; }
     .item { margin-bottom: 10px; }
+     .license-text-container {
+      margin-top: 10px;
+      margin-bottom: 15px;
+    }
+    .license-text-label {
+      font-weight: bold;
+      font-size: 1.1em;
+      color: #323232;
+      margin-bottom: 5px;
+    }
+    .license-text-content {
+      font-size: 0.9em;
+      color: #323232;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      max-width: 100%;
+    }
   </style>
 </head>
 <body>
@@ -39,7 +57,11 @@ export const downloadAttributionHtml = async (
     <div class="component">
       <div class="component-name">${component.name} - ${component.version}</div>
       <div class="item"><span class="label">Notice:</span> <span class="value">${component.notice || 'N/A'}</span></div>
-      <div class="item"><span class="label">License:</span> <span class="value">${component.licensesExp || 'N/A'}</span></div>
+      <div class="item"><span class="label">License:</span> <span class="value">${components.licensesExp || 'N/A'}</span></div>
+      <div class="license-text-container">
+        <div class="license-text-label">License Text:</div>
+        <div class="license-text-content">${component.licenseText || 'N/A'}</div>
+      </div>
       <div class="item"><span class="label">Copyright:</span> <span class="value">${component.copyright || 'N/A'}</span></div>
     </div>
   `
@@ -58,8 +80,9 @@ export const downloadAttributionHtml = async (
     const year = now.getFullYear()
 
     // Format name and version
-    const formattedName = name.replace(/[.\s]/g, '_')
-    const formattedVersion = version.replace(/[.\s]/g, '_')
+
+    const formattedName = name.toLowerCase().replace(/[.\s]/g, '_')
+    const formattedVersion = version.toLowerCase().replace(/[.\s]/g, '_')
 
     return `${formattedName}_${formattedVersion}_${month}_${year}`
   }

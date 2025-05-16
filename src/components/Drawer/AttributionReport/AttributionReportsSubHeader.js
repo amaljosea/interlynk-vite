@@ -1,3 +1,4 @@
+import { gql } from '@apollo/client'
 import { client } from 'context/ApolloWrapper'
 import React, { useMemo, useState } from 'react'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -18,7 +19,64 @@ import MenuHeading from 'components/Misc/MenuHeading'
 import useCustomToast from 'hooks/useCustomToast'
 
 import { downloadAttributionHtml } from './AttributionHtml'
-import { downloadAttributionPdf } from './AttributionPdf'
+import { generateAttributionPdf } from './generateAttributionPdf'
+
+export const GetLicensesTable = gql`
+  query GetLicensesTable(
+    $first: Int
+    $after: String
+    $last: Int
+    $before: String
+    $status: [String!]
+    $search: String
+    $licenseType: [String!]
+    $orderBy: OrganizationLicenseOrderByInput
+  ) {
+    organization {
+      licenses(
+        first: $first
+        last: $last
+        after: $after
+        before: $before
+        status: $status
+        search: $search
+        licenseType: $licenseType
+        orderBy: $orderBy
+      ) {
+        totalCount
+        pageInfo {
+          hasNextPage
+          endCursor
+          hasPreviousPage
+          startCursor
+        }
+        nodes {
+          id
+          content {
+            __typename
+            ... on License {
+              id
+              name
+              shortId
+              text
+              comment
+              url
+            }
+            ... on LicenseCustom {
+              id
+              name
+              text
+              url
+              comment
+              spdxId
+            }
+          }
+          __typename
+        }
+      }
+    }
+  }
+`
 
 const AttributionReportsSubHeader = ({
   compSearch,
@@ -48,58 +106,68 @@ const AttributionReportsSubHeader = ({
 
     const handleDownload = async () => {
       setIsLoading(true)
-      if (selectedRowData.length > 0) {
-        const sortedData = [...selectedRowData].sort((a, b) => {
-          return new Date(b.updatedAt) - new Date(a.updatedAt)
-        })
-
-        if (downloadType === 'pdf') {
-          downloadAttributionPdf(sortedData, productName, productVersion)
-        } else {
-          downloadAttributionHtml(sortedData, productName, productVersion)
-        }
-        setIsLoading(false)
-        return
-      }
-
-      let allComponents = []
-      let componentsHasNextPage = true
-      let componentsEndCursor = null
 
       try {
-        while (componentsHasNextPage) {
-          if (componentsHasNextPage) {
-            const componentsRes = await client.query({
-              query,
-              variables: {
-                ...variables,
-                after: componentsEndCursor
-              }
-            })
+        let items = []
 
-            const fetchedComponents =
-              componentsRes?.data?.sbom?.components?.nodes || []
-            const pageInfo = componentsRes?.data?.sbom?.components?.pageInfo
-
-            allComponents.push(...fetchedComponents)
-            componentsEndCursor = pageInfo?.endCursor
-            componentsHasNextPage = pageInfo?.hasNextPage
-          }
-        }
-
-        if (downloadType === 'pdf') {
-          downloadAttributionPdf(allComponents, productName, productVersion)
+        if (selectedRowData.length > 0) {
+          items = [...selectedRowData].sort(
+            (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+          )
         } else {
-          downloadAttributionHtml(allComponents, productName, productVersion)
+          // Fetch all components
+          let allComponents = []
+          let hasNext = true
+          let cursor = null
+
+          while (hasNext) {
+            const res = await client.query({
+              query,
+              variables: { ...variables, after: cursor }
+            })
+            const nodes = res.data.sbom.components.nodes || []
+            const pageInfo = res.data.sbom.components.pageInfo
+
+            allComponents.push(...nodes)
+            cursor = pageInfo.endCursor
+            hasNext = pageInfo.hasNextPage
+          }
+          items = allComponents
         }
 
-        setIsLoading(false)
+        // Per-component license text lookup
+        const finalItems = await Promise.all(
+          items.map(async (c) => {
+            if (!c.licensesExp) {
+              return { ...c, licenseText: '' }
+            }
+            try {
+              const { data } = await client.query({
+                query: GetLicensesTable,
+                variables: { search: c.licensesExp, first: 1 }
+              })
+              const licNode = data.organization.licenses.nodes[0]?.content
+
+              return { ...c, licenseText: licNode?.text || '' }
+            } catch (err) {
+              return { ...c, licenseText: '' }
+            }
+          })
+        )
+
+        // Trigger download
+        if (downloadType === 'pdf') {
+          await generateAttributionPdf(finalItems, productName, productVersion)
+        } else {
+          downloadAttributionHtml(finalItems, productName, productVersion)
+        }
       } catch (error) {
-        setIsLoading(false)
         showToast({
-          description: `Error downloading Attribution ${downloadType === 'pdf' ? 'pdf' : 'HTML'}. Please try again later.`,
+          description: `Error downloading Attribution ${downloadType.toUpperCase()}. Please try again later.`,
           status: 'error'
         })
+      } finally {
+        setIsLoading(false)
       }
     }
 

@@ -245,6 +245,7 @@ const AttributionReportsDrawer = ({
         editingField={editingRow?.field}
         rowData={editingRow}
         sbomId={sbomId}
+        setSelectedRowData={setSelectedRowData}
       />
     </>
   )
