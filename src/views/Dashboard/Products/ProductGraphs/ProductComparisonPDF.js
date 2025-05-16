@@ -23,7 +23,7 @@ import {
 
 const styles = StyleSheet.create({
   page: {
-    padding: 40,
+    padding: 30,
     fontFamily: 'Helvetica',
     fontSize: 12,
     lineHeight: 1.5
@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 30
+    marginBottom: 20
   },
   logoArea: {
     flexDirection: 'row',
@@ -311,6 +311,86 @@ const ProductComparisonPDF = ({
 
         <View style={styles.chartArea}>
           <RenderVulnLineChart />
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            marginTop: 10,
+            flexWrap: 'wrap',
+            gap: 10
+          }}
+        >
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginRight: 15
+            }}
+          >
+            <View
+              style={{
+                width: 12,
+                height: 12,
+                backgroundColor: '#3182CE',
+                marginRight: 6
+              }}
+            />
+            <Text style={{ fontSize: 10, marginTop: 6 }}>Total</Text>
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginRight: 15
+            }}
+          >
+            <View
+              style={{
+                width: 12,
+                height: 12,
+                backgroundColor: '#38a169',
+                opacity: 0.3,
+                marginRight: 6
+              }}
+            />
+            <Text style={{ fontSize: 10, marginTop: 6 }}>
+              Fixed & Not Affected
+            </Text>
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginRight: 15
+            }}
+          >
+            <View
+              style={{
+                width: 12,
+                height: 12,
+                backgroundColor: '#ed7b7b',
+                opacity: 0.3,
+                marginRight: 6
+              }}
+            />
+            <Text style={{ fontSize: 10, marginTop: 6 }}>Affected</Text>
+          </View>
+
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View
+              style={{
+                width: 12,
+                height: 12,
+                backgroundColor: '#718096',
+                opacity: 0.3,
+                marginRight: 6
+              }}
+            />
+            <Text style={{ fontSize: 10, marginTop: 6 }}>Unspecified</Text>
+          </View>
         </View>
       </Page>
     </Document>
