@@ -128,20 +128,21 @@ const CustomVuln = ({ isOpen, onClose }) => {
   const handleSearch = () => {
     if (cve !== '') {
       lookup({ variables: { vulnId: cve } }).then((res) => {
-        const { cveLookup } = res?.data || ''
-        const { vulnId, description, advisories } = cveLookup || {}
+        const { cveLookup } = res?.data || {}
         if (cveLookup) {
+          const { reportedAt, published, lastModified, severity, advisories } =
+            cveLookup || {}
           setFormData((prev) => ({
             ...prev,
-            desc: description,
-            vulnIdentifier: vulnId,
-            cvssScore: cveLookup?.cvssScore,
-            cvssVector: cveLookup?.cvssVector,
-            sev: cveLookup?.severity?.toLowerCase(),
-            reportedAt: new Date(cveLookup?.reportedAt),
-            publishedAt: new Date(cveLookup?.published),
-            lastModifiedAt: new Date(cveLookup?.lastModified),
-            advisories: advisories?.length > 0 ? advisories : []
+            desc: cveLookup?.description || undefined,
+            vulnIdentifier: cveLookup?.vulnId || undefined,
+            cvssScore: cveLookup?.cvssScore || undefined,
+            cvssVector: cveLookup?.cvssVector || undefined,
+            sev: severity ? severity?.toLowerCase() : undefined,
+            advisories: advisories?.length > 0 ? advisories : [],
+            publishedAt: published ? new Date(published) : undefined,
+            reportedAt: reportedAt ? new Date(reportedAt) : undefined,
+            lastModifiedAt: lastModified ? new Date(lastModified) : undefined
           }))
         } else {
           setError('Data not found')
