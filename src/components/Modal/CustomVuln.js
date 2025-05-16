@@ -67,8 +67,8 @@ const CustomVuln = ({ isOpen, onClose }) => {
     }
   )
 
-  const { components } = allComponents?.sbom || ''
-  const { nodes } = components || ''
+  const { components } = allComponents?.sbom || {}
+  const { nodes } = components || {}
 
   const [error, setError] = useState('')
   const [cve, setCve] = useState('')
@@ -76,11 +76,11 @@ const CustomVuln = ({ isOpen, onClose }) => {
   const [cpeError, setCpeError] = useState('')
   const [compId, setCompId] = useState('')
   const [formData, setFormData] = useState({
-    vulnIdentifier: undefined,
-    desc: undefined,
-    sev: undefined,
-    purl: undefined,
-    cpe: undefined,
+    vulnIdentifier: '',
+    desc: '',
+    sev: '',
+    purl: '',
+    cpe: '',
     reportedAt: undefined,
     publishedAt: undefined,
     lastModifiedAt: undefined,
@@ -134,11 +134,11 @@ const CustomVuln = ({ isOpen, onClose }) => {
             cveLookup || {}
           setFormData((prev) => ({
             ...prev,
-            desc: cveLookup?.description || undefined,
-            vulnIdentifier: cveLookup?.vulnId || undefined,
-            cvssScore: cveLookup?.cvssScore || undefined,
-            cvssVector: cveLookup?.cvssVector || undefined,
-            sev: severity ? severity?.toLowerCase() : undefined,
+            desc: cveLookup?.description || '',
+            vulnIdentifier: cveLookup?.vulnId || '',
+            cvssScore: cveLookup?.cvssScore || '',
+            cvssVector: cveLookup?.cvssVector || '',
+            sev: severity ? severity?.toLowerCase() : '',
             advisories: advisories?.length > 0 ? advisories : [],
             publishedAt: published ? new Date(published) : undefined,
             reportedAt: reportedAt ? new Date(reportedAt) : undefined,
@@ -191,7 +191,12 @@ const CustomVuln = ({ isOpen, onClose }) => {
     })
   }
 
-  const isDisabled = error !== '' || purlError !== '' || cpeError !== ''
+  const isDisabled =
+    formData?.vulnIdentifier === '' ||
+    formData?.desc === '' ||
+    error !== '' ||
+    purlError !== '' ||
+    cpeError !== ''
 
   useEffect(() => {
     if (components?.nodes?.length > 0) {
