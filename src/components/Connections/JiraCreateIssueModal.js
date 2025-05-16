@@ -118,13 +118,19 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
       case 'array': {
         const options =
           field?.allowedValues?.map((opt) => ({
-            label: opt?.value,
+            label: opt?.value || opt?.name,
             value: opt?.id
           })) || []
 
-        const selected = Array.isArray(value)
-          ? value.map((v) => ({ label: v, value: v }))
-          : []
+        const selected =
+          field?.allowedValues?.length > 0
+            ? field?.allowedValues
+                .filter((item) => value.includes(item?.id))
+                .map((item) => ({
+                  value: item?.id,
+                  label: item?.value || item?.name
+                }))
+            : []
 
         return (
           <LynkSelect
