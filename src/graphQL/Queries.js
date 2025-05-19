@@ -4371,7 +4371,7 @@ export const VerifyJiraToken = gql`
 `
 
 export const GetJiraProjects = gql`
-  query JiraInformation {
+  query GetJiraProjects {
     jira {
       projects {
         id
