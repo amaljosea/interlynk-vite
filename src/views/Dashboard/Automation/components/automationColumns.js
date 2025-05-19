@@ -87,7 +87,7 @@ export const useAutomationColumns = (
             (item) => item?.key === automationConditions[0]?.field
           )
         return (
-          <Flex alignItems={'center'} gap={3}>
+          <Flex alignItems={'center'} gap={3} my={3}>
             <div
               draggable={editAutomations}
               onDrag={() => setActiveRow(row)}
