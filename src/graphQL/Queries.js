@@ -4401,7 +4401,7 @@ export const GetJiraProjectFields = gql`
   }
 `
 
-export const GetJiraOptions = gql`
+export const JiraInformation = gql`
   query JiraInformation($pKey: ID!) {
     jira(projectKey: $pKey) {
       users {

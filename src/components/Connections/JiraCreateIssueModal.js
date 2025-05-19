@@ -20,9 +20,9 @@ import useCustomToast from 'hooks/useCustomToast'
 import { CreateJiraIssue } from 'graphQL/Mutation'
 import {
   GetDefaultJiraProduct,
-  GetJiraOptions,
   GetJiraProjectFields,
-  GetJiraProjects
+  GetJiraProjects,
+  JiraInformation
 } from 'graphQL/Queries'
 
 import { LuBolt } from 'react-icons/lu'
@@ -42,7 +42,7 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
 
   const { jiraProject } = settings?.project?.projectSetting || ''
 
-  const [getOptions, { data: options }] = useLazyQuery(GetJiraOptions, {
+  const [getOptions, { data: options }] = useLazyQuery(JiraInformation, {
     fetchPolicy: 'network-only'
   })
 
