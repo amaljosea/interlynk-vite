@@ -6,7 +6,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { initializeDashboardData } from 'utils/initDashboardData'
 import { getItem } from 'utils/localStorageUtils'
 
-import { Button, Flex, Stack, Text } from '@chakra-ui/react'
+import { Button, Stack, Text } from '@chakra-ui/react'
 import { Alert, AlertDescription, AlertIcon } from '@chakra-ui/react'
 import { FormControl, FormHelperText, FormLabel } from '@chakra-ui/react'
 import { Input, InputGroup, InputRightElement } from '@chakra-ui/react'
@@ -104,12 +104,7 @@ const LoginForm = () => {
     'You have to confirm your email address before continuing.'
 
   return (
-    <Flex
-      height={'100%'}
-      mt={[4, 6, 8, 24]}
-      direction={'column'}
-      alignItems={'flex-start'}
-    >
+    <Stack>
       <Text
         color={primaryTextColor}
         fontSize={'20px'}
@@ -118,7 +113,7 @@ const LoginForm = () => {
       >
         Welcome
       </Text>
-      <Text fontSize={'sm'} color={headingTextColor}>
+      <Text fontSize={'sm'} textAlign={'center'} color={headingTextColor}>
         Log in to continue to the dashboard
       </Text>
       {error !== '' && (
@@ -139,7 +134,14 @@ const LoginForm = () => {
         </Alert>
       )}
       <form style={{ width: '100%' }} onSubmit={handleSubmit}>
-        <Stack py={'1rem'} direction={'column'} gap={3} width={'100%'} mt={2}>
+        <Stack
+          minW={'auto'}
+          maxW={'420px'}
+          py={'1rem'}
+          direction={'column'}
+          gap={3}
+          width={'100%'}
+        >
           <FormControl isRequired>
             <FormLabel htmlFor='email'>Email address</FormLabel>
             <Input
@@ -178,24 +180,26 @@ const LoginForm = () => {
             </InputGroup>
             <FormHelperText display='flex' justifyContent='flex-end'>
               <Link to='/reset_password'>
-                <Text _hover={{ color: primaryBlueText }}>
+                <Text fontSize={12} _hover={{ color: primaryBlueText }}>
                   Forgot password?
                 </Text>
               </Link>
             </FormHelperText>
           </FormControl>
           <Button
+            mt={2}
             width='full'
             type='submit'
             title='Login'
             colorScheme='blue'
             isLoading={loading}
-            loadingText='Logging in'
+            loadingText='Loading...'
             isDisabled={email === '' || password === ''}
           >
             Log in
           </Button>
           <Stack
+            mt={2}
             alignItems={'center'}
             justifyContent={'center'}
             direction={'row'}
@@ -213,7 +217,7 @@ const LoginForm = () => {
           <PolicyTerms />
         </Stack>
       </form>
-    </Flex>
+    </Stack>
   )
 }
 

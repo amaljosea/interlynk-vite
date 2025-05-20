@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { validPassword } from 'utils/formValidationUtils'
 
-import { Box, Button, Flex, Stack, Text, chakra } from '@chakra-ui/react'
+import { Box, Button, Stack, Text, chakra } from '@chakra-ui/react'
 import { Input, InputGroup, InputRightElement } from '@chakra-ui/react'
 import {
   FormControl,
@@ -149,13 +149,7 @@ const ResetForm = () => {
 
   if (success) {
     return (
-      <Flex
-        my={10}
-        gap={4}
-        direction={'column'}
-        alignItems={'center'}
-        justifyContent={'center'}
-      >
+      <Stack minW={'auto'} maxW={'420px'}>
         <Text fontSize={'xl'} textAlign={'center'} fontWeight={'medium'}>
           Check your email
         </Text>
@@ -175,20 +169,13 @@ const ResetForm = () => {
             try a different email.
           </chakra.span>
         </Text>
-      </Flex>
+      </Stack>
     )
   }
 
   if (token) {
     return (
-      <Flex
-        mt={10}
-        gap={4}
-        width={'100%'}
-        direction={'column'}
-        alignItems={'flex-start'}
-        justifyContent={'center'}
-      >
+      <Stack minW={'auto'} maxW={'420px'}>
         <Text fontSize={'xl'} fontWeight={'medium'}>
           Reset your password
         </Text>
@@ -267,22 +254,16 @@ const ResetForm = () => {
             </Button>
           </Stack>
         </form>
-      </Flex>
+      </Stack>
     )
   }
 
   return (
-    <Flex
-      gap={4}
-      mt={[6, 8, 10]}
-      direction={'column'}
-      alignItems={'flex-start'}
-      justifyContent={'center'}
-    >
-      <Text fontSize={'20px'} fontWeight={'semibold'}>
+    <Stack minW={'auto'} maxW={'420px'}>
+      <Text fontSize={'20px'} textAlign={'center'} fontWeight={'semibold'}>
         Reset your password
       </Text>
-      <Text fontSize={'sm'} color={headingTextColor}>
+      <Text fontSize={'sm'} textAlign={'center'} color={headingTextColor}>
         Enter the email address associated with your account and we will send
         you a link to reset your password.
       </Text>
@@ -326,7 +307,7 @@ const ResetForm = () => {
           </Text>
         </Stack>
       </form>
-    </Flex>
+    </Stack>
   )
 }
 
