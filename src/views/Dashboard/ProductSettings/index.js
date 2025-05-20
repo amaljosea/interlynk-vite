@@ -145,6 +145,10 @@ const Settings = ({ enabled, data, mfc }) => {
         <SimpleGrid w={'100%'} columns={3} gap={[6, 12, 24]}>
           {/* COLUMNS 1 */}
           <Stack spacing={5}>
+            <Text fontSize={14} fontWeight={'semibold'}>
+              Advisory Feeds
+            </Text>
+
             {/* APPLY CHECK */}
             <ProductSetting
               id={'checks'}
@@ -190,6 +194,10 @@ const Settings = ({ enabled, data, mfc }) => {
           </Stack>
           {/* COLUMN 2 */}
           <Stack spacing={4}>
+            <Text fontSize={14} fontWeight={'semibold'}>
+              Default Settings
+            </Text>
+
             {/* DATE RENTATION */}
             <FormControl>
               <FormLabel>

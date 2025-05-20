@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getSettingsLabel } from 'utils'
 
-import { FormControl, FormLabel, Stack } from '@chakra-ui/react'
+import { FormControl, FormLabel, Stack, Text } from '@chakra-ui/react'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -144,8 +144,12 @@ const JiraFields = () => {
 
   return (
     <Stack spacing={4}>
+      <Text fontSize={14} fontWeight={'semibold'}>
+        JIRA Settings
+      </Text>
+
       <FormControl hidden={isFreeTier}>
-        <FormLabel>Jira Project</FormLabel>
+        <FormLabel>Project</FormLabel>
         <LynkSelect
           options={projects}
           isClearable={true}
