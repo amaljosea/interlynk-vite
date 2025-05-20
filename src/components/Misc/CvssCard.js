@@ -17,7 +17,7 @@ import LynkModal from 'components/LynkModal'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaCircleInfo } from 'react-icons/fa6'
+import { LuInfo } from 'react-icons/lu'
 
 const CvssText = ({ children }) => {
   const { primaryTextColor } = useThemeColor(['primaryTextColor'])
@@ -74,7 +74,7 @@ const CvssCard = ({ isOpen, onClose, value }) => {
       noFooter
       isOpen={isOpen}
       onClose={onClose}
-      Icon={FaCircleInfo}
+      Icon={LuInfo}
       title={'CVSS Vector'}
     >
       <Stack spacing={2}>

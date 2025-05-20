@@ -110,7 +110,7 @@ const Invitation = () => {
   return (
     <Stack minW={'auto'} maxW={'420px'}>
       {isRejected && (
-        <Icon mb={6} boxSize={16} as={LuCircleX} color={primaryErrorColor} />
+        <Icon mb={6} color={primaryErrorColor} boxSize={18} as={LuCircleX} />
       )}
       <Text fontSize={'20px'} textAlign={'center'} fontWeight={'semibold'}>
         {isRejected

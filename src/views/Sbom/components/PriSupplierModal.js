@@ -21,7 +21,7 @@ import {
   supplierUpdate
 } from 'graphQL/Mutation'
 
-import { BiShieldPlus } from 'react-icons/bi'
+import { LuContainer } from 'react-icons/lu'
 
 const PriSupplierModal = (props) => {
   const { isOpen, onClose, activeRow, ruleExists, recheck } = props
@@ -298,7 +298,7 @@ const PriSupplierModal = (props) => {
       <LynkModal
         isOpen={isOpen}
         onClose={onClose}
-        Icon={BiShieldPlus}
+        Icon={LuContainer}
         disabled={isInvalid}
         onSubmit={handleSubmit}
         hideCancelButton={rlLoading}

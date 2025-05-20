@@ -28,8 +28,8 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { BsFillPatchQuestionFill } from 'react-icons/bs'
 import {
+  LuCircleHelp,
   LuEllipsisVertical,
   LuGlobe,
   LuLightbulb,
@@ -101,10 +101,7 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
           const icon = validPurl ? (
             GetIcon(purl?.split('/')[0], colorMode)
           ) : (
-            <BsFillPatchQuestionFill
-              fontSize={24}
-              color={inverseSecondaryBgColor}
-            />
+            <LuCircleHelp size={24} color={inverseSecondaryBgColor} />
           )
           return (
             <Flex sx={{ alignItems: 'center', gap: 2, my: 4 }}>

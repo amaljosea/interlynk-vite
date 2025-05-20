@@ -10,7 +10,6 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaLock } from 'react-icons/fa6'
 import { LuLock } from 'react-icons/lu'
 
 import Components from './Components'

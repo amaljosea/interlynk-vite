@@ -16,7 +16,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { sbomUpdate } from 'graphQL/Mutation'
 import { GetSbomAlternatives } from 'graphQL/Queries'
 
-import { FaArrowUp } from 'react-icons/fa6'
 import { LuArrowUp } from 'react-icons/lu'
 
 import ConfirmationModal from './ConfirmationModal'

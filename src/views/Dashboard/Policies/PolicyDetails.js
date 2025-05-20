@@ -13,7 +13,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetPolicy } from 'graphQL/Queries'
 
-import { MdPolicy } from 'react-icons/md'
+import { LuShieldCheck } from 'react-icons/lu'
 
 const PolicyDetails = () => {
   const params = useParams()
@@ -48,7 +48,7 @@ const PolicyDetails = () => {
             <Icon
               h={'64px'}
               w={'64px'}
-              as={MdPolicy}
+              as={LuShieldCheck}
               color={secondaryBlueText}
             />
             <Box>

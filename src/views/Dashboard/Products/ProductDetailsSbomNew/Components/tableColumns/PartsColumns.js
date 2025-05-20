@@ -13,7 +13,7 @@ import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { BsFillPatchQuestionFill } from 'react-icons/bs'
+import { LuCircleHelp } from 'react-icons/lu'
 
 const PartsColumns = (
   onFilterSev,
@@ -55,10 +55,7 @@ const PartsColumns = (
           const icon = validPurl ? (
             GetIcon(purl?.split('/')[0], colorMode)
           ) : (
-            <BsFillPatchQuestionFill
-              fontSize={24}
-              color={inverseSecondaryBgColor}
-            />
+            <LuCircleHelp size={24} color={inverseSecondaryBgColor} />
           )
 
           return (

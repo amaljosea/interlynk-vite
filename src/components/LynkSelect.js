@@ -8,7 +8,7 @@ import useQueryParam from 'hooks/useQueryParam'
 import { useSelect } from 'hooks/useSelect'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { MdClose } from 'react-icons/md'
+import { LuX } from 'react-icons/lu'
 
 const LynkSelect = (props) => {
   const { style } = useSelect('field')
@@ -22,7 +22,7 @@ const LynkSelect = (props) => {
 
     return (
       <components.ClearIndicator {...props}>
-        <MdClose fontSize={16} color={primaryTextColor} cursor='pointer' />
+        <LuX fontSize={16} color={primaryTextColor} cursor='pointer' />
       </components.ClearIndicator>
     )
   }

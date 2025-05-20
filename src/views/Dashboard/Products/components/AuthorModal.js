@@ -19,7 +19,7 @@ import useQueryParam from 'hooks/useQueryParam'
 import { AutomationRuleCreate, authorCreate } from 'graphQL/Mutation'
 import { GetCheckResults } from 'graphQL/Queries'
 
-import { FaUserPlus } from 'react-icons/fa6'
+import { LuUserPlus } from 'react-icons/lu'
 
 const TextInput = ({ name, value, onChange, placeholder }) => {
   return (
@@ -245,7 +245,7 @@ const AuthorModal = ({ isOpen, onClose, ruleExists, recheck }) => {
   return (
     <LynkModal
       isOpen={isOpen}
-      Icon={FaUserPlus}
+      Icon={LuUserPlus}
       isLoading={loading}
       buttonText={'Save'}
       title={`Add Author`}

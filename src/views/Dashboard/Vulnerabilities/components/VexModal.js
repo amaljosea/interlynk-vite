@@ -2,7 +2,6 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { CheckIcon } from '@chakra-ui/icons'
 import {
   Box,
   Checkbox,
@@ -35,9 +34,8 @@ import {
   getVexStatuses
 } from 'graphQL/Queries'
 
-import { FaTimes } from 'react-icons/fa'
-import { FaPenToSquare } from 'react-icons/fa6'
-import { LuCheck, LuX } from 'react-icons/lu'
+
+import { LuCheck, LuSquarePen, LuX } from 'react-icons/lu'
 
 const VexModal = ({
   vulnId,
@@ -347,7 +345,7 @@ const VexModal = ({
       isOpen={isOpen}
       buttonText={'Save'}
       isLoading={loading}
-      Icon={FaPenToSquare}
+      Icon={LuSquarePen}
       onSubmit={handleSave}
       onClose={handleClose}
       title={'Vulnerabilty Status'}

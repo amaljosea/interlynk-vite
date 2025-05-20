@@ -12,7 +12,6 @@ import LynkModal from 'components/LynkModal'
 
 import { AutomationRuleCreate, AutomationRuleUpdate } from 'graphQL/Mutation'
 
-import { FaPlus } from 'react-icons/fa6'
 import { LuCirclePlus } from 'react-icons/lu'
 
 import RuleActions from './RuleActions'

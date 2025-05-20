@@ -11,7 +11,7 @@ import RefreshBtn from 'components/Icons/RefreshBtn'
 import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
-import { RiFundsBoxFill } from 'react-icons/ri'
+import { LuSquareChartGantt } from 'react-icons/lu'
 
 import CompFilters from '../../CompFilters'
 
@@ -58,7 +58,7 @@ const ComponentsSubHeader = ({
             <Tooltip label='View Health Map'>
               <IconButton
                 colorScheme='blue'
-                icon={<RiFundsBoxFill />}
+                icon={<LuSquareChartGantt size={18} />}
                 hidden={!shouldShowDemoFeatures}
                 onClick={() => action('view_health_map', null)}
               />

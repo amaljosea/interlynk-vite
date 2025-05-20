@@ -12,6 +12,7 @@ import {
   Stack,
   Tag,
   TagLabel,
+  TagLeftIcon,
   Text,
   Tooltip,
   useDisclosure
@@ -28,9 +29,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetCompVulnData, GetConnectedSbom } from 'graphQL/Queries'
 
-import { BsCircleHalf } from 'react-icons/bs'
-import { FaPen } from 'react-icons/fa'
-import { LuFolderTree, LuSquarePen } from 'react-icons/lu'
+import { LuBan, LuFolderTree, LuSquarePen } from 'react-icons/lu'
 
 import VexModal from './VexModal'
 import VulnFilters from './VulnsFilter'
@@ -199,16 +198,8 @@ const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
             variant={'subtle'}
             colorScheme={statusColor(vexStatus?.name || 'Unspecified')}
           >
-            <TagLabel
-              gap={2}
-              mx={'auto'}
-              fontSize={14}
-              display={'flex'}
-              alignItems='center'
-            >
-              {isComplete === false && <BsCircleHalf />}{' '}
-              {vexStatus?.name || 'Unspecified'}
-            </TagLabel>
+            {isComplete === false && <TagLeftIcon boxSize='14px' as={LuBan} />}
+            <TagLabel>{vexStatus?.name || 'Unspecified'}</TagLabel>
           </Tag>
         )
       },

@@ -4,7 +4,6 @@ import { validScore } from 'utils/formValidationUtils'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import {
-  Box,
   Button,
   Flex,
   Input,
@@ -35,7 +34,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { UpdateScoreSetting } from 'graphQL/Mutation'
 import { GetScoreSetting } from 'graphQL/Queries'
 
-import { MdGraphicEq } from 'react-icons/md'
+import { LuChevronLeft, LuChevronRight } from 'react-icons/lu'
 
 const WeightControl = () => {
   const { primaryTextColor, primaryBlueText } = useThemeColor([
@@ -343,7 +342,11 @@ const WeightControl = () => {
                     isOpen={showTooltip}
                   >
                     <RangeSliderThumb boxSize={4} index={index}>
-                      <Box color={'darkgray'} as={MdGraphicEq} />
+                      {index === 0 ? (
+                        <LuChevronLeft color='darkgray' />
+                      ) : (
+                        <LuChevronRight color='darkgray' />
+                      )}
                     </RangeSliderThumb>
                   </Tooltip>
                 ))}

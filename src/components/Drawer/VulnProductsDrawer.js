@@ -1,5 +1,4 @@
 import { gql } from '@apollo/client'
-import { useMemo } from 'react'
 import { getFullDate, timeSince } from 'utils'
 
 import { Flex, Tag, Text, Tooltip } from '@chakra-ui/react'

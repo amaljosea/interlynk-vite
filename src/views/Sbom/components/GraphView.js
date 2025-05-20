@@ -13,7 +13,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { GetCompDependency } from 'graphQL/Queries'
 import { GetShareCompDependency } from 'graphQL/Queries'
 
-import { BiZoomIn, BiZoomOut } from 'react-icons/bi'
+import { LuZoomIn, LuZoomOut } from 'react-icons/lu'
 
 import SearchFilter from './SearchFilter'
 
@@ -163,8 +163,6 @@ const GraphView = ({ data, activeComp }) => {
         name: name || version || '----',
         children: dependsOnNodes
       }
-      console.log('data', data)
-
       setTreeView(data)
     }
   }, [compDependency, dependsOn, id, name, version])
@@ -226,7 +224,7 @@ const GraphView = ({ data, activeComp }) => {
               variant='outline'
               onClick={handleZoomIn}
               isDisabled={zoom > 0.8}
-              icon={<BiZoomIn size={20} />}
+              icon={<LuZoomIn size={20} />}
             />
           </Tooltip>
           <Tooltip label='Zoom Out'>
@@ -234,7 +232,7 @@ const GraphView = ({ data, activeComp }) => {
               variant='outline'
               onClick={handleZoomOut}
               isDisabled={zoom < 0.2}
-              icon={<BiZoomOut size={20} />}
+              icon={<LuZoomOut size={20} />}
             />
           </Tooltip>
         </Flex>

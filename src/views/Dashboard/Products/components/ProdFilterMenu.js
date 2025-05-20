@@ -19,9 +19,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetLabels } from 'graphQL/Queries'
 
-import { FaCheck } from 'react-icons/fa6'
 import { LuCheck, LuDot } from 'react-icons/lu'
-import { RxDotFilled } from 'react-icons/rx'
 
 const stages = [
   'all',

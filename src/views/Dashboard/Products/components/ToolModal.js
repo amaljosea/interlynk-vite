@@ -11,7 +11,7 @@ import useCustomToast from 'hooks/useCustomToast'
 
 import { toolCreate } from 'graphQL/Mutation'
 
-import { FaWrench } from 'react-icons/fa6'
+import { LuWrench } from 'react-icons/lu'
 
 const TextInput = ({ name, value, onChange, placeholder }) => {
   return (
@@ -77,7 +77,7 @@ const ToolModal = ({ isOpen, onClose, resolved = false }) => {
   return (
     <LynkModal
       isOpen={isOpen}
-      Icon={FaWrench}
+      Icon={LuWrench}
       isLoading={loading}
       buttonText={'Save'}
       title={`Add Tools`}

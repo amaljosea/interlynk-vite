@@ -23,7 +23,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { CreateCompRelation, DeleteCompRelation } from 'graphQL/Mutation'
 import { GetCompDependency } from 'graphQL/Queries'
 
-import { FaPlus } from 'react-icons/fa6'
 import { LuCirclePlus } from 'react-icons/lu'
 
 import ActionButton from './ActionButton'

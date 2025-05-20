@@ -20,7 +20,6 @@ import LynkAction from 'components/Misc/LynkAction'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { FaScaleBalanced } from 'react-icons/fa6'
 import { LuScale } from 'react-icons/lu'
 
 import Pagination from '../Pagination'

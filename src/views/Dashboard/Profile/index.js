@@ -15,7 +15,6 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
-import { FaBuilding, FaUserCircle } from 'react-icons/fa'
 import { LuBuilding, LuCircleUser } from 'react-icons/lu'
 
 import Connections from '../../../components/Connections/Connections'

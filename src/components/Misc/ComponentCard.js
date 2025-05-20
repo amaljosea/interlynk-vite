@@ -21,9 +21,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { BiLayer } from 'react-icons/bi'
-import { FaCube } from 'react-icons/fa6'
-import { LuComponent } from 'react-icons/lu'
+import { LuComponent, LuLayers } from 'react-icons/lu'
 import { PiTreeStructure } from 'react-icons/pi'
 
 export const GetComponentData = gql`
@@ -139,7 +137,7 @@ const ComponentCard = ({ value, isOpen, onClose }) => {
       isOpen={isOpen}
       onClose={onClose}
       title='Component Details'
-      Icon={BiLayer}
+      Icon={LuLayers}
       noFooter={true}
       maxW={'600px'}
     >

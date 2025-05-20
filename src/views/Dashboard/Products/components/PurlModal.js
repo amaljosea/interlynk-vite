@@ -22,7 +22,7 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
 
-import { FaCircleInfo } from 'react-icons/fa6'
+import { LuInfo } from 'react-icons/lu'
 
 const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
   const { status, component } = activeRow || ''
@@ -254,7 +254,7 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
       isOpen={isOpen}
       onClose={onClose}
       buttonText={'Save'}
-      Icon={FaCircleInfo}
+      Icon={LuInfo}
       isLoading={loading}
       disabled={isInvalid}
       title={'PURL Details'}

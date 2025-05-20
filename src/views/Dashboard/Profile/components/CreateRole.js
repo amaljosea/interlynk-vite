@@ -13,7 +13,7 @@ import { useSelect } from 'hooks/useSelect'
 import { OrgRoleCreate } from 'graphQL/Mutation'
 import { GetAllPermissions } from 'graphQL/Queries'
 
-import { BiUserPlus } from 'react-icons/bi'
+import { LuUserPlus } from 'react-icons/lu'
 
 const CreateRole = ({ isOpen, onClose }) => {
   const [roleName, setRoleName] = useState('')
@@ -81,7 +81,7 @@ const CreateRole = ({ isOpen, onClose }) => {
       buttonText='Save'
       onClose={onClose}
       onSubmit={onSave}
-      Icon={BiUserPlus}
+      Icon={LuUserPlus}
       title={'Add Role'}
       isLoading={loading}
       disabled={isInvalid}

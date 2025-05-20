@@ -14,7 +14,7 @@ import LynkModal from 'components/LynkModal'
 import { createApiToken } from 'graphQL/Mutation'
 import { updateApiToken } from 'graphQL/Mutation'
 
-import { BiShieldQuarter } from 'react-icons/bi'
+import { LuKey } from 'react-icons/lu'
 
 const TokenModal = ({ data, isOpen, onClose }) => {
   const defaultDate = new Date()
@@ -150,7 +150,7 @@ const TokenModal = ({ data, isOpen, onClose }) => {
       onClose={onClose}
       onSubmit={onSubmit}
       title={modalTitle}
-      Icon={BiShieldQuarter}
+      Icon={LuKey}
       disabled={isButtonDisabled}
       buttonText={buttonName}
     >
