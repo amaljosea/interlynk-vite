@@ -302,12 +302,14 @@ const Settings = ({ enabled, data, mfc }) => {
                 </Tooltip>
               </FormLabel>
               <LynkSelect
+                value={project}
                 options={options}
                 isClearable={true}
+                name='jiraProject'
                 placeholder='Project'
+                aria-label='jiraProject'
                 isDisabled={!editControls}
                 onChange={(value) => onUpdate(value, 'jira')}
-                value={project}
               />
             </FormControl>
           </Stack>
