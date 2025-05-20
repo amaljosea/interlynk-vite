@@ -94,10 +94,8 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
 
   const { projectSetting } = settings?.project || {}
 
-  const [getJiraInformation] = useLazyQuery(JiraInformation, {
-    skip: project?.value ? false : true,
-    variables: { pKey: project?.value || undefined }
-  })
+  const [getJiraInformation, { data: info, loading: infoLoading }] =
+    useLazyQuery(JiraInformation)
 
   const [createJiraIssue, { loading }] = useMutation(CreateJiraIssue)
 
@@ -121,10 +119,16 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
     setFormValues({})
   }
 
-  const handleChangeProject = (project) => {
+  const handleChangeProject = async (project) => {
     setProject(project)
+    setIsApply(true)
     setIssueType(null)
     handleClear()
+    if (project) {
+      await getJiraInformation({
+        variables: { pKey: project?.value }
+      })
+    }
   }
 
   const handleChangeIssue = (issue) => {
@@ -236,31 +240,6 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
       .then((res) => {
         if (res?.data?.jira) {
           const { jira } = res?.data || {}
-          const issueTypes =
-            jira?.issueTypes?.length > 0
-              ? jira?.jiraIssueTypes?.map((issueType) => ({
-                  value: issueType.id,
-                  label: issueType.name
-                }))
-              : []
-          setIssueTypeList(issueTypes)
-          const assignees =
-            jira?.users?.length > 0
-              ? jira?.users?.map((assignee) => ({
-                  value: assignee.accountId,
-                  label: assignee.name
-                }))
-              : []
-          setAssigneeList(assignees)
-          const reporters =
-            jira?.users?.length > 0
-              ? jira?.users?.map((assignee) => ({
-                  value: assignee.accountId,
-                  label: assignee.name
-                }))
-              : []
-          setReporterList(reporters)
-
           const issueType = jira?.issueTypes?.find(
             (item) => item?.id === jiraIssueType
           )
@@ -288,6 +267,36 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
       })
       .finally(() => setIsApply(true))
   }
+
+  useEffect(() => {
+    if (info?.jira) {
+      const { jira } = info || {}
+      const issueTypes =
+        jira?.issueTypes?.length > 0
+          ? jira?.issueTypes?.map((issueType) => ({
+              value: issueType.id,
+              label: issueType.name
+            }))
+          : []
+      setIssueTypeList(issueTypes)
+      const assignees =
+        jira?.users?.length > 0
+          ? jira?.users?.map((assignee) => ({
+              value: assignee.accountId,
+              label: assignee.name
+            }))
+          : []
+      setAssigneeList(assignees)
+      const reporters =
+        jira?.users?.length > 0
+          ? jira?.users?.map((assignee) => ({
+              value: assignee.accountId,
+              label: assignee.name
+            }))
+          : []
+      setReporterList(reporters)
+    }
+  }, [info])
 
   useEffect(() => {
     const vulnId = row.vuln?.vulnId || 'N/A'
@@ -460,6 +469,7 @@ ${customFields}
             value={issueType}
             isClearable={true}
             options={issueTypeList}
+            isLoading={infoLoading}
             placeholder='Select Issue Type'
             onChange={(value) => handleChangeIssue(value)}
           />
