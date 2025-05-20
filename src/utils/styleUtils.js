@@ -79,6 +79,7 @@ export const sevColor = (severity) => {
     case 'negligible':
       return { bg: '#48BB78', text: '#22543D', btn: 'green' }
     case 'unknown':
+    case 'none':
       return { bg: '#A0AEC0', text: '#1A202C', btn: 'gray' }
   }
 }

@@ -22,6 +22,26 @@ export const downloadAttributionHtml = async (
     .label { color: #888; min-width: 80px; display: inline-block; font-weight: bold; color: #323232; font-size: 1.1em; }
     .value { color: #323232; line-height: 26pt; }
     .item { margin-bottom: 10px; }
+     .license-text-container {
+      margin-top: 10px;
+      margin-bottom: 15px;
+    }
+    .license-text-label {
+      font-weight: bold;
+      font-size: 1.1em;
+      color: #323232;
+      margin-bottom: 5px;
+    }
+    .license-text-content {
+      font-size: 0.9em;
+      color: #323232;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      max-width: 100%;
+    }
+    .license-item { margin-bottom: 8px; }
+    .license-short-id { font-weight: bold; }
   </style>
 </head>
 <body>
@@ -34,16 +54,43 @@ export const downloadAttributionHtml = async (
   </div>
   <div class="divider"></div>
   ${components
-    .map(
-      (component) => `
-    <div class="component">
-      <div class="component-name">${component.name} - ${component.version}</div>
-      <div class="item"><span class="label">Notice:</span> <span class="value">${component.notice || 'N/A'}</span></div>
-      <div class="item"><span class="label">License:</span> <span class="value">${component.licensesExp || 'N/A'}</span></div>
-      <div class="item"><span class="label">Copyright:</span> <span class="value">${component.copyright || 'N/A'}</span></div>
-    </div>
-  `
-    )
+    .map((component) => {
+      const licenseExpText = component.licensesExp || 'N/A'
+
+      return `
+          <div class="component">
+            <div class="component-name">${component.name} - ${component.version}</div>
+            <div class="item"><span class="label">Notice:</span> <span class="value">${component.notice || 'N/A'}</span></div>
+            <div class="item"><span class="label">License:</span> <span class="value">${licenseExpText}</span></div>
+           ${
+             licenseExpText !== 'N/A'
+               ? `
+              <div class="license-text-container">
+                <div class="license-text-label">License Text:</div>
+                ${
+                  Array.isArray(component.licenseText) &&
+                  component.licenseText.length > 0
+                    ? component.licenseText
+                        .filter((item) => item?.content?.text)
+                        .map(
+                          (licenseItem) => `
+                      <div class="license-item">
+                        <span class="license-short-id">${licenseItem?.content?.shortId || 'N/A'}:</span>
+                        <div class="license-text-content" style="margin-left: 20px;">${licenseItem?.content?.text || 'N/A'}</div>
+                      </div>
+                    `
+                        )
+                        .join('')
+                    : `<div class="license-text-content">N/A</div>`
+                }
+              </div>
+            `
+               : `<div class="item"><span class="label">License Text:</span> <span class="value">N/A</span></div>`
+           }
+            <div class="item"><span class="label">Copyright:</span> <span class="value">${component.copyright || 'N/A'}</span></div>
+          </div>
+        `
+    })
     .join('')}
 </body>
 </html>
@@ -58,10 +105,9 @@ export const downloadAttributionHtml = async (
     const year = now.getFullYear()
 
     // Format name and version
-    const formattedName = name.replace(/[.\s]/g, '_')
-    const formattedVersion = version.replace(/[.\s]/g, '_')
+    const formattedName = name.toLowerCase().replace(/[.\s]/g, '_')
 
-    return `${formattedName}_${formattedVersion}_${month}_${year}`
+    return `${formattedName}_${version}_${month}_${year}`
   }
 
   const filename = formatFilename(productName, productVersion)

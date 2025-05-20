@@ -190,8 +190,8 @@ const colors = {
     dark: '#95DE64'
   },
   graphRedColor: {
-    light: '#e53e3e99',
-    dark: '#e53e3e99'
+    light: '#ed7b7b',
+    dark: '#ed7b7b'
   },
   graphGreenColor: {
     light: '#38a169',

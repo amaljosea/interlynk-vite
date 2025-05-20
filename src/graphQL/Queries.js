@@ -3314,7 +3314,9 @@ export const GetCompSupportData = gql`
     $sbomId: Uuid
     $projectId: Uuid
     $first: Int
+    $last: Int
     $after: String
+    $before: String
     $includeParts: Boolean
     $orderBy: ComponentSupportLevelOrderByInput
     $supportLevel: [String!]
@@ -3324,7 +3326,9 @@ export const GetCompSupportData = gql`
       sbomId: $sbomId
       projectId: $projectId
       first: $first
+      last: $last
       after: $after
+      before: $before
       includeParts: $includeParts
       orderBy: $orderBy
       supportLevel: $supportLevel

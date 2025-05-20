@@ -20,7 +20,8 @@ const AttributionReportsEditModal = ({
   onClose,
   editingField,
   rowData,
-  sbomId
+  sbomId,
+  setSelectedRowData
 }) => {
   const [updateComponent, { loading }] = useMutation(UpdateComponent)
   const { showToast } = useCustomToast()
@@ -92,6 +93,13 @@ const AttributionReportsEditModal = ({
           status: 'success'
         })
       }
+      setSelectedRowData((prevSelectedRows) =>
+        prevSelectedRows.map((selectedRow) =>
+          selectedRow.id === rowData?.id
+            ? { ...selectedRow, licensesExp: license }
+            : selectedRow
+        )
+      )
       onClose()
     })
   }
@@ -113,6 +121,14 @@ const AttributionReportsEditModal = ({
           status: 'success'
         })
       }
+
+      setSelectedRowData((prevSelectedRows) =>
+        prevSelectedRows.map((selectedRow) =>
+          selectedRow.id === rowData?.id
+            ? { ...selectedRow, copyright: copyrightValue }
+            : selectedRow
+        )
+      )
       onClose()
     })
   }
@@ -124,7 +140,7 @@ const AttributionReportsEditModal = ({
         notice: noticeValue || undefined
       }
     }).then((res) => {
-      const { errors } = res?.data?.componentUpdate || ''
+      const { errors } = res?.data?.componentUpdate || {}
       if (errors?.length > 0) {
         showToast({ description: errors[0], status: 'error' })
       } else {
@@ -132,6 +148,14 @@ const AttributionReportsEditModal = ({
           description: `Notice updated successfully for ${rowData?.name}`,
           status: 'success'
         })
+
+        setSelectedRowData((prevSelectedRows) =>
+          prevSelectedRows.map((selectedRow) =>
+            selectedRow.id === rowData?.id
+              ? { ...selectedRow, notice: noticeValue }
+              : selectedRow
+          )
+        )
       }
       onClose()
     })

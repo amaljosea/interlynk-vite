@@ -371,6 +371,10 @@ const ProgressOverviewCard = () => {
         version2Metrics={version2Metrics}
         support1={support1}
         support2={support2}
+        supportPieChartData={supportPieChartData}
+        vulnPieChartData={vulnPieChartData}
+        visibleLines={visibleLines}
+        chartData={chartData}
       />
     ).toBlob()
 
@@ -532,7 +536,7 @@ const ProgressOverviewCard = () => {
                   type='monotone'
                   dataKey='Fixed & Not Affected'
                   stroke={graphGreenColor}
-                  strokeOpacity={0.3}
+                  strokeOpacity={0.8}
                   strokeWidth={2}
                 />
               )}
@@ -541,7 +545,7 @@ const ProgressOverviewCard = () => {
                   type='monotone'
                   dataKey='Affected'
                   stroke={graphRedColor}
-                  strokeOpacity={0.3}
+                  strokeOpacity={0.8}
                   strokeWidth={2}
                 />
               )}
@@ -550,7 +554,7 @@ const ProgressOverviewCard = () => {
                   type='monotone'
                   dataKey='Unspecified'
                   stroke={secondaryTextInverse}
-                  strokeOpacity={0.3}
+                  strokeOpacity={0.8}
                   strokeWidth={2}
                 />
               )}

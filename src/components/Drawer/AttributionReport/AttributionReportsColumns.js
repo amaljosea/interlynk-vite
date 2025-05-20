@@ -70,15 +70,15 @@ const AttributionReportsColumns = ({ onEdit }) => {
         name: 'LICENSES',
         selector: (row) => (
           <Flex alignItems='center' gap={2}>
-            <Text fontSize={14} color={primaryTextColor}>
-              {truncatedValue(row?.licensesExp || 'N/A', 30)}
-            </Text>
             <IconButton
               icon={<EditButton size={16} />}
               size='sm'
               variant='ghost'
               onClick={() => onEdit(row, 'license')}
             />
+            <Text fontSize={14} color={primaryTextColor}>
+              {truncatedValue(row?.licensesExp || 'N/A', 30)}
+            </Text>
           </Flex>
         ),
         width: '15%'
@@ -89,6 +89,12 @@ const AttributionReportsColumns = ({ onEdit }) => {
         name: 'NOTICE',
         selector: (row) => (
           <Flex alignItems='center' gap={2}>
+            <IconButton
+              icon={<EditButton size={16} />}
+              size='sm'
+              variant='ghost'
+              onClick={() => onEdit(row, 'notice')}
+            />
             {row?.notice ? (
               <CheckCircleIcon color={primarySuccessColor} w={4} h={4} />
             ) : (
@@ -104,12 +110,6 @@ const AttributionReportsColumns = ({ onEdit }) => {
                 <CloseIcon color={primaryBgColor} boxSize='8px' />
               </Box>
             )}
-            <IconButton
-              icon={<EditButton size={16} />}
-              size='sm'
-              variant='ghost'
-              onClick={() => onEdit(row, 'notice')}
-            />
           </Flex>
         ),
         width: '10%'
@@ -120,6 +120,12 @@ const AttributionReportsColumns = ({ onEdit }) => {
         name: 'COPYRIGHT',
         selector: (row) => (
           <Flex alignItems='center' gap={2}>
+            <IconButton
+              icon={<EditButton size={16} />}
+              size='sm'
+              variant='ghost'
+              onClick={() => onEdit(row, 'copyright')}
+            />
             {row?.copyright ? (
               <CheckCircleIcon color={primarySuccessColor} w={4} h={4} />
             ) : (
@@ -135,12 +141,6 @@ const AttributionReportsColumns = ({ onEdit }) => {
                 <CloseIcon color={primaryBgColor} boxSize='8px' />
               </Box>
             )}
-            <IconButton
-              icon={<EditButton size={16} />}
-              size='sm'
-              variant='ghost'
-              onClick={() => onEdit(row, 'copyright')}
-            />
           </Flex>
         ),
         width: '10%'
