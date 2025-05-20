@@ -51,9 +51,12 @@ const JiraFields = () => {
 
   const [updateSettings] = useMutation(ProjectSettingUpdate)
 
-  const { data: projectOptions } = useQuery(GetJiraProjects, {
-    skip: activeTab === 'settings' ? false : true
-  })
+  const { data: projectOptions, loading: projectLoading } = useQuery(
+    GetJiraProjects,
+    {
+      skip: activeTab === 'settings' ? false : true
+    }
+  )
   const { projects: jiraProjects } = projectOptions?.jira || {}
   const projects =
     jiraProjects?.length > 0
@@ -63,7 +66,7 @@ const JiraFields = () => {
         }))
       : []
 
-  const { data: options } = useQuery(JiraInformation, {
+  const { data: options, loading } = useQuery(JiraInformation, {
     skip: project?.value ? false : true,
     variables: { pKey: project?.value || undefined }
   })
@@ -101,15 +104,7 @@ const JiraFields = () => {
 
   const onUpdate = async (item, field) => {
     const { value } = item || {}
-    await updateSettings({
-      variables: {
-        id,
-        jiraProject: field === 'jiraProject' && value ? value : undefined,
-        jiraIssueType: field === 'jiraIssueType' && value ? value : undefined,
-        jiraAssignee: field === 'jiraAssignee' && value ? value : undefined,
-        jiraReporter: field === 'jiraReporter' && value ? value : undefined
-      }
-    })
+    await updateSettings({ variables: { id, [field]: value ? value : '' } })
       .then((res) => res.data)
       .finally(() => {
         showToast({
@@ -155,6 +150,7 @@ const JiraFields = () => {
           options={projects}
           isClearable={true}
           placeholder='Project'
+          isLoading={projectLoading}
           isDisabled={!editControls}
           onChange={(value) => onUpdate(value, 'jiraProject')}
           value={project}
@@ -166,6 +162,7 @@ const JiraFields = () => {
         <LynkSelect
           value={issueType}
           isClearable={true}
+          isLoading={loading}
           isDisabled={!editControls}
           placeholder='Select Issue Type'
           options={issueTypes}
@@ -178,6 +175,7 @@ const JiraFields = () => {
         <LynkSelect
           value={assignee}
           isClearable={true}
+          isLoading={loading}
           isDisabled={!editControls}
           placeholder='Select Assignee'
           options={assignees}
@@ -190,6 +188,7 @@ const JiraFields = () => {
         <LynkSelect
           value={reporter}
           isClearable={true}
+          isLoading={loading}
           isDisabled={!editControls}
           placeholder='Select Reporter'
           options={reporters}

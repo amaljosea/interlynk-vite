@@ -1,8 +1,13 @@
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  Button,
+  Flex,
   FormControl,
   FormLabel,
   Grid,
@@ -19,7 +24,6 @@ import useCustomToast from 'hooks/useCustomToast'
 
 import { CreateJiraIssue } from 'graphQL/Mutation'
 import {
-  GetDefaultJiraProduct,
   GetJiraProjectFields,
   GetJiraProjects,
   JiraInformation
@@ -27,41 +31,32 @@ import {
 
 import { LuBolt } from 'react-icons/lu'
 
+const GetProjectSettings = gql`
+  query GetProjectSettings($id: Uuid!) {
+    project(id: $id) {
+      projectSetting {
+        id
+        jiraProject
+        jiraIssueType
+        jiraAssignee
+        jiraReporter
+      }
+    }
+  }
+`
+
 const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
   const params = useParams()
-
-  const { data: projectOptions } = useQuery(GetJiraProjects, {
-    skip: isOpen ? false : true,
-    fetchPolicy: 'network-only'
-  })
-
-  const { data: settings } = useQuery(GetDefaultJiraProduct, {
-    skip: isOpen ? false : true,
-    variables: { id: params.productid }
-  })
-
-  const { jiraProject } = settings?.project?.projectSetting || ''
-
-  const [getOptions, { data: options }] = useLazyQuery(JiraInformation, {
-    fetchPolicy: 'network-only'
-  })
-
-  const [createJiraIssue, { loading }] = useMutation(CreateJiraIssue)
-
   const { showToast } = useCustomToast()
 
   const [summary, setSummary] = useState('')
+  const [issueTypeList, setIssueTypeList] = useState([])
+  const [assigneeList, setAssigneeList] = useState([])
+  const [reporterList, setReporterList] = useState([])
 
-  const [projects, setProjects] = useState([])
   const [project, setProject] = useState(null)
-
-  const [issueTypes, setIssueTypes] = useState([])
   const [issueType, setIssueType] = useState(null)
-
-  const [assignees, setAssignees] = useState([])
   const [assignee, setAssignee] = useState(null)
-
-  const [reporters, setReporters] = useState([])
   const [reporter, setReporter] = useState(null)
 
   const [priorities, setPriorities] = useState([])
@@ -71,9 +66,40 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
   const [label, setLabel] = useState(null)
 
   const [description, setDescription] = useState('')
+  const [isApply, setIsApply] = useState(false)
   const [isCreateDisabled, setIsCreateDisabled] = useState(true)
 
   const [formValues, setFormValues] = useState({})
+
+  const { data: projectOptions, loading: projectsLoading } = useQuery(
+    GetJiraProjects,
+    {
+      skip: isOpen ? false : true,
+      fetchPolicy: 'network-only'
+    }
+  )
+  const { projects: jiraProjects } = projectOptions?.jira || {}
+  const projectList =
+    jiraProjects?.length > 0
+      ? jiraProjects?.map((project) => ({
+          value: project.key,
+          label: project.name
+        }))
+      : []
+
+  const { data: settings } = useQuery(GetProjectSettings, {
+    skip: isOpen ? false : true,
+    variables: { id: params.productid }
+  })
+
+  const { projectSetting } = settings?.project || {}
+
+  const [getJiraInformation] = useLazyQuery(JiraInformation, {
+    skip: project?.value ? false : true,
+    variables: { pKey: project?.value || undefined }
+  })
+
+  const [createJiraIssue, { loading }] = useMutation(CreateJiraIssue)
 
   const { data } = useQuery(GetJiraProjectFields, {
     fetchPolicy: 'network-only',
@@ -96,7 +122,6 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
   }
 
   const handleChangeProject = (project) => {
-    project && getOptions({ variables: { pKey: project.value } })
     setProject(project)
     setIssueType(null)
     handleClear()
@@ -198,6 +223,72 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
       .join('\n\n')
   }
 
+  const handleApply = async () => {
+    const { jiraProject, jiraIssueType, jiraAssignee, jiraReporter } =
+      projectSetting || {}
+    const project = projectOptions?.jira?.projects?.find(
+      (item) => item?.key === jiraProject
+    )
+    setProject(project ? { value: project?.key, label: project.name } : null)
+    await getJiraInformation({
+      variables: { pKey: project?.key || undefined }
+    })
+      .then((res) => {
+        if (res?.data?.jira) {
+          const { jira } = res?.data || {}
+          const issueTypes =
+            jira?.issueTypes?.length > 0
+              ? jira?.jiraIssueTypes?.map((issueType) => ({
+                  value: issueType.id,
+                  label: issueType.name
+                }))
+              : []
+          setIssueTypeList(issueTypes)
+          const assignees =
+            jira?.users?.length > 0
+              ? jira?.users?.map((assignee) => ({
+                  value: assignee.accountId,
+                  label: assignee.name
+                }))
+              : []
+          setAssigneeList(assignees)
+          const reporters =
+            jira?.users?.length > 0
+              ? jira?.users?.map((assignee) => ({
+                  value: assignee.accountId,
+                  label: assignee.name
+                }))
+              : []
+          setReporterList(reporters)
+
+          const issueType = jira?.issueTypes?.find(
+            (item) => item?.id === jiraIssueType
+          )
+          const assignee = jira?.users?.find(
+            (item) => item?.accountId === jiraAssignee
+          )
+          const reporter = jira?.users?.find(
+            (item) => item?.accountId === jiraReporter
+          )
+
+          setIssueType(
+            issueType ? { value: issueType?.id, label: issueType?.name } : null
+          )
+          setAssignee(
+            assignee
+              ? { value: assignee?.accountId, label: assignee?.name }
+              : null
+          )
+          setReporter(
+            reporter
+              ? { value: reporter?.accountId, label: reporter?.name }
+              : null
+          )
+        }
+      })
+      .finally(() => setIsApply(true))
+  }
+
   useEffect(() => {
     const vulnId = row.vuln?.vulnId || 'N/A'
     const desc = row.vuln?.desc || 'N/A'
@@ -243,12 +334,7 @@ ${customFields}
       `
     )
     setSummary(`[Vulnerability]: ${vulnId}`)
-
-    if (jiraProject) {
-      getOptions({ variables: { pKey: jiraProject } })
-      setProject({ value: jiraProject, label: jiraProject })
-    }
-  }, [jiraProject, getOptions, row])
+  }, [row])
 
   useEffect(() => {
     if (summary && project && issueType && reporter && assignee) {
@@ -257,40 +343,6 @@ ${customFields}
       setIsCreateDisabled(true)
     }
   }, [summary, project, issueType, reporter, assignee])
-
-  useEffect(() => {
-    if (options) {
-      setIssueTypes(
-        options.jira?.issueTypes?.map((issueType) => ({
-          value: issueType.id,
-          label: issueType.name
-        }))
-      )
-      setAssignees(
-        options.jira?.users?.map((assignee) => ({
-          value: assignee.accountId,
-          label: assignee.name
-        }))
-      )
-      setReporters(
-        options.jira?.users?.map((reporter) => ({
-          value: reporter.accountId,
-          label: reporter.name
-        }))
-      )
-    }
-  }, [options])
-
-  useEffect(() => {
-    if (projectOptions) {
-      setProjects(
-        projectOptions.jira?.projects?.map((project) => ({
-          value: project.key,
-          label: project.name
-        }))
-      )
-    }
-  }, [projectOptions])
 
   useEffect(() => {
     if (fields?.length > 0) {
@@ -363,7 +415,24 @@ ${customFields}
       title={'Create Jira Issue'}
       disabled={isCreateDisabled}
     >
-      <FormControl isRequired>
+      {projectSetting?.jiraProject && !isApply && (
+        <Flex gap={4} alignItems={'center'} justifyContent={'space-between'}>
+          <Alert fontSize={'14px'} variant='left-accent' status='info'>
+            <AlertIcon />
+            <AlertDescription>Found default settings.</AlertDescription>
+            <Button
+              size={'sm'}
+              ml={'auto'}
+              onClick={handleApply}
+              _hover={{ bg: 'auto' }}
+            >
+              Apply
+            </Button>
+          </Alert>
+        </Flex>
+      )}
+
+      <FormControl pt={'15px'} isRequired>
         <FormLabel>Summary</FormLabel>
         <Input
           value={summary}
@@ -376,10 +445,10 @@ ${customFields}
         <FormControl isRequired>
           <FormLabel>Project</FormLabel>
           <LynkSelect
-            dropDown
             value={project}
-            options={projects}
             isClearable={true}
+            options={projectList}
+            isLoading={projectsLoading}
             placeholder='Select Project'
             onChange={(value) => handleChangeProject(value)}
           />
@@ -388,11 +457,10 @@ ${customFields}
         <FormControl isRequired>
           <FormLabel>Issue Type</FormLabel>
           <LynkSelect
-            dropDown
             value={issueType}
             isClearable={true}
+            options={issueTypeList}
             placeholder='Select Issue Type'
-            options={issueTypes}
             onChange={(value) => handleChangeIssue(value)}
           />
         </FormControl>
@@ -400,11 +468,10 @@ ${customFields}
         <FormControl isRequired hidden={!issueType}>
           <FormLabel>Reporter</FormLabel>
           <LynkSelect
-            dropDown
             value={reporter}
             isClearable={true}
+            options={reporterList}
             placeholder='Select Reporter'
-            options={reporters}
             onChange={(e) => setReporter(e)}
           />
         </FormControl>
@@ -412,11 +479,10 @@ ${customFields}
         <FormControl isRequired hidden={!issueType}>
           <FormLabel>Assignee</FormLabel>
           <LynkSelect
-            dropDown
             value={assignee}
             isClearable={true}
+            options={assigneeList}
             placeholder='Select Assignee'
-            options={assignees}
             onChange={(e) => setAssignee(e)}
           />
         </FormControl>
@@ -440,7 +506,6 @@ ${customFields}
         <FormControl hidden={!issueType}>
           <FormLabel>Priority</FormLabel>
           <LynkSelect
-            dropDown
             value={priority}
             isClearable={true}
             placeholder='Select Priority'
