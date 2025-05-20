@@ -100,15 +100,7 @@ const Settings = ({ enabled, data, mfc }) => {
   const ProductSetting = ({ id, label, value }) => {
     if (id === 'enableSupportLevel' && isFreeTier) return null
     return (
-      <Flex gap={2} align='center'>
-        <LynkSwitch
-          id={id}
-          size='md'
-          me='10px'
-          isChecked={value || false}
-          isDisabled={!enabled || !editControls}
-          onChange={(e) => onUpdate(e.target.checked, id)}
-        />
+      <Flex gap={2} align='center' justifyContent={'space-between'}>
         <Flex align='center'>
           <Text
             noOfLines={1}
@@ -122,6 +114,14 @@ const Settings = ({ enabled, data, mfc }) => {
             <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
           </Tooltip>
         </Flex>
+        <LynkSwitch
+          id={id}
+          size='md'
+          me='10px'
+          isChecked={value || false}
+          isDisabled={!enabled || !editControls}
+          onChange={(e) => onUpdate(e.target.checked, id)}
+        />
       </Flex>
     )
   }
