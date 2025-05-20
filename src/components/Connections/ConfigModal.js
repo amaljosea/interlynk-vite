@@ -63,26 +63,53 @@ const ConfigModal = ({
     childKey: 'create_update_connection'
   })
 
-  const handleBlur = (e) => {
-    const { value } = e.target
-    const isInvalidEmail = value !== '' && !validateEmail(value)
-    const isInvalidTeamURL = value !== '' && !isValidTeamsWebhookUrl(value)
-    const isInvalidAddress = value !== '' && !isValidSlackWebhookUrl(value)
-    switch (title) {
-      case 'Email Configuration':
-        isInvalidEmail && setErrorMessage('Please enter a valid email')
-        break
-      case 'Slack Configuration':
-        isInvalidAddress &&
-          setErrorMessage('Please enter a valid slack webhook address')
-        break
-      case 'Teams Configuration':
-        isInvalidTeamURL &&
-          setErrorMessage('Please enter a valid team webhook address')
-        break
-      default:
-        setErrorMessage('')
-    }
+  const validateConfigs = () => {
+    let isValid = true
+    let addressErrorShown = false
+
+    const newConfigs = configs.map((config) => {
+      let isConfigValid = true
+      let addressError = ''
+
+      const trimmedAddress = config.address.trim()
+
+      if (trimmedAddress !== '') {
+        if (title === 'Email Configuration' && !validateEmail(trimmedAddress)) {
+          isConfigValid = false
+          isValid = false
+          addressError = 'Please enter a valid email'
+        }
+        if (
+          title === 'Slack Configuration' &&
+          !isValidSlackWebhookUrl(trimmedAddress)
+        ) {
+          isConfigValid = false
+          isValid = false
+          addressError = 'Please enter a valid slack webhook address'
+        }
+        if (
+          title === 'Teams Configuration' &&
+          !isValidTeamsWebhookUrl(trimmedAddress)
+        ) {
+          isConfigValid = false
+          isValid = false
+          addressError = 'Please enter a valid team webhook address'
+        }
+      }
+
+      if (!isConfigValid && !addressErrorShown) {
+        setErrorMessage(addressError)
+        addressErrorShown = true
+      }
+
+      return {
+        ...config,
+        isValid: isConfigValid
+      }
+    })
+
+    setConfigs(newConfigs)
+    return isValid
   }
 
   useEffect(() => {
@@ -167,6 +194,9 @@ const ConfigModal = ({
   }
 
   const handleUpdate = async () => {
+    const isValid = validateConfigs()
+    if (!isValid) return
+
     const validConfigs = getValidConfigs()
 
     if (validConfigs.length === 0) {
@@ -197,6 +227,9 @@ const ConfigModal = ({
   }
 
   const handleSave = async () => {
+    const isValid = validateConfigs()
+    if (!isValid) return
+
     const validConfigs = getValidConfigs()
 
     if (validConfigs.length === 0) {
@@ -317,7 +350,6 @@ const ConfigModal = ({
                     onChange={(e) =>
                       handleChange(index, 'address', e.target.value)
                     }
-                    onBlur={handleBlur}
                   />
                   <FormErrorMessage>{config?.error}</FormErrorMessage>
                 </Box>
