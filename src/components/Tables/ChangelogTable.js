@@ -88,7 +88,7 @@ const ChangelogTable = ({ activeEnv }) => {
         const { action, updatedAt, event } = row
         const eventType = getChangelog(event)
         return (
-          <Flex alignItems={'center'} gap={3}>
+          <Flex alignItems={'center'} gap={3} my={3}>
             <Tooltip
               placement='top'
               label={action}
