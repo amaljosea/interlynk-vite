@@ -146,7 +146,7 @@ const Settings = ({ enabled, data, mfc }) => {
           {/* COLUMNS 1 */}
           <Stack spacing={5}>
             <Text fontSize={14} fontWeight={'semibold'}>
-              Advisory Feeds
+              Import Actions
             </Text>
 
             {/* APPLY CHECK */}
@@ -195,7 +195,7 @@ const Settings = ({ enabled, data, mfc }) => {
           {/* COLUMN 2 */}
           <Stack spacing={4}>
             <Text fontSize={14} fontWeight={'semibold'}>
-              Default Settings
+              Environment Defaults
             </Text>
 
             {/* DATE RENTATION */}

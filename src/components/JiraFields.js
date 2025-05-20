@@ -145,7 +145,7 @@ const JiraFields = () => {
   return (
     <Stack spacing={4}>
       <Text fontSize={14} fontWeight={'semibold'}>
-        JIRA Settings
+        JIRA Defaults
       </Text>
 
       <FormControl hidden={isFreeTier}>
@@ -153,7 +153,7 @@ const JiraFields = () => {
         <LynkSelect
           options={projects}
           isClearable={true}
-          placeholder='Project'
+          placeholder='Select Project'
           isLoading={projectLoading}
           isDisabled={!editControls}
           onChange={(value) => onUpdate(value, 'jiraProject')}

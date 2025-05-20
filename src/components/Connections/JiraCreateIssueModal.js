@@ -1,13 +1,8 @@
 import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  Button,
-  Flex,
   FormControl,
   FormLabel,
   Grid,
@@ -66,7 +61,6 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
   const [label, setLabel] = useState(null)
 
   const [description, setDescription] = useState('')
-  const [isApply, setIsApply] = useState(false)
   const [isCreateDisabled, setIsCreateDisabled] = useState(true)
 
   const [formValues, setFormValues] = useState({})
@@ -121,8 +115,10 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
 
   const handleChangeProject = async (project) => {
     setProject(project)
-    setIsApply(true)
     setIssueType(null)
+    setIssueTypeList([])
+    setAssigneeList([])
+    setReporterList([])
     handleClear()
     if (project) {
       await getJiraInformation({
@@ -227,46 +223,47 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
       .join('\n\n')
   }
 
-  const handleApply = async () => {
+  const handleApply = useCallback(async () => {
     const { jiraProject, jiraIssueType, jiraAssignee, jiraReporter } =
       projectSetting || {}
     const project = projectOptions?.jira?.projects?.find(
       (item) => item?.key === jiraProject
     )
     setProject(project ? { value: project?.key, label: project.name } : null)
-    await getJiraInformation({
-      variables: { pKey: project?.key || undefined }
-    })
-      .then((res) => {
-        if (res?.data?.jira) {
-          const { jira } = res?.data || {}
-          const issueType = jira?.issueTypes?.find(
-            (item) => item?.id === jiraIssueType
-          )
-          const assignee = jira?.users?.find(
-            (item) => item?.accountId === jiraAssignee
-          )
-          const reporter = jira?.users?.find(
-            (item) => item?.accountId === jiraReporter
-          )
-
-          setIssueType(
-            issueType ? { value: issueType?.id, label: issueType?.name } : null
-          )
-          setAssignee(
-            assignee
-              ? { value: assignee?.accountId, label: assignee?.name }
-              : null
-          )
-          setReporter(
-            reporter
-              ? { value: reporter?.accountId, label: reporter?.name }
-              : null
-          )
+    if (project) {
+      await getJiraInformation({ variables: { pKey: project?.key } }).then(
+        (res) => {
+          if (res?.data?.jira) {
+            const { jira } = res?.data || {}
+            const issueType = jira?.issueTypes?.find(
+              (item) => item?.id === jiraIssueType
+            )
+            const assignee = jira?.users?.find(
+              (item) => item?.accountId === jiraAssignee
+            )
+            const reporter = jira?.users?.find(
+              (item) => item?.accountId === jiraReporter
+            )
+            setIssueType(
+              issueType
+                ? { value: issueType?.id, label: issueType?.name }
+                : null
+            )
+            setAssignee(
+              assignee
+                ? { value: assignee?.accountId, label: assignee?.name }
+                : null
+            )
+            setReporter(
+              reporter
+                ? { value: reporter?.accountId, label: reporter?.name }
+                : null
+            )
+          }
         }
-      })
-      .finally(() => setIsApply(true))
-  }
+      )
+    }
+  }, [getJiraInformation, projectOptions?.jira?.projects, projectSetting])
 
   useEffect(() => {
     if (info?.jira) {
@@ -343,7 +340,8 @@ ${customFields}
       `
     )
     setSummary(`[Vulnerability]: ${vulnId}`)
-  }, [row])
+    handleApply()
+  }, [handleApply, row])
 
   useEffect(() => {
     if (summary && project && issueType && reporter && assignee) {
@@ -424,23 +422,6 @@ ${customFields}
       title={'Create Jira Issue'}
       disabled={isCreateDisabled}
     >
-      {projectSetting?.jiraProject && !isApply && (
-        <Flex gap={4} alignItems={'center'} justifyContent={'space-between'}>
-          <Alert fontSize={'14px'} variant='left-accent' status='info'>
-            <AlertIcon />
-            <AlertDescription>Found default settings.</AlertDescription>
-            <Button
-              size={'sm'}
-              ml={'auto'}
-              onClick={handleApply}
-              _hover={{ bg: 'auto' }}
-            >
-              Apply
-            </Button>
-          </Alert>
-        </Flex>
-      )}
-
       <FormControl pt={'15px'} isRequired>
         <FormLabel>Summary</FormLabel>
         <Input
