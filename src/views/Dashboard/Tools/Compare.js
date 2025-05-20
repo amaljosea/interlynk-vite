@@ -5,6 +5,7 @@ import { sortByUpdatedAt } from 'utils'
 import { Flex, Grid, HStack, Icon, Stack, Text } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
+import CustomLoader from 'components/CustomLoader'
 import CustomDropdownIndicator from 'components/Misc/CustomDropdownIndicator'
 import DiffTable from 'components/Tables/DiffTable'
 
@@ -365,12 +366,23 @@ const Compare = ({ selectedSboms }) => {
       </Grid>
       {/* SBOM DIFFERENCE */}
       <Card width='100%'>
-        <DiffTable
-          diffs={driftData?.sbom}
-          isLoading={isLoading}
-          sbomOne={firstSbomInfo}
-          sbomTwo={secondSbomInfo}
-        />
+        {isLoading ? (
+          <CustomLoader />
+        ) : !firstSbomInfo || !secondSbomInfo ? (
+          <Text textAlign='center' marginY={10}>
+            Please select two SBOMs to compare.
+          </Text>
+        ) : driftData?.sbom?.sbomDrift?.length > 0 ? (
+          <DiffTable
+            diffs={driftData?.sbom}
+            sbomOne={firstSbomInfo}
+            sbomTwo={secondSbomInfo}
+          />
+        ) : (
+          <Text textAlign='center' marginY={10}>
+            No difference found between selected SBOMs.
+          </Text>
+        )}
       </Card>
     </Flex>
   )
