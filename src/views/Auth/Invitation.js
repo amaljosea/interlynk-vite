@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { clearData } from 'utils/authUtils'
 
 import { WarningIcon } from '@chakra-ui/icons'
-import { Button, Flex, Icon, Stack, Text } from '@chakra-ui/react'
+import { Button, Icon, Stack, Text } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 
@@ -15,7 +15,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { AcceptInvitation, DeclineInvitation } from 'graphQL/Mutation'
 import { OrgUserInvitationInfo } from 'graphQL/Queries'
 
-import { FaTimesCircle } from 'react-icons/fa'
+import { LuCircleX } from 'react-icons/lu'
 
 const Invitation = () => {
   const { showToast } = useCustomToast()
@@ -26,8 +26,10 @@ const Invitation = () => {
   const [error, setError] = useState([])
   const [isRejected, setIsRejected] = useState(false)
 
-  const [acceptInvitation] = useMutation(AcceptInvitation)
-  const [rejectInvitation] = useMutation(DeclineInvitation)
+  const [acceptInvitation, { loading: acceptLoading }] =
+    useMutation(AcceptInvitation)
+  const [rejectInvitation, { loading: rejectLoading }] =
+    useMutation(DeclineInvitation)
 
   const { data, loading } = useQuery(OrgUserInvitationInfo, {
     skip: !token,
@@ -89,12 +91,7 @@ const Invitation = () => {
 
   if (error?.length > 0) {
     return (
-      <Flex
-        flexDir={'column'}
-        textAlign={'center'}
-        alignItems={'center'}
-        justifyContent={'center'}
-      >
+      <Stack minW={'auto'} maxW={'420px'}>
         <Icon color={primaryErrorColor} boxSize={20} as={WarningIcon} />
         <Text my={6}>
           That did not work because of the following error:
@@ -106,27 +103,16 @@ const Invitation = () => {
           <br />
           Please contact the admin to re-send the link.
         </Text>
-      </Flex>
+      </Stack>
     )
   }
 
   return (
-    <Flex
-      gap={2}
-      width={'100%'}
-      flexDir={'column'}
-      alignItems={'center'}
-      justifyContent={'center'}
-    >
+    <Stack minW={'auto'} maxW={'420px'}>
       {isRejected && (
-        <Icon
-          mb={6}
-          color={primaryErrorColor}
-          boxSize={16}
-          as={FaTimesCircle}
-        />
+        <Icon mb={6} boxSize={16} as={LuCircleX} color={primaryErrorColor} />
       )}
-      <Text fontSize={'20px'} fontWeight={'semibold'}>
+      <Text fontSize={'20px'} textAlign={'center'} fontWeight={'semibold'}>
         {isRejected
           ? 'Invitation Rejected'
           : `Invitation to join ${organizationName}`}
@@ -137,13 +123,14 @@ const Invitation = () => {
           : `You are invited to join ${organizationName} at Interlynk`}
       </Text>
       {!isRejected && (
-        <Stack mt={8} spacing={4} w={'full'}>
+        <Stack mt={8} spacing={3} w={'full'}>
           <Button
             w={'100%'}
             variant='solid'
             colorScheme='blue'
             onClick={onAccept}
             title='Accept invitation'
+            isLoading={acceptLoading}
           >
             Accept Invitation
           </Button>
@@ -152,12 +139,13 @@ const Invitation = () => {
             variant='ghost'
             colorScheme='blue'
             onClick={onReject}
+            isLoading={rejectLoading}
           >
             Decline
           </Button>
         </Stack>
       )}
-    </Flex>
+    </Stack>
   )
 }
 

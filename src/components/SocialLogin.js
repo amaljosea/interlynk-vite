@@ -1,4 +1,4 @@
-import { Button, ButtonGroup } from '@chakra-ui/react'
+import { Button, Stack } from '@chakra-ui/react'
 
 import { FaGithub } from 'react-icons/fa6'
 import { FcGoogle } from 'react-icons/fc'
@@ -53,12 +53,11 @@ const SocialLogin = () => {
   }
 
   return (
-    <ButtonGroup>
+    <Stack>
       <Button
         width={'100%'}
         title='Google'
         variant='outline'
-        colorScheme='blue'
         onClick={() => onAuth('google')}
         leftIcon={<FcGoogle fontSize={18} />}
       >
@@ -68,13 +67,12 @@ const SocialLogin = () => {
         width={'100%'}
         title='Github'
         variant='outline'
-        colorScheme='blue'
         leftIcon={<FaGithub />}
         onClick={() => onAuth('github')}
       >
         Github
       </Button>
-    </ButtonGroup>
+    </Stack>
   )
 }
 

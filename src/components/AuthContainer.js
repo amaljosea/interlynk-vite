@@ -1,39 +1,33 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-
 /* eslint-disable no-restricted-syntax */
 import InterlynkLogo from 'assets/img/logo.png'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
-import { Flex, Grid, GridItem, Heading, Img, Text } from '@chakra-ui/react'
-
-import { useThemeColor } from 'hooks/useThemeColors'
+import { Flex, Heading, Img, Stack, Text } from '@chakra-ui/react'
 
 const AuthContainer = ({ children }) => {
-  const { primaryBgColor } = useThemeColor(['primaryBgColor'])
-  const headers = [
-    'Interlynk automates your SBOM compliance without compromising privacy or control.',
-    'Seamlessly manage SBOMs with Interlynk.',
-    'Stay compliant and in control with Interlynk.',
-    'Simplify your SBOM management with automation.',
-    'Ensure SBOM compliance effortlessly with Interlynk.'
-  ]
   const [selectedHeader, setSelectedHeader] = useState('')
 
-  // Randomly select a header on component mount
   useEffect(() => {
+    const headers = [
+      'Interlynk automates your SBOM compliance without compromising privacy or control.',
+      'Seamlessly manage SBOMs with Interlynk.',
+      'Stay compliant and in control with Interlynk.',
+      'Simplify your SBOM management with automation.',
+      'Ensure SBOM compliance effortlessly with Interlynk.'
+    ]
     const randomIndex = Math.floor(Math.random() * headers.length)
     setSelectedHeader(headers[randomIndex])
-  }, []) // Empty dependency array ensures it runs only once
+  }, [])
 
   return (
-    <Grid width={'100%'} height={'100vh'} templateColumns='repeat(12, 1fr)'>
-      <GridItem
+    <Stack minH={'100vh'} direction={{ base: 'column', md: 'row' }}>
+      <Flex
         p={10}
-        as={Flex}
-        colSpan={8}
+        flex={1}
         flexDir='column'
         alignItems='flex-start'
+        display={['none', 'flex']}
         justifyContent='space-between'
         bgGradient='linear(to-br, #4299e1, #1A365D)'
       >
@@ -52,24 +46,18 @@ const AuthContainer = ({ children }) => {
             </Text>
           </Flex>
         </Link>
-        <Heading opacity={0.8} fontSize={'5xl'} color={'blue.200'}>
+        <Heading
+          opacity={0.8}
+          color={'blue.200'}
+          fontSize={['2xl', '3xl', '5xl']}
+        >
           {selectedHeader}
         </Heading>
-      </GridItem>
-      <GridItem
-        p={10}
-        colSpan={4}
-        height={'100%'}
-        display={'flex'}
-        flexDir={'column'}
-        bg={primaryBgColor}
-        overflowY={'scroll'}
-        alignItems={'center'}
-        justifyContent={'center'}
-      >
+      </Flex>
+      <Flex p={8} flex={1} align={'center'} justify={'center'}>
         {children}
-      </GridItem>
-    </Grid>
+      </Flex>
+    </Stack>
   )
 }
 

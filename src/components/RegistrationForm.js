@@ -222,16 +222,11 @@ const RegistrationForm = () => {
   }
 
   return (
-    <Flex
-      height={'100%'}
-      mt={[4, 6, 8, 24]}
-      direction={'column'}
-      alignItems={'flex-start'}
-    >
+    <Stack>
       <Text fontSize={'20px'} fontWeight={'semibold'} textAlign={'center'}>
         Welcome
       </Text>
-      <Text fontSize={'sm'} color={headingTextColor}>
+      <Text fontSize={'sm'} textAlign={'center'} color={headingTextColor}>
         Register to continue to the dashboard.
       </Text>
       {error !== '' && (
@@ -239,7 +234,14 @@ const RegistrationForm = () => {
           <LynkAlert msg={error} />
         </Box>
       )}
-      <Stack pt={8} direction={'column'} gap={3} width={'100%'}>
+      <Stack
+        pt={8}
+        gap={3}
+        minW={'auto'}
+        maxW={'420px'}
+        width={'100%'}
+        direction={'column'}
+      >
         {/* NAME */}
         <FormControl isInvalid={nameError !== ''}>
           <FormLabel htmlFor='organization'>Name</FormLabel>
@@ -303,7 +305,7 @@ const RegistrationForm = () => {
           )}
         </FormControl>
         {/* CONFIRM PASSWORD */}
-        <FormControl mt={3} isRequired isInvalid={passError !== ''}>
+        <FormControl isRequired isInvalid={passError !== ''}>
           <FormLabel htmlFor='ConfirmPassword'>Confirm Password</FormLabel>
           <InputGroup>
             <Input
@@ -326,13 +328,13 @@ const RegistrationForm = () => {
           )}
         </FormControl>
         <Button
-          mt={5}
+          mt={2}
           width='full'
           title='Register'
           colorScheme='blue'
           isLoading={loading}
           onClick={handleSubmit}
-          loadingText='Submitting'
+          loadingText='Loading...'
           disabled={
             isInvalid || loading || error || nameError || name.length === 1
           }
@@ -340,7 +342,7 @@ const RegistrationForm = () => {
           Register
         </Button>
         <Stack
-          mt={4}
+          mt={2}
           alignItems={'center'}
           justifyContent={'center'}
           direction={'row'}
@@ -357,7 +359,7 @@ const RegistrationForm = () => {
         <SocialLogin />
         <PolicyTerms />
       </Stack>
-    </Flex>
+    </Stack>
   )
 }
 
