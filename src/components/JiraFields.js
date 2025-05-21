@@ -29,6 +29,25 @@ const GetProjectSettings = gql`
   }
 `
 
+const GetJiraConnections = gql`
+  query GetJiraConnections {
+    organization {
+      connections {
+        nodes {
+          enabled
+          connection {
+            ... on JiraConnection {
+              userName
+              apiToken
+              url
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 const JiraFields = () => {
   const params = useParams()
   const productId = params.productid
@@ -50,6 +69,16 @@ const JiraFields = () => {
   })
 
   const [updateSettings] = useMutation(ProjectSettingUpdate)
+
+  const { data: config } = useQuery(GetJiraConnections, {
+    skip: activeTab === 'settings' ? false : true
+  })
+  const { nodes } = config?.organization?.connections || {}
+  const jiraConnection = nodes?.some(
+    (item) =>
+      item?.connection?.__typename === 'JiraConnection' &&
+      item?.enabled === true
+  )
 
   const { data: projectOptions, loading: projectLoading } = useQuery(
     GetJiraProjects,
@@ -141,6 +170,8 @@ const JiraFields = () => {
       reporter ? { value: reporter?.accountId, label: reporter?.name } : null
     )
   }, [options, projectOptions?.jira?.projects, projectSetting])
+
+  if (!jiraConnection) return null
 
   return (
     <Stack spacing={4}>
