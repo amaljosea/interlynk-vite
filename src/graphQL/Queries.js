@@ -5773,3 +5773,36 @@ export const BitbucketRepositories = gql`
     }
   }
 `
+export const ProductProgressMetrics = gql`
+  query ProductProgressMetrics($projectId: Uuid!) {
+    project(id: $projectId) {
+      id
+      projectGroup {
+        name
+      }
+      sbomVersions(
+        first: 25
+        orderBy: { direction: DESC, field: SBOMS_CREATED_AT }
+      ) {
+        totalCount
+        nodes {
+          projectVersion
+          vulnRunStatus
+          vulnerabilityMetrics {
+            affectedCount
+            fixedCount
+            inTriageCount
+            notAffectedCount
+            unspecifiedCount
+          }
+          supportLevelMetrics {
+            abandonedCount
+            activelyMaintainedCount
+            noLongerMaintainedCount
+            unspecifiedCount
+          }
+        }
+      }
+    }
+  }
+`
