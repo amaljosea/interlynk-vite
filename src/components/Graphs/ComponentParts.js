@@ -18,6 +18,7 @@ import {
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 
+import { useScrollHide } from 'hooks/useScrollHide'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { LuCircleDot, LuComponent, LuGitMerge } from 'react-icons/lu'
@@ -54,7 +55,7 @@ const GetPartComponents = gql`
 
 const ComponentPart = () => {
   const params = useParams()
-
+  const hide = useScrollHide(5)
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   const { data, loading } = useQuery(GetPartComponents, {
@@ -77,7 +78,7 @@ const ComponentPart = () => {
   })
   const total = list.reduce((acc, { count }) => acc + count, 0)
 
-  const hidden = sbomParts?.length === 0
+  const hidden = hide || sbomParts?.length === 0
 
   if (loading)
     return (

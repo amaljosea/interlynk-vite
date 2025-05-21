@@ -20,6 +20,7 @@ import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import VulnBadge from 'components/Misc/VulnBadge'
 
+import { useScrollHide } from 'hooks/useScrollHide'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { LuCircleDot, LuGitMerge, LuShieldCheck } from 'react-icons/lu'
@@ -89,7 +90,7 @@ const PolicyTypes = ({ policy }) => {
 
 const PolicyParts = () => {
   const params = useParams()
-
+  const hide = useScrollHide(5)
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   const { data, loading } = useQuery(GetPartPolicies, {
@@ -137,7 +138,7 @@ const PolicyParts = () => {
 
   const total = list.reduce((acc, { count }) => acc + count, 0)
 
-  const hidden = sbomParts?.length === 0
+  const hidden = hide || sbomParts?.length === 0
 
   if (loading)
     return (
