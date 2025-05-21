@@ -2,7 +2,6 @@
 import { gql, useQuery } from '@apollo/client'
 import { useParams } from 'react-router-dom'
 import { truncatedValue } from 'utils'
-import { partsInfoTabs } from 'utils'
 
 import {
   Box,
@@ -21,7 +20,6 @@ import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import VulnBadge from 'components/Misc/VulnBadge'
 
-import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { LuCircleDot, LuGitMerge, LuShieldCheck } from 'react-icons/lu'
@@ -91,7 +89,6 @@ const PolicyTypes = ({ policy }) => {
 
 const PolicyParts = () => {
   const params = useParams()
-  const activeTab = useQueryParam('tab')
 
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
@@ -140,7 +137,7 @@ const PolicyParts = () => {
 
   const total = list.reduce((acc, { count }) => acc + count, 0)
 
-  const hidden = !partsInfoTabs.includes(activeTab) || sbomParts?.length === 0
+  const hidden = sbomParts?.length === 0
 
   if (loading)
     return (

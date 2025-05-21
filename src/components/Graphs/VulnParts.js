@@ -2,7 +2,6 @@
 import { gql, useQuery } from '@apollo/client'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getSignedUrlParams, truncatedValue } from 'utils'
-import { partsInfoTabs } from 'utils'
 
 import {
   Box,
@@ -24,7 +23,6 @@ import VulnBadge from 'components/Misc/VulnBadge'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
-import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { LuBug, LuCircleDot, LuGitMerge } from 'react-icons/lu'
@@ -171,7 +169,6 @@ const VulnTypes = ({ data }) => {
 
 const VulnParts = () => {
   const params = useParams()
-  const activeTab = useQueryParam('tab')
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   const { data, loading } = useQuery(GetPartVulns, {
@@ -199,7 +196,7 @@ const VulnParts = () => {
     })
   const total = list.reduce((acc, { count }) => acc + count, 0)
 
-  const hidden = !partsInfoTabs.includes(activeTab) || sbomParts?.length === 0
+  const hidden = sbomParts?.length === 0
 
   if (loading)
     return (
