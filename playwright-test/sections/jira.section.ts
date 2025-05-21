@@ -14,6 +14,14 @@ export class JiraIntegration {
 
   async addConfig(hostURL: string, email: string, token: string) {
     await this.page.getByRole('button', { name: 'Configure' }).nth(1).click()
+    const deleteBtn = this.page
+      .getByRole('button', { name: 'Delete' })
+      .isVisible()
+    if (deleteBtn) {
+      this.page.getByRole('button', { name: 'Delete' }).click()
+      await this.page.waitForTimeout(3000)
+    }
+    await this.page.getByRole('button', { name: 'Configure' }).nth(1).click()
     await this.page
       .getByRole('textbox', { name: 'Jira Host URL' })
       .fill(hostURL)
