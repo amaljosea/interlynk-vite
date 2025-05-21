@@ -14,7 +14,7 @@ export function useScrollHide(thresholdPercent = 15) {
     }
 
     window.addEventListener('scroll', handleScroll)
-    handleScroll() // Run on mount to capture initial scroll state
+    handleScroll()
 
     return () => window.removeEventListener('scroll', handleScroll)
   }, [thresholdPercent])
