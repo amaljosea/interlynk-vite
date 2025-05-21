@@ -10,7 +10,6 @@ import LicenseParts from 'components/Graphs/LicenseParts'
 import PolicyParts from 'components/Graphs/PolicyParts'
 import VulnParts from 'components/Graphs/VulnParts'
 
-import { useGlobalState } from 'hooks/useGlobalState'
 import { useGradualPolling } from 'hooks/useGradualPolling'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
