@@ -5158,304 +5158,108 @@ export const getVersionLifestage = gql`
 
 // GET ALL VULNERABILITIES BY SEVERITY
 export const getVulnsBySeverity = gql`
-  query getVulnsBySeverity(
-    $firstMatchDateAfter: ISO8601DateTime
-    $status: [String!]
-    $envNames: [String!]
+  query vulnsBySeverity(
+    $envName: String!
     $labelIds: [Uuid!]
+    $kev: Boolean
+    $status: [String!]
   ) {
     organization {
-      total: vulns(projectNames: $envNames, projectGroupLabelIds: $labelIds) {
-        totalCount
-      }
-      critical: vulns(
-        firstMatchDateAfter: $firstMatchDateAfter
-        severity: ["critical"]
-        status: $status
-        projectNames: $envNames
+      total: vulnCounts(
+        projectName: $envName
         projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-      high: vulns(
-        firstMatchDateAfter: $firstMatchDateAfter
-        severity: ["high"]
+        kev: $kev
         status: $status
-        projectNames: $envNames
-        projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-      medium: vulns(
-        firstMatchDateAfter: $firstMatchDateAfter
-        severity: ["medium"]
+      )
+      critical: vulnCounts(
+        severity: ["Critical"]
+        projectName: $envName
         status: $status
-        projectNames: $envNames
         projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-      low: vulns(
-        firstMatchDateAfter: $firstMatchDateAfter
-        severity: ["low"]
+        kev: $kev
+      )
+      high: vulnCounts(
+        severity: ["High"]
+        projectName: $envName
         status: $status
-        projectNames: $envNames
         projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-      unknown: vulns(
-        firstMatchDateAfter: $firstMatchDateAfter
-        severity: ["unknown"]
+        kev: $kev
+      )
+      medium: vulnCounts(
+        severity: ["Medium"]
+        projectName: $envName
         status: $status
-        projectNames: $envNames
         projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
+        kev: $kev
+      )
+      low: vulnCounts(
+        severity: ["Low"]
+        projectName: $envName
+        status: ["Fixed"]
+        projectGroupLabelIds: $labelIds
+        kev: $kev
+      )
+      unknown: vulnCounts(
+        severity: ["Unknown"]
+        projectName: $envName
+        status: $status
+        projectGroupLabelIds: $labelIds
+        kev: $kev
+      )
     }
   }
 `
 
 // GET ALL VULNERABILITIES BY STATUS
 export const getVulnsByStatus = gql`
-  query getAllVulnsByStatuses($envNames: [String!], $labelIds: [Uuid!]) {
-    organization {
-      total: vulns(projectNames: $envNames, projectGroupLabelIds: $labelIds) {
-        totalCount
-      }
-
-      unspecified: vulns(
-        status: ["Unspecified"]
-        projectNames: $envNames
-        projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-
-      inTriage: vulns(
-        status: ["In Triage"]
-        projectNames: $envNames
-        projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-
-      affected: vulns(
-        status: ["Affected"]
-        projectNames: $envNames
-        projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-
-      fixed: vulns(
-        status: ["Fixed"]
-        projectNames: $envNames
-        projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-
-      notAffected: vulns(
-        status: ["Not Affected"]
-        projectNames: $envNames
-        projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-    }
-  }
-`
-
-// GET CRITICAL VULNERABILITIES BY STATUS
-export const getCriticalVulnsByStatus = gql`
-  query getCriticalVulnsByStatus(
+  query vulnsByStatus(
     $severity: [String!]
-    $envNames: [String!]
+    $envName: String!
     $labelIds: [Uuid!]
-  ) {
-    organization {
-      total: vulns(
-        severity: $severity
-        projectNames: $envNames
-        projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-
-      criticalUnspecified: vulns(
-        severity: $severity
-        status: ["Unspecified"]
-        projectNames: $envNames
-        projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-
-      criticalInTriage: vulns(
-        severity: $severity
-        status: ["In Triage"]
-        projectNames: $envNames
-        projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-
-      criticalAffected: vulns(
-        severity: $severity
-        status: ["Affected"]
-        projectNames: $envNames
-        projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-
-      criticalFixed: vulns(
-        severity: $severity
-        status: ["Fixed"]
-        projectNames: $envNames
-        projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-
-      criticalNotAffected: vulns(
-        severity: $severity
-        status: ["Not Affected"]
-        projectNames: $envNames
-        projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-    }
-  }
-`
-
-// GET HIGH VULNERABILITIES BY STATUS
-export const getHighVulnsByStatus = gql`
-  query getHighVulnsByStatus(
-    $severity: [String!]
-    $envNames: [String!]
-    $labelIds: [Uuid!]
-  ) {
-    organization {
-      total: vulns(
-        severity: $severity
-        projectNames: $envNames
-        projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-
-      highUnspecified: vulns(
-        severity: $severity
-        status: ["Unspecified"]
-        projectNames: $envNames
-        projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-
-      highInTriage: vulns(
-        severity: $severity
-        status: ["In Triage"]
-        projectNames: $envNames
-        projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-
-      highAffected: vulns(
-        severity: $severity
-        status: ["Affected"]
-        projectNames: $envNames
-        projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-
-      highFixed: vulns(
-        severity: $severity
-        status: ["Fixed"]
-        projectNames: $envNames
-        projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-
-      highNotAffected: vulns(
-        severity: $severity
-        status: ["Not Affected"]
-        projectNames: $envNames
-        projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-    }
-  }
-`
-
-// GET KEV VULNERABILITIES BY STATUS
-export const getKevVulnsByStatus = gql`
-  query getKevVulnsByStatus(
     $kev: Boolean
-    $envNames: [String!]
-    $labelIds: [Uuid!]
   ) {
     organization {
-      total: vulns(
-        kev: $kev
-        projectNames: $envNames
+      total: vulnCounts(
+        severity: $severity
+        projectName: $envName
         projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-
-      kevUnspecified: vulns(
         kev: $kev
+      )
+      unspecified: vulnCounts(
+        severity: $severity
+        projectName: $envName
         status: ["Unspecified"]
-        projectNames: $envNames
         projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-
-      kevInTriage: vulns(
         kev: $kev
+      )
+      inTriage: vulnCounts(
+        severity: $severity
+        projectName: $envName
         status: ["In Triage"]
-        projectNames: $envNames
         projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-
-      kevAffected: vulns(
         kev: $kev
+      )
+      affected: vulnCounts(
+        severity: $severity
+        projectName: $envName
         status: ["Affected"]
-        projectNames: $envNames
         projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-
-      kevFixed: vulns(
         kev: $kev
+      )
+      fixed: vulnCounts(
+        severity: $severity
+        projectName: $envName
         status: ["Fixed"]
-        projectNames: $envNames
         projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
-
-      kevNotAffected: vulns(
         kev: $kev
+      )
+      notAffected: vulnCounts(
+        severity: $severity
+        projectName: $envName
         status: ["Not Affected"]
-        projectNames: $envNames
         projectGroupLabelIds: $labelIds
-      ) {
-        totalCount
-      }
+        kev: $kev
+      )
     }
   }
 `
