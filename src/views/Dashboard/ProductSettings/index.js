@@ -1,5 +1,6 @@
-import { useMutation, useQuery } from '@apollo/client'
-import { useEffect, useState } from 'react'
+import { useMutation } from '@apollo/client'
+import { useState } from 'react'
+import { getSettingsLabel } from 'utils'
 import { infoData } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
@@ -14,28 +15,25 @@ import {
 import { FormControl, FormLabel } from '@chakra-ui/react'
 
 import CardBody from 'components/Card/CardBody'
+import JiraFields from 'components/JiraFields'
 import LynkSelect from 'components/LynkSelect'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
-import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ProjectSettingUpdate } from 'graphQL/Mutation'
-import { GetJiraProjects } from 'graphQL/Queries'
 
 import ConfirmationModal from '../Products/components/ConfirmationModal'
 
 const Settings = ({ enabled, data, mfc }) => {
-  const activeTab = useQueryParam('tab')
   const { isFreeTier } = useGlobalQueryContext()
 
   const {
     id,
     dataRetentionDays,
-    jiraProject,
     checksEnabled,
     organizationManufacturer,
     automatedFixesEnabled,
@@ -44,36 +42,11 @@ const Settings = ({ enabled, data, mfc }) => {
     copyVexFromPrevious,
     vulnScanningEnabled,
     enableSupportLevel
-  } = data || ''
-
-  const { data: projectOptions } = useQuery(GetJiraProjects, {
-    skip: activeTab !== 'settings'
-  })
-
-  useEffect(() => {
-    if (projectOptions?.jira) {
-      setOptions(
-        projectOptions.jira?.projects?.map((project) => ({
-          value: project.key,
-          label: project.name
-        }))
-      )
-    }
-  }, [projectOptions])
-
-  useEffect(() => {
-    if (jiraProject) {
-      setProject({ value: jiraProject, label: jiraProject })
-    } else {
-      setProject(null)
-    }
-  }, [jiraProject])
+  } = data || {}
 
   const { showToast } = useCustomToast()
   const [checks, setChecks] = useState(false)
   const [internalComp, setInternalComp] = useState(false)
-  const [options, setOptions] = useState([])
-  const [project, setProject] = useState(null)
 
   const { sameSecondaryText, primaryBlueText } = useThemeColor([
     'sameSecondaryText',
@@ -91,35 +64,7 @@ const Settings = ({ enabled, data, mfc }) => {
 
   const { isOpen: isCompOpen, onClose: onCompClose } = useDisclosure()
 
-  const getSettingsLabel = (type) => {
-    switch (type) {
-      case 'checks':
-        return 'Checks'
-      case 'internalComp':
-        return 'Internal component labeling'
-      case 'automation':
-        return 'Automation'
-      case 'vulnScan':
-        return 'Vulnerability scan'
-      case 'copyVexFromPrevious':
-        return 'Retain vulnerability status'
-      case 'manufacturer':
-        return 'Manufacturer'
-      case 'enableSupportLevel':
-        return 'Component support analysis'
-      case 'dataRetention':
-        return 'Data Retaintion'
-      case 'jira':
-        return 'Default JIRA project'
-      case 'autoArchive':
-        return 'Auto Archive'
-    }
-  }
-
   const onUpdate = async (val, field) => {
-    if (field === 'jira') {
-      setProject(val)
-    }
     await updateSettings({
       variables: {
         id,
@@ -131,7 +76,6 @@ const Settings = ({ enabled, data, mfc }) => {
         copyVexFromPrevious: field === 'copyVexFromPrevious' ? val : undefined,
         mfcId: field === 'manufacturer' ? val : undefined,
         enableSupportLevel: field === 'enableSupportLevel' ? val : undefined,
-        jiraProject: field === 'jira' && val ? val?.value : undefined,
         days: field === 'dataRetention' ? Number(val) : undefined,
         pkgUpdateThreshold:
           field === 'pkgUpdateThreshold' ? Number(val) : undefined,
@@ -153,36 +97,34 @@ const Settings = ({ enabled, data, mfc }) => {
     return result?.desc
   }
 
-  const ProductSetting = ({ id, label, value }) => (
-    <Flex
-      align='center'
-      justifyContent={'space-between'}
-      hidden={id === 'enableSupportLevel' && isFreeTier}
-    >
-      <Flex align='center'>
-        <Text
-          noOfLines={1}
-          color={sameSecondaryText}
-          fontSize={14}
-          fontWeight='400'
-        >
-          {label}
-        </Text>
-        <Tooltip label={onCheck(`${label}`)}>
-          <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
-        </Tooltip>
+  const ProductSetting = ({ id, label, value }) => {
+    if (id === 'enableSupportLevel' && isFreeTier) return null
+    return (
+      <Flex gap={2} align='center' justifyContent={'space-between'}>
+        <Flex align='center'>
+          <Text
+            noOfLines={1}
+            color={sameSecondaryText}
+            fontSize={14}
+            fontWeight='400'
+          >
+            {label}
+          </Text>
+          <Tooltip label={onCheck(`${label}`)}>
+            <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
+          </Tooltip>
+        </Flex>
+        <LynkSwitch
+          id={id}
+          size='md'
+          me='10px'
+          isChecked={value || false}
+          isDisabled={!enabled || !editControls}
+          onChange={(e) => onUpdate(e.target.checked, id)}
+        />
       </Flex>
-
-      <LynkSwitch
-        id={id}
-        size='md'
-        me='10px'
-        isChecked={value || false}
-        isDisabled={!enabled || !editControls}
-        onChange={(e) => onUpdate(e.target.checked, id)}
-      />
-    </Flex>
-  )
+    )
+  }
 
   const dataRetentionOptions = [1, 30, 90, 365, 0].map((item) => ({
     value: item,
@@ -200,12 +142,13 @@ const Settings = ({ enabled, data, mfc }) => {
   return (
     <>
       <CardBody py={4}>
-        <SimpleGrid w={'100%'} columns={2} gap={6}>
+        <SimpleGrid w={'100%'} columns={3} gap={[6, 12, 24]}>
           {/* COLUMNS 1 */}
           <Stack spacing={5}>
             <Text fontSize={14} fontWeight={'semibold'}>
-              Advisory Feeds
+              Import Actions
             </Text>
+
             {/* APPLY CHECK */}
             <ProductSetting
               id={'checks'}
@@ -250,7 +193,11 @@ const Settings = ({ enabled, data, mfc }) => {
             />
           </Stack>
           {/* COLUMN 2 */}
-          <Stack spacing={4} ml={20}>
+          <Stack spacing={4}>
+            <Text fontSize={14} fontWeight={'semibold'}>
+              Environment Defaults
+            </Text>
+
             {/* DATE RENTATION */}
             <FormControl>
               <FormLabel>
@@ -293,24 +240,9 @@ const Settings = ({ enabled, data, mfc }) => {
                 placeholder='Select manufacturer'
               />
             </FormControl>
-            {/* JIRE DEFAULT PROJECT */}
-            <FormControl hidden={isFreeTier}>
-              <FormLabel>
-                Jira Default Project
-                <Tooltip label={onCheck(`Jira Default Project`)}>
-                  <InfoIcon ml={2} color={primaryBlueText} />
-                </Tooltip>
-              </FormLabel>
-              <LynkSelect
-                options={options}
-                isClearable={true}
-                placeholder='Project'
-                isDisabled={!editControls}
-                onChange={(value) => onUpdate(value, 'jira')}
-                value={project}
-              />
-            </FormControl>
           </Stack>
+          {/* COLUMN 3 */}
+          <JiraFields />
         </SimpleGrid>
       </CardBody>
 

@@ -210,3 +210,35 @@ export const formatDataForGraph = (items) => {
 
   return itemsFormattedAndReversed
 }
+
+export const calculateTotalVulns = (metrics = {}) => {
+  const {
+    affectedCount = 0,
+    fixedCount = 0,
+    notAffectedCount = 0,
+    unspecifiedCount = 0,
+    inTriageCount = 0
+  } = metrics
+  return (
+    affectedCount +
+    fixedCount +
+    notAffectedCount +
+    unspecifiedCount +
+    inTriageCount
+  )
+}
+
+export const calculateDelta = (newValue, oldValue) => {
+  const delta = newValue - oldValue
+  const percent =
+    oldValue === 0
+      ? newValue === 0
+        ? 0
+        : 100
+      : ((delta / oldValue) * 100).toFixed(2)
+  return {
+    delta,
+    deltaPercent: Math.abs(percent),
+    deltaDirection: delta >= 0 ? 'increase' : 'decrease'
+  }
+}

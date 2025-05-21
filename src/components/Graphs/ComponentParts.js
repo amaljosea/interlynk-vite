@@ -2,7 +2,6 @@
 import { gql, useQuery } from '@apollo/client'
 import { useParams } from 'react-router-dom'
 import { truncatedValue } from 'utils'
-import { partsInfoTabs } from 'utils'
 
 import {
   Divider,
@@ -19,7 +18,7 @@ import {
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 
-import useQueryParam from 'hooks/useQueryParam'
+import { useScrollHide } from 'hooks/useScrollHide'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { LuCircleDot, LuComponent, LuGitMerge } from 'react-icons/lu'
@@ -56,8 +55,7 @@ const GetPartComponents = gql`
 
 const ComponentPart = () => {
   const params = useParams()
-  const activeTab = useQueryParam('tab')
-
+  const hide = useScrollHide(5)
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   const { data, loading } = useQuery(GetPartComponents, {
@@ -80,7 +78,7 @@ const ComponentPart = () => {
   })
   const total = list.reduce((acc, { count }) => acc + count, 0)
 
-  const hidden = !partsInfoTabs.includes(activeTab) || sbomParts?.length === 0
+  const hidden = hide || sbomParts?.length === 0
 
   if (loading)
     return (
