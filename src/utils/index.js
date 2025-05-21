@@ -673,3 +673,34 @@ export const splitBySupportLevel = (groups) => {
 
   return { withSupport, withoutSupport }
 }
+
+export const getSettingsLabel = (type) => {
+  switch (type) {
+    case 'checks':
+      return 'Checks'
+    case 'internalComp':
+      return 'Internal component labeling'
+    case 'automation':
+      return 'Automation'
+    case 'vulnScan':
+      return 'Vulnerability scan'
+    case 'copyVexFromPrevious':
+      return 'Retain vulnerability status'
+    case 'manufacturer':
+      return 'Manufacturer'
+    case 'enableSupportLevel':
+      return 'Component support analysis'
+    case 'dataRetention':
+      return 'Data Retaintion'
+    case 'jiraProject':
+      return 'Default JIRA project'
+    case 'jiraIssueType':
+      return 'Default JIRA issue type'
+    case 'jiraAssignee':
+      return 'Default JIRA assignee'
+    case 'jiraReporter':
+      return 'Default JIRA reporter'
+    case 'autoArchive':
+      return 'Auto Archive'
+  }
+}
