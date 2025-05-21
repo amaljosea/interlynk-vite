@@ -12,16 +12,7 @@ export class JiraIntegration {
     await this.page.getByRole('tab', { name: 'integration' }).click()
   }
 
-  async addConfig(hostURL: string, email: string, token: string) {
-    await this.page.getByRole('button', { name: 'Configure' }).nth(1).click()
-    const deleteBtn = this.page
-      .getByRole('button', { name: 'Delete' })
-      .isVisible()
-    if (deleteBtn) {
-      this.page.getByRole('button', { name: 'Delete' }).click()
-      await this.page.waitForTimeout(3000)
-    }
-    await this.page.getByRole('button', { name: 'Configure' }).nth(1).click()
+  async createConnection(hostURL: string, email: string, token: string) {
     await this.page
       .getByRole('textbox', { name: 'Jira Host URL' })
       .fill(hostURL)
@@ -29,6 +20,22 @@ export class JiraIntegration {
     await this.page.getByRole('textbox', { name: 'API Token' }).fill(token)
     await this.page.getByRole('button', { name: 'Verify' }).click()
     await this.page.waitForTimeout(3000)
+  }
+
+  async addConfig(hostURL: string, email: string, token: string) {
+    await this.page.getByRole('button', { name: 'Configure' }).nth(1).click()
+    const deleteBtn = await this.page
+      .getByRole('button', { name: 'Delete' })
+      .isVisible()
+    if (deleteBtn) {
+      this.page.getByRole('button', { name: 'Delete' }).click()
+      await this.page.waitForTimeout(3000)
+      await this.page.getByRole('button', { name: 'Configure' }).nth(1).click()
+      await this.page.waitForTimeout(3000)
+      await this.createConnection(hostURL, email, token)
+    } else {
+      await this.createConnection(hostURL, email, token)
+    }
   }
 
   async saveConnection() {
