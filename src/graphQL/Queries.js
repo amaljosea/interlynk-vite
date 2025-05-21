@@ -4371,7 +4371,7 @@ export const VerifyJiraToken = gql`
 `
 
 export const GetJiraProjects = gql`
-  query JiraInformation {
+  query GetJiraProjects {
     jira {
       projects {
         id
@@ -4401,7 +4401,7 @@ export const GetJiraProjectFields = gql`
   }
 `
 
-export const GetJiraOptions = gql`
+export const JiraInformation = gql`
   query JiraInformation($pKey: ID!) {
     jira(projectKey: $pKey) {
       users {
@@ -5770,6 +5770,39 @@ export const BitbucketRepositories = gql`
         projectName
       }
       totalCount
+    }
+  }
+`
+export const ProductProgressMetrics = gql`
+  query ProductProgressMetrics($projectId: Uuid!) {
+    project(id: $projectId) {
+      id
+      projectGroup {
+        name
+      }
+      sbomVersions(
+        first: 25
+        orderBy: { direction: DESC, field: SBOMS_CREATED_AT }
+      ) {
+        totalCount
+        nodes {
+          projectVersion
+          vulnRunStatus
+          vulnerabilityMetrics {
+            affectedCount
+            fixedCount
+            inTriageCount
+            notAffectedCount
+            unspecifiedCount
+          }
+          supportLevelMetrics {
+            abandonedCount
+            activelyMaintainedCount
+            noLongerMaintainedCount
+            unspecifiedCount
+          }
+        }
+      }
     }
   }
 `

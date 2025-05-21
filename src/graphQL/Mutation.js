@@ -371,6 +371,9 @@ export const ProjectSettingUpdate = gql`
     $copyVexFromPrevious: Boolean
     $mfcId: Uuid
     $jiraProject: String
+    $jiraIssueType: String
+    $jiraAssignee: String
+    $jiraReporter: String
     $enableSupportLevel: Boolean
     $enableAutoArchive: Boolean
   ) {
@@ -385,12 +388,19 @@ export const ProjectSettingUpdate = gql`
         copyVexFromPrevious: $copyVexFromPrevious
         organizationManufacturerId: $mfcId
         jiraProject: $jiraProject
+        jiraIssueType: $jiraIssueType
+        jiraAssignee: $jiraAssignee
+        jiraReporter: $jiraReporter
         enableSupportLevel: $enableSupportLevel
         enableAutoArchive: $enableAutoArchive
       }
     ) {
       projectSetting {
         id
+        jiraProject
+        jiraIssueType
+        jiraAssignee
+        jiraReporter
         checksEnabled
         automatedFixesEnabled
         dataRetentionDays
