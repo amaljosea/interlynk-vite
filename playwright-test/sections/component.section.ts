@@ -863,11 +863,11 @@ export default class ComponentSection {
           await this.page.getByTestId('component-actions').first().click()
           await this.page.getByTestId('view_insights').first().click()
 
-          const parentComp = this.page
+          const parentCompVisible = await this.page
             .locator("//p[@aria-label='comp_name']")
             .isVisible()
 
-          if (parentComp) {
+          if (parentCompVisible) {
             await this.page.getByLabel('Close').click()
           } else {
             errors.push('component name tag not found')
