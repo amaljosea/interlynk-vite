@@ -5195,7 +5195,7 @@ export const getVulnsBySeverity = gql`
       low: vulnCounts(
         severity: ["Low"]
         projectName: $envName
-        status: ["Fixed"]
+        status: $status
         projectGroupLabelIds: $labelIds
         kev: $kev
       )
