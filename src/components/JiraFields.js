@@ -184,6 +184,8 @@ const JiraFields = () => {
         <LynkSelect
           options={projects}
           isClearable={true}
+          name='jiraProject'
+          aria-label='jiraProject'
           placeholder='Select Project'
           isLoading={projectLoading}
           isDisabled={!editControls}
