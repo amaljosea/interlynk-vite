@@ -21,6 +21,18 @@ import {
   YAxis
 } from 'recharts'
 
+// Constants
+const COLORS = {
+  primary: '#3d71ee',
+  active: '#38a169',
+  noLongerMaintained: '#ffa500',
+  abandoned: '#e53e3e99',
+  unspecified: '#718096',
+  affected: '#ed7b7b',
+  total: '#3182CE'
+}
+
+// Styles
 const styles = StyleSheet.create({
   page: {
     padding: 30,
@@ -44,38 +56,48 @@ const styles = StyleSheet.create({
   },
   companyName: {
     fontSize: 32,
-    color: '#3d71ee',
+    color: COLORS.primary,
     marginBottom: 4
   },
-  reportTitle: {
-    fontSize: 20,
-    color: '#3d71ee',
-    marginBottom: 4
-  },
+  title: (size = 20) => ({
+    fontSize: size,
+    color: COLORS.primary,
+    marginBottom: 4,
+    textAlign: 'center'
+  }),
   versionComparison: {
     fontSize: 14,
-    color: '#3d71ee',
+    color: COLORS.primary,
     marginBottom: 25,
     textAlign: 'center'
   },
   sectionTitle: {
     fontSize: 14,
     marginBottom: 10,
-    color: '#3d71ee'
+    color: COLORS.primary
   },
   productName: {
     fontSize: 18,
-    color: '#3d71ee',
+    color: COLORS.primary,
     marginTop: 15
   },
-  versionName: {
-    fontSize: 16,
-    marginBottom: 6,
-    color: '#3d71ee'
+  summarySection: {
+    flexDirection: 'row',
+    marginBottom: 20
   },
-  textItem: {
-    marginBottom: 4
+  summaryDataContainer: {
+    marginLeft: 30,
+    flexDirection: 'row'
   },
+  vulnTrendHeader: {
+    fontSize: 14,
+    color: '#3d71ee',
+    textAlign: 'center'
+  },
+  textItem: (color) => ({
+    marginBottom: 4,
+    color
+  }),
   divider: {
     height: 1,
     backgroundColor: '#ccc',
@@ -87,10 +109,150 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10
-  }
+  },
+  legendSection: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 5,
+    flexWrap: 'wrap',
+    gap: 10
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 15
+  },
+  legendLabel: {
+    fontSize: 10,
+    marginTop: 6
+  },
+  legendColor: (color, opacity = 1) => ({
+    width: 12,
+    height: 12,
+    backgroundColor: color,
+    opacity,
+    marginRight: 6
+  })
 })
 
-const colorStyle = (color) => ({ color })
+// Chart Components
+const PieChartPDF = ({ data }) => (
+  <ReactPDFChart>
+    <PieChart width={140} height={110}>
+      <Pie
+        cx='50%'
+        cy='50%'
+        data={data}
+        dataKey='value'
+        innerRadius={30}
+        outerRadius={50}
+        isAnimationActive={false}
+      >
+        {data.map((entry, index) => (
+          <Cell key={`cell-${index}`} fill={entry.color} />
+        ))}
+      </Pie>
+    </PieChart>
+  </ReactPDFChart>
+)
+
+const VulnLineChart = ({ data, visibleLines }) => (
+  <ReactPDFChart>
+    <LineChart data={data} height={200} width={400}>
+      <CartesianGrid stroke='#0000001f' strokeDasharray='3 3' />
+      <XAxis dataKey='version' tick={{ fontSize: 10 }}>
+        <Label
+          value='versions'
+          offset={0}
+          position='insideBottom'
+          fontSize={13}
+        />
+      </XAxis>
+      <YAxis tick={{ fontSize: 12 }}>
+        <Label value='vulns' offset={0} position='insideLeft' fontSize={13} />
+      </YAxis>
+      {visibleLines['Total'] && (
+        <Line
+          type='monotone'
+          dataKey='Total'
+          stroke={COLORS.total}
+          strokeWidth={2}
+          isAnimationActive={false}
+        />
+      )}
+      {visibleLines['Fixed & Not Affected'] && (
+        <Line
+          type='monotone'
+          dataKey='Fixed & Not Affected'
+          stroke={COLORS.active}
+          strokeOpacity={0.8}
+          strokeWidth={2}
+          isAnimationActive={false}
+        />
+      )}
+      {visibleLines['Affected'] && (
+        <Line
+          type='monotone'
+          dataKey='Affected'
+          stroke={COLORS.affected}
+          strokeOpacity={0.8}
+          strokeWidth={2}
+          isAnimationActive={false}
+        />
+      )}
+      {visibleLines['Unspecified'] && (
+        <Line
+          type='monotone'
+          dataKey='Unspecified'
+          stroke={COLORS.unspecified}
+          strokeOpacity={0.8}
+          strokeWidth={2}
+          isAnimationActive={false}
+        />
+      )}
+    </LineChart>
+  </ReactPDFChart>
+)
+
+const VersionSupportSummary = ({ versionName, metrics }) => (
+  <View>
+    <Text style={styles.title(16)}>{versionName}</Text>
+    <Text style={styles.textItem(COLORS.active)}>
+      Actively Maintained: {metrics.activelyMaintainedCount}
+    </Text>
+    <Text style={styles.textItem(COLORS.noLongerMaintained)}>
+      No Longer Maintained: {metrics.noLongerMaintainedCount}
+    </Text>
+    <Text style={styles.textItem(COLORS.abandoned)}>
+      Abandoned: {metrics.abandonedCount}
+    </Text>
+    <Text style={styles.textItem(COLORS.unspecified)}>
+      Unspecified: {metrics.unspecifiedCount}
+    </Text>
+  </View>
+)
+
+const VersionVulnSummary = ({ versionName, metrics }) => (
+  <View>
+    <Text style={styles.title(16)}>{versionName}</Text>
+    <Text style={styles.textItem(COLORS.affected)}>
+      Affected: {metrics.affectedCount}
+    </Text>
+    <Text style={styles.textItem(COLORS.active)}>
+      Fixed + Not Affected: {metrics.fixedCount + metrics.notAffectedCount}
+    </Text>
+    <Text style={styles.textItem(COLORS.unspecified)}>
+      Unspecified: {metrics.unspecifiedCount}
+    </Text>
+  </View>
+)
+
+const LegendItem = ({ color, label, opacity = 1 }) => (
+  <View style={styles.legendItem}>
+    <View style={styles.legendColor(color, opacity)} />
+    <Text style={styles.legendLabel}>{label}</Text>
+  </View>
+)
 
 const ProductComparisonPDF = ({
   productName,
@@ -104,103 +266,8 @@ const ProductComparisonPDF = ({
   visibleLines,
   chartData
 }) => {
-  const RenderSupportPieChart = () => (
-    <ReactPDFChart>
-      <PieChart width={140} height={110}>
-        <Pie
-          cx='50%'
-          cy='50%'
-          data={supportPieChartData}
-          dataKey='value'
-          innerRadius={30}
-          outerRadius={50}
-          isAnimationActive={false}
-        >
-          {supportPieChartData.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={entry.color} />
-          ))}
-        </Pie>
-      </PieChart>
-    </ReactPDFChart>
-  )
-
-  const RenderVulnPieChart = () => (
-    <ReactPDFChart>
-      <PieChart width={140} height={110}>
-        <Pie
-          cx='50%'
-          cy='50%'
-          data={vulnPieChartData}
-          dataKey='value'
-          innerRadius={30}
-          outerRadius={50}
-          isAnimationActive={false}
-        >
-          {vulnPieChartData.map((entry, index) => (
-            <Cell key={`vuln-cell-${index}`} fill={entry.color} />
-          ))}
-        </Pie>
-      </PieChart>
-    </ReactPDFChart>
-  )
-
-  const RenderVulnLineChart = () => (
-    <ReactPDFChart>
-      <LineChart data={chartData} height={200} width={400}>
-        <CartesianGrid stroke='#0000001f' strokeDasharray='3 3' />
-        <XAxis dataKey='version' tick={{ fontSize: 10 }}>
-          <Label
-            value='versions'
-            offset={0}
-            position='insideBottom'
-            fontSize={13}
-          />
-        </XAxis>
-        <YAxis tick={{ fontSize: 12 }}>
-          <Label value='vulns' offset={0} position='insideLeft' fontSize={13} />
-        </YAxis>
-        {visibleLines['Total'] && (
-          <Line
-            type='monotone'
-            dataKey='Total'
-            stroke='#3182CE'
-            strokeWidth={2}
-            isAnimationActive={false}
-          />
-        )}
-        {visibleLines['Fixed & Not Affected'] && (
-          <Line
-            type='monotone'
-            dataKey='Fixed & Not Affected'
-            stroke='#38a169'
-            strokeOpacity={0.8}
-            strokeWidth={2}
-            isAnimationActive={false}
-          />
-        )}
-        {visibleLines['Affected'] && (
-          <Line
-            type='monotone'
-            dataKey='Affected'
-            stroke='#ed7b7b'
-            strokeOpacity={0.8}
-            strokeWidth={2}
-            isAnimationActive={false}
-          />
-        )}
-        {visibleLines['Unspecified'] && (
-          <Line
-            type='monotone'
-            dataKey='Unspecified'
-            stroke='#718096'
-            strokeOpacity={0.8}
-            strokeWidth={2}
-            isAnimationActive={false}
-          />
-        )}
-      </LineChart>
-    </ReactPDFChart>
-  )
+  const version1Name = selectedVersions.version1?.projectVersion
+  const version2Name = selectedVersions.version2?.projectVersion
 
   return (
     <Document>
@@ -212,203 +279,66 @@ const ProductComparisonPDF = ({
             <Text style={styles.companyName}>Interlynk</Text>
           </View>
 
-          <Text style={styles.reportTitle}>
-            Product Progress Overview Report
-          </Text>
-
-          {/* Product Name */}
+          <Text style={styles.title()}>Product Progress Overview Report</Text>
           <Text style={styles.productName}>{productName}</Text>
         </View>
-
         <View style={styles.divider} />
-
         <Text style={styles.versionComparison}>
-          Comparison between versions{' '}
-          {selectedVersions.version1?.projectVersion} and{' '}
-          {selectedVersions.version2?.projectVersion}
+          Comparison between versions {version1Name} and {version2Name}
         </Text>
-
         {/* Support Summary */}
         <Text style={styles.sectionTitle}>Support Status Summary</Text>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginBottom: 20
-          }}
-        >
-          <RenderSupportPieChart />
-          {/* Version 1 */}
-          <View>
-            <Text style={styles.versionName}>
-              {selectedVersions.version1?.projectVersion}
-            </Text>
-            <Text style={[styles.textItem, colorStyle('#38a169')]}>
-              Actively Maintained: {support1.activelyMaintainedCount}
-            </Text>
-            <Text style={[styles.textItem, colorStyle('#ffa500')]}>
-              No Longer Maintained: {support1.noLongerMaintainedCount}
-            </Text>
-            <Text style={[styles.textItem, colorStyle('#e53e3e99')]}>
-              Abandoned: {support1.abandonedCount}
-            </Text>
-            <Text style={[styles.textItem, colorStyle('#718096')]}>
-              Unspecified: {support1.unspecifiedCount}
-            </Text>
-          </View>
-
-          {/* Version 2 */}
-          <View>
-            <Text style={styles.versionName}>
-              {selectedVersions.version2?.projectVersion}
-            </Text>
-            <Text style={[styles.textItem, colorStyle('#38a169')]}>
-              Actively Maintained: {support2.activelyMaintainedCount}
-            </Text>
-            <Text style={[styles.textItem, colorStyle('#ffa500')]}>
-              No Longer Maintained: {support2.noLongerMaintainedCount}
-            </Text>
-            <Text style={[styles.textItem, colorStyle('#e53e3e99')]}>
-              Abandoned: {support2.abandonedCount}
-            </Text>
-            <Text style={[styles.textItem, colorStyle('#718096')]}>
-              Unspecified: {support2.unspecifiedCount}
-            </Text>
+        <View style={styles.summarySection}>
+          <PieChartPDF data={supportPieChartData} />
+          <View style={styles.summaryDataContainer}>
+            <VersionSupportSummary
+              versionName={version1Name}
+              metrics={support1}
+            />
+            <View style={{ marginLeft: 40 }}>
+              <VersionSupportSummary
+                versionName={version2Name}
+                metrics={support2}
+              />
+            </View>
           </View>
         </View>
 
         {/* Vulnerabilities Summary */}
         <Text style={styles.sectionTitle}>Vulnerabilities Summary</Text>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginBottom: 20
-          }}
-        >
-          <RenderVulnPieChart />
-
-          {/* Version 1 */}
-          <View>
-            <Text style={styles.versionName}>
-              {selectedVersions.version1?.projectVersion}
-            </Text>
-            <Text style={[styles.textItem, colorStyle('#e53e3e99')]}>
-              Affected: {version1Metrics.affectedCount}
-            </Text>
-            <Text style={[styles.textItem, colorStyle('#38a169')]}>
-              Fixed + Not Affected:{' '}
-              {version1Metrics.fixedCount + version1Metrics.notAffectedCount}
-            </Text>
-            <Text style={[styles.textItem, colorStyle('#718096')]}>
-              Unspecified: {version1Metrics.unspecifiedCount}
-            </Text>
-          </View>
-
-          {/* Version 2 */}
-          <View>
-            <Text style={styles.versionName}>
-              {selectedVersions.version2?.projectVersion}
-            </Text>
-            <Text style={[styles.textItem, colorStyle('#e53e3e99')]}>
-              Affected: {version2Metrics.affectedCount}
-            </Text>
-            <Text style={[styles.textItem, colorStyle('#38a169')]}>
-              Fixed + Not Affected:{' '}
-              {version2Metrics.fixedCount + version2Metrics.notAffectedCount}
-            </Text>
-            <Text style={[styles.textItem, colorStyle('#718096')]}>
-              Unspecified: {version2Metrics.unspecifiedCount}
-            </Text>
+        <View style={styles.summarySection}>
+          <PieChartPDF data={vulnPieChartData} />
+          <View style={styles.summaryDataContainer}>
+            <VersionVulnSummary
+              versionName={version1Name}
+              metrics={version1Metrics}
+            />
+            <View style={{ marginLeft: 54 }}>
+              <VersionVulnSummary
+                versionName={version2Name}
+                metrics={version2Metrics}
+              />
+            </View>
           </View>
         </View>
-
-        <Text style={{ fontSize: 14, color: '#3d71ee', textAlign: 'center' }}>
-          Vulnerabilities Trend
-        </Text>
-
+        {/* Vulnerabilities Trend */}
+        <Text style={styles.vulnTrendHeader}>Vulnerabilities Trend</Text>
         <View style={styles.chartArea}>
-          <RenderVulnLineChart />
+          <VulnLineChart data={chartData} visibleLines={visibleLines} />
         </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            marginTop: 5,
-            flexWrap: 'wrap',
-            gap: 10
-          }}
-        >
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginRight: 15
-            }}
-          >
-            <View
-              style={{
-                width: 12,
-                height: 12,
-                backgroundColor: '#3182CE',
-                marginRight: 6
-              }}
-            />
-            <Text style={{ fontSize: 10, marginTop: 6 }}>Total</Text>
-          </View>
-
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginRight: 15
-            }}
-          >
-            <View
-              style={{
-                width: 12,
-                height: 12,
-                backgroundColor: '#38a169',
-                opacity: 0.8,
-                marginRight: 6
-              }}
-            />
-            <Text style={{ fontSize: 10, marginTop: 6 }}>
-              Fixed & Not Affected
-            </Text>
-          </View>
-
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginRight: 15
-            }}
-          >
-            <View
-              style={{
-                width: 12,
-                height: 12,
-                backgroundColor: '#ed7b7b',
-                opacity: 0.8,
-                marginRight: 6
-              }}
-            />
-            <Text style={{ fontSize: 10, marginTop: 6 }}>Affected</Text>
-          </View>
-
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <View
-              style={{
-                width: 12,
-                height: 12,
-                backgroundColor: '#718096',
-                opacity: 0.8,
-                marginRight: 6
-              }}
-            />
-            <Text style={{ fontSize: 10, marginTop: 6 }}>Unspecified</Text>
-          </View>
+        <View style={styles.legendSection}>
+          <LegendItem color={COLORS.total} label='Total' />
+          <LegendItem
+            color={COLORS.active}
+            label='Fixed & Not Affected'
+            opacity={0.8}
+          />
+          <LegendItem color={COLORS.affected} label='Affected' opacity={0.8} />
+          <LegendItem
+            color={COLORS.unspecified}
+            label='Unspecified'
+            opacity={0.8}
+          />
         </View>
       </Page>
     </Document>
