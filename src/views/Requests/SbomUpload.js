@@ -122,9 +122,20 @@ const SbomUpload = () => {
                 textColor={secondaryTextColor}
               >
                 {requestData?.requester?.name} at{' '}
-                {requestData?.organization?.name} has requested an SBOM for
-                Product - {requestData?.productName} and Version -{' '}
-                {requestData?.productVersion}.
+                {requestData?.organization?.name} has requested an SBOM
+                {requestData?.productName || requestData?.productVersion
+                  ? ' for'
+                  : ''}
+                {requestData?.productName && (
+                  <> Product - {requestData.productName}</>
+                )}
+                {requestData?.productName &&
+                  requestData?.productVersion &&
+                  ' and'}
+                {requestData?.productVersion && (
+                  <> Version - {requestData.productVersion}</>
+                )}
+                .
               </Text>
             </Stack>
             <Stack minHeight='165px'>
