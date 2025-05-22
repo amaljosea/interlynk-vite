@@ -16,34 +16,34 @@ const AllVulnerabilitiesBySeverity = () => {
     skip: !organization,
     variables: {
       labelIds: labelIdsVar,
-      envNames: [envName]
+      envName: envName
     }
   })
 
   const vulnSeverities = [
     {
       name: 'critical',
-      value: data?.organization?.critical?.totalCount,
+      value: data?.organization?.critical,
       color: '#E53E3E'
     },
     {
       name: 'high',
-      value: data?.organization?.high?.totalCount,
+      value: data?.organization?.high,
       color: '#DD6B20'
     },
     {
       name: 'medium',
-      value: data?.organization?.medium?.totalCount,
+      value: data?.organization?.medium,
       color: '#D69E2E'
     },
     {
       name: 'low',
-      value: data?.organization?.low?.totalCount,
+      value: data?.organization?.low,
       color: '#38A169'
     },
     {
       name: 'unknown',
-      value: data?.organization?.unknown?.totalCount,
+      value: data?.organization?.unknown,
       color: '#718096'
     }
   ]
@@ -52,7 +52,7 @@ const AllVulnerabilitiesBySeverity = () => {
       loading={loading}
       data={vulnSeverities}
       title='All Vulnerabilities by Severity'
-      total={data?.organization?.total?.totalCount}
+      total={data?.organization?.total}
     />
   )
 }

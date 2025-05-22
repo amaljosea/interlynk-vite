@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { getKevVulnsByStatus } from 'graphQL/Queries'
+import { getVulnsByStatus } from 'graphQL/Queries'
 
 import LynkPieChart from '../Charts/LynkPieChart'
 
@@ -12,39 +12,39 @@ const KevVulnerabilitiesByStatus = () => {
 
   const labelIdsVar = labelIds?.length > 0 ? labelIds : undefined
 
-  const { data, loading } = useQuery(getKevVulnsByStatus, {
+  const { data, loading } = useQuery(getVulnsByStatus, {
     skip: !organization,
     variables: {
       kev: true,
       labelIds: labelIdsVar,
-      envNames: [envName]
+      envName: envName
     }
   })
 
   const vulnKEVStatuses = [
     {
       name: 'Unspecified',
-      value: data?.organization?.kevUnspecified?.totalCount,
+      value: data?.organization?.unspecified,
       color: '#718096'
     },
     {
       name: 'In Triage',
-      value: data?.organization?.kevInTriage?.totalCount,
+      value: data?.organization?.inTriage,
       color: '#003558'
     },
     {
       name: 'Affected',
-      value: data?.organization?.kevAffected?.totalCount,
+      value: data?.organization?.affected,
       color: '#E53E3E'
     },
     {
       name: 'Fixed',
-      value: data?.organization?.kevFixed?.totalCount,
+      value: data?.organization?.fixed,
       color: '#3182ce'
     },
     {
       name: 'Not Affected',
-      value: data?.organization?.kevNotAffected?.totalCount,
+      value: data?.organization?.notAffected,
       color: '#38A169'
     }
   ]
@@ -53,7 +53,7 @@ const KevVulnerabilitiesByStatus = () => {
       loading={loading}
       data={vulnKEVStatuses}
       title='KEV Vulnerabilties by Status'
-      total={data?.organization?.total?.totalCount}
+      total={data?.organization?.total}
     />
   )
 }
