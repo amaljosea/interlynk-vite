@@ -388,6 +388,10 @@ export const GetProductTable = gql`
             id
             name
             sbomsCount
+            sboms {
+              productLifeCycleStage
+              id
+            }
           }
           description
           updatedAt

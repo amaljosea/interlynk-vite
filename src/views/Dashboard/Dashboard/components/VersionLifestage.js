@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/client'
+import { useNavigate } from 'react-router-dom'
 
 import { Grid, GridItem, SimpleGrid, Stack, Text } from '@chakra-ui/react'
 import { Tag, TagLabel } from '@chakra-ui/react'
@@ -21,8 +22,14 @@ import {
 } from 'react-icons/lu'
 
 const VersionLifestages = () => {
-  const { organization, envName } = useGlobalState()
-  const { grayBorderColor } = useThemeColor(['grayBorderColor'])
+  const navigate = useNavigate()
+  const { organization, envName, dispatch } = useGlobalState()
+  const { grayBorderColor, primaryBlueText } = useThemeColor([
+    'grayBorderColor',
+    'primaryBlueText'
+  ])
+
+  const { prodDispatch } = dispatch
 
   const { data, loading } = useQuery(getVersionLifestage, {
     skip: !organization,
@@ -92,6 +99,9 @@ const VersionLifestages = () => {
 
   const total = lifeStages?.reduce((sum, stage) => sum + stage.count, 0)
 
+  const handleFilter = (value) =>
+    navigate(`/vendor/products?lifestage=${value}`)
+
   if (loading) return <LynkLoader />
 
   return (
@@ -114,10 +124,20 @@ const VersionLifestages = () => {
         <Stack>
           {lifeStages?.map((item, index) => (
             <SimpleGrid w={'100%'} key={index} columns={2} spacing={2}>
-              <Text fontSize={'sm'} textTransform={'capitalize'}>
+              <Text
+                fontSize={'sm'}
+                cursor={'pointer'}
+                textTransform={'capitalize'}
+                _hover={{ color: primaryBlueText }}
+                onClick={() => handleFilter(item?.label)}
+              >
                 {item?.label?.replaceAll('_', ' ')}
               </Text>
-              <Tag colorScheme={item?.color}>
+              <Tag
+                cursor={'pointer'}
+                colorScheme={item?.color}
+                onClick={() => handleFilter(item?.label)}
+              >
                 <TagLabel mx={'auto'} fontSize={'sm'}>
                   {item?.count}
                 </TagLabel>

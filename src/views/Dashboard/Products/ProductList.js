@@ -15,6 +15,7 @@ import { GetProductTable } from 'graphQL/Queries'
 
 function ProductList() {
   const { setIsOpen } = useTour()
+  const filter = useQueryParam('lifestage')
   const { dispatch, prodState } = useGlobalState()
   const { prodDispatch, prodCompDispatch, prodVulnDispatch } = dispatch
   const { field, direction, enabled, searchInput, labelIds, lifestage } =
@@ -26,15 +27,21 @@ function ProductList() {
     parentKey: 'view_product_group'
   })
 
+  console.warn('filter', filter)
+
+  const productLifestage = filter
+    ? [filter]
+    : !lifestage?.includes('none')
+      ? getUndefinedIfEmptyOrAll(lifestage)
+      : ['none']
+
   const filters = {
     field,
     direction,
     enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
     labelIds: getUndefinedIfEmptyOrAll(labelIds),
     search: searchInput !== '' ? searchInput : undefined,
-    lifestage: !lifestage?.includes('none')
-      ? getUndefinedIfEmptyOrAll(lifestage)
-      : 'none'
+    lifestage: productLifestage
   }
 
   const { nodes, paginationProps, reset, loading, error } = usePaginatedQuery(
@@ -61,6 +68,20 @@ function ProductList() {
       })
     }
   }, [nodes, prodDispatch])
+
+  useEffect(() => {
+    if (filter) {
+      prodDispatch({
+        type: 'PRODUCT_BY_LIFESTAGE',
+        payload: [filter]
+      })
+    } else {
+      prodDispatch({
+        type: 'PRODUCT_BY_LIFESTAGE',
+        payload: []
+      })
+    }
+  }, [filter, prodDispatch])
 
   useEffect(() => {
     if (product === null) {

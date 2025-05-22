@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/client'
+import { useNavigate } from 'react-router-dom'
 
 import { Flex, Kbd, Stack, Text } from '@chakra-ui/react'
 import {
@@ -33,6 +34,7 @@ const stages = [
 ]
 
 const ProdFilterMenu = (props) => {
+  const navigate = useNavigate()
   const { isFreeTier } = useGlobalQueryContext()
 
   const { reset, filterMode, setFilterMode, setSelectedTags } = props
@@ -74,6 +76,7 @@ const ProdFilterMenu = (props) => {
       type: 'FILTER_LIFESTAGE',
       payload: value
     })
+    navigate('/vendor/products')
     reset()
   }
 

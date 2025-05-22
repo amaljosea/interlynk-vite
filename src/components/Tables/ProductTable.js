@@ -63,7 +63,7 @@ const ProductTable = (props) => {
   const { field, searchInput } = prodState
 
   const environment = envName
-  const { prodDispatch } = dispatch
+  const { prodDispatch, versionDispatch } = dispatch
 
   const [activeRow, setActiveRow] = useState(null)
   const [openTagMenu, setOpenTagMenu] = useState(false)
@@ -117,13 +117,16 @@ const ProductTable = (props) => {
       type: 'SET_CURRENT_PRODUCT',
       payload: { id: env?.id || defaultProject?.id }
     })
+    versionDispatch({ type: 'FILTER_LIFESTAGE', payload: [] })
     const link = generateProductDetailPageUrlFromCurrentUrl({
       productgroupid: id,
       productid: env?.id || defaultProject?.id,
       paramsObj: {
         tab: 'versions'
-      }
+      },
+      replaceParams: true
     })
+
     navigate(link)
   }
 
