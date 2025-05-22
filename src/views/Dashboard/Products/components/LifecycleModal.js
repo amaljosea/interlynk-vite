@@ -71,14 +71,7 @@ const LifecycleModal = ({ data, isOpen, onClose }) => {
     const { value } = selectedItem
     setFormData((prev) => ({
       ...prev,
-      [name]: value === '' ? undefined : value,
-      releaseDate: data?.releaseDate ? new Date(data?.releaseDate) : new Date(),
-      endOfLifeDate: data?.endOfLifeDate
-        ? new Date(data?.endOfLifeDate)
-        : new Date(),
-      endOfSupportDate: data?.endOfSupportDate
-        ? new Date(data?.endOfSupportDate)
-        : new Date()
+      [name]: value === '' ? undefined : value
     }))
     setError('')
   }
@@ -98,8 +91,21 @@ const LifecycleModal = ({ data, isOpen, onClose }) => {
   }
 
   const handleSubmit = () => {
-    const { stage, releaseDate, endOfLifeDate, endOfSupportDate } =
-      formData || ''
+    const { stage, releaseDate, endOfLifeDate, endOfSupportDate } = formData
+
+    if (stage === 'released' && !releaseDate) {
+      setError('Release date is required')
+      return
+    }
+    if (stage === 'end_of_life' && !endOfLifeDate) {
+      setError('End of Life date is required')
+      return
+    }
+    if (stage === 'end_of_support' && !endOfSupportDate) {
+      setError('End of Support date is required')
+      return
+    }
+
     updateStage({
       variables: {
         id: data?.sbomId,
