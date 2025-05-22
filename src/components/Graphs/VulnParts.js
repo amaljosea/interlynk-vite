@@ -33,6 +33,7 @@ const GetPartVulns = gql`
     sbom(projectId: $projectId, sbomId: $sbomId) {
       id
       projectVersion
+      vulnRunStatus
       project {
         id
         name
@@ -127,42 +128,50 @@ const VulnTypes = ({ data }) => {
     }
   }
 
+  const vulnRunStatus = data?.vulnRunStatus
+  const notStarted = data?.vulnRunStatus === 'NOT_STARTED'
+
   return (
     <Flex flexWrap={'wrap'} gap={1} scale={0.5}>
       <VulnBadge
         color='red'
         label='Critical'
+        status={vulnRunStatus}
         onClick={() => handleFilter(['critical'])}
       >
-        {vulnStats?.critical || 0}
+        {notStarted ? '-' : vulnStats?.critical || 0}
       </VulnBadge>
       <VulnBadge
         color='orange'
         label='High'
+        status={vulnRunStatus}
         onClick={() => handleFilter(['high'])}
       >
-        {vulnStats?.high || 0}
+        {notStarted ? '-' : vulnStats?.high || 0}
       </VulnBadge>
       <VulnBadge
         color='yellow'
         label='Medium'
+        status={vulnRunStatus}
         onClick={() => handleFilter(['medium'])}
       >
-        {vulnStats?.medium || 0}
+        {notStarted ? '-' : vulnStats?.medium || 0}
       </VulnBadge>
       <VulnBadge
         color='green'
         label='Low'
+        status={vulnRunStatus}
         onClick={() => handleFilter(['low'])}
       >
-        {vulnStats?.low || 0}
+        {notStarted ? '-' : vulnStats?.low || 0}
       </VulnBadge>
       <VulnBadge
         color='gray'
         label='Unknown'
+        status={vulnRunStatus}
         onClick={() => handleFilter(['unknown'])}
       >
-        {vulnStats?.unknown || 0}
+        {notStarted ? '-' : vulnStats?.unknown || 0}
       </VulnBadge>
     </Flex>
   )
