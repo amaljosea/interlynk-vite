@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { calculateExpiryDate, getSignedUrlParams } from 'utils'
 import { openSsf } from 'variables/general'
 
-import { Box, Flex, Grid, Tag, Text, VStack } from '@chakra-ui/react'
+import { Box, Flex, Grid, Tag, Text, Tooltip, VStack } from '@chakra-ui/react'
 
 import DetailItem from 'components/Misc/DetailItem'
 import SupplierTag from 'components/SupplierTag'
@@ -14,6 +14,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 const ExpandedComponent = (props) => {
   const { data, isArchived, action } = props
   const {
+    version,
     componentSupportLevel: manual,
     componentSupportLevelAutomatic: automatic
   } = data || {}
@@ -24,7 +25,10 @@ const ExpandedComponent = (props) => {
   const signedUrlParams = getSignedUrlParams()
   const { isFreeTier } = useGlobalQueryContext()
 
-  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+  const { primaryBlueText, primaryTextColor } = useThemeColor([
+    'primaryBlueText',
+    'primaryTextColor'
+  ])
 
   const getDate = (value) =>
     value ? `${new Date(value).toLocaleDateString()}` : `N/A`
@@ -53,6 +57,11 @@ const ExpandedComponent = (props) => {
     const assessmentExpiresOn = calculateExpiryDate(retainManualOverrideFor)
     const explanation = notes || automatic?.notes || 'N/A'
     const assessedBy = user?.name || 'N/A'
+    const { packageVersion, latestPackageVersion } = data?.enrichedContent || {}
+
+    const isOutdated =
+      latestPackageVersion?.version &&
+      latestPackageVersion?.version !== packageVersion?.version
 
     const purlColor = purl && primaryBlueText
     const cpesColor = cpes?.length > 0 && primaryBlueText
@@ -62,14 +71,33 @@ const ExpandedComponent = (props) => {
 
     const showCustomerSupplier = isCustomerView && suppliers?.length === 0
 
+    const VersionPreview = () => {
+      return (
+        <Flex alignItems={'center'} gap={isOutdated ? 2 : 0}>
+          <Text fontSize={14} color={primaryTextColor}>
+            {version || 'N/A'}
+          </Text>
+          {isOutdated && latestPackageVersion?.version && (
+            <Tooltip label={'Latest'}>
+              <Text fontSize={14} color={primaryBlueText}>
+                {`(${latestPackageVersion?.version})`}
+              </Text>
+            </Tooltip>
+          )}
+        </Flex>
+      )
+    }
+
     return (
       <Box
         sx={{ w: '100%', p: 5 }}
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
-        <Grid templateColumns='repeat(3, 1fr)' py={2} gap={6}>
+        <Grid templateColumns='repeat(4, 1fr)' py={2} gap={6}>
           {/* NAME */}
           <DetailItem label='Name' value={name || 'N/A'} />
+          {/* VERSION */}
+          <DetailItem label='Version' value={<VersionPreview />} />
           {/* TYPE */}
           <DetailItem label='Type' value={type || 'N/A'} />
           {/* Supplier */}

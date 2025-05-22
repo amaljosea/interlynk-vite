@@ -1,7 +1,12 @@
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
-import { isValidPurl, parseLicenseString, truncatedValue } from 'utils'
-import { getFullDate, timeSince } from 'utils'
+import {
+  getFullDate,
+  isValidPurl,
+  parseLicenseString,
+  timeSince,
+  truncatedValue
+} from 'utils'
 import { GetIcon } from 'utils/styleUtils'
 
 import { ViewIcon } from '@chakra-ui/icons'
@@ -84,11 +89,11 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
         selector: (row) => {
           const { purl, name, primary, internal, sbomId: bomId, sbom } = row
           const { latestPackageVersion, packageVersion } =
-            row?.enrichedContent || ''
+            row?.enrichedContent || {}
           const isOutdated =
             latestPackageVersion?.version !== packageVersion?.version
-          const { projectVersion, project } = sbom || ''
-          const { projectGroup } = project || ''
+          const { projectVersion, project } = sbom || {}
+          const { projectGroup } = project || {}
           const isPart = sbomId !== bomId
           const isVulnerable = row?.vulns?.totalCount > 0
 
@@ -214,14 +219,12 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
         id: 'COMPONENTS_VERSION',
         name: 'VERSION',
         selector: (row) => (
-          <Tooltip label={row?.version || 'N/A'}>
-            <Text my={4} fontSize={14} color={primaryTextColor}>
-              {row?.version ? truncatedValue(row?.version, 20) : 'N/A'}
-            </Text>
-          </Tooltip>
+          <Text my={4} color={primaryTextColor}>
+            {row?.version}
+          </Text>
         ),
         wrap: true,
-        width: '14%',
+        width: '20%',
         sortable: true
       },
       // COMPONENT HEALTH
@@ -288,12 +291,12 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
           return (
             <Tooltip label={licensesExp} placement={'top'}>
               <Text my={3} fontSize={14} color={primaryTextColor}>
-                {truncatedValue(license, 40)}
+                {truncatedValue(license, 20)}
               </Text>
             </Tooltip>
           )
         },
-        width: '18%',
+        width: '12%',
         sortable: true,
         wrap: true
       },

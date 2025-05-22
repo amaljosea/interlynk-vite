@@ -107,7 +107,7 @@ const CompInsights = ({ isOpen, onClose, data }) => {
 
   const { enrichedContent } = insights?.component || ''
   const { packageVersion, latestPackageVersion, repository } =
-    enrichedContent || ''
+    enrichedContent || {}
 
   const getLicense = (item) => {
     if (!item) return 'N/A'
