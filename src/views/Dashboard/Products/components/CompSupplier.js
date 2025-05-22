@@ -45,7 +45,7 @@ const GetSupplier = gql`
 const CompSupplier = ({ data }) => {
   const { showToast } = useCustomToast()
   const { secondaryTextInverse } = useThemeColor(['secondaryTextInverse'])
-  const { id, sbomId } = data || ''
+  const { id, sbomId } = data || {}
 
   const {
     tabData,

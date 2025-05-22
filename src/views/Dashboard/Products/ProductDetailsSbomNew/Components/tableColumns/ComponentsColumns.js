@@ -82,7 +82,6 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
 
   return useMemo(() => {
     const columns = [
-      // COMPONENT
       {
         id: 'COMPONENTS_UPDATED_AT',
         name: 'NAME',
@@ -358,7 +357,7 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
                   <Portal>
                     <MenuList fontSize={'sm'}>
                       <MenuItem
-                        hidden={isPart}
+                        // hidden={isPart}
                         data-testid='edit_component'
                         onClick={() => action(editComponent, row)}
                         isDisabled={status === 'signed' || !updateComponent}

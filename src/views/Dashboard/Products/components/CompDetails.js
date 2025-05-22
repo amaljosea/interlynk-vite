@@ -54,8 +54,8 @@ const CompDetails = ({ data, primaryComp }) => {
   } = useContext(TabContext)
   const { details } = tabData
 
-  const { sbomId, sbom } = data || ''
-  const { id: productId } = sbom?.project || ''
+  const { sbomId, sbom } = data || {}
+  const { id: productId } = sbom?.project || {}
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 

@@ -41,7 +41,7 @@ const GetCompUrls = gql`
 
 const CompLinks = ({ data }) => {
   const { showToast } = useCustomToast()
-  const { id, sbomId } = data || ''
+  const { id, sbomId } = data || {}
 
   const {
     tab,

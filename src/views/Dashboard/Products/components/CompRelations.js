@@ -30,7 +30,7 @@ import ActionButton from './ActionButton'
 const CompRelations = ({ data, compPath }) => {
   const { showToast } = useCustomToast()
 
-  const { id, name, sbomId } = data || ''
+  const { id, name, sbomId } = data || {}
 
   const {
     tab,

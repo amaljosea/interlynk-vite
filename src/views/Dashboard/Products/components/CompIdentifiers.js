@@ -2,7 +2,6 @@ import { useMutation } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { PackageURL } from 'packageurl-js'
 import { useContext, useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
 
 import { Stack } from '@chakra-ui/react'
 
@@ -22,8 +21,6 @@ import ActionButton from './ActionButton'
 
 const CompIdentifiers = ({ data }) => {
   const { showToast } = useCustomToast()
-  const params = useParams()
-  const sbomId = params.sbomid
   const { isCustomerView } = useRouteFlags()
 
   const {
@@ -64,7 +61,7 @@ const CompIdentifiers = ({ data }) => {
     updateComponent({
       variables: {
         id: data?.id,
-        sbomId: sbomId,
+        sbomId: data?.sbomId,
         purl: identifiers?.purl,
         cpes: identifiers?.cpe !== '' ? [identifiers?.cpe] : []
       }
