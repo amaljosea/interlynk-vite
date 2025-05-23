@@ -1,13 +1,20 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { timeSince } from 'utils'
 import { licenseStatusTypes } from 'variables/general'
 
 import { AddIcon } from '@chakra-ui/icons'
-import { Divider, Textarea } from '@chakra-ui/react'
-import { Button, ButtonGroup } from '@chakra-ui/react'
-import { Flex, Stack, Text } from '@chakra-ui/react'
-import { FormControl, FormLabel } from '@chakra-ui/react'
+import {
+  Button,
+  ButtonGroup,
+  Divider,
+  Flex,
+  FormControl,
+  FormLabel,
+  Stack,
+  Text,
+  Textarea
+} from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import LynkAlert from 'components/LynkAlert'
@@ -70,27 +77,27 @@ const LicenseStatus = ({ data, isOpen, onClose }) => {
         setError(errors[0])
       } else {
         setEdit(false)
+        setFormData({ licenseStatus: '', licenseNotes: '' })
         showToast({ description: 'Note Updated', status: 'success' })
       }
     })
   }
 
   const isDisabled =
-    formData?.licenseStatus === '' || formData?.licenseNotes === ''
+    formData?.licenseStatus.trim() === '' ||
+    formData?.licenseNotes.trim() === ''
 
-  const filterData =
-    componentLicenseStatusHistories?.length > 0
-      ? componentLicenseStatusHistories?.sort((a, b) => {
-          const dateA = new Date(a?.createdAt)
-          const dateB = new Date(b?.createdAt)
-          return dateB - dateA
-        })
-      : []
+  const filterData = useMemo(() => {
+    if (!componentLicenseStatusHistories?.length) return []
+    return [...componentLicenseStatusHistories].sort(
+      (a, b) => new Date(b?.createdAt) - new Date(a?.createdAt)
+    )
+  }, [componentLicenseStatusHistories])
 
-  const selectOptions = licenseStatusTypes?.map((item) => ({
-    value: item,
-    label: item
-  }))
+  const selectOptions = useMemo(
+    () => licenseStatusTypes?.map((item) => ({ value: item, label: item })),
+    []
+  )
 
   return (
     <LynkDrawer
@@ -172,7 +179,7 @@ const LicenseStatus = ({ data, isOpen, onClose }) => {
             onClick={handleUpdate}
             data-testid='update_status'
           >
-            Update Status
+            Add Status
           </Button>
         )}
         <Divider />
@@ -182,10 +189,10 @@ const LicenseStatus = ({ data, isOpen, onClose }) => {
           <Stack>
             {filterData?.length > 0 ? (
               <Stack spacing={6} mb={4}>
-                {filterData?.map((item, index) => (
+                {filterData?.map((item) => (
                   <Flex
                     gap={8}
-                    key={index}
+                    key={item.id}
                     justify='space-between'
                     alignItems={'flex-start'}
                   >

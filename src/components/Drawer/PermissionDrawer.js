@@ -14,6 +14,20 @@ import useQueryParam from 'hooks/useQueryParam'
 import { UpdateOrganizationRole } from 'graphQL/Mutation'
 import { GetAllPermissions } from 'graphQL/Queries'
 
+const PERMISSION_CATEGORIES = [
+  'Organization Management',
+  'Product Management',
+  'Product Environment Management',
+  'SBOM Management',
+  'User Management',
+  'Vulnerability Management',
+  'License Management',
+  'Policy Management',
+  'Support Management',
+  'Vendor Management',
+  'Connection Management'
+]
+
 const PermissionDrawer = ({ isOpen, onClose, selectedRole }) => {
   const { showToast } = useCustomToast()
   const activetab = useQueryParam('tab')
@@ -29,7 +43,7 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole }) => {
   const { data, loading } = useQuery(GetAllPermissions, {
     skip: activetab === 'roles' ? false : true
   })
-  const { organizationRoles } = data?.organization || ''
+  const organizationRoles = data?.organization?.organizationRoles || []
 
   const activeRole = organizationRoles?.find(
     (item) => item?.name === selectedRole
@@ -53,6 +67,7 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole }) => {
       if (errors?.length > 0) {
         setError(errors[0])
       } else {
+        setError('')
         showToast({
           description: `${filterItem?.name} Permission updated successfully`,
           status: 'success'
@@ -75,8 +90,8 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole }) => {
               item.hidden === null &&
               item.supersededBy.length > 0
           )
-          .map((item, index) => (
-            <Checkbox isDisabled key={index} isChecked={item.value}>
+          .map((item) => (
+            <Checkbox isDisabled key={item.key} isChecked={item.value}>
               {item.name}
             </Checkbox>
           ))}
@@ -122,39 +137,12 @@ const PermissionDrawer = ({ isOpen, onClose, selectedRole }) => {
           )}
           {error !== '' && <LynkAlert msg={error} />}
           <Stack spacing={4} dir='blue'>
-            {/* ORGANIZATION MANAGEMENT */}
-            <Permissions category={'Organization Management'} />
-            <Divider />
-            {/* PROJECT GROUP MANAGEMENT */}
-            <Permissions category={'Product Management'} />
-            <Divider />
-            {/* PROJECT MANAGEMENT */}
-            <Permissions category={'Product Environment Management'} />
-            <Divider />
-            {/* SBOM MANAGEMENT */}
-            <Permissions category={'SBOM Management'} />
-            <Divider />
-            {/* USER MANAGEMENT */}
-            <Permissions category={'User Management'} />
-            <Divider />
-            {/* VULN MANAGEMENT */}
-            <Permissions category={'Vulnerability Management'} />
-            <Divider />
-            {/* LICENSE MANAGEMENT */}
-            <Permissions category={'License Management'} />
-            <Divider />
-            {/* POLICY MANAGEMENT */}
-            <Permissions category={'Policy Management'} />
-            <Divider />
-            {/* SUPPORT MANAGEMENT */}
-            <Permissions category={'Support Management'} />
-            <Divider />
-            {/* VENDOR MANAGEMENT */}
-            <Permissions category={'Vendor Management'} />
-            <Divider />
-            {/* CONNECTION MANAGEMENT */}
-            <Permissions category={'Connection Management'} />
-            <Divider />
+            {PERMISSION_CATEGORIES.map((category) => (
+              <Stack spacing={4} key={category}>
+                <Permissions category={category} />
+                <Divider />
+              </Stack>
+            ))}
           </Stack>
         </Stack>
       )}

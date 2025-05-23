@@ -13,7 +13,11 @@ import {
 
 import LynkDrawer from 'components/LynkDrawer'
 
+const TABLE_HEADERS = ['PRODUCT', 'VERSION', 'ENVIRONMENT', 'STATUS']
+
 const ConnectedSbomDrawer = ({ data, isOpen, onClose }) => {
+  const connectedSboms = data?.connectedSboms || []
+
   return (
     <LynkDrawer
       title={'Also Affected'}
@@ -25,22 +29,20 @@ const ConnectedSbomDrawer = ({ data, isOpen, onClose }) => {
       <Table variant='simple' m={0} p={0}>
         <Thead>
           <Tr>
-            {['PRODUCT', 'VERSION', 'ENVIRONEMENT', 'STATUS'].map(
-              (item, index) => (
-                <Th
-                  px={0}
-                  key={index}
-                  textAlign={item === 'STATUS' ? 'right' : 'left'}
-                >
-                  {item}
-                </Th>
-              )
-            )}
+            {TABLE_HEADERS.map((item, index) => (
+              <Th
+                px={0}
+                key={index}
+                textAlign={item === 'STATUS' ? 'right' : 'left'}
+              >
+                {item}
+              </Th>
+            ))}
           </Tr>
         </Thead>
         <Tbody width={'100%'}>
-          {data?.connectedSboms?.length > 0 &&
-            data?.connectedSboms?.map((item, index) => {
+          {connectedSboms.length > 0 &&
+            connectedSboms.map((item, index) => {
               const { project, projectVersion } = item
               return (
                 <Tr key={index}>
