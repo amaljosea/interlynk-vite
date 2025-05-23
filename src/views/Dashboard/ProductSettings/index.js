@@ -100,8 +100,11 @@ const Settings = ({ enabled, data, mfc }) => {
   const ProductSetting = ({ id, label, value }) => {
     if (id === 'enableSupportLevel' && isFreeTier) return null
     return (
-      <Flex gap={2} align='center' justifyContent={'space-between'}>
+      <Flex gap={4} align='center' justifyContent={'space-between'}>
         <Flex align='center'>
+          <Tooltip label={onCheck(`${label}`)}>
+            <InfoIcon mr={2} fontSize={'sm'} color={primaryBlueText} />
+          </Tooltip>
           <Text
             noOfLines={1}
             color={sameSecondaryText}
@@ -110,9 +113,6 @@ const Settings = ({ enabled, data, mfc }) => {
           >
             {label}
           </Text>
-          <Tooltip label={onCheck(`${label}`)}>
-            <InfoIcon ml={2} fontSize={'xs'} color={primaryBlueText} />
-          </Tooltip>
         </Flex>
         <LynkSwitch
           id={id}
@@ -142,7 +142,7 @@ const Settings = ({ enabled, data, mfc }) => {
   return (
     <>
       <CardBody py={4}>
-        <SimpleGrid w={'100%'} columns={3} gap={[6, 12, 24]}>
+        <SimpleGrid w={'100%'} columns={3} gap={[6, 12]}>
           {/* COLUMNS 1 */}
           <Stack spacing={5}>
             <Text fontSize={14} fontWeight={'semibold'}>
