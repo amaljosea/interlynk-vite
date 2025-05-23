@@ -17,6 +17,7 @@ import {
   Tooltip
 } from '@chakra-ui/react'
 
+import LynkSeparator from 'components/LynkSeparator'
 import LynkAction from 'components/Misc/LynkAction'
 import VulnBadge from 'components/Misc/VulnBadge'
 
@@ -124,12 +125,7 @@ const VersionColumns = (props) => {
                     {lifestage}
                   </Tag>
                 )}
-                <Text
-                  color={secondaryTextColor}
-                  hidden={!daysUntilDeletion || signedUrlParams}
-                >
-                  •
-                </Text>
+                <LynkSeparator hidden={!daysUntilDeletion || signedUrlParams} />
                 {daysUntilDeletion && !signedUrlParams && (
                   <Tooltip
                     label={`Marked for deletion on ${endDate ? new Date(endDate).toLocaleDateString() : ''}`}
@@ -140,20 +136,15 @@ const VersionColumns = (props) => {
                     />
                   </Tooltip>
                 )}
-                <Text
-                  color={secondaryTextColor}
+                <LynkSeparator
                   hidden={alternatives?.length === 0 || signedUrlParams}
-                >
-                  •
-                </Text>
+                />
                 {!isReprocess && showIcon && (
                   <Tooltip label={ignoreMsg}>
                     <IconButton size={'xs'} icon={<LuRepeat size={16} />} />
                   </Tooltip>
                 )}
-                <Text color={secondaryTextColor} hidden={signedUrlParams}>
-                  •
-                </Text>
+                <LynkSeparator hidden={signedUrlParams} />
                 <Tooltip label={getFullDate(updatedAt)} placement='top'>
                   <Text color={secondaryTextColor}>{timeSince(updatedAt)}</Text>
                 </Tooltip>

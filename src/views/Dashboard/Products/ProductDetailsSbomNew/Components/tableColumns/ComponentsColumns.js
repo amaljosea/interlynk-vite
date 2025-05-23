@@ -26,6 +26,7 @@ import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
 import { HealthScore } from 'components/HealthScore'
 import LynkBadge from 'components/LynkBadge'
+import LynkSeparator from 'components/LynkSeparator'
 import ExternalLink from 'components/Misc/ExternalLink'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -136,9 +137,8 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
                       action={() => action(editComponent, row)}
                     />
                   )}
-                  <Text hidden={!primary} color={secondaryTextColor}>
-                    •
-                  </Text>
+
+                  <LynkSeparator hidden={!primary} />
                   {internal && (
                     <LynkBadge
                       color='blue'
@@ -146,9 +146,7 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
                       action={() => action(editComponent, row)}
                     />
                   )}
-                  <Text hidden={!internal} color={secondaryTextColor}>
-                    •
-                  </Text>
+                  <LynkSeparator hidden={!internal} />
                   {isOutdated && (
                     <LynkBadge
                       color='yellow'
@@ -156,9 +154,7 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
                       action={() => action(viewInsights, row)}
                     />
                   )}
-                  <Text hidden={!isOutdated} color={secondaryTextColor}>
-                    •
-                  </Text>
+                  <LynkSeparator hidden={!isOutdated} />
                   {isVulnerable && !isAllVulnsNotAffected && (
                     <LynkBadge
                       color='red'
@@ -166,9 +162,7 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
                       action={() => action(viewCompVulnerabilities, row)}
                     />
                   )}
-                  <Text hidden={!isVulnerable} color={secondaryTextColor}>
-                    •
-                  </Text>
+                  <LynkSeparator hidden={!isVulnerable} />
                   {packageVersion?.isDeprecated === true && (
                     <LynkBadge
                       color='orange'
@@ -176,12 +170,7 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
                       action={() => action(viewInsights, row)}
                     />
                   )}
-                  <Text
-                    hidden={!packageVersion?.isDeprecated}
-                    color={secondaryTextColor}
-                  >
-                    •
-                  </Text>
+                  <LynkSeparator hidden={!packageVersion?.isDeprecated} />
                   {isPart && (
                     <Tooltip
                       label={`${projectGroup?.name} : ${projectVersion || 'N/A'}`}
@@ -191,9 +180,7 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
                       </Box>
                     </Tooltip>
                   )}
-                  <Text hidden={!isPart} color={secondaryTextColor}>
-                    •
-                  </Text>
+                  <LynkSeparator hidden={!isPart} />
                   <Tooltip label={getFullDate(row?.updatedAt)}>
                     <Text fontSize={14} color={secondaryTextColor}>
                       {timeSince(row?.updatedAt)}
