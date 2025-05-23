@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import { jsPDF } from 'jspdf'
+import { attributionFilename } from 'utils/DownloadUtils/pdfUtils'
 
 export const fetchLogo = async () => {
   try {
@@ -21,20 +22,12 @@ export const fetchLogo = async () => {
   }
 }
 
-export const formatFilename = (name, version) => {
-  const now = new Date()
-  const month = now.toLocaleString('default', { month: 'short' }).toLowerCase()
-  const year = now.getFullYear()
-  const formattedName = name.toLowerCase().replace(/[.\s]/g, '_')
-  return `${formattedName}_${version}_${month}_${year}.pdf`
-}
-
 export const generateAttributionPdf = async (
   finalItems,
   productName,
   productVersion
 ) => {
-  const filename = formatFilename(productName, productVersion)
+  const filename = attributionFilename(productName, productVersion)
   const pdfDoc = new jsPDF({ compress: true })
   const pageWidth = pdfDoc.internal.pageSize.getWidth()
   const pageHeight = pdfDoc.internal.pageSize.getHeight()
@@ -260,5 +253,5 @@ export const generateAttributionPdf = async (
     align: 'center'
   })
 
-  pdfDoc.save(filename)
+  pdfDoc.save(`${filename}.pdf`)
 }

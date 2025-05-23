@@ -27,10 +27,6 @@ export const GetLicensesTable = gql`
     $after: String
     $last: Int
     $before: String
-    $status: [String!]
-    $search: String
-    $licenseType: [String!]
-    $orderBy: OrganizationLicenseOrderByInput
     $expression: String
   ) {
     organization {
@@ -39,10 +35,6 @@ export const GetLicensesTable = gql`
         last: $last
         after: $after
         before: $before
-        status: $status
-        search: $search
-        licenseType: $licenseType
-        orderBy: $orderBy
         expression: $expression
       ) {
         totalCount
@@ -58,20 +50,14 @@ export const GetLicensesTable = gql`
             __typename
             ... on License {
               id
-              name
               shortId
               text
-              comment
-              url
               __typename
             }
             ... on LicenseCustom {
               id
-              name
               text
               url
-              comment
-              spdxId
               __typename
             }
           }

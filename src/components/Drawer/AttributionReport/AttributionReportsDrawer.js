@@ -24,15 +24,7 @@ export const GetComponentData = gql`
     $after: String
     $before: String
     $search: String
-    $licenses: [String!]
-    $supplierName: [String!]
-    $ecosystem: [String!]
-    $supportLevel: [String!]
-    $kind: [String!]
     $internal: Boolean
-    $primary: Boolean
-    $direct: Boolean
-    $includeParts: Boolean
     $orderBy: ComponentOrderByInput
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
@@ -44,16 +36,9 @@ export const GetComponentData = gql`
         first: $first
         last: $last
         search: $search
-        licenses: $licenses
-        supplierName: $supplierName
-        ecosystem: $ecosystem
-        kind: $kind
         internal: $internal
-        primary: $primary
-        direct: $direct
+
         orderBy: $orderBy
-        supportLevel: $supportLevel
-        includeParts: $includeParts
       ) {
         totalCount
         pageInfo {
@@ -105,17 +90,21 @@ const AttributionReportsDrawer = ({
 
   const isSortable = field !== '' && direction !== ''
 
+  const getQueryVariables = (includeSearch = false) => {
+    return {
+      sbomId,
+      projectId: productId,
+      internal: internal ? !internal : undefined,
+      orderBy: isSortable ? { field, direction } : undefined,
+      ...(includeSearch && searchInput !== '' && { search: searchInput })
+    }
+  }
+
   const { nodes, error, paginationProps, loading, reset } = usePaginatedQuery(
     GetComponentData,
     {
       selector: 'sbom.components',
-      variables: {
-        sbomId: sbomId,
-        projectId: productId,
-        search: searchInput !== '' ? searchInput : undefined,
-        orderBy: isSortable ? { field, direction } : undefined,
-        internal: internal ? !internal : undefined
-      },
+      variables: getQueryVariables(true),
       onCompleted: (data) => {
         prodCompDispatch({
           type: 'SET_TOTAL_COMP',
@@ -135,17 +124,14 @@ const AttributionReportsDrawer = ({
     setSelectedRowData(state?.selectedRows)
   }
 
-  const onSearchInputChange = useCallback(
-    (e) => {
-      const { value } = e.target
-      if (value === '') {
-        handleClear()
-      } else {
-        setCompSearch(value)
-      }
-    },
-    [handleClear]
-  )
+  const onSearchInputChange = (e) => {
+    const { value } = e.target
+    if (value === '') {
+      handleClear()
+    } else {
+      setCompSearch(value)
+    }
+  }
 
   const handleClear = useCallback(async () => {
     setCompSearch('')
@@ -172,12 +158,7 @@ const AttributionReportsDrawer = ({
     setInternal,
     internal,
     query: GetComponentData,
-    variables: {
-      sbomId: sbomId,
-      projectId: productId,
-      internal: internal ? !internal : undefined,
-      orderBy: isSortable ? { field, direction } : undefined
-    },
+    variables: getQueryVariables(false),
     selectedRowData,
     productName,
     productVersion
@@ -242,7 +223,6 @@ const AttributionReportsDrawer = ({
       <AttributionReportsEditModal
         isOpen={editingRow.id !== null}
         onClose={handleEditClose}
-        editingField={editingRow?.field}
         rowData={editingRow}
         sbomId={sbomId}
         setSelectedRowData={setSelectedRowData}

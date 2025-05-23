@@ -2,7 +2,7 @@ import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { formatSupportLevel, getSignedUrlParams } from 'utils'
-import { exportExcel } from 'views/Sbom/DownloadUtils/excelUtils'
+import { exportExcel } from 'utils/DownloadUtils/excelUtils'
 import DownloadModal from 'views/Sbom/components/DownloadModal'
 
 import { Box, Divider, IconButton, Stack } from '@chakra-ui/react'

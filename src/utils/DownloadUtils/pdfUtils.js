@@ -180,3 +180,12 @@ export const excludeStatusLabels = [
 
 //Following labels and values are ommited if Internal notes is not checked
 export const excludeStatusNotesLabels = ['internal notes']
+
+//Filename formatting for attribution report PDF and HTML
+export const attributionFilename = (name, version) => {
+  const now = new Date()
+  const month = now.toLocaleString('default', { month: 'short' }).toLowerCase()
+  const year = now.getFullYear()
+  const formattedName = name.toLowerCase().replace(/[.\s]/g, '_')
+  return `${formattedName}_${version}_${month}_${year}`
+}

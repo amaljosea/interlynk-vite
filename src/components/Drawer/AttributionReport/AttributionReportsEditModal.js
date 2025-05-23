@@ -13,12 +13,11 @@ import useCustomToast from 'hooks/useCustomToast'
 
 import { UpdateComponent } from 'graphQL/Mutation'
 
-import { FaCopyright, FaScaleBalanced } from 'react-icons/fa6'
+import { FaCopyright, FaFileLines, FaScaleBalanced } from 'react-icons/fa6'
 
 const AttributionReportsEditModal = ({
   isOpen,
   onClose,
-  editingField,
   rowData,
   sbomId,
   setSelectedRowData
@@ -29,6 +28,8 @@ const AttributionReportsEditModal = ({
 
   const [copyrightValue, setCopyrightValue] = useState('')
   const [noticeValue, setNoticeValue] = useState('')
+
+  const editingField = rowData?.field
 
   useEffect(() => {
     if (editingField === 'copyright') {
@@ -44,6 +45,8 @@ const AttributionReportsEditModal = ({
         return 'Edit License'
       case 'copyright':
         return 'Edit Copyright'
+      case 'notice':
+        return 'Edit Notice'
       default:
         return 'Edit'
     }
@@ -66,6 +69,42 @@ const AttributionReportsEditModal = ({
         return FaScaleBalanced
       case 'copyright':
         return FaCopyright
+      case 'notice':
+        return FaFileLines
+    }
+  }
+
+  const handleUpdate = async (field, value, updateKey) => {
+    const variables = {
+      id: rowData?.id,
+      sbomId,
+      [updateKey]: value || undefined
+    }
+
+    try {
+      const res = await updateComponent({ variables })
+      const { errors } = res?.data?.componentUpdate || {}
+
+      if (errors?.length > 0) {
+        showToast({ description: errors[0], status: 'error' })
+      } else {
+        showToast({
+          description: `${field} updated successfully for ${rowData?.name}`,
+          status: 'success'
+        })
+
+        setSelectedRowData((prevSelectedRows) =>
+          prevSelectedRows.map((selectedRow) =>
+            selectedRow.id === rowData?.id
+              ? { ...selectedRow, [updateKey]: value }
+              : selectedRow
+          )
+        )
+
+        onClose()
+      }
+    } catch (error) {
+      showToast({ description: 'Something went wrong', status: 'error' })
     }
   }
 
@@ -77,88 +116,15 @@ const AttributionReportsEditModal = ({
     const license = isCustomLicense
       ? transformLicenseString(tabData.details.licenses[0].value)
       : tabData.details?.licenses?.[0]?.value || ''
-    updateComponent({
-      variables: {
-        id: rowData?.id,
-        sbomId,
-        licenses: { licensesExp: license || '' }
-      }
-    }).then((res) => {
-      const { errors } = res?.data?.componentUpdate || ''
-      if (errors?.length > 0) {
-        showToast({ description: errors[0], status: 'error' })
-      } else {
-        showToast({
-          description: `License updated successfully for ${rowData?.name}`,
-          status: 'success'
-        })
-      }
-      setSelectedRowData((prevSelectedRows) =>
-        prevSelectedRows.map((selectedRow) =>
-          selectedRow.id === rowData?.id
-            ? { ...selectedRow, licensesExp: license }
-            : selectedRow
-        )
-      )
-      onClose()
-    })
+
+    handleUpdate('License', { licensesExp: license }, 'licenses')
   }
 
   const handleUpdateCopyright = () => {
-    updateComponent({
-      variables: {
-        id: rowData?.id,
-        sbomId,
-        copyright: copyrightValue || undefined
-      }
-    }).then((res) => {
-      const { errors } = res?.data?.componentUpdate || ''
-      if (errors?.length > 0) {
-        showToast({ description: errors[0], status: 'error' })
-      } else {
-        showToast({
-          description: `Copyright updated successfully for ${rowData?.name}`,
-          status: 'success'
-        })
-      }
-
-      setSelectedRowData((prevSelectedRows) =>
-        prevSelectedRows.map((selectedRow) =>
-          selectedRow.id === rowData?.id
-            ? { ...selectedRow, copyright: copyrightValue }
-            : selectedRow
-        )
-      )
-      onClose()
-    })
+    handleUpdate('Copyright', copyrightValue, 'copyright')
   }
   const handleUpdateNotice = () => {
-    updateComponent({
-      variables: {
-        id: rowData?.id,
-        sbomId,
-        notice: noticeValue || undefined
-      }
-    }).then((res) => {
-      const { errors } = res?.data?.componentUpdate || {}
-      if (errors?.length > 0) {
-        showToast({ description: errors[0], status: 'error' })
-      } else {
-        showToast({
-          description: `Notice updated successfully for ${rowData?.name}`,
-          status: 'success'
-        })
-
-        setSelectedRowData((prevSelectedRows) =>
-          prevSelectedRows.map((selectedRow) =>
-            selectedRow.id === rowData?.id
-              ? { ...selectedRow, notice: noticeValue }
-              : selectedRow
-          )
-        )
-      }
-      onClose()
-    })
+    handleUpdate('Notice', noticeValue, 'notice')
   }
 
   return (

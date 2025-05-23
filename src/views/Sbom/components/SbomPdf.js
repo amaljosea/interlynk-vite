@@ -11,7 +11,7 @@ import {
   generalValues,
   getComponentValues,
   getVulnValues
-} from '../DownloadUtils/pdfUtils'
+} from '../../../utils/DownloadUtils/pdfUtils'
 
 export const downloadSbomPdf = (
   productName,
