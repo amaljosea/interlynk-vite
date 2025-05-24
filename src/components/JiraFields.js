@@ -8,6 +8,7 @@ import { FormControl, FormLabel, Stack, Text } from '@chakra-ui/react'
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
+import { useJiraConnection } from 'hooks/useJiraConnection'
 import useQueryParam from 'hooks/useQueryParam'
 
 import { ProjectSettingUpdate } from 'graphQL/Mutation'
@@ -24,25 +25,6 @@ const GetProjectSettings = gql`
         jiraIssueType
         jiraAssignee
         jiraReporter
-      }
-    }
-  }
-`
-
-const GetJiraConnections = gql`
-  query GetJiraConnections {
-    organization {
-      connections {
-        nodes {
-          enabled
-          connection {
-            ... on JiraConnection {
-              userName
-              apiToken
-              url
-            }
-          }
-        }
       }
     }
   }
@@ -70,15 +52,7 @@ const JiraFields = () => {
 
   const [updateSettings] = useMutation(ProjectSettingUpdate)
 
-  const { data: config } = useQuery(GetJiraConnections, {
-    skip: activeTab === 'settings' ? false : true
-  })
-  const { nodes } = config?.organization?.connections || {}
-  const jiraConnection = nodes?.some(
-    (item) =>
-      item?.connection?.__typename === 'JiraConnection' &&
-      item?.enabled === true
-  )
+  const { connection } = useJiraConnection()
 
   const { data: projectOptions, loading: projectLoading } = useQuery(
     GetJiraProjects,
@@ -171,7 +145,7 @@ const JiraFields = () => {
     )
   }, [options, projectOptions?.jira?.projects, projectSetting])
 
-  if (!jiraConnection) return null
+  if (!connection) return null
 
   return (
     <Stack spacing={4}>

@@ -17,7 +17,7 @@ import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
 
-import { CreateJiraIssue } from 'graphQL/Mutation'
+import { CreateBulkJiraIssue, CreateJiraIssue } from 'graphQL/Mutation'
 import {
   GetJiraProjectFields,
   GetJiraProjects,
@@ -40,7 +40,14 @@ const GetProjectSettings = gql`
   }
 `
 
-const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
+const JiraCreateIssueModal = ({
+  isOpen,
+  onClose,
+  row,
+  selectedVulns,
+  setSelectedVulns,
+  setToggleClear
+}) => {
   const params = useParams()
   const { showToast } = useCustomToast()
 
@@ -92,6 +99,17 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
     useLazyQuery(JiraInformation)
 
   const [createJiraIssue, { loading }] = useMutation(CreateJiraIssue)
+  const [createBulkIssue, { loading: bulkLoading }] = useMutation(
+    CreateBulkJiraIssue,
+    {
+      onCompleted: (data) => {
+        if (data) {
+          setSelectedVulns([])
+          setToggleClear(true)
+        }
+      }
+    }
+  )
 
   const { data } = useQuery(GetJiraProjectFields, {
     fetchPolicy: 'network-only',
@@ -296,32 +314,35 @@ const JiraCreateIssueModal = ({ isOpen, onClose, row }) => {
   }, [info])
 
   useEffect(() => {
-    const vulnId = row.vuln?.vulnId || 'N/A'
-    const desc = row.vuln?.desc || 'N/A'
-    const nvdAliasId = row.vuln?.nvdAliasId || 'N/A'
-    const component = row.component?.name || 'N/A'
-    const sev = row.vuln?.sev || 'N/A'
-    const cvssVector = row.vuln?.cvssVector || 'N/A'
-    const cvssScore = row.vuln?.cvssScore || 'N/A'
-    const epssPercentile = row.vuln?.vulnInfo?.epssPercentile || 'N/A'
-    const epssScore = row.vuln?.vulnInfo?.epssScore || 'N/A'
-    const kev = row.vuln?.vulnInfo?.kev === true ? 'True' : 'False' || 'N/A'
-    const vexStatus = row.vexStatus?.name || 'N/A'
-    const actionStmt = row.actionStmt || 'N/A'
-    const impact = row.impact || 'N/A'
-    const justification = row.vexJustification?.name || 'N/A'
-    const note = row?.note || 'N/A'
-    const customFields = formatCustomVulnFields(row?.componentVulnCustomFields)
+    if (selectedVulns?.length === 0) {
+      const vulnId = row?.vuln?.vulnId || 'N/A'
+      const desc = row?.vuln?.desc || 'N/A'
+      const nvdAliasId = row?.vuln?.nvdAliasId || 'N/A'
+      const component = row?.component?.name || 'N/A'
+      const sev = row?.vuln?.sev || 'N/A'
+      const cvssVector = row?.vuln?.cvssVector || 'N/A'
+      const cvssScore = row?.vuln?.cvssScore || 'N/A'
+      const epssPercentile = row?.vuln?.vulnInfo?.epssPercentile || 'N/A'
+      const epssScore = row?.vuln?.vulnInfo?.epssScore || 'N/A'
+      const kev = row?.vuln?.vulnInfo?.kev === true ? 'True' : 'False' || 'N/A'
+      const vexStatus = row?.vexStatus?.name || 'N/A'
+      const actionStmt = row?.actionStmt || 'N/A'
+      const impact = row?.impact || 'N/A'
+      const justification = row?.vexJustification?.name || 'N/A'
+      const note = row?.note || 'N/A'
+      const customFields = formatCustomVulnFields(
+        row?.componentVulnCustomFields
+      )
 
-    setDescription(
-      `Subject: [${vulnId}]: ${desc}\n
+      setDescription(
+        `Subject: [${vulnId}]: ${desc}\n
 Body:\n
 Summary: ${desc || 'N/A'}\n
 Issue Type:\n
 Vulnerability:\n
-Affected Product: ${row.component.sbom.project.projectGroup.name}\n
-Affected Version (Environment): ${row.component.sbom.project.projectGroup.name} (${row.component.sbom.project.name})\n
-Affected Components: ${component}: ${row.component.version}\nPURL: ${row.component.purl}\n
+Affected Product: ${row?.component?.sbom?.project?.projectGroup?.name}\n
+Affected Version (Environment): ${row?.component?.sbom?.project?.projectGroup?.name} (${row?.component?.sbom?.project?.name})\n
+Affected Components: ${component}: ${row?.component?.version}\nPURL: ${row?.component?.purl}\n
 Description: ${desc}\n
 Additional Details:\n
 NVD ID: ${nvdAliasId}\n
@@ -338,10 +359,15 @@ Vulnerability Justification: ${justification}\n
 Vulnerability Notes: ${note}\n
 ${customFields}
       `
-    )
-    setSummary(`[Vulnerability]: ${vulnId}`)
+      )
+      setSummary(`[Vulnerability]: ${vulnId}`)
+    } else {
+      const vulnIds = selectedVulns?.map((item) => item?.vuln?.vulnId)
+      setSummary(`[Vulnerability]: ${vulnIds?.join(', ')}`)
+    }
+
     handleApply()
-  }, [handleApply, row])
+  }, [handleApply, row, selectedVulns])
 
   useEffect(() => {
     if (summary && project && issueType && reporter && assignee) {
@@ -411,18 +437,55 @@ ${customFields}
     })
   }
 
+  const handleBulkCreate = () => {
+    setIsCreateDisabled(true)
+    const filteredLabels = label?.map((item) => item?.value)
+    const vulnIds = selectedVulns?.map((item) => item?.id)
+    createBulkIssue({
+      variables: {
+        vulnIds: vulnIds,
+        projectKey: project?.value,
+        issueTypeId: issueType?.value,
+        assignee: assignee?.value,
+        reporter: reporter?.value,
+        labels: filteredLabels?.length > 0 ? filteredLabels : undefined,
+        priority: priority?.value || undefined
+      }
+    }).then((res) => {
+      const ticketErrors = res?.data?.jiraIssueBulkCreate?.results?.flatMap(
+        (result) => result?.errors
+      )
+      if (ticketErrors?.length > 0) {
+        showToast({
+          title: 'Jira Issue creation failed.',
+          description: 'An error occurred while creating your Jira Issue.',
+          status: 'error'
+        })
+      } else {
+        showToast({
+          title: 'Jira Issue created.',
+          description: 'Your Jira Issues has been successfully created.',
+          status: 'success'
+        })
+        onClose()
+      }
+    })
+  }
+
+  const hasMultipleVuln = selectedVulns?.length > 0
+
   return (
     <LynkModal
       Icon={LuBolt}
       isOpen={isOpen}
       onClose={onClose}
-      isLoading={loading}
       buttonText={'Create'}
-      onSubmit={handleCreate}
       title={'Create Jira Issue'}
       disabled={isCreateDisabled}
+      isLoading={loading || bulkLoading}
+      onSubmit={hasMultipleVuln ? handleBulkCreate : handleCreate}
     >
-      <FormControl pt={'15px'} isRequired>
+      <FormControl pt={'15px'} isRequired hidden={hasMultipleVuln}>
         <FormLabel>Summary</FormLabel>
         <Input
           value={summary}
@@ -480,7 +543,7 @@ ${customFields}
       </Grid>
 
       <Stack spacing={4}>
-        <FormControl hidden={!issueType}>
+        <FormControl hidden={!issueType || hasMultipleVuln}>
           <FormLabel>Create/Assign Label</FormLabel>
           <LynkSelect
             isCreatable
@@ -494,7 +557,7 @@ ${customFields}
           />
         </FormControl>
 
-        <FormControl hidden={!issueType}>
+        <FormControl hidden={!issueType || hasMultipleVuln}>
           <FormLabel>Priority</FormLabel>
           <LynkSelect
             value={priority}
@@ -507,16 +570,16 @@ ${customFields}
 
         {componentField && (
           <FormControl
-            hidden={!issueType}
             key={componentField?.id}
             isRequired={componentField?.required}
+            hidden={!issueType || hasMultipleVuln}
           >
             <FormLabel>{componentField?.name}</FormLabel>
             {renderField(componentField)}
           </FormControl>
         )}
 
-        <FormControl isReadOnly>
+        <FormControl isReadOnly hidden={hasMultipleVuln}>
           <FormLabel>Description</FormLabel>
           <Textarea
             rows={'12'}

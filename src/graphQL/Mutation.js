@@ -2298,6 +2298,32 @@ export const CreateJiraIssue = gql`
   }
 `
 
+export const CreateBulkJiraIssue = gql`
+  mutation CreateBulkJiraIssue(
+    $vulnIds: [ID!]!
+    $projectKey: String!
+    $issueTypeId: String!
+    $reporter: String
+    $assignee: String
+  ) {
+    jiraIssueBulkCreate(
+      input: {
+        componentVulnIds: $vulnIds
+        projectKey: $projectKey
+        issueTypeId: $issueTypeId
+        reporter: $reporter
+        assignee: $assignee
+      }
+    ) {
+      results {
+        componentVulnId
+        errors
+        jiraIssueUrl
+      }
+    }
+  }
+`
+
 export const CreateSlackConnection = gql`
   mutation CreateSlackConnection(
     $configs: [ConnectionConfigInput!]!

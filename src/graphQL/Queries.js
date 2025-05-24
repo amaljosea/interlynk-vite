@@ -5614,3 +5614,22 @@ export const ProductProgressMetrics = gql`
     }
   }
 `
+
+export const GetJiraConnections = gql`
+  query GetJiraConnections {
+    organization {
+      connections {
+        nodes {
+          enabled
+          connection {
+            ... on JiraConnection {
+              userName
+              apiToken
+              url
+            }
+          }
+        }
+      }
+    }
+  }
+`

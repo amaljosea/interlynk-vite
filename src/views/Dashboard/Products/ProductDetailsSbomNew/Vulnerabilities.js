@@ -405,9 +405,12 @@ const Vulnerabilities = ({ sbomData }) => {
 
       {JIRA.isOpen && (
         <JiraCreateIssueModal
+          row={activeRow}
           isOpen={JIRA.isOpen}
           onClose={JIRA.onClose}
-          row={activeRow}
+          selectedVulns={selectedVulns}
+          setSelectedVulns={setSelectedVulns}
+          setToggleClear={setToggleClear}
         />
       )}
       {/* COPY DATA TABLE */}
