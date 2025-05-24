@@ -4,6 +4,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 
 import { DurationSelect } from './Selects/DurationSelect'
 import LabelSelect from './Selects/LabelSelect'
+import { LifecycleSelect } from './Selects/LifecycleSelect'
 import { ProductSelect } from './Selects/ProductSelect'
 import { VersionSelect } from './Selects/VersionSelect'
 
@@ -11,7 +12,7 @@ export const Filters = () => {
   const { analyticsState, dispatch } = useGlobalState()
   const { analyticsDispatch } = dispatch
 
-  const { product, label, version, duration } = analyticsState || {}
+  const { product, label, lifecycle, version, duration } = analyticsState || {}
 
   const changeFilter = (key, value) => {
     switch (key) {
@@ -19,6 +20,8 @@ export const Filters = () => {
         return analyticsDispatch({ type: 'FILTER_LABEL', payload: value })
       case 'product':
         return analyticsDispatch({ type: 'FILTER_PRODUCT', payload: value })
+      case 'lifecycle':
+        return analyticsDispatch({ type: 'FILTER_LIFECYCLE', payload: value })
       case 'version':
         return analyticsDispatch({ type: 'FILTER_VERSION', payload: value })
       case 'duration':
@@ -29,7 +32,7 @@ export const Filters = () => {
   }
 
   return (
-    <SimpleGrid width='100%' columns={4} gap={5} alignItems='center'>
+    <SimpleGrid width='100%' columns={5} gap={5} alignItems='center'>
       <LabelSelect
         value={label}
         onChange={(value) => changeFilter('label', value)}
@@ -37,6 +40,10 @@ export const Filters = () => {
       <ProductSelect
         value={product}
         onChange={(value) => changeFilter('product', value)}
+      />
+      <LifecycleSelect
+        value={lifecycle}
+        onChange={(value) => changeFilter('lifecycle', value)}
       />
       <VersionSelect
         value={version}

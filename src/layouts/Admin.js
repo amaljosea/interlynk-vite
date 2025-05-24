@@ -39,6 +39,7 @@ export default function Admin() {
   const navigate = useNavigate()
   const {
     setOrganization,
+    setSelectedAnalytics,
     setSelectedProducts,
     setSelectedActivities,
     setSelectedPolicies,
@@ -48,7 +49,11 @@ export default function Admin() {
   const isMobile = isMobileOrTablet()
 
   const cards = getItem('selectedCards')
+  const analytics = getItem('selectedAnalytics')
+
   const selectedCards = cards ? JSON.parse(cards) : null
+  const selectedAnalyticsCards = analytics ? JSON.parse(analytics) : []
+
   const { activities, products, vulns, trends, policies } = selectedCards || {}
 
   const productId = params.productid
@@ -174,6 +179,7 @@ export default function Admin() {
       setSelectedTrends(trends)
       setSelectedVulns(vulns)
       setSelectedPolicies(policies)
+      setSelectedAnalytics(selectedAnalyticsCards)
     } else {
       setOrganization(null)
     }

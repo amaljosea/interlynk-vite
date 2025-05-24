@@ -21,12 +21,14 @@ const VulnSeverityMetrics = gql`
     $endDate: ISO8601Date
     $level: OrganizationMetricLevelEnum
     $labelIds: [Uuid!]
+    $lifecycle: [ProductLifecycleStageEnum!]
   ) {
     dailyMetrics {
       sbomMetrics(
         first: $first
         after: $after
         level: $level
+        lifecycle: $lifecycle
         projectNames: $projectNames
         projectGroupIds: $projectGroupIds
         sbomIds: $sbomIds
@@ -51,8 +53,8 @@ const VulnBySeverity = () => {
   const theme = useTheme()
   const { envName, analyticsState } = useGlobalState()
   const { startDate, endDate } = useDateRange()
-  
-  const { product, label, version } = analyticsState || {}
+
+  const { product, label, version, lifecycle } = analyticsState || {}
 
   const { dates } = getDays({ startDate, endDate })
 
@@ -65,6 +67,7 @@ const VulnBySeverity = () => {
       projectNames: [envName],
       labelIds: label?.length > 0 ? label : [],
       sbomIds: version?.length > 0 ? version?.map((p) => p.value) : [],
+      lifecycle: lifecycle?.length > 0 ? lifecycle?.map((p) => p.value) : [],
       projectGroupIds: product?.length > 0 ? product?.map((p) => p.value) : []
     }
   })

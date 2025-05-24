@@ -27,6 +27,16 @@ export const allTrends = [
 
 export const allPolicies = ['policy_results']
 
+export const allAnalytics = [
+  'component_count',
+  'license_count',
+  'vulnerabilities_by_severity',
+  'vulnerabilities_by_status',
+  'patch_velocity',
+  'defect_density',
+  'deploy_velocity'
+]
+
 export const initializeDashboardData = () => {
   const data = {
     activities: allActivities,
@@ -36,4 +46,8 @@ export const initializeDashboardData = () => {
     policies: allPolicies
   }
   setItem('selectedCards', JSON.stringify(data))
+}
+
+export const initializeAnalyticsData = () => {
+  setItem('selectedAnalytics', JSON.stringify(allAnalytics))
 }

@@ -2,16 +2,19 @@ import { useEffect } from 'react'
 
 import { Button, Flex } from '@chakra-ui/react'
 
+import AnalyticsList from 'components/AnalyticsList'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import GlobalEnvFilter from 'components/Misc/GlobalEnvFilter'
 
+import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 import { Filters } from './Filters'
 import { Graphs } from './Graphs'
 
 const Analytics = () => {
+  const { isFreeTier } = useGlobalQueryContext()
   const { organization, envName, dispatch } = useGlobalState()
   const { analyticsDispatch } = dispatch
 
@@ -35,7 +38,10 @@ const Analytics = () => {
         >
           {envName}
         </Button>
-        {organization && <GlobalEnvFilter />}
+        <Flex gap={2} alignItems={'center'}>
+          {organization && <GlobalEnvFilter />}
+          {!isFreeTier && <AnalyticsList />}
+        </Flex>
       </Flex>
       <Card>
         <CardBody>

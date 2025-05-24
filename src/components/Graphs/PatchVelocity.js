@@ -21,11 +21,13 @@ const PatchVelocityMetrics = gql`
     $endDate: ISO8601Date
     $vulnIds: [Uuid!]
     $labelIds: [Uuid!]
+    $lifecycle: [ProductLifecycleStageEnum!]
   ) {
     dailyMetrics {
       projectVulnMetrics(
         first: $first
         after: $after
+        lifecycle: $lifecycle
         projectIds: $projectIds
         projectGroupIds: $projectGroupIds
         startDate: $startDate
@@ -58,7 +60,7 @@ const PatchVelocity = () => {
   const theme = useTheme()
   const { analyticsState } = useGlobalState()
   const { startDate, endDate } = useDateRange()
-  const { product, label } = analyticsState || {}
+  const { product, label, lifecycle } = analyticsState || {}
 
   const { dates } = getDays({ startDate, endDate })
 
@@ -67,9 +69,10 @@ const PatchVelocity = () => {
       endDate,
       startDate,
       labelIds: label?.length > 0 ? label : [],
+      lifecycle: lifecycle?.length > 0 ? lifecycle?.map((p) => p.value) : [],
       projectGroupIds: product?.length > 0 ? product?.map((p) => p.value) : []
     }),
-    [endDate, label, product, startDate]
+    [endDate, label, lifecycle, product, startDate]
   )
 
   const { data, loading } = useFetchAllNodes({

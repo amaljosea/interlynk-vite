@@ -40,6 +40,7 @@ const GlobalStateProvider = ({ children }) => {
   const [selectedVulns, setSelectedVulns] = useState([])
   const [selectedTrends, setSelectedTrends] = useState([])
   const [selectedPolicies, setSelectedPolicies] = useState([])
+  const [selectedAnalytics, setSelectedAnalytics] = useState([])
 
   const updateSelection = (data) => {
     setItem('selectedCards', JSON.stringify(data))
@@ -85,6 +86,7 @@ const GlobalStateProvider = ({ children }) => {
       setItem('selectedCards', JSON.stringify(updated))
     }
   }
+
 
   const handleClearAll = () => {
     updateSelection({
@@ -239,6 +241,7 @@ const GlobalStateProvider = ({ children }) => {
   const [analyticsState, analyticsDispatch] = useReducer(analyticsReducer, {
     product: null,
     label: null,
+    lifecycle: [],
     version: [],
     duration: null
   })
@@ -270,6 +273,8 @@ const GlobalStateProvider = ({ children }) => {
         setSelectedTrends,
         selectedPolicies,
         setSelectedPolicies,
+        selectedAnalytics,
+        setSelectedAnalytics,
         updateCards,
         handleClearAll,
         handleSelectAll,

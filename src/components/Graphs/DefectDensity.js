@@ -23,12 +23,14 @@ const DefectDensityMetrics = gql`
     $endDate: ISO8601Date
     $level: OrganizationMetricLevelEnum
     $labelIds: [Uuid!]
+    $lifecycle: [ProductLifecycleStageEnum!]
   ) {
     dailyMetrics {
       sbomMetrics(
         first: $first
         after: $after
         level: $level
+        lifecycle: $lifecycle
         projectNames: $projectNames
         projectGroupIds: $projectGroupIds
         sbomIds: $sbomIds
@@ -58,7 +60,7 @@ const DefectDensityMetrics = gql`
 const DefectDensity = () => {
   const { envName, analyticsState } = useGlobalState()
   const { startDate, endDate } = useDateRange()
-  const { product, label, version } = analyticsState || {}
+  const { product, label, version, lifecycle } = analyticsState || {}
 
   const { dates } = getDays({ startDate, endDate })
 
@@ -69,9 +71,10 @@ const DefectDensity = () => {
       projectNames: [envName],
       labelIds: label?.length > 0 ? label : [],
       sbomIds: version?.length > 0 ? version?.map((p) => p.value) : [],
+      lifecycle: lifecycle?.length > 0 ? lifecycle?.map((p) => p.value) : [],
       projectGroupIds: product?.length > 0 ? product?.map((p) => p.value) : []
     }),
-    [endDate, startDate, envName, label, version, product]
+    [endDate, startDate, envName, label, version, lifecycle, product]
   )
 
   const { data, loading } = useFetchAllNodes({

@@ -3,7 +3,10 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { initializeDashboardData } from 'utils/initDashboardData'
+import {
+  initializeAnalyticsData,
+  initializeDashboardData
+} from 'utils/initDashboardData'
 import { getItem } from 'utils/localStorageUtils'
 
 import { Button, Stack, Text } from '@chakra-ui/react'
@@ -31,6 +34,7 @@ const LoginForm = () => {
   )
 
   const cards = getItem('selectedCards')
+  const analytics = getItem('selectedAnalytics')
 
   const loginURL = process.env.REACT_APP_VENDOR_LOGIN_URL
 
@@ -58,6 +62,7 @@ const LoginForm = () => {
           Cookies.set('authToken', response.headers.authorization)
           Cookies.set('refreshToken', status?.data?.refresh_token)
           !cards && initializeDashboardData()
+          !analytics && initializeAnalyticsData()
           navigate('/vendor/dashboard')
         }
       })

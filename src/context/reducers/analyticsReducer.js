@@ -5,6 +5,7 @@ const analyticsReducer = (state, action) => {
       return {
         product: null,
         label: null,
+        lifecycle: [],
         version: [],
         duration: null
       }
@@ -13,13 +14,21 @@ const analyticsReducer = (state, action) => {
         ...state,
         product: null,
         version: [],
+        lifecycle: [],
         label: payload
       }
     case 'FILTER_PRODUCT':
       return {
         ...state,
         version: [],
+        lifecycle: [],
         product: payload
+      }
+    case 'FILTER_LIFECYCLE':
+      return {
+        ...state,
+        version: [],
+        lifecycle: payload
       }
     case 'FILTER_VERSION':
       return {

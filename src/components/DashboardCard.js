@@ -56,7 +56,7 @@ export function DashboardCard({ id, type, title, content, desc, onDelete }) {
               aria-label='Drag handle'
               icon={<LuGripVertical />}
               _active={{ cursor: 'grabbing' }}
-              hidden={isAnalytics || isActivities}
+              hidden={isActivities}
             />
             <Heading size='sm'>{title}</Heading>
           </Flex>
@@ -64,7 +64,7 @@ export function DashboardCard({ id, type, title, content, desc, onDelete }) {
             aria-label='Delete card'
             icon={<LuX />}
             variant='ghost'
-            hidden={isAnalytics}
+            // hidden={isAnalytics}
             onClick={() => onDelete(type)}
             _hover={{ bg: 'none' }}
           />

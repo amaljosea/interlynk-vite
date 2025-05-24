@@ -17,6 +17,7 @@ const LicenseMetrics = gql`
     $endDate: ISO8601Date
     $labelIds: [Uuid!]
     $level: OrganizationMetricLevelEnum
+    $lifecycle: [ProductLifecycleStageEnum!]
   ) {
     dailyMetrics {
       sbomMetrics(
@@ -27,6 +28,7 @@ const LicenseMetrics = gql`
         sbomIds: $sbomIds
         startDate: $startDate
         endDate: $endDate
+        lifecycle: $lifecycle
         projectGroupLabelIds: $labelIds
       ) {
         nodes {
@@ -39,8 +41,8 @@ const LicenseMetrics = gql`
 
 const LicenseCount = () => {
   const { envName, analyticsState } = useGlobalState()
-  const { version, product, duration, label } = analyticsState || {}
-  const { startDate, endDate } = duration || ''
+  const { version, product, duration, label, lifecycle } = analyticsState || {}
+  const { startDate, endDate } = duration || {}
 
   const { dates } = getDays({ startDate, endDate })
 
@@ -53,6 +55,7 @@ const LicenseCount = () => {
       projectNames: [envName],
       labelIds: label?.length > 0 ? label : [],
       sbomIds: version?.length > 0 ? version?.map((p) => p.value) : [],
+      lifecycle: lifecycle?.length > 0 ? lifecycle?.map((p) => p.value) : [],
       projectGroupIds: product?.length > 0 ? product?.map((p) => p.value) : []
     }
   })
