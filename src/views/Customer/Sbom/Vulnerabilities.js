@@ -37,7 +37,7 @@ const Vulnerabilities = ({ sbomData }) => {
     severities,
     components,
     statues,
-    include,
+    exclude,
     kev,
     epss,
     filters,
@@ -61,7 +61,7 @@ const Vulnerabilities = ({ sbomData }) => {
         sbomId: sbomId,
         search: searchInput !== '' ? searchInput : undefined,
         severity: severities.length > 0 ? severities : undefined,
-        source: include.includes('parts') ? undefined : 'COMPONENT',
+        source: exclude?.includes('parts') ? 'COMPONENT' : undefined,
         componentName: components.length > 0 ? components : undefined,
         status: statues.length > 0 ? statues : undefined,
         kev:
@@ -72,7 +72,7 @@ const Vulnerabilities = ({ sbomData }) => {
               : false,
         epss: epss !== '' && epss !== 'all' ? epssRange : undefined,
         direct: direct === 'direct only' ? true : undefined,
-        includeRetracted: include.includes('retracted') ? true : false,
+        includeRetracted: exclude?.includes('retracted') ? false : true,
         vexComplete: vexComplete === 'all' ? undefined : false,
         field: field,
         direction: direction
