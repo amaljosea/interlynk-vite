@@ -863,7 +863,7 @@ export default class ComponentSection {
           await this.page.getByTestId('component-actions').first().click()
           await this.page.getByTestId('view_insights').first().click()
 
-          const parentCompVisible = await this.page
+          const parentCompVisible = this.page
             .locator("//p[@aria-label='comp_name']")
             .isVisible()
 
