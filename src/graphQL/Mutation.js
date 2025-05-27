@@ -2298,6 +2298,15 @@ export const CreateJiraIssue = gql`
   }
 `
 
+export const SbomJiraTicketSync = gql`
+  mutation SbomJiraTicketSync($sbomId: Uuid!) {
+    sbomJiraTicketSync(input: { sbomId: $sbomId }) {
+      errors
+      success
+    }
+  }
+`
+
 export const CreateBulkJiraIssue = gql`
   mutation CreateBulkJiraIssue(
     $vulnIds: [ID!]!

@@ -27,7 +27,11 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
 
-import { CustomVulnUpdate, ManualVulnScan } from 'graphQL/Mutation'
+import {
+  CustomVulnUpdate,
+  ManualVulnScan,
+  SbomJiraTicketSync
+} from 'graphQL/Mutation'
 import {
   FirstDegreePartVulns,
   GetVulnData,
@@ -163,31 +167,10 @@ const Vulnerabilities = ({ sbomData }) => {
   const CUSTOM_VULNS = useDisclosure()
   const DELETE = useDisclosure()
 
-  const action = (type, data) => {
-    setActiveRow(data)
-    switch (type) {
-      case 'vuln_status':
-        return VEX.onOpen()
-      case 'vuln_links':
-        return LINK.onOpen()
-      case 'create_jira_ticket':
-        return JIRA.onOpen()
-      case 'view_cvss':
-        return CVSS.onOpen()
-      case 'vuln_import':
-        return IMPORT.onOpen()
-      case 'edit_vuln':
-        return VULN.onOpen()
-      case 'custom_vuln':
-        return CUSTOM_VULNS.onOpen()
-      case 'remove_vuln':
-        return DELETE.onOpen()
-      default:
-        return VEX.onOpen()
-    }
-  }
+  const [syncJiraTicket] = useMutation(SbomJiraTicketSync)
 
   const [updateVuln, { loading: deleteLoading }] = useMutation(CustomVulnUpdate)
+
   const { data: vulnData } = useQuery(verfifyCustomVuln, {
     skip: DELETE.isOpen ? false : true,
     variables: { vulnIdentifier: activeRow?.vuln?.vulnId }
@@ -195,6 +178,22 @@ const Vulnerabilities = ({ sbomData }) => {
 
   const { customVuln } = vulnData || {}
   const { customVulnSboms } = customVuln || ''
+
+  const handleSync = () => {
+    syncJiraTicket({ variables: { sbomId: sbomId } }).then((res) => {
+      if (res?.data?.sbomJiraTicketSync?.errors?.length > 0) {
+        showToast({
+          description: res?.data?.sbomJiraTicketSync?.errors[0],
+          status: 'error'
+        })
+      } else {
+        showToast({
+          description: 'Issue tracker tickets synced successfully',
+          status: 'success'
+        })
+      }
+    })
+  }
 
   const handleRemove = () => {
     const attribute = customVulnSboms?.map((item) => ({
@@ -318,6 +317,32 @@ const Vulnerabilities = ({ sbomData }) => {
     showToast,
     isVulnScanEnabled
   ])
+
+  const action = (type, data) => {
+    setActiveRow(data)
+    switch (type) {
+      case 'vuln_status':
+        return VEX.onOpen()
+      case 'vuln_links':
+        return LINK.onOpen()
+      case 'create_jira_ticket':
+        return JIRA.onOpen()
+      case 'view_cvss':
+        return CVSS.onOpen()
+      case 'vuln_import':
+        return IMPORT.onOpen()
+      case 'edit_vuln':
+        return VULN.onOpen()
+      case 'custom_vuln':
+        return CUSTOM_VULNS.onOpen()
+      case 'remove_vuln':
+        return DELETE.onOpen()
+      case 'sync_issue_tracker_tickets':
+        return handleSync()
+      default:
+        return VEX.onOpen()
+    }
+  }
 
   const subHeader = VulnerabilitySubHeader({
     handleClear,
