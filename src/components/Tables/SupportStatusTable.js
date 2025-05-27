@@ -33,7 +33,12 @@ import { GetCompSupportData } from 'graphQL/Queries'
 
 import { LuSquarePen } from 'react-icons/lu'
 
-const SupportStatusTable = () => {
+const SupportStatusTable = ({
+  toggleClear,
+  selectedItems,
+  setSelectedItems,
+  setToggleClear
+}) => {
   const params = useParams()
   const projectId = params.productid
   const activeTab = useQueryParam('tab')
@@ -46,8 +51,6 @@ const SupportStatusTable = () => {
 
   const STATUS = useDisclosure()
 
-  const [toggleClear, setToggleClear] = useState(false)
-  const [selectedItems, setSelectedItems] = useState([])
   const [searchInput, setSearchInput] = useState('')
   const [supportData, setSupportData] = useState({
     search: '',

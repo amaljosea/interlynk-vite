@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/client'
+import { useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { getFilterValue, parseEpssRange, setKEV } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
@@ -43,6 +44,9 @@ const ProductTabs = (props) => {
   const tab = queryParams[0].get('tab')
   const activeTabNumber = Math.max(tabs.indexOf(tab), 0)
 
+  const [toggleClear, setToggleClear] = useState(false)
+  const [selectedItems, setSelectedItems] = useState([])
+
   const { data, settings } = props
 
   const { enabled, projects } = data || ''
@@ -58,6 +62,8 @@ const ProductTabs = (props) => {
   }
 
   const onTabChange = (value) => {
+    setToggleClear(true)
+    setSelectedItems([])
     if (value === 1) {
       globalVulnDispatch({ type: 'CLEAR_GLOBAL_VULN' })
     }
@@ -142,7 +148,12 @@ const ProductTabs = (props) => {
         </TabPanel>
         {/* VULNERABILITIES */}
         <TabPanel px={0}>
-          <SupportStatusTable />
+          <SupportStatusTable
+            toggleClear={toggleClear}
+            setToggleClear={setToggleClear}
+            selectedItems={selectedItems}
+            setSelectedItems={setSelectedItems}
+          />
         </TabPanel>
         {/* AUTOMATIONS */}
         <TabPanel px={0}>
