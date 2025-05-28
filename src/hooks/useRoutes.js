@@ -2,6 +2,7 @@
 import { useMemo } from 'react'
 import CustomerProducts from 'views/Customer/Products'
 import Dashboard from 'views/Dashboard/Dashboard'
+import Package from 'views/Dashboard/Package'
 import Policies from 'views/Dashboard/Policies'
 import Products from 'views/Dashboard/Products'
 import Profile from 'views/Dashboard/Profile'
@@ -19,6 +20,7 @@ import {
   LuGitCompare,
   LuHeartHandshake,
   LuHouse,
+  LuPackage,
   LuScale,
   LuSettings,
   LuShieldCheck
@@ -60,6 +62,13 @@ export function useRoutes() {
         name: 'Licenses',
         icon: <LuScale size={20} />,
         component: Licenses,
+        layout: '/vendor'
+      },
+      {
+        path: '/package',
+        name: 'Package',
+        icon: <LuPackage size={20} />,
+        component: Package,
         layout: '/vendor'
       },
       {

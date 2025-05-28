@@ -155,6 +155,12 @@ export const allDefaultActions = [
     path: '/vendor/licenses'
   },
   {
+    id: 'package',
+    name: 'Package',
+    section: 'navigation',
+    path: '/vendor/package'
+  },
+  {
     id: 'analytics',
     name: 'Analytics',
     section: 'navigation',

@@ -20,7 +20,8 @@ const AttributionReportsEditModal = ({
   onClose,
   rowData,
   sbomId,
-  setSelectedRowData
+  setSelectedRowData,
+  sourcePreferences
 }) => {
   const [updateComponent, { loading }] = useMutation(UpdateComponent)
   const { showToast } = useCustomToast()
@@ -31,24 +32,37 @@ const AttributionReportsEditModal = ({
 
   const editingField = rowData?.field
 
+  const isEditable =
+    sourcePreferences[rowData.id] === 'sbom' ||
+    sourcePreferences[rowData.id] === undefined
+
   useEffect(() => {
+    const source = isEditable
+      ? rowData
+      : rowData?.enrichedContent?.packageVersion
+
     if (editingField === 'copyright') {
-      setCopyrightValue(rowData?.copyright || '')
+      setCopyrightValue(
+        isEditable ? source?.copyright || '' : source?.copyright || 'N/A'
+      )
     } else if (editingField === 'notice') {
-      setNoticeValue(rowData?.notice || '')
+      setNoticeValue(
+        isEditable ? source?.notice || '' : source?.notice || 'N/A'
+      )
     }
-  }, [editingField, rowData])
+  }, [editingField, rowData, isEditable])
 
   const getModalTitle = () => {
+    const prefix = isEditable ? 'Edit' : 'View'
     switch (editingField) {
       case 'license':
-        return 'Edit License'
+        return `${prefix} License`
       case 'copyright':
-        return 'Edit Copyright'
+        return `${prefix} Copyright`
       case 'notice':
-        return 'Edit Notice'
+        return `${prefix} Notice`
       default:
-        return 'Edit'
+        return prefix
     }
   }
 
@@ -136,14 +150,24 @@ const AttributionReportsEditModal = ({
       buttonText='Save'
       isLoading={loading}
       Icon={getIcon()}
+      disabled={!isEditable}
     >
       <Box>
         <Text mb={4}>
-          Editing {editingField} for{' '}
+          {isEditable ? 'Editing ' : 'Viewing '}
+          {editingField} for{' '}
           <span style={{ fontStyle: 'italic' }}>{rowData?.name}</span>
         </Text>
         {editingField === 'license' && (
-          <LicenseField sbomView={false} license={rowData?.license} />
+          <LicenseField
+            sbomView={false}
+            license={
+              isEditable
+                ? rowData?.license
+                : rowData?.enrichedContent?.packageVersion?.licenseExp
+            }
+            disabled={!isEditable}
+          />
         )}
         {(editingField === 'copyright' || editingField === 'notice') && (
           <FormControl>
@@ -152,6 +176,7 @@ const AttributionReportsEditModal = ({
               htmlFor={editingField === 'copyright' ? 'copyright' : 'notice'}
             />
             <Textarea
+              isDisabled={!isEditable}
               name={editingField === 'copyright' ? 'copyright' : 'notice'}
               value={
                 editingField === 'copyright' ? copyrightValue : noticeValue

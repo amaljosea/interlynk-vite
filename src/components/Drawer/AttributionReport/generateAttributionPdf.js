@@ -25,7 +25,8 @@ export const fetchLogo = async () => {
 export const generateAttributionPdf = async (
   finalItems,
   productName,
-  productVersion
+  productVersion,
+  sourcePreferences
 ) => {
   const filename = attributionFilename(productName, productVersion)
   const pdfDoc = new jsPDF({ compress: true })
@@ -62,6 +63,20 @@ export const generateAttributionPdf = async (
   yPosition += 10
 
   finalItems.forEach((comp) => {
+    const source = sourcePreferences[comp.id] || 'sbom'
+    const noticeText =
+      source === 'library'
+        ? comp.enrichedContent?.packageVersion?.notice || 'N/A'
+        : comp.notice || 'N/A'
+    const copyrightText =
+      source === 'library'
+        ? comp.enrichedContent?.packageVersion?.copyright || 'N/A'
+        : comp.copyright || 'N/A'
+    const licenseText =
+      source === 'library'
+        ? comp.enrichedContent?.packageVersion?.licenseExp || 'N/A'
+        : comp.licensesExp || 'NA'
+
     yPosition += 10
 
     pdfDoc.setFontSize(14)
@@ -92,7 +107,6 @@ export const generateAttributionPdf = async (
     pdfDoc.text('Notice:', margin, yPosition)
     pdfDoc.setFont('helvetica', 'normal')
     pdfDoc.setTextColor('#323232')
-    const noticeText = comp.notice || 'N/A'
     const noticeLines = pdfDoc.splitTextToSize(
       noticeText,
       pageWidth - 2 * margin
@@ -118,9 +132,8 @@ export const generateAttributionPdf = async (
     pdfDoc.text('License:', margin, yPosition)
     pdfDoc.setFont('helvetica', 'normal')
     pdfDoc.setTextColor('#323232')
-    const licenseExpText = comp.licensesExp || 'N/A'
     const licenseExpLines = pdfDoc.splitTextToSize(
-      licenseExpText,
+      licenseText,
       pageWidth - 2 * margin
     )
     yPosition += 5
@@ -216,7 +229,6 @@ export const generateAttributionPdf = async (
     pdfDoc.text('Copyright:', margin, yPosition)
     pdfDoc.setFont('helvetica', 'normal')
     pdfDoc.setTextColor('#323232')
-    const copyrightText = comp.copyright || 'N/A'
     const copyrightLines = pdfDoc.splitTextToSize(
       copyrightText,
       pageWidth - 2 * margin
@@ -248,7 +260,6 @@ export const generateAttributionPdf = async (
   })
 
   // Add the final page number
-
   pdfDoc.text(`Page ${pageNumber}`, pageWidth / 2, pageHeight - 10, {
     align: 'center'
   })

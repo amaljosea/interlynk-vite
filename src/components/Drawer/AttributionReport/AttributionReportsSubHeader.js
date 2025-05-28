@@ -10,6 +10,7 @@ import {
   Menu,
   Radio,
   RadioGroup,
+  Select,
   Stack
 } from '@chakra-ui/react'
 
@@ -79,7 +80,9 @@ const AttributionReportsSubHeader = ({
   variables,
   selectedRowData,
   productName,
-  productVersion
+  productVersion,
+  onBulkSourceChange,
+  sourcePreferences
 }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [downloadType, setDownloadType] = useState('pdf')
@@ -128,13 +131,25 @@ const AttributionReportsSubHeader = ({
         // Per-component license text lookup
         const finalItems = await Promise.all(
           items.map(async (c) => {
-            if (!c.licensesExp) {
+            const source = sourcePreferences[c.id] || 'sbom'
+            let licenseExpression = ''
+
+            if (source === 'sbom') {
+              licenseExpression = c.licensesExp
+            } else {
+              const libraryLicense =
+                c.enrichedContent?.packageVersion?.licenseExp
+              licenseExpression = libraryLicense
+            }
+
+            if (!licenseExpression) {
               return { ...c, licenseText: '' }
             }
+
             try {
               const { data } = await client.query({
                 query: GetLicensesTable,
-                variables: { expression: c.licensesExp, first: 100 }
+                variables: { expression: licenseExpression, first: 100 }
               })
               const licenseNodes = data.organization.licenses.nodes || []
 
@@ -147,9 +162,19 @@ const AttributionReportsSubHeader = ({
 
         // Trigger download
         if (downloadType === 'pdf') {
-          await generateAttributionPdf(finalItems, productName, productVersion)
+          await generateAttributionPdf(
+            finalItems,
+            productName,
+            productVersion,
+            sourcePreferences
+          )
         } else {
-          downloadAttributionHtml(finalItems, productName, productVersion)
+          downloadAttributionHtml(
+            finalItems,
+            productName,
+            productVersion,
+            sourcePreferences
+          )
         }
       } catch (error) {
         showToast({
@@ -185,6 +210,16 @@ const AttributionReportsSubHeader = ({
               />
             </Menu>
           </Box>
+          {selectedRowData.length > 0 && (
+            <Select
+              placeholder={`Change Source for ${selectedRowData.length} items`}
+              width='300px'
+              onChange={(e) => onBulkSourceChange(e.target.value)}
+            >
+              <option value='sbom'>Set Source to SBOM</option>
+              <option value='library'>Set Source to Library</option>
+            </Select>
+          )}
         </Flex>
         <Flex alignItems='center' gap={4}>
           <RadioGroup value={downloadType} onChange={setDownloadType}>
@@ -217,7 +252,9 @@ const AttributionReportsSubHeader = ({
     selectedRowData,
     downloadType,
     productName,
-    productVersion
+    productVersion,
+    onBulkSourceChange,
+    sourcePreferences
   ])
 }
 

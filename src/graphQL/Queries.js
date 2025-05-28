@@ -5633,3 +5633,75 @@ export const GetJiraConnections = gql`
     }
   }
 `
+
+export const PackageVersionsTable = gql`
+  query PackageVersions(
+    $first: Int
+    $after: String
+    $last: Int
+    $before: String
+    $search: String
+    $orderBy: PackageVersionOrderByInput
+  ) {
+    packageVersions(
+      packageName: $search
+      # version: "2.0.31"
+      orderBy: $orderBy
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+    ) {
+      totalCount
+      nodes {
+        copyright
+        id
+        isArchived
+        isDeprecated
+        isLatest
+        isOutdated
+        isPreRelease
+        issueTrackerUrl
+        license
+        licenseExp
+        maintainers
+        notice
+        packageId
+        publishedAt
+        purl
+        repositoryUrl
+        updatedAt
+        version
+        website
+        package {
+          createdAt
+          description
+          ecosystem
+          id
+          isDeprecated
+          name
+          purl
+          updatedAt
+          website
+        }
+        createdAt
+        organizationPackageVersion {
+          copyrightOverride
+          createdAt
+          id
+          licenseOverride
+          noticeOverride
+          organizationId
+          packageVersionId
+          updatedAt
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+        hasPreviousPage
+        startCursor
+      }
+    }
+  }
+`

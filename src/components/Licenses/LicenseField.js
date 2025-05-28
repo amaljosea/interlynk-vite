@@ -19,7 +19,7 @@ import { useSelect } from 'hooks/useSelect'
 
 import { LicenseAutoComplete } from 'graphQL/Queries'
 
-const LicenseField = ({ resolved, sbomView, license }) => {
+const LicenseField = ({ resolved, sbomView, license, disabled }) => {
   const { style } = useSelect('field')
   const { isCustomerView } = useRouteFlags()
   const { tabData, setTabData, handleChange } = useContext(TabContext)
@@ -210,7 +210,7 @@ const LicenseField = ({ resolved, sbomView, license }) => {
             className='react-select'
             isClearable={!resolved}
             isSearchable={!resolved}
-            isDisabled={isCustomerView}
+            isDisabled={isCustomerView || disabled}
             isLoading={loading}
             noOptionsMessage={() =>
               resolved || isCustomerView ? null : `Please search...`

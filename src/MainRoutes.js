@@ -15,6 +15,7 @@ import PubProductList from 'views/Customer/Products/ProductList'
 import PubSbomDetails from 'views/Customer/Sbom/index.js'
 import Analytics from 'views/Dashboard/Analytics/index.js'
 import Dashboard from 'views/Dashboard/Dashboard'
+import Package from 'views/Dashboard/Package/index.js'
 import Policies from 'views/Dashboard/Policies'
 import PolicyDetails from 'views/Dashboard/Policies/PolicyDetails.js'
 import Products from 'views/Dashboard/Products'
@@ -101,6 +102,7 @@ export const MainRoutes = () => {
             path='licenses'
             element={<ConditionalRoute element={Licenses} />}
           />
+          <Route path={`package`} element={<Package />} />
           <Route
             path='analytics'
             element={<ConditionalRoute element={Analytics} />}

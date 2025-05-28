@@ -2961,3 +2961,51 @@ export const ComponentSupportLevelBulkDelete = gql`
     }
   }
 `
+export const OrganizationPackageVersionCreate = gql`
+  mutation OrganizationPackageVersionCreate(
+    $input: OrganizationPackageVersionCreateInput!
+  ) {
+    organizationPackageVersionCreate(input: $input) {
+      organizationPackageVersion {
+        id
+        copyrightOverride
+        createdAt
+        licenseOverride
+        noticeOverride
+        organizationId
+        packageVersionId
+        updatedAt
+      }
+      errors
+    }
+  }
+`
+
+export const OrganizationPackageVersionUpdate = gql`
+  mutation OrganizationPackageVersionUpdate(
+    $input: OrganizationPackageVersionUpdateInput!
+  ) {
+    organizationPackageVersionUpdate(input: $input) {
+      organizationPackageVersion {
+        id
+        copyrightOverride
+        noticeOverride
+        licenseOverride
+        updatedAt
+      }
+      errors
+      clientMutationId
+    }
+  }
+`
+
+export const OrganizationPackageVersionDelete = gql`
+  mutation DeleteOrganizationPackageVersion($id: ID!) {
+    organizationPackageVersionDelete(input: { id: $id }) {
+      organizationPackageVersion {
+        id
+      }
+      errors
+    }
+  }
+`

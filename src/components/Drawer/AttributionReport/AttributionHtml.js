@@ -3,7 +3,8 @@ import { attributionFilename } from 'utils/DownloadUtils/pdfUtils'
 export const downloadAttributionHtml = async (
   components,
   productName,
-  productVersion
+  productVersion,
+  sourcePreferences
 ) => {
   // Build the HTML content as a string
   const htmlContent = `
@@ -57,12 +58,24 @@ export const downloadAttributionHtml = async (
   <div class="divider"></div>
   ${components
     .map((component) => {
-      const licenseExpText = component.licensesExp || 'N/A'
+      const source = sourcePreferences[component.id] || 'sbom'
+      const noticeText =
+        source === 'library'
+          ? component.enrichedContent?.packageVersion?.notice || 'N/A'
+          : component.notice || 'N/A'
+      const copyrightText =
+        source === 'library'
+          ? component.enrichedContent?.packageVersion?.copyright || 'N/A'
+          : component.copyright || 'N/A'
+      const licenseExpText =
+        source === 'library'
+          ? component.enrichedContent?.packageVersion?.licenseExp
+          : component.licensesExp || 'N/A'
 
       return `
           <div class="component">
             <div class="component-name">${component.name} - ${component.version}</div>
-            <div class="item"><span class="label">Notice:</span> <span class="value">${component.notice || 'N/A'}</span></div>
+            <div class="item"><span class="label">Notice:</span> <span class="value">${noticeText}</span></div>
             <div class="item"><span class="label">License:</span> <span class="value">${licenseExpText}</span></div>
            ${
              licenseExpText !== 'N/A'
@@ -89,7 +102,7 @@ export const downloadAttributionHtml = async (
             `
                : `<div class="item"><span class="label">License Text:</span> <span class="value">N/A</span></div>`
            }
-            <div class="item"><span class="label">Copyright:</span> <span class="value">${component.copyright || 'N/A'}</span></div>
+            <div class="item"><span class="label">Copyright:</span> <span class="value">${copyrightText}</span></div>
           </div>
         `
     })

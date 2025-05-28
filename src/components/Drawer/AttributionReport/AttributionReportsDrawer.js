@@ -48,6 +48,14 @@ export const GetComponentData = gql`
           hasPreviousPage
         }
         nodes {
+          enrichedContent {
+            packageVersion {
+              copyright
+              notice
+              licenseExp
+              license
+            }
+          }
           id
           sbomId
           name
@@ -57,6 +65,14 @@ export const GetComponentData = gql`
           copyright
           licensesExp
           notice
+          enrichedContent {
+            latestPackageVersion {
+              copyright
+              id
+              license
+              notice
+            }
+          }
         }
       }
     }
@@ -87,6 +103,7 @@ const AttributionReportsDrawer = ({
     license: ''
   })
   const [selectedRowData, setSelectedRowData] = useState([])
+  const [sourcePreferences, setSourcePreferences] = useState({})
 
   const isSortable = field !== '' && direction !== ''
 
@@ -117,7 +134,10 @@ const AttributionReportsDrawer = ({
   const columns = AttributionReportsColumns({
     onEdit: (row, field) => {
       handleEdit(row, field, row.name, row.copyright, row.licensesExp)
-    }
+    },
+    sourcePreferences,
+    setSourcePreferences,
+    selectedRowData
   })
 
   const handleRowSelect = (state) => {
@@ -150,6 +170,29 @@ const AttributionReportsDrawer = ({
     [prodCompDispatch, reset]
   )
 
+  const handleSort = useCallback(
+    (column, sortDirection) => {
+      if (column?.id && sortDirection) {
+        prodCompDispatch({
+          type: 'SET_SORT_ORDER',
+          payload: {
+            field: column.id,
+            direction: sortDirection.toUpperCase()
+          }
+        })
+      }
+    },
+    [prodCompDispatch]
+  )
+
+  const handleBulkSourceChange = (source) => {
+    const newPreferences = { ...sourcePreferences }
+    selectedRowData.forEach((row) => {
+      newPreferences[row.id] = source
+    })
+    setSourcePreferences(newPreferences)
+  }
+
   const subHeader = AttributionReportsSubHeader({
     compSearch,
     handleSearch,
@@ -161,7 +204,9 @@ const AttributionReportsDrawer = ({
     variables: getQueryVariables(false),
     selectedRowData,
     productName,
-    productVersion
+    productVersion,
+    onBulkSourceChange: handleBulkSourceChange,
+    sourcePreferences
   })
 
   const handleEdit = (row, field) => {
@@ -171,7 +216,8 @@ const AttributionReportsDrawer = ({
       name: row.name,
       copyright: row.copyright,
       license: row.licensesExp,
-      notice: row.notice
+      notice: row.notice,
+      enrichedContent: row.enrichedContent
     })
   }
 
@@ -181,7 +227,8 @@ const AttributionReportsDrawer = ({
       field: null,
       copyright: '',
       license: '',
-      notice: ''
+      notice: '',
+      enrichedContent: {}
     })
   }
 
@@ -213,6 +260,7 @@ const AttributionReportsDrawer = ({
                 subHeader
                 subHeaderComponent={subHeader}
                 onSelectedRowsChange={handleRowSelect}
+                onSort={handleSort}
               />
             </Flex>
           )}
@@ -226,6 +274,7 @@ const AttributionReportsDrawer = ({
         rowData={editingRow}
         sbomId={sbomId}
         setSelectedRowData={setSelectedRowData}
+        sourcePreferences={sourcePreferences}
       />
     </>
   )
