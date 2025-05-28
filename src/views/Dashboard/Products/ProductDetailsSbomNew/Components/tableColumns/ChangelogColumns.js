@@ -1,5 +1,10 @@
 import { useMemo } from 'react'
-import { getFullDate, timeSince, truncatedValue } from 'utils'
+import {
+  capitalizeFirstLetter,
+  getFullDate,
+  timeSince,
+  truncatedValue
+} from 'utils'
 import { getChangelogColor } from 'utils/styleUtils'
 
 import {
@@ -265,20 +270,20 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
       {
         id: 'ACTIVITY_LOGS_CHANGED_BY',
         name: 'BY',
-        selector: (row) => (
-          <Tooltip placement='top' label={row.changedBy}>
-            <Text
-              sx={{
-                textAlign: 'right',
-                color: primaryTextColor,
-                cursor: 'pointer'
-              }}
-              onClick={() => checkUser(row)}
-            >
-              {row.changedBy}
-            </Text>
-          </Tooltip>
-        ),
+        selector: (row) => {
+          const user = capitalizeFirstLetter(row?.changedBy)
+          return (
+            <Tooltip placement='top' label={user}>
+              <Text
+                cursor='pointer'
+                color={primaryTextColor}
+                onClick={() => checkUser(row)}
+              >
+                {user}
+              </Text>
+            </Tooltip>
+          )
+        },
         sortable: true,
         width: '12%',
         right: 'true',

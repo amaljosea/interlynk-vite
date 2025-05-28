@@ -1,6 +1,10 @@
 import { useCallback, useMemo, useState } from 'react'
-import { getFullDate, timeSince } from 'utils'
-import { truncatedValue } from 'utils'
+import {
+  capitalizeFirstLetter,
+  getFullDate,
+  timeSince,
+  truncatedValue
+} from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import { getChangelogColor } from 'utils/styleUtils'
 import ChangelogFilterMenu from 'views/Sbom/components/ChangelogFilterMenu'
@@ -152,21 +156,23 @@ const ChangelogTable = ({ activeEnv }) => {
     {
       id: 'ACTIVITY_LOGS_CHANGED_BY',
       name: 'BY',
-      selector: (row) => (
-        <Tooltip placement='top' label={row.changedBy}>
-          <Text
-            cursor={'pointer'}
-            color={primaryTextColor}
-            textTransform={'capitalize'}
-            onClick={() => {
-              setActiveRow(row)
-              onUserOpen()
-            }}
-          >
-            {row.changedBy}
-          </Text>
-        </Tooltip>
-      ),
+      selector: (row) => {
+        const user = capitalizeFirstLetter(row?.changedBy)
+        return (
+          <Tooltip placement='top' label={user}>
+            <Text
+              cursor={'pointer'}
+              color={primaryTextColor}
+              onClick={() => {
+                setActiveRow(row)
+                onUserOpen()
+              }}
+            >
+              {user}
+            </Text>
+          </Tooltip>
+        )
+      },
       right: 'true',
       wrap: true,
       sortable: true
