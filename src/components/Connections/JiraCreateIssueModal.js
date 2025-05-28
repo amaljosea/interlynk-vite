@@ -1,6 +1,7 @@
 import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { generateJiraDescription } from 'utils/jiraUtils'
 
 import {
   FormControl,
@@ -230,17 +231,6 @@ const JiraCreateIssueModal = ({
     }
   }
 
-  const formatCustomVulnFields = (customFields) => {
-    if (customFields.length === 0) return ''
-
-    return customFields
-      .map(
-        (field) =>
-          `${field.componentVulnCustomFieldDefinition.displayName}: ${field.value}`
-      )
-      .join('\n\n')
-  }
-
   const handleApply = useCallback(async () => {
     const { jiraProject, jiraIssueType, jiraAssignee, jiraReporter } =
       projectSetting || {}
@@ -315,57 +305,13 @@ const JiraCreateIssueModal = ({
 
   useEffect(() => {
     if (selectedVulns?.length === 0) {
-      const vulnId = row?.vuln?.vulnId || 'N/A'
-      const desc = row?.vuln?.desc || 'N/A'
-      const nvdAliasId = row?.vuln?.nvdAliasId || 'N/A'
-      const component = row?.component?.name || 'N/A'
-      const sev = row?.vuln?.sev || 'N/A'
-      const cvssVector = row?.vuln?.cvssVector || 'N/A'
-      const cvssScore = row?.vuln?.cvssScore || 'N/A'
-      const epssPercentile = row?.vuln?.vulnInfo?.epssPercentile || 'N/A'
-      const epssScore = row?.vuln?.vulnInfo?.epssScore || 'N/A'
-      const kev = row?.vuln?.vulnInfo?.kev === true ? 'True' : 'False' || 'N/A'
-      const vexStatus = row?.vexStatus?.name || 'N/A'
-      const actionStmt = row?.actionStmt || 'N/A'
-      const impact = row?.impact || 'N/A'
-      const justification = row?.vexJustification?.name || 'N/A'
-      const note = row?.note || 'N/A'
-      const customFields = formatCustomVulnFields(
-        row?.componentVulnCustomFields
-      )
-
-      setDescription(
-        `Subject: [${vulnId}]: ${desc}\n
-Body:\n
-Summary: ${desc || 'N/A'}\n
-Issue Type:\n
-Vulnerability:\n
-Affected Product: ${row?.component?.sbom?.project?.projectGroup?.name}\n
-Affected Version (Environment): ${row?.component?.sbom?.project?.projectGroup?.name} (${row?.component?.sbom?.project?.name})\n
-Affected Components: ${component}: ${row?.component?.version}\nPURL: ${row?.component?.purl}\n
-Description: ${desc}\n
-Additional Details:\n
-NVD ID: ${nvdAliasId}\n
-Severity: ${sev}\n
-CVSS Score: ${cvssScore}\n
-CVSS Vector: ${cvssVector}\n
-EPSS Percentile: ${epssPercentile}\n
-EPSS Score: ${epssScore}\n
-Vulnerability Status: ${vexStatus}\n
-KEV: ${kev}\n
-Vulnerability Action Statement: ${actionStmt}\n
-Vulnerability Impact: ${impact}\n
-Vulnerability Justification: ${justification}\n
-Vulnerability Notes: ${note}\n
-${customFields}
-      `
-      )
-      setSummary(`[Vulnerability]: ${vulnId}`)
+      const description = generateJiraDescription(row)
+      setDescription(description)
+      setSummary(`[Vulnerability]: ${row?.vuln?.vulnId}`)
     } else {
       const vulnIds = selectedVulns?.map((item) => item?.vuln?.vulnId)
       setSummary(`[Vulnerability]: ${vulnIds?.join(', ')}`)
     }
-
     handleApply()
   }, [handleApply, row, selectedVulns])
 
@@ -440,10 +386,14 @@ ${customFields}
   const handleBulkCreate = () => {
     setIsCreateDisabled(true)
     const filteredLabels = label?.map((item) => item?.value)
-    const vulnIds = selectedVulns?.map((item) => item?.id)
+    const issues = selectedVulns?.map((item) => ({
+      componentVulnId: item?.id,
+      description: generateJiraDescription(item) || '',
+      summary: `[Vulnerability]: ${item?.vuln?.vulnId}`
+    }))
     createBulkIssue({
       variables: {
-        vulnIds: vulnIds,
+        issues: issues,
         projectKey: project?.value,
         issueTypeId: issueType?.value,
         assignee: assignee?.value,

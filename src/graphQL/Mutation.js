@@ -2309,7 +2309,7 @@ export const SbomJiraTicketSync = gql`
 
 export const CreateBulkJiraIssue = gql`
   mutation CreateBulkJiraIssue(
-    $vulnIds: [ID!]!
+    $issues: [JiraIssueBulkCreateIssueInput!]!
     $projectKey: String!
     $issueTypeId: String!
     $reporter: String
@@ -2317,7 +2317,7 @@ export const CreateBulkJiraIssue = gql`
   ) {
     jiraIssueBulkCreate(
       input: {
-        componentVulnIds: $vulnIds
+        issues: $issues
         projectKey: $projectKey
         issueTypeId: $issueTypeId
         reporter: $reporter
