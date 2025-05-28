@@ -150,6 +150,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   const isPersonal = selectedTab === 'PERSONAL'
 
   const userName = isPersonal ? orgData?.currentUser?.name : orgData?.name
+  const activeTab = tabs.find((tab) => tab.name === selectedTab)
 
   useEffect(() => {
     if (dp) {
@@ -165,54 +166,50 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
     }, 1000)
   }, [SERVER_URL, dp])
 
+  if (!orgData) return null
+
   return (
     <>
-      <Menu>
-        <MenuButton
-          px={3}
-          as={Button}
-          fontSize='sm'
-          colorScheme='blue'
-          fontWeight='medium'
-          textTransform='capitalize'
-          display={!orgData ? 'none' : 'block'}
-        >
-          <Flex align='center'>
-            {/* Left Icon */}
-            {tabs
-              .filter((tab) => tab.name === selectedTab)
-              .map((tab, index) => (
-                <tab.icon
-                  key={index}
-                  color={secondaryBgColor}
-                  style={{ marginRight: '8px', fontSize: 20 }}
-                />
-              ))}
+      {activeTab && (
+        <Menu>
+          <MenuButton
+            px={3}
+            as={Button}
+            fontSize='sm'
+            colorScheme='blue'
+            fontWeight='medium'
+            textTransform='capitalize'
+            display={!orgData ? 'none' : 'block'}
+          >
+            <Flex align='center'>
+              <activeTab.icon
+                color={secondaryBgColor}
+                style={{ marginRight: '8px', fontSize: 20 }}
+              />
+              <Text fontSize='sm'>{activeTab?.name?.toLowerCase()}</Text>
+              <ChevronDownIcon ml='4px' boxSize='20px' />
+            </Flex>
+          </MenuButton>
+          <MenuList fontSize={'sm'}>
+            {tabs.map((tab, index) => (
+              <MenuOptionGroup key={index} value={selectedTab} type='radio'>
+                <MenuItemOption
+                  value={tab.name}
+                  onClick={() => {
+                    setSelectedTab(tab.name)
+                    handleTabChange(tab.name)
+                  }}
+                  fontSize='sm'
+                  textTransform={'capitalize'}
+                >
+                  {tab.name.toLowerCase()}
+                </MenuItemOption>
+              </MenuOptionGroup>
+            ))}
+          </MenuList>
+        </Menu>
+      )}
 
-            {/* Text */}
-            <Text fontSize='sm'>{selectedTab.toLowerCase()}</Text>
-            {/* Right Icon */}
-            <ChevronDownIcon ml='4px' boxSize='20px' />
-          </Flex>
-        </MenuButton>
-        <MenuList fontSize={'sm'}>
-          {tabs.map((tab, index) => (
-            <MenuOptionGroup key={index} value={selectedTab} type='radio'>
-              <MenuItemOption
-                value={tab.name}
-                onClick={() => {
-                  setSelectedTab(tab.name)
-                  handleTabChange(tab.name)
-                }}
-                fontSize='sm'
-                textTransform={'capitalize'}
-              >
-                {tab.name.toLowerCase()}
-              </MenuItemOption>
-            </MenuOptionGroup>
-          ))}
-        </MenuList>
-      </Menu>
       <Card my={5}>
         <CardBody>
           {/* USER INFO */}
