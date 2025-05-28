@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { truncatedValue } from 'utils'
 
-import { Box, Stack, Text, Tooltip } from '@chakra-ui/react'
+import { Box, Divider, Stack, Text, Tooltip } from '@chakra-ui/react'
 
 import LynkDrawer from 'components/LynkDrawer'
 import LynkTable from 'components/LynkTable'
@@ -35,14 +35,13 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
     {
       id: 'COMPONENT',
       name: 'COMPONENT',
-      compact: true,
       selector: (row) => {
-        const { violation, component } = row || ''
-        const { primaryComponent } = violation || ''
+        const { violation, component } = row || {}
+        const { primaryComponent } = violation || {}
 
         if (params?.productgroupid) {
           return (
-            <Box my={2}>
+            <Box my={3}>
               <RowComponent content={component || primaryComponent || ''} />
             </Box>
           )
@@ -50,12 +49,13 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
 
         return (
           <Tooltip label={component?.name}>
-            <Text fontSize={14} color={primaryTextColor}>
+            <Text my={3} fontSize={14} color={primaryTextColor}>
               {truncatedValue(component?.name, 30)}
             </Text>
           </Tooltip>
         )
       },
+      width: '60%',
       wrap: true
     },
     {
@@ -64,7 +64,7 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
       selector: (row) => {
         const { violation, component } = row
         return (
-          <Text color={primaryTextColor} my={2}>
+          <Text color={primaryTextColor} my={3}>
             {component?.version || violation?.primaryComponent?.version || ''}
           </Text>
         )
@@ -74,11 +74,10 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
     {
       id: 'LICENSE',
       name: 'LICENSE',
-      style: { padding: 0, margin: 0 },
       selector: (row) => {
         const { component } = row
         return (
-          <Text color={primaryTextColor} my={2}>
+          <Text color={primaryTextColor} my={3}>
             {component?.licensesExp || ''}
           </Text>
         )
@@ -92,7 +91,7 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
       selector: (row) => {
         const { violation } = row
         return (
-          <Text color={primaryTextColor} my={2}>
+          <Text color={primaryTextColor} my={3}>
             {violation?.vuln?.vulnId || ''}
           </Text>
         )
@@ -173,6 +172,7 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
           Violations List:
         </Text>
       </Stack>
+      <Divider mt={2} />
       <Box overflowY={'scroll'} hidden={category === 'version'}>
         <LynkTable
           columns={columns}
