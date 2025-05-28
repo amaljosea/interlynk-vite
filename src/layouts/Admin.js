@@ -7,7 +7,7 @@ import { KBarProvider } from 'kbar'
 import React, { useEffect } from 'react'
 import { Outlet, useNavigate, useParams } from 'react-router-dom'
 import { displayErrorMessage } from 'utils/errorUtils'
-import { getItem } from 'utils/localStorageUtils'
+import { getItem, setItem } from 'utils/localStorageUtils'
 import { tourStyles } from 'utils/tourUtils'
 import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 
@@ -173,6 +173,7 @@ export default function Admin() {
 
   useEffect(() => {
     if (data && data.organization) {
+      const { id, name } = data.organization || {}
       setOrganization(data.organization)
       setSelectedProducts(products)
       setSelectedActivities(activities)
@@ -180,6 +181,7 @@ export default function Admin() {
       setSelectedVulns(vulns)
       setSelectedPolicies(policies)
       setSelectedAnalytics(selectedAnalyticsCards)
+      setItem('organization', JSON.stringify({ id: id, name: name }))
     } else {
       setOrganization(null)
     }

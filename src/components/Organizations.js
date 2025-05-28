@@ -1,8 +1,9 @@
 import { useLazyQuery, useMutation } from '@apollo/client'
 import Cookies from 'js-cookie'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { timeSince, truncatedValue } from 'utils'
+import { getItem } from 'utils/localStorageUtils'
 import OrgModal from 'views/Dashboard/Profile/components/OrgModal'
 
 import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
@@ -22,13 +23,19 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { SwitchOrganization } from 'graphQL/Mutation'
-import { AllOrganizations, MyOrganizations } from 'graphQL/Queries'
+import {
+  AllOrganizations,
+  GetOrgConnections,
+  MyOrganizations
+} from 'graphQL/Queries'
 
 import { LuBuilding } from 'react-icons/lu'
 
 const Organizations = () => {
   const navigate = useNavigate()
-  const { organization } = useGlobalState()
+  const org = getItem('organization')
+  const parsedOrg = JSON.parse(org)
+  const { organization, setOrganization } = useGlobalState()
   const isSuperAdmin = organization?.currentUser?.superAdmin
 
   const [switchOrg] = useMutation(SwitchOrganization)
@@ -39,6 +46,7 @@ const Organizations = () => {
 
   const [getAllOrg, { loading: allOrgLoading }] = useLazyQuery(AllOrganizations)
   const [getMyOrg, { loading: myOrgLoading }] = useLazyQuery(MyOrganizations)
+  const [getOrg] = useLazyQuery(GetOrgConnections)
 
   const onChange = async (item) => {
     await switchOrg({ variables: { orgId: item?.id } })
@@ -74,6 +82,16 @@ const Organizations = () => {
       })
     }
   }
+
+  useEffect(() => {
+    if (organization?.id !== parsedOrg?.id) {
+      getOrg().then((res) => {
+        if (res?.data?.organization) {
+          setOrganization(res?.data?.organization)
+        }
+      })
+    }
+  }, [getOrg, organization?.id, parsedOrg?.id, setOrganization])
 
   const OrgList = () => {
     if (options?.length === 0) return null
