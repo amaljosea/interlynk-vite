@@ -23,13 +23,11 @@ import {
 
 const VersionLifestages = () => {
   const navigate = useNavigate()
-  const { organization, envName, dispatch } = useGlobalState()
+  const { organization, envName } = useGlobalState()
   const { grayBorderColor, primaryBlueText } = useThemeColor([
     'grayBorderColor',
     'primaryBlueText'
   ])
-
-  const { prodDispatch } = dispatch
 
   const { data, loading } = useQuery(getVersionLifestage, {
     skip: !organization,

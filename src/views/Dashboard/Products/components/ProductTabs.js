@@ -62,8 +62,8 @@ const ProductTabs = (props) => {
   }
 
   const onTabChange = (value) => {
-    setToggleClear(true)
     setSelectedItems([])
+    setToggleClear((value) => !value)
     if (value === 1) {
       globalVulnDispatch({ type: 'CLEAR_GLOBAL_VULN' })
     }
