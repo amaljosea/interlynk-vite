@@ -26,7 +26,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { OrganizationPackageVersionDelete } from 'graphQL/Mutation'
 
-import UpdateOverrideModal from './UpdateOverrideModal'
+import PackageVersionOverrideModal from './PackageVersionOverrideModal'
 
 const PackageTable = ({
   data,
@@ -311,7 +311,7 @@ const PackageTable = ({
       <Pagination {...paginationProps} />
 
       {isOpen && (
-        <UpdateOverrideModal
+        <PackageVersionOverrideModal
           onClose={onClose}
           isOpen={isOpen}
           data={activeRow}
