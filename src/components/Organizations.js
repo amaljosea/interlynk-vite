@@ -25,7 +25,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { SwitchOrganization } from 'graphQL/Mutation'
 import {
   AllOrganizations,
-  GetOrgConnections,
+  GetOrganization,
   MyOrganizations
 } from 'graphQL/Queries'
 
@@ -44,9 +44,9 @@ const Organizations = () => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
 
+  const [getOrg] = useLazyQuery(GetOrganization)
   const [getAllOrg, { loading: allOrgLoading }] = useLazyQuery(AllOrganizations)
   const [getMyOrg, { loading: myOrgLoading }] = useLazyQuery(MyOrganizations)
-  const [getOrg] = useLazyQuery(GetOrgConnections)
 
   const onChange = async (item) => {
     await switchOrg({ variables: { orgId: item?.id } })
