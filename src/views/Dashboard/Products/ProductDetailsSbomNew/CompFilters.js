@@ -19,65 +19,57 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useRouteFlags } from 'hooks/useRouteFlags'
 
 const GetEcosystems = gql`
-  query GetEcosystems($productId: Uuid!, $sbomId: Uuid!) {
+  query GetEcosystems(
+    $productId: Uuid!
+    $sbomId: Uuid!
+    $includeParts: Boolean
+  ) {
     sbom(projectId: $productId, sbomId: $sbomId) {
       filters {
-        ecosystems
+        ecosystems(includeParts: $includeParts)
       }
     }
   }
 `
 
 const GetKinds = gql`
-  query GetKinds($productId: Uuid!, $sbomId: Uuid!) {
+  query GetKinds($productId: Uuid!, $sbomId: Uuid!, $includeParts: Boolean) {
     sbom(projectId: $productId, sbomId: $sbomId) {
       filters {
-        kinds
+        kinds(includeParts: $includeParts)
       }
     }
   }
 `
 
 const GetLicenses = gql`
-  query GetLicenses($productId: Uuid!, $sbomId: Uuid!) {
+  query GetLicenses($productId: Uuid!, $sbomId: Uuid!, $includeParts: Boolean) {
     sbom(projectId: $productId, sbomId: $sbomId) {
       filters {
-        licenses
+        licenses(includeParts: $includeParts)
       }
     }
   }
 `
 
 const GetShareLynkEcosystems = gql`
-  query GetEcosystems($sbomId: Uuid!) {
+  query GetEcosystems($sbomId: Uuid!, $includeParts: Boolean) {
     shareLynkQuery {
       sbom(id: $sbomId) {
         filters {
-          ecosystems
+          ecosystems(includeParts: $includeParts)
         }
       }
     }
   }
 `
 
-// const GetShareLynkSupplierNames = gql`
-//   query GetSupplierNames($sbomId: Uuid!) {
-//     shareLynkQuery {
-//       sbom(id: $sbomId) {
-//         filters {
-//           supplierNames
-//         }
-//       }
-//     }
-//   }
-// `
-
 const GetShareLynkKinds = gql`
-  query GetKinds($sbomId: Uuid!) {
+  query GetKinds($sbomId: Uuid!, $includeParts: Boolean) {
     shareLynkQuery {
       sbom(id: $sbomId) {
         filters {
-          kinds
+          kinds(includeParts: $includeParts)
         }
       }
     }
@@ -85,11 +77,11 @@ const GetShareLynkKinds = gql`
 `
 
 const GetShareLynkLicenses = gql`
-  query GetLicenses($sbomId: Uuid!) {
+  query GetLicenses($sbomId: Uuid!, $includeParts: Boolean) {
     shareLynkQuery {
       sbom(id: $sbomId) {
         filters {
-          licenses
+          licenses(includeParts: $includeParts)
         }
       }
     }
@@ -122,7 +114,13 @@ const CompFilters = ({ reset }) => {
     isCustomerView ? GetShareLynkLicenses : GetLicenses
   )
 
-  const variables = isCustomerView ? { sbomId } : { productId, sbomId }
+  const variables = isCustomerView
+    ? { sbomId, includeParts: exclude?.includes('parts') ? false : true }
+    : {
+        productId,
+        sbomId,
+        includeParts: exclude?.includes('parts') ? false : true
+      }
 
   const onFilterType = (value) => {
     prodCompDispatch({ type: 'FILTER_SCOPE', payload: value })
