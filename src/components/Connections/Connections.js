@@ -174,7 +174,7 @@ const Connections = ({ org }) => {
         </CardHeader>
         <CardBody>
           <Flex wrap='wrap' gap={'20px'}>
-            {!isFreeTier && (
+            {org && !isFreeTier && (
               <ConnectionCard
                 name='Bitbucket'
                 iconSrc={bitbucketPng}
