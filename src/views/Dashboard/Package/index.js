@@ -11,7 +11,7 @@ import PackageTable from './PackageTable'
 
 const Package = () => {
   const [filters, setFilters] = useState({
-    orderBy: { field: 'PACKAGE_VERSIONS_UPDATED_AT', direction: 'ASC' }
+    orderBy: { field: 'UPDATED_AT', direction: 'DESC' }
   })
 
   const { nodes, paginationProps, reset, loading } = usePaginatedQuery(

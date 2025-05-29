@@ -112,7 +112,7 @@ const PackageTable = ({
   const columns = useMemo(
     () => [
       {
-        id: 'PACKAGE_VERSIONS_UPDATED_AT',
+        id: 'UPDATED_AT',
         name: 'NAME',
         width: '25%',
         wrap: true,
@@ -145,7 +145,8 @@ const PackageTable = ({
               )}
             </Flex>
           </Flex>
-        )
+        ),
+        sortable: true
       },
       // ECOSYSTEM
       {
@@ -168,8 +169,7 @@ const PackageTable = ({
         selector: (row) => {
           return <Text color={primaryTextColor}>{row?.version || 'N/A'}</Text>
         },
-        sortable: true,
-        sortFunction: (a, b) => new Date(a.version) - new Date(b.version)
+        sortable: true
       },
       // LICENSE
       {
@@ -303,7 +303,7 @@ const PackageTable = ({
           subHeaderComponent={subHeader}
           columns={columns}
           data={data}
-          defaultSortFieldId='PACKAGE_VERSIONS_UPDATED_AT'
+          defaultSortFieldId='UPDATED_AT'
           onSort={handleSort}
         />
       </Flex>
