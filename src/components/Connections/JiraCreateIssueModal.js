@@ -310,7 +310,7 @@ const JiraCreateIssueModal = ({
       setSummary(`[Vulnerability]: ${row?.vuln?.vulnId}`)
     } else {
       const vulnIds = selectedVulns?.map((item) => item?.vuln?.vulnId)
-      setSummary(`[Vulnerability]: ${vulnIds?.join(', ')}`)
+      setSummary(`[Vulnerability] : ${vulnIds?.join(', ')}`)
     }
     handleApply()
   }, [handleApply, row, selectedVulns])

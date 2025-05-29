@@ -9,6 +9,12 @@ const formatCustomVulnFields = (customFields) => {
     .join('\n\n')
 }
 
+const cleanDescription = (text) => {
+  return text.startsWith('### Description')
+    ? text.replace(/^### Description\s*/, '')
+    : text
+}
+
 export const generateJiraDescription = (data) => {
   const vulnId = data?.vuln?.vulnId || 'N/A'
   const desc = data?.vuln?.desc || 'N/A'
@@ -27,8 +33,9 @@ export const generateJiraDescription = (data) => {
   const note = data?.note || 'N/A'
   const customFields = formatCustomVulnFields(data?.componentVulnCustomFields)
 
-  return `Subject: [${vulnId}]: ${desc}\n
-Summary: ${desc || 'N/A'}\n
+  const subjectDesc = desc !== '' ? cleanDescription(desc) : 'N/A'
+
+  return `Subject: [${vulnId}] : ${subjectDesc?.substring(0, 80)}...\n
 Affected Product: ${data?.component?.sbom?.project?.projectGroup?.name}\n
 Affected Version (Environment): ${data?.component?.sbom?.project?.projectGroup?.name} (${data?.component?.sbom?.project?.name})\n
 Affected Components: ${component}: ${data?.component?.version}\nPURL: ${data?.component?.purl}\n
