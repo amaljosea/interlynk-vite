@@ -87,7 +87,6 @@ const GlobalStateProvider = ({ children }) => {
     }
   }
 
-
   const handleClearAll = () => {
     updateSelection({
       products: [],
@@ -166,7 +165,7 @@ const GlobalStateProvider = ({ children }) => {
     severities: [],
     components: [],
     statues: [],
-    exclude: [],
+    exclude: ['retracted'],
     source: false,
     kev: '',
     epss: '',
