@@ -212,7 +212,7 @@ const AttributionReportsSubHeader = ({
           </Box>
           {selectedRowData.length > 0 && (
             <Select
-              placeholder={`Change Source for ${selectedRowData.length} items`}
+              placeholder={`Change source for selected items`}
               width='300px'
               onChange={(e) => onBulkSourceChange(e.target.value)}
             >

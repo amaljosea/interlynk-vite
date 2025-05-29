@@ -186,6 +186,7 @@ const AttributionReportsDrawer = ({
   )
 
   const handleBulkSourceChange = (source) => {
+    if (source === '') return
     const newPreferences = { ...sourcePreferences }
     selectedRowData.forEach((row) => {
       newPreferences[row.id] = source
