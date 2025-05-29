@@ -43,7 +43,14 @@ const AttributionReportsColumns = ({
 
       if (field === 'licensesExp') {
         const libraryLicense = row.enrichedContent?.packageVersion?.licenseExp
-        return libraryLicense || 'N/A'
+        if (
+          !libraryLicense ||
+          libraryLicense.startsWith(' OR') ||
+          libraryLicense.startsWith('OR')
+        ) {
+          return 'N/A'
+        }
+        return libraryLicense
       }
 
       const value = row.enrichedContent?.packageVersion?.[field]

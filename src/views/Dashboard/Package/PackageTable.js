@@ -178,10 +178,14 @@ const PackageTable = ({
         wrap: true,
         selector: (row) => {
           const { licenseExp } = row
+          let licenseValue
+          if (licenseExp?.startsWith(' OR') || licenseExp?.startsWith('OR')) {
+            licenseValue = 'N/A'
+          }
           return (
-            <Tooltip label={licenseExp}>
+            <Tooltip label={licenseValue}>
               <Text fontSize={14} color={primaryTextColor}>
-                {truncatedValue(licenseExp, 20) || 'N/A'}
+                {truncatedValue(licenseValue, 20) || 'N/A'}
               </Text>
             </Tooltip>
           )
