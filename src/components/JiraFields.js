@@ -168,7 +168,7 @@ const JiraFields = () => {
         />
       </FormControl>
 
-      <FormControl isRequired>
+      <FormControl>
         <FormLabel>Issue Type</FormLabel>
         <LynkSelect
           value={issueType}
@@ -181,7 +181,7 @@ const JiraFields = () => {
         />
       </FormControl>
 
-      <FormControl isRequired hidden={!issueType}>
+      <FormControl hidden={!issueType}>
         <FormLabel>Assignee</FormLabel>
         <LynkSelect
           value={assignee}
@@ -194,7 +194,7 @@ const JiraFields = () => {
         />
       </FormControl>
 
-      <FormControl isRequired hidden={!issueType}>
+      <FormControl hidden={!issueType}>
         <FormLabel>Reporter</FormLabel>
         <LynkSelect
           value={reporter}

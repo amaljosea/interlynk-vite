@@ -188,7 +188,8 @@ const Vulnerabilities = ({ sbomData }) => {
         })
       } else {
         showToast({
-          description: 'Issue tracker tickets synced successfully',
+          description:
+            'Issue tracker links have been updated to sync with related tickets in Jira',
           status: 'success'
         })
       }
