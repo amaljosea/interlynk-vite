@@ -11,6 +11,7 @@ import CardBody from 'components/Card/CardBody'
 import EnvironmentDrawer from 'components/Drawer/EnvironmentDrawer'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useGradualPolling } from 'hooks/useGradualPolling'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { GetProjectSettings } from 'graphQL/Queries'
@@ -38,6 +39,9 @@ const GetProjectDetails = gql`
         projectGroup {
           name
         }
+        sboms {
+          vulnRunStatus
+        }
       }
     }
   }
@@ -59,11 +63,21 @@ const ProductDetailsMain = () => {
   const [activeEnv, setActiveEnv] = useState(productId || '')
 
   // GET PROJECT DATA
-  const { data, loading, error } = useQuery(GetProjectDetails, {
-    variables: { id: productGroupId }
-  })
+  const { data, loading, error, startPolling, stopPolling } = useQuery(
+    GetProjectDetails,
+    {
+      variables: { id: productGroupId }
+    }
+  )
 
   const { name, description, projects } = data?.projectGroup || ''
+  const matchingProject = projects?.find((project) => project?.name === envName)
+
+  const shouldPoll = matchingProject?.sboms?.some(
+    (sbom) => sbom?.vulnRunStatus !== 'FINISHED'
+  )
+
+  useGradualPolling({ shouldPoll, startPolling, stopPolling })
 
   const ENV = useDisclosure()
 
@@ -104,11 +118,12 @@ const ProductDetailsMain = () => {
 
   const { projectSetting } = settings?.project || ''
 
-  const matchingProject = projects?.find((project) => project?.name === envName)
+  const completedSboms =
+    matchingProject?.sboms?.filter(
+      (sbom) => sbom?.vulnRunStatus === 'FINISHED'
+    ) ?? []
 
-  const sbomsCount = matchingProject ? matchingProject?.sbomsCount : 0
-
-  const showProductProgress = sbomsCount >= 2
+  const showProductProgress = completedSboms.length >= 2
 
   if (loading) {
     return (
