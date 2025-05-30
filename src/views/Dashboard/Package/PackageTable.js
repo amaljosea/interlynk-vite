@@ -178,14 +178,17 @@ const PackageTable = ({
         wrap: true,
         selector: (row) => {
           const { licenseExp } = row
-          let licenseValue
           if (licenseExp?.startsWith(' OR') || licenseExp?.startsWith('OR')) {
-            licenseValue = 'N/A'
+            return (
+              <Text fontSize={14} color={primaryTextColor}>
+                N/A
+              </Text>
+            )
           }
           return (
-            <Tooltip label={licenseValue}>
+            <Tooltip label={licenseExp}>
               <Text fontSize={14} color={primaryTextColor}>
-                {truncatedValue(licenseValue, 20) || 'N/A'}
+                {truncatedValue(licenseExp, 20) || 'N/A'}
               </Text>
             </Tooltip>
           )
@@ -236,10 +239,11 @@ const PackageTable = ({
         name: 'ACTIONS',
         selector: (row) => (
           <Menu>
-            <LynkAction />
+            <LynkAction data-testid='package_actions' />
             <Portal>
               <MenuList fontSize='sm'>
                 <MenuItem
+                  data-testid='create_override'
                   hidden={row?.organizationPackageVersion}
                   onClick={() => {
                     setActiveRow(row)
@@ -249,6 +253,7 @@ const PackageTable = ({
                   Create override
                 </MenuItem>
                 <MenuItem
+                  data-testid='update_override'
                   hidden={!row?.organizationPackageVersion}
                   onClick={() => {
                     setActiveRow(row)
@@ -258,6 +263,7 @@ const PackageTable = ({
                   Update override
                 </MenuItem>
                 <MenuItem
+                  data-testid='delete_override'
                   hidden={!row?.organizationPackageVersion}
                   onClick={() =>
                     handleDeleteOverride(row?.organizationPackageVersion.id)
