@@ -98,12 +98,12 @@ const SbomCompare = ({
 
   const VersionSelect = (
     <LynkSelect
-      value={selectedVersion?.label}
-      onChange={(value) => onVersionChange(value)}
       isSearchable
-      type='text'
+      value={selectedVersion?.label}
+      name={isSbomOne ? 'versionOne' : 'versionTwo'}
+      aria-label={isSbomOne ? 'versionOne' : 'versionTwo'}
+      onChange={(value) => onVersionChange(value)}
       placeholder={selectedVersion?.label || '--Select--'}
-      name='versions'
       isDisabled={disableVersionField}
       options={uniqueVersions}
       dropDown={true}
@@ -158,7 +158,9 @@ const SbomCompare = ({
           <Stack spacing={5} mt={6} height={'285px'}>
             {/* PROJECT GROUPS */}
             <FormControl fontSize={'sm'}>
-              <FormLabel htmlFor='groupOne'>Product</FormLabel>
+              <FormLabel htmlFor={isSbomOne ? 'groupOne' : 'groupTwo'}>
+                Product
+              </FormLabel>
               <AsyncSelect
                 {...{
                   ...lazyDropDownProps,
@@ -166,7 +168,9 @@ const SbomCompare = ({
                   value: null,
                   isDisabled: isDisabled,
                   id: isSbomOne ? 'groupOne' : 'groupTwo',
-                  placeholder: selectedGroup?.name || '--Select--'
+                  placeholder: selectedGroup?.name || '--Select--',
+                  name: isSbomOne ? 'groupOne' : 'groupTwo',
+                  'aria-label': isSbomOne ? 'groupOne' : 'groupTwo'
                 }}
               />
             </FormControl>
@@ -174,13 +178,11 @@ const SbomCompare = ({
             <FormControl fontSize={'sm'}>
               <FormLabel htmlFor='productOne'>Environment</FormLabel>
               <LynkSelect
-                id={isSbomOne ? 'productOne' : 'productTwo'}
+                name={isSbomOne ? 'productOne' : 'productTwo'}
+                aria-label={isSbomOne ? 'productOne' : 'productTwo'}
                 value={selectedProd?.label || null}
                 onChange={onSelectProduct}
-                type='text'
                 placeholder={selectedProd?.label || '--Select--'}
-                name={isSbomOne ? 'productOne' : 'productTwo'}
-                isSearchable={false}
                 isDisabled={isDisabled}
                 options={envOptions}
                 dropDown={true}
