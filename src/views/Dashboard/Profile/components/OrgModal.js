@@ -88,8 +88,6 @@ const OrgModal = ({ isOpen, onClose, shouldSwitchOrg = false }) => {
             status: 'success'
           })
 
-        localStorage.setItem('organization', orgName)
-
         if (shouldSwitchOrg) {
           handleSwitchOrg(orgId, orgName)
         } else {
