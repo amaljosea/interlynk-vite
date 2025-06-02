@@ -104,8 +104,8 @@ const AttributionReportsSubHeader = ({
         let items = []
 
         if (selectedRowData.length > 0) {
-          items = [...selectedRowData].sort(
-            (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+          items = [...selectedRowData].sort((a, b) =>
+            a.name.localeCompare(b.name)
           )
         } else {
           // Fetch all components

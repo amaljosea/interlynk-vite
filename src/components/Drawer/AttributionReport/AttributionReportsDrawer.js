@@ -112,7 +112,11 @@ const AttributionReportsDrawer = ({
       sbomId,
       projectId: productId,
       internal: internal ? !internal : undefined,
-      orderBy: isSortable ? { field, direction } : undefined,
+      orderBy: includeSearch
+        ? isSortable
+          ? { field, direction }
+          : undefined
+        : { field: 'COMPONENTS_NAME', direction: 'ASC' },
       ...(includeSearch && searchInput !== '' && { search: searchInput })
     }
   }
