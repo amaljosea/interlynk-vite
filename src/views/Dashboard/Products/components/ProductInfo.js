@@ -1,5 +1,5 @@
 import { addDays, differenceInDays, parseISO } from 'date-fns'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import {
   getSignedUrlParams,
@@ -30,41 +30,35 @@ import {
   LuTag
 } from 'react-icons/lu'
 
-const ProductInfo = ({ settings, data }) => {
+const ProductInfo = ({ settings = {}, data = {} }) => {
   const params = useParams()
   const { versionState, dispatch } = useGlobalState()
   const signedUrlParams = getSignedUrlParams()
   const { isFreeTier } = useGlobalQueryContext()
-
+  const { secondaryBlueText } = useThemeColor(['secondaryBlueText'])
   const { field, direction, searchInput, lifestage } = versionState
   const { versionDispatch } = dispatch
-
-  const { name, description } = data || ''
-
-  const { secondaryBlueText } = useThemeColor(['secondaryBlueText'])
-
-  const [warning, setWarning] = useState(false)
-  const [exceedingCount, setExceedingCount] = useState(0)
+  const { name = '', description = '' } = data
 
   const {
-    checksEnabled,
-    enableAutoArchive,
-    dataRetentionDays,
-    enableSupportLevel,
-    vulnScanningEnabled,
-    internalCompMatchingEnabled,
-    automatedFixesEnabled
-  } = settings || ''
+    checksEnabled = false,
+    enableAutoArchive = false,
+    dataRetentionDays = 0,
+    enableSupportLevel = false,
+    vulnScanningEnabled = false,
+    internalCompMatchingEnabled = false,
+    automatedFixesEnabled = false
+  } = settings
 
   const variables = useMemo(
     () => ({
       id: params?.productid,
-      field: field,
-      direction: direction,
+      field,
+      direction,
       lifestage: getUndefinedIfEmptyOrAll(lifestage),
-      search: searchInput === '' ? undefined : searchInput
+      search: searchInput || undefined
     }),
-    [direction, field, lifestage, params?.productid, searchInput]
+    [params?.productid, field, direction, lifestage, searchInput]
   )
 
   const { data: versionDates } = useFetchAllNodes({
@@ -73,6 +67,18 @@ const ProductInfo = ({ settings, data }) => {
     selector: 'project.sbomVersions',
     skip: signedUrlParams
   })
+
+  const exceedingCount = useMemo(() => {
+    if (!versionDates || !dataRetentionDays) return 0
+    const now = new Date()
+    const retention = Math.floor(dataRetentionDays)
+    return versionDates.filter((item) => {
+      const createdDate = parseISO(item?.createdAt)
+      const expirationDate = addDays(createdDate, retention)
+      const daysLeft = differenceInDays(expirationDate, now)
+      return daysLeft <= 7 && daysLeft >= 0 && retention !== 0
+    }).length
+  }, [versionDates, dataRetentionDays])
 
   const handleSort = (column, sortDirection) => {
     versionDispatch({
@@ -83,27 +89,6 @@ const ProductInfo = ({ settings, data }) => {
       }
     })
   }
-
-  useEffect(() => {
-    if (versionDates && dataRetentionDays) {
-      const currentDate = new Date()
-      const retentionTimeInt = Math.floor(dataRetentionDays)
-      const exceedingItems = versionDates?.filter((item) => {
-        const createdDate = parseISO(item?.createdAt)
-        const expirationDate = addDays(createdDate, retentionTimeInt)
-        const daysUntilDeletion = differenceInDays(expirationDate, currentDate)
-        return (
-          daysUntilDeletion <= 7 &&
-          daysUntilDeletion >= 0 &&
-          retentionTimeInt !== 0
-        )
-      })
-      setExceedingCount(exceedingItems?.length)
-      setWarning(exceedingItems?.length > 0)
-    } else {
-      setWarning(false)
-    }
-  }, [dataRetentionDays, versionDates])
 
   return (
     <Flex direction={'row'} alignItems={'flex-start'} gap={5} width={'100%'}>
@@ -148,7 +133,7 @@ const ProductInfo = ({ settings, data }) => {
             isDisabled={!enableSupportLevel}
             label={`Component Support Analysis ${enableSupportLevel ? 'Enabled' : 'Disabled'}`}
           />
-          {warning && (
+          {exceedingCount > 0 && (
             <Tooltip
               label={`${exceedingCount} SBOM${exceedingCount > 1 ? 's are' : ' is'} marked for deletion in the next 7 days. This is based on the data retention under Settings tab.`}
             >
