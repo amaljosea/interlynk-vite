@@ -155,7 +155,7 @@ const PackageTable = ({
         wrap: true,
         selector: (row) => {
           return (
-            <Text color={primaryTextColor}>
+            <Text fontSize={14} color={primaryTextColor}>
               {row?.package?.ecosystem || 'N/A'}
             </Text>
           )
@@ -167,7 +167,11 @@ const PackageTable = ({
         name: 'VERSION',
         wrap: true,
         selector: (row) => {
-          return <Text color={primaryTextColor}>{row?.version || 'N/A'}</Text>
+          return (
+            <Text fontSize={14} color={primaryTextColor}>
+              {row?.version || 'N/A'}
+            </Text>
+          )
         },
         sortable: true
       },
@@ -201,7 +205,7 @@ const PackageTable = ({
         wrap: true,
         selector: (row) => {
           return (
-            <Text color={primaryTextColor}>
+            <Text fontSize={14} color={primaryTextColor}>
               {truncatedValue(row?.copyright, 20) || 'N/A'}
             </Text>
           )
@@ -214,7 +218,7 @@ const PackageTable = ({
         wrap: true,
         selector: (row) => {
           return (
-            <Text color={primaryTextColor}>
+            <Text fontSize={14} color={primaryTextColor}>
               {truncatedValue(row?.notice, 20) || 'N/A'}
             </Text>
           )
@@ -227,7 +231,9 @@ const PackageTable = ({
         name: 'PUBLISHED',
         selector: (row) => {
           return (
-            <Text color={primaryTextColor}>{timeSince(row.updatedAt)}</Text>
+            <Text fontSize={14} color={primaryTextColor}>
+              {timeSince(row.updatedAt)}
+            </Text>
           )
         },
         sortable: true,

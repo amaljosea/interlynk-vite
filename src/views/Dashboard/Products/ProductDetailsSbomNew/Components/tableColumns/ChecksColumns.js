@@ -166,7 +166,7 @@ const ChecksColumns = (
         selector: (row) => {
           const { organizationRule } = row
           return (
-            <Text color={primaryTextColor}>
+            <Text fontSize={14} color={primaryTextColor}>
               {organizationRule.rule.friendlyId}
             </Text>
           )
@@ -200,7 +200,7 @@ const ChecksColumns = (
                   <RowComponent content={component} />
                 </Box>
               )}
-              <Text color={primaryTextColor}>
+              <Text fontSize={14} color={primaryTextColor}>
                 {organizationRule.rule.longDesc !== null
                   ? `${organizationRule.rule.shortDesc?.substring(0, 300)}${
                       organizationRule.rule.shortDesc.length > 300 ? '...' : ''
@@ -219,7 +219,9 @@ const ChecksColumns = (
         name: 'UPDATED',
         selector: (row) => (
           <Tooltip label={getFullDate(row.updatedAt)} placement={'top'}>
-            <Text color={primaryTextColor}>{timeSince(row.updatedAt)}</Text>
+            <Text fontSize={14} color={primaryTextColor}>
+              {timeSince(row.updatedAt)}
+            </Text>
           </Tooltip>
         ),
         sortable: true,

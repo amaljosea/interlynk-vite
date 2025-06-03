@@ -146,7 +146,7 @@ const ProductColumns = (props) => {
               <Stack spacing={1}>
                 <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
                   <Text
-                    fontSize={16}
+                    fontSize={14}
                     color={primaryBlueText}
                     cursor={'pointer'}
                     width={'fit-content'}
@@ -181,7 +181,9 @@ const ProductColumns = (props) => {
           const { updatedAt } = row
           return (
             <Tooltip label={getFullDate(updatedAt)} placement={'top'}>
-              <Text color={primaryTextColor}>{timeSince(updatedAt)}</Text>
+              <Text fontSize={14} color={primaryTextColor}>
+                {timeSince(updatedAt)}
+              </Text>
             </Tooltip>
           )
         },

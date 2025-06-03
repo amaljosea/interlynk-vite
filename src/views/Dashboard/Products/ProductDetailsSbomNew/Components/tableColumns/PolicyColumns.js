@@ -21,7 +21,9 @@ const PolicyColumns = (isInitialized) => {
           const { policy } = row
           return (
             <Stack my={4} spacing={1}>
-              <Text color={primaryTextColor}>{policy?.name || ''}</Text>
+              <Text fontSize={14} color={primaryTextColor}>
+                {policy?.name || ''}
+              </Text>
               <Text size='sm' color={secondaryTextInverse}>
                 {policy?.description}
               </Text>
@@ -76,7 +78,9 @@ const PolicyColumns = (isInitialized) => {
         name: 'LAST CHECKED',
         selector: (row) => (
           <Tooltip label={getFullDate(row?.updatedAt)} placement={'top'}>
-            <Text color={primaryTextColor}>{timeSince(row?.updatedAt)}</Text>
+            <Text fontSize={14} color={primaryTextColor}>
+              {timeSince(row?.updatedAt)}
+            </Text>
           </Tooltip>
         ),
         right: 'true',

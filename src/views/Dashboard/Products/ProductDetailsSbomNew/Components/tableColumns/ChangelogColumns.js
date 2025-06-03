@@ -69,13 +69,16 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
                 <RowComponent content={loggablePrefix} />
               ) : (
                 <Text
+                  fontSize={14}
                   onClick={() => onSelect(row)}
                   sx={{ cursor: 'pointer', color: primaryBlueText }}
                 >
                   {loggableType === 'Sbom' ? 'SBOM' : loggablePrefix}
                 </Text>
               )}
-              <Text color={primaryTextColor}>{event}</Text>
+              <Text fontSize={14} color={primaryTextColor}>
+                {event}
+              </Text>
             </Stack>
           )
         },
@@ -96,6 +99,7 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
           if (event === 'purl') {
             return (
               <Text
+                fontSize={14}
                 onClick={() => {
                   setActiveRow(orig)
                   PURL.onOpen()
@@ -116,9 +120,13 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
               >
                 <Box textOverflow={'wrap'}>
                   {orig === 'f' ? (
-                    <Text color={primaryTextColor}>False</Text>
+                    <Text fontSize={14} color={primaryTextColor}>
+                      False
+                    </Text>
                   ) : orig === 't' ? (
-                    <Text color={primaryTextColor}>True</Text>
+                    <Text fontSize={14} color={primaryTextColor}>
+                      True
+                    </Text>
                   ) : license?.length > 0 ? (
                     license.map((item, index) => (
                       <Flex
@@ -142,7 +150,9 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
                       </Flex>
                     ))
                   ) : license?.length === 0 ? (
-                    <Text color={primaryTextColor}>N/A</Text>
+                    <Text fontSize={14} color={primaryTextColor}>
+                      N/A
+                    </Text>
                   ) : urls && urls.length > 0 ? (
                     urls.map((item, index) => (
                       <Flex
@@ -168,7 +178,11 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
                       </Flex>
                     ))
                   ) : (
-                    <Text color={primaryTextColor} whiteSpace={'wrap'}>
+                    <Text
+                      fontSize={14}
+                      color={primaryTextColor}
+                      whiteSpace={'wrap'}
+                    >
                       {orig || 'N/A'}
                     </Text>
                   )}
@@ -193,6 +207,7 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
           if (event === 'purl') {
             return (
               <Text
+                fontSize={14}
                 onClick={() => {
                   setActiveRow(updated)
                   PURL.onOpen()
@@ -214,9 +229,13 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
               >
                 <Box>
                   {updated === 'f' ? (
-                    <Text color={primaryTextColor}>False</Text>
+                    <Text fontSize={14} color={primaryTextColor}>
+                      False
+                    </Text>
                   ) : updated === 't' ? (
-                    <Text color={primaryTextColor}>True</Text>
+                    <Text fontSize={14} color={primaryTextColor}>
+                      True
+                    </Text>
                   ) : updatedValue?.length > 0 ? (
                     <Flex my={2} gap={2} flexDir={'column'} flexWrap={'wrap'}>
                       {updatedValue.map((item, index) => (
@@ -232,7 +251,9 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
                       ))}
                     </Flex>
                   ) : updatedValue?.length === 0 ? (
-                    <Text color={primaryTextColor}>N/A</Text>
+                    <Text fontSize={14} color={primaryTextColor}>
+                      N/A
+                    </Text>
                   ) : urls && urls.length > 0 ? (
                     <Flex my={2} gap={2} flexDir={'column'} flexWrap={'wrap'}>
                       {urls.map((item, index) => (
@@ -251,6 +272,7 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
                     </Flex>
                   ) : (
                     <Text
+                      fontSize={14}
                       color={primaryTextColor}
                       whiteSpace={'wrap'}
                       cursor={'pointer'}
@@ -275,6 +297,7 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
           return (
             <Tooltip placement='top' label={user}>
               <Text
+                fontSize={14}
                 cursor='pointer'
                 color={primaryTextColor}
                 onClick={() => checkUser(row)}
@@ -294,17 +317,16 @@ const ChangelogColumns = (setActiveRow, onSelect, PURL, checkUser) => {
         id: 'ACTIVITY_LOGS_CREATED_AT',
         name: 'CHANGED',
         selector: (row) => (
-          <Box width={'fit-content'}>
-            <Tooltip label={getFullDate(row.updatedAt)} placement={'top'}>
-              <Text
-                cursor={'pointer'}
-                color={primaryTextColor}
-                width={'fit-content'}
-              >
-                {timeSince(row.updatedAt)}
-              </Text>
-            </Tooltip>
-          </Box>
+          <Tooltip label={getFullDate(row.updatedAt)} placement={'top'}>
+            <Text
+              fontSize={14}
+              cursor={'pointer'}
+              color={primaryTextColor}
+              width={'fit-content'}
+            >
+              {timeSince(row.updatedAt)}
+            </Text>
+          </Tooltip>
         ),
         sortable: true,
         sortFunction: (a, b) => {

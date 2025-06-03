@@ -121,7 +121,11 @@ const LegalTable = () => {
       id: 'ORG_NAME',
       name: 'ORGANIZATION NAME',
       selector: (row) => (
-        <Text color={primaryTextColor} textTransform={'capitalize'}>
+        <Text
+          fontSize={14}
+          color={primaryTextColor}
+          textTransform={'capitalize'}
+        >
           {row?.organizationName}
         </Text>
       ),
@@ -133,7 +137,11 @@ const LegalTable = () => {
       name: 'URL',
       selector: (row) => {
         if (!row?.url) {
-          return <Text color={primaryTextColor}>N/A</Text>
+          return (
+            <Text fontSize={14} color={primaryTextColor}>
+              N/A
+            </Text>
+          )
         }
 
         return (
@@ -143,7 +151,7 @@ const LegalTable = () => {
                 row?.url.startsWith('http') ? row.url : `https://${row.url}`
               }
             />
-            <Text color={primaryTextColor}>
+            <Text fontSize={14} color={primaryTextColor}>
               {row?.url.startsWith('http') ? row.url : `https://${row.url}`}
             </Text>
           </Flex>
@@ -159,7 +167,11 @@ const LegalTable = () => {
         const { organizationContacts } = row
 
         if (organizationContacts?.length === 0) {
-          return <Text color={primaryTextColor}>N/A</Text>
+          return (
+            <Text fontSize={14} color={primaryTextColor}>
+              N/A
+            </Text>
+          )
         }
 
         return (
@@ -181,7 +193,9 @@ const LegalTable = () => {
                     <PhoneIcon color={primaryBlueText} boxSize={3} />
                   </Tooltip>
                 )}
-                <Text color={primaryTextColor}>{item?.name || ''}</Text>
+                <Text fontSize={14} color={primaryTextColor}>
+                  {item?.name || ''}
+                </Text>
               </Flex>
             ))}
           </Flex>
@@ -198,7 +212,9 @@ const LegalTable = () => {
         const { createdAt } = row
         return (
           <Tooltip label={getFullDate(createdAt)} placement='top'>
-            <Text color={primaryTextColor}>{timeSince(createdAt)}</Text>
+            <Text fontSize={14} color={primaryTextColor}>
+              {timeSince(createdAt)}
+            </Text>
           </Tooltip>
         )
       },
@@ -218,7 +234,9 @@ const LegalTable = () => {
         const { updatedAt } = row
         return (
           <Tooltip label={getFullDate(updatedAt)} placement='top'>
-            <Text color={primaryTextColor}>{timeSince(updatedAt)}</Text>
+            <Text fontSize={14} color={primaryTextColor}>
+              {timeSince(updatedAt)}
+            </Text>
           </Tooltip>
         )
       },

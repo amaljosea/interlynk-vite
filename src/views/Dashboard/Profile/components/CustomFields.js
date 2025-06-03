@@ -7,6 +7,7 @@ import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 import { useDisclosure } from '@chakra-ui/react'
 
 import AddButton from 'components/Icons/AddButton'
+import LynkTable from 'components/LynkTable'
 import LynkAction from 'components/Misc/LynkAction'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -18,7 +19,6 @@ import { GetCustomFields } from 'graphQL/Queries'
 
 import FieldModal from './FieldModal'
 import FieldWarning from './FieldWarning'
-import LynkTable from 'components/LynkTable'
 
 const CustomFields = () => {
   const activetab = useQueryParam('tab')
@@ -40,7 +40,11 @@ const CustomFields = () => {
 
   const [activeRow, setActiveRow] = useState(null)
 
-  const textStyle = { color: primaryTextColor, textTransform: 'capitalize' }
+  const textStyle = {
+    fontSize: 14,
+    color: primaryTextColor,
+    textTransform: 'capitalize'
+  }
 
   const FIELD = useDisclosure()
   const WARNING = useDisclosure()
@@ -66,7 +70,9 @@ const CustomFields = () => {
       id: 'INTERNAL_NAME',
       name: 'INTERNAL NAME',
       selector: (row) => (
-        <Text color={primaryTextColor}>{row?.internalName}</Text>
+        <Text fontSize={14} color={primaryTextColor}>
+          {row?.internalName}
+        </Text>
       ),
       wrap: true
     },
@@ -104,7 +110,9 @@ const CustomFields = () => {
         const { updatedAt } = row
         return (
           <Tooltip label={getFullDate(updatedAt)} placement='top'>
-            <Text color={primaryTextColor}>{timeSince(updatedAt)}</Text>
+            <Text fontSize={14} color={primaryTextColor}>
+              {timeSince(updatedAt)}
+            </Text>
           </Tooltip>
         )
       },

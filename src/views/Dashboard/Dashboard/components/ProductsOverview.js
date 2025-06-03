@@ -137,6 +137,7 @@ const ProductsOverview = () => {
             >
               <Text
                 my={3}
+                fontSize={14}
                 color={uniqueSbom ? primaryBlueText : secondaryTextInverse}
               >
                 {truncatedValue(project?.projectGroup?.name, 16)}
@@ -169,6 +170,7 @@ const ProductsOverview = () => {
             >
               <Text
                 my={2}
+                fontSize={14}
                 color={uniqueSbom ? primaryBlueText : secondaryTextInverse}
                 textAlign={'right'}
               >
@@ -304,7 +306,7 @@ const ProductsOverview = () => {
         const { createdAt } = row
         return (
           <Tooltip placement='top' label={getFullDate(createdAt)}>
-            <Text color={primaryTextColor} textAlign={'right'}>
+            <Text fontSize={14} color={primaryTextColor} textAlign={'right'}>
               {timeSince(createdAt)}
             </Text>
           </Tooltip>

@@ -11,6 +11,7 @@ import { MenuItem, MenuList } from '@chakra-ui/react'
 import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
 import SearchFilter from 'components/Licenses/LicenseSearchFilter'
+import LynkTable from 'components/LynkTable'
 import LynkAction from 'components/Misc/LynkAction'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -24,7 +25,6 @@ import ConfirmationModal from '../Products/components/ConfirmationModal'
 import Filters from './Filters'
 import RequestAcceptModal from './RequestAcceptModal'
 import RequestModal from './RequestModal'
-import LynkTable from 'components/LynkTable'
 
 const RequestTable = (props) => {
   const { data, loading, filters, setFilters, paginationProps } = props
@@ -202,7 +202,7 @@ const RequestTable = (props) => {
       id: 'EMAIL',
       name: 'EMAIL',
       selector: (row) => (
-        <Text color={primaryTextColor} data-testid='request_id'>
+        <Text fontSize={14} color={primaryTextColor} data-testid='request_id'>
           {row?.email}
         </Text>
       )
@@ -213,7 +213,9 @@ const RequestTable = (props) => {
       selector: (row) => {
         return (
           <Stack my={4}>
-            <Text color={primaryTextColor}>{row?.productName}</Text>
+            <Text fontSize={14} color={primaryTextColor}>
+              {row?.productName}
+            </Text>
             <Text color={primaryTextColor}>{row?.productVersion}</Text>
           </Stack>
         )
@@ -225,7 +227,9 @@ const RequestTable = (props) => {
       name: 'REQUESTED',
       selector: (row) => (
         <Tooltip label={getFullDate(row?.requestedAt)} placement={'top'}>
-          <Text color={primaryTextColor}>{timeSince(row?.requestedAt)}</Text>
+          <Text fontSize={14} color={primaryTextColor}>
+            {timeSince(row?.requestedAt)}
+          </Text>
         </Tooltip>
       ),
       wrap: true
@@ -237,7 +241,7 @@ const RequestTable = (props) => {
         const { uploadedAt } = row
         return (
           <Tooltip placement={'top'} label={getFullDate(row?.uploadedAt)}>
-            <Text color={primaryTextColor}>
+            <Text fontSize={14} color={primaryTextColor}>
               {uploadedAt ? timeSince(row?.uploadedAt) : ''}
             </Text>
           </Tooltip>

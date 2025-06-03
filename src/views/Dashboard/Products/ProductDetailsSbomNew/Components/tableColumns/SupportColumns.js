@@ -49,7 +49,9 @@ const SupportColumns = ({ action }) => {
 
           return (
             <Stack my={3} spacing={1}>
-              <Text color={primaryTextColor}>{name}</Text>
+              <Text fontSize={14} color={primaryTextColor}>
+                {name}
+              </Text>
               <Flex gap={2} alignItems={'center'} flexWrap={'wrap'}>
                 {isPart && (
                   <Tooltip label={<PartInfo data={occurrences} />}>
@@ -92,7 +94,7 @@ const SupportColumns = ({ action }) => {
           const { occurrences } = row || {}
           const { componentSupportLevel } = occurrences[0] || {}
           return (
-            <Text color={primaryTextColor}>
+            <Text fontSize={14} color={primaryTextColor}>
               {componentSupportLevel?.user ? 'Manual' : 'Automatic'}
             </Text>
           )
@@ -143,7 +145,7 @@ const SupportColumns = ({ action }) => {
           const { endDate } = componentSupportLevel || {}
           if (endDate) {
             return (
-              <Text color={primaryTextColor}>
+              <Text fontSize={14} color={primaryTextColor}>
                 {new Date(endDate).toLocaleDateString()}
               </Text>
             )

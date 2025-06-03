@@ -21,7 +21,12 @@ const LicenseColumns = () => {
         selector: ({ licenseExpression }) => {
           return (
             <Flex direction='row' alignItems={'center'} gap={2}>
-              <Text color={primaryTextColor} my={3} fontWeight={'medium'}>
+              <Text
+                my={3}
+                fontSize={14}
+                fontWeight={'medium'}
+                color={primaryTextColor}
+              >
                 {parseLicenseString(licenseExpression) || 'Not Available'}
               </Text>
             </Flex>

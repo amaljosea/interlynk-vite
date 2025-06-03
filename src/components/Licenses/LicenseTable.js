@@ -80,6 +80,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
               gap={2}
             >
               <Text
+                fontSize={14}
                 wordBreak={'break-all'}
                 color={primaryTextColor}
                 data-tag='allowRowEvents'
@@ -122,7 +123,11 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
           attribution = 'Not Available'
         }
         return (
-          <Text color={primaryTextColor} textTransform='capitalize'>
+          <Text
+            fontSize={14}
+            color={primaryTextColor}
+            textTransform='capitalize'
+          >
             {attribution.toLowerCase()}
           </Text>
         )
@@ -139,7 +144,11 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
           copyLeft = 'Not Available'
         }
         return (
-          <Text color={primaryTextColor} textTransform='capitalize'>
+          <Text
+            fontSize={14}
+            color={primaryTextColor}
+            textTransform='capitalize'
+          >
             {copyLeft.toLowerCase()}
           </Text>
         )
@@ -156,7 +165,11 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
           sourceDistribution = 'Not Available'
         }
         return (
-          <Text color={primaryTextColor} textTransform='capitalize'>
+          <Text
+            fontSize={14}
+            color={primaryTextColor}
+            textTransform='capitalize'
+          >
             {sourceDistribution.toLowerCase()}
           </Text>
         )
@@ -172,7 +185,11 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
           modifications = 'Not Available'
         }
         return (
-          <Text color={primaryTextColor} textTransform='capitalize'>
+          <Text
+            fontSize={14}
+            color={primaryTextColor}
+            textTransform='capitalize'
+          >
             {modifications.toLowerCase()}
           </Text>
         )

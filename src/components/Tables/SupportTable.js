@@ -208,7 +208,9 @@ const SupportTable = ({
       selector: (row) => {
         return (
           <Stack my={4}>
-            <Text color={primaryTextColor}>{row?.productName}</Text>
+            <Text fontSize={14} color={primaryTextColor}>
+              {row?.productName}
+            </Text>
             <Text color={primaryTextColor}>{row?.productVersion}</Text>
           </Stack>
         )
@@ -223,6 +225,7 @@ const SupportTable = ({
       selector: (row) => (
         <Text
           my={4}
+          fontSize={14}
           color={primaryTextColor}
           cursor={'pointer'}
           onClick={() => {
@@ -240,7 +243,9 @@ const SupportTable = ({
       id: 'COMPONENT_SUPPORT_OVERRIDES_PRODUCT_VERSION',
       name: 'VERSION',
       selector: (row) => (
-        <Text color={primaryTextColor}>{row?.productVersion}</Text>
+        <Text fontSize={14} color={primaryTextColor}>
+          {row?.productVersion}
+        </Text>
       ),
       width: '10%',
       wrap: true,
@@ -305,7 +310,9 @@ const SupportTable = ({
       name: 'UPDATED',
       selector: (row) => (
         <Tooltip label={getFullDate(row.updatedAt)} placement={'top'}>
-          <Text color={primaryTextColor}>{timeSince(row.updatedAt)}</Text>
+          <Text fontSize={14} color={primaryTextColor}>
+            {timeSince(row.updatedAt)}
+          </Text>
         </Tooltip>
       ),
       right: 'true',

@@ -70,7 +70,12 @@ const RoleTable = () => {
       id: 'name',
       name: 'NAME',
       selector: (row) => (
-        <Text color={primaryTextColor} textTransform={'capitalize'} my={2}>
+        <Text
+          fontSize={14}
+          color={primaryTextColor}
+          textTransform={'capitalize'}
+          my={2}
+        >
           {row?.name}
         </Text>
       ),
@@ -82,7 +87,11 @@ const RoleTable = () => {
       name: 'CREATED',
       selector: (row) => (
         <Tooltip label={getFullDate(row?.createdAt)} placement='top'>
-          <Text color={primaryTextColor} textTransform={'lowercase'}>
+          <Text
+            fontSize={14}
+            color={primaryTextColor}
+            textTransform={'lowercase'}
+          >
             {timeSince(row?.createdAt)}
           </Text>
         </Tooltip>

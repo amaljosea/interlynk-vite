@@ -115,7 +115,7 @@ export const useAutomationColumns = (
             </Tooltip>
 
             <Flex direction={'column'} alignItems={'start'} gap={1}>
-              <Text color={primaryTextColor}>{row?.name}</Text>
+              <Text fontSize={14} color={primaryTextColor}>{row?.name}</Text>
               <Tooltip label={getFullDate(createdAt)} placement='top'>
                 <Text color={secondaryTextColor} textAlign={'right'}>
                   {timeSince(createdAt)}
@@ -137,7 +137,7 @@ export const useAutomationColumns = (
         return (
           <List spacing={3} my={3} color={primaryTextColor}>
             {automationConditions.map((item, index) => (
-              <ListItem key={index}>
+              <ListItem fontSize={14} key={index}>
                 {
                   subOperators?.automationConditionSubjectFieldMapping?.find(
                     (sub) => sub?.key === item?.field
@@ -164,7 +164,7 @@ export const useAutomationColumns = (
         return (
           <List spacing={3} my={3} color={primaryTextColor}>
             {automationActions.map((item, index) => (
-              <ListItem key={index}>
+              <ListItem fontSize={14} key={index}>
                 {
                   subOperators?.automationConditionSubjectFieldMapping?.find(
                     (sub) => sub?.key === item?.field
@@ -187,7 +187,7 @@ export const useAutomationColumns = (
         const { createdAt } = row
         return (
           <Tooltip label={getFullDate(createdAt)} placement='top'>
-            <Text color={primaryTextColor} textAlign={'right'}>
+            <Text fontSize={14} color={primaryTextColor} textAlign={'right'}>
               {timeSince(createdAt)}
             </Text>
           </Tooltip>
@@ -211,7 +211,7 @@ export const useAutomationColumns = (
         const { updatedAt } = row
         return (
           <Tooltip label={getFullDate(updatedAt)} placement='top'>
-            <Text color={primaryTextColor} textAlign={'right'}>
+            <Text fontSize={14} color={primaryTextColor} textAlign={'right'}>
               {timeSince(updatedAt)}
             </Text>
           </Tooltip>

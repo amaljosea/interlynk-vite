@@ -93,7 +93,7 @@ export const InternalComponents = () => {
       grow: 1.5,
       selector: (row) => {
         return (
-          <Text color={primaryTextColor} my={2}>
+          <Text fontSize={14} color={primaryTextColor} my={2}>
             {row.ignoreCase ? 'Yes' : 'No'}
           </Text>
         )
@@ -104,7 +104,7 @@ export const InternalComponents = () => {
       name: 'CREATED',
       selector: (row) => (
         <Tooltip label={getFullDate(row.createdAt)} placement={'top'}>
-          <Text color={primaryTextColor} my={2}>
+          <Text fontSize={14} color={primaryTextColor} my={2}>
             {timeSince(row.createdAt)}
           </Text>
         </Tooltip>
@@ -115,7 +115,7 @@ export const InternalComponents = () => {
       name: 'UPDATED',
       selector: (row) => (
         <Tooltip label={getFullDate(row.updatedAt)} placement={'top'}>
-          <Text color={primaryTextColor} my={2}>
+          <Text fontSize={14} color={primaryTextColor} my={2}>
             {timeSince(row.updatedAt)}
           </Text>
         </Tooltip>

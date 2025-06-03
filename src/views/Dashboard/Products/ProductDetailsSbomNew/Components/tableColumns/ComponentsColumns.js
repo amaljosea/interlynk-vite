@@ -205,7 +205,7 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
         id: 'COMPONENTS_VERSION',
         name: 'VERSION',
         selector: (row) => (
-          <Text my={4} color={primaryTextColor}>
+          <Text my={4} fontSize={14} color={primaryTextColor}>
             {row?.version}
           </Text>
         ),

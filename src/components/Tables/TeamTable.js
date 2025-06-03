@@ -118,7 +118,7 @@ const TeamTable = () => {
               name={row?.name || 'User'}
               src={profileImage && `${SERVER_URL}/${profileImage?.url}`}
             />
-            <Text color={primaryTextColor} my={2}>
+            <Text fontSize={14} color={primaryTextColor} my={2}>
               {row?.email}
             </Text>
           </Flex>
@@ -134,7 +134,7 @@ const TeamTable = () => {
         <Flex gap={row.name !== '' ? 2 : 0} sx={{ alignItems: 'center' }}>
           <Text
             color={primaryTextColor}
-            sx={{ fontSize: '14px', w: 'fit-content' }}
+            sx={{ fontSize: 14, w: 'fit-content' }}
           >
             {row.name ? truncatedValue(row.name, 20) : 'N/A'}
           </Text>
@@ -156,7 +156,11 @@ const TeamTable = () => {
       id: 'role',
       name: 'ROLE',
       selector: (row) => (
-        <Text color={primaryTextColor} textTransform={'capitalize'}>
+        <Text
+          fontSize={14}
+          color={primaryTextColor}
+          textTransform={'capitalize'}
+        >
           {row?.role?.name || ''}
         </Text>
       ),
@@ -169,7 +173,11 @@ const TeamTable = () => {
         const timeStart = userTimeStart(row)
         return (
           <Tooltip label={getFullDate(timeStart)} placement={'top'}>
-            <Text color={primaryTextColor} textTransform={'capitalize'}>
+            <Text
+              fontSize={14}
+              color={primaryTextColor}
+              textTransform={'capitalize'}
+            >
               {timeStart ? timeSince(timeStart) : ''}
             </Text>
           </Tooltip>

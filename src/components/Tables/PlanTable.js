@@ -56,16 +56,16 @@ const PlanTable = () => {
           </Thead>
           <Tbody>
             <Tr>
-              <LynkTd fontSize={'sm'}>
+              <LynkTd fontSize={14}>
                 {isFreeTier ? 'Free' : 'Enterprise'}
               </LynkTd>
-              <LynkTd fontSize={'sm'}>
+              <LynkTd fontSize={14}>
                 {isFreeTier ? FREE_TIER_PRODUCT_LIMIT : 'Unlimited'}
               </LynkTd>
-              <LynkTd fontSize={'sm'}>
+              <LynkTd fontSize={14}>
                 {isFreeTier ? FREE_TIER_USER_LIMIT : 'Unlimited'}
               </LynkTd>
-              <LynkTd fontSize={'sm'}>N/A</LynkTd>
+              <LynkTd fontSize={14}>N/A</LynkTd>
             </Tr>
           </Tbody>
         </Table>

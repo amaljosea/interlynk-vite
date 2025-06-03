@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { getFullDate, timeSince } from 'utils'
+import { timeSince } from 'utils'
 
 import {
   Flex,
@@ -12,8 +12,7 @@ import {
   Stack,
   Tag,
   TagLabel,
-  Text,
-  Tooltip
+  Text
 } from '@chakra-ui/react'
 
 import LynkAction from 'components/Misc/LynkAction'
@@ -78,7 +77,7 @@ const GlobalPolicyColumns = ({ action, handleApply }) => {
         selector: (row, index) => (
           <Stack my={4} spacing={1}>
             <Link to={`/vendor/policies/${row?.id}`}>
-              <Text color={primaryBlueText} data-testid={`policy_${index}`}>
+              <Text fontSize={14} color={primaryBlueText} data-testid={`policy_${index}`}>
                 {row?.name}
               </Text>
             </Link>
@@ -99,7 +98,7 @@ const GlobalPolicyColumns = ({ action, handleApply }) => {
           return (
             <Flex gap={2} alignItems={'center'}>
               {!excludePrimaryComponent && !excludeInternalComponent && (
-                <Text color={primaryTextColor}>N/A</Text>
+                <Text fontSize={14} color={primaryTextColor}>N/A</Text>
               )}
               {excludePrimaryComponent && (
                 <Tag variant='solid' colorScheme='blue'>

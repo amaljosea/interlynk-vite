@@ -107,7 +107,7 @@ const ChangelogTable = ({ activeEnv }) => {
               </Tag>
             </Tooltip>
             <Flex direction={'column'} alignItems={'start'} gap={1}>
-              <Text color={primaryTextColor}>
+              <Text fontSize={14} color={primaryTextColor}>
                 {truncatedValue(eventType, 20)}
               </Text>
               <Tooltip label={getFullDate(updatedAt)} placement='top'>
@@ -131,7 +131,7 @@ const ChangelogTable = ({ activeEnv }) => {
         const { event, orig } = row
         const content = orig ? `${event} / ${orig}` : ''
         return (
-          <Text color={primaryTextColor} my={2}>
+          <Text fontSize={14} color={primaryTextColor} my={2}>
             {content || 'N/A'}
           </Text>
         )
@@ -146,7 +146,7 @@ const ChangelogTable = ({ activeEnv }) => {
         const { event, updated } = row
         const content = updated ? `${event} / ${updated}` : ''
         return (
-          <Text color={primaryTextColor} overflow={'auto'} my={2}>
+          <Text fontSize={14} color={primaryTextColor} overflow={'auto'} my={3}>
             {content || 'N/A'}
           </Text>
         )
@@ -161,6 +161,7 @@ const ChangelogTable = ({ activeEnv }) => {
         return (
           <Tooltip placement='top' label={user}>
             <Text
+              fontSize={14}
               cursor={'pointer'}
               color={primaryTextColor}
               onClick={() => {
@@ -183,7 +184,9 @@ const ChangelogTable = ({ activeEnv }) => {
       name: 'CHANGED',
       selector: (row) => (
         <Tooltip label={getFullDate(row.updatedAt)} placement={'top'}>
-          <Text color={primaryTextColor}>{timeSince(row.updatedAt)}</Text>
+          <Text fontSize={14} color={primaryTextColor}>
+            {timeSince(row.updatedAt)}
+          </Text>
         </Tooltip>
       ),
       sortable: true,

@@ -86,7 +86,7 @@ const GlobalVulnTable = (props) => {
                   }
                   onClick={() => localStorage.setItem('activeVuln', vulnId)}
                 >
-                  <Text fontSize='sm' color={primaryBlueText}>
+                  <Text fontSize={14} color={primaryBlueText}>
                     {vulnId || ''}
                   </Text>
                 </Link>
@@ -197,7 +197,7 @@ const GlobalVulnTable = (props) => {
             label={published ? getFullDate(publishedAt) : 'N/A'}
             placement={'top'}
           >
-            <Text color={primaryTextColor} textAlign={'right'}>
+            <Text fontSize={14} color={primaryTextColor} textAlign={'right'}>
               {published || 'N/A'}
             </Text>
           </Tooltip>
