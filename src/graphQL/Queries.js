@@ -3473,6 +3473,7 @@ export const GetPolicies = gql`
         operator
         resultType
         updatedAt
+        notificationEnabled
         excludeInternalComponent
         excludePrimaryComponent
         policyRules {
@@ -3614,6 +3615,7 @@ export const GetProjectPolicies = gql`
         description
         operator
         organizationId
+        notificationEnabled
         resultType
         updatedAt
         policyRules {

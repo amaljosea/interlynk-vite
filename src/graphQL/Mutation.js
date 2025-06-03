@@ -1680,6 +1680,7 @@ export const PolicyCreate = gql`
     $name: String!
     $desc: String
     $isEnabled: Boolean
+    $notification: Boolean
     $operator: PolicyOperatorEnum!
     $resultType: PolicyResultTypeEnum!
     $excludeInternalComponent: Boolean
@@ -1696,6 +1697,7 @@ export const PolicyCreate = gql`
         excludeInternalComponent: $excludeInternalComponent
         excludePrimaryComponent: $excludePrimaryComponent
         policyRulesAttributes: $policyRulesAttributes
+        notificationEnabled: $notification
       }
     ) {
       policy {
@@ -1719,16 +1721,16 @@ export const PolicyCreate = gql`
 export const RequestCreate = gql`
   mutation RequestCreate(
     $email: String!
+    $notes: String
     $productName: String
     $productVersion: String
-    $notes: String
   ) {
     requestCreate(
       input: {
         email: $email
+        notes: $notes
         productName: $productName
         productVersion: $productVersion
-        notes: $notes
       }
     ) {
       request {
@@ -1853,6 +1855,7 @@ export const PolicyUpdate = gql`
     $name: String
     $desc: String
     $isEnabled: Boolean
+    $notification: Boolean
     $operator: PolicyOperatorEnum
     $resultType: PolicyResultTypeEnum
     $excludeInternalComponent: Boolean
@@ -1867,6 +1870,7 @@ export const PolicyUpdate = gql`
         isEnabled: $isEnabled
         operator: $operator
         resultType: $resultType
+        notificationEnabled: $notification
         excludeInternalComponent: $excludeInternalComponent
         excludePrimaryComponent: $excludePrimaryComponent
         policyRulesAttributes: $policyRulesAttributes

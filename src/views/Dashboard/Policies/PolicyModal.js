@@ -9,7 +9,7 @@ import {
   FormControl,
   FormLabel,
   Input,
-  Stack,
+  SimpleGrid,
   Text,
   Textarea
 } from '@chakra-ui/react'
@@ -31,7 +31,8 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
     operator: '',
     resultType: '',
     isPrimary: false,
-    isInternal: false
+    isInternal: false,
+    notification: false
   }
   const [formData, setFormData] = useState(initialState)
   const [error, setError] = useState('')
@@ -153,6 +154,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
         name: formData?.name,
         desc: formData?.desc,
         isEnabled: true,
+        notification: formData?.notification,
         excludeInternalComponent: formData?.isInternal,
         excludePrimaryComponent: formData?.isPrimary,
         operator: formData?.operator || undefined,
@@ -220,6 +222,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
       isEnabled: data?.isEnabled,
       policyRulesAttributes: rules,
       operator: formData?.operator || undefined,
+      notification: formData?.notification,
       excludePrimaryComponent: formData?.isPrimary,
       resultType: formData?.resultType || undefined,
       excludeInternalComponent: formData?.isInternal
@@ -315,6 +318,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
         name: data?.name,
         desc: data?.description,
         operator: getOperator(data?.operator),
+        notification: data?.notificationEnabled,
         isPrimary: data?.excludePrimaryComponent,
         isInternal: data?.excludeInternalComponent,
         resultType: getResultType(data?.resultType)
@@ -397,38 +401,39 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
               placeholder='Enter description'
             />
           </FormControl>
-          {/* POLICY RESULT AND TYPE */}
-          <FormControl isRequired>
-            <FormLabel htmlFor='resultType'>Policy Result</FormLabel>
-            <LynkSelect
-              name='resultType'
-              value={resultTypeOptions.find(
-                (opt) => opt.value === formData?.resultType
-              )}
-              onChange={(selectedItem) =>
-                handleSelectChange(selectedItem, 'resultType')
-              }
-              options={resultTypeOptions}
-              id='policy_result_type'
-              dropDown
-            />
-          </FormControl>
-          <FormControl isRequired>
-            <FormLabel htmlFor='operator'>On Conditions</FormLabel>
-            <LynkSelect
-              name='operator'
-              value={operatorOptions.find(
-                (opt) => opt.value === formData?.operator
-              )}
-              onChange={(selectedItem) =>
-                handleSelectChange(selectedItem, 'operator')
-              }
-              options={operatorOptions}
-              id='policy_result_condition'
-              dropDown
-            />
-          </FormControl>
-          <Divider />
+          <SimpleGrid w='100%' columns={2} gap={4}>
+            {/* POLICY RESULT AND TYPE */}
+            <FormControl isRequired>
+              <FormLabel htmlFor='resultType'>Policy Result</FormLabel>
+              <LynkSelect
+                name='resultType'
+                value={resultTypeOptions.find(
+                  (opt) => opt.value === formData?.resultType
+                )}
+                onChange={(selectedItem) =>
+                  handleSelectChange(selectedItem, 'resultType')
+                }
+                options={resultTypeOptions}
+                id='policy_result_type'
+                dropDown
+              />
+            </FormControl>
+            <FormControl isRequired>
+              <FormLabel htmlFor='operator'>On Conditions</FormLabel>
+              <LynkSelect
+                name='operator'
+                value={operatorOptions.find(
+                  (opt) => opt.value === formData?.operator
+                )}
+                onChange={(selectedItem) =>
+                  handleSelectChange(selectedItem, 'operator')
+                }
+                options={operatorOptions}
+                id='policy_result_condition'
+                dropDown
+              />
+            </FormControl>
+          </SimpleGrid>
           {/* CONDITIONS */}
           <FormControl isRequired>
             <FormLabel htmlFor='conditions'>Conditions</FormLabel>
@@ -457,23 +462,30 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
           {/* APPLY CONDITION */}
           <FormControl>
             <FormLabel htmlFor='doesNptapplyTo'>Does not apply to</FormLabel>
-            <Stack spacing={3} mt={3}>
+            <Flex mt={2} gap={5} align={'center'}>
               <Checkbox
                 name='isPrimary'
                 isChecked={formData?.isPrimary}
                 onChange={handleChange}
               >
-                <Text fontSize={12}>Primary Component</Text>
+                <Text fontSize={14}>Primary Component</Text>
               </Checkbox>
               <Checkbox
                 name='isInternal'
                 isChecked={formData?.isInternal}
                 onChange={handleChange}
               >
-                <Text fontSize={12}>Internal Components</Text>
+                <Text fontSize={14}>Internal Components</Text>
               </Checkbox>
-            </Stack>
+            </Flex>
           </FormControl>
+          <Checkbox
+            name='notification'
+            isChecked={formData?.notification}
+            onChange={handleChange}
+          >
+            <Text fontSize={14}>Notification</Text>
+          </Checkbox>
           {/* ERROR HANDLING */}
           {error !== '' && <LynkAlert msg={error} />}
         </Flex>

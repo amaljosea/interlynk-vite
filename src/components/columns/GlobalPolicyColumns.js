@@ -21,6 +21,8 @@ import LynkSwitch from 'components/Misc/LynkSwitch'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useThemeColor } from 'hooks/useThemeColors'
 
+import { LuCircleCheck, LuCircleX } from 'react-icons/lu'
+
 const GlobalPolicyColumns = ({ action, handleApply }) => {
   const params = useParams()
   const productId = params.productid
@@ -42,13 +44,15 @@ const GlobalPolicyColumns = ({ action, handleApply }) => {
 
   const {
     primaryBlueText,
-    primaryTextColor,
     primaryErrorColor,
+    primarySuccessColor,
+    primaryTextColor,
     secondaryTextColor
   } = useThemeColor([
     'primaryBlueText',
-    'primaryTextColor',
     'primaryErrorColor',
+    'primarySuccessColor',
+    'primaryTextColor',
     'secondaryTextColor'
   ])
 
@@ -86,7 +90,18 @@ const GlobalPolicyColumns = ({ action, handleApply }) => {
             </Text>
           </Stack>
         ),
-        width: productId ? '50%' : '32%',
+        width: '32%',
+        wrap: true
+      },
+      {
+        id: 'NOTIFICATION',
+        name: 'NOTIFICATION',
+        selector: (row) =>
+          row?.notificationEnabled ? (
+            <LuCircleCheck fontSize={20} color={primarySuccessColor} />
+          ) : (
+            <LuCircleX fontSize={20} color={primaryErrorColor} />
+          ),
         wrap: true
       },
       {
@@ -228,6 +243,7 @@ const GlobalPolicyColumns = ({ action, handleApply }) => {
     handleApply,
     primaryBlueText,
     primaryErrorColor,
+    primarySuccessColor,
     primaryTextColor,
     productId,
     removePolicy,
