@@ -1,31 +1,25 @@
 import { useMemo } from 'react'
 import { truncatedValue } from 'utils'
 
-import { CheckCircleIcon, CloseIcon } from '@chakra-ui/icons'
-import { Box, Flex, IconButton, Select, Text } from '@chakra-ui/react'
+import { Flex, IconButton, Select, Text } from '@chakra-ui/react'
 
 import EditButton from 'components/Icons/EditButton'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { LuEye } from 'react-icons/lu'
+import { LuCircleCheck, LuCircleX, LuEye } from 'react-icons/lu'
 
 const AttributionReportsColumns = ({
   onEdit,
   sourcePreferences,
   setSourcePreferences
 }) => {
-  const {
-    primaryErrorColor,
-    primarySuccessColor,
-    primaryTextColor,
-    primaryBgColor
-  } = useThemeColor([
-    'primaryErrorColor',
-    'primarySuccessColor',
-    'primaryTextColor',
-    'primaryBgColor'
-  ])
+  const { primaryErrorColor, primarySuccessColor, primaryTextColor } =
+    useThemeColor([
+      'primaryErrorColor',
+      'primarySuccessColor',
+      'primaryTextColor'
+    ])
 
   const columns = useMemo(() => {
     const handleSourceChange = (componentId, value) => {
@@ -140,19 +134,9 @@ const AttributionReportsColumns = ({
               onClick={() => onEdit(row, 'notice')}
             />
             {getValueFromSource(row, 'notice') ? (
-              <CheckCircleIcon color={primarySuccessColor} w={4} h={4} />
+              <LuCircleCheck fontSize={20} color={primarySuccessColor} />
             ) : (
-              <Box
-                display='flex'
-                alignItems='center'
-                justifyContent='center'
-                bg={primaryErrorColor}
-                borderRadius='full'
-                width='16px'
-                height='16px'
-              >
-                <CloseIcon color={primaryBgColor} boxSize='8px' />
-              </Box>
+              <LuCircleX fontSize={20} color={primaryErrorColor} />
             )}
           </Flex>
         ),
@@ -177,19 +161,9 @@ const AttributionReportsColumns = ({
               onClick={() => onEdit(row, 'copyright')}
             />
             {getValueFromSource(row, 'copyright') ? (
-              <CheckCircleIcon color={primarySuccessColor} w={4} h={4} />
+              <LuCircleCheck fontSize={20} color={primarySuccessColor} />
             ) : (
-              <Box
-                display='flex'
-                alignItems='center'
-                justifyContent='center'
-                bg={primaryErrorColor}
-                borderRadius='full'
-                width='16px'
-                height='16px'
-              >
-                <CloseIcon color={primaryBgColor} boxSize='8px' />
-              </Box>
+              <LuCircleX fontSize={20} color={primaryErrorColor} />
             )}
           </Flex>
         ),
@@ -215,13 +189,12 @@ const AttributionReportsColumns = ({
       }
     ]
   }, [
-    primaryTextColor,
-    primarySuccessColor,
-    primaryErrorColor,
-    primaryBgColor,
-    onEdit,
+    setSourcePreferences,
     sourcePreferences,
-    setSourcePreferences
+    primaryTextColor,
+    onEdit,
+    primarySuccessColor,
+    primaryErrorColor
   ])
 
   return columns
