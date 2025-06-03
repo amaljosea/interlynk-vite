@@ -21,6 +21,8 @@ import slackPng from '../../assets/img/Slack.png'
 import teamsPng from '../../assets/img/Teams.png'
 import githubBlackPng from '../../assets/img/github-black.png'
 import githubWhitePng from '../../assets/img/github-white.png'
+import linearDark from '../../assets/img/linear_dark.png'
+import linearLight from '../../assets/img/linear_light.png'
 import Card from '../Card/Card'
 import CardBody from '../Card/CardBody'
 import CardHeader from '../Card/CardHeader'
@@ -29,6 +31,7 @@ import ConnectionCard from './ConnectionCard'
 import EmailConfigModal from './EmailConfigModal'
 import GithubConfigModal from './GithubConfigModal'
 import JiraConfigModal from './JiraConfigModal'
+import LinearConfigModal from './LinearConfigModal'
 import SlackConfigModal from './SlackConfigModal'
 import TeamsConfigModal from './TeamsConfigModal'
 
@@ -62,6 +65,7 @@ const Connections = ({ org }) => {
   const TEAM = useDisclosure()
   const EMAIL = useDisclosure()
   const GITHUB = useDisclosure()
+  const LINEAR = useDisclosure()
   const BITBUCKET = useDisclosure()
 
   const [greenCheck, setGreenCheck] = useState({
@@ -69,7 +73,8 @@ const Connections = ({ org }) => {
     slack: false,
     teams: false,
     github: false,
-    bitbucket: false
+    bitbucket: false,
+    linear: false
   })
 
   const [hostId, setHostId] = useState(null)
@@ -77,6 +82,7 @@ const Connections = ({ org }) => {
   const [slackData, setSlackData] = useState([])
   const [teamsData, setTeamsData] = useState([])
   const [emailData, setEmailData] = useState([])
+  const [linearData, setLinearData] = useState(null)
   const [githubData, setGithubData] = useState(null)
   const [bitbucketData, setBitbucketData] = useState(null)
 
@@ -86,6 +92,10 @@ const Connections = ({ org }) => {
         case 'JiraConnection':
           setGreenCheck((prev) => ({ ...prev, jira: true }))
           setJiraData(connection)
+          break
+        case 'LinearConnection':
+          setGreenCheck((prev) => ({ ...prev, linear: true }))
+          setLinearData(connection)
           break
         case 'SlackConnection':
           setGreenCheck((prev) => ({ ...prev, slack: true }))
@@ -117,6 +127,8 @@ const Connections = ({ org }) => {
     switch (type) {
       case 'Jira':
         return 'Jira integration allows easy creation of vulnerability, license or component issues on connected Jira boards.'
+      case 'Linear':
+        return 'Linear streamline issues, projects, and product roadmaps.'
       case 'Slack':
         return 'Slack integration supports delivering Interlynk notifications in configured Slack Channel.'
       case 'Teams':
@@ -138,6 +150,7 @@ const Connections = ({ org }) => {
     setTeamsData(null)
     setEmailData(null)
     setGithubData(null)
+    setLinearData(null)
     setBitbucketData(null)
 
     const hostId = org ? data?.organization?.id : data?.organizationUser?.id
@@ -191,6 +204,15 @@ const Connections = ({ org }) => {
                 onConfigure={JIRA.onOpen}
                 isConnected={greenCheck.jira}
                 description={getDescription('Jira')}
+              />
+            )}
+            {org && !isFreeTier && (
+              <ConnectionCard
+                name='Linear'
+                onConfigure={LINEAR.onOpen}
+                isConnected={greenCheck.linear}
+                description={getDescription('Linear')}
+                iconSrc={colorMode === 'light' ? linearDark : linearLight}
               />
             )}
             {!isFreeTier && (
@@ -253,6 +275,16 @@ const Connections = ({ org }) => {
           isOpen={JIRA.isOpen}
           onClose={JIRA.onClose}
           updateCon={updateCon}
+          setGreenCheck={setGreenCheck}
+        />
+      )}
+
+      {LINEAR.isOpen && (
+        <LinearConfigModal
+          data={linearData}
+          updateCon={updateCon}
+          isOpen={LINEAR.isOpen}
+          onClose={LINEAR.onClose}
           setGreenCheck={setGreenCheck}
         />
       )}

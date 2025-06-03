@@ -2337,6 +2337,64 @@ export const CreateBulkJiraIssue = gql`
   }
 `
 
+export const CreateLinearConnection = gql`
+  mutation CreateLinearConnection($apiToken: String!, $url: String!) {
+    linearConnectionCreate(input: { apiToken: $apiToken, url: $url }) {
+      organizationConnection {
+        id
+        enabled
+        connection {
+          ... on LinearConnection {
+            apiToken
+            url
+          }
+        }
+      }
+      errors
+    }
+  }
+`
+
+export const DeleteLinearConnection = gql`
+  mutation DeleteLinearConnection($organizationConnectionId: ID!) {
+    linearConnectionDelete(
+      input: { organizationConnectionId: $organizationConnectionId }
+    ) {
+      errors
+      organizationConnection {
+        id
+      }
+    }
+  }
+`
+
+export const LinearCreateIssue = gql`
+  mutation LinearCreateIssue(
+    $componentVulnId: ID!
+    $assigneeId: ID
+    $title: String!
+    $description: String!
+    $projectId: ID
+    $stateId: ID
+    $teamId: ID!
+  ) {
+    linearIssueCreate(
+      input: {
+        componentVulnId: $componentVulnId
+        assigneeId: $assigneeId
+        title: $title
+        description: $description
+        projectId: $projectId
+        stateId: $stateId
+        teamId: $teamId
+      }
+    ) {
+      issueUrl
+      errors
+    }
+  }
+`
+
 export const CreateSlackConnection = gql`
   mutation CreateSlackConnection(
     $configs: [ConnectionConfigInput!]!

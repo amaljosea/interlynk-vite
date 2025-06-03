@@ -4288,6 +4288,11 @@ export const GetOrgConnections = gql`
                 frequency
               }
             }
+            ... on LinearConnection {
+              id
+              url
+              apiToken
+            }
           }
         }
       }
@@ -4413,6 +4418,62 @@ export const JiraInformation = gql`
       issueTypes(projectKey: $pKey) {
         id
         name
+      }
+    }
+  }
+`
+
+export const VerifyLinearToken = gql`
+  query VerifyLinearToken($apiToken: String!, $url: String!) {
+    organization {
+      linearVerify(apiToken: $apiToken, url: $url) {
+        name
+        email
+        accountId
+        url
+        organizationId
+        organizationName
+      }
+    }
+  }
+`
+
+export const LinearTeams = gql`
+  query LinearTeams {
+    linear {
+      teams {
+        id
+        name
+      }
+    }
+  }
+`
+
+export const LinearTeamData = gql`
+  query LinearTeamData($teamId: ID!) {
+    linear(teamId: $teamId) {
+      projects {
+        id
+        name
+      }
+      issueTypes {
+        id
+        name
+        description
+        scope
+        color
+      }
+      workflowStates {
+        id
+        name
+        type
+      }
+      users {
+        id
+        name
+        email
+        displayName
+        active
       }
     }
   }

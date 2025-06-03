@@ -13,6 +13,7 @@ import ImportWizard from 'views/Sbom/components/ImportWizard'
 import { Flex, useDisclosure } from '@chakra-ui/react'
 
 import JiraCreateIssueModal from 'components/Connections/JiraCreateIssueModal'
+import LinearCreateIssueModal from 'components/Connections/LinearCreateIssueModal'
 import VulnDrawer from 'components/Drawer/VulnDrawer'
 import VulnLinkDrawer from 'components/Drawer/VulnLinkDrawer'
 import LynkDrawer from 'components/LynkDrawer'
@@ -164,6 +165,7 @@ const Vulnerabilities = ({ sbomData }) => {
   const CVSS = useDisclosure()
   const VULN = useDisclosure()
   const IMPORT = useDisclosure()
+  const LINEAR = useDisclosure()
   const CUSTOM_VULNS = useDisclosure()
   const DELETE = useDisclosure()
 
@@ -340,6 +342,8 @@ const Vulnerabilities = ({ sbomData }) => {
         return DELETE.onOpen()
       case 'sync_issue_tracker_tickets':
         return handleSync()
+      case 'create_linear_ticket':
+        return LINEAR.onOpen()
       default:
         return VEX.onOpen()
     }
@@ -439,6 +443,15 @@ const Vulnerabilities = ({ sbomData }) => {
           setToggleClear={setToggleClear}
         />
       )}
+
+      {LINEAR.isOpen && (
+        <LinearCreateIssueModal
+          row={activeRow}
+          isOpen={LINEAR.isOpen}
+          onClose={LINEAR.onClose}
+        />
+      )}
+
       {/* COPY DATA TABLE */}
       {IMPORT.isOpen && nodes && (
         <LynkDrawer
