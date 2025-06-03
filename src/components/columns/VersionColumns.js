@@ -296,9 +296,8 @@ const VersionColumns = (props) => {
               >
                 {notStarted ? '-' : stats?.vulnStats?.high || 0}
               </VulnBadge>
-              {total !== 0 && (
+              {vulnRunStatus === 'FINISHED' && total !== 0 && (
                 <Popover
-                  key={row?.id}
                   placement='right'
                   closeOnBlur={false}
                   returnFocusOnClose={false}
