@@ -85,8 +85,8 @@ const ProdFilterMenu = (props) => {
   })
 
   const { data, loading } = useQuery(GetLabels, {
-    variables: { first: 100 },
-    skip: productPermissions === false
+    variables: { first: 200 },
+    skip: productPermissions === false || isFreeTier
   })
   const { nodes } = data?.labels || {}
 

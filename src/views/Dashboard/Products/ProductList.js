@@ -16,18 +16,16 @@ import { GetProductTable } from 'graphQL/Queries'
 function ProductList() {
   const { setIsOpen } = useTour()
   const filter = useQueryParam('lifestage')
+  const productId = useQueryParam('id')
+
   const { dispatch, prodState } = useGlobalState()
   const { prodDispatch, prodCompDispatch, prodVulnDispatch } = dispatch
   const { field, direction, enabled, searchInput, labelIds, lifestage } =
     prodState
 
-  const product = useQueryParam('id')
-
-  const productPermissions = useHasPermission({
+  const hasProductPermission = useHasPermission({
     parentKey: 'view_product_group'
   })
-
-  console.warn('filter', filter)
 
   const productLifestage = filter
     ? [filter]
@@ -40,56 +38,45 @@ function ProductList() {
     direction,
     enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
     labelIds: getUndefinedIfEmptyOrAll(labelIds),
-    search: searchInput !== '' ? searchInput : undefined,
+    search: searchInput || undefined,
     lifestage: productLifestage
   }
 
   const { nodes, paginationProps, reset, loading, error } = usePaginatedQuery(
     GetProductTable,
     {
-      skip: productPermissions === false,
+      skip: hasProductPermission === false,
       selector: 'organization.projectGroups',
-      variables: {
-        ...filters
-      },
-      onCompleted: (data) =>
+      variables: filters,
+      onCompleted: (data) => {
         prodDispatch({
           type: 'GET_DATA',
           payload: data?.organization?.projectGroups
         })
+      }
     }
   )
 
   useEffect(() => {
     if (nodes) {
-      prodDispatch({
-        type: 'SET_TOTAL_PRODUCT',
-        payload: nodes.totalCount
-      })
+      prodDispatch({ type: 'SET_TOTAL_PRODUCT', payload: nodes.totalCount })
     }
   }, [nodes, prodDispatch])
 
   useEffect(() => {
-    if (filter) {
-      prodDispatch({
-        type: 'PRODUCT_BY_LIFESTAGE',
-        payload: [filter]
-      })
-    } else {
-      prodDispatch({
-        type: 'PRODUCT_BY_LIFESTAGE',
-        payload: []
-      })
-    }
+    prodDispatch({
+      type: 'PRODUCT_BY_LIFESTAGE',
+      payload: filter ? [filter] : []
+    })
   }, [filter, prodDispatch])
 
   useEffect(() => {
-    if (product === null) {
+    if (!productId) {
       setIsOpen(false)
       prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     }
-  }, [prodCompDispatch, prodVulnDispatch, product, setIsOpen])
+  }, [productId, setIsOpen, prodCompDispatch, prodVulnDispatch])
 
   if (error) {
     return (

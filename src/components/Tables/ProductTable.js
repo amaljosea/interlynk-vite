@@ -12,8 +12,8 @@ import { Flex, useDisclosure } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import BitbucketProjects from 'components/Drawer/BitbucketProjects'
+import LabelsDrawer from 'components/Drawer/LabelsDrawer'
 import ShareLynkDrawer from 'components/Drawer/ShareLynkDrawer'
-import TagDrawer from 'components/Drawer/TagDrawer'
 import LynkTable from 'components/LynkTable'
 import ProductColumns from 'components/columns/ProductColumns'
 import ProductHeader from 'components/headers/ProductHeader'
@@ -31,38 +31,15 @@ import {
 
 import Pagination from '../Pagination'
 
-const ProductTable = (props) => {
+const ProductTable = ({ data, reset, loading, paginationProps }) => {
   const navigate = useNavigate()
   const { setIsOpen } = useTour()
   const { orgView, isFreeTier } = useGlobalQueryContext()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
-  const { data, reset, loading, paginationProps } = props
-
-  const { data: conn } = useQuery(GetBitbucketConnection, {
-    skip: orgView && !isFreeTier ? false : true
-  })
-  const connections = conn?.organization?.connections?.nodes || []
-  const bitbucket = connections?.some(
-    (item) => item?.connection?.__typename === 'BitbucketConnection'
-  )
-
-  const { data: prodData } = useQuery(GetTotalProduct, {
-    skip: orgView && isFreeTier ? false : true,
-    variables: { first: 100 }
-  })
-  const { totalCount } = prodData?.organization?.projectGroups || ''
-
-  // const { headingTextColor, semiTransparentBorder } = useThemeColor([
-  //   'headingTextColor',
-  //   'semiTransparentBorder'
-  // ])
-
   const { prodState, setEnvName, setClearSelect, dispatch, envName } =
     useGlobalState()
   const { field, searchInput } = prodState
-
-  const environment = envName
   const { prodDispatch, versionDispatch } = dispatch
 
   const [activeRow, setActiveRow] = useState(null)
@@ -79,6 +56,29 @@ const ProductTable = (props) => {
   const SHARELYNK = useDisclosure()
   const GITHUB = useDisclosure()
   const BITBUCKET = useDisclosure()
+
+  const { data: conn } = useQuery(GetBitbucketConnection, {
+    skip: !(orgView && !isFreeTier)
+  })
+  const connections = conn?.organization?.connections?.nodes || []
+  const bitbucket = connections.some(
+    (item) => item?.connection?.__typename === 'BitbucketConnection'
+  )
+
+  const { data: prodData } = useQuery(GetTotalProduct, {
+    skip: !(orgView && isFreeTier),
+    variables: { first: 100 }
+  })
+  const totalCount = prodData?.organization?.projectGroups?.totalCount || 0
+
+  const { data: prodLabels, loading: labelLoading } = useQuery(GetLabels, {
+    skip: isFreeTier,
+    variables: { first: 200 }
+  })
+  const productLabels = prodLabels?.labels?.nodes || []
+
+  const [deleteProjectGroup, { loading: deleting }] =
+    useMutation(DeleteProjectGroup)
 
   const action = (type, data) => {
     setActiveRow(data)
@@ -108,36 +108,22 @@ const ProductTable = (props) => {
   }
 
   const handleClick = (data) => {
-    const { id, projects, defaultProject } = data || {}
+    const { id, projects, defaultProject } = data
     setIsOpen(false)
     setClearSelect(true)
-    const env = projects?.find((item) => item.name === environment)
-    setEnvName(env ? env?.name : defaultProject?.name)
-    prodDispatch({
-      type: 'SET_CURRENT_PRODUCT',
-      payload: { id: env?.id || defaultProject?.id }
-    })
+    const env = projects?.find((p) => p.name === envName) || defaultProject
+    setEnvName(env?.name)
+    prodDispatch({ type: 'SET_CURRENT_PRODUCT', payload: { id: env?.id } })
     versionDispatch({ type: 'FILTER_LIFESTAGE', payload: [] })
+
     const link = generateProductDetailPageUrlFromCurrentUrl({
       productgroupid: id,
-      productid: env?.id || defaultProject?.id,
-      paramsObj: {
-        tab: 'versions'
-      },
+      productid: env?.id,
+      paramsObj: { tab: 'versions' },
       replaceParams: true
     })
-
     navigate(link)
   }
-
-  const { data: prodLabels, loading: labelLoading } = useQuery(GetLabels, {
-    skip: openTagMenu ? false : true,
-    variables: { first: 100 }
-  })
-  const { nodes: productLabels } = prodLabels?.labels || ''
-
-  const [deleteProjectGroup, { loading: dLLoading }] =
-    useMutation(DeleteProjectGroup)
 
   const onProductDelete = useCallback(async () => {
     await deleteProjectGroup({ variables: { id: activeRow?.id } }).then(
@@ -280,7 +266,7 @@ const ProductTable = (props) => {
         <ConfirmationModal
           isOpen={DELETE.isOpen}
           name={activeRow.name}
-          isLoading={dLLoading}
+          isLoading={deleting}
           title='Delete Product'
           onClose={DELETE.onClose}
           onConfirm={onProductDelete}
@@ -314,7 +300,12 @@ const ProductTable = (props) => {
 
       {/* Labels */}
       {LABEL.isOpen && (
-        <TagDrawer isOpen={LABEL.isOpen} onClose={LABEL.onClose} />
+        <LabelsDrawer
+          isOpen={LABEL.isOpen}
+          onClose={LABEL.onClose}
+          data={productLabels}
+          loading={labelLoading}
+        />
       )}
 
       {/* BitBucket Projects */}
