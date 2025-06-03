@@ -1,3 +1,4 @@
+import { useQuery } from '@apollo/client'
 import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
@@ -24,12 +25,13 @@ import { ProgressBar } from 'components/ProgressBar'
 import SbomProcess from 'components/SbomProcess'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
-import { useGlobalState } from 'hooks/useGlobalState'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProjectGroup } from 'hooks/useProjectGroup'
 import { useSbomScores } from 'hooks/useSbomScores'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { useThemeColor } from 'hooks/useThemeColors'
+
+import { ActiveCompliances } from 'graphQL/Queries'
 
 import { LuArrowRight, LuPackage } from 'react-icons/lu'
 
@@ -72,8 +74,11 @@ const SbomDetails = ({ sbomData }) => {
     partsContext.pop()
   }
 
-  const { organization } = useGlobalState()
-  const { activeCompliances } = organization || ''
+  const { data: complianceData, loading: complianceLoading } =
+    useQuery(ActiveCompliances)
+
+  const activeCompliances =
+    complianceData?.organization?.activeCompliances || []
 
   const result = activeCompliances?.find((item) => item?.scoreEnabled)
 
@@ -231,7 +236,7 @@ const SbomDetails = ({ sbomData }) => {
                 </CardBody>
               </Card>
             </GridItem>
-            {!isFreeTier && (
+            {!complianceLoading && !isFreeTier && (
               <GridItem colSpan={isUnspecified ? 8 : 4}>
                 <ProgressBar
                   value={healthScore}
@@ -240,12 +245,13 @@ const SbomDetails = ({ sbomData }) => {
                 />
               </GridItem>
             )}
-            {!isUnspecified && (
+
+            {!complianceLoading && !isUnspecified && (
               <GridItem colSpan={isFreeTier ? 6 : 4}>
                 <ProgressBar
                   value={qualityScore}
                   loading={scoreLoading}
-                  text={`SBOM Quality Score ${`(${result?.complianceType?.toUpperCase()})`}`}
+                  text={`SBOM Quality Score (${result?.complianceType?.toUpperCase()})`}
                 />
               </GridItem>
             )}

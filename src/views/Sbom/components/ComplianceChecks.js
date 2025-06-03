@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { complianceData } from 'variables/general'
@@ -20,10 +20,10 @@ import CustomLoader from 'components/CustomLoader'
 import LynkDrawer from 'components/LynkDrawer'
 
 import useCustomToast from 'hooks/useCustomToast'
-import { useGlobalState } from 'hooks/useGlobalState'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { recheckHealth } from 'graphQL/Mutation'
+import { ActiveCompliances } from 'graphQL/Queries'
 
 import { LuCircleCheck, LuCircleX } from 'react-icons/lu'
 
@@ -50,8 +50,10 @@ const ComplianceChecks = (props) => {
       'sameSecondaryText'
     ])
 
-  const { organization } = useGlobalState()
-  const { activeCompliances } = organization || ''
+  const { data: compliance, loading: complianceLoading } =
+    useQuery(ActiveCompliances)
+
+  const activeCompliances = compliance?.organization?.activeCompliances || []
   const tabs = activeCompliances
     ?.filter((item) => item?.complianceType !== 'unspecified')
     ?.map((item) => item?.complianceType)
@@ -271,41 +273,45 @@ const ComplianceChecks = (props) => {
       onClose={onClose}
       noFooter
     >
-      <Tabs index={tab} onChange={onTabChange}>
-        <TabList
-          position={'fixed'}
-          bg={secondaryBgColor}
-          zIndex={1}
-          left={0}
-          right={0}
-          top={!name ? '60px' : '90px'}
-        >
-          {tabs.map((item, index) => (
-            <Tab
-              py={3.5}
-              key={index}
-              fontSize={'sm'}
-              textTransform={'uppercase'}
-              _focus={{ outline: 'none', bg: 'none' }}
-            >
-              {item}
-            </Tab>
-          ))}
-        </TabList>
-        <TabPanels pos={'relative'} top={14} overflowX={'hidden'}>
-          {tabs?.map((item, index) => (
-            <TabPanel padding={0} key={index}>
-              {item === 'bsi' ? (
-                <Center py={24} color={sameSecondaryText}>
-                  Coming Soon...
-                </Center>
-              ) : (
-                <ScoreBoard loading={getLoading(item)} data={getData(item)} />
-              )}
-            </TabPanel>
-          ))}
-        </TabPanels>
-      </Tabs>
+      {complianceLoading ? (
+        <CustomLoader />
+      ) : (
+        <Tabs index={tab} onChange={onTabChange}>
+          <TabList
+            position={'fixed'}
+            bg={secondaryBgColor}
+            zIndex={1}
+            left={0}
+            right={0}
+            top={!name ? '60px' : '90px'}
+          >
+            {tabs.map((item, index) => (
+              <Tab
+                py={3.5}
+                key={index}
+                fontSize={'sm'}
+                textTransform={'uppercase'}
+                _focus={{ outline: 'none', bg: 'none' }}
+              >
+                {item}
+              </Tab>
+            ))}
+          </TabList>
+          <TabPanels pos={'relative'} top={14} overflowX={'hidden'}>
+            {tabs?.map((item, index) => (
+              <TabPanel padding={0} key={index}>
+                {item === 'bsi' ? (
+                  <Center py={24} color={sameSecondaryText}>
+                    Coming Soon...
+                  </Center>
+                ) : (
+                  <ScoreBoard loading={getLoading(item)} data={getData(item)} />
+                )}
+              </TabPanel>
+            ))}
+          </TabPanels>
+        </Tabs>
+      )}
     </LynkDrawer>
   )
 }

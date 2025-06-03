@@ -2,7 +2,7 @@ import { gql, useLazyQuery, useQuery } from '@apollo/client'
 import { client } from 'context/ApolloWrapper'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getSignedUrlParams, truncatedValue,csvToJson } from 'utils'
+import { csvToJson, getSignedUrlParams, truncatedValue } from 'utils'
 
 import { DownloadIcon } from '@chakra-ui/icons'
 import {
@@ -35,6 +35,7 @@ import {
   GetVulnData,
   SignedSbomDownload
 } from 'graphQL/Queries'
+import { ActiveCompliances } from 'graphQL/Queries'
 
 import ComplianceChecks from './ComplianceChecks'
 import { downloadSbomPdf } from './SbomPdf'
@@ -74,7 +75,10 @@ const DownloadModal = (props) => {
 
   const productDescription = data?.projectGroup.description
 
-  const { activeCompliances } = organization || ''
+  const { data: complianceData } = useQuery(ActiveCompliances)
+
+  const activeCompliances =
+    complianceData?.organization?.activeCompliances || []
   const compliance = activeCompliances?.find((item) => item?.scoreEnabled)
   const isUnspecified =
     compliance === undefined || compliance?.complianceType === 'unspecified'

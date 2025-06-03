@@ -8,19 +8,12 @@ export const GetOrganization = gql`
       name
       tier
       updatedAt
-      activeCompliances {
-        id
-        isEnabled
-        scoreEnabled
-        complianceType
-      }
       currentUser {
         id
         name
         email
         superAdmin
         isPasswordSet
-        unconfirmedEmail
         profileImage {
           filename
           url
