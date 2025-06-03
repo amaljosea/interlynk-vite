@@ -299,7 +299,9 @@ const VersionColumns = (props) => {
               {total !== 0 && (
                 <Popover
                   key={row?.id}
+                  placement='right'
                   closeOnBlur={false}
+                  returnFocusOnClose={false}
                   isOpen={openPopoverId === row?.id}
                   onClose={() => setOpenPopoverId(null)}
                 >
@@ -316,12 +318,13 @@ const VersionColumns = (props) => {
                   <Portal>
                     <PopoverContent
                       zIndex={111}
+                      width={'200px'}
                       overflow={'hidden'}
                       color={primaryTextColor}
                       onMouseEnter={() => setOpenPopoverId(row?.id)}
                       onMouseLeave={() => setOpenPopoverId(null)}
                     >
-                      <PopoverBody minW={'250px'}>
+                      <PopoverBody>
                         <SeverityInfo data={row} onClick={onFilterSev} />
                       </PopoverBody>
                     </PopoverContent>
