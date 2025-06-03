@@ -4,6 +4,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 const LynkSeparator = ({ hidden }) => {
   const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
+
   return (
     <Text color={secondaryTextColor} hidden={hidden}>
       •

@@ -1,23 +1,34 @@
+/* eslint-disable no-unused-vars */
 import { addDays, differenceInDays, parseISO } from 'date-fns'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getFullDate, getSignedUrlParams, timeSince } from 'utils'
+import {
+  getFullDate,
+  getSignedUrlParams,
+  timeSince,
+  truncatedValue
+} from 'utils'
 
 import {
+  Box,
   Divider,
   Flex,
-  IconButton,
   Menu,
   MenuItem,
   MenuList,
+  Popover,
+  PopoverBody,
+  PopoverContent,
+  PopoverTrigger,
   Portal,
+  SimpleGrid,
   Stack,
   Tag,
+  TagLabel,
   Text,
   Tooltip
 } from '@chakra-ui/react'
 
-import LynkSeparator from 'components/LynkSeparator'
 import LynkAction from 'components/Misc/LynkAction'
 import VulnBadge from 'components/Misc/VulnBadge'
 
@@ -36,6 +47,46 @@ const StatusInfo = ({ data }) => {
       <Text>Affected: {data?.affectedCount}</Text>
       <Text>Not Afftected: {data?.notAffectedCount}</Text>
       <Text>Fixed: {data?.fixedCount}</Text>
+    </Stack>
+  )
+}
+
+const SeverityInfo = ({ data, onClick }) => {
+  const { generateProductVersionDetailPageUrlFromCurrentUrl } =
+    useProductUrlContext()
+
+  const { stats, id, vulnRunStatus } = data || {}
+  const notStarted = vulnRunStatus === 'NOT_STARTED'
+
+  const link = generateProductVersionDetailPageUrlFromCurrentUrl({
+    sbomid: id,
+    paramsObj: {
+      tab: 'vulnerabilities'
+    }
+  })
+
+  const vulnStats = [
+    { label: 'medium', color: 'yellow', value: stats?.vulnStats?.medium || 0 },
+    { label: 'low', color: 'green', value: stats?.vulnStats?.low || 0 },
+    { label: 'unknown', color: 'gray', value: stats?.vulnStats?.unknown || 0 }
+  ]
+
+  return (
+    <Stack w={'100%'} spacing={2} py={1}>
+      {vulnStats.map((item, index) => (
+        <SimpleGrid key={index} columns={2} gap={2}>
+          <Text fontSize={14} textTransform={'capitalize'}>
+            {item.label}
+          </Text>
+          <VulnBadge
+            color={item.color}
+            status={vulnRunStatus}
+            onClick={() => onClick([item.label], id, link)}
+          >
+            {notStarted ? '-' : item.value}
+          </VulnBadge>
+        </SimpleGrid>
+      ))}
     </Stack>
   )
 }
@@ -71,6 +122,8 @@ const VersionColumns = (props) => {
     parentKey: 'view_sbom',
     childKey: 'update_sbom'
   })
+
+  const [openPopoverId, setOpenPopoverId] = useState(null)
 
   const retention = retentionTime && Math.floor(retentionTime)
 
@@ -108,12 +161,18 @@ const VersionColumns = (props) => {
 
           return (
             <Stack my={3} spacing={1} className={index === 0 ? 'versions' : ''}>
-              <Link to={link} onClick={onStartTour} data-testid={`version`}>
-                <Text w={'fit-content'} color={primaryBlueText} fontSize={14}>
-                  {projectVersion}
-                </Text>
-              </Link>
               <Flex gap={2} alignItems={'center'} flexWrap={'wrap'}>
+                <Link to={link} onClick={onStartTour} data-testid={`version`}>
+                  <Tooltip label={projectVersion}>
+                    <Text
+                      w={'fit-content'}
+                      color={primaryBlueText}
+                      fontSize={14}
+                    >
+                      {truncatedValue(projectVersion, 8)}
+                    </Text>
+                  </Tooltip>
+                </Link>
                 {productLifeCycleStage && (
                   <Tag
                     fontSize={12}
@@ -125,34 +184,30 @@ const VersionColumns = (props) => {
                     {lifestage}
                   </Tag>
                 )}
-                <LynkSeparator hidden={!daysUntilDeletion || signedUrlParams} />
                 {daysUntilDeletion && !signedUrlParams && (
                   <Tooltip
                     label={`Marked for deletion on ${endDate ? new Date(endDate).toLocaleDateString() : ''}`}
                   >
-                    <IconButton
-                      size={'xs'}
-                      icon={<LuMessageCircleOff size={16} />}
-                    />
+                    <Box>
+                      <LuMessageCircleOff size={16} color={primaryTextColor} />
+                    </Box>
                   </Tooltip>
                 )}
-                <LynkSeparator
-                  hidden={alternatives?.length === 0 || signedUrlParams}
-                />
                 {!isReprocess && showIcon && (
                   <Tooltip label={ignoreMsg}>
-                    <IconButton size={'xs'} icon={<LuRepeat size={16} />} />
+                    <Box>
+                      <LuRepeat size={16} color={primaryTextColor} />
+                    </Box>
                   </Tooltip>
                 )}
-                <LynkSeparator hidden={signedUrlParams} />
-                <Tooltip label={getFullDate(updatedAt)} placement='top'>
-                  <Text color={secondaryTextColor}>{timeSince(updatedAt)}</Text>
-                </Tooltip>
               </Flex>
+              <Tooltip label={getFullDate(updatedAt)} placement='top'>
+                <Text color={secondaryTextColor}>{timeSince(updatedAt)}</Text>
+              </Tooltip>
             </Stack>
           )
         },
-        width: '20%',
+        width: '25%',
         wrap: true,
         sortable: true,
         sortFunction: (a, b) => {
@@ -176,11 +231,13 @@ const VersionColumns = (props) => {
                 }
               })}
             >
-              <Text color={primaryTextColor}>{stats?.compCount}</Text>
+              <Tag minW={'50px'} colorScheme='teal'>
+                <TagLabel mx={'auto'}> {stats?.compCount}</TagLabel>
+              </Tag>
             </Link>
           )
         },
-        width: '10%'
+        width: '13%'
       },
       // LICENSES
       {
@@ -189,23 +246,25 @@ const VersionColumns = (props) => {
         selector: (row) => {
           const { stats } = row
           return (
-            <Text
+            <Tag
+              minW={'50px'}
+              colorScheme='orange'
               onClick={() => onSelectLicenses(row)}
-              color={primaryTextColor}
             >
-              {stats?.compLicenseCount}
-            </Text>
+              <TagLabel mx={'auto'}> {stats?.compLicenseCount}</TagLabel>
+            </Tag>
           )
         },
-        width: '8%'
+        width: '10%'
       },
       // VULNERABILITIES
       {
         id: 'VULNERABILITIES',
         name: 'VULNERABILITIES',
-        width: '30%',
+        width: '22%',
         selector: (row) => {
-          const { stats, id, vulnRunStatus } = row
+          const { id, stats, vulnRunStatus } = row
+          const { vulnStats } = stats || {}
           const notStarted = vulnRunStatus === 'NOT_STARTED'
           const link = generateProductVersionDetailPageUrlFromCurrentUrl({
             sbomid: id,
@@ -213,8 +272,14 @@ const VersionColumns = (props) => {
               tab: 'vulnerabilities'
             }
           })
+          const { critical, high, ...rest } = vulnStats
+          const total = Object.values(rest).reduce(
+            (sum, value) => sum + value,
+            0
+          )
+
           return (
-            <Flex gap={1} flexWrap={'wrap'} my={4}>
+            <Flex gap={2}>
               <VulnBadge
                 color='red'
                 label='Critical'
@@ -231,30 +296,38 @@ const VersionColumns = (props) => {
               >
                 {notStarted ? '-' : stats?.vulnStats?.high || 0}
               </VulnBadge>
-              <VulnBadge
-                color='yellow'
-                label='Medium'
-                status={vulnRunStatus}
-                onClick={() => onFilterSev(['medium'], id, link)}
-              >
-                {notStarted ? '-' : stats?.vulnStats?.medium || 0}
-              </VulnBadge>
-              <VulnBadge
-                color='green'
-                label='Low'
-                status={vulnRunStatus}
-                onClick={() => onFilterSev(['low'], id, link)}
-              >
-                {notStarted ? '-' : stats?.vulnStats?.low || 0}
-              </VulnBadge>
-              <VulnBadge
-                color='gray'
-                label='Unknown'
-                status={vulnRunStatus}
-                onClick={() => onFilterSev(['unknown'], id, link)}
-              >
-                {notStarted ? '-' : stats?.vulnStats?.unknown || 0}
-              </VulnBadge>
+              {total !== 0 && (
+                <Popover
+                  key={row?.id}
+                  closeOnBlur={false}
+                  isOpen={openPopoverId === row?.id}
+                  onClose={() => setOpenPopoverId(null)}
+                >
+                  <PopoverTrigger>
+                    <Tag
+                      minW={'60px'}
+                      colorScheme='gray'
+                      onMouseEnter={() => setOpenPopoverId(row?.id)}
+                      onMouseLeave={() => setOpenPopoverId(null)}
+                    >
+                      <TagLabel mx={'auto'}>+{total}</TagLabel>
+                    </Tag>
+                  </PopoverTrigger>
+                  <Portal>
+                    <PopoverContent
+                      zIndex={111}
+                      overflow={'hidden'}
+                      color={primaryTextColor}
+                      onMouseEnter={() => setOpenPopoverId(row?.id)}
+                      onMouseLeave={() => setOpenPopoverId(null)}
+                    >
+                      <PopoverBody minW={'250px'}>
+                        <SeverityInfo data={row} onClick={onFilterSev} />
+                      </PopoverBody>
+                    </PopoverContent>
+                  </Portal>
+                </Popover>
+              )}
             </Flex>
           )
         }
@@ -263,7 +336,7 @@ const VersionColumns = (props) => {
       {
         id: 'STATUSES',
         name: 'STATUSES',
-        width: '8%',
+        width: '10%',
         selector: (row) => {
           const { vulnerabilityMetrics } = row
           const total = Number(
@@ -275,11 +348,13 @@ const VersionColumns = (props) => {
           )
           return (
             <Tooltip label={<StatusInfo data={vulnerabilityMetrics} />}>
-              <Text color={primaryTextColor}>{total}</Text>
+              <Tag minW={'50px'} colorScheme='blue'>
+                <TagLabel mx={'auto'}> {total}</TagLabel>
+              </Tag>
             </Tooltip>
           )
         },
-        omit: signedUrlParams
+        omit: true
       },
       // CREATED AT
       {
@@ -292,7 +367,7 @@ const VersionColumns = (props) => {
               <Text
                 color={secondaryTextColor}
                 textAlign={'right'}
-                fontSize={12}
+                fontSize={14}
               >
                 {timeSince(createdAt)}
               </Text>
@@ -395,6 +470,7 @@ const VersionColumns = (props) => {
     onFilterSev,
     onSelectLicenses,
     onStartTour,
+    openPopoverId,
     primaryBlueText,
     primaryErrorColor,
     primaryTextColor,
