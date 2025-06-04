@@ -5838,3 +5838,45 @@ export const GetComponentDataForExport = gql`
     }
   }
 `
+export const GetComponentDataForPdf = gql`
+  query GetComponentDataForPdf(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $first: Int
+    $after: String
+    $includeParts: Boolean
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      components(
+        sbomId: $sbomId
+        first: $first
+        after: $after
+        includeParts: $includeParts
+      ) {
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
+        nodes {
+          name
+          version
+          kind
+          purl
+          cpes
+          uniqueId
+          licensesExp
+          suppliers {
+            name
+          }
+          sbom {
+            project {
+              projectGroup {
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`

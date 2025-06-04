@@ -28,14 +28,14 @@ import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
+  ActiveCompliances,
   DownloadSBOM,
-  GetComponentData,
+  GetComponentDataForPdf,
   GetProductManufacturer,
   GetSbomQualityScores,
   GetVulnData,
   SignedSbomDownload
 } from 'graphQL/Queries'
-import { ActiveCompliances } from 'graphQL/Queries'
 
 import ComplianceChecks from './ComplianceChecks'
 import { downloadSbomPdf } from './SbomPdf'
@@ -163,7 +163,7 @@ const DownloadModal = (props) => {
       while (componentsHasNextPage || vulnsHasNextPage) {
         if (componentsHasNextPage) {
           const componentsRes = await client.query({
-            query: GetComponentData,
+            query: GetComponentDataForPdf,
             variables: {
               projectId: productId,
               sbomId,
