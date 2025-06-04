@@ -1,20 +1,14 @@
 import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { generateJiraDescription } from 'utils/jiraUtils'
+import { generateDescription, generateJiraDescription } from 'utils/ticketUtils'
 
-import {
-  FormControl,
-  FormLabel,
-  Grid,
-  Input,
-  Stack,
-  Textarea
-} from '@chakra-ui/react'
+import { FormControl, FormLabel, Grid, Input, Stack } from '@chakra-ui/react'
 
 import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
 import LynkSelect from 'components/LynkSelect'
+import { MarkdownPreview } from 'components/MarkdownPreview'
 
 import useCustomToast from 'hooks/useCustomToast'
 
@@ -65,7 +59,6 @@ const JiraCreateIssueModal = ({
   const [priorities, setPriorities] = useState([])
   const [priority, setPriority] = useState(null)
 
-  const [labels, setLabels] = useState([])
   const [label, setLabel] = useState(null)
 
   const [description, setDescription] = useState('')
@@ -305,7 +298,7 @@ const JiraCreateIssueModal = ({
 
   useEffect(() => {
     if (selectedVulns?.length === 0) {
-      const description = generateJiraDescription(row)
+      const description = generateDescription('jira', row)
       setDescription(description)
       setSummary(`[Vulnerability]: ${row?.vuln?.vulnId}`)
     } else {
@@ -351,10 +344,11 @@ const JiraCreateIssueModal = ({
     setIsCreateDisabled(true)
     const filteredLabels = label?.map((item) => item?.value)
     const components = formValues?.Components || null
+    const desc = generateJiraDescription(row)
     createJiraIssue({
       variables: {
         summary,
-        description,
+        description: desc,
         componentVulnId: row?.id,
         projectKey: project?.value,
         issueTypeId: issueType?.value,
@@ -388,7 +382,7 @@ const JiraCreateIssueModal = ({
     const filteredLabels = label?.map((item) => item?.value)
     const issues = selectedVulns?.map((item) => ({
       componentVulnId: item?.id,
-      description: generateJiraDescription(item) || '',
+      description: generateDescription('jira', item) || '',
       summary: `[Vulnerability]: ${item?.vuln?.vulnId}`
     }))
     createBulkIssue({
@@ -502,7 +496,6 @@ const JiraCreateIssueModal = ({
             isClearable={true}
             isSearchable={true}
             placeholder='Add Labels'
-            options={labels}
             onChange={(e) => setLabel(e)}
           />
         </FormControl>
@@ -531,14 +524,7 @@ const JiraCreateIssueModal = ({
 
         <FormControl isReadOnly hidden={hasMultipleVuln}>
           <FormLabel>Description</FormLabel>
-          <Textarea
-            rows={'12'}
-            id='description'
-            name='description'
-            value={description}
-            placeholder='Description'
-            onChange={(e) => setDescription(e.target.value)}
-          />
+          <MarkdownPreview content={description} />
         </FormControl>
       </Stack>
     </LynkModal>

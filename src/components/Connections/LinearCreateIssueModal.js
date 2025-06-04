@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
-import { generateLinearDescription } from 'utils/ticketUtils'
+import { generateDescription } from 'utils/ticketUtils'
 
 import {
   FormControl,
@@ -92,7 +92,7 @@ const LinearCreateIssueModal = ({ row, isOpen, onClose }) => {
   useEffect(() => {
     if (row) {
       setTitle(`[Vulnerability]: ${row?.vuln?.vulnId}`)
-      const description = generateLinearDescription(row)
+      const description = generateDescription('linear', row)
       setDescription(description)
     }
   }, [row])

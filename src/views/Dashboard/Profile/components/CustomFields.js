@@ -63,7 +63,11 @@ const CustomFields = () => {
     {
       id: 'DISPLAY_NAME',
       name: 'DISPLAY NAME',
-      selector: (row) => <Text sx={textStyle}>{row?.displayName}</Text>,
+      selector: (row) => (
+        <Text fontSize={14} color={primaryTextColor}>
+          {row?.displayName}
+        </Text>
+      ),
       wrap: true
     },
     {
