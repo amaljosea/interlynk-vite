@@ -1681,6 +1681,25 @@ export const GetComponentData = gql`
   }
 `
 
+export const GetComponentHealthMapData = gql`
+  query GetComponentHealthMapData(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $first: Int
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      components(sbomId: $sbomId, first: $first) {
+        nodes {
+          name
+          version
+          purl
+          cpes
+        }
+      }
+    }
+  }
+`
+
 // GET TOTAL COMPONENTS
 export const GetTotalComponents = gql`
   query GetTotalComponents(

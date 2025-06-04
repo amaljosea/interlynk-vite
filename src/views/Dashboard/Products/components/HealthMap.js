@@ -19,7 +19,7 @@ import LynkDrawer from 'components/LynkDrawer'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-import { GetComponentData } from 'graphQL/Queries'
+import { GetComponentHealthMapData } from 'graphQL/Queries'
 
 const getBg = (score) => {
   if (score >= 0 && score < 30) {
@@ -68,7 +68,7 @@ const HealthMap = ({ isOpen, onClose }) => {
   const { prodCompState } = useGlobalState()
   const { totalComp } = prodCompState
 
-  const { data, loading } = useQuery(GetComponentData, {
+  const { data, loading } = useQuery(GetComponentHealthMapData, {
     skip: isOpen ? false : true,
     variables: {
       sbomId: sbomId,
