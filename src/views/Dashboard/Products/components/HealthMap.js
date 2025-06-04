@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import { useQuery } from '@apollo/client'
 import React from 'react'
 import { useParams } from 'react-router-dom'
@@ -23,14 +24,13 @@ import { GetComponentHealthMapData } from 'graphQL/Queries'
 
 const getBg = (score) => {
   if (score >= 0 && score < 30) {
-    // eslint-disable-next-line
     return 'red.300'
   } else if (score >= 30 && score < 50) {
-    // eslint-disable-next-line
     return 'yellow.300'
   } else if (score >= 50 && score <= 100) {
-    // eslint-disable-next-line
     return 'green.300'
+  } else {
+    return 'blue.300'
   }
 }
 
