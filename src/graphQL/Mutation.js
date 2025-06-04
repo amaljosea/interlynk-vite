@@ -2302,9 +2302,9 @@ export const CreateJiraIssue = gql`
   }
 `
 
-export const SbomJiraTicketSync = gql`
-  mutation SbomJiraTicketSync($sbomId: Uuid!) {
-    sbomJiraTicketSync(input: { sbomId: $sbomId }) {
+export const SbomTicketSync = gql`
+  mutation SbomTicketSync($sbomId: Uuid!) {
+    sbomTicketSync(input: { sbomId: $sbomId }) {
       errors
       success
     }

@@ -31,7 +31,7 @@ import useQueryParam from 'hooks/useQueryParam'
 import {
   CustomVulnUpdate,
   ManualVulnScan,
-  SbomJiraTicketSync
+  SbomTicketSync
 } from 'graphQL/Mutation'
 import {
   FirstDegreePartVulns,
@@ -169,7 +169,7 @@ const Vulnerabilities = ({ sbomData }) => {
   const CUSTOM_VULNS = useDisclosure()
   const DELETE = useDisclosure()
 
-  const [syncJiraTicket] = useMutation(SbomJiraTicketSync)
+  const [syncTicket] = useMutation(SbomTicketSync)
 
   const [updateVuln, { loading: deleteLoading }] = useMutation(CustomVulnUpdate)
 
@@ -182,10 +182,10 @@ const Vulnerabilities = ({ sbomData }) => {
   const { customVulnSboms } = customVuln || ''
 
   const handleSync = () => {
-    syncJiraTicket({ variables: { sbomId: sbomId } }).then((res) => {
-      if (res?.data?.sbomJiraTicketSync?.errors?.length > 0) {
+    syncTicket({ variables: { sbomId: sbomId } }).then((res) => {
+      if (res?.data?.sbomTicketSync?.errors?.length > 0) {
         showToast({
-          description: res?.data?.sbomJiraTicketSync?.errors[0],
+          description: res?.data?.sbomTicketSync?.errors[0],
           status: 'error'
         })
       } else {
