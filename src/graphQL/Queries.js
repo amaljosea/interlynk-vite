@@ -5780,3 +5780,89 @@ export const PackageVersionsTable = gql`
     }
   }
 `
+export const GetComponentDataForExport = gql`
+  query GetComponentDataForExport(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $search: String
+    $licenses: [String!]
+    $supplierName: [String!]
+    $ecosystem: [String!]
+    $supportLevel: [String!]
+    $kind: [String!]
+    $internal: Boolean
+    $primary: Boolean
+    $direct: Boolean
+    $includeParts: Boolean
+    $orderBy: ComponentOrderByInput
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      components(
+        sbomId: $sbomId
+        after: $after
+        before: $before
+        first: $first
+        last: $last
+        search: $search
+        licenses: $licenses
+        supplierName: $supplierName
+        ecosystem: $ecosystem
+        kind: $kind
+        internal: $internal
+        primary: $primary
+        direct: $direct
+        orderBy: $orderBy
+        supportLevel: $supportLevel
+        includeParts: $includeParts
+      ) {
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
+          name
+          version
+          purl
+          licensesExp
+          updatedAt
+          description
+          group
+          kind
+          internal
+          cpes
+          scope
+          primary
+          externalUrls {
+            name
+            url
+          }
+          suppliers {
+            name
+            url
+            contactName
+            contactEmail
+          }
+          componentSupportLevel {
+            level
+            endDate
+            notes
+            retainManualOverrideFor
+            user {
+              name
+            }
+          }
+          componentSupportLevelAutomatic {
+            level
+            notes
+          }
+        }
+      }
+    }
+  }
+`

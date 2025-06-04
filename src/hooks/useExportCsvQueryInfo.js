@@ -4,12 +4,12 @@ import { useParams } from 'react-router-dom'
 import {
   GetCompSupportData,
   GetCompVulnData,
-  GetComponentData,
   GetGlobalVulns,
   GetSbomLicensesTable,
   GetUsers,
   GetVulnData
 } from 'graphQL/Queries'
+import { GetComponentDataForExport } from 'graphQL/Queries'
 
 import { useGlobalState } from './useGlobalState'
 import useQueryParam from './useQueryParam'
@@ -29,7 +29,7 @@ const useExportCsvQueryInfo = (tableType, rowsToExport, searchFilters) => {
     switch (tableType) {
       case 'SBOM Components View':
         return {
-          query: GetComponentData,
+          query: GetComponentDataForExport,
           variables: {
             sbomId,
             projectId: productId,
