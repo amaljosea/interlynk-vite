@@ -5720,7 +5720,6 @@ export const PackageVersionsTable = gql`
   ) {
     packageVersions(
       packageName: $search
-      # version: "2.0.31"
       orderBy: $orderBy
       first: $first
       last: $last
@@ -5729,45 +5728,18 @@ export const PackageVersionsTable = gql`
     ) {
       totalCount
       nodes {
-        copyright
         id
-        isArchived
-        isDeprecated
-        isLatest
-        isOutdated
-        isPreRelease
-        issueTrackerUrl
-        license
-        licenseExp
-        maintainers
-        notice
-        packageId
-        publishedAt
-        purl
-        repositoryUrl
         updatedAt
         version
-        website
+        licenseExp
+        copyright
+        notice
         package {
-          createdAt
-          description
-          ecosystem
-          id
-          isDeprecated
           name
-          purl
-          updatedAt
-          website
+          ecosystem
         }
-        createdAt
         organizationPackageVersion {
-          copyrightOverride
-          createdAt
           id
-          licenseOverride
-          noticeOverride
-          organizationId
-          packageVersionId
           updatedAt
         }
       }
