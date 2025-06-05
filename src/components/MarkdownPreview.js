@@ -12,9 +12,11 @@ import {
   UnorderedList
 } from '@chakra-ui/react'
 
+import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 export const MarkdownPreview = ({ expandView = false, content }) => {
+  const { isCustomerView } = useRouteFlags()
   const { grayBorderColor, primaryTextColor, primaryBlueText } = useThemeColor([
     'grayBorderColor',
     'primaryTextColor',
@@ -28,7 +30,7 @@ export const MarkdownPreview = ({ expandView = false, content }) => {
       maxH={'300px'}
       overflow={'hidden'}
       overflowY={'scroll'}
-      w={expandView ? '40vw' : '100%'}
+      w={expandView && !isCustomerView ? '40vw' : '100%'}
       border={`1px solid ${grayBorderColor}`}
     >
       <ReactMarkdown

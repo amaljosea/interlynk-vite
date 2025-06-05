@@ -279,7 +279,7 @@ const VersionColumns = (props) => {
           )
 
           return (
-            <Flex gap={2}>
+            <Flex gap={2} alignItems={'center'}>
               <VulnBadge
                 color='red'
                 label='Critical'
@@ -296,6 +296,9 @@ const VersionColumns = (props) => {
               >
                 {notStarted ? '-' : stats?.vulnStats?.high || 0}
               </VulnBadge>
+              {signedUrlParams && (
+                <Text color={primaryTextColor}>+{total}</Text>
+              )}
               {vulnRunStatus === 'FINISHED' && total !== 0 && (
                 <Popover
                   placement='right'
