@@ -1,71 +1,33 @@
 import { useMutation } from '@apollo/client'
-import React, { useCallback, useMemo, useState } from 'react'
-import { getFullDate, timeSince, truncatedValue } from 'utils'
-import { FREE_TIER_USER_LIMIT } from 'variables/general'
-import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
+import React, { useCallback, useState } from 'react'
 import RoleModal from 'views/Dashboard/Profile/components/RoleModal'
 import TeamModal from 'views/Dashboard/Profile/components/TeamModal'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import {
-  Avatar,
-  Badge,
-  Box,
-  Flex,
-  Menu,
-  MenuItem,
-  MenuList,
-  Portal,
-  Stack,
-  Tag,
-  TagLabel,
-  Text,
-  Tooltip,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Stack, Text, useDisclosure } from '@chakra-ui/react'
 
-import AddButton from 'components/Icons/AddButton'
-import RefreshBtn from 'components/Icons/RefreshBtn'
 import LynkModal from 'components/LynkModal'
 import LynkTable from 'components/LynkTable'
-import LynkAction from 'components/Misc/LynkAction'
 import Pagination from 'components/Pagination'
+import TeamColumns from 'components/columns/TeamColumns'
+import TeamHeader from 'components/headers/TeamHeader'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
-import { useRouteFlags } from 'hooks/useRouteFlags'
-import { useThemeColor } from 'hooks/useThemeColors'
 
 import { InviteUser, deleteOrgUser } from 'graphQL/Mutation'
 import { GetUsers } from 'graphQL/Queries'
 
 import { LuUserRoundX } from 'react-icons/lu'
 
-function userTimeStart(row) {
-  let timeStart
-  if (row.invitationStatus === 'accepted') {
-    timeStart = row.invitationAcceptedAt
-      ? row.invitationAcceptedAt
-      : row.createdAt
-  }
-  return timeStart
-}
-
 const TeamTable = () => {
   const activetab = useQueryParam('tab')
-  const { isCustomerView } = useRouteFlags()
   const { showToast } = useCustomToast()
   const { organization } = useGlobalState()
-  const SERVER_URL = process.env.REACT_APP_SERVER
 
-  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
-
-  const { tier, currentUser } = organization || ''
-  const { email } = currentUser || ''
-  const isFreeTier = tier === 'free'
+  const { currentUser } = organization || {}
 
   const USER = useDisclosure()
   const TEAM = useDisclosure()
@@ -86,194 +48,45 @@ const TeamTable = () => {
 
   const numberOfUsers = nodes?.length
 
-  const inviteUser = useHasPermission({
-    parentKey: 'view_users',
-    childKey: 'invite_users'
-  })
+  const onResendInvite = async (row) => {
+    await inviteUsers({
+      variables: {
+        email: row?.email.toLowerCase(),
+        roleId: row?.role?.id
+      }
+    }).then((res) => {
+      if (res.data.organizationUserInvite.errors.length > 0) {
+        showToast({
+          description: res.data.organizationUserInvite.errors[0],
+          status: 'error'
+        })
+      } else {
+        showToast({
+          description: 'Invitation sent successfully',
+          status: 'success'
+        })
+      }
+    })
+  }
+
+  const action = (type, data) => {
+    setActiveRow(data)
+    switch (type) {
+      case 'change_role':
+        return ROLE.onOpen()
+      case 'revoke_invitation':
+        return USER.onOpen()
+      case 'resend_invite':
+        return onResendInvite()
+      case 'add_user':
+        return TEAM.onOpen()
+    }
+  }
 
   const editUserRole = useHasPermission({
     parentKey: 'view_users',
     childKey: 'edit_user_role'
   })
-
-  const removeUser = useHasPermission({
-    parentKey: 'view_users',
-    childKey: 'remove_user'
-  })
-
-  // COLUMNS
-  const columns = [
-    {
-      id: 'email',
-      name: 'EMAIL',
-      selector: (row) => {
-        const { profileImage } = row
-        return (
-          <Flex
-            justifyContent={'center'}
-            sx={{ w: '100%', px: 0, py: '.8rem', gap: 2, alignItems: 'center' }}
-          >
-            <Avatar
-              size={'sm'}
-              name={row?.name || 'User'}
-              src={profileImage && `${SERVER_URL}/${profileImage?.url}`}
-            />
-            <Text fontSize={14} color={primaryTextColor} my={2}>
-              {row?.email}
-            </Text>
-          </Flex>
-        )
-      },
-      width: '32%',
-      wrap: true
-    },
-    {
-      id: 'name',
-      name: 'NAME',
-      selector: (row) => (
-        <Flex gap={row.name !== '' ? 2 : 0} sx={{ alignItems: 'center' }}>
-          <Text
-            color={primaryTextColor}
-            sx={{ fontSize: 14, w: 'fit-content' }}
-          >
-            {row.name ? truncatedValue(row.name, 20) : 'N/A'}
-          </Text>
-          {row.email === email && (
-            <Badge
-              variant='outline'
-              colorScheme='blue'
-              sx={{ py: 1, px: 2, borderRadius: 4 }}
-            >
-              You
-            </Badge>
-          )}
-        </Flex>
-      ),
-      width: '21%',
-      wrap: true
-    },
-    {
-      id: 'role',
-      name: 'ROLE',
-      selector: (row) => (
-        <Text
-          fontSize={14}
-          color={primaryTextColor}
-          textTransform={'capitalize'}
-        >
-          {row?.role?.name || ''}
-        </Text>
-      ),
-      width: '8%'
-    },
-    {
-      id: 'joinedDate',
-      name: 'JOINED',
-      selector: (row) => {
-        const timeStart = userTimeStart(row)
-        return (
-          <Tooltip label={getFullDate(timeStart)} placement={'top'}>
-            <Text
-              fontSize={14}
-              color={primaryTextColor}
-              textTransform={'capitalize'}
-            >
-              {timeStart ? timeSince(timeStart) : ''}
-            </Text>
-          </Tooltip>
-        )
-      },
-      center: 'true',
-      sortable: true,
-      sortFunction: (a, b) => {
-        const aUserStart = userTimeStart(a)
-        const bUserStart = userTimeStart(b)
-        if (!aUserStart && !bUserStart) return 0
-        if (!aUserStart) return 1
-        if (!bUserStart) return -1
-        const dateA = new Date(aUserStart)
-        const dateB = new Date(bUserStart)
-        return dateA - dateB // Sort in descending order
-      },
-      width: '16%'
-    },
-    {
-      id: 'status',
-      name: 'STATUS',
-      selector: (row) => {
-        const { invitationStatus } = row
-        return (
-          <Tag
-            variant='subtle'
-            colorScheme={
-              invitationStatus === 'invited'
-                ? 'orange'
-                : invitationStatus === 'accepted'
-                  ? 'green'
-                  : invitationStatus === 'declined'
-                    ? 'red'
-                    : 'blue'
-            }
-            sx={{ w: 'fit-content', textTransform: 'capitalize' }}
-          >
-            <TagLabel mx='auto'>
-              {invitationStatus?.replace(/_/g, ' ')}
-            </TagLabel>
-          </Tag>
-        )
-      },
-      center: true,
-      width: '13%'
-    },
-    {
-      id: 'action',
-      name: 'ACTION',
-      selector: (row) => {
-        const { invitationStatus } = row
-        return (
-          <Menu>
-            <LynkAction />
-            <Portal>
-              <MenuList fontSize={'sm'}>
-                <MenuItem
-                  isDisabled={row.email === email || !editUserRole}
-                  onClick={() => {
-                    setActiveRow(row)
-                    ROLE.onOpen()
-                  }}
-                >
-                  Change Role
-                </MenuItem>
-                <MenuItem
-                  isDisabled={row.email === email || !removeUser}
-                  onClick={() => {
-                    setActiveRow(row)
-                    USER.onOpen()
-                  }}
-                >
-                  {invitationStatus === 'declined' ||
-                  invitationStatus === 'invited'
-                    ? 'Revoke Invitation'
-                    : 'Remove User'}
-                </MenuItem>
-                {(invitationStatus === 'declined' ||
-                  invitationStatus === 'invited' ||
-                  invitationStatus === 'pending_registration') && (
-                  <MenuItem
-                    onClick={() => onResendInvite(row)}
-                    isDisabled={!inviteUser}
-                  >
-                    Resend Invite
-                  </MenuItem>
-                )}
-              </MenuList>
-            </Portal>
-          </Menu>
-        )
-      },
-      right: 'true'
-    }
-  ]
 
   // CLEAR SEARCH
   const handleClear = useCallback(async () => {
@@ -302,67 +115,18 @@ const TeamTable = () => {
     }
   }, [])
 
-  // HEADER SECTION
-  const subHeaderComponent = useMemo(() => {
-    return (
-      <Flex w={'100%'} alignItems={'center'} justifyContent={'space-between'}>
-        {/* SEARCH COMPONENTS */}
-        <SearchFilter
-          id='team'
-          onClear={handleClear}
-          onFilter={handleSearch}
-          filterText={searchInput}
-          onChange={onSearchInputChange}
-        />
+  // COLUMNS
+  const columns = TeamColumns({ action })
 
-        <Flex sx={{ gap: 2, justifyContent: 'flex-end' }}>
-          {/* EXPORT CSV */}
-          {!isCustomerView && (
-            <ExportCsv
-              tableType='Users'
-              filters={{
-                search: searchInput !== '' ? searchInput : undefined
-              }}
-            />
-          )}
-          {/* INVITE USER */}
-          <Box position='relative'>
-            <Tooltip
-              label={
-                isFreeTier && numberOfUsers >= FREE_TIER_USER_LIMIT
-                  ? 'Limit reached for free tier'
-                  : 'Invite User'
-              }
-              placement='bottom'
-              isDisabled={false} // Ensure the tooltip is never disabled
-            >
-              <Box>
-                <AddButton
-                  aria-label='add_user'
-                  onClick={TEAM.onOpen}
-                  isDisabled={
-                    !inviteUser ||
-                    (isFreeTier && numberOfUsers >= FREE_TIER_USER_LIMIT)
-                  }
-                />
-              </Box>
-            </Tooltip>
-          </Box>
-          <RefreshBtn />
-        </Flex>
-      </Flex>
-    )
-  }, [
+  // HEADER SECTION
+  const subHeader = TeamHeader({
+    action,
+    searchInput,
     handleClear,
     handleSearch,
-    searchInput,
     onSearchInputChange,
-    isFreeTier,
-    numberOfUsers,
-    TEAM.onOpen,
-    inviteUser,
-    isCustomerView
-  ])
+    numberOfUsers
+  })
 
   const handleRemove = async () => {
     await deleteUser({
@@ -374,27 +138,6 @@ const TeamTable = () => {
       .finally(() => USER.onClose())
   }
 
-  const onResendInvite = async (row) => {
-    await inviteUsers({
-      variables: {
-        email: row?.email.toLowerCase(),
-        roleId: row?.role?.id
-      }
-    }).then((res) => {
-      if (res.data.organizationUserInvite.errors.length > 0) {
-        showToast({
-          description: res.data.organizationUserInvite.errors[0],
-          status: 'error'
-        })
-      } else {
-        showToast({
-          description: 'Invitation sent successfully',
-          status: 'success'
-        })
-      }
-    })
-  }
-
   return (
     <>
       <LynkTable
@@ -402,8 +145,8 @@ const TeamTable = () => {
         columns={columns}
         data={nodes || []}
         progressPending={loading}
+        subHeaderComponent={subHeader}
         defaultSortFieldId={'joinedDate'}
-        subHeaderComponent={subHeaderComponent}
       />
 
       <Pagination {...paginationProps} />

@@ -84,10 +84,10 @@ const TeamModal = ({ isOpen, onClose, data, changeRole }) => {
         >
           <FormLabel>Email</FormLabel>
           <Input
-            type='text'
+            type='email'
             value={email}
-            textTransform={'lowercase'}
             onChange={onChaneEmail}
+            placeholder='Enter email address'
           />
           {email !== '' && !validateEmail(email) && (
             <FormErrorMessage>Email is invalid</FormErrorMessage>
