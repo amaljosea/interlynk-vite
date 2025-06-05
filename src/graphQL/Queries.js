@@ -1681,6 +1681,37 @@ export const GetComponentData = gql`
   }
 `
 
+export const GetPrimaryComponentData = gql`
+  query GetPrimaryComponentData($projectId: Uuid!, $sbomId: Uuid!) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      components(sbomId: $sbomId, first: 1, primary: true) {
+        nodes {
+          id
+          sbomId
+          name
+          version
+          description
+          copyright
+          group
+          kind
+          licensesExp
+          scope
+          primary
+          internal
+          purl
+          cpes
+          suppliers {
+            name
+            url
+            contactName
+            contactEmail
+          }
+        }
+      }
+    }
+  }
+`
+
 export const GetComponentHealthMapData = gql`
   query GetComponentHealthMapData(
     $projectId: Uuid!

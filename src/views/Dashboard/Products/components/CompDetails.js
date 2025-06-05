@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
 import { transformLicenseString } from 'utils'
 import { infoData } from 'variables/general'
 import { componentTypes } from 'variables/general'
@@ -36,6 +37,8 @@ import ActionButton from './ActionButton'
 const CompDetails = ({ data, primaryComp }) => {
   const { showToast } = useCustomToast()
   const { isCustomerView } = useRouteFlags()
+  const params = useParams()
+  const productId = params.productid
 
   const { dispatch } = useGlobalState()
   const { prodCompDispatch } = dispatch
@@ -54,8 +57,7 @@ const CompDetails = ({ data, primaryComp }) => {
   } = useContext(TabContext)
   const { details } = tabData
 
-  const { sbomId, sbom } = data || {}
-  const { id: productId } = sbom?.project || {}
+  const { sbomId } = data || {}
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 

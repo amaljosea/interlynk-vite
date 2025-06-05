@@ -26,7 +26,7 @@ import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { recheckHealth, sbomDelete } from 'graphQL/Mutation'
 import {
   GetCheckResults,
-  GetComponentData,
+  GetPrimaryComponentData,
   GetProject,
   ShareProject
 } from 'graphQL/Queries'
@@ -119,12 +119,11 @@ const SbomActions = ({ sbom }) => {
     nodes: primaryComponent,
     loading: primaryCompLoading,
     error
-  } = usePaginatedQuery(GetComponentData, {
+  } = usePaginatedQuery(GetPrimaryComponentData, {
     skip: signedUrlParams,
     selector: 'sbom.components',
     variables: {
-      primary: true,
-      sbomId: sbomId,
+      sbomId,
       projectId: productId
     }
   })
