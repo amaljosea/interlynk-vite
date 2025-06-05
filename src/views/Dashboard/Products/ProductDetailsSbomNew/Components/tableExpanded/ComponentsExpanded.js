@@ -139,9 +139,9 @@ const ExpandedComponent = (props) => {
           />
           {/*  Depends On */}
           <DetailItem
-            value={dependsOn?.length === 0 && 'N/A'}
-            colSpan={3}
+            colSpan={4}
             label='Depends On'
+            value={dependsOn?.length === 0 && 'N/A'}
           >
             <Flex alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
               {dependsOn?.length > 0 &&
@@ -168,7 +168,7 @@ const ExpandedComponent = (props) => {
           </DetailItem>
           {/* Dependency Of */}
           <DetailItem
-            colSpan={3}
+            colSpan={4}
             label='Dependency Of'
             value={dependencyOf?.length === 0 && 'N/A'}
           >
