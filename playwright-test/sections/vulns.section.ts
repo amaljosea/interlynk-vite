@@ -57,6 +57,7 @@ export default class VulnsSection {
       await this.page.waitForTimeout(3000)
       await this.page.getByRole('tab', { name: 'general' }).click()
 
+      await this.page.reload()
       await this.page
         .waitForSelector(selector, { state: 'visible' })
         .then(async () => {
@@ -302,6 +303,7 @@ export default class VulnsSection {
           await this.page.waitForTimeout(3000)
           await this.page.getByRole('tab', { name: 'general' }).click()
 
+          await this.page.reload()
           await this.page
             .waitForSelector(selector, {
               state: 'visible'
