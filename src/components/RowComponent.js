@@ -1,3 +1,4 @@
+import { useCallback, useMemo } from 'react'
 import { truncatedValue } from 'utils'
 
 import { Tag, Text, useDisclosure } from '@chakra-ui/react'
@@ -8,27 +9,23 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import ComponentCard from './Misc/ComponentCard'
 
-const RowComponent = ({ key, content }) => {
+const RowComponent = ({ content }) => {
   const tab = useQueryParam('tab')
   const { isCustomerView } = useRouteFlags()
   const { primaryBlueText, primaryTextColor } = useThemeColor([
     'primaryBlueText',
     'primaryTextColor'
   ])
-
-  const { name } = content || ''
-
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const onView = () => (isCustomerView ? null : onOpen())
+  const onView = useCallback(() => {
+    if (!isCustomerView) onOpen()
+  }, [isCustomerView, onOpen])
 
-  const getValue = () => {
-    if (typeof content === 'string') {
-      return truncatedValue(content, 40)
-    } else {
-      return truncatedValue(name, 40)
-    }
-  }
+  const displayValue = useMemo(() => {
+    const value = typeof content === 'string' ? content : content?.name || ''
+    return truncatedValue(value, 40)
+  }, [content])
 
   const textStyle = {
     fontSize: 14,
@@ -36,17 +33,13 @@ const RowComponent = ({ key, content }) => {
     cursor: 'pointer'
   }
 
+  const Element = tab === 'licenses' ? Tag : Text
+
   return (
     <>
-      {tab === 'licenses' ? (
-        <Tag key={key} onClick={onView} cursor={'pointer'}>
-          {getValue()}
-        </Tag>
-      ) : (
-        <Text {...textStyle} onClick={onView}>
-          {getValue()}
-        </Text>
-      )}
+      <Element onClick={onView} {...textStyle}>
+        {displayValue}
+      </Element>
 
       {isOpen && (
         <ComponentCard value={content} isOpen={isOpen} onClose={onClose} />
