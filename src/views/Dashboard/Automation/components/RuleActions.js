@@ -32,12 +32,6 @@ const RuleActions = ({
             [field]: value,
             subject: isComponent ? 'component' : 'version'
           }
-        } else if (field === 'operator') {
-          return {
-            ...item,
-            [field]: value,
-            value: value === 'set' ? '' : 'primary_component.version'
-          }
         } else {
           return {
             ...item,
@@ -106,6 +100,54 @@ const RuleActions = ({
     { label: 'No', value: 'false' }
   ]
 
+  const primaryOptions = [
+    {
+      label: 'Primary Component',
+      options: [
+        {
+          label: 'Primary Component License Expression',
+          value: 'primary_component.license_exp'
+        },
+        { label: 'Primary Component PURL', value: 'primary_component.purl' },
+        { label: 'Primary Component CPE', value: 'primary_component.cpe' },
+        {
+          label: 'Primary Component Supplier Organization Name',
+          value: 'primary_component.supplier_name'
+        },
+        {
+          label: 'Primary Component Supplier URL',
+          value: 'primary_component.supplier_url'
+        },
+        {
+          label: 'Primary Component Supplier Contact Name',
+          value: 'primary_component.supplier_contact_name'
+        },
+        {
+          label: 'Primary Component Supplier Contact Email',
+          value: 'primary_component.supplier_contact_email'
+        },
+        { label: 'Primary Component Group', value: 'primary_component.group' },
+        { label: 'Primary Component Name', value: 'primary_component.name' },
+        {
+          label: 'Primary Component Version',
+          value: 'primary_component.version'
+        },
+        {
+          label: 'Primary Component Support Level',
+          value: 'primary_component.support_level'
+        },
+        {
+          label: 'Primary Component End of Support',
+          value: 'primary_component.end_of_support'
+        },
+        {
+          label: 'Primary Component Internal',
+          value: 'primary_component.internal'
+        }
+      ]
+    }
+  ]
+
   const supportOptions = [
     { label: '-- Select --', value: '' },
     { label: 'Unspecified', value: 'UNSPECIFIED' },
@@ -124,6 +166,19 @@ const RuleActions = ({
     { label: 'Copy', value: 'copy' },
     { label: 'Set', value: 'set' }
   ]
+
+  const formatGroupLabel = (data) => (
+    <Flex justifyContent={'space-between'} alignItems={'center'}>
+      <Text>Primary Component</Text>
+      <Text>{data?.options?.length}</Text>
+    </Flex>
+  )
+
+  const Option = (props) => {
+    const { data } = props
+    const result = data?.label?.replace('Primary Component', '').trim()
+    return <components.Option {...props}>{result}</components.Option>
+  }
 
   return (
     <>
@@ -210,32 +265,54 @@ const RuleActions = ({
                   onChange={(value) => handleDateChange(value, item?.id)}
                 />
               ) : (
-                <FormControl as={Flex} alignItems='center' gap={2}>
-                  <Input
-                    type={'text'}
-                    placeholder={'Add value'}
-                    value={item.value}
-                    onChange={(e) =>
-                      onActionChange(e.target.value, item.id, 'value')
-                    }
-                    isReadOnly={item?.operator === 'copy'}
-                    isDisabled={
-                      conditionErrorMessage || conditions?.length === 0
-                    }
-                  />
-                  <Flex gap={4} justifyContent={'space-between'}>
-                    {index !== 0 && (
-                      <DeleteButton
-                        onClick={() => onDeleteAction(item)}
-                        aria-label={'Remove action'}
-                        display={
-                          conditionErrorMessage || conditions?.length === 0
-                            ? 'none'
-                            : 'flex'
-                        }
-                      />
-                    )}
-                  </Flex>
+                <FormControl
+                  as={Flex}
+                  alignItems='center'
+                  gap={index !== 0 ? 2 : 0}
+                >
+                  {item?.operator === 'copy' ? (
+                    <LynkSelect
+                      type='text'
+                      onChange={(selected) => {
+                        onActionChange(selected?.value, item.id, 'value')
+                      }}
+                      placeholder='-- Select --'
+                      options={primaryOptions}
+                      value={
+                        primaryOptions[0]?.options.find(
+                          (option) => option.value === item?.value
+                        ) || null
+                      }
+                      dropDown
+                      components={{ Option }}
+                      formatGroupLabel={formatGroupLabel}
+                    />
+                  ) : (
+                    <Input
+                      type={'text'}
+                      placeholder={'Add value'}
+                      value={item.value}
+                      onChange={(e) =>
+                        onActionChange(e.target.value, item.id, 'value')
+                      }
+                      isReadOnly={item?.operator === 'copy'}
+                      isDisabled={
+                        conditionErrorMessage || conditions?.length === 0
+                      }
+                    />
+                  )}
+
+                  {index !== 0 && (
+                    <DeleteButton
+                      onClick={() => onDeleteAction(item)}
+                      aria-label={'Remove action'}
+                      display={
+                        conditionErrorMessage || conditions?.length === 0
+                          ? 'none'
+                          : 'flex'
+                      }
+                    />
+                  )}
                 </FormControl>
               )}
             </Flex>

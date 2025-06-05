@@ -76,57 +76,84 @@ export const useAutomationColumns = (
     version: <BiLayer fontSize={18} />
   }
   return [
+    // REORDER
+    {
+      id: 'REORDER',
+      name: '',
+      selector: (row) => {
+        return (
+          <div
+            draggable={editAutomations}
+            onDrag={() => setActiveRow(row)}
+            onDrop={(e) => moveRow(e, row)}
+          >
+            <LuGripVertical size={20} cursor={'move'} color='darkgray' />
+          </div>
+        )
+      },
+      width: '5%',
+      wrap: true
+    },
+    // STATUS
+    {
+      id: 'STATUS',
+      name: 'STATUS',
+      selector: (row) => {
+        return (
+          <LynkSwitch
+            isChecked={row?.active}
+            isDisabled={!editAutomations}
+            onChange={() => {
+              setActiveRow(row)
+              RULE_ACTIVE.onOpen()
+            }}
+          />
+        )
+      },
+      width: '8%',
+      wrap: true
+    },
     // RULE
     {
-      id: 'priority',
+      id: 'UPDATED_AT',
       name: 'RULE',
       selector: (row) => {
-        const { automationConditions, createdAt } = row
+        const { automationConditions, updatedAt } = row
         const actionField =
           subOperators?.automationConditionSubjectFieldMapping?.find(
             (item) => item?.key === automationConditions[0]?.field
           )
         return (
           <Flex alignItems={'center'} gap={3} my={3}>
-            <div
-              draggable={editAutomations}
-              onDrag={() => setActiveRow(row)}
-              onDrop={(e) => moveRow(e, row)}
-            >
-              <LuGripVertical size={20} cursor={'move'} color='darkgray' />
-            </div>
-            <LynkSwitch
-              isChecked={row?.active}
-              isDisabled={!editAutomations}
-              onChange={() => {
-                setActiveRow(row)
-                RULE_ACTIVE.onOpen()
-              }}
-            />
             <Tooltip
               label={actionField?.subject}
               textTransform={'capitalize'}
               placement={'top'}
             >
-              <IconButton
-                icon={automationIcon[actionField?.subject]}
-                size={'sm'}
-              />
+              <IconButton icon={automationIcon[actionField?.subject]} />
             </Tooltip>
 
             <Flex direction={'column'} alignItems={'start'} gap={1}>
-              <Text fontSize={14} color={primaryTextColor}>{row?.name}</Text>
-              <Tooltip label={getFullDate(createdAt)} placement='top'>
+              <Text fontSize={14} color={primaryTextColor}>
+                {row?.name}
+              </Text>
+              <Tooltip label={getFullDate(updatedAt)} placement='top'>
                 <Text color={secondaryTextColor} textAlign={'right'}>
-                  {timeSince(createdAt)}
+                  {timeSince(updatedAt)}
                 </Text>
               </Tooltip>
             </Flex>
           </Flex>
         )
       },
-      width: '50%',
-      wrap: true
+      width: '30%',
+      wrap: true,
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a?.updatedAt)
+        const dateB = new Date(b?.updatedAt)
+        return dateA - dateB
+      }
     },
     // CONDITION
     {
@@ -178,54 +205,6 @@ export const useAutomationColumns = (
       },
       wrap: true,
       sortable: false
-    },
-    // CREATED AT
-    {
-      id: 'CREATED_AT',
-      name: 'CREATED',
-      selector: (row) => {
-        const { createdAt } = row
-        return (
-          <Tooltip label={getFullDate(createdAt)} placement='top'>
-            <Text fontSize={14} color={primaryTextColor} textAlign={'right'}>
-              {timeSince(createdAt)}
-            </Text>
-          </Tooltip>
-        )
-      },
-      width: '10%',
-      right: 'true',
-      // sortable: true,
-      sortFunction: (a, b) => {
-        const dateA = new Date(a.createdAt)
-        const dateB = new Date(b.createdAt)
-        return dateA - dateB
-      },
-      omit: true
-    },
-    // UPDATED AT
-    {
-      id: 'UPDATED_AT',
-      name: 'UPDATED',
-      selector: (row) => {
-        const { updatedAt } = row
-        return (
-          <Tooltip label={getFullDate(updatedAt)} placement='top'>
-            <Text fontSize={14} color={primaryTextColor} textAlign={'right'}>
-              {timeSince(updatedAt)}
-            </Text>
-          </Tooltip>
-        )
-      },
-      // sortable: true,
-      sortFunction: (a, b) => {
-        const dateA = new Date(a.updatedAt)
-        const dateB = new Date(b.updatedAt)
-        return dateA - dateB
-      },
-      width: '10%',
-      right: 'true',
-      omit: true
     },
     // ACTIONS
     {
