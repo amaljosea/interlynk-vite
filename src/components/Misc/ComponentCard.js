@@ -1,10 +1,12 @@
 import { gql, useQuery } from '@apollo/client'
 import { PackageURL } from 'packageurl-js'
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { EditIcon } from '@chakra-ui/icons'
 import {
+  Button,
+  ButtonGroup,
   Divider,
   Flex,
   IconButton,
@@ -12,7 +14,6 @@ import {
   Stack,
   Text
 } from '@chakra-ui/react'
-import { Button, ButtonGroup } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import LynkModal from 'components/LynkModal'
@@ -24,7 +25,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { LuComponent, LuLayers } from 'react-icons/lu'
 import { PiTreeStructure } from 'react-icons/pi'
 
-export const GetComponentData = gql`
+const GetComponentData = gql`
   query GetComponentData($projectId: Uuid!, $sbomId: Uuid!, $search: String) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       components(sbomId: $sbomId, search: $search) {
@@ -33,7 +34,6 @@ export const GetComponentData = gql`
           name
           kind
           purl
-          cpes
           version
           primary
           internal
@@ -44,23 +44,22 @@ export const GetComponentData = gql`
   }
 `
 
-const ComponentCard = ({ value, isOpen, onClose }) => {
+const ComponentCard = ({ value: componentData, isOpen, onClose }) => {
   const params = useParams()
   const navigate = useNavigate()
   const { dispatch } = useGlobalState()
-
   const { prodCompDispatch } = dispatch
-
-  const isChnagelog = typeof value === 'string'
-  const componentName = isChnagelog ? value?.split(' ')[0] : value?.name
 
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
 
-  const link = generateProductVersionDetailPageUrlFromCurrentUrl({
-    paramsObj: {
-      tab: 'components'
-    }
+  const isChangelogView = typeof componentData === 'string'
+  const componentName = isChangelogView
+    ? componentData?.split(' ')[0]
+    : componentData?.name
+
+  const linkToComponentTab = generateProductVersionDetailPageUrlFromCurrentUrl({
+    paramsObj: { tab: 'components' }
   })
 
   const { primaryBlueText, sameSecondaryText, infoTextColor } = useThemeColor([
@@ -69,10 +68,8 @@ const ComponentCard = ({ value, isOpen, onClose }) => {
     'infoTextColor'
   ])
 
-  const [pkg, setPkg] = useState(null)
-
   const { data, loading } = useQuery(GetComponentData, {
-    skip: isOpen ? false : true,
+    skip: !isOpen,
     variables: {
       sbomId: params.sbomid,
       projectId: params.productid,
@@ -80,9 +77,26 @@ const ComponentCard = ({ value, isOpen, onClose }) => {
     }
   })
 
-  const { nodes } = data?.sbom?.components || ''
-  const { name, version, kind, purl, licensesExp, primary, internal } =
-    nodes?.length > 0 ? nodes[0] : ''
+  const component = data?.sbom?.components?.nodes?.[0] || {}
+  const {
+    name = 'N/A',
+    version = 'N/A',
+    kind = 'N/A',
+    purl,
+    licensesExp = 'N/A',
+    primary,
+    internal
+  } = component
+
+  const parsedPurl = useMemo(() => {
+    if (!purl) return null
+    try {
+      return PackageURL.fromString(purl)
+    } catch (err) {
+      console.warn('Invalid PURL:', err)
+      return null
+    }
+  }, [purl])
 
   const label = { fontSize: 12, color: sameSecondaryText }
   const infoStyle = {
@@ -98,39 +112,19 @@ const ComponentCard = ({ value, isOpen, onClose }) => {
     variant: 'outline'
   }
 
-  const onCheck = () => {
-    prodCompDispatch({
-      type: 'CHANGE_SEARCH_INPUT',
-      payload: componentName || ''
-    })
-    prodCompDispatch({
-      type: 'SET_EXPAND',
-      payload: componentName || ''
-    })
-    navigate(link)
+  const handleEditComponent = () => {
+    prodCompDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: componentName })
+    prodCompDispatch({ type: 'SET_EXPAND', payload: componentName })
+    navigate(linkToComponentTab)
   }
 
-  const onCheckTree = () => {
-    if (nodes?.length > 0) {
-      prodCompDispatch({
-        type: 'CHANGE_SEARCH_INPUT',
-        payload: componentName || ''
-      })
-      prodCompDispatch({ type: 'SET_COMPONENT', payload: nodes[0] })
-      navigate(link)
+  const handleViewHierarchy = () => {
+    if (component?.id) {
+      prodCompDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: componentName })
+      prodCompDispatch({ type: 'SET_COMPONENT', payload: component })
+      navigate(linkToComponentTab)
     }
   }
-
-  useEffect(() => {
-    if (purl) {
-      try {
-        const result = PackageURL.fromString(purl)
-        setPkg(result)
-      } catch (ex) {
-        console.warn('ex', ex)
-      }
-    }
-  }, [purl])
 
   return (
     <LynkModal
@@ -138,7 +132,7 @@ const ComponentCard = ({ value, isOpen, onClose }) => {
       onClose={onClose}
       title='Component Details'
       Icon={LuLayers}
-      noFooter={true}
+      noFooter
       maxW={'600px'}
     >
       {loading ? (
@@ -161,22 +155,23 @@ const ComponentCard = ({ value, isOpen, onClose }) => {
               {name}
             </Text>
           </Flex>
+
           <SimpleGrid columns={3} gap={5}>
             <Stack spacing={1}>
               <Text {...label}>Ecosystem</Text>
-              <Text {...infoStyle}>{pkg?.type || 'N/A'}</Text>
+              <Text {...infoStyle}>{parsedPurl?.type || 'N/A'}</Text>
             </Stack>
             <Stack spacing={1}>
               <Text {...label}>Version</Text>
-              <Text {...infoStyle}>{version || 'N/A'}</Text>
+              <Text {...infoStyle}>{version}</Text>
             </Stack>
             <Stack spacing={1}>
               <Text {...label}>Type</Text>
-              <Text {...infoStyle}>{kind || 'N/A'}</Text>
+              <Text {...infoStyle}>{kind}</Text>
             </Stack>
             <Stack spacing={1}>
               <Text {...label}>License</Text>
-              <Text {...infoStyle}>{licensesExp || 'N/A'}</Text>
+              <Text {...infoStyle}>{licensesExp}</Text>
             </Stack>
             <Stack spacing={1}>
               <Text {...label}>Primary</Text>
@@ -187,19 +182,20 @@ const ComponentCard = ({ value, isOpen, onClose }) => {
               <Text {...infoStyle}>{internal ? 'Yes' : 'No'}</Text>
             </Stack>
           </SimpleGrid>
+
           <Stack spacing={4}>
             <Divider />
             <ButtonGroup>
               <Button
                 {...buttonStyle}
-                onClick={onCheckTree}
+                onClick={handleViewHierarchy}
                 leftIcon={<PiTreeStructure fontSize={16} />}
               >
-                Component Hierachy
+                Component Hierarchy
               </Button>
               <Button
                 {...buttonStyle}
-                onClick={onCheck}
+                onClick={handleEditComponent}
                 leftIcon={<EditIcon fontSize={16} />}
               >
                 Edit Component
