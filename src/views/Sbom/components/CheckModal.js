@@ -1,4 +1,4 @@
-import { useLazyQuery, useMutation } from '@apollo/client'
+import { gql, useLazyQuery, useMutation } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -25,9 +25,29 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
-import { GetComponentData } from 'graphQL/Queries'
 
 import { LuWrench } from 'react-icons/lu'
+
+export const GetComponentData = gql`
+  query GetComponentData(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $first: Int
+    $orderBy: ComponentOrderByInput
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
+      components(sbomId: $sbomId, first: $first, orderBy: $orderBy) {
+        nodes {
+          id
+          sbomId
+          name
+          version
+        }
+      }
+    }
+  }
+`
 
 const CheckModal = (props) => {
   const { isOpen, onClose, activeRow, ruleExists, recheck } = props
@@ -108,6 +128,23 @@ const CheckModal = (props) => {
   const [getCompData, { data }] = useLazyQuery(GetComponentData, {
     fetchPolicy: 'network-only'
   })
+
+  useEffect(() => {
+    if (PRIMARY_COMPONENT) {
+      getCompData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: 100,
+          orderBy: { field, direction }
+        }
+      }).then((res) => {
+        if (res.data) {
+          setComponentList(res.data.sbom.components.nodes)
+        }
+      })
+    }
+  }, [direction, field, getCompData, PRIMARY_COMPONENT, productId, sbomId])
 
   const [createRule, { loading: ruleLoading }] =
     useMutation(AutomationRuleCreate)
@@ -337,22 +374,6 @@ const CheckModal = (props) => {
       document.removeEventListener('click', handleClickOutside)
     }
   }, [])
-
-  useEffect(() => {
-    if (PRIMARY_COMPONENT) {
-      getCompData({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: 100,
-          field: field,
-          direction: direction
-        }
-      }).then(
-        (res) => res.data && setComponentList(res.data.sbom.components.nodes)
-      )
-    }
-  }, [direction, field, getCompData, PRIMARY_COMPONENT, productId, sbomId])
 
   return (
     <LynkModal

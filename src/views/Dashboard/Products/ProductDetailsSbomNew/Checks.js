@@ -13,6 +13,7 @@ import { Flex, useDisclosure } from '@chakra-ui/react'
 
 import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import LicenseModal from 'components/LicenseModal'
+import LynkTable from 'components/LynkTable'
 import Pagination from 'components/Pagination'
 
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -27,7 +28,6 @@ import FixedModal from '../components/FixedModal'
 import ChecksColumns from './Components/tableColumns/ChecksColumns'
 import ChecksSubHeader from './Components/tableSubHeaders/ChecksSubHeader'
 import Support from './SbomChecks/Support'
-import LynkTable from 'components/LynkTable'
 
 const Checks = ({ sbomData }) => {
   const params = useParams()
