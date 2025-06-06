@@ -1,7 +1,6 @@
 import { useQuery } from '@apollo/client'
 import { useEffect } from 'react'
-import { useParams } from 'react-router-dom'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   getFullDate,
   getSignedUrlParams,
@@ -11,13 +10,21 @@ import {
 } from 'utils'
 import SbomActions from 'views/Sbom/components/SbomActions'
 
-import { EditIcon } from '@chakra-ui/icons'
-import { Flex, TagRightIcon, Text, Tooltip } from '@chakra-ui/react'
-import { Tag, TagLabel } from '@chakra-ui/react'
-import { Icon } from '@chakra-ui/react'
-import { Grid, GridItem } from '@chakra-ui/react'
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@chakra-ui/react'
-import { useDisclosure } from '@chakra-ui/react'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  Flex,
+  Grid,
+  GridItem,
+  Icon,
+  Tag,
+  TagLabel,
+  TagRightIcon,
+  Text,
+  Tooltip,
+  useDisclosure
+} from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -33,7 +40,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ActiveCompliances } from 'graphQL/Queries'
 
-import { LuArrowRight, LuPackage } from 'react-icons/lu'
+import { LuArrowRight, LuPackage, LuSquarePen } from 'react-icons/lu'
 
 import LifecycleModal from '../../components/LifecycleModal'
 
@@ -189,7 +196,7 @@ const SbomDetails = ({ sbomData }) => {
                         {String(lifecycleData?.stage).replace(/_/g, ' ')}
                       </TagLabel>
                       <TagRightIcon
-                        as={EditIcon}
+                        as={LuSquarePen}
                         onClick={onOpen}
                         hidden={isArchived}
                         label={'add_lifecycle'}
@@ -201,9 +208,9 @@ const SbomDetails = ({ sbomData }) => {
               <Text
                 wordBreak={'break-all'}
                 hidden={description === ''}
-                sx={{ w: '90%', mb: 1, mr: 'auto', fontSize: 'sm' }}
+                sx={{ w: '100%', mb: 1, mr: 'auto', fontSize: 'sm' }}
               >
-                {description}
+                {truncatedValue(description, 200)}...
               </Text>
             </GridItem>
             <GridItem colSpan={4} hidden={isArchived}>
