@@ -92,7 +92,7 @@ const AttributionReportsEditModal = ({
     const variables = {
       id: rowData?.id,
       sbomId,
-      [updateKey]: value || undefined
+      [updateKey]: value || ''
     }
 
     try {
