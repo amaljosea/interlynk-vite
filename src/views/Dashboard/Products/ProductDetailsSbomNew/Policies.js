@@ -39,9 +39,7 @@ const Policies = ({ sbomData }) => {
     usePaginatedQuery(PolicyResults, {
       skip: activeTab === 'policies' ? false : true,
       selector: 'policyResults',
-      variables: {
-        sbomId
-      }
+      variables: { sbomId }
     })
 
   const isInitialized = nodes?.some((item) => item?.result === 'initialized')
@@ -53,7 +51,9 @@ const Policies = ({ sbomData }) => {
 
   const [policyScan] = useMutation(SbomPolicyScan)
 
-  const shouldPoll = isInitialized
+  const shouldPoll = nodes?.some(
+    (item) => item?.sbom?.policyRunStatus === 'IN_PROGRESS'
+  )
 
   useGradualPolling({ shouldPoll, startPolling, stopPolling })
 
@@ -93,17 +93,15 @@ const Policies = ({ sbomData }) => {
     <>
       <Flex flexDir={'column'} width={'100%'}>
         <LynkTable
+          subHeader
           columns={columns}
           data={nodes || []}
-          progressPending={loading}
-          subHeader
-          subHeaderComponent={subHeader}
-          expandableRows
           expandOnRowClicked
+          progressPending={loading}
+          expandableRows={!shouldPoll}
+          subHeaderComponent={subHeader}
           expandableRowsComponent={ExpandedComponent}
-          expandableRowsComponentProps={{
-            onCheckViolations
-          }}
+          expandableRowsComponentProps={{ onCheckViolations }}
         />
 
         <Pagination {...paginationProps} />

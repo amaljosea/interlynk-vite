@@ -57,13 +57,15 @@ const PolicyColumns = (isInitialized) => {
             violationsCount,
             sbom: { policyRunStatus }
           } = row
-          if (isInitialized || policyRunStatus !== 'FINISHED')
-            return <Spinner size='xs' mt={0.5} />
           const vColor =
             violationsCount === 0 ? 'green' : getResultColor(resultType)
+
+          if (isInitialized || policyRunStatus !== 'FINISHED')
+            return <Spinner size={'sm'} color={primaryTextColor} />
+
           return (
             <Tag width={'60px'} colorScheme={vColor}>
-              <TagLabel mx={'auto'} pt={0.5}>
+              <TagLabel mx={'auto'} pt={0.4}>
                 {violationsCount}
               </TagLabel>
             </Tag>
