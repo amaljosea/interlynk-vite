@@ -5,15 +5,25 @@ export const useDataTableStyles = () => {
     headingTextColor,
     hoverBgColor,
     semiTransparentBorder,
-    grayHeaderColor
+    grayHeaderColor,
+    cardBg
   } = useThemeColor([
     'headingTextColor',
     'hoverBgColor',
     'semiTransparentBorder',
-    'grayHeaderColor'
+    'grayHeaderColor',
+    'cardBg'
   ])
 
   return {
+    head: {
+      style: {
+        top: 0,
+        zIndex: 10,
+        position: 'sticky',
+        backgroundColor: cardBg
+      }
+    },
     headCells: {
       style: {
         fontFamily: 'inherit',

@@ -196,6 +196,10 @@ const colors = {
   graphGreenColor: {
     light: '#38a169',
     dark: '#38a169'
+  },
+  cardBg: {
+    light: '#FFFFFF',
+    dark: '#1f2733'
   }
 }
 

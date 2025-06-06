@@ -1,5 +1,5 @@
 import { gql } from '@apollo/client'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { Box, Flex, Text } from '@chakra-ui/react'
@@ -25,6 +25,7 @@ export const GetComponentData = gql`
     $before: String
     $search: String
     $internal: Boolean
+    $includeParts: Boolean
     $orderBy: ComponentOrderByInput
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
@@ -37,6 +38,7 @@ export const GetComponentData = gql`
         last: $last
         search: $search
         internal: $internal
+        includeParts: $includeParts
 
         orderBy: $orderBy
       ) {
@@ -58,6 +60,14 @@ export const GetComponentData = gql`
           }
           id
           sbomId
+          sbom {
+            projectVersion
+            project {
+              projectGroup {
+                name
+              }
+            }
+          }
           name
           version
           internal
@@ -110,6 +120,7 @@ const AttributionReportsDrawer = ({
   const getQueryVariables = (includeSearch = false) => {
     return {
       sbomId,
+      includeParts: true,
       projectId: productId,
       internal: internal ? !internal : undefined,
       orderBy: includeSearch
@@ -217,6 +228,8 @@ const AttributionReportsDrawer = ({
   const handleEdit = (row, field) => {
     setEditingRow({
       id: row.id,
+      sbomId: row.sbomId,
+
       field,
       name: row.name,
       copyright: row.copyright,
@@ -242,6 +255,17 @@ const AttributionReportsDrawer = ({
     onClose()
   }
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isOpen])
+
   return (
     <>
       <LynkDrawer
@@ -256,28 +280,30 @@ const AttributionReportsDrawer = ({
           {error ? (
             <Text>Something went wrong</Text>
           ) : (
-            <Flex flexDir={'column'} width={'100%'} height={'auto'}>
+            <Flex width={'100%'} flexDir={'column'} alignItems={'flex-start'}>
               <LynkTable
-                data={nodes}
-                columns={columns}
-                selectableRows
-                progressPending={loading}
                 subHeader
-                subHeaderComponent={subHeader}
-                onSelectedRowsChange={handleRowSelect}
+                fixedHeader
+                data={nodes}
+                selectableRows
+                columns={columns}
                 onSort={handleSort}
+                progressPending={loading}
+                subHeaderComponent={subHeader}
+                fixedHeaderScrollHeight='60vh'
+                className='data-table-container'
+                onSelectedRowsChange={handleRowSelect}
               />
             </Flex>
           )}
+          <Pagination {...paginationProps} />
         </Box>
-        <Pagination {...paginationProps} />
       </LynkDrawer>
 
       <AttributionReportsEditModal
         isOpen={editingRow.id !== null}
         onClose={handleEditClose}
         rowData={editingRow}
-        sbomId={sbomId}
         setSelectedRowData={setSelectedRowData}
         sourcePreferences={sourcePreferences}
       />

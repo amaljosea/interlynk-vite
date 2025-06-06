@@ -1,9 +1,11 @@
 import { useMemo } from 'react'
+import { useParams } from 'react-router-dom'
 import { truncatedValue } from 'utils'
 
-import { Flex, IconButton, Select, Text } from '@chakra-ui/react'
+import { Box, Flex, IconButton, Select, Text, Tooltip } from '@chakra-ui/react'
 
 import EditButton from 'components/Icons/EditButton'
+import LynkBadge from 'components/LynkBadge'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -14,6 +16,7 @@ const AttributionReportsColumns = ({
   sourcePreferences,
   setSourcePreferences
 }) => {
+  const params = useParams()
   const { primaryErrorColor, primarySuccessColor, primaryTextColor } =
     useThemeColor([
       'primaryErrorColor',
@@ -56,7 +59,10 @@ const AttributionReportsColumns = ({
         id: 'COMPONENTS_NAME',
         name: 'NAME',
         selector: (row) => {
-          const { name } = row
+          const { name, sbomId, sbom } = row
+          const { projectVersion, project } = sbom || {}
+          const { projectGroup } = project || {}
+          const isPart = sbomId !== params?.sbomid
 
           return (
             <Flex sx={{ alignItems: 'center', gap: 2, my: 4 }}>
@@ -66,8 +72,17 @@ const AttributionReportsColumns = ({
                 color={primaryTextColor}
                 aria-label='component_name'
               >
-                {truncatedValue(name, 40)}
+                {truncatedValue(name, 30)}
               </Text>
+              {isPart && (
+                <Tooltip
+                  label={`${projectGroup?.name} : ${projectVersion || 'N/A'}`}
+                >
+                  <Box>
+                    <LynkBadge color='blue' title='Part' />
+                  </Box>
+                </Tooltip>
+              )}
             </Flex>
           )
         },
@@ -191,6 +206,7 @@ const AttributionReportsColumns = ({
   }, [
     setSourcePreferences,
     sourcePreferences,
+    params?.sbomid,
     primaryTextColor,
     onEdit,
     primarySuccessColor,

@@ -19,7 +19,6 @@ const AttributionReportsEditModal = ({
   isOpen,
   onClose,
   rowData,
-  sbomId,
   setSelectedRowData,
   sourcePreferences
 }) => {
@@ -91,7 +90,7 @@ const AttributionReportsEditModal = ({
   const handleUpdate = async (field, value, updateKey) => {
     const variables = {
       id: rowData?.id,
-      sbomId,
+      sbomId: rowData?.sbomId,
       [updateKey]: value || ''
     }
 
