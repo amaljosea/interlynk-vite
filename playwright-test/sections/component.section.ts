@@ -27,23 +27,23 @@ export default class ComponentSection {
     const filePath = path.resolve(__dirname, '../resources', jsonFiles[0])
     await this.page.locator("//input[@id='fileInput']").setInputFiles(filePath)
 
-    await this.page.waitForTimeout(2000)
+    await this.page.waitForTimeout(1000)
 
     await this.page.locator("button[type='submit']").click()
-    await this.page.waitForTimeout(2000)
+    await this.page.waitForTimeout(1000)
 
     await this.page.getByTestId(`product_Test`).click()
-    await this.page.waitForTimeout(2000)
+    await this.page.waitForTimeout(1000)
     await this.page.reload()
 
     const version = this.page.getByTestId('version').nth(0)
 
     if (version.isVisible()) {
       await version.click()
-      await this.page.waitForTimeout(2000)
+      await this.page.waitForTimeout(1000)
 
       await this.page.getByRole('tab', { name: 'components' }).click()
-      await this.page.waitForTimeout(3000)
+      await this.page.waitForTimeout(1000)
       await this.page.locator("button[name='add_component']").click()
 
       const createModal = await this.page
@@ -73,15 +73,15 @@ export default class ComponentSection {
   public async create() {
     try {
       await this.page.locator("//a[@aria-label='products']").click()
-      await this.page.waitForTimeout(3000)
+      await this.page.waitForTimeout(1000)
 
       const product = await this.page.getByTestId(`product_Test`).isVisible()
 
       if (product) {
         console.log('Product "test" exists. Uploading SBOM.')
-        await this.page.waitForTimeout(3000)
+        await this.page.waitForTimeout(1000)
         await this.createComponent()
-        await this.page.waitForTimeout(3000)
+        await this.page.waitForTimeout(1000)
       } else {
         console.log('Product "test" does not exist. Creating it.')
         await this.page.locator("//button[@aria-label='Add product']").click()
@@ -90,7 +90,7 @@ export default class ComponentSection {
           .getByPlaceholder('Add product description')
           .fill('for testing')
         await this.page.locator("button[type='submit']").click()
-        await this.page.waitForTimeout(3000)
+        await this.page.waitForTimeout(1000)
         await this.createComponent()
       }
 
@@ -108,7 +108,7 @@ export default class ComponentSection {
 
       if (product.isVisible()) {
         await product.click()
-        await this.page.waitForTimeout(2000)
+        await this.page.waitForTimeout(1000)
 
         const version = this.page.getByTestId('version').nth(0)
 
@@ -117,7 +117,7 @@ export default class ComponentSection {
 
           await this.page.getByRole('tab', { name: 'components' }).click()
 
-          await this.page.waitForTimeout(5000)
+          await this.page.waitForTimeout(1000)
 
           await this.page
             .getByRole('tab', { name: 'components' })
@@ -132,7 +132,7 @@ export default class ComponentSection {
             .getByLabel('component_name')
             .textContent()
 
-          await this.page.waitForTimeout(4000)
+          await this.page.waitForTimeout(1000)
 
           if (searchResult !== 'Kernel') {
             errors.push('Result not found')
@@ -144,7 +144,7 @@ export default class ComponentSection {
         errors.push('Product not found')
       }
 
-      await this.page.waitForTimeout(2000)
+      await this.page.waitForTimeout(1000)
       expect(errors.length).toBe(0)
     } catch (error) {
       throw error
@@ -160,13 +160,13 @@ export default class ComponentSection {
 
       if (product.isVisible()) {
         await product.click()
-        await this.page.waitForTimeout(2000)
+        await this.page.waitForTimeout(1000)
 
         const version = this.page.getByTestId('version').nth(0)
 
         if (version.isVisible()) {
           await version.click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByRole('tab', { name: 'components' }).click()
 
@@ -182,7 +182,7 @@ export default class ComponentSection {
           await copyright.fill('testing')
 
           await this.page.getByRole('button', { name: 'Save' }).click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByRole('tab', { name: 'identifiers' }).click()
           await this.page
@@ -194,13 +194,13 @@ export default class ComponentSection {
           await this.page.keyboard.type(
             'cpe:2.3:a:byonepress:social_locker:2.0.2:*:*:*:*:wordpress:*:*'
           )
-          await this.page.waitForTimeout(5000)
+          await this.page.waitForTimeout(1000)
           await this.page.keyboard.press('ArrowDown')
           await this.page.keyboard.press('Enter')
           await this.page.waitForTimeout(1000)
 
           await this.page.getByRole('button', { name: 'Save' }).click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByRole('tab', { name: 'suppliers' }).click()
           await this.page
@@ -217,7 +217,7 @@ export default class ComponentSection {
             .fill('sp@interlynk.io')
 
           await this.page.getByRole('button', { name: 'Save' }).click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.locator("//button[@aria-label='comp_close']").click()
         } else {
@@ -316,13 +316,13 @@ export default class ComponentSection {
 
       if (product.isVisible()) {
         await product.click()
-        await this.page.waitForTimeout(2000)
+        await this.page.waitForTimeout(1000)
 
         const version = this.page.getByTestId('version').nth(0)
 
         if (version.isVisible()) {
           await version.click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByRole('tab', { name: 'components' }).click()
 
@@ -331,30 +331,30 @@ export default class ComponentSection {
 
           await this.page.getByRole('tab', { name: 'relationships' }).click()
 
-          await this.page.waitForTimeout(5000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.locator('#relationType').click()
           await this.page.keyboard.press('ArrowDown')
           await this.page.keyboard.press('Enter')
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
 
           this.page.locator('input#relationTo').fill('antlr')
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
           await this.page.keyboard.press('Enter')
 
           await this.page
             .getByRole('button', { name: 'Add Relationship' })
             .click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByTestId('delete_depends_on').first().click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.locator("button[type='submit']").click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.locator("//button[@aria-label='comp_close']").click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
         } else {
           errors.push(`Version not found`)
         }
@@ -377,17 +377,17 @@ export default class ComponentSection {
 
       if (product.isVisible()) {
         await product.click()
-        await this.page.waitForTimeout(2000)
+        await this.page.waitForTimeout(1000)
 
         const version = this.page.getByTestId('version').nth(0)
 
         if (version.isVisible()) {
           await version.click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByRole('tab', { name: 'components' }).click()
 
-          await this.page.waitForTimeout(5000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByTestId('component-actions').first().click()
           await this.page.waitForTimeout(1000)
@@ -401,7 +401,7 @@ export default class ComponentSection {
         errors.push('Product not found')
       }
 
-      await this.page.waitForTimeout(3000)
+      await this.page.waitForTimeout(1000)
     } catch (error) {
       throw error
     }
@@ -416,17 +416,17 @@ export default class ComponentSection {
 
       if (product.isVisible()) {
         await product.click()
-        await this.page.waitForTimeout(2000)
+        await this.page.waitForTimeout(1000)
 
         const version = this.page.getByTestId('version').nth(0)
 
         if (version.isVisible()) {
           await version.click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByRole('tab', { name: 'components' }).click()
 
-          await this.page.waitForTimeout(5000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByTestId('component-actions').first().click()
           await this.page.getByTestId('edit_component').first().click()
@@ -455,7 +455,7 @@ export default class ComponentSection {
         errors.push('Product not found')
       }
 
-      await this.page.waitForTimeout(2000)
+      await this.page.waitForTimeout(1000)
       expect(errors.length).toBe(0)
     } catch (error) {
       throw error
@@ -520,26 +520,26 @@ export default class ComponentSection {
 
       if (product.isVisible()) {
         await product.click()
-        await this.page.waitForTimeout(2000)
+        await this.page.waitForTimeout(1000)
 
         const version = this.page.getByTestId('version').nth(0)
 
         if (version.isVisible()) {
           await version.click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByRole('tab', { name: 'components' }).click()
-          await this.page.waitForTimeout(3000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByTestId('component-actions').first().click()
           await this.page.waitForTimeout(1000)
           await this.page.getByTestId('edit_component').first().click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByRole('tab', { name: 'identifiers' }).click()
 
           await this.page.getByTestId('purl_expand').first().click()
-          await this.page.waitForTimeout(3000)
+          await this.page.waitForTimeout(1000)
 
           await this.page
             .getByLabel('Identifiers')
@@ -549,20 +549,20 @@ export default class ComponentSection {
             .click()
           await this.page.keyboard.type('npm')
           await this.page.keyboard.press('Enter')
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
           await this.page.locator('#purl_namespace').click()
           await this.page.keyboard.type('react')
-          await this.page.waitForTimeout(3000)
+          await this.page.waitForTimeout(1000)
           await this.page.keyboard.press('Enter')
           await this.page.waitForTimeout(1000)
           await this.page.locator('#purl_name').click()
           await this.page.keyboard.type('react-dom')
-          await this.page.waitForTimeout(3000)
+          await this.page.waitForTimeout(1000)
           await this.page.keyboard.press('Enter')
           await this.page.waitForTimeout(1000)
           await this.page.locator('#purl_version').click()
           await this.page.keyboard.type('2.3.5')
-          await this.page.waitForTimeout(3000)
+          await this.page.waitForTimeout(1000)
           await this.page.keyboard.press('Enter')
           await this.page.waitForTimeout(1000)
           await this.page.getByTestId('purl_qualifiers').fill('type=jar')
@@ -570,7 +570,7 @@ export default class ComponentSection {
           await this.page.getByRole('button', { name: 'Save PURL' }).click()
 
           await this.page.getByLabel('Close').click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
         } else {
           errors.push('Version not found')
         }
@@ -592,26 +592,26 @@ export default class ComponentSection {
 
       if (product.isVisible()) {
         await product.click()
-        await this.page.waitForTimeout(2000)
+        await this.page.waitForTimeout(1000)
 
         const version = this.page.getByTestId('version').nth(0)
 
         if (version.isVisible()) {
           await version.click()
-          await this.page.waitForTimeout(3000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByRole('tab', { name: 'components' }).click()
-          await this.page.waitForTimeout(3000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByTestId('component-actions').first().click()
           await this.page.waitForTimeout(1000)
           await this.page.getByTestId('edit_component').first().click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByRole('tab', { name: 'identifiers' }).click()
 
           await this.page.getByTestId('cpe_expand').first().click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
 
           await this.page
             .getByLabel('Identifiers')
@@ -621,27 +621,27 @@ export default class ComponentSection {
             .click()
           await this.page.keyboard.type('a')
           await this.page.keyboard.press('Enter')
-          await this.page.waitForTimeout(3000)
+          await this.page.waitForTimeout(1000)
           await this.page.locator('#cpe_vendor').click()
           await this.page.keyboard.type('calibre-ebook')
-          await this.page.waitForTimeout(3000)
+          await this.page.waitForTimeout(1000)
           await this.page.keyboard.press('Enter')
           await this.page.waitForTimeout(1000)
           await this.page.locator('#cpe_product').click()
           await this.page.keyboard.type('calibre')
-          await this.page.waitForTimeout(3000)
+          await this.page.waitForTimeout(1000)
           await this.page.keyboard.press('Enter')
           await this.page.waitForTimeout(1000)
           await this.page.locator('#cpe_version').click()
           await this.page.keyboard.type('1.0')
-          await this.page.waitForTimeout(3000)
+          await this.page.waitForTimeout(1000)
           await this.page.keyboard.press('Enter')
           await this.page.waitForTimeout(1000)
 
           await this.page.getByRole('button', { name: 'Save CPE' }).click()
 
           await this.page.getByRole('button', { name: 'Save' }).click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByLabel('Close').click()
           await this.page.waitForTimeout(1000)
@@ -666,16 +666,16 @@ export default class ComponentSection {
 
       if (product.isVisible()) {
         await product.click()
-        await this.page.waitForTimeout(2000)
+        await this.page.waitForTimeout(1000)
 
         const version = this.page.getByTestId('version').nth(0)
 
         if (version.isVisible()) {
           await version.click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByRole('tab', { name: 'components' }).click()
-          await this.page.waitForTimeout(3000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByTestId('component-actions').first().click()
           await this.page.waitForTimeout(1000)
@@ -692,7 +692,7 @@ export default class ComponentSection {
             errors.push('Parent component not found')
           }
 
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
         } else {
           errors.push('Version not found')
         }
@@ -714,22 +714,22 @@ export default class ComponentSection {
 
       if (product.isVisible()) {
         await product.click()
-        await this.page.waitForTimeout(2000)
+        await this.page.waitForTimeout(1000)
 
         const version = this.page.getByTestId('version').nth(0)
 
         if (version.isVisible()) {
           await version.click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByRole('tab', { name: 'components' }).click()
 
-          await this.page.waitForTimeout(5000)
+          await this.page.waitForTimeout(1000)
           await this.page.getByTestId('filter_Exclude').click()
           await this.page
             .getByRole('menuitemcheckbox', { name: 'Parts' })
             .click()
-          await this.page.waitForTimeout(5000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByTestId('component-actions').first().click()
           await this.page.getByTestId('edit_license_status').first().click()
@@ -749,14 +749,14 @@ export default class ComponentSection {
               .getByRole('textbox', { name: 'Add some notes' })
               .fill('Test')
             await this.page.getByRole('button', { name: 'Save' }).click()
-            await this.page.waitForTimeout(3000)
+            await this.page.waitForTimeout(1000)
 
             await this.page.getByRole('button', { name: 'comp_close' }).click()
           } else {
             errors.push('component name tag not found')
           }
 
-          await this.page.waitForTimeout(3000)
+          await this.page.waitForTimeout(1000)
         } else {
           errors.push('Version not found')
         }
@@ -778,22 +778,22 @@ export default class ComponentSection {
 
       if (product.isVisible()) {
         await product.click()
-        await this.page.waitForTimeout(2000)
+        await this.page.waitForTimeout(1000)
 
         const version = this.page.getByTestId('version').nth(0)
 
         if (version.isVisible()) {
           await version.click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByRole('tab', { name: 'components' }).click()
 
-          await this.page.waitForTimeout(5000)
+          await this.page.waitForTimeout(1000)
           await this.page.getByTestId('filter_Exclude').click()
           await this.page
             .getByRole('menuitemcheckbox', { name: 'Parts' })
             .click()
-          await this.page.waitForTimeout(5000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByTestId('component-actions').first().click()
           await this.page.getByTestId('edit_notes').first().click()
@@ -808,25 +808,25 @@ export default class ComponentSection {
               .getByRole('textbox', { name: 'Comment' })
               .fill('Testing')
             await this.page.getByRole('button', { name: 'Save' }).click()
-            await this.page.waitForTimeout(3000)
+            await this.page.waitForTimeout(1000)
 
             await this.page.getByTestId('edit_note').click()
             await this.page
               .getByRole('textbox', { name: 'Comment' })
               .fill('Testing 1')
             await this.page.getByRole('button', { name: 'Save' }).click()
-            await this.page.waitForTimeout(3000)
+            await this.page.waitForTimeout(1000)
 
             await this.page.getByTestId('delete_note').click()
             await this.page.getByTestId('confirm_delete').click()
-            await this.page.waitForTimeout(3000)
+            await this.page.waitForTimeout(1000)
 
             await this.page.getByRole('button', { name: 'comp_close' }).click()
           } else {
             errors.push('component name tag not found')
           }
 
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
         } else {
           errors.push('Version not found')
         }
@@ -848,17 +848,17 @@ export default class ComponentSection {
 
       if (product.isVisible()) {
         await product.click()
-        await this.page.waitForTimeout(2000)
+        await this.page.waitForTimeout(1000)
 
         const version = this.page.getByTestId('version').nth(0)
 
         if (version.isVisible()) {
           await version.click()
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByRole('tab', { name: 'components' }).click()
 
-          await this.page.waitForTimeout(5000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByTestId('component-actions').first().click()
           await this.page.getByTestId('view_insights').first().click()
@@ -873,18 +873,18 @@ export default class ComponentSection {
             errors.push('component name tag not found')
           }
 
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.locator("//a[@aria-label='products']").click()
           await this.page.getByTestId('product-actions').first().click()
 
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
 
           await this.page.getByTestId('delete_product').first().click()
           await this.page.getByTestId(`delete-field`).fill('DELETE')
           await this.page.locator("button[type='submit']").click()
 
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(1000)
         } else {
           errors.push('Version not found')
         }
