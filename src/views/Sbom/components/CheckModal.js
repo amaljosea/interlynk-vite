@@ -7,8 +7,8 @@ import { ProductDetailsTabs } from 'utils/TabsObjects'
 import { componentTypes } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
-import { List, ListItem, Stack } from '@chakra-ui/react'
-import { Box, Button, Flex, Icon, Text, Tooltip } from '@chakra-ui/react'
+import { Stack } from '@chakra-ui/react'
+import { Button, Flex, Icon, Text, Tooltip } from '@chakra-ui/react'
 import { FormControl, FormLabel, Input } from '@chakra-ui/react'
 
 import EnvironmentSelector from 'components/EnvironmentSelector'
@@ -63,11 +63,7 @@ const CheckModal = (props) => {
   const { tabData } = useContext(TabContext)
   const { details } = tabData
 
-  const { primaryBgColor, secondaryBgColor, primaryBlueText } = useThemeColor([
-    'primaryBgColor',
-    'secondaryBgColor',
-    'primaryBlueText'
-  ])
+  const { primaryBlueText } = useThemeColor(['primaryBlueText'])
 
   const { status, component } = activeRow || ''
   const { id: componentId, name, version, kind, licensesExp } = component || ''
@@ -91,9 +87,8 @@ const CheckModal = (props) => {
   const timestamp = currentTime
   const currentTime = now.toISOString().slice(0, 16)
 
-  const [comp, setComp] = useState('')
+  const [comp, setComp] = useState(null)
   const [error, setError] = useState('')
-  const [activeComp, setActiveComp] = useState(null)
   const [isDisabled, setIsDisabled] = useState(false)
   const [compType, setCompType] = useState(kind || '')
   const [componentList, setComponentList] = useState([])
@@ -125,7 +120,7 @@ const CheckModal = (props) => {
 
   const hideRule = !COMPONENT_LICENSE && !COMPONENT_VERSION
 
-  const [getCompData, { data }] = useLazyQuery(GetComponentData, {
+  const [getCompData, { loading }] = useLazyQuery(GetComponentData, {
     fetchPolicy: 'network-only'
   })
 
@@ -140,7 +135,16 @@ const CheckModal = (props) => {
         }
       }).then((res) => {
         if (res.data) {
-          setComponentList(res.data.sbom.components.nodes)
+          const { nodes } = res?.data?.sbom?.components || {}
+          if (nodes?.length > 0) {
+            const result = nodes?.map((item) => ({
+              label: item?.name,
+              value: item?.id
+            }))
+            setComponentList(result)
+          } else {
+            setComponentList([])
+          }
         }
       })
     }
@@ -149,22 +153,12 @@ const CheckModal = (props) => {
   const [createRule, { loading: ruleLoading }] =
     useMutation(AutomationRuleCreate)
 
-  const [updateComponent, { loading: loading }] = useMutation(UpdateComponent, {
-    onCompleted: () => recheck()
-  })
-
-  const handleComponentChange = (e) => {
-    const value = e.target.value
-    setComp(value)
-    if (value === '') {
-      setComponentList([])
-    } else {
-      const filterData = data?.sbom.components.nodes.filter((str) =>
-        str.name.includes(value)
-      )
-      setComponentList(filterData ? filterData : [])
+  const [updateComponent, { loading: updating }] = useMutation(
+    UpdateComponent,
+    {
+      onCompleted: () => recheck()
     }
-  }
+  )
 
   const heading = (name) => {
     switch (name) {
@@ -313,7 +307,7 @@ const CheckModal = (props) => {
       const res = await updateComponent({
         variables: {
           sbomId: sbomId,
-          id: PRIMARY_COMPONENT ? activeComp?.id : componentId,
+          id: PRIMARY_COMPONENT ? comp?.value : componentId,
           primary: PRIMARY_COMPONENT ? true : undefined,
           kind: COMPONENT_TYPE ? compType : undefined,
           version: COMPONENT_VERSION ? compVersion : undefined,
@@ -351,8 +345,8 @@ const CheckModal = (props) => {
         fontSize={'sm'}
         variant='ghost'
         hidden={hideRule}
-        loadingText='Loading...'
         isLoading={ruleLoading}
+        loadingText='Loading...'
         isDisabled={disabledRule}
         onClick={handleAutomation}
         colorScheme={ruleExists ? 'green' : 'blue'}
@@ -382,11 +376,11 @@ const CheckModal = (props) => {
       onClose={onClose}
       disabled={disabled}
       buttonText={'Save'}
-      isLoading={loading}
       onSubmit={handleSubmit}
       title={heading(shortDesc)}
       hideCancelButton={ruleLoading}
       hidden={resolved || ruleLoading}
+      isLoading={ruleLoading || updating}
       leftFooterContent={!isFreeTier && <RuleAction />}
     >
       <Stack mb={error || component ? 4 : 0}>
@@ -397,45 +391,18 @@ const CheckModal = (props) => {
       {PRIMARY_COMPONENT && (
         <Stack spacing={4}>
           <FormControl isRequired isDisabled={resolved}>
-            <FormLabel>Select</FormLabel>
-            <Input value={comp} onChange={handleComponentChange} />
+            <FormLabel>Component</FormLabel>
+            <LynkSelect
+              value={comp}
+              name='component'
+              isClearable={true}
+              isLoading={loading}
+              placeholder='Select'
+              aria-label='component'
+              options={componentList}
+              onChange={(value) => setComp(value)}
+            />
           </FormControl>
-
-          {comp !== '' && componentList.length > 0 && (
-            <Box
-              position='absolute'
-              zIndex='1'
-              width='100%'
-              top={10}
-              mt='8'
-              bg={primaryBgColor}
-              border={`1px solid ${secondaryBgColor}`}
-              minH={'auto'}
-              maxH={'300px'}
-              overflowY={'scroll'}
-              borderRadius={4}
-              ref={compRef}
-            >
-              <List>
-                {componentList.map((item, index) => (
-                  <ListItem
-                    key={index}
-                    cursor='pointer'
-                    fontSize={'sm'}
-                    onClick={() => {
-                      setActiveComp(item)
-                      setComp(item.name)
-                      setComponentList([])
-                    }}
-                    p='2'
-                    _hover={{ background: secondaryBgColor }}
-                  >
-                    <Text>{item.name}</Text>
-                  </ListItem>
-                ))}
-              </List>
-            </Box>
-          )}
         </Stack>
       )}
 

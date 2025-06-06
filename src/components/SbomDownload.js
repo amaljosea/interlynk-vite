@@ -204,8 +204,7 @@ const SbomDownload = ({ sbom, primaryLoading }) => {
     } catch (err) {
       console.warn(err)
       showToast({
-        description:
-          'Error downloading SBOM spreadsheet. Please try again later.',
+        description: 'Error downloading SBOM spreadsheet. Please try again later.',
         status: 'error'
       })
       setIsLoading(false)
