@@ -1,8 +1,89 @@
 import * as XLSX from 'xlsx-js-style'
+import { gql } from '@apollo/client'
 import { client } from 'context/ApolloWrapper'
 import { currentDateTime, formatDateWithTimeZone, listItemsForDoc } from 'utils'
 
-import { GetComponentData, GetVulnData } from 'graphQL/Queries'
+export const GetComponentData = gql`
+  query GetComponentData(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $first: Int
+    $after: String
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      components(sbomId: $sbomId, first: $first, after: $after) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
+          id
+          name
+          version
+          kind
+          purl
+          cpes
+          uniqueId
+          licensesExp
+          suppliers {
+            name
+          }
+        }
+      }
+    }
+  }
+`
+
+export const GetVulnData = gql`
+  query GetVulnData(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $first: Int
+    $after: String
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      vulns(sbomId: $sbomId, first: $first, after: $after) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
+          id
+          impact
+          note
+          actionStmt
+          vuln {
+            vulnId
+            desc
+            source
+            publishedAt
+            vulnInfo {
+              epssPercentile
+              epssScores
+              kev
+            }
+          }
+          component {
+            name
+            version
+          }
+          vexStatus {
+            name
+          }
+          vexJustification {
+            name
+          }
+        }
+      }
+    }
+  }
+`
 
 const getMaxContentWidths = (data) => {
   const columnWidths = []
