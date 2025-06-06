@@ -32,7 +32,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
     resultType: '',
     isPrimary: false,
     isInternal: false,
-    notification: false
+    notification: true
   }
   const [formData, setFormData] = useState(initialState)
   const [error, setError] = useState('')
@@ -484,7 +484,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
             isChecked={formData?.notification}
             onChange={handleChange}
           >
-            <Text fontSize={14}>Notification</Text>
+            <Text fontSize={14}>Enable Notifications</Text>
           </Checkbox>
           {/* ERROR HANDLING */}
           {error !== '' && <LynkAlert msg={error} />}
