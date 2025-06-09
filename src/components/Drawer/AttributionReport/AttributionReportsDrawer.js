@@ -15,7 +15,7 @@ import AttributionReportsColumns from './AttributionReportsColumns'
 import AttributionReportsEditModal from './AttributionReportsEditModal'
 import AttributionReportsSubHeader from './AttributionReportsSubHeader'
 
-export const GetComponentData = gql`
+const GetComponentData = gql`
   query GetComponentData(
     $projectId: Uuid!
     $sbomId: Uuid!

@@ -28,7 +28,7 @@ import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
 
 import { LuWrench } from 'react-icons/lu'
 
-export const GetComponentData = gql`
+const GetComponentData = gql`
   query GetComponentData(
     $projectId: Uuid!
     $sbomId: Uuid!

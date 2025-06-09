@@ -25,7 +25,7 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 
 import { deleteComSupplier } from 'graphQL/Mutation'
-import { GetComponentData } from 'graphQL/Queries'
+import { GetComponentColumnData } from 'graphQL/Queries'
 
 import CompDrawer from '../components/CompDrawer'
 import CompInsights from '../components/CompInsights'
@@ -92,7 +92,7 @@ const Components = ({ sbomData }) => {
 
   // GET COMPONENT DATA
   const { nodes, error, paginationProps, reset, loading } = usePaginatedQuery(
-    GetComponentData,
+    GetComponentColumnData,
     {
       selector: 'sbom.components',
       variables: {

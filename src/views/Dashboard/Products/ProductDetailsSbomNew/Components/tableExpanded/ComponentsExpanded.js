@@ -1,9 +1,12 @@
+import { useQuery } from '@apollo/client'
 import { useMemo } from 'react'
 import { calculateExpiryDate, getSignedUrlParams } from 'utils'
 import { openSsf } from 'variables/general'
 
 import { Box, Flex, Grid, Tag, Text, Tooltip, VStack } from '@chakra-ui/react'
 
+import Card from 'components/Card/Card'
+import CustomLoader from 'components/CustomLoader'
 import DetailItem from 'components/Misc/DetailItem'
 import SupplierTag from 'components/SupplierTag'
 
@@ -11,15 +14,30 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-const ExpandedComponent = (props) => {
-  const { data, isArchived, action } = props
+import { GetComponentExpandedData } from 'graphQL/Queries'
+
+const ExpandedComponent = ({ data, isArchived, action }) => {
+  const {
+    data: componentData,
+    loading,
+    error
+  } = useQuery(GetComponentExpandedData, {
+    skip: !data?.id,
+    variables: {
+      sbomId: data?.sbomId,
+      id: data?.id
+    }
+  })
+
+  const component = componentData?.component
+
   const {
     version,
     componentSupportLevel: manual,
     componentSupportLevelAutomatic: automatic
-  } = data || {}
+  } = component || {}
   const { endDate, retainManualOverrideFor, notes, user } = manual || {}
-  const openSSF = openSsf?.find((item) => item?.name === data?.purl)
+  const openSSF = openSsf?.find((item) => item?.name === component?.purl)
 
   const { isCustomerView } = useRouteFlags()
   const signedUrlParams = getSignedUrlParams()
@@ -39,17 +57,17 @@ const ExpandedComponent = (props) => {
   }
 
   return useMemo(() => {
-    const name = data?.name
-    const type = data?.kind
-    const suppliers = data?.suppliers
-    const description = data?.description
-    const dependsOn = data?.dependsOn
-    const dependencyOf = data?.dependencyOf
-    const purl = data?.purl
+    const name = component?.name
+    const type = component?.kind
+    const suppliers = component?.suppliers
+    const description = component?.description
+    const dependsOn = component?.dependsOn
+    const dependencyOf = component?.dependencyOf
+    const purl = component?.purl
     const purlForDisplay = decodeURI(purl)
-    const cpes = data?.cpes
-    const scope = data?.scope
-    const licensesExp = data?.licensesExp
+    const cpes = component?.cpes
+    const scope = component?.scope
+    const licensesExp = component?.licensesExp
     const openSsfScore = openSSF?.score
     const level = manual?.level || automatic?.level
     const supportLevel = getSupportLevel(level)
@@ -57,7 +75,8 @@ const ExpandedComponent = (props) => {
     const assessmentExpiresOn = calculateExpiryDate(retainManualOverrideFor)
     const explanation = notes || automatic?.notes || 'N/A'
     const assessedBy = user?.name || 'N/A'
-    const { packageVersion, latestPackageVersion } = data?.enrichedContent || {}
+    const { packageVersion, latestPackageVersion } =
+      component?.enrichedContent || {}
 
     const isOutdated =
       latestPackageVersion?.version &&
@@ -87,6 +106,15 @@ const ExpandedComponent = (props) => {
         </Flex>
       )
     }
+
+    if (error)
+      return (
+        <Card>
+          <Text textAlign={'center'}>Something went wrong...</Text>
+        </Card>
+      )
+
+    if (loading) return <CustomLoader />
 
     return (
       <Box
@@ -196,7 +224,7 @@ const ExpandedComponent = (props) => {
           {/* PURL */}
           <DetailItem
             cursor='pointer'
-            onClick={() => action('view_purl', data)}
+            onClick={() => action('view_purl', component)}
             value={purl ? purlForDisplay : 'N/A'}
             label='PURL'
             valueStyle={purl && { color: purlColor }}
@@ -206,7 +234,7 @@ const ExpandedComponent = (props) => {
             cursor={cpes?.length > 0 ? 'pointer' : 'default'}
             label='CPES'
             value={cpes?.length > 0 ? cpes[0] : 'N/A'}
-            onClick={() => action('view_cpe', data)}
+            onClick={() => action('view_cpe', component)}
             valueStyle={cpes?.length > 0 && { color: cpesColor }}
           />
           {/* Scope */}
@@ -254,7 +282,7 @@ const ExpandedComponent = (props) => {
       </Box>
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, isCustomerView, signedUrlParams, openSSF?.score, isArchived])
+  }, [component, isCustomerView, signedUrlParams, openSSF?.score, isArchived])
 }
 
 export default ExpandedComponent

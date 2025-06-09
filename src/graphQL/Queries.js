@@ -1681,6 +1681,184 @@ export const GetComponentData = gql`
   }
 `
 
+export const GetComponentColumnData = gql`
+  query GetComponentColumnData(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $search: String
+    $licenses: [String!]
+    $supplierName: [String!]
+    $ecosystem: [String!]
+    $supportLevel: [String!]
+    $kind: [String!]
+    $internal: Boolean
+    $primary: Boolean
+    $direct: Boolean
+    $includeParts: Boolean
+    $orderBy: ComponentOrderByInput
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
+      components(
+        sbomId: $sbomId
+        after: $after
+        before: $before
+        first: $first
+        last: $last
+        search: $search
+        licenses: $licenses
+        supplierName: $supplierName
+        ecosystem: $ecosystem
+        kind: $kind
+        internal: $internal
+        primary: $primary
+        direct: $direct
+        orderBy: $orderBy
+        supportLevel: $supportLevel
+        includeParts: $includeParts
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
+          id
+          sbomId
+          sbom {
+            id
+            projectVersion
+            project {
+              projectGroup {
+                name
+              }
+            }
+          }
+          enrichedContent {
+            packageVersion {
+              version
+              isDeprecated
+            }
+            latestPackageVersion {
+              version
+            }
+          }
+          name
+          version
+          primary
+          internal
+          purl
+          cpes
+          licensesExp
+          updatedAt
+          healthScore
+          group
+          description
+          copyright
+          kind
+          scope
+          suppliers {
+            name
+            url
+            contactName
+            contactEmail
+          }
+          scoreBreakdown {
+            age
+            community
+            security
+          }
+          vulns {
+            totalCount
+            nodes {
+              vexStatus {
+                name
+              }
+            }
+          }
+          externalUrls {
+            name
+            url
+          }
+        }
+      }
+    }
+  }
+`
+
+export const GetComponentExpandedData = gql`
+  query GetComponentExpandedData($id: Uuid!, $sbomId: Uuid!) {
+    component(id: $id, sbomId: $sbomId) {
+      id
+      __typename
+      name
+      kind
+      version
+      description
+      purl
+      cpes
+      scope
+      licensesExp
+
+      suppliers {
+        id
+        name
+        url
+        contactEmail
+        contactName
+      }
+
+      componentSupportLevel {
+        level
+        endDate
+        retainManualOverrideFor
+        notes
+        user {
+          name
+        }
+      }
+
+      componentSupportLevelAutomatic {
+        level
+        notes
+      }
+
+      enrichedContent {
+        packageVersion {
+          version
+        }
+        latestPackageVersion {
+          version
+        }
+      }
+
+      dependsOn {
+        toComp {
+          id
+          name
+          version
+          updatedAt
+        }
+      }
+
+      dependencyOf {
+        fromComp {
+          id
+          name
+          version
+          updatedAt
+        }
+      }
+    }
+  }
+`
+
 export const GetPrimaryComponentData = gql`
   query GetPrimaryComponentData($projectId: Uuid!, $sbomId: Uuid!) {
     sbom(projectId: $projectId, sbomId: $sbomId) {

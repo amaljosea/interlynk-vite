@@ -3,7 +3,7 @@ import { gql } from '@apollo/client'
 import { client } from 'context/ApolloWrapper'
 import { currentDateTime, formatDateWithTimeZone, listItemsForDoc } from 'utils'
 
-export const GetComponentData = gql`
+const GetComponentData = gql`
   query GetComponentData(
     $projectId: Uuid!
     $sbomId: Uuid!
@@ -37,7 +37,7 @@ export const GetComponentData = gql`
   }
 `
 
-export const GetVulnData = gql`
+const GetVulnData = gql`
   query GetVulnData(
     $projectId: Uuid!
     $sbomId: Uuid!
