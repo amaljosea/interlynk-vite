@@ -85,7 +85,7 @@ const Kbar = () => {
     const env = productData?.organization?.projectGroups?.nodes
       .flatMap((group) => group.projects)
       .find((item) => item.name === value)
-    onChangeEnv(env?.name)
+    onChangeEnv(env)
   }
   const { setColorMode } = useColorMode()
 

@@ -29,6 +29,7 @@ const EnvFilter = ({ data }) => {
     if (params.productgroupid) {
       const project = projects.find((p) => p.name === value)
       const currentTab = { tab: activeTab }
+      onChangeEnv(project)
       navigate(
         generateProductDetailPageUrlFromCurrentUrl({
           productid: project.id,
@@ -36,7 +37,6 @@ const EnvFilter = ({ data }) => {
         })
       )
     }
-    onChangeEnv(value)
     setClearSelect(true)
   }
 

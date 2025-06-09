@@ -1,5 +1,5 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { capitalizeFirstLetter } from 'utils'
 
@@ -32,27 +32,38 @@ const GetProjectGroup = gql`
 
 const UploadModal = ({ isOpen, onClose, group }) => {
   const params = useParams()
-  const { envName } = useGlobalState()
+  const { activeProject, setActiveProject } = useGlobalState()
   const { showToast } = useCustomToast()
 
   const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
 
-  const { data } = useQuery(GetProjectGroup, {
+  const { data, loading } = useQuery(GetProjectGroup, {
     skip: isOpen ? false : true,
     variables: { id: group?.id }
   })
 
-  const { projects } = data?.projectGroup || ''
+  const { projects } = data?.projectGroup || {}
 
-  const [sbomUpload, { error, loading }] = useMutation(UploadSbom)
+  const [sbomUpload, { error, loading: uploading }] = useMutation(UploadSbom)
 
-  const defaultENV = projects?.find((item) =>
-    envName ? item?.name === envName : item?.name === 'default'
-  )
-
-  const [selectedEnv, setSelectedEnv] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [selectedFile, setSelectedFile] = useState(null)
+
+  const projectOptions = useMemo(
+    () =>
+      projects
+        ?.sort((a, b) => a?.name?.localeCompare(b?.name))
+        ?.map((item) => ({
+          value: item?.id,
+          label: capitalizeFirstLetter(item?.name)
+        })) || [],
+    [projects]
+  )
+
+  const handleSelect = (item) => {
+    const result = projectOptions.find((opt) => opt.value === item?.value)
+    setActiveProject(result)
+  }
 
   const handleUpload = async () => {
     if (!selectedFile) {
@@ -61,7 +72,7 @@ const UploadModal = ({ isOpen, onClose, group }) => {
     }
 
     await sbomUpload({
-      variables: { doc: selectedFile, projectId: selectedEnv }
+      variables: { doc: selectedFile, projectId: activeProject?.value }
     })
       .then((res) => {
         if (res?.data?.sbomUpload?.errors?.length > 0) {
@@ -80,30 +91,17 @@ const UploadModal = ({ isOpen, onClose, group }) => {
       .finally(() => onClose())
   }
 
-  useEffect(() => {
-    if (defaultENV) {
-      setSelectedEnv(defaultENV?.id)
-    }
-  }, [defaultENV])
-
-  const projectOptions =
-    projects
-      ?.sort((a, b) => a?.name?.localeCompare(b?.name))
-      ?.map((item) => ({
-        value: item?.id,
-        label: capitalizeFirstLetter(item?.name)
-      })) || []
-
   return (
     <>
       <LynkModal
         isOpen={isOpen}
-        onClose={onClose}
-        onSubmit={handleUpload}
-        title={'Upload SBOM'}
         Icon={LuUpload}
-        disabled={!selectedFile || loading}
+        onClose={onClose}
         buttonText='Upload'
+        title={'Upload SBOM'}
+        isLoading={uploading}
+        onSubmit={handleUpload}
+        disabled={!selectedFile || uploading}
       >
         <Flex flexDir={'column'} gap={3} alignItems={'flex-start'}>
           {!params?.productgroupid && (
@@ -118,14 +116,12 @@ const UploadModal = ({ isOpen, onClose, group }) => {
             <FormControl>
               <FormLabel>Environment</FormLabel>
               <LynkSelect
-                id='dataRetention'
-                value={
-                  projectOptions.find((opt) => opt.value === selectedEnv) ||
-                  null
-                }
-                onChange={(selected) => setSelectedEnv(selected?.value)}
-                options={projectOptions}
                 dropDown
+                id='environment'
+                isLoading={loading}
+                value={activeProject}
+                options={projectOptions}
+                onChange={(selected) => handleSelect(selected)}
               />
               <FormHelperText color={secondaryTextColor} fontSize={12}>
                 Interlynk supports importing CycloneDX versions 1.2-1.5 in JSON
@@ -135,7 +131,7 @@ const UploadModal = ({ isOpen, onClose, group }) => {
             <FileUpload
               selectedFile={selectedFile}
               setSelectedFile={setSelectedFile}
-              isLoading={loading}
+              isLoading={uploading}
               error={error}
               setErrorMessage={setErrorMessage}
             />

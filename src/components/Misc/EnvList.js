@@ -21,7 +21,7 @@ const EnvList = ({ data }) => {
   const handleClick = (value) => {
     const env = projects?.find((item) => item.name === value)
     onClearSelection()
-    onChangeEnv(env?.name)
+    onChangeEnv(env)
     prodDispatch({
       type: 'SET_CURRENT_PRODUCT',
       payload: { id: env?.id }

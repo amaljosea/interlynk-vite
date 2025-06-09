@@ -12,6 +12,7 @@ import {
   versionReducer
 } from 'context/reducers'
 import React, { createContext, useContext, useReducer, useState } from 'react'
+import { capitalizeFirstLetter } from 'utils'
 import {
   allActivities,
   allPolicies,
@@ -32,6 +33,7 @@ const GlobalStateProvider = ({ children }) => {
   const [organization, setOrganization] = useState(null)
   const [userPermissions, setUserPermissions] = useState([])
   const [envName, setEnvName] = useState(env || 'default')
+  const [activeProject, setActiveProject] = useState(null)
   const [clearSelect, setClearSelect] = useState(false)
   const [selectedSbom, setSelectedSbom] = useState([])
   const [labelIds, setLabelIds] = useState([])
@@ -247,7 +249,11 @@ const GlobalStateProvider = ({ children }) => {
 
   const onChangeEnv = (env) => {
     localStorage.setItem('environment', env)
-    setEnvName(env)
+    setActiveProject({
+      label: capitalizeFirstLetter(env?.name),
+      value: env?.id
+    })
+    setEnvName(env?.name)
   }
 
   const onClearSelection = () => {
@@ -297,6 +303,8 @@ const GlobalStateProvider = ({ children }) => {
         setLabelIds,
         supportState,
         analyticsState,
+        activeProject,
+        setActiveProject,
         dispatch: {
           prodDispatch,
           prodCompDispatch,
