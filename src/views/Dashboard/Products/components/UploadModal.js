@@ -1,5 +1,5 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { capitalizeFirstLetter } from 'utils'
 
@@ -32,7 +32,7 @@ const GetProjectGroup = gql`
 
 const UploadModal = ({ isOpen, onClose, group }) => {
   const params = useParams()
-  const { activeProject, setActiveProject } = useGlobalState()
+  const { envName } = useGlobalState()
   const { showToast } = useCustomToast()
 
   const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
@@ -46,24 +46,13 @@ const UploadModal = ({ isOpen, onClose, group }) => {
 
   const [sbomUpload, { error, loading: uploading }] = useMutation(UploadSbom)
 
-  const [errorMessage, setErrorMessage] = useState('')
-  const [selectedFile, setSelectedFile] = useState(null)
-
-  const projectOptions = useMemo(
-    () =>
-      projects
-        ?.sort((a, b) => a?.name?.localeCompare(b?.name))
-        ?.map((item) => ({
-          value: item?.id,
-          label: capitalizeFirstLetter(item?.name)
-        })) || [],
-    [projects]
+  const defaultENV = projects?.find((item) =>
+    envName ? item?.name === envName : item?.name === 'default'
   )
 
-  const handleSelect = (item) => {
-    const result = projectOptions.find((opt) => opt.value === item?.value)
-    setActiveProject(result)
-  }
+  const [selectedEnv, setSelectedEnv] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
+  const [selectedFile, setSelectedFile] = useState(null)
 
   const handleUpload = async () => {
     if (!selectedFile) {
@@ -72,7 +61,7 @@ const UploadModal = ({ isOpen, onClose, group }) => {
     }
 
     await sbomUpload({
-      variables: { doc: selectedFile, projectId: activeProject?.value }
+      variables: { doc: selectedFile, projectId: selectedEnv }
     })
       .then((res) => {
         if (res?.data?.sbomUpload?.errors?.length > 0) {
@@ -91,11 +80,25 @@ const UploadModal = ({ isOpen, onClose, group }) => {
       .finally(() => onClose())
   }
 
+  useEffect(() => {
+    if (defaultENV) {
+      setSelectedEnv(defaultENV?.id)
+    }
+  }, [defaultENV])
+
+  const projectOptions =
+    projects
+      ?.sort((a, b) => a?.name?.localeCompare(b?.name))
+      ?.map((item) => ({
+        value: item?.id,
+        label: capitalizeFirstLetter(item?.name)
+      })) || []
+
   return (
     <>
       <LynkModal
-        isOpen={isOpen}
         Icon={LuUpload}
+        isOpen={isOpen}
         onClose={onClose}
         buttonText='Upload'
         title={'Upload SBOM'}
@@ -117,11 +120,14 @@ const UploadModal = ({ isOpen, onClose, group }) => {
               <FormLabel>Environment</FormLabel>
               <LynkSelect
                 dropDown
-                id='environment'
+                id='dataRetention'
                 isLoading={loading}
-                value={activeProject}
                 options={projectOptions}
-                onChange={(selected) => handleSelect(selected)}
+                onChange={(selected) => setSelectedEnv(selected?.value)}
+                value={
+                  projectOptions.find((opt) => opt.value === selectedEnv) ||
+                  null
+                }
               />
               <FormHelperText color={secondaryTextColor} fontSize={12}>
                 Interlynk supports importing CycloneDX versions 1.2-1.5 in JSON
@@ -131,7 +137,7 @@ const UploadModal = ({ isOpen, onClose, group }) => {
             <FileUpload
               selectedFile={selectedFile}
               setSelectedFile={setSelectedFile}
-              isLoading={uploading}
+              isLoading={loading}
               error={error}
               setErrorMessage={setErrorMessage}
             />
@@ -141,5 +147,4 @@ const UploadModal = ({ isOpen, onClose, group }) => {
     </>
   )
 }
-
 export default UploadModal
