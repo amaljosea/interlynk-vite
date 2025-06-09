@@ -38,6 +38,10 @@ export const downloadSbomPdf = (
   let currentY
   const productIcon = InterlynkLogo
 
+  const LINE_HEIGHT_10PT = 7
+
+  const MAX_CONTENT_Y = 270
+
   const formatValue = (
     value,
     doc,
@@ -67,7 +71,7 @@ export const downloadSbomPdf = (
   doc.page = 1
 
   function footer() {
-    doc.setLineWidth(6)
+    doc.setLineWidth(2)
     doc.setDrawColor(...blueColor)
 
     // Draw the line at the footer
@@ -78,8 +82,9 @@ export const downloadSbomPdf = (
     doc.page++
   }
 
-  const checkPageHeight = () => {
-    if (currentY > 260) {
+  // checkPageHeight  to trigger a new page if currentY is too close to the footer
+  const checkPageHeight = (minimumRequiredSpace = LINE_HEIGHT_10PT) => {
+    if (currentY + minimumRequiredSpace > MAX_CONTENT_Y) {
       doc.addPage()
       footer()
 
@@ -91,32 +96,14 @@ export const downloadSbomPdf = (
       doc.addImage(productIcon, 'JPEG', iconX, iconY, iconWidth, iconHeight)
       doc.text('Interlynk', 22, 21)
 
-      const availableWidth = pageWidth - leftMargin - rightMargin - 100
       const sbomSubText = `${productName}: ${version}`
-      let wrappedText = doc.splitTextToSize(sbomSubText, availableWidth)
-      if (wrappedText.length > 3) {
-        wrappedText = [
-          wrappedText[0],
-          `${wrappedText[1]}...`,
-          wrappedText[wrappedText.length - 1]
-        ]
-      }
-
-      let yPosition = 20
       doc.setFontSize(14)
-      wrappedText.forEach((line, index) => {
-        if (index === wrappedText.length - 1 && index !== 0) {
-          yPosition += 5
-        } else {
-          yPosition += index * 5
-        }
-        doc.text(line, 155, yPosition)
-      })
+      doc.text(sbomSubText, 155, 20)
 
       // Reset vertical position for the new page content
-      currentY = yPosition + 20
+      currentY = 30 // Adjusted to account for single-line header
       doc.setFontSize(10)
-      doc.setTextColor(...grayColor)
+      doc.setTextColor(...darkGrayColor)
     }
   }
 
@@ -134,28 +121,13 @@ export const downloadSbomPdf = (
   doc.setFontSize(14)
   doc.text(sbomSubText, rightAlignedX + 45, 21)
 
-  const availableWidthForProductName = pageWidth - leftMargin - rightMargin - 20
-  const wrappedProductName = doc.splitTextToSize(
-    productName,
-    availableWidthForProductName
-  )
   currentY = 45
-  wrappedProductName.forEach((line, index) => {
-    doc.setFontSize(24)
-    currentY += index * 10
-    doc.text(line, leftMargin, currentY)
-  })
-  currentY += 10
-  const wrappedVersionName = doc.splitTextToSize(
-    version,
-    availableWidthForProductName
-  )
+  doc.setFontSize(24)
+  doc.text(productName, leftMargin, currentY)
 
-  wrappedVersionName.forEach((line, index) => {
-    doc.setFontSize(16)
-    currentY += index * 10
-    doc.text(line, leftMargin, currentY)
-  })
+  currentY += 10
+  doc.setFontSize(16)
+  doc.text(version, leftMargin, currentY)
 
   currentY += 5
 
@@ -194,127 +166,144 @@ export const downloadSbomPdf = (
     config
   })
 
-  // Set gray color for section labels on the left side
   doc.setTextColor(...grayColor)
   doc.setFontSize(10)
   currentY += 10
 
   // Iterate over the labels and values, dynamically adjusting the Y-position
   labels.forEach((label, index) => {
-    // Left-aligned label
+    checkPageHeight(LINE_HEIGHT_10PT * 2)
     doc.text(label, leftMargin, currentY)
-
-    // Set dark gray color for the corresponding value on the right
     doc.setTextColor(...darkGrayColor)
 
-    // Add wrapped value below the label
-    const valueLines = values[index]
+    const valueLines = values?.[index]
+      ? formatValue(
+          values?.[index]?.join(' ') || '',
+          doc,
+          pageWidth,
+          rightMargin,
+          contentGap,
+          leftMargin
+        )
+      : ['']
+
     valueLines.forEach((line, lineIndex) => {
+      checkPageHeight()
       const lineWidth = doc.getTextWidth(line)
       const rightAlignedX = pageWidth - rightMargin - lineWidth
-      doc.text(
-        line,
-        rightAlignedX,
-        currentY + lineIndex * 10 // Increment Y position for wrapped lines
-      )
+      doc.text(line, rightAlignedX, currentY + lineIndex * LINE_HEIGHT_10PT)
     })
 
-    currentY += 10 + (valueLines.length - 1) * 10 // Adjust for wrapped lines
-
+    currentY += valueLines.length * LINE_HEIGHT_10PT
     doc.setTextColor(...grayColor)
-    checkPageHeight()
   })
-  checkPageHeight()
+
+  // Force a page break after General section
+  doc.addPage()
+  footer()
+  // Set up the new page (header, font, color, etc.)
+  doc.setTextColor(...blueColor)
+  doc.setFontSize(24)
+  doc.addImage(productIcon, 'JPEG', iconX, iconY, iconWidth, iconHeight)
+  doc.text('Interlynk', 22, 21)
+  doc.setFontSize(14)
+  doc.text(`${productName}: ${version}`, 155, 20)
+  currentY = 30
+  doc.setFontSize(10)
+  doc.setTextColor(...grayColor)
 
   //Components section
   doc.setTextColor(...blueColor)
   doc.setFontSize(14)
   currentY += 10
   if (componentsActual.length > 0) {
+    checkPageHeight(LINE_HEIGHT_10PT * 2)
     doc.text('Components', leftMargin, currentY)
   }
-  checkPageHeight()
   currentY += 10
 
   doc.setTextColor(...grayColor)
   doc.setFontSize(10)
 
-  const availableWidth = pageWidth - leftMargin - rightMargin - 110
+  const availableWidthForComponentFields =
+    pageWidth - leftMargin - rightMargin - 20
 
   componentsActual.forEach((component) => {
-    const projectGroupName = component.sbom?.project?.projectGroup?.name || ''
-    const componentName = component.name
+    // Component Description
     const componentText =
-      projectGroupName === parentSbom
-        ? `${componentName} - ${component.version}`
+      component.sbom?.project?.projectGroup?.name === parentSbom
+        ? `${component.name} - ${component.version}`
         : includeParts
-          ? `${projectGroupName}: ${componentName} - ${component.version}`
-          : `${componentName} - ${component.version}`
-    const componentDesc = formatValue(
-      componentText,
-      doc,
-      pageWidth,
-      80,
-      80,
-      leftMargin
-    )
+          ? `${component.sbom?.project?.projectGroup?.name || ''}: ${component.name} - ${component.version}`
+          : `${component.name} - ${component.version}`
+
+    const componentDescLines = doc.splitTextToSize(componentText)
+
+    checkPageHeight(componentDescLines.length * LINE_HEIGHT_10PT * 1.5)
 
     doc.setTextColor(...grayColor)
-    doc.text(componentDesc, leftMargin, currentY)
-    let initialY = currentY
-    currentY += componentDesc.length > 1 ? componentDesc.length * 5 : 5
+    doc.setFontSize(12)
+    doc.text(componentDescLines, leftMargin + 10, currentY)
+    currentY += componentDescLines.length * LINE_HEIGHT_10PT * 1.5
 
-    currentY = initialY
-
+    // Iterate through component labels and values
     const componentValues = getComponentValues(component, config)
-
     componentLabels.forEach((label, index) => {
-      doc.setTextColor(...grayColor)
-      doc.text(label, leftMargin + 40, currentY)
+      const value = componentValues?.[index] || ''
 
       doc.setTextColor(...darkGrayColor)
-      const wrappedText = doc.splitTextToSize(
-        componentValues[index],
-        availableWidth
-      )
-      const rightAlignedX =
-        pageWidth - rightMargin - doc.getTextWidth(wrappedText.join(''))
-      if (wrappedText.length > 1) {
-        doc.text(wrappedText, leftMargin + 110, currentY)
-      } else {
-        doc.text(wrappedText, rightAlignedX, currentY)
-      }
+      doc.setFontSize(10)
 
-      currentY += wrappedText.length > 1 ? wrappedText.length * 5 : 10
-      checkPageHeight()
+      doc.setFont(undefined, 'bold')
+      const labelWidth = doc.getTextWidth(`${label}: `)
+      doc.setFont(undefined, 'normal')
+      const wrappedText = doc.splitTextToSize(
+        value,
+        availableWidthForComponentFields - labelWidth
+      )
+
+      const totalLines = wrappedText.length > 0 ? wrappedText.length : 1
+      checkPageHeight(totalLines * LINE_HEIGHT_10PT)
+
+      doc.setFont(undefined, 'bold')
+      doc.text(`${label}: `, leftMargin + 10, currentY)
+
+      doc.setFont(undefined, 'normal')
+      wrappedText.forEach((line, lineIndex) => {
+        const xPos =
+          lineIndex === 0 ? leftMargin + 10 + labelWidth : leftMargin + 10
+        doc.text(line, xPos, currentY + lineIndex * LINE_HEIGHT_10PT)
+      })
+      currentY += totalLines * LINE_HEIGHT_10PT
     })
-    checkPageHeight()
 
     // Divider between components
-    doc.setLineWidth(6)
+    currentY += 5 //
+    checkPageHeight(15)
+    doc.setLineWidth(2)
     doc.setDrawColor(225, 225, 225)
-
     doc.line(leftMargin, currentY, pageWidth - rightMargin, currentY)
     currentY += 15
   })
-  checkPageHeight()
+  checkPageHeight() // One final check after components section
 
   //Vulnerabilities section
   doc.setTextColor(...blueColor)
   doc.setFontSize(14)
   currentY += 10
   if (vulnActual.length > 0) {
+    checkPageHeight(LINE_HEIGHT_10PT * 2)
     doc.text('Vulnerabilities', leftMargin, currentY)
   }
-  checkPageHeight()
-
   currentY += 10
 
   doc.setTextColor(...grayColor)
   doc.setFontSize(10)
 
+  const availableWidthForVulnFields = pageWidth - leftMargin - rightMargin - 20
+
   vulnActual.forEach((vuln) => {
-    const VulnLabels = [
+    const allVulnLabels = [
       'Short Description',
       'Component Name',
       'Component Version',
@@ -329,20 +318,19 @@ export const downloadSbomPdf = (
       'Internal Notes'
     ]
 
-    // Insert custom field labels dynamically
     if (excludeVulnStatus) {
       const customFieldLabels =
         vuln?.componentVulnCustomFields?.map(
           (field) =>
             field?.componentVulnCustomFieldDefinition?.displayName || 'NA'
         ) || []
-
-      VulnLabels.push(...customFieldLabels)
+      allVulnLabels.push(...customFieldLabels)
     }
+    allVulnLabels.push('Created By', 'Created On')
 
-    // Add the remaining labels
-    VulnLabels.push('Created By', 'Created On')
+    const vulnValues = getVulnValues(vuln, excludeVulnStatus, config)
 
+    // 1. Draw Vulnerability ID
     const projectGroupName =
       vuln.component?.sbom?.project?.projectGroup?.name || ''
     const componentName = vuln.component?.name || ''
@@ -354,59 +342,58 @@ export const downloadSbomPdf = (
         : includeParts
           ? `${projectGroupName}: ${componentName} - ${vulnId}`
           : `${vulnId}`
-    const vulnIdPlusParts = formatValue(
-      vulnText || 'NA',
-      doc,
-      pageWidth,
-      80,
-      80,
-      leftMargin
-    )
+    const vulnIdPlusPartsLines = doc.splitTextToSize(vulnText || 'NA')
+
+    checkPageHeight(vulnIdPlusPartsLines.length * LINE_HEIGHT_10PT * 1.5)
+
     doc.setTextColor(...grayColor)
-    doc.text(vulnIdPlusParts, leftMargin, currentY)
-    let initialY = currentY
-    currentY += vulnIdPlusParts.length > 1 ? vulnIdPlusParts.length * 10 : 5
-    currentY = initialY
+    doc.setFontSize(12)
+    doc.text(vulnIdPlusPartsLines, leftMargin + 10, currentY)
+    currentY += vulnIdPlusPartsLines.length * LINE_HEIGHT_10PT * 1.5
 
-    const vulnValues = getVulnValues(vuln, excludeVulnStatus, config)
-    VulnLabels.forEach((label, index) => {
+    allVulnLabels.forEach((label, index) => {
       if (
-        !excludeVulnStatus &&
-        excludeStatusLabels.includes(label.toLowerCase())
+        (excludeVulnStatus &&
+          excludeStatusLabels.includes(label.toLowerCase())) ||
+        (excludeStatusNotes &&
+          excludeStatusNotesLabels.includes(label.toLowerCase()))
       ) {
         return
       }
 
-      if (
-        !excludeStatusNotes &&
-        excludeStatusNotesLabels.includes(label.toLowerCase())
-      ) {
-        return
-      }
-      doc.setTextColor(...grayColor) // Gray color
-      doc.text(label, leftMargin + 40, currentY)
-      doc.setTextColor(...darkGrayColor) // Dark gray for values
-      const wrappedText = doc.splitTextToSize(vulnValues[index], availableWidth)
-      const rightAlignedX =
-        pageWidth - rightMargin - doc.getTextWidth(wrappedText.join(''))
-      /* doc.text(wrappedText, leftMargin + 110, currentY) */
-      if (wrappedText.length > 1) {
-        // If wrappedText has more than one line, place it at the left position
-        doc.text(wrappedText, leftMargin + 110, currentY)
-      } else {
-        // If wrappedText has exactly one line, place it right-aligned
-        doc.text(wrappedText, rightAlignedX, currentY)
-      }
+      const value = vulnValues?.[index] || ''
 
-      currentY += wrappedText.length > 1 ? wrappedText.length * 5 : 10
+      doc.setTextColor(...darkGrayColor)
+      doc.setFontSize(10)
+
+      doc.setFont(undefined, 'bold')
+      const labelWidth = doc.getTextWidth(`${label}: `)
+      doc.setFont(undefined, 'normal')
+      const wrappedText = doc.splitTextToSize(
+        value,
+        availableWidthForVulnFields - labelWidth
+      )
+
+      doc.setFont(undefined, 'bold')
+
       checkPageHeight()
+      doc.text(`${label}: `, leftMargin + 10, currentY)
+      // Draw the value (normal)
+      doc.setFont(undefined, 'normal')
+      wrappedText.forEach((line, lineIndex) => {
+        checkPageHeight()
+        const xPos =
+          lineIndex === 0 ? leftMargin + 10 + labelWidth : leftMargin + 10
+        doc.text(line, xPos, currentY)
+        currentY += LINE_HEIGHT_10PT
+      })
     })
-    checkPageHeight()
-    doc.setLineWidth(6)
-    doc.setDrawColor(225, 225, 225)
-    checkPageHeight()
 
-    // Light gray color
+    // 3. Draw Divider
+    currentY += 5 // Add a small padding before the divider
+    checkPageHeight(15)
+    doc.setLineWidth(2)
+    doc.setDrawColor(225, 225, 225)
     doc.line(leftMargin, currentY, pageWidth - rightMargin, currentY)
     currentY += 15
   })
