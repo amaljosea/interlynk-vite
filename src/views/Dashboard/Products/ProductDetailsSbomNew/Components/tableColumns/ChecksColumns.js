@@ -50,7 +50,7 @@ const ChecksColumns = (
 
   const updateComp = useHasPermission({
     parentKey: 'view_sbom',
-    childKey: 'update_sbom_components'
+    childKey: 'edit_sbom_components'
   })
 
   const [getRules, { loading: loadingRules }] = useLazyQuery(GetExistingRules)

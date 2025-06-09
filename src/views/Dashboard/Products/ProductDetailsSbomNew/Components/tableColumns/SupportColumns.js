@@ -30,9 +30,9 @@ const SupportColumns = ({ action }) => {
     'secondaryTextColor'
   ])
 
-  const updateComponent = useHasPermission({
-    parentKey: 'view_sbom',
-    childKey: 'update_sbom_components'
+  const editSupportLevel = useHasPermission({
+    parentKey: 'view_support_level',
+    childKey: 'edit_support_level'
   })
 
   return useMemo(() => {
@@ -176,7 +176,7 @@ const SupportColumns = ({ action }) => {
                 <MenuList fontSize={'sm'}>
                   <MenuItem
                     hidden={isFreeTier}
-                    isDisabled={!updateComponent}
+                    isDisabled={!editSupportLevel}
                     data-testid='edit_component_support'
                     onClick={() => action('view_support_drawer', row)}
                   >
@@ -197,7 +197,7 @@ const SupportColumns = ({ action }) => {
     isFreeTier,
     primaryTextColor,
     secondaryTextColor,
-    updateComponent
+    editSupportLevel
   ])
 }
 

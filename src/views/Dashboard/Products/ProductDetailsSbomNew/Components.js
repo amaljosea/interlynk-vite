@@ -115,7 +115,7 @@ const Components = ({ sbomData }) => {
 
   const updateComponent = useHasPermission({
     parentKey: 'view_sbom',
-    childKey: 'update_sbom_components'
+    childKey: 'edit_sbom_components'
   })
 
   const MAP = useDisclosure()

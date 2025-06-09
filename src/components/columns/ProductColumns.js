@@ -77,7 +77,7 @@ const ProductColumns = (props) => {
 
   const canArchiveProduct = useHasPermission({
     parentKey: 'view_product_group',
-    childKey: 'archive_product_group'
+    childKey: 'delete_product_group'
   })
 
   const canEditShareynk = useHasPermission({

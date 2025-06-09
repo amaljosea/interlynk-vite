@@ -60,7 +60,7 @@ const ConfigModal = ({
 
   const updateCon = useHasPermission({
     parentKey: 'view_connections',
-    childKey: 'create_update_connection'
+    childKey: 'edit_connections'
   })
 
   const validateConfigs = () => {

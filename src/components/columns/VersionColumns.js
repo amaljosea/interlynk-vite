@@ -116,7 +116,7 @@ const VersionColumns = (props) => {
   })
   const archiveSbom = useHasPermission({
     parentKey: 'view_sbom',
-    childKey: 'archive_sbom'
+    childKey: 'delete_sbom'
   })
   const updateSbom = useHasPermission({
     parentKey: 'view_sbom',

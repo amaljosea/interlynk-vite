@@ -33,7 +33,7 @@ const RequestTable = (props) => {
 
   const addReq = useHasPermission({
     parentKey: 'view_requests',
-    childKey: 'create_request'
+    childKey: 'edit_requests'
   })
 
   const { primaryTextColor, primaryErrorColor } = useThemeColor([

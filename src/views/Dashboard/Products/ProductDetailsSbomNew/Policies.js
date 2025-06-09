@@ -31,7 +31,7 @@ const Policies = ({ sbomData }) => {
   const isArchived = isSbomArchived(sbomData)
 
   const policyRun = useHasPermission({
-    parentKey: 'view_policy',
+    parentKey: 'view_policies',
     childKey: 'run_policy_scan'
   })
 

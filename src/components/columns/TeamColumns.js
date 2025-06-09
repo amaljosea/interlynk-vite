@@ -37,7 +37,7 @@ const TeamColumns = ({ action }) => {
 
   const removeUser = useHasPermission({
     parentKey: 'view_users',
-    childKey: 'remove_user'
+    childKey: 'delete_user'
   })
 
   return useMemo(() => {

@@ -84,7 +84,7 @@ function Profile() {
 
   const manageListing = useHasPermission({
     parentKey: 'view_feeds',
-    childKey: 'manage_listing'
+    childKey: 'manage_lists'
   })
 
   const onOrgTabChange = (index) => {

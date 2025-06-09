@@ -49,7 +49,7 @@ const ProductActions = ({ data }) => {
   })
   const archiveProduct = useHasPermission({
     parentKey: 'view_product_group',
-    childKey: 'archive_product_group'
+    childKey: 'delete_product_group'
   })
   const canCreateSBOM = useHasPermission({
     parentKey: 'view_sbom',

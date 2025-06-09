@@ -17,8 +17,8 @@ import { GetAllPermissions } from 'graphQL/Queries'
 const PERMISSION_CATEGORIES = [
   'Organization Management',
   'Product Management',
-  'Product Environment Management',
   'SBOM Management',
+  'Support Level Management',
   'User Management',
   'Vulnerability Management',
   'License Management',

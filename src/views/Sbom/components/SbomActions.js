@@ -51,11 +51,11 @@ const SbomActions = ({ sbom }) => {
 
   const archiveSboms = useHasPermission({
     parentKey: 'view_sbom',
-    childKey: 'archive_sbom'
+    childKey: 'delete_sbom'
   })
   const updateSboms = useHasPermission({
     parentKey: 'view_sbom',
-    childKey: 'update_sbom_components'
+    childKey: 'edit_sbom_components'
   })
 
   const navigate = useNavigate()

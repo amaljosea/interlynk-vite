@@ -21,7 +21,7 @@ const ConnectionCard = ({
 
   const canUpdate = useHasPermission({
     parentKey: 'view_connections',
-    childKey: 'create_update_connection'
+    childKey: 'edit_connections'
   })
 
   return (

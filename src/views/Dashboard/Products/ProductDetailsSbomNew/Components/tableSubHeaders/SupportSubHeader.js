@@ -28,7 +28,7 @@ const SupportSubHeader = ({
 
   const editComponent = useHasPermission({
     parentKey: 'view_sbom',
-    childKey: 'update_sbom_components'
+    childKey: 'edit_sbom_components'
   })
 
   const { withSupport, withoutSupport } = splitBySupportLevel(selectedItems)

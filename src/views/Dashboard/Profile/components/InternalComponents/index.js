@@ -33,7 +33,7 @@ export const InternalComponents = () => {
 
   const manageListing = useHasPermission({
     parentKey: 'view_feeds',
-    childKey: 'manage_listing'
+    childKey: 'manage_lists'
   })
 
   const [mutate] = useMutation(updateOrgComp, {

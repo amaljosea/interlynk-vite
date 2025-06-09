@@ -28,8 +28,8 @@ const GlobalPolicyColumns = ({ action, handleApply }) => {
   const productId = params.productid
 
   const updatePolicy = useHasPermission({
-    parentKey: 'view_policy',
-    childKey: 'create_update_policy'
+    parentKey: 'view_policies',
+    childKey: 'edit_policies'
   })
 
   const editProdPolicies = useHasPermission({
@@ -38,8 +38,8 @@ const GlobalPolicyColumns = ({ action, handleApply }) => {
   })
 
   const removePolicy = useHasPermission({
-    parentKey: 'view_policy',
-    childKey: 'remove_policy'
+    parentKey: 'view_policies',
+    childKey: 'delete_policies'
   })
 
   const {

@@ -32,8 +32,8 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
   const [activeRow, setActiveRow] = useState(null)
 
   const updateLic = useHasPermission({
-    parentKey: 'view_license',
-    childKey: 'edit_license_attributes'
+    parentKey: 'view_licenses',
+    childKey: 'edit_licenses'
   })
 
   const { isOpen, onOpen, onClose } = useDisclosure()

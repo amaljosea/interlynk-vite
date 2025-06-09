@@ -47,7 +47,7 @@ const JiraFields = () => {
 
   const editControls = useHasPermission({
     parentKey: 'view_product_group',
-    childKey: 'update_product_settings'
+    childKey: 'edit_product_settings'
   })
 
   const [updateSettings] = useMutation(ProjectSettingUpdate)

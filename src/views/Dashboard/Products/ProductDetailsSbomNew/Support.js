@@ -49,9 +49,9 @@ const Support = () => {
   const sbomId = params.sbomid
   const activeTab = useQueryParam('tab')
 
-  const editComponent = useHasPermission({
-    parentKey: 'view_sbom',
-    childKey: 'update_sbom_components'
+  const editSupportLevel = useHasPermission({
+    parentKey: 'view_support_level',
+    childKey: 'edit_support_level'
   })
 
   const { supportState, dispatch } = useGlobalState()
@@ -229,7 +229,7 @@ const Support = () => {
           progressPending={loading}
           defaultSortFieldId={field}
           subHeaderComponent={subHeader}
-          selectableRows={editComponent}
+          selectableRows={editSupportLevel}
           clearSelectedRows={toggleClear}
           className='data-table-container'
           onSelectedRowsChange={handleChange}

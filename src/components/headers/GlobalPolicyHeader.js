@@ -20,8 +20,8 @@ const GlobalPolicyHeader = ({
   const productId = params.productid
 
   const updatePolicy = useHasPermission({
-    parentKey: 'view_policy',
-    childKey: 'create_update_policy'
+    parentKey: 'view_policies',
+    childKey: 'edit_policies'
   })
 
   return useMemo(() => {

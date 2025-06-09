@@ -46,12 +46,12 @@ const SupportTable = ({
 
   const editSup = useHasPermission({
     parentKey: 'view_support',
-    childKey: 'create_update_support'
+    childKey: 'edit_support'
   })
 
   const archiveSup = useHasPermission({
     parentKey: 'view_support',
-    childKey: 'remove_support'
+    childKey: 'delete_support'
   })
 
   const { primaryTextColor, primaryErrorColor } = useThemeColor([
