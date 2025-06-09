@@ -30,6 +30,7 @@ const LynkDate = (props) => {
       className={react_datatime}
       inputProps={{
         name: props?.name,
+        disabled: props?.disabled,
         placeholder: 'Select date',
         onBlur: () => setFocus(false),
         onFocus: () => setFocus(true),
@@ -41,7 +42,8 @@ const LynkDate = (props) => {
           outline: border,
           fontSize: '14px',
           boxShadow: 'none',
-          background: 'none'
+          background: 'none',
+          opacity: props?.disabled ? 0.4 : 1
         }
       }}
     />

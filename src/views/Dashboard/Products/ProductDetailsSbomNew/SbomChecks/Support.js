@@ -34,10 +34,10 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
   const { isFreeTier } = useGlobalQueryContext()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
-  const { status, component } = activeRow || ''
+  const { status, component } = activeRow || {}
 
-  const { name, version, componentSupportLevel } = component || ''
-  const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
+  const { name, version, componentSupportLevel } = component || {}
+  const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || {}
 
   const inputStyle = { size: 'md', fontSize: 'sm' }
   const defaultDate = new Date()
@@ -334,7 +334,7 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
 
       <Stack spacing={4} mt={2}>
         {/* SUPPRT LEVEL */}
-        <FormControl isRequired>
+        <FormControl isRequired isDisabled={resolved}>
           <FormLabel htmlFor='supportLevel'>Support Level</FormLabel>
           <LynkSelect
             styles={inputStyle}
@@ -344,6 +344,7 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
                 (opt) => opt.value === formData?.supportLevel
               ) || null
             }
+            isDisabled={resolved}
             onChange={(selected) => handleSelect(selected, 'supportLevel')}
             options={supportLevelOptions}
             dropDown
@@ -352,10 +353,11 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
         {/* END-OF-SUPPORT DATE */}
         {(formData?.supportLevel === 'actively_maintained' ||
           formData?.supportLevel === 'no_longer_maintained') && (
-          <FormControl>
+          <FormControl isDisabled={resolved}>
             <FormLabel htmlFor='endOfSupport'>End-Of-Support Date</FormLabel>
             <LynkDate
               name='endOfSupport'
+              disabled={resolved}
               value={formData?.endOfSupport}
               onChange={(value) => handleDateChange(value, 'endOfSupport')}
             />
@@ -363,6 +365,7 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
         )}
         {/* RETAIN MANNUAL OVERRIDE */}
         <FormControl
+          isDisabled={resolved}
           hidden={noLongerMaintained}
           isInvalid={totalDays > 365}
           isRequired={!component?.internal}
@@ -371,6 +374,7 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
             Assessment Expires On
           </FormLabel>
           <LynkDate
+            disabled={resolved}
             name='assessmentExpiresOn'
             value={formData?.assessmentExpiresOn}
             onChange={(value) => handleDateChange(value, 'assessmentExpiresOn')}
@@ -378,7 +382,7 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
           <FormErrorMessage>{assessmentExpiryWarning}</FormErrorMessage>
         </FormControl>
         {/* EXPLANATION */}
-        <FormControl>
+        <FormControl isDisabled={resolved}>
           <FormLabel htmlFor='explanation'>Explanation</FormLabel>
           <Input
             sx={inputStyle}
