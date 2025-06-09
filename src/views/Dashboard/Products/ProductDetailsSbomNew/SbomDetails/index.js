@@ -205,13 +205,14 @@ const SbomDetails = ({ sbomData }) => {
                   </Tooltip>
                 )}
               </Flex>
-              <Text
-                wordBreak={'break-all'}
-                hidden={description === ''}
-                sx={{ w: '100%', mb: 1, mr: 'auto', fontSize: 'sm' }}
-              >
-                {truncatedValue(description, 200)}...
-              </Text>
+              {description && (
+                <Text
+                  wordBreak={'break-all'}
+                  sx={{ w: '100%', mb: 1, mr: 'auto', fontSize: 'sm' }}
+                >
+                  {truncatedValue(description, 200)}
+                </Text>
+              )}
             </GridItem>
             <GridItem colSpan={4} hidden={isArchived}>
               <SbomActions sbom={sbomData} />
