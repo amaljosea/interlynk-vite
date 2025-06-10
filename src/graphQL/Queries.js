@@ -6089,3 +6089,113 @@ export const GetComponentDataForPdf = gql`
     }
   }
 `
+
+export const GetVulnDataForCSV = gql`
+  query GetVulnData(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $search: String
+    $severity: [String!]
+    $status: [String!]
+    $componentName: [String!]
+    $source: SbomVulnSourceEnum
+    $kev: Boolean
+    $epss: RangeInput
+    $direct: Boolean
+    $vexComplete: Boolean
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $orderBy: ComponentVulnOrderByInput
+    $includeRetracted: Boolean
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      vulns(
+        sbomId: $sbomId
+        search: $search
+        severity: $severity
+        status: $status
+        componentName: $componentName
+        vulnerabilitySource: $source
+        kev: $kev
+        epss: $epss
+        direct: $direct
+        vexComplete: $vexComplete
+        after: $after
+        before: $before
+        first: $first
+        last: $last
+        orderBy: $orderBy
+        includeRetracted: $includeRetracted
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
+          id
+          isPart
+          lastAffectedVersions
+          externalUrls {
+            name
+            url
+          }
+          currentExternalUrls {
+            name
+            url
+          }
+          componentVulnCustomFields {
+            componentVulnCustomFieldDefinition {
+              displayName
+            }
+            value
+          }
+          componentVulnLogs {
+            justification
+            actionStmt
+            impact
+            response
+            fixedIn
+            note
+          }
+          vuln {
+            vulnId
+            desc
+            sev
+            source
+            cvssScore
+            publishedAt
+            lastModifiedAt
+            cvssVector
+            nvdAliasId
+            vulnInfo {
+              epssScores
+              epssPercentile
+              kev
+              advisories
+              cwes
+            }
+          }
+          component {
+            name
+            version
+            sbom {
+              project {
+                projectGroup {
+                  name
+                }
+              }
+            }
+          }
+          vexStatus {
+            name
+          }
+        }
+      }
+    }
+  }
+`

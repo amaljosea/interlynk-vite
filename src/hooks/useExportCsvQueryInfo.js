@@ -7,7 +7,7 @@ import {
   GetGlobalVulns,
   GetSbomLicensesTable,
   GetUsers,
-  GetVulnData
+  GetVulnDataForCSV
 } from 'graphQL/Queries'
 import { GetComponentDataForExport } from 'graphQL/Queries'
 
@@ -56,7 +56,7 @@ const useExportCsvQueryInfo = (tableType, rowsToExport, searchFilters) => {
 
       case 'SBOM Vulnerability View':
         return {
-          query: GetVulnData,
+          query: GetVulnDataForCSV,
           variables: {
             projectId: productId,
             sbomId: sbomId,
