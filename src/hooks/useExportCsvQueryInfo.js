@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom'
 import {
   GetCompSupportData,
   GetCompVulnData,
-  GetGlobalVulns,
+  GetGlobalVulnCSVData,
   GetSbomLicensesTable,
   GetUsers,
   GetVulnDataForCSV
@@ -84,7 +84,7 @@ const useExportCsvQueryInfo = (tableType, rowsToExport, searchFilters) => {
 
       case 'Vulnerability View':
         return {
-          query: GetGlobalVulns,
+          query: GetGlobalVulnCSVData,
           variables: {
             ...(productGroupId ? { projectGroupIds: [productGroupId] } : {}),
             ...(productId ? { projectIds: [productId] } : {}),
