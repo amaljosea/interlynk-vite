@@ -890,6 +890,7 @@ export const sbomUpdate = gql`
     $generateUniqueId: Boolean
     $moveTo: Uuid
     $stage: String
+    $created: Boolean
     $releaseDate: ISO8601Date
     $endOfLifeDate: ISO8601Date
     $endOfSupportDate: ISO8601Date
@@ -898,6 +899,7 @@ export const sbomUpdate = gql`
       input: {
         id: $id
         spec: $spec
+        created: $created
         specVersion: $specVersion
         format: $format
         licenses: $licenses

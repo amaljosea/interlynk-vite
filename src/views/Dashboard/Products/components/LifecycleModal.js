@@ -153,7 +153,7 @@ const LifecycleModal = ({ data, isOpen, onClose }) => {
       buttonText={'Save'}
       onSubmit={handleSubmit}
       disabled={!formData?.stage}
-      title={`${data?.length > 0 ? 'Update' : 'Add'} Lifecycle`}
+      title={`${data?.sbomId ? 'Update' : 'Add'} Lifestage`}
     >
       <Stack spacing={4}>
         {error && <LynkAlert msg={error} />}

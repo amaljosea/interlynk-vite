@@ -141,6 +141,7 @@ const VersionColumns = (props) => {
             createdAt,
             alternatives,
             isReprocess,
+            lifecycle,
             productLifeCycleStage,
             updatedAt
           } = row
@@ -173,6 +174,15 @@ const VersionColumns = (props) => {
                     </Text>
                   </Tooltip>
                 </Link>
+                <Tag
+                  fontSize={12}
+                  variant='subtle'
+                  w={'fit-content'}
+                  colorScheme='green'
+                  textTransform={'capitalize'}
+                >
+                  {lifecycle}
+                </Tag>
                 {productLifeCycleStage && (
                   <Tag
                     fontSize={12}
@@ -399,7 +409,7 @@ const VersionColumns = (props) => {
                     onClick={() => action('set_lifecycle', row)}
                     aria-label={`sbom-${row?.projectVersion}-lifecycle`}
                   >
-                    Set Lifecycle
+                    Set Lifestage
                   </MenuItem>
                   <MenuItem
                     aria-label={`sbom-${row?.projectVersion}-reprocess`}

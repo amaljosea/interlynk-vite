@@ -19,6 +19,7 @@ const PRODUCT_OPTION_QUERY = gql`
             sbomVersions {
               nodes {
                 id
+                lifecycle
                 projectVersion
               }
             }
@@ -54,7 +55,8 @@ export const ProductSelect = ({ value, onChange }) => {
           value: project?.id,
           versions: project?.sbomVersions?.nodes?.map((version) => ({
             label: version?.projectVersion,
-            value: version?.id
+            value: version?.id,
+            lifecycle: version?.lifecycle
           }))
         }))
       }))

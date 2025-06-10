@@ -60,7 +60,8 @@ const SbomDetails = ({ sbomData }) => {
     primaryComponent,
     vulnRunStatus,
     updatedAt,
-    healthScore
+    healthScore,
+    lifecycle
   } = sbomData || {}
   const { name, version, description } = primaryComponent || {}
 
@@ -173,17 +174,22 @@ const SbomDetails = ({ sbomData }) => {
               </Breadcrumb>
               <Flex
                 alignItems={'center'}
-                sx={{ gap: 1, fontWeight: 'semibold', flexWrap: 'wrap' }}
+                sx={{ gap: 2, fontWeight: 'semibold', flexWrap: 'wrap' }}
               >
-                {name && (
-                  <Text fontSize={22} wordBreak={'break-all'}>
-                    {truncatedValue(name, 40)}
+                <Flex gap={1}>
+                  {name && (
+                    <Text fontSize={22} wordBreak={'break-all'}>
+                      {truncatedValue(name, 40)}
+                    </Text>
+                  )}
+                  {version && <Text fontSize={22}>:</Text>}
+                  <Text mr={2} fontSize={22} wordBreak={'breal-all'}>
+                    {truncatedValue(projectVersion, 40)}
                   </Text>
-                )}
-                {version && <Text fontSize={22}>:</Text>}
-                <Text mr={2} fontSize={22} wordBreak={'breal-all'}>
-                  {truncatedValue(projectVersion, 40)}
-                </Text>
+                </Flex>
+                <Tag colorScheme='teal' w={'fit-content'}>
+                  <TagLabel textTransform={'capitalize'}>{lifecycle}</TagLabel>
+                </Tag>
                 {lifecycleData?.stage && (
                   <Tooltip label='Lifecycle stage'>
                     <Tag

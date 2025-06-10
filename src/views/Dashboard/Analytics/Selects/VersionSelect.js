@@ -7,15 +7,14 @@ const getVersionOptions = (filters, env) => {
 
   const optionsFinal = product?.reduce((options, singleProduct) => {
     const selectedProject = singleProduct?.projects?.find(
-      (project) => project?.label === env
+      (project) => project?.label === env && project
     )
 
-    const optionsInternal = selectedProject?.versions?.reduce(
-      (acc, version) => {
+    const optionsInternal = selectedProject?.versions
+      ?.filter((item) => item?.lifecycle !== 'draft')
+      ?.reduce((acc, version) => {
         return [...acc, { label: version?.label, value: version?.value }]
-      },
-      []
-    )
+      }, [])
 
     return [...options, ...optionsInternal]
   }, [])

@@ -15,7 +15,7 @@ export const LifecycleSelect = ({ value, onChange }) => {
     <CustomSelect
       isMulti
       value={value}
-      label='Lifecycle'
+      label='Lifestage'
       options={options}
       onChange={(newValue) => onChange(newValue)}
     />
