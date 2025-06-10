@@ -163,15 +163,15 @@ const ComponentCard = ({ value: componentData, isOpen, onClose }) => {
             </Stack>
             <Stack spacing={1}>
               <Text {...label}>Version</Text>
-              <Text {...infoStyle}>{version}</Text>
+              <Text {...infoStyle}>{version || 'N/A'}</Text>
             </Stack>
             <Stack spacing={1}>
               <Text {...label}>Type</Text>
-              <Text {...infoStyle}>{kind}</Text>
+              <Text {...infoStyle}>{kind || 'N/A'}</Text>
             </Stack>
             <Stack spacing={1}>
               <Text {...label}>License</Text>
-              <Text {...infoStyle}>{licensesExp}</Text>
+              <Text {...infoStyle}>{licensesExp || 'N/A'}</Text>
             </Stack>
             <Stack spacing={1}>
               <Text {...label}>Primary</Text>
