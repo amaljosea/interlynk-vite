@@ -102,7 +102,6 @@ const UploadModal = ({ isOpen, onClose, group }) => {
         onClose={onClose}
         buttonText='Upload'
         title={'Upload SBOM'}
-        isLoading={uploading}
         onSubmit={handleUpload}
         disabled={!selectedFile || uploading}
       >
@@ -137,7 +136,7 @@ const UploadModal = ({ isOpen, onClose, group }) => {
             <FileUpload
               selectedFile={selectedFile}
               setSelectedFile={setSelectedFile}
-              isLoading={loading}
+              isLoading={uploading}
               error={error}
               setErrorMessage={setErrorMessage}
             />
