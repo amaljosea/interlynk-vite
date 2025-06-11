@@ -2501,6 +2501,7 @@ export const ShareVulnData = gql`
               publishedAt
               lastModifiedAt
               nvdAliasId
+              updatedAt
               vulnInfo {
                 cveId
                 epssScore
