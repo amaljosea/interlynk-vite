@@ -9,7 +9,9 @@ const ReprocessSbom = ({ isOpen, onClose, data, projectGroup }) => {
   const { showToast } = useCustomToast()
   const { id, projectVersion } = data || ''
 
-  const [reprocessSbom, { loading }] = useMutation(SbomReprocess)
+  const [reprocessSbom, { loading }] = useMutation(SbomReprocess, {
+    refetchQueries: ['GetVersionsTable']
+  })
 
   const onReprocess = () => {
     reprocessSbom({ variables: { sbomId: id } })

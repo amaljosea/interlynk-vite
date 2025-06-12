@@ -51,7 +51,9 @@ const GetLifecycleData = gql`
 
 const LifecycleModal = ({ data, isOpen, onClose }) => {
   const { showToast } = useCustomToast()
-  const [updateStage, { loading }] = useMutation(UpdateLifecycle)
+  const [updateStage, { loading }] = useMutation(UpdateLifecycle, {
+    refetchQueries: ['GetVersionsTable']
+  })
 
   const { data: sbomData } = useQuery(GetLifecycleData, {
     skip: isOpen ? false : true,
