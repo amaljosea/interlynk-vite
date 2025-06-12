@@ -702,5 +702,7 @@ export const getSettingsLabel = (type) => {
       return 'Default JIRA reporter'
     case 'autoArchive':
       return 'Auto Archive'
+    case 'enableKeepPartsUpdated':
+      return 'Parts check'
   }
 }

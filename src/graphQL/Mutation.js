@@ -376,6 +376,7 @@ export const ProjectSettingUpdate = gql`
     $jiraReporter: String
     $enableSupportLevel: Boolean
     $enableAutoArchive: Boolean
+    $enableKeepPartsUpdated: Boolean
   ) {
     projectSettingUpdate(
       input: {
@@ -393,6 +394,7 @@ export const ProjectSettingUpdate = gql`
         jiraReporter: $jiraReporter
         enableSupportLevel: $enableSupportLevel
         enableAutoArchive: $enableAutoArchive
+        enableKeepPartsUpdated: $enableKeepPartsUpdated
       }
     ) {
       projectSetting {

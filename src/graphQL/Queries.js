@@ -508,6 +508,7 @@ export const GetProjectSettings = gql`
         copyVexFromPrevious
         jiraProject
         enableSupportLevel
+        enableKeepPartsUpdated
         organizationManufacturer {
           id
           organizationName

@@ -41,7 +41,8 @@ const Settings = ({ enabled, data, mfc }) => {
     internalCompMatchingEnabled,
     copyVexFromPrevious,
     vulnScanningEnabled,
-    enableSupportLevel
+    enableSupportLevel,
+    enableKeepPartsUpdated
   } = data || {}
 
   const { showToast } = useCustomToast()
@@ -76,6 +77,8 @@ const Settings = ({ enabled, data, mfc }) => {
         copyVexFromPrevious: field === 'copyVexFromPrevious' ? val : undefined,
         mfcId: field === 'manufacturer' ? val : undefined,
         enableSupportLevel: field === 'enableSupportLevel' ? val : undefined,
+        enableKeepPartsUpdated:
+          field === 'enableKeepPartsUpdated' ? val : undefined,
         days: field === 'dataRetention' ? Number(val) : undefined,
         pkgUpdateThreshold:
           field === 'pkgUpdateThreshold' ? Number(val) : undefined,
@@ -148,12 +151,17 @@ const Settings = ({ enabled, data, mfc }) => {
             <Text fontSize={14} fontWeight={'semibold'}>
               Import Actions
             </Text>
-
             {/* APPLY CHECK */}
             <ProductSetting
               id={'checks'}
               value={checksEnabled}
               label={'Run SBOM Checks'}
+            />
+            {/* PARTS CHECK */}
+            <ProductSetting
+              id={'enableKeepPartsUpdated'}
+              value={enableKeepPartsUpdated}
+              label={'Always Use Latest Parts'}
             />
             {/* APPLY INTERNAL COMPONENTS */}
             <ProductSetting
