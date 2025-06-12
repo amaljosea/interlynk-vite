@@ -79,7 +79,9 @@ const CompLinks = ({ data }) => {
   const [error, setError] = useState('')
   const [linkError, setLinkError] = useState('')
 
-  const [updateLinks, { loading }] = useMutation(UpdateCompLinks)
+  const [updateLinks, { loading }] = useMutation(UpdateCompLinks, {
+    refetchQueries: ['GetCompUrls']
+  })
 
   const containsSpace = hasWhiteSpace(links?.url)
 

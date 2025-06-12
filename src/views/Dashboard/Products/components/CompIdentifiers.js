@@ -39,7 +39,9 @@ const CompIdentifiers = ({ data }) => {
   const { dispatch } = useGlobalState()
   const { prodCompDispatch } = dispatch
 
-  const [updateComponent, { loading }] = useMutation(UpdateComponent)
+  const [updateComponent, { loading }] = useMutation(UpdateComponent, {
+    refetchQueries: ['GetComponentColumnData']
+  })
 
   const [cpeValue, setCpeValue] = useState('')
   const [purlOpen, setPurlOpen] = useState(false)

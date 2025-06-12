@@ -84,9 +84,15 @@ const CompSupplier = ({ data }) => {
     }
   }
 
-  const [createSupplier] = useMutation(addComSupplier)
-  const [updateSupplier] = useMutation(updateComSupplier)
-  const [deleteSupplier] = useMutation(deleteComSupplier)
+  const [createSupplier] = useMutation(addComSupplier, {
+    refetchQueries: ['GetComponentColumnData','GetSupplier']
+  })
+  const [updateSupplier] = useMutation(updateComSupplier, {
+    refetchQueries: ['GetComponentColumnData','GetSupplier']
+  })
+  const [deleteSupplier] = useMutation(deleteComSupplier, {
+    refetchQueries: ['GetComponentColumnData','GetSupplier']
+  })
 
   const handleRemove = () => {
     disableButtonTemporarily(setIsDisabled, 4000)
