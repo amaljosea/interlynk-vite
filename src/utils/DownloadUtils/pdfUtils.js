@@ -138,23 +138,31 @@ export const getVulnValues = (vulnerability, excludeVulnStatus, config) => {
     getFormattedValue(vulnerability?.vuln?.source, config),
     getFormattedValue(epssPercentile, config),
     getFormattedValue(epssScores, config),
-    getFormattedValue(kev, config),
-    getFormattedValue(vulnerability?.vexStatus?.name || 'Unspecified', config),
-    getFormattedValue(vulnerability?.vexJustification?.name, config),
-    getFormattedValue(vulnerability?.impact, config),
-    getFormattedValue(vulnerability?.actionStmt, config),
-    getFormattedValue(vulnerability?.note, config)
+    getFormattedValue(kev, config)
   ]
 
-  // Insert custom field values
+  // Add status and related fields only when excludeVulnStatus is true
   if (excludeVulnStatus) {
+    values.push(
+      getFormattedValue(
+        vulnerability?.vexStatus?.name || 'Unspecified',
+        config
+      ),
+      getFormattedValue(vulnerability?.vexJustification?.name, config),
+      getFormattedValue(vulnerability?.impact, config),
+      getFormattedValue(vulnerability?.actionStmt, config),
+      getFormattedValue(vulnerability?.note, config)
+    )
+
+    // Add custom fields before createdBy and createdOn
     const customFields = vulnerability?.componentVulnCustomFields || []
     customFields.forEach((field) => {
       const value = field?.value || 'NA'
       values.push(getFormattedValue(value, config))
     })
   }
-  // Add the remaining fields
+
+  // Add createdBy and createdOn fields at the end
   values.push(
     getFormattedValue(
       '', // Placeholder for 'Created By'

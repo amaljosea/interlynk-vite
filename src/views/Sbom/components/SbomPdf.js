@@ -310,15 +310,19 @@ export const downloadSbomPdf = (
       'Source',
       'EPSS Percentile',
       'EPSS Probability',
-      'Known Exploitable Vulnerability',
-      'Status',
-      'Justification',
-      'Impact Statement',
-      'Action Statement',
-      'Internal Notes'
+      'Known Exploitable Vulnerability'
     ]
 
     if (excludeVulnStatus) {
+      allVulnLabels.push(
+        'Status',
+        'Justification',
+        'Impact Statement',
+        'Action Statement',
+        'Internal Notes'
+      )
+
+      // Add custom field labels
       const customFieldLabels =
         vuln?.componentVulnCustomFields?.map(
           (field) =>
@@ -326,6 +330,7 @@ export const downloadSbomPdf = (
         ) || []
       allVulnLabels.push(...customFieldLabels)
     }
+
     allVulnLabels.push('Created By', 'Created On')
 
     const vulnValues = getVulnValues(vuln, excludeVulnStatus, config)
@@ -353,9 +358,9 @@ export const downloadSbomPdf = (
 
     allVulnLabels.forEach((label, index) => {
       if (
-        (excludeVulnStatus &&
+        (!excludeVulnStatus &&
           excludeStatusLabels.includes(label.toLowerCase())) ||
-        (excludeStatusNotes &&
+        (!excludeStatusNotes &&
           excludeStatusNotesLabels.includes(label.toLowerCase()))
       ) {
         return
