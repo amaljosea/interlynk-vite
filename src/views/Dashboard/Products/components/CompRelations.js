@@ -54,7 +54,11 @@ const CompRelations = ({ data, compPath }) => {
   const { headingTextColor } = useThemeColor(['headingTextColor'])
 
   const [addRelation] = useMutation(CreateCompRelation, {
-    refetchQueries: ['GetComponentColumnData', 'GetCompDependency']
+    refetchQueries: [
+      'GetComponentColumnData',
+      'GetComponentExpandedData',
+      'GetCompDependency'
+    ]
   })
   const [removeRelation, { loading: deleteLoading }] =
     useMutation(DeleteCompRelation)

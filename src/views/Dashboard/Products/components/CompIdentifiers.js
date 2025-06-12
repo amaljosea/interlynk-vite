@@ -40,7 +40,7 @@ const CompIdentifiers = ({ data }) => {
   const { prodCompDispatch } = dispatch
 
   const [updateComponent, { loading }] = useMutation(UpdateComponent, {
-    refetchQueries: ['GetComponentColumnData']
+    refetchQueries: ['GetComponentColumnData', 'GetComponentExpandedData']
   })
 
   const [cpeValue, setCpeValue] = useState('')

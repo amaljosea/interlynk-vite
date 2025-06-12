@@ -62,7 +62,7 @@ const CompDetails = ({ data, primaryComp }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const [updateComponent, { loading }] = useMutation(UpdateComponent, {
-    refetchQueries: ['GetComponentColumnData']
+    refetchQueries: ['GetComponentColumnData', 'GetComponentExpandedData']
   })
 
   const defaultDate = new Date()

@@ -85,13 +85,25 @@ const CompSupplier = ({ data }) => {
   }
 
   const [createSupplier] = useMutation(addComSupplier, {
-    refetchQueries: ['GetComponentColumnData','GetSupplier']
+    refetchQueries: [
+      'GetComponentColumnData',
+      'GetComponentExpandedData',
+      'GetSupplier'
+    ]
   })
   const [updateSupplier] = useMutation(updateComSupplier, {
-    refetchQueries: ['GetComponentColumnData','GetSupplier']
+    refetchQueries: [
+      'GetComponentColumnData',
+      'GetComponentExpandedData',
+      'GetSupplier'
+    ]
   })
   const [deleteSupplier] = useMutation(deleteComSupplier, {
-    refetchQueries: ['GetComponentColumnData','GetSupplier']
+    refetchQueries: [
+      'GetComponentColumnData',
+      'GetComponentExpandedData',
+      'GetSupplier'
+    ]
   })
 
   const handleRemove = () => {
