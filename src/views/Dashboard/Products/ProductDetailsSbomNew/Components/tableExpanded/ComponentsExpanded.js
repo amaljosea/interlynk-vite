@@ -1,8 +1,8 @@
 import { useQuery } from '@apollo/client'
 import { useMemo } from 'react'
 import { calculateExpiryDate, getSignedUrlParams } from 'utils'
-// import { openSsf } from 'variables/general'
 
+// import { openSsf } from 'variables/general'
 import { Box, Flex, Grid, Tag, Text, Tooltip, VStack } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
@@ -26,7 +26,9 @@ const ExpandedComponent = ({ data, isArchived, action }) => {
     variables: {
       sbomId: data?.sbomId,
       id: data?.id
-    }
+    },
+    fetchPolicy: 'cache-first',
+    nextFetchPolicy: 'cache-first'
   })
 
   const component = componentData?.component
