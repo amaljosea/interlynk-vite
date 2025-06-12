@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { useMemo } from 'react'
 import { calculateExpiryDate, getSignedUrlParams } from 'utils'
-import { openSsf } from 'variables/general'
+// import { openSsf } from 'variables/general'
 
 import { Box, Flex, Grid, Tag, Text, Tooltip, VStack } from '@chakra-ui/react'
 
@@ -37,7 +37,7 @@ const ExpandedComponent = ({ data, isArchived, action }) => {
     componentSupportLevelAutomatic: automatic
   } = component || {}
   const { endDate, retainManualOverrideFor, notes, user } = manual || {}
-  const openSSF = openSsf?.find((item) => item?.name === component?.purl)
+  // const openSSF = openSsf?.find((item) => item?.name === component?.purl)
 
   const { isCustomerView } = useRouteFlags()
   const signedUrlParams = getSignedUrlParams()
@@ -68,7 +68,7 @@ const ExpandedComponent = ({ data, isArchived, action }) => {
     const cpes = component?.cpes
     const scope = component?.scope
     const licensesExp = component?.licensesExp
-    const openSsfScore = openSSF?.score
+    // const openSsfScore = openSSF?.score
     const level = manual?.level || automatic?.level
     const supportLevel = getSupportLevel(level)
     const endOfSupportDate = getDate(endDate)
@@ -246,7 +246,7 @@ const ExpandedComponent = ({ data, isArchived, action }) => {
           {/* Licenses */}
           <DetailItem label='Licenses' value={licensesExp || 'N/A'} />
           {/*  OpenSSF Scorecard */}
-          <DetailItem label='OpenSSF Scorecard' value={openSsfScore || 'N/A'} />
+          {/* <DetailItem label='OpenSSF Scorecard' value={openSsfScore || 'N/A'} /> */}
           {/* Support Level */}
           <DetailItem
             label='Support Level'
@@ -282,7 +282,7 @@ const ExpandedComponent = ({ data, isArchived, action }) => {
       </Box>
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [component, isCustomerView, signedUrlParams, openSSF?.score, isArchived])
+  }, [component, isCustomerView, signedUrlParams, isArchived])
 }
 
 export default ExpandedComponent
