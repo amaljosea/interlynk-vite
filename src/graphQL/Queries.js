@@ -3837,6 +3837,8 @@ export const GetProjectPolicies = gql`
         operator
         organizationId
         notificationEnabled
+        excludeInternalComponent
+        excludePrimaryComponent
         resultType
         updatedAt
         policyRules {
@@ -3897,6 +3899,8 @@ export const PolicyResults = gql`
           id
           name
           description
+          excludeInternalComponent
+          excludePrimaryComponent
           policyRules {
             id
             name

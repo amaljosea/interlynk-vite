@@ -2,7 +2,15 @@ import { useMemo } from 'react'
 import { getFullDate, timeSince } from 'utils'
 import { getResultColor } from 'utils/styleUtils'
 
-import { Spinner, Stack, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
+import {
+  Flex,
+  Spinner,
+  Stack,
+  Tag,
+  TagLabel,
+  Text,
+  Tooltip
+} from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -32,6 +40,33 @@ const PolicyColumns = (isInitialized) => {
         },
         width: '40%',
         wrap: true
+      },
+      {
+        id: 'EXCLUDED',
+        name: 'EXCLUDED',
+        selector: (row) => {
+          const { excludePrimaryComponent, excludeInternalComponent } =
+            row?.policy || ''
+          return (
+            <Flex gap={2} alignItems={'center'}>
+              {!excludePrimaryComponent && !excludeInternalComponent && (
+                <Text fontSize={14} color={primaryTextColor}>
+                  N/A
+                </Text>
+              )}
+              {excludePrimaryComponent && (
+                <Tag variant='solid' colorScheme='blue'>
+                  Primary
+                </Tag>
+              )}
+              {excludeInternalComponent && (
+                <Tag variant='solid' colorScheme='cyan'>
+                  Internal
+                </Tag>
+              )}
+            </Flex>
+          )
+        }
       },
       {
         id: 'RESULT',

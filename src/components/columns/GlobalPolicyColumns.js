@@ -81,7 +81,11 @@ const GlobalPolicyColumns = ({ action, handleApply }) => {
         selector: (row, index) => (
           <Stack my={4} spacing={1}>
             <Link to={`/vendor/policies/${row?.id}`}>
-              <Text fontSize={14} color={primaryBlueText} data-testid={`policy_${index}`}>
+              <Text
+                fontSize={14}
+                color={primaryBlueText}
+                data-testid={`policy_${index}`}
+              >
                 {row?.name}
               </Text>
             </Link>
@@ -113,7 +117,9 @@ const GlobalPolicyColumns = ({ action, handleApply }) => {
           return (
             <Flex gap={2} alignItems={'center'}>
               {!excludePrimaryComponent && !excludeInternalComponent && (
-                <Text fontSize={14} color={primaryTextColor}>N/A</Text>
+                <Text fontSize={14} color={primaryTextColor}>
+                  N/A
+                </Text>
               )}
               {excludePrimaryComponent && (
                 <Tag variant='solid' colorScheme='blue'>
@@ -127,8 +133,7 @@ const GlobalPolicyColumns = ({ action, handleApply }) => {
               )}
             </Flex>
           )
-        },
-        omit: productId
+        }
       },
       {
         id: 'CONDITIONS',
