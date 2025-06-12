@@ -2491,6 +2491,10 @@ export const ShareVulnData = gql`
             id
             isPart
             isFirstDegreePart
+            externalUrls {
+              name
+              url
+            }
             vuln {
               vulnId
               desc
@@ -2504,6 +2508,8 @@ export const ShareVulnData = gql`
               updatedAt
               vulnInfo {
                 cveId
+                advisories
+                cwes
                 epssScore
                 epssPercentile
                 kev
