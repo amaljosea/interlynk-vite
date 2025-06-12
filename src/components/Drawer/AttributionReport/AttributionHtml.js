@@ -9,11 +9,16 @@ export const downloadAttributionHtml = async (
   const filename = attributionFilename(productName, productVersion)
   const logoBase64 = await getBase64Logo()
 
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = (today.getMonth() + 1).toString().padStart(2, '0')
+  const day = today.getDate().toString().padStart(2, '0')
+  const formattedDate = `${year}-${month}-${day}`
+
   //  Generate TOC Destinations and Content HTML
   const tocDestinations = []
   let contentHtml = ''
   let currentTocAlphabet = ''
-  let tocItemNumber = 1
 
   components.forEach((comp) => {
     const currentComponentName = `${comp.name || 'Unknown'} - ${comp.version || 'Unknown'}`
@@ -30,9 +35,8 @@ export const downloadAttributionHtml = async (
       currentTocAlphabet = firstChar
       tocDestinations.push({
         isGroupHeader: true,
-        title: `${tocItemNumber}. ${currentTocAlphabet}`
+        title: `${currentTocAlphabet}`
       })
-      tocItemNumber++
     }
 
     tocDestinations.push({
@@ -65,13 +69,13 @@ export const downloadAttributionHtml = async (
         <div class="header-divider"></div>
         <div class="component-content">
             <div class="component-name">${currentComponentName}</div>
-            <div class="item"><span class="label">Notice:</span> <span class="value">${noticeText}</span></div>
-            <div class="item"><span class="label">License:</span> <span class="value">${licenseExpText}</span></div>
+            <div class="item"><span class="label">Notice</span> <span class="value">${noticeText}</span></div>
+            <div class="item"><span class="label">License</span> <span class="value">${licenseExpText}</span></div>
             ${
               licenseExpText !== 'N/A'
                 ? `
                 <div class="license-text-container">
-                    <div class="license-text-label">License Text:</div>
+                    <div class="license-text-label">License Text</div>
                     ${
                       Array.isArray(comp.licenseText) &&
                       comp.licenseText.length > 0
@@ -80,8 +84,8 @@ export const downloadAttributionHtml = async (
                             .map(
                               (licenseItem) => `
                                 <div class="license-item">
-                                    <span class="license-short-id">${licenseItem?.content?.shortId || 'N/A'}:</span>
-                                    <div class="license-text-content" style="margin-left: 20px;">${licenseItem?.content?.text || 'N/A'}</div>
+                                    <span class="license-short-id">${licenseItem?.content?.shortId || 'N/A'}</span>
+                                    <div class="license-text-content">${licenseItem?.content?.text || 'N/A'}</div>
                                 </div>
                             `
                             )
@@ -92,7 +96,7 @@ export const downloadAttributionHtml = async (
             `
                 : `<div class="item"><span class="label">License Text:</span> <span class="value">N/A</span></div>`
             }
-            <div class="item"><span class="label">Copyright:</span> <span class="value">${copyrightText}</span></div>
+            <div class="item"><span class="label">Copyright</span> <span class="value">${copyrightText}</span></div>
         </div>
       </div>
     `
@@ -134,29 +138,77 @@ export const downloadAttributionHtml = async (
 
     /* Front Page Styles */
     .front-page {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        height: 100vh; /* Full viewport height for the front page */
-        padding: 0 40px; /* Adjust padding if needed */
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      text-align: center;
+      height: 100vh;
+      padding: 0 40px;
+      padding-bottom: 40px; /* Add padding to the bottom for the footer */
     }
-    .front-page .logo { height: 100px; margin-bottom: 20px; }
-    .front-page .interlynk-title { font-size: 4em; color: #3d71ee; margin-bottom: 5px; }
-    .front-page .report-title { font-size: 2.5em; color: #3d71ee; }
+
+    .front-page-content {
+      flex-grow: 1; /* Allows content to take up available space */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      width: 100%;
+    }
+
+    .main-title {
+      font-size: 3.5em;
+      color: #323232;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #323232;
+      padding-bottom: 5px;
+      display: inline-block; 
+    }
+
+    .subtitle {
+      font-size: 2em;
+      color: #323232;
+      margin-top: 5px;
+      margin-bottom: 30px;
+    }
+
+    .revision {
+      font-size: 1.2em;
+      color: #323232;
+      margin-top: 50px;
+    }
+
+    .footer-logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end; 
+      width: 100%;
+      padding-right: 40px;
+    }
+
+    .footer-logo-container .logo {
+      height: 40px;   
+      margin-right: 5px;
+    }
+
+    .prepared-by {
+      font-size: 0.9em;
+      color: #323232;
+    }
 
     /* TOC Styles */
     .toc-section {
         padding: 40px;
         break-before: page; /* For printing */
     }
-    .toc-section h2 { font-size: 2em; color: #000000; margin-bottom: 30px; }
+    .toc-section h2 { font-size: 22px; color: #000000; margin-bottom: 30px; }
     .toc-list { list-style: none; padding: 0; }
-    .toc-list li { margin-bottom: 7px; font-size: 1.1em; }
+    .toc-list li { margin-bottom: 7px; font-size: 12px; font-weight: bold; }
     .toc-list li a { text-decoration: none; color: #323232; }
     .toc-list li a:hover { text-decoration: underline; }
-    .toc-group-header h3 { font-size: 1.2em; font-weight: bold; margin-top: 20px; margin-bottom: 10px; color: #000000; }
+    .toc-group-header h3 { font-size: 16px; font-weight: bold; margin-top: 20px; margin-bottom: 5px; color: #000000; }
 
     /* Component Section Styles */
     .component-section {
@@ -187,7 +239,7 @@ export const downloadAttributionHtml = async (
         margin-right: 10px;
     }
     .component-header-name {
-        font-size: 1em;
+        font-size: 18px;
         color: #000000;
     }
     .header-divider {
@@ -200,18 +252,18 @@ export const downloadAttributionHtml = async (
         margin-top: 20px;
     }
 
-    .component-name { font-weight: bold; font-size: 1.2em; color: #000000; margin-bottom: 10px; }
-    .label { font-weight: bold; color: #000000; font-size: 1.1em; display: inline-block; width: 100px;}
-    .value { color: #323232; line-height: 1.4; }
+    .component-name { font-weight: bold; font-size: 18px; color: #000000; margin-bottom: 10px; }
+    .label { font-weight: bold; color: #000000; font-size: 16px; display: block; text-decoration: underline;}
+    .value { color: #323232; line-height: 1.4; font-size: 13.33px; display: block; }
     .item { margin-bottom: 15px; }
 
     .license-text-container { margin-top: 15px; margin-bottom: 15px; }
-    .license-text-label { font-weight: bold; font-size: 1.1em; color: #000000; margin-bottom: 10px; }
-    .license-text-content { font-size: 0.9em; color: #323232; line-height: 1.4; white-space: pre-wrap; word-wrap: break-word; max-width: 100%; margin-left: 20px; }
+    .license-text-label { font-weight: bold; font-size: 16px; color: #000000; margin-bottom: 10px; text-decoration: underline; }
+    .license-text-content { font-size: 13.33px; color: #323232; line-height: 1.4; white-space: pre-wrap; word-wrap: break-word; max-width: 100%; }
     .license-item { margin-bottom: 8px; }
-    .license-short-id { font-weight: bold; color: #323232; font-size: 1em;}
+    .license-short-id { font-weight: normal; color: #323232; font-size: 15px; text-decoration: underline;}
 
-    /* Page Numbers (for print) - This is more complex to simulate accurately in HTML for all pages */
+ 
     @media print {
         body { margin: 0; }
         .page {
@@ -245,9 +297,15 @@ export const downloadAttributionHtml = async (
 </head>
 <body>
   <div class="page front-page">
-    ${logoBase64 ? `<img src="data:image/png;base64,${logoBase64}" class="logo" alt="Interlynk Logo" />` : ''}
-    <div class="interlynk-title">Interlynk</div>
-    <div class="report-title">Attribution Report</div>
+    <div class="front-page-content">
+      <h1 class="main-title">Software Licenses</h1>
+      <p class="subtitle">${productName}</p>
+      <p class="revision">Revision: ${productVersion} (${formattedDate})</p>
+    </div>
+    <div class="footer-logo-container">
+      ${logoBase64 ? `<img src="data:image/png;base64,${logoBase64}" class="logo" alt="Interlynk Logo" />` : ''}
+      <span class="prepared-by">Prepared by Interlynk Inc.</span>
+    </div>
   </div>
 
   ${tocHtml}
