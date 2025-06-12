@@ -94,12 +94,13 @@ const GlobalPolicyColumns = ({ action, handleApply }) => {
             </Text>
           </Stack>
         ),
-        width: '32%',
+        width: '30%',
         wrap: true
       },
       {
         id: 'NOTIFICATION',
         name: 'NOTIFICATION',
+        width: '13%',
         selector: (row) =>
           row?.notificationEnabled ? (
             <LuCircleCheck fontSize={20} color={primarySuccessColor} />
@@ -111,11 +112,12 @@ const GlobalPolicyColumns = ({ action, handleApply }) => {
       {
         id: 'EXCLUDED',
         name: 'EXCLUDED',
+        width: '15%',
         selector: (row) => {
           const { excludePrimaryComponent, excludeInternalComponent } =
             row || ''
           return (
-            <Flex gap={2} alignItems={'center'}>
+            <Flex gap={2} flexWrap={'wrap'} alignItems={'center'}>
               {!excludePrimaryComponent && !excludeInternalComponent && (
                 <Text fontSize={14} color={primaryTextColor}>
                   N/A
@@ -149,7 +151,7 @@ const GlobalPolicyColumns = ({ action, handleApply }) => {
             </TagLabel>
           </Tag>
         ),
-        width: '15%',
+        width: '12%',
         wrap: true
       },
       {
@@ -174,7 +176,7 @@ const GlobalPolicyColumns = ({ action, handleApply }) => {
             </Tag>
           )
         },
-        width: '15%',
+        width: '12%',
         wrap: true
       },
       // EXCLUSION
@@ -235,7 +237,6 @@ const GlobalPolicyColumns = ({ action, handleApply }) => {
             </Menu>
           )
         },
-        width: '10%',
         right: 'true',
         omit: productId
       }
