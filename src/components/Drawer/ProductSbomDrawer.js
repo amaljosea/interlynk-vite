@@ -96,10 +96,8 @@ function ProductSbomDrawer({ sbom, isOpen, onClose }) {
 
   const [createSupplier, { loading: supLoading }] = useMutation(supplierCreate)
   const [createSbom, { loading: sbomLoading }] = useMutation(sbomCreate)
-  const [createComponent, { loading: compLoading }] = useMutation(
-    CreateComponent,
-    { refetchQueries: ['GetVersionsTable'] }
-  )
+  const [createComponent, { loading: compLoading }] =
+    useMutation(CreateComponent)
 
   const handleSave = (id) => {
     createSupplier({
