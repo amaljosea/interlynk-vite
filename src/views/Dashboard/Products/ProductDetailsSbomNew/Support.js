@@ -41,7 +41,7 @@ export const GetSupportSettings = gql`
   }
 `
 
-const Support = () => {
+const Support = ({ sbomData }) => {
   const params = useParams()
   const { showToast } = useCustomToast()
 
@@ -195,6 +195,8 @@ const Support = () => {
     }
   }
 
+  const isInDraft = sbomData?.lifecycle === 'draft'
+
   const handleReset = () => {
     setSelectedItems([])
     setToggleClear(true)
@@ -211,7 +213,8 @@ const Support = () => {
     handleClear,
     onSearchInputChange,
     selectedItems,
-    supportData
+    supportData,
+    isInDraft
   })
 
   // COLUMNS

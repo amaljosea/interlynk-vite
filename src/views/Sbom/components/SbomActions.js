@@ -23,7 +23,7 @@ import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
-import { recheckHealth, sbomDelete, sbomUpdate } from 'graphQL/Mutation'
+import { recheckHealth, sbomDelete } from 'graphQL/Mutation'
 import {
   GetCheckResults,
   GetPrimaryComponentData,
@@ -31,7 +31,7 @@ import {
   ShareProject
 } from 'graphQL/Queries'
 
-import { LuCircleCheckBig, LuClipboardList, LuFileBox } from 'react-icons/lu'
+import { LuCircleCheckBig, LuClipboardList } from 'react-icons/lu'
 
 import CheckModal from './CheckModal'
 import CopyModal from './CopyModal'
@@ -69,7 +69,6 @@ const SbomActions = ({ sbom }) => {
   const VERIFY = useDisclosure()
   const DELETE = useDisclosure()
   const ATTRIBUTION = useDisclosure()
-  const LIFECYCLE = useDisclosure()
 
   const [status, setStatus] = useState('created')
   const [checks, setChecks] = useState(false)
@@ -86,7 +85,6 @@ const SbomActions = ({ sbom }) => {
   const productVersion = sbom?.projectVersion
 
   const [deleteSbom] = useMutation(sbomDelete)
-  const [updateSbom, { loading: updating }] = useMutation(sbomUpdate)
   const [healthRecheck] = useMutation(recheckHealth)
 
   const { isOpen: isCopied, onClose: onCopiedClose } = useDisclosure()
@@ -193,25 +191,6 @@ const SbomActions = ({ sbom }) => {
     })
   }
 
-  const updateLifecycle = () => {
-    updateSbom({
-      variables: { id: sbomId, created: true, spec: sbom?.spec }
-    }).then((res) => {
-      if (res?.data?.sbomUpdate?.errors?.length > 0) {
-        showToast({
-          description: res?.data?.sbomUpdate?.errors[0],
-          status: 'warning'
-        })
-      } else {
-        showToast({
-          description: 'SBOM lifecycle updated successfully',
-          status: 'success'
-        })
-        LIFECYCLE.onClose()
-      }
-    })
-  }
-
   const updateLabel = noPrimaryComp
     ? 'No primary component for this SBOM to edit'
     : 'Edit'
@@ -232,17 +211,6 @@ const SbomActions = ({ sbom }) => {
           display={signedUrlParams ? 'none' : 'flex'}
           isDisabled={status === 'signed' || !updateSboms || noPrimaryComp}
         />
-        {/* FINALIZE SBOM BUID */}
-        {sbom?.lifecycle === 'draft' && (
-          <Tooltip label='Finalize'>
-            <IconButton
-              colorScheme='blue'
-              icon={<LuFileBox size={18} />}
-              onClick={LIFECYCLE.onOpen}
-              display={signedUrlParams || isFreeTier ? 'none' : 'flex'}
-            />
-          </Tooltip>
-        )}
         {/* GRAPH VIEW */}
         <PrimaryTreeView
           status={status}
@@ -355,23 +323,6 @@ const SbomActions = ({ sbom }) => {
           items={[
             'Remove this versions and its SBOM',
             'Remove access to this version for all users'
-          ]}
-        />
-      )}
-
-      {/* UPDATE LIFECYCLE */}
-      {LIFECYCLE.isOpen && (
-        <ConfirmationModal
-          isLoading={updating}
-          isOpen={LIFECYCLE.isOpen}
-          onClose={LIFECYCLE.onClose}
-          onConfirm={updateLifecycle}
-          name={`${sbom?.project?.projectGroup?.name} - ${sbom?.projectVersion}`}
-          title='Finalize SBOM Build'
-          description='Finalizing this SBOM will:'
-          items={[
-            'Create a new version',
-            'Prevent any further edits (you will not be able to revert it to draft)'
           ]}
         />
       )}

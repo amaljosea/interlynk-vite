@@ -22,7 +22,8 @@ const SupportSubHeader = ({
   handleClear,
   onSearchInputChange,
   selectedItems,
-  supportData
+  supportData,
+  isInDraft
 }) => {
   const { isCustomerView } = useRouteFlags()
 
@@ -49,7 +50,7 @@ const SupportSubHeader = ({
           <SupportFilters reset={reset} />
         </Flex>
         <Stack spacing={2} alignItems={'center'} direction={'row'}>
-          {!isCustomerView && (
+          {!isCustomerView && !isInDraft && (
             <Tooltip placement='left' label={'Rerun Support Analysis'}>
               <IconButton
                 icon={<LuActivity size={18} />}
@@ -87,6 +88,7 @@ const SupportSubHeader = ({
     handleSearch,
     reset,
     isCustomerView,
+    isInDraft,
     editComponent,
     selectedItems?.length,
     info,

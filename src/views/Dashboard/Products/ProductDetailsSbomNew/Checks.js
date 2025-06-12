@@ -195,6 +195,8 @@ const Checks = ({ sbomData }) => {
     }
   }
 
+  const isInDraft = sbomData?.lifecycle === 'draft'
+
   // COLUMNS
   const columns = ChecksColumns(
     setActiveRow,
@@ -206,7 +208,7 @@ const Checks = ({ sbomData }) => {
   )
 
   // SUB HEADER
-  const subHeader = ChecksSubHeader(reset, isArchived)
+  const subHeader = ChecksSubHeader(reset, isArchived, isInDraft)
 
   // SORTING
   const handleSort = (column, sortDirection) => {

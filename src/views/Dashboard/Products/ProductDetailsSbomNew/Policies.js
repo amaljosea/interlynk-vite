@@ -83,11 +83,19 @@ const Policies = ({ sbomData }) => {
     [onOpen]
   )
 
+  const isInDraft = sbomData?.lifecycle === 'draft'
+
   //Columns
   const columns = PolicyColumns(isInitialized)
 
   // SUB HEADER
-  const subHeader = PolicySubHeader(reset, isArchived, handleRefresh, policyRun)
+  const subHeader = PolicySubHeader(
+    reset,
+    isArchived,
+    handleRefresh,
+    policyRun,
+    isInDraft
+  )
 
   return (
     <>

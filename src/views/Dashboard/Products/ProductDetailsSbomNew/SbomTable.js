@@ -112,7 +112,7 @@ const SbomTable = ({ data, loading, error }) => {
             </TabPanel>
             {!isFreeTier && (
               <TabPanel px={0}>
-                <Support />
+                <Support sbomData={data} />
               </TabPanel>
             )}
             <TabPanel px={0}>

@@ -19,7 +19,7 @@ import { LuScanLine } from 'react-icons/lu'
 
 import CheckFilters from '../../CheckFilters'
 
-const ChecksSubHeader = (reset, isArchived) => {
+const ChecksSubHeader = (reset, isArchived, isInDraft) => {
   const { showToast } = useCustomToast()
 
   const activeTab = useQueryParam('tab')
@@ -120,33 +120,35 @@ const ChecksSubHeader = (reset, isArchived) => {
         </Flex>
 
         <Flex gap={2}>
-          <Tooltip label='Re-Check'>
-            <IconButton
-              fontSize={'sm'}
-              variant='solid'
-              colorScheme='blue'
-              fontWeight='normal'
-              onClick={handleReCheck}
-              hidden={isArchived}
-              isDisabled={!editChecks}
-              icon={<LuScanLine size={18} />}
-            />
-          </Tooltip>
+          {!isInDraft && (
+            <Tooltip label='Re-Check'>
+              <IconButton
+                fontSize={'sm'}
+                variant='solid'
+                colorScheme='blue'
+                fontWeight='normal'
+                onClick={handleReCheck}
+                hidden={isArchived}
+                isDisabled={!editChecks}
+                icon={<LuScanLine size={18} />}
+              />
+            </Tooltip>
+          )}
           <RefreshBtn />
         </Flex>
       </Flex>
     )
   }, [
-    isArchived,
     checkSearch,
     filterHead,
-    editChecks,
     reset,
+    isInDraft,
+    isArchived,
+    editChecks,
+    showToast,
     healthRecheck,
     sbomId,
-    showToast,
-    sbomCheckDispatch,
-    setCheckSearch
+    sbomCheckDispatch
   ])
 
   return subHeader

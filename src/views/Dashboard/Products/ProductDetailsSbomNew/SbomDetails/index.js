@@ -245,7 +245,10 @@ const SbomDetails = ({ sbomData }) => {
                   </Tooltip>
                   {/* PROCESS */}
                   {!signedUrlParams && (
-                    <SbomProcess hasFinished={hasFinished} />
+                    <SbomProcess
+                      lifecycle={lifecycle}
+                      hasFinished={hasFinished}
+                    />
                   )}
                 </CardBody>
               </Card>

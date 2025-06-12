@@ -349,6 +349,8 @@ const Vulnerabilities = ({ sbomData }) => {
     }
   }
 
+  const isInDraft = sbomData?.lifecycle === 'draft'
+
   const subHeader = VulnerabilitySubHeader({
     handleClear,
     handleScan,
@@ -360,7 +362,8 @@ const Vulnerabilities = ({ sbomData }) => {
     reset,
     selectedVulns,
     vulnSearch,
-    projectSettingsLoad
+    projectSettingsLoad,
+    isInDraft
   })
 
   const handleSort = (column, sortDirection) => {

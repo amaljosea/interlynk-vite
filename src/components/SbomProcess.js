@@ -21,7 +21,7 @@ import {
 
 import { SettingsTag } from './Misc/SettingsTag'
 
-const SbomProcess = ({ hasFinished }) => {
+const SbomProcess = ({ lifecycle, hasFinished }) => {
   const params = useParams()
   const { isFreeTier } = useGlobalQueryContext()
   const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
@@ -30,7 +30,9 @@ const SbomProcess = ({ hasFinished }) => {
     variables: { id: params?.productid }
   })
 
-  const { projectSetting } = settings?.project || ''
+  const isInDraft = lifecycle === 'draft'
+
+  const { projectSetting } = settings?.project || {}
   const {
     checksEnabled,
     enableAutoArchive,
@@ -58,46 +60,46 @@ const SbomProcess = ({ hasFinished }) => {
       />
       <Divider width={3} borderColor={sameSecondaryText} />
       <SettingsTag
-        label={`Checks ${checksEnabled ? 'Completed' : 'Skipped'}`}
+        label={`Checks ${checksEnabled && !isInDraft ? 'Completed' : 'Skipped'}`}
         icon={<LuSearch size={14} />}
-        isDisabled={!checksEnabled}
+        isDisabled={!checksEnabled || isInDraft}
       />
       <Divider width={3} borderColor={sameSecondaryText} />
       <SettingsTag
-        label={`Internal Labeling ${internalComp ? 'Completed' : 'Skipped'}`}
+        label={`Internal Labeling ${internalComp && !isInDraft ? 'Completed' : 'Skipped'}`}
         icon={<LuTag size={14} />}
-        isDisabled={!internalComp}
+        isDisabled={!internalComp || isInDraft}
       />
       <Divider width={3} borderColor={sameSecondaryText} />
       <SettingsTag
         label={`Auto Archive ${!enableAutoArchive ? 'Disabled' : hasFinished ? 'Completed' : 'Skipped'}`}
         icon={<LuArchive size={14} />}
-        isDisabled={!enableAutoArchive}
+        isDisabled={!enableAutoArchive || isInDraft}
       />
       <Divider width={3} borderColor={sameSecondaryText} />
       <SettingsTag
-        label={`Automation ${automatedFixesEnabled ? 'Completed' : 'Skipped'}`}
+        label={`Automation ${automatedFixesEnabled && !isInDraft ? 'Completed' : 'Skipped'}`}
         icon={<LuBot size={14} />}
-        isDisabled={!automatedFixesEnabled}
+        isDisabled={!automatedFixesEnabled || isInDraft}
       />
       <Divider width={3} borderColor={sameSecondaryText} />
       <SettingsTag
         label={`Vulnerability Scan ${!vulnScan ? 'Disabled' : hasFinished ? 'Completed' : 'Pending'}`}
         icon={<LuBug size={14} />}
-        isDisabled={!hasFinished || !vulnScan}
+        isDisabled={!hasFinished || !vulnScan || isInDraft}
       />
       <Divider width={3} hidden={isFreeTier} borderColor={sameSecondaryText} />
       <SettingsTag
         hidden={isFreeTier}
         label={`Component Support Analysis ${!enableSupportLevel ? 'Disabled' : hasFinished ? 'Completed' : 'Skipped'}`}
         icon={<LuActivity size={14} />}
-        isDisabled={!enableSupportLevel}
+        isDisabled={!enableSupportLevel || isInDraft}
       />
       <Divider width={3} borderColor={sameSecondaryText} />
       <SettingsTag
         label={`SBOM ${!isSbomPending ? 'Ready' : 'not ready'}`}
         icon={<LuCheck size={14} />}
-        isDisabled={isSbomPending}
+        isDisabled={isSbomPending || isInDraft}
       />
     </Flex>
   )

@@ -3,6 +3,7 @@ import { addDays, differenceInDays, parseISO } from 'date-fns'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
+  capitalizeFirstLetter,
   getFullDate,
   getSignedUrlParams,
   timeSince,
@@ -13,6 +14,7 @@ import {
   Box,
   Divider,
   Flex,
+  Icon,
   Menu,
   MenuItem,
   MenuList,
@@ -37,7 +39,12 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { LuMessageCircleOff, LuRepeat } from 'react-icons/lu'
+import {
+  LuFilePen,
+  LuMessageCircleOff,
+  LuRepeat,
+  LuSquareCheckBig
+} from 'react-icons/lu'
 
 const StatusInfo = ({ data }) => {
   return (
@@ -159,10 +166,22 @@ const VersionColumns = (props) => {
           })
           const showIcon = alternatives?.length > 0
           const lifestage = String(productLifeCycleStage)?.replaceAll(/_/g, ' ')
+          const lifecycleIcon =
+            lifecycle === 'draft' ? LuFilePen : LuSquareCheckBig
+          const lifecycleLabel = capitalizeFirstLetter(lifecycle)
 
           return (
             <Stack my={3} spacing={1} className={index === 0 ? 'versions' : ''}>
               <Flex gap={2} alignItems={'center'} flexWrap={'wrap'}>
+                <Tooltip label={lifecycleLabel}>
+                  <Box>
+                    <Icon
+                      fontSize={18}
+                      as={lifecycleIcon}
+                      color={primaryTextColor}
+                    />
+                  </Box>
+                </Tooltip>
                 <Link to={link} onClick={onStartTour} data-testid={`version`}>
                   <Tooltip label={projectVersion}>
                     <Text
@@ -174,15 +193,6 @@ const VersionColumns = (props) => {
                     </Text>
                   </Tooltip>
                 </Link>
-                <Tag
-                  fontSize={12}
-                  variant='subtle'
-                  w={'fit-content'}
-                  colorScheme='green'
-                  textTransform={'capitalize'}
-                >
-                  {lifecycle}
-                </Tag>
                 {productLifeCycleStage && (
                   <Tag
                     fontSize={12}
