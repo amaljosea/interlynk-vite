@@ -6204,3 +6204,69 @@ export const GetVulnDataForCSV = gql`
     }
   }
 `
+
+export const GetGlobalVulnCSVData = gql`
+  query GetGlobalVulnExportData(
+    $first: Int
+    $last: Int
+    $env: String
+    $after: String
+    $before: String
+    $search: String
+    $severity: [String!]
+    $projectNames: [String!]
+    $projectIds: [Uuid!]
+    $projectGroupIds: [Uuid!]
+    $status: [String!]
+    $kev: Boolean
+    $epss: RangeInput
+    $field: VulnOrderByFields!
+    $direction: OrderByDirection!
+    $projectGroupLabelIds: [Uuid!]
+  ) {
+    organization {
+      vulns(
+        after: $after
+        first: $first
+        before: $before
+        last: $last
+        search: $search
+        projectNames: $projectNames
+        projectGroupIds: $projectGroupIds
+        projectGroupLabelIds: $projectGroupLabelIds
+        status: $status
+        severity: $severity
+        kev: $kev
+        epss: $epss
+        orderBy: { field: $field, direction: $direction }
+        projectIds: $projectIds
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          hasPreviousPage
+          startCursor
+        }
+        nodes {
+          vulnId
+          sev
+          source
+          cvssScore
+          publishedAt
+          lastModifiedAt
+          vulnInfo {
+            epssScores
+          }
+          metrics(projectName: $env) {
+            affectedCount
+            fixedCount
+            inTriageCount
+            notAffectedCount
+            unspecifiedCount
+          }
+        }
+      }
+    }
+  }
+`
