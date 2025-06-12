@@ -16,7 +16,11 @@ const ArchiveSbom = ({ isOpen, onClose, data, projectGroup }) => {
   const isArchived = isSbomArchived(data)
 
   const [updateSbom] = useMutation(sbomUpdate, {
-    refetchQueries: ['GetVersionsTable']
+    refetchQueries: [
+      'GetVersionsTable',
+      'GetProjectDetails',
+      'GetArchivedVersions'
+    ]
   })
 
   const [isLoading, setIsLoading] = useState(false)
