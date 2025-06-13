@@ -35,8 +35,8 @@ import {
 } from 'graphQL/Mutation'
 import {
   FirstDegreePartVulns,
-  GetVulnData,
   GetVulnFilterData,
+  GetVulnProductDetails,
   ShareVulnFilters
 } from 'graphQL/Queries'
 import { verfifyCustomVuln } from 'graphQL/Queries'
@@ -114,7 +114,7 @@ const Vulnerabilities = ({ sbomData }) => {
   const epssRange = parseEpssRange(epss)
 
   const { nodes, paginationProps, loading, reset } = usePaginatedQuery(
-    GetVulnData,
+    GetVulnProductDetails,
     {
       skip: sbomId && activeTab === 'vulnerabilities' ? false : true,
       selector: 'sbom.vulns',

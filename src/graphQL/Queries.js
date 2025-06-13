@@ -6270,3 +6270,115 @@ export const GetGlobalVulnCSVData = gql`
     }
   }
 `
+
+export const GetVulnProductDetails = gql`
+  query GetVulnTableData(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $search: String
+    $severity: [String!]
+    $status: [String!]
+    $componentName: [String!]
+    $source: SbomVulnSourceEnum
+    $kev: Boolean
+    $epss: RangeInput
+    $direct: Boolean
+    $vexComplete: Boolean
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $orderBy: ComponentVulnOrderByInput
+    $includeRetracted: Boolean
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      vulns(
+        sbomId: $sbomId
+        search: $search
+        severity: $severity
+        status: $status
+        componentName: $componentName
+        vulnerabilitySource: $source
+        kev: $kev
+        epss: $epss
+        direct: $direct
+        vexComplete: $vexComplete
+        after: $after
+        before: $before
+        first: $first
+        last: $last
+        orderBy: $orderBy
+        includeRetracted: $includeRetracted
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
+          id
+          sbomId
+          vexJustificationId
+          isPart
+          isComplete
+          fixedVersions
+          lastAffectedVersions
+          note
+          detail
+          actionStmt
+          fixedIn
+          impact
+          externalUrls {
+            name
+            url
+          }
+          vuln {
+            id
+            vulnId
+            source
+            updatedAt
+            cvssScore
+            cvssVector
+            nvdAliasId
+            desc
+            sev
+            publishedAt
+            lastModifiedAt
+            vulnInfo {
+              epssPercentile
+              kev
+              cwes
+              advisories
+            }
+          }
+          component {
+            name
+            version
+            sbom {
+              project {
+                projectGroup {
+                  id
+                  name
+                }
+              }
+            }
+          }
+          vexStatus {
+            id
+            name
+          }
+          vexJustification {
+            id
+            name
+          }
+          cdxResponse {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+`
