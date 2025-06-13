@@ -52,7 +52,7 @@ const GetLifecycleData = gql`
 const LifecycleModal = ({ data, isOpen, onClose }) => {
   const { showToast } = useCustomToast()
   const [updateStage, { loading }] = useMutation(UpdateLifecycle, {
-    refetchQueries: ['GetVersionsTable']
+    refetchQueries: ['GetVersionsTable', 'GetProductData']
   })
 
   const { data: sbomData } = useQuery(GetLifecycleData, {
