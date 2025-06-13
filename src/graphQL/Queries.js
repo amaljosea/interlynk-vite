@@ -2040,68 +2040,78 @@ export const ShareComponentData = gql`
           }
           nodes {
             id
-            name
             sbomId
             sbom {
               id
               projectVersion
               project {
-                id
                 projectGroup {
                   name
                 }
               }
             }
+            name
             version
             primary
             internal
             purl
-            copyright
             cpes
-            updatedAt
-            uniqueId
-            kind
-            copyright
-            publisher
-            description
             licensesExp
+            updatedAt
             group
+            description
+            copyright
+            kind
             scope
             externalUrls {
               name
               url
             }
-            suppliers {
-              id
-              name
-              url
-              contactEmail
-              contactName
-            }
-            dependencyOf {
-              id
-              relType
-              fromId
-              toId
-              fromComp {
-                id
-                name
-                version
-              }
-              updatedAt
-            }
-            dependsOn {
-              id
-              relType
-              fromId
-              toId
-              toComp {
-                id
-                name
-                version
-              }
-              updatedAt
-            }
+          }
+        }
+      }
+    }
+  }
+`
+
+export const ShareComponentExpandedData = gql`
+  query ShareComponentExpandedData($id: Uuid!) {
+    shareLynkQuery {
+      component(id: $id) {
+        id
+        __typename
+        name
+        kind
+        version
+        description
+        purl
+        cpes
+        scope
+        licensesExp
+
+        suppliers {
+          id
+          name
+          url
+          contactEmail
+          contactName
+        }
+
+        dependsOn {
+          toComp {
+            id
+            name
+            version
+            updatedAt
+          }
+        }
+
+        dependencyOf {
+          fromComp {
+            id
+            name
+            version
+            updatedAt
           }
         }
       }

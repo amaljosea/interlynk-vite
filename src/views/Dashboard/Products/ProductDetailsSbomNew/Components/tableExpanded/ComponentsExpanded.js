@@ -15,23 +15,35 @@ import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetComponentExpandedData } from 'graphQL/Queries'
+import { ShareComponentExpandedData } from 'graphQL/Queries'
 
 const ExpandedComponent = ({ data, isArchived, action }) => {
+  const { isCustomerView } = useRouteFlags()
+  const { isFreeTier } = useGlobalQueryContext()
+  const signedUrlParams = getSignedUrlParams()
+
+  const componentId = data?.id
+  const sbomId = data?.sbomId
+
   const {
     data: componentData,
     loading,
     error
-  } = useQuery(GetComponentExpandedData, {
-    skip: !data?.id,
-    variables: {
-      sbomId: data?.sbomId,
-      id: data?.id
-    },
-    fetchPolicy: 'cache-first',
-    nextFetchPolicy: 'cache-first'
-  })
+  } = useQuery(
+    isCustomerView ? ShareComponentExpandedData : GetComponentExpandedData,
+    {
+      skip: !componentId,
+      variables: isCustomerView
+        ? { id: componentId }
+        : { id: componentId, sbomId },
+      fetchPolicy: 'cache-first',
+      nextFetchPolicy: 'cache-first'
+    }
+  )
 
-  const component = componentData?.component
+  const component = isCustomerView
+    ? componentData?.shareLynkQuery?.component
+    : componentData?.component
 
   const {
     version,
@@ -40,10 +52,6 @@ const ExpandedComponent = ({ data, isArchived, action }) => {
   } = component || {}
   const { endDate, retainManualOverrideFor, notes, user } = manual || {}
   // const openSSF = openSsf?.find((item) => item?.name === component?.purl)
-
-  const { isCustomerView } = useRouteFlags()
-  const signedUrlParams = getSignedUrlParams()
-  const { isFreeTier } = useGlobalQueryContext()
 
   const { primaryBlueText, primaryTextColor } = useThemeColor([
     'primaryBlueText',
