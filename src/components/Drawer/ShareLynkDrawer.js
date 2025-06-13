@@ -3,10 +3,22 @@ import { useMemo, useState } from 'react'
 import { getFullDate, timeSince, truncatedValue } from 'utils'
 import { getShareLinklUrl } from 'utils/url'
 
-import { Button, Checkbox, Divider, Input, Stack, Tag } from '@chakra-ui/react'
-import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
-import { Flex, Text, Tooltip } from '@chakra-ui/react'
-import { useClipboard } from '@chakra-ui/react'
+import {
+  Box,
+  Button,
+  Checkbox,
+  Divider,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
+  Stack,
+  Tag,
+  Text,
+  Tooltip,
+  useClipboard
+} from '@chakra-ui/react'
 
 import ConfirmDeleteButton from 'components/ConfirmDeleteButton'
 import AddButton from 'components/Icons/AddButton'
@@ -21,7 +33,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { CreateShareLynk, DeleteSharelynk } from 'graphQL/Mutation'
 import { GetSharelynks } from 'graphQL/Queries'
 
-import { PiFileSvgDuotone } from 'react-icons/pi'
+import { LuFileSymlink } from 'react-icons/lu'
 
 const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
   const { showToast } = useCustomToast()
@@ -40,8 +52,14 @@ const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
   const [noExpire, setNoExpire] = useState(false)
   const [show, setShow] = useState(false)
 
-  const [createLynk, { loading: createLoading }] = useMutation(CreateShareLynk)
-  const [deleteLynk, { loading: deleteLoading }] = useMutation(DeleteSharelynk)
+  const [createLynk, { loading: createLoading }] = useMutation(
+    CreateShareLynk,
+    { refetchQueries: ['GetSharelynks'] }
+  )
+  const [deleteLynk, { loading: deleteLoading }] = useMutation(
+    DeleteSharelynk,
+    { refetchQueries: ['GetSharelynks'] }
+  )
 
   const { data, loading } = useQuery(GetSharelynks, {
     skip: isOpen ? false : true,
@@ -50,7 +68,7 @@ const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
       ids: [groupId]
     }
   })
-  const { nodes } = data?.shareLynks || ''
+  const { nodes } = data?.shareLynks || {}
 
   const svgLink = useClipboard(
     `${BACKEND_URL}/api/v1/badges?type=hcard&project_group_id=${groupId}`
@@ -135,15 +153,15 @@ const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
       <Flex gap={2} alignItems={'center'} justifyContent={'flex-end'}>
         {nodes?.length > 0 && (
           <Tooltip label='SVG Link' placement='left'>
-            <>
+            <Box>
               <CopyButton
-                icon={<PiFileSvgDuotone size={26} />}
-                hasCopied={svgLink?.hasCopied}
-                onCopy={onCopySvg}
                 size={'md'}
+                onCopy={onCopySvg}
+                hasCopied={svgLink?.hasCopied}
+                icon={<LuFileSymlink size={18} />}
                 colorScheme={{ copied: 'green', default: 'blue' }}
               />
-            </>
+            </Box>
           </Tooltip>
         )}
         <AddButton
@@ -176,10 +194,10 @@ const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
         return (
           <Flex my={4} gap={2} alignItems={'center'}>
             <CopyButton
+              size={'md'}
               isDisabled={!enabled}
               hasCopied={sbomLink?.hasCopied}
               onCopy={() => sbomLink.onCopy()}
-              size={'md'}
               colorScheme={{ copied: 'green', default: 'blue' }}
             />
             <Input
@@ -213,6 +231,7 @@ const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
         const dateB = new Date(b.updatedAt)
         return dateA - dateB // Sort in descending order
       },
+      width: '25%',
       right: 'true',
       wrap: true
     },
@@ -227,23 +246,26 @@ const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
           loading={deleteLoading}
         />
       ),
-      width: '25%',
       right: 'true'
     }
   ]
 
+  const SubTitle = () => {
+    return (
+      <Tag colorScheme='blue' wordBreak={'break-all'}>
+        {name ? truncatedValue(name, 20) : ''}
+      </Tag>
+    )
+  }
+
   return (
     <LynkDrawer
-      title={'ShareLynks'}
-      subtitle={
-        <Tag colorScheme='blue' wordBreak={'break-all'}>
-          {name ? truncatedValue(name, 20) : ''}
-        </Tag>
-      }
+      noFooter
       size='lg'
       isOpen={isOpen}
       onClose={onClose}
-      noFooter
+      title={'ShareLynks'}
+      subtitle={<SubTitle />}
     >
       <Stack hidden={!show} mt={1} spacing={3}>
         <FormControl isInvalid={!isValidDate} hidden={noExpire}>
