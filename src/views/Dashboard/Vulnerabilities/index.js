@@ -15,7 +15,7 @@ import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import useQueryParam from 'hooks/useQueryParam'
 import { useRouteFlags } from 'hooks/useRouteFlags'
 
-import { GetGlobalVulns } from 'graphQL/Queries'
+import { GetGlobalVulnerabilityList } from 'graphQL/Queries'
 
 import VulnInfo from './vulnInfo'
 
@@ -55,7 +55,7 @@ const Vulnerabilities = () => {
   }
 
   const { nodes, paginationProps, reset, loading } = usePaginatedQuery(
-    GetGlobalVulns,
+    GetGlobalVulnerabilityList,
     {
       skip: tab === 'productVulnerabilities' && vulnsPermissions ? false : true,
       selector: 'organization.vulns',

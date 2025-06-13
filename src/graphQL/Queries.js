@@ -6369,3 +6369,72 @@ export const GetVulnProductDetails = gql`
     }
   }
 `
+export const GetGlobalVulnerabilityList = gql`
+  query GetGlobalVulns(
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $search: String
+    $severity: [String!]
+    $status: [String!]
+    $kev: Boolean
+    $epss: RangeInput
+    $field: VulnOrderByFields!
+    $direction: OrderByDirection!
+    $projectNames: [String!]
+    $projectIds: [Uuid!]
+    $projectGroupIds: [Uuid!]
+    $projectGroupLabelIds: [Uuid!]
+    $env: String
+  ) {
+    organization {
+      vulns(
+        after: $after
+        first: $first
+        before: $before
+        last: $last
+        search: $search
+        projectNames: $projectNames
+        projectGroupIds: $projectGroupIds
+        projectGroupLabelIds: $projectGroupLabelIds
+        status: $status
+        severity: $severity
+        kev: $kev
+        epss: $epss
+        orderBy: { field: $field, direction: $direction }
+        projectIds: $projectIds
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          hasPreviousPage
+          startCursor
+        }
+        nodes {
+          vulnId
+          id
+          source
+          lastModifiedAt
+          publishedAt
+          sev
+          cvssScore
+          nvdAliasId
+          metrics(projectName: $env) {
+            unspecifiedCount
+            inTriageCount
+            affectedCount
+            fixedCount
+            notAffectedCount
+          }
+          vulnInfo {
+            kev
+            epssScores
+            epssScore
+          }
+        }
+      }
+    }
+  }
+`

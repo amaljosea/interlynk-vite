@@ -19,7 +19,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
-import { GetGlobalVulns, GetOrgMfc } from 'graphQL/Queries'
+import { GetGlobalVulnerabilityList, GetOrgMfc } from 'graphQL/Queries'
 
 const tabs = [
   'versions',
@@ -94,7 +94,7 @@ const ProductTabs = (props) => {
     reset,
     paginationProps,
     loading: globalVulnloading
-  } = usePaginatedQuery(GetGlobalVulns, {
+  } = usePaginatedQuery(GetGlobalVulnerabilityList, {
     skip: tab === VULNERABILITIES ? false : true,
     selector: 'organization.vulns',
     variables: { ...vulnFilters }
