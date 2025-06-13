@@ -2490,15 +2490,9 @@ export const ShareVulnData = gql`
           }
           nodes {
             id
-            impact
             isPart
             isFirstDegreePart
-            cdxResponseId
             externalUrls {
-              name
-              url
-            }
-            currentExternalUrls {
               name
               url
             }
@@ -2515,49 +2509,32 @@ export const ShareVulnData = gql`
               updatedAt
               vulnInfo {
                 cveId
+                advisories
+                cwes
                 epssScore
-                epssScores
                 epssPercentile
                 kev
               }
             }
             componentVulnLogs {
               id
-              changedBy
-              status
-              justification
-              impact
-              note
-              detail
-              response
-              actionStmt
-              fixedIn
-              updatedAt
             }
             component {
               name
               version
               sbom {
                 id
-                createdAt
                 projectVersion
                 project {
+                  id
                   projectGroup {
                     name
+                    id
                   }
-                }
-                primaryComponent {
-                  name
-                  version
                 }
               }
             }
             vexStatus {
-              id
-              name
-            }
-            vexJustification {
-              id
               name
             }
           }
