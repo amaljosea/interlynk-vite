@@ -33,7 +33,7 @@ import {
   GetComponentDataForPdf,
   GetProductManufacturer,
   GetSbomQualityScores,
-  GetVulnData,
+  GetVulnDataForPdf,
   SignedSbomDownload
 } from 'graphQL/Queries'
 
@@ -185,7 +185,7 @@ const DownloadModal = (props) => {
 
         if (vulnsHasNextPage) {
           const vulnRes = await client.query({
-            query: GetVulnData,
+            query: GetVulnDataForPdf,
             variables: {
               projectId: productId,
               sbomId,

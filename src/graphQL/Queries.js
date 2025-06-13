@@ -6438,3 +6438,70 @@ export const GetGlobalVulnerabilityList = gql`
     }
   }
 `
+export const GetVulnDataForPdf = gql`
+  query GetVulnData(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $first: Int
+    $after: String
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      vulns(sbomId: $sbomId, first: $first, after: $after) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
+          id
+          impact
+          note
+          actionStmt
+          componentVulnCustomFields {
+            componentVulnCustomFieldDefinition {
+              displayName
+            }
+            value
+          }
+          vuln {
+            vulnId
+            desc
+            source
+            publishedAt
+            vulnInfo {
+              epssPercentile
+              epssScores
+              kev
+            }
+          }
+          component {
+            name
+            version
+            sbom {
+              id
+              project {
+                id
+                projectGroup {
+                  id
+                  name
+                }
+              }
+              primaryComponent {
+                name
+                version
+              }
+            }
+          }
+          vexStatus {
+            name
+          }
+          vexJustification {
+            name
+          }
+        }
+      }
+    }
+  }
+`
