@@ -4848,15 +4848,6 @@ export const GetProjectGroupAndVersionDetails = gql`
         nodes {
           id
           name
-          defaultProject {
-            id
-            sbomVersions {
-              nodes {
-                id
-                projectVersion
-              }
-            }
-          }
           projects {
             id
             name
