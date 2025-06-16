@@ -7,10 +7,13 @@ import { UpdateProjectGroup } from 'graphQL/Mutation'
 import ConfirmationModal from './ConfirmationModal'
 
 const StatusModal = ({ isOpen, onClose, group }) => {
-  const { id, enabled, name } = group || ''
-
-  const [projectGroupUpdate, { loading }] = useMutation(UpdateProjectGroup)
   const showToast = useCustomToast()
+
+  const { id, enabled, name } = group || {}
+
+  const [projectGroupUpdate, { loading }] = useMutation(UpdateProjectGroup, {
+    refetchQueries: ['GetProductTable']
+  })
 
   // TOGGLE STATUS
   const toggleStatus = async () => {

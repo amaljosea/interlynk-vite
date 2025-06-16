@@ -13,10 +13,14 @@ import { LuBox } from 'react-icons/lu'
 
 const ProductModal = ({ isOpen, onClose, data }) => {
   const { id, name, description } = data || ''
-  const [projectGroupCreate, { loading: crLoading }] =
-    useMutation(CreateProjectGroup)
-  const [projectGroupUpdate, { loading: upLoading }] =
-    useMutation(UpdateProjectGroup)
+  const [projectGroupCreate, { loading: crLoading }] = useMutation(
+    CreateProjectGroup,
+    { refetchQueries: ['GetProductTable', 'GetTotalProduct'] }
+  )
+  const [projectGroupUpdate, { loading: upLoading }] = useMutation(
+    UpdateProjectGroup,
+    { refetchQueries: ['GetProductTable', 'GetTotalProduct'] }
+  )
 
   const initialData = { name: name || '', desc: description || '' }
   const [formData, setFormData] = useState(initialData)

@@ -22,7 +22,7 @@ const EnvironmentButtons = ({
   const resolvedProductId = isGeneralFilter ? true : params.productid
 
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
-  const { id, projects, defaultProject } = data || ''
+  const { id, projects, defaultProject } = data || {}
 
   const { secondaryBlueBorder } = useThemeColor(['secondaryBlueBorder'])
 

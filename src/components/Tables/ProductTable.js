@@ -77,8 +77,10 @@ const ProductTable = ({ data, reset, loading, paginationProps }) => {
   })
   const productLabels = prodLabels?.labels?.nodes || []
 
-  const [deleteProjectGroup, { loading: deleting }] =
-    useMutation(DeleteProjectGroup)
+  const [deleteProjectGroup, { loading: deleting }] = useMutation(
+    DeleteProjectGroup,
+    { refetchQueries: ['GetProductTable', 'GetTotalProduct'] }
+  )
 
   const action = (type, data) => {
     setActiveRow(data)

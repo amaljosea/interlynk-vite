@@ -10,8 +10,10 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { UpdateProjectGroup } from 'graphQL/Mutation'
 
 const LabelInput = ({ data, setOpen, onOpenLabel, nodes }) => {
-  const { id: prodId, name, desc, labels } = data || ''
-  const [projectGroupUpdate] = useMutation(UpdateProjectGroup)
+  const { id: prodId, name, desc, labels } = data || {}
+  const [projectGroupUpdate] = useMutation(UpdateProjectGroup, {
+    refetchQueries: ['GetProductTable']
+  })
 
   const { primaryBlueText, sameSecondaryText } = useThemeColor([
     'primaryBlueText',

@@ -332,7 +332,7 @@ export const GetProductNames = gql`
 `
 
 export const GetProductTable = gql`
-  query GetProjectTable(
+  query GetProductTable(
     $search: String
     $enabled: Boolean
     $labelIds: [Uuid!]

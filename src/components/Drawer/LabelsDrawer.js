@@ -14,9 +14,15 @@ import { LabelCreate, LabelDelete, LabelUpdate } from 'graphQL/Mutation'
 
 const LabelsDrawer = ({ isOpen, onClose, data = [], loading }) => {
   const { showToast } = useCustomToast()
-  const [createLabel] = useMutation(LabelCreate)
-  const [updateLabel] = useMutation(LabelUpdate)
-  const [deleteLabelMutation] = useMutation(LabelDelete)
+  const [createLabel] = useMutation(LabelCreate, {
+    refetchQueries: ['GetLabels']
+  })
+  const [updateLabel] = useMutation(LabelUpdate, {
+    refetchQueries: ['GetLabels']
+  })
+  const [deleteLabelMutation] = useMutation(LabelDelete, {
+    refetchQueries: ['GetLabels']
+  })
 
   const [labels, setLabels] = useState([])
 

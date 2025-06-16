@@ -173,6 +173,15 @@ const ProductColumns = (props) => {
         wrap: true,
         sortable: true
       },
+      // ENVIRONMENT
+      {
+        id: 'ENVIRONMENTS',
+        name: 'ENVIRONMENTS',
+        selector: (row) => <EnvList data={row} />,
+        width: '20%',
+        wrap: true,
+        right: signedUrlParams ? true : false
+      },
       // UPDATEDAT
       {
         id: 'PROJECT_GROUPS_UPDATED_AT',
@@ -194,15 +203,6 @@ const ProductColumns = (props) => {
           return dateA - dateB
         },
         wrap: true
-      },
-      // ENVIRONMENT
-      {
-        id: 'ENVIRONMENTS',
-        name: 'ENVIRONMENTS',
-        selector: (row) => <EnvList data={row} />,
-        width: '20%',
-        wrap: true,
-        right: signedUrlParams ? true : false
       },
       // ACTIONS
       {
@@ -246,7 +246,7 @@ const ProductColumns = (props) => {
                   {openTagMenu && !labelLoading && (
                     <Fade initialScale={0.9} in={openTagMenu} delay={0.2}>
                       <Box
-                        top={0}
+                        bottom={0}
                         h={'auto'}
                         right={226}
                         width='220px'

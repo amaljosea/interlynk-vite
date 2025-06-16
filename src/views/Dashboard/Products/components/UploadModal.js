@@ -44,7 +44,13 @@ const UploadModal = ({ isOpen, onClose, group }) => {
 
   const { projects } = data?.projectGroup || {}
 
-  const [sbomUpload, { error, loading: uploading }] = useMutation(UploadSbom)
+  const [sbomUpload, { error, loading: uploading }] = useMutation(UploadSbom, {
+    refetchQueries: [
+      'GetProductTable',
+      'GetProjectGroupDetails',
+      'GetVersionsTable'
+    ]
+  })
 
   const defaultENV = projects?.find((item) =>
     envName ? item?.name === envName : item?.name === 'default'
