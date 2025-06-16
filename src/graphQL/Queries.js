@@ -491,6 +491,20 @@ export const GetProjectGroups = gql`
   }
 `
 
+export const GetJiraSettings = gql`
+  query GetJiraSettings($id: Uuid!) {
+    project(id: $id) {
+      projectSetting {
+        id
+        jiraProject
+        jiraIssueType
+        jiraAssignee
+        jiraReporter
+      }
+    }
+  }
+`
+
 // GET PROJECT SETTINGS
 export const GetProjectSettings = gql`
   query GetProjectSettings($id: Uuid!) {

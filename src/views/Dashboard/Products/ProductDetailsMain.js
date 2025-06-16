@@ -16,7 +16,6 @@ import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { GetProjectSettings } from 'graphQL/Queries'
 
-// import { ProductGraphs } from './ProductGraphs'
 import ProgressOverviewCard from './ProductGraphs/ProgressOverviewCard'
 import ProductActions from './components/ProductActions'
 import ProductInfo from './components/ProductInfo'

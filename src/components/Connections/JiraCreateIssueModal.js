@@ -1,4 +1,4 @@
-import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { generateDescription, generateJiraDescription } from 'utils/ticketUtils'
@@ -18,22 +18,9 @@ import {
   GetJiraProjects,
   JiraInformation
 } from 'graphQL/Queries'
+import { GetJiraSettings } from 'graphQL/Queries'
 
 import { LuBolt } from 'react-icons/lu'
-
-const GetProjectSettings = gql`
-  query GetProjectSettings($id: Uuid!) {
-    project(id: $id) {
-      projectSetting {
-        id
-        jiraProject
-        jiraIssueType
-        jiraAssignee
-        jiraReporter
-      }
-    }
-  }
-`
 
 const JiraCreateIssueModal = ({
   isOpen,
@@ -82,7 +69,7 @@ const JiraCreateIssueModal = ({
         }))
       : []
 
-  const { data: settings } = useQuery(GetProjectSettings, {
+  const { data: settings } = useQuery(GetJiraSettings, {
     skip: isOpen ? false : true,
     variables: { id: params.productid }
   })

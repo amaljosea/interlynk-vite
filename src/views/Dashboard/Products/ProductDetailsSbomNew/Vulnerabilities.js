@@ -46,8 +46,8 @@ import VulnerabilityColumns from './Components/tableColumns/VulnerabilityColumns
 import ExpandedComponent from './Components/tableExpanded/VulnerabilityExpanded'
 import VulnerabilitySubHeader from './Components/tableSubHeaders/VulnerabilitySubHeader'
 
-export const GetProjectSettings = gql`
-  query GetProjectSettings($id: Uuid!) {
+export const GetVulnSettings = gql`
+  query GetVulnSettings($id: Uuid!) {
     project(id: $id) {
       projectSetting {
         vulnScanningEnabled
@@ -68,7 +68,7 @@ const Vulnerabilities = ({ sbomData }) => {
   })
 
   const { data: projectSettings, loading: projectSettingsLoad } = useQuery(
-    GetProjectSettings,
+    GetVulnSettings,
     {
       variables: { id: productId }
     }

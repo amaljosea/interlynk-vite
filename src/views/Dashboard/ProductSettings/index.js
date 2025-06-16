@@ -59,7 +59,9 @@ const Settings = ({ enabled, data, mfc }) => {
     childKey: 'edit_product_settings'
   })
 
-  const [updateSettings] = useMutation(ProjectSettingUpdate)
+  const [updateSettings] = useMutation(ProjectSettingUpdate, {
+    refetchQueries: ['GetProjectSettings', 'GetProjectInfo']
+  })
 
   const { isOpen: isChecksOpen, onClose: onChecksClose } = useDisclosure()
 

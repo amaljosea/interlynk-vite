@@ -1,4 +1,4 @@
-import { gql, useMutation, useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getSettingsLabel } from 'utils'
@@ -12,23 +12,13 @@ import { useJiraConnection } from 'hooks/useJiraConnection'
 import useQueryParam from 'hooks/useQueryParam'
 
 import { ProjectSettingUpdate } from 'graphQL/Mutation'
-import { GetJiraProjects, JiraInformation } from 'graphQL/Queries'
+import {
+  GetJiraProjects,
+  GetJiraSettings,
+  JiraInformation
+} from 'graphQL/Queries'
 
 import LynkSelect from './LynkSelect'
-
-const GetProjectSettings = gql`
-  query GetProjectSettings($id: Uuid!) {
-    project(id: $id) {
-      projectSetting {
-        id
-        jiraProject
-        jiraIssueType
-        jiraAssignee
-        jiraReporter
-      }
-    }
-  }
-`
 
 const JiraFields = () => {
   const params = useParams()
@@ -96,7 +86,7 @@ const JiraFields = () => {
         }))
       : []
 
-  const { data: settings } = useQuery(GetProjectSettings, {
+  const { data: settings } = useQuery(GetJiraSettings, {
     skip: activeTab === 'settings' ? false : true,
     variables: { id: productId }
   })
