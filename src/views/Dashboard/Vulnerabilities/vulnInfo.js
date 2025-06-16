@@ -99,11 +99,11 @@ const VulnInfo = () => {
     skip: params?.productid ? false : true,
     variables: { id: params?.productid }
   })
-  const { nodes } = versions?.project?.sbomVersions || ''
+  const { nodes } = versions?.project?.sbomVersions || {}
 
   const productVersions = nodes?.map((item) => item?.projectVersion)
 
-  const { vuln } = data || ''
+  const { vuln } = data || {}
   const {
     source,
     desc,
@@ -118,7 +118,7 @@ const VulnInfo = () => {
     sbomVersionsCount,
     sev,
     cvssScore
-  } = vuln || ''
+  } = vuln || {}
 
   const { kev, epssScore, epssPercentile, cwes } = vulnInfo || ''
 
@@ -135,7 +135,7 @@ const VulnInfo = () => {
       projectGroupIds: [params?.productgroupid]
     }
   })
-  const { totalCount } = vulns?.componentVulns || ''
+  const { totalCount } = vulns?.componentVulns || {}
 
   const cvssColor =
     cvssVector && !cvssVector?.startsWith('[')
@@ -249,6 +249,7 @@ const VulnInfo = () => {
                     <Text
                       color={cvssColor}
                       cursor={'pointer'}
+                      wordBreak={'break-all'}
                       onClick={() => (isInvalid ? null : onOpen())}
                     >
                       {cvssVector || 'N/A'}
