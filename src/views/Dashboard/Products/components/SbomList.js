@@ -85,7 +85,6 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
     {
       id: 'COMPONENTS',
       name: 'COMPONENTS',
-      compact: true,
       wrap: true,
       selector: (row) => {
         const { stats } = row || {}
@@ -159,7 +158,6 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
     {
       id: 'ACTIONS',
       name: 'ACTIONS',
-      compact: true,
       right: true,
       wrap: true,
       selector: (row) => (

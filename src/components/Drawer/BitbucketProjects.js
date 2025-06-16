@@ -127,7 +127,6 @@ const BitbucketProjects = ({ isOpen, onClose }) => {
     {
       id: 'REPOSITORIES',
       name: 'REPOSITORIES',
-      compact: true,
       selector: (row) => {
         const { mainbranch, name } = row || ''
         return (

@@ -66,7 +66,6 @@ const VulnProductsDrawer = ({ isOpen, onClose, data }) => {
     {
       id: 'PRODUCT_GROUP',
       name: 'PRODUCT',
-      compact: true,
       selector: (row) => {
         const { name } = row
         return (
@@ -82,7 +81,6 @@ const VulnProductsDrawer = ({ isOpen, onClose, data }) => {
     {
       id: 'VEX_UPDATED_AT',
       name: 'UPDATED',
-      compact: true,
       selector: (row) => (
         <Tooltip label={getFullDate(row?.updatedAt)} placement={'top'}>
           <Text color={primaryTextColor}>{timeSince(row?.updatedAt)}</Text>

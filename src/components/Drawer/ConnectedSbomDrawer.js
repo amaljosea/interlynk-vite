@@ -16,7 +16,6 @@ const ConnectedSbomDrawer = ({ data, isOpen, onClose }) => {
     {
       id: 'PRODUCT',
       name: 'PRODUCT',
-      compact: true,
       wrap: true,
       selector: (row) => {
         const { project } = row || {}
