@@ -1,4 +1,4 @@
-import { getCvssObject, getCvssVersion, getFormatedCvss } from 'utils/cvssUtils'
+import { parseCvssVector } from 'utils/cvssUtils'
 
 import {
   Divider,
@@ -38,7 +38,7 @@ const CvssTag = ({ color, children }) => (
   <Tag
     size='sm'
     ml={'auto'}
-    minW='120px'
+    minW='160px'
     variant='subtle'
     maxW='fit-content'
     colorScheme={color}
@@ -52,9 +52,7 @@ const CvssCard = ({ isOpen, onClose, value }) => {
   const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
   const cvss = useClipboard(value)
 
-  const version = getCvssVersion(value)
-  const CVSS = getCvssObject(value)
-  const output = getFormatedCvss(version, CVSS)
+  const { version, parsed } = parseCvssVector(value)
 
   const colorScheme = {
     High: 'red',
@@ -92,12 +90,14 @@ const CvssCard = ({ isOpen, onClose, value }) => {
           />
         </Flex>
         <VStack align='stretch' spacing={2} py={2}>
-          {output ? (
-            Object.entries(output)?.map(([key, item]) => (
+          {version ? (
+            parsed?.map(({ key, name, value }) => (
               <Stack mt={0} key={key} spacing={1}>
                 <SimpleGrid mb={1} columns={2} flexWrap={'wrap'}>
-                  <CvssText>{key}</CvssText>
-                  <CvssTag color={colorScheme[item] || 'blue'}>{item}</CvssTag>
+                  <CvssText>{name}</CvssText>
+                  <CvssTag color={colorScheme[value] || 'blue'}>
+                    {value}
+                  </CvssTag>
                 </SimpleGrid>
                 <Divider />
               </Stack>
