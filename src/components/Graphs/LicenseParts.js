@@ -21,7 +21,7 @@ import CardBody from 'components/Card/CardBody'
 import { LuScale } from 'react-icons/lu'
 
 const GetPartLicenses = gql`
-  query GetSbomParts($projectId: Uuid!, $sbomId: Uuid!) {
+  query GetPartLicenses($projectId: Uuid!, $sbomId: Uuid!) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       projectVersion
       componentLicenses {

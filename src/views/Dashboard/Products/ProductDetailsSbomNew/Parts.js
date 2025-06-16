@@ -71,7 +71,14 @@ const Parts = ({ data }) => {
 
   const [activeRow, setActiveRow] = useState(null)
 
-  const [deleteSbomPart, { loading: dlLoading }] = useMutation(SbomPartDelete)
+  const [deleteSbomPart, { loading: dlLoading }] = useMutation(SbomPartDelete, {
+    refetchQueries: [
+      'GetSbomParts',
+      'GetPartComponents',
+      'GetPartVulns',
+      'GetPartPolicies'
+    ]
+  })
 
   const handleRemove = async () => {
     await deleteSbomPart({

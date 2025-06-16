@@ -25,7 +25,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { LuCircleDot, LuGitMerge, LuShieldCheck } from 'react-icons/lu'
 
 const GetPartPolicies = gql`
-  query GetSbomParts($projectId: Uuid!, $sbomId: Uuid!) {
+  query GetPartPolicies($projectId: Uuid!, $sbomId: Uuid!) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       projectVersion
       project {

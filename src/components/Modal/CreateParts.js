@@ -64,7 +64,14 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
   const [selectedGrpName, setSelectedGrpName] = useState('')
   const [selectedGroup, setSelectedGroup] = useState({})
 
-  const [createSbomPart, { loading }] = useMutation(SbomPartCreate)
+  const [createSbomPart, { loading }] = useMutation(SbomPartCreate, {
+    refetchQueries: [
+      'GetSbomParts',
+      'GetPartComponents',
+      'GetPartVulns',
+      'GetPartPolicies'
+    ]
+  })
 
   const [getProduct] = useLazyQuery(GetProject)
 
