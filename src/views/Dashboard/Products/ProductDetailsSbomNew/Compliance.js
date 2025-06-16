@@ -75,8 +75,6 @@ const Compliance = ({ sbomData }) => {
     (item) => item?.complianceType !== 'unspecified'
   )
 
-  const tabs = filterData?.map((item) => item?.type)
-
   const getScore = (type) => {
     switch (type) {
       case 'fda':
@@ -178,8 +176,6 @@ const Compliance = ({ sbomData }) => {
 
       {isOpen && (
         <ComplianceChecks
-          tabs={tabs}
-          fileName={null}
           isOpen={isOpen}
           onClose={onClose}
           activeTab={activeTab}

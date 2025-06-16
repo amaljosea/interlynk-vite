@@ -10,11 +10,16 @@ import {
   Divider,
   Flex,
   Stack,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  Tag,
+  TagLabel,
   Text,
   Tooltip
 } from '@chakra-ui/react'
-import { Tag, TagLabel } from '@chakra-ui/react'
-import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import LynkDrawer from 'components/LynkDrawer'
@@ -27,116 +32,190 @@ import { ActiveCompliances } from 'graphQL/Queries'
 
 import { LuCircleCheck, LuCircleX } from 'react-icons/lu'
 
-const sbomCategory = ['Timestamp', 'Supplier Name', 'Unique ID', 'Author']
+const SBOM_CATEGORIES = ['Timestamp', 'Supplier Name', 'Unique ID', 'Author']
 
-const ComplianceChecks = (props) => {
-  const {
-    name,
-    isOpen,
-    onClose,
-    ntia,
-    fda,
-    ntiaLoading,
-    fdaLoading,
-    activeTab
-  } = props
-  const params = useParams()
-  const { showToast } = useCustomToast()
-  const { secondaryBgColor, lightBlueBg, primaryBlueText, sameSecondaryText } =
+const getBgColor = (score) => {
+  if (score === 0) return 'red'
+  if (score === 100) return 'green'
+  return 'orange'
+}
+
+const getComplianceDescription = (title) => {
+  return complianceData.find((item) => item?.title === title)?.desc
+}
+
+const ComplianceReport = ({ item }) => {
+  const { primaryBlueText, primarySuccessColor, primaryErrorColor } =
     useThemeColor([
-      'secondaryBgColor',
-      'lightBlueBg',
       'primaryBlueText',
-      'sameSecondaryText'
+      'primarySuccessColor',
+      'primaryErrorColor'
     ])
 
-  const { data: compliance, loading: complianceLoading } =
-    useQuery(ActiveCompliances)
+  return (
+    <Flex
+      gap={6}
+      width={'100%'}
+      alignItems={'center'}
+      justifyContent={'space-between'}
+    >
+      <Stack direction={'row'}>
+        <Text fontSize={'xs'} textTransform={'capitalize'}>
+          {item?.category?.replace('Component ', '')}
+        </Text>
+        <Tooltip label={getComplianceDescription(item?.category)}>
+          <InfoIcon fontSize={'sm'} color={primaryBlueText} />
+        </Tooltip>
+      </Stack>
+      <Box fontSize={'xs'} ml={'auto'}>
+        {SBOM_CATEGORIES.includes(item?.category) ? (
+          item?.score === 100 ? (
+            <LuCircleCheck color={primarySuccessColor} size={22} />
+          ) : (
+            <LuCircleX color={primaryErrorColor} size={22} />
+          )
+        ) : (
+          <Tag
+            w={'60px'}
+            variant='subtle'
+            title='Compliance score'
+            colorScheme={getBgColor(item?.score)}
+          >
+            <TagLabel ml={'auto'} fontSize={'sm'}>
+              {Math.round(item?.score)} %
+            </TagLabel>
+          </Tag>
+        )}
+      </Box>
+    </Flex>
+  )
+}
 
-  const activeCompliances = compliance?.organization?.activeCompliances || []
-  const tabs = activeCompliances
-    ?.filter((item) => item?.complianceType !== 'unspecified')
-    ?.map((item) => item?.complianceType)
+const RunAlert = ({ onRun }) => {
+  const { lightBlueBg, primaryBlueText } = useThemeColor([
+    'lightBlueBg',
+    'primaryBlueText'
+  ])
 
-  const [tab, setTab] = useState(activeTab || 0)
-  const onTabChange = (value) => setTab(value)
+  return (
+    <Flex
+      p={3}
+      mt={2}
+      gap={3}
+      bg={lightBlueBg}
+      width={'100%'}
+      borderRadius={5}
+      alignItems={'center'}
+      justifyContent={'space-between'}
+    >
+      <Flex gap={2} alignItems={'center'}>
+        <InfoIcon color={primaryBlueText} />
+        <Text fontSize={'sm'}>Run checks to see compliance scores</Text>
+      </Flex>
+      <Text
+        fontSize={'sm'}
+        color={primaryBlueText}
+        cursor={'pointer'}
+        onClick={onRun}
+        fontWeight={'medium'}
+      >
+        Run Checks
+      </Text>
+    </Flex>
+  )
+}
 
-  const [healthRecheck] = useMutation(recheckHealth)
+const ScoreBoard = ({ data, loading, onRun }) => {
+  const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
 
-  const getBgColor = (score) => {
-    if (score === 0) {
-      return 'red'
-    } else if (score === 100) {
-      return 'green'
-    } else {
-      return 'orange'
-    }
-  }
+  const generalData = data?.scoreByCategory?.filter(
+    (item) => !item?.category?.startsWith('Component')
+  )
+  const componentData = data?.scoreByCategory?.filter((item) =>
+    item?.category?.startsWith('Component')
+  )
 
-  const onCheck = (title) => {
-    const result = complianceData?.find((item) => item?.title === title)
-    return result?.desc
-  }
+  if (loading) return <CustomLoader />
 
-  const ComplianceReport = ({ key, item }) => {
-    const { primaryBlueText, primarySuccessColor, primaryErrorColor } =
-      useThemeColor([
-        'primaryBlueText',
-        'primarySuccessColor',
-        'primaryErrorColor'
-      ])
-    return (
+  return (
+    <Flex flexDir={'column'} alignItems={'flex-start'} gap={3}>
+      {data?.score !== 0 && (
+        <>
+          <Text fontSize={'sm'} fontWeight={'medium'}>
+            General Details
+          </Text>
+          {generalData?.length ? (
+            generalData.map((item, index) => (
+              <ComplianceReport key={index} item={item} />
+            ))
+          ) : (
+            <Text color={sameSecondaryText}>No record to display</Text>
+          )}
+          <Text mt={3} fontSize={'sm'} fontWeight={'medium'}>
+            Component Details
+          </Text>
+          {componentData?.length ? (
+            componentData.map((item, index) => (
+              <ComplianceReport key={index} item={item} />
+            ))
+          ) : (
+            <Text color={sameSecondaryText}>No record to display</Text>
+          )}
+          <Divider mt={1} hidden={!data} />
+        </>
+      )}
       <Flex
-        gap={6}
-        key={key}
+        mt={1}
+        hidden={!data}
         width={'100%'}
         alignItems={'center'}
         justifyContent={'space-between'}
       >
-        <Stack direction={'row'}>
-          <Text fontSize={'xs'} textTransform={'capitalize'}>
-            {item?.category?.replace('Component ', '')}
-          </Text>
-          <Tooltip label={onCheck(item?.category)}>
-            <InfoIcon fontSize={'sm'} color={primaryBlueText} />
-          </Tooltip>
-        </Stack>
-        <Box fontSize={'xs'} ml={'auto'}>
-          {sbomCategory?.includes(item?.category) ? (
-            <>
-              {item?.score === 100 ? (
-                <LuCircleCheck color={primarySuccessColor} size={22} />
-              ) : (
-                <LuCircleX color={primaryErrorColor} size={22} />
-              )}
-            </>
-          ) : (
-            <Tag
-              w={'60px'}
-              variant='subtle'
-              title='Compliance score'
-              colorScheme={getBgColor(item?.score)}
-            >
-              <TagLabel ml={'auto'} fontSize={'sm'}>
-                {Math.round(item?.score)} %
-              </TagLabel>
-            </Tag>
-          )}
-        </Box>
+        <Text fontSize={'sm'} fontWeight={'medium'}>
+          Score
+        </Text>
+        <Tag w={'60px'} title='Compliance score'>
+          <TagLabel ml={'auto'}>
+            {data?.score === 0 ? 'N/A' : `${Math.round(data?.score)}%`}
+          </TagLabel>
+        </Tag>
       </Flex>
-    )
-  }
+      {data?.score === 0 && <RunAlert onRun={onRun} />}
+    </Flex>
+  )
+}
 
-  const handleSave = () => {
-    showToast({
-      description: 'Checks rescan is in progress',
-      status: 'info'
-    })
-    healthRecheck({
-      variables: {
-        sbomId: params?.sbomid
-      }
-    }).then((res) => {
+const ComplianceChecks = ({
+  name,
+  isOpen,
+  onClose,
+  ntia,
+  fda,
+  ntiaLoading,
+  fdaLoading,
+  activeTab = 0
+}) => {
+  const { sbomid } = useParams()
+  const { showToast } = useCustomToast()
+  const { secondaryBgColor, sameSecondaryText } = useThemeColor([
+    'secondaryBgColor',
+    'sameSecondaryText'
+  ])
+
+  const [tabIndex, setTabIndex] = useState(activeTab)
+
+  const { data: compliance, loading: complianceLoading } =
+    useQuery(ActiveCompliances)
+  const [healthRecheck] = useMutation(recheckHealth)
+
+  const activeCompliances = compliance?.organization?.activeCompliances || []
+  const tabs = activeCompliances
+    .filter((item) => item?.complianceType !== 'unspecified')
+    .map((item) => item?.complianceType)
+
+  const handleRecheck = () => {
+    showToast({ description: 'Checks rescan is in progress', status: 'info' })
+    healthRecheck({ variables: { sbomId: sbomid } }).then((res) => {
       if (res?.data) {
         showToast({
           description: 'Health re-check successfully',
@@ -146,113 +225,8 @@ const ComplianceChecks = (props) => {
     })
   }
 
-  const RunAlert = () => {
-    return (
-      <Flex
-        p={3}
-        mt={2}
-        gap={3}
-        bg={lightBlueBg}
-        width={'100%'}
-        borderRadius={5}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
-        <Flex gap={2} alignItems={'center'}>
-          <InfoIcon color={primaryBlueText} />
-          <Text fontSize={'sm'}>Run checks to see compliance scores</Text>
-        </Flex>
-        <Text
-          fontSize={'sm'}
-          color={primaryBlueText}
-          cursor={'pointer'}
-          onClick={handleSave}
-          fontWeight={'medium'}
-        >
-          Run Checks
-        </Text>
-      </Flex>
-    )
-  }
-
-  const ScoreBoard = ({ data, loading }) => {
-    const sbomData = data?.scoreByCategory?.filter(
-      (item) => !item?.category?.startsWith('Component')
-    )
-    const compData = data?.scoreByCategory?.filter((item) =>
-      item?.category?.startsWith('Component')
-    )
-
-    if (loading) return <CustomLoader />
-
-    return (
-      <Flex flexDir={'column'} alignItems={'flex-start'} gap={3}>
-        <Flex
-          gap={3}
-          width={'100%'}
-          flexDir={'column'}
-          hidden={data?.score === 0}
-        >
-          <Text fontSize={'sm'} fontWeight={'medium'}>
-            General Details
-          </Text>
-          {sbomData ? (
-            sbomData?.map((item, index) => (
-              <ComplianceReport key={index} item={item} />
-            ))
-          ) : (
-            <Text color={sameSecondaryText}>No record to display</Text>
-          )}
-          <Text mt={3} fontSize={'sm'} fontWeight={'medium'}>
-            Component Details
-          </Text>
-          {compData ? (
-            compData?.map((item, index) => (
-              <ComplianceReport key={index} item={item} />
-            ))
-          ) : (
-            <Text color={sameSecondaryText}>No record to display</Text>
-          )}
-          <Divider mt={1} hidden={!data} />
-        </Flex>
-        <Flex
-          mt={1}
-          hidden={!data}
-          width={'100%'}
-          alignItems={'center'}
-          justifyContent={'space-between'}
-        >
-          <Text fontSize={'sm'} fontWeight={'medium'}>
-            Score
-          </Text>
-          <Tag w={'60px'} title='Compliance score'>
-            <TagLabel ml={'auto'}>
-              {data?.score === 0 ? 'N/A' : `${Math.round(data?.score)} %`}
-            </TagLabel>
-          </Tag>
-        </Flex>
-        {data?.score === 0 && <RunAlert />}
-      </Flex>
-    )
-  }
-
-  const getLoading = (type) => {
-    switch (type) {
-      case 'fda':
-        return fdaLoading
-      case 'ntia':
-        return ntiaLoading
-    }
-  }
-
-  const getData = (type) => {
-    switch (type) {
-      case 'fda':
-        return fda
-      case 'ntia':
-        return ntia
-    }
-  }
+  const getLoadingState = (type) => (type === 'fda' ? fdaLoading : ntiaLoading)
+  const getComplianceData = (type) => (type === 'fda' ? fda : ntia)
 
   return (
     <LynkDrawer
@@ -276,7 +250,7 @@ const ComplianceChecks = (props) => {
       {complianceLoading ? (
         <CustomLoader />
       ) : (
-        <Tabs index={tab} onChange={onTabChange}>
+        <Tabs index={tabIndex} onChange={setTabIndex}>
           <TabList
             position={'fixed'}
             bg={secondaryBgColor}
@@ -285,7 +259,7 @@ const ComplianceChecks = (props) => {
             right={0}
             top={!name ? '60px' : '90px'}
           >
-            {tabs.map((item, index) => (
+            {tabs.map((tab, index) => (
               <Tab
                 py={3.5}
                 key={index}
@@ -293,19 +267,23 @@ const ComplianceChecks = (props) => {
                 textTransform={'uppercase'}
                 _focus={{ outline: 'none', bg: 'none' }}
               >
-                {item}
+                {tab}
               </Tab>
             ))}
           </TabList>
           <TabPanels pos={'relative'} top={14} overflowX={'hidden'}>
-            {tabs?.map((item, index) => (
-              <TabPanel padding={0} key={index}>
-                {item === 'bsi' ? (
+            {tabs.map((tab, index) => (
+              <TabPanel key={index} p={0}>
+                {tab === 'bsi' ? (
                   <Center py={24} color={sameSecondaryText}>
                     Coming Soon...
                   </Center>
                 ) : (
-                  <ScoreBoard loading={getLoading(item)} data={getData(item)} />
+                  <ScoreBoard
+                    data={getComplianceData(tab)}
+                    loading={getLoadingState(tab)}
+                    onRun={handleRecheck}
+                  />
                 )}
               </TabPanel>
             ))}

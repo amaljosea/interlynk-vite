@@ -506,8 +506,8 @@ const DownloadModal = (props) => {
         <ComplianceChecks
           name={fileName}
           isOpen={DETAILS.isOpen}
-          fdaLoading={fdaLoading}
           onClose={DETAILS.onClose}
+          fdaLoading={fdaLoading}
           ntiaLoading={ntiaLoading}
           fda={fdaData?.length > 0 ? fdaData[0] : []}
           ntia={ntiaData?.length > 0 ? ntiaData[0] : []}
