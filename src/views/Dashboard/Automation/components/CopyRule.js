@@ -18,7 +18,9 @@ const CopyRule = ({ isOpen, onClose, env, data }) => {
   const { name: ruleName, automationActions, automationConditions } = data || ''
   const { name: projectName, id: projectId } = env || ''
 
-  const [createRule] = useMutation(AutomationRuleCreate)
+  const [createRule] = useMutation(AutomationRuleCreate, {
+    refetchQueries: ['GetProjectAutomations']
+  })
 
   const { data: rule } = useQuery(GetAutomationNames, {
     skip: !env,

@@ -75,10 +75,14 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
   const isComponent = conditions?.some((item) => item?.category === 'component')
   // const isVersion = conditions?.some((item) => item?.category === 'version')
 
-  const [createRule, { loading: loadingCreate }] =
-    useMutation(AutomationRuleCreate)
-  const [updateRule, { loading: loadingUpdate }] =
-    useMutation(AutomationRuleUpdate)
+  const [createRule, { loading: loadingCreate }] = useMutation(
+    AutomationRuleCreate,
+    { refetchQueries: ['GetProjectAutomations'] }
+  )
+  const [updateRule, { loading: loadingUpdate }] = useMutation(
+    AutomationRuleUpdate,
+    { refetchQueries: ['GetProjectAutomations'] }
+  )
 
   const checkActionValidity = (data) => {
     for (let i = 0; i < data.length; i++) {

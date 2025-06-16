@@ -8,7 +8,9 @@ import { AutomationRuleDelete } from 'graphQL/Mutation'
 const DeleteRule = ({ isOpen, onClose, activeRow }) => {
   const { showToast } = useCustomToast()
 
-  const [deleteRule, { loading }] = useMutation(AutomationRuleDelete)
+  const [deleteRule, { loading }] = useMutation(AutomationRuleDelete, {
+    refetchQueries: ['GetProjectAutomations']
+  })
 
   const handleDelete = async () => {
     await deleteRule({ variables: { id: activeRow?.id } }).then((res) => {

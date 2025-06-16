@@ -9,7 +9,7 @@ const StatusWarning = ({ isOpen, onClose, activeRow }) => {
   const { showToast } = useCustomToast()
 
   const [updateRule] = useMutation(AutomationRuleUpdate, {
-    fetchPolicy: 'network-only'
+    refetchQueries: ['GetProjectAutomations']
   })
 
   const { active, name } = activeRow

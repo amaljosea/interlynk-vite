@@ -42,7 +42,9 @@ const ImportRule = (props) => {
   const [selectedFile, setSelectedFile] = useState(null)
   const [isDragActive, setIsDragActive] = useState(false)
 
-  const [importRule, { loading }] = useMutation(AutomationRulesImport)
+  const [importRule, { loading }] = useMutation(AutomationRulesImport, {
+    refetchQueries: ['GetProjectAutomations']
+  })
 
   useEffect(() => {
     const handleGlobalDragOver = (e) => {
