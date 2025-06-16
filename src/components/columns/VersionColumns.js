@@ -166,22 +166,22 @@ const VersionColumns = (props) => {
           })
           const showIcon = alternatives?.length > 0
           const lifestage = String(productLifeCycleStage)?.replaceAll(/_/g, ' ')
-          const lifecycleIcon =
-            lifecycle === 'draft' ? LuFilePen : LuSquareCheckBig
           const lifecycleLabel = capitalizeFirstLetter(lifecycle)
 
           return (
             <Stack my={3} spacing={1} className={index === 0 ? 'versions' : ''}>
               <Flex gap={2} alignItems={'center'} flexWrap={'wrap'}>
-                <Tooltip label={lifecycleLabel}>
-                  <Box>
-                    <Icon
-                      fontSize={18}
-                      as={lifecycleIcon}
-                      color={primaryTextColor}
-                    />
-                  </Box>
-                </Tooltip>
+                {lifecycle === 'draft' && (
+                  <Tooltip label={lifecycleLabel}>
+                    <Box>
+                      <Icon
+                        fontSize={18}
+                        as={LuFilePen}
+                        color={primaryTextColor}
+                      />
+                    </Box>
+                  </Tooltip>
+                )}
                 <Link to={link} onClick={onStartTour} data-testid={`version`}>
                   <Tooltip label={projectVersion}>
                     <Text

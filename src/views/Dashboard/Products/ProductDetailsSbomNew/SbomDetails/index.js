@@ -187,9 +187,6 @@ const SbomDetails = ({ sbomData }) => {
                     {truncatedValue(projectVersion, 40)}
                   </Text>
                 </Flex>
-                <Tag colorScheme='teal' w={'fit-content'}>
-                  <TagLabel textTransform={'capitalize'}>{lifecycle}</TagLabel>
-                </Tag>
                 {lifecycleData?.stage && (
                   <Tooltip label='Lifecycle stage'>
                     <Tag

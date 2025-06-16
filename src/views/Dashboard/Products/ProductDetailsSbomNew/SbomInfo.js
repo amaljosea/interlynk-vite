@@ -3,7 +3,9 @@ import { getSignedUrlParams } from 'utils'
 
 import {
   Alert,
+  AlertDescription,
   AlertIcon,
+  AlertTitle,
   Button,
   Flex,
   SkeletonText,
@@ -72,18 +74,27 @@ const SbomInfo = ({ data, error, loading }) => {
     <>
       <Stack spacing={5}>
         {data?.lifecycle === 'draft' && (
-          <Alert status='warning' borderRadius={8}>
+          <Alert status='info' py={5} borderRadius={'15px'}>
             <Flex
               w='100%'
               alignItems={'center'}
               justifyContent={'space-between'}
             >
-              <Flex>
+              <Flex alignItems={'center'}>
                 <AlertIcon />
-                This SBOM is currently in draft mode.
+                <Stack spacing={0}>
+                  <AlertTitle>
+                    This version has been created manually and is currently in
+                    the Draft mode.
+                  </AlertTitle>
+                  <AlertDescription>
+                    Import actions will run on this version once it is
+                    finalized.
+                  </AlertDescription>
+                </Stack>
               </Flex>
               <Button
-                colorScheme='green'
+                colorScheme='blue'
                 leftIcon={<LuFilePen />}
                 onClick={() => LIFECYCLE.onOpen()}
                 hidden={signedUrlParams || isFreeTier}
