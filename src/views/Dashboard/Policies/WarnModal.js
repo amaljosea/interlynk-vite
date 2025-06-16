@@ -9,7 +9,9 @@ import ConfirmationModal from '../Products/components/ConfirmationModal'
 const WarnModal = ({ isOpen, onClose, data }) => {
   const { showToast } = useCustomToast()
   const { id, isEnabled, name } = data
-  const [updatePolicy] = useMutation(PolicyUpdate)
+  const [updatePolicy, { loading }] = useMutation(PolicyUpdate, {
+    refetchQueries: ['GetPolicies']
+  })
 
   const toggleStatus = async () => {
     await updatePolicy({
@@ -42,7 +44,7 @@ const WarnModal = ({ isOpen, onClose, data }) => {
     ]
   }
 
-  return <ConfirmationModal {...modalProps} />
+  return <ConfirmationModal isLoading={loading} {...modalProps} />
 }
 
 export default WarnModal

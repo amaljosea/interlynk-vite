@@ -9,7 +9,9 @@ import ConfirmationModal from '../Products/components/ConfirmationModal'
 const DeleteModal = ({ isOpen, onClose, data }) => {
   const { showToast } = useCustomToast()
   const { id, name } = data
-  const [deletePolicy, { loading }] = useMutation(PolicyDelete)
+  const [deletePolicy, { loading }] = useMutation(PolicyDelete, {
+    refetchQueries: ['GetPolicies']
+  })
 
   const onDeletePolicy = async () => {
     await deletePolicy({ variables: { id } }).then((res) => {

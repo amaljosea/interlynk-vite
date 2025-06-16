@@ -53,8 +53,12 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
   ])
   const [deletedRules, setDeletedRules] = useState([])
 
-  const [createPolicy, { loading: crLoading }] = useMutation(PolicyCreate)
-  const [updatePolicy, { loading: upLoading }] = useMutation(PolicyUpdate)
+  const [createPolicy, { loading: creating }] = useMutation(PolicyCreate, {
+    refetchQueries: ['GetPolicies']
+  })
+  const [updatePolicy, { loading: updating }] = useMutation(PolicyUpdate, {
+    refetchQueries: ['GetPolicies']
+  })
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -362,135 +366,133 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
   ]
 
   return (
-    <>
-      <LynkModal
-        isOpen={isOpen}
-        Icon={LuShieldCheck}
-        onClose={onClose}
-        buttonText={data ? 'Update' : 'Save'}
-        disabled={errorMessage || error !== ''}
-        isLoading={data ? upLoading : crLoading}
-        title={`${data ? 'Edit' : 'Create'} Policy`}
-        onSubmit={data ? handleUpdate : handleCreate}
+    <LynkModal
+      isOpen={isOpen}
+      Icon={LuShieldCheck}
+      onClose={onClose}
+      buttonText={data ? 'Update' : 'Save'}
+      disabled={errorMessage || error !== ''}
+      isLoading={data ? creating : updating}
+      title={`${data ? 'Edit' : 'Create'} Policy`}
+      onSubmit={data ? handleUpdate : handleCreate}
+    >
+      <Flex
+        width={'100%'}
+        alignItems={'flex-start'}
+        direction={'column'}
+        gap={4}
       >
-        <Flex
-          width={'100%'}
-          alignItems={'flex-start'}
-          direction={'column'}
-          gap={4}
-        >
-          {/* POLICY NAME */}
-          <FormControl isRequired>
-            <FormLabel htmlFor='name'>Name</FormLabel>
-            <Input
-              type='text'
-              name='name'
-              fontSize='sm'
-              placeholder='Enter name'
-              value={formData?.name}
-              onChange={handleChange}
-            />
-          </FormControl>
-          {/* POLICY DESCTIPTION */}
-          <FormControl>
-            <FormLabel htmlFor='desc'>Description</FormLabel>
-            <Textarea
-              name='desc'
-              value={formData?.desc}
-              onChange={handleChange}
-              placeholder='Enter description'
-            />
-          </FormControl>
-          <SimpleGrid w='100%' columns={2} gap={4}>
-            {/* POLICY RESULT AND TYPE */}
-            <FormControl isRequired>
-              <FormLabel htmlFor='resultType'>Policy Result</FormLabel>
-              <LynkSelect
-                name='resultType'
-                value={resultTypeOptions.find(
-                  (opt) => opt.value === formData?.resultType
-                )}
-                onChange={(selectedItem) =>
-                  handleSelectChange(selectedItem, 'resultType')
-                }
-                options={resultTypeOptions}
-                id='policy_result_type'
-                dropDown
-              />
-            </FormControl>
-            <FormControl isRequired>
-              <FormLabel htmlFor='operator'>On Conditions</FormLabel>
-              <LynkSelect
-                name='operator'
-                value={operatorOptions.find(
-                  (opt) => opt.value === formData?.operator
-                )}
-                onChange={(selectedItem) =>
-                  handleSelectChange(selectedItem, 'operator')
-                }
-                options={operatorOptions}
-                id='policy_result_condition'
-                dropDown
-              />
-            </FormControl>
-          </SimpleGrid>
-          {/* CONDITIONS */}
-          <FormControl isRequired>
-            <FormLabel htmlFor='conditions'>Conditions</FormLabel>
-            <PolicyConditions
-              conditions={conditions}
-              setConditions={setConditions}
-              setError={setError}
-              setDeletedRules={setDeletedRules}
-              plSubjects={plSubjects}
-              formData={formData}
-            />
-          </FormControl>
-          {/* ADD CONDITIONS */}
-          <Button
-            variant='link'
-            onClick={addRow}
-            colorScheme='blue'
-            leftIcon={<LuCirclePlus size={18} />}
-            title='Add policy condition'
-            data-testid='add_policy_condition'
-            sx={{ fontSize: 'sm', fontWeight: 'medium', pl: '2px' }}
-          >
-            Add condition
-          </Button>
-          <Divider />
-          {/* APPLY CONDITION */}
-          <FormControl>
-            <FormLabel htmlFor='doesNptapplyTo'>Does not apply to</FormLabel>
-            <Flex mt={2} gap={5} align={'center'}>
-              <Checkbox
-                name='isPrimary'
-                isChecked={formData?.isPrimary}
-                onChange={handleChange}
-              >
-                <Text fontSize={14}>Primary Component</Text>
-              </Checkbox>
-              <Checkbox
-                name='isInternal'
-                isChecked={formData?.isInternal}
-                onChange={handleChange}
-              >
-                <Text fontSize={14}>Internal Components</Text>
-              </Checkbox>
-            </Flex>
-          </FormControl>
-          <Checkbox
-            name='notification'
-            isChecked={formData?.notification}
+        {/* POLICY NAME */}
+        <FormControl isRequired>
+          <FormLabel htmlFor='name'>Name</FormLabel>
+          <Input
+            type='text'
+            name='name'
+            fontSize='sm'
+            placeholder='Enter name'
+            value={formData?.name}
             onChange={handleChange}
-          >
-            <Text fontSize={14}>Enable Notifications</Text>
-          </Checkbox>
-          {/* ERROR HANDLING */}
-          {error !== '' && <LynkAlert msg={error} />}
-        </Flex>
-      </LynkModal>
-    </>
+          />
+        </FormControl>
+        {/* POLICY DESCTIPTION */}
+        <FormControl>
+          <FormLabel htmlFor='desc'>Description</FormLabel>
+          <Textarea
+            name='desc'
+            value={formData?.desc}
+            onChange={handleChange}
+            placeholder='Enter description'
+          />
+        </FormControl>
+        <SimpleGrid w='100%' columns={2} gap={4}>
+          {/* POLICY RESULT AND TYPE */}
+          <FormControl isRequired>
+            <FormLabel htmlFor='resultType'>Policy Result</FormLabel>
+            <LynkSelect
+              name='resultType'
+              value={resultTypeOptions.find(
+                (opt) => opt.value === formData?.resultType
+              )}
+              onChange={(selectedItem) =>
+                handleSelectChange(selectedItem, 'resultType')
+              }
+              options={resultTypeOptions}
+              id='policy_result_type'
+              dropDown
+            />
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel htmlFor='operator'>On Conditions</FormLabel>
+            <LynkSelect
+              name='operator'
+              value={operatorOptions.find(
+                (opt) => opt.value === formData?.operator
+              )}
+              onChange={(selectedItem) =>
+                handleSelectChange(selectedItem, 'operator')
+              }
+              options={operatorOptions}
+              id='policy_result_condition'
+              dropDown
+            />
+          </FormControl>
+        </SimpleGrid>
+        {/* CONDITIONS */}
+        <FormControl isRequired>
+          <FormLabel htmlFor='conditions'>Conditions</FormLabel>
+          <PolicyConditions
+            conditions={conditions}
+            setConditions={setConditions}
+            setError={setError}
+            setDeletedRules={setDeletedRules}
+            plSubjects={plSubjects}
+            formData={formData}
+          />
+        </FormControl>
+        {/* ADD CONDITIONS */}
+        <Button
+          variant='link'
+          onClick={addRow}
+          colorScheme='blue'
+          leftIcon={<LuCirclePlus size={18} />}
+          title='Add policy condition'
+          data-testid='add_policy_condition'
+          sx={{ fontSize: 'sm', fontWeight: 'medium', pl: '2px' }}
+        >
+          Add condition
+        </Button>
+        <Divider />
+        {/* APPLY CONDITION */}
+        <FormControl>
+          <FormLabel htmlFor='doesNptapplyTo'>Does not apply to</FormLabel>
+          <Flex mt={2} gap={5} align={'center'}>
+            <Checkbox
+              name='isPrimary'
+              isChecked={formData?.isPrimary}
+              onChange={handleChange}
+            >
+              <Text fontSize={14}>Primary Component</Text>
+            </Checkbox>
+            <Checkbox
+              name='isInternal'
+              isChecked={formData?.isInternal}
+              onChange={handleChange}
+            >
+              <Text fontSize={14}>Internal Components</Text>
+            </Checkbox>
+          </Flex>
+        </FormControl>
+        <Checkbox
+          name='notification'
+          isChecked={formData?.notification}
+          onChange={handleChange}
+        >
+          <Text fontSize={14}>Enable Notifications</Text>
+        </Checkbox>
+        {/* ERROR HANDLING */}
+        {error !== '' && <LynkAlert msg={error} />}
+      </Flex>
+    </LynkModal>
   )
 }
 
