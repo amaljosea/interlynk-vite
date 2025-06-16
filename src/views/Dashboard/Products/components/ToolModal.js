@@ -29,7 +29,10 @@ const TextInput = ({ name, value, onChange, placeholder }) => {
 const ToolModal = ({ isOpen, onClose, resolved = false }) => {
   const params = useParams()
   const { showToast } = useCustomToast()
-  const [createTool, { loading }] = useMutation(toolCreate)
+  const [createTool, { loading }] = useMutation(toolCreate, {
+    refetchQueries: ['SingleSbomScore', 'GetProductData']
+  })
+
   const initialData = {
     name: '',
     version: '',

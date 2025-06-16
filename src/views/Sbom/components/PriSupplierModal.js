@@ -37,7 +37,7 @@ const PriSupplierModal = (props) => {
 
   const { status } = activeRow || ''
   const resolved = status === 'resolved'
-  const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || ''
+  const { friendlyId, shortDesc } = activeRow?.organizationRule?.rule || {}
 
   const initialData = useMemo(
     () => ({
@@ -74,10 +74,12 @@ const PriSupplierModal = (props) => {
   const isInvalid = formData?.url !== '' && !validateUrl(formData?.url)
 
   const [createSupplier, { loading: crLoading }] = useMutation(supplierCreate, {
-    onCompleted: () => (friendlyId ? recheck() : null)
+    onCompleted: () => (friendlyId ? recheck() : null),
+    refetchQueries: ['SingleSbomScore', 'GetProductData']
   })
   const [updateSupplier, { loading: upLoading }] = useMutation(supplierUpdate, {
-    onCompleted: () => (friendlyId ? recheck() : null)
+    onCompleted: () => (friendlyId ? recheck() : null),
+    refetchQueries: ['SingleSbomScore', 'GetProductData']
   })
 
   const [createRule, { loading: rlLoading }] = useMutation(AutomationRuleCreate)

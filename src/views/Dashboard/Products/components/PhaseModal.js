@@ -10,6 +10,7 @@ import LynkModal from 'components/LynkModal'
 import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
+
 import { LuWrench } from 'react-icons/lu'
 
 const UpdatePhases = gql`
@@ -27,7 +28,9 @@ const UpdatePhases = gql`
 const PhaseModal = ({ data, isOpen, onClose }) => {
   const params = useParams()
   const { showToast } = useCustomToast()
-  const [updatePhase, { loading }] = useMutation(UpdatePhases)
+  const [updatePhase, { loading }] = useMutation(UpdatePhases, {
+    refetchQueries: ['SingleSbomScore', 'GetProductData']
+  })
 
   const [phases, setPhases] = useState([])
   const [error, setError] = useState('')

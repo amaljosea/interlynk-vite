@@ -47,7 +47,8 @@ const AuthorModal = ({ isOpen, onClose, ruleExists, recheck }) => {
   const [createRule, { loading: ruleLoading }] =
     useMutation(AutomationRuleCreate)
   const [createAuthor, { loading }] = useMutation(authorCreate, {
-    onCompleted: () => (activeTab === 'checks' ? recheck() : null)
+    onCompleted: () => (activeTab === 'checks' ? recheck() : null),
+    refetchQueries: ['SingleSbomScore', 'GetProductData']
   })
 
   const { nodes } = usePaginatedQuery(GetCheckResults, {
@@ -63,7 +64,7 @@ const AuthorModal = ({ isOpen, onClose, ruleExists, recheck }) => {
   })
 
   const { status, organizationRule, sbom } = nodes?.length ? nodes[0] : []
-  const { friendlyId, shortDesc } = organizationRule?.rule || ''
+  const { friendlyId, shortDesc } = organizationRule?.rule || {}
 
   const resolved = status === 'resolved'
 

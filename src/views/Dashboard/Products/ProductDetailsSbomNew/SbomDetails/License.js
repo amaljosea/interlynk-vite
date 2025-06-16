@@ -16,8 +16,9 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { sbomUpdate } from 'graphQL/Mutation'
 
-import ConfirmationModal from '../../components/ConfirmationModal'
 import { LuScale } from 'react-icons/lu'
+
+import ConfirmationModal from '../../components/ConfirmationModal'
 
 const License = ({ data, permission }) => {
   const { isCustomerView } = useRouteFlags()
@@ -35,14 +36,16 @@ const License = ({ data, permission }) => {
   const LICENSE = useDisclosure()
   const DELETE_LICENSE = useDisclosure()
 
-  const [updateSbom, { loading }] = useMutation(sbomUpdate)
+  const [updateSbom, { loading }] = useMutation(sbomUpdate, {
+    refetchQueries: ['SingleSbomScore', 'GetProductData']
+  })
 
   const onLicenseOpen = () => {
     sbomDispatch({ type: 'SET_LICENSES', payload: license })
     LICENSE?.onOpen()
   }
 
-  const onUpdateLicense = async () => {
+  const onUpdateLicense = () => {
     const licenseObj =
       sbomState?.license?.length > 0 ? sbomState?.license[0] : null
     const isCustomLicense = licenseObj && licenseObj?.type === 'Custom License'
@@ -51,7 +54,7 @@ const License = ({ data, permission }) => {
       ? transformLicenseString(licenseObj?.value)
       : licenseObj?.value || ''
 
-    await updateSbom({
+    updateSbom({
       variables: {
         id: id,
         spec: spec,

@@ -4,7 +4,7 @@ import { useMemo } from 'react'
 import { getSignedUrlParams } from 'utils'
 import { getComponentHealthScoreFromLocalData } from 'utils/getComponentHealthScoreFromLocalData'
 
-const QUERY = gql`
+const SingleSbomScore = gql`
   query SingleSbomScore(
     $projectId: Uuid!
     $sbomId: Uuid!
@@ -58,7 +58,7 @@ export const calculateHealthScore = (sbom) => {
 }
 
 export const useSbomScores = ({ projectId, sbomId, format }) => {
-  const { data, loading } = useQuery(QUERY, {
+  const { data, loading } = useQuery(SingleSbomScore, {
     skip: sbomId && !signedUrlParams ? false : true,
     variables: {
       projectId,

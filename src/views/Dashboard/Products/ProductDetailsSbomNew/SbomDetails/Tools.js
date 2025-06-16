@@ -29,7 +29,9 @@ const Tools = ({ data, permission }) => {
   const TOOL = useDisclosure()
   const DELETE_TOOL = useDisclosure()
 
-  const [deleteTool, { loading }] = useMutation(toolDelete)
+  const [deleteTool, { loading }] = useMutation(toolDelete, {
+    refetchQueries: ['SingleSbomScore', 'GetProductData']
+  })
 
   const { primaryBlueText, sameSecondaryText } = useThemeColor([
     'primaryBlueText',

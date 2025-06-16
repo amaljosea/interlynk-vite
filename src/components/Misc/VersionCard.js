@@ -12,7 +12,7 @@ import { GoVersions } from 'react-icons/go'
 
 import CustomTag from './CustomTag'
 
-export const GetProductData = gql`
+export const GetProductVersionData = gql`
   query GetProductData($projectId: Uuid!, $sbomId: Uuid!) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       primaryComponent {
@@ -32,7 +32,7 @@ const VersionCard = ({ isOpen, onClose }) => {
   const params = useParams()
   const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
-  const { data, loading } = useQuery(GetProductData, {
+  const { data, loading } = useQuery(GetProductVersionData, {
     variables: {
       sbomId: params.sbomid,
       projectId: params.productid

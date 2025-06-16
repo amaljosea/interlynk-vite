@@ -24,7 +24,9 @@ const Supplier = ({ data, permission }) => {
   const SUPPLIER = useDisclosure()
   const DELETE_SUPPLIER = useDisclosure()
 
-  const [deleteSupplier, { loading }] = useMutation(supplierDelete)
+  const [deleteSupplier, { loading }] = useMutation(supplierDelete, {
+    refetchQueries: ['SingleSbomScore', 'GetProductData']
+  })
 
   const [activeTool, setActiveTool] = useState(null)
 

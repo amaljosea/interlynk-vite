@@ -20,7 +20,9 @@ const Authors = ({ data, permission }) => {
   const AUTHOR = useDisclosure()
   const DELETE_AUTHOR = useDisclosure()
 
-  const [deleteAuthor, { loading }] = useMutation(authorDelete)
+  const [deleteAuthor, { loading }] = useMutation(authorDelete, {
+    refetchQueries: ['SingleSbomScore', 'GetProductData']
+  })
 
   const { primaryBlueText, sameSecondaryText } = useThemeColor([
     'primaryBlueText',
