@@ -34,7 +34,9 @@ const ImportWizard = ({ currentSbomId, currentProductId, onClose }) => {
   const groupId = params.productgroupid
   const { secondaryBgColor } = useThemeColor(['secondaryBgColor'])
 
-  const [compVexImport, { loading }] = useMutation(ComponentVulnVexImport)
+  const [compVexImport, { loading }] = useMutation(ComponentVulnVexImport, {
+    refetchQueries: ['GetVulnProductDetails']
+  })
 
   const { prodVulnState, dispatch } = useGlobalState()
   const { selectedVulns } = prodVulnState

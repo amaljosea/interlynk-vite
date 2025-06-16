@@ -34,7 +34,6 @@ import {
   getVexStatuses
 } from 'graphQL/Queries'
 
-
 import { LuCheck, LuSquarePen, LuX } from 'react-icons/lu'
 
 const VexModal = ({
@@ -104,6 +103,7 @@ const VexModal = ({
   })
 
   const [compVexCreate, { loading }] = useMutation(updateBulkCompVex, {
+    refetchQueries: ['GetVulnProductDetails'],
     onCompleted: (data) => {
       if (data) {
         setSelectedVulns([])

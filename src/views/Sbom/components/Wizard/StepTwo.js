@@ -27,10 +27,12 @@ import { IntersectingVulns } from 'graphQL/Queries'
 import { LuBan } from 'react-icons/lu'
 
 const StepTwo = ({ sbomId, currentSbomId }) => {
-  const { primaryTextColor, primaryErrorColor } = useThemeColor([
-    'primaryTextColor',
-    'primaryErrorColor'
-  ])
+  const { primaryTextColor, primaryErrorColor, secondaryTextColor } =
+    useThemeColor([
+      'primaryTextColor',
+      'primaryErrorColor',
+      'secondaryTextColor'
+    ])
 
   const { colorMode } = useColorMode()
   const { prodVulnState, dispatch } = useGlobalState()
@@ -97,7 +99,7 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
             <Text color={primaryTextColor}>
               {fromVuln?.component?.name || 'N/A'}
             </Text>
-            <Text color={primaryTextColor}>
+            <Text color={secondaryTextColor}>
               {fromVuln?.component?.version || ''}
             </Text>
           </Stack>
@@ -117,7 +119,6 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
           <Tag
             size='md'
             variant='subtle'
-            width={'130px'}
             colorScheme={statusColor(toVuln?.vexStatus?.name || 'Unspecified')}
           >
             <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
@@ -138,7 +139,6 @@ const StepTwo = ({ sbomId, currentSbomId }) => {
           <Tag
             size='md'
             variant='subtle'
-            width={'130px'}
             colorScheme={statusColor(
               fromVuln?.vexStatus?.name || 'Unspecified'
             )}

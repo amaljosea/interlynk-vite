@@ -92,10 +92,13 @@ const JiraCreateIssueModal = ({
   const [getJiraInformation, { data: info, loading: infoLoading }] =
     useLazyQuery(JiraInformation)
 
-  const [createJiraIssue, { loading }] = useMutation(CreateJiraIssue)
+  const [createJiraIssue, { loading }] = useMutation(CreateJiraIssue, {
+    refetchQueries: ['GetVulnProductDetails']
+  })
   const [createBulkIssue, { loading: bulkLoading }] = useMutation(
     CreateBulkJiraIssue,
     {
+      refetchQueries: ['GetVulnProductDetails'],
       onCompleted: (data) => {
         if (data) {
           setSelectedVulns([])

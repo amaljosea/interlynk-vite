@@ -424,7 +424,6 @@ const Vulnerabilities = ({ sbomData }) => {
           data={activeRow}
           isOpen={LINK.isOpen}
           onClose={LINK.onClose}
-          sbomId={sbomId}
         />
       )}
 

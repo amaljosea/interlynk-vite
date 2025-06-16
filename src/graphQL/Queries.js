@@ -6259,7 +6259,7 @@ export const GetGlobalVulnCSVData = gql`
 `
 
 export const GetVulnProductDetails = gql`
-  query GetVulnTableData(
+  query GetVulnProductDetails(
     $projectId: Uuid!
     $sbomId: Uuid!
     $search: String

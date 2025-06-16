@@ -31,7 +31,9 @@ const LinearCreateIssueModal = ({ row, isOpen, onClose }) => {
   const [assignee, setAssignee] = useState(null)
   const [workflowState, setWorkflowState] = useState(null)
 
-  const [createIssue, { loading: creating }] = useMutation(LinearCreateIssue)
+  const [createIssue, { loading: creating }] = useMutation(LinearCreateIssue, {
+    refetchQueries: ['GetVulnProductDetails']
+  })
 
   const { data, loading } = useQuery(LinearTeams, { skip: !isOpen })
   const { teams } = data?.linear || {}

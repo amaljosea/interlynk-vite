@@ -16,8 +16,9 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { ComponentVulnUpdate } from 'graphQL/Mutation'
 import { DispositionByParentUpdate } from 'graphQL/Mutation'
 
-const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
-  const { id, externalUrls, currentExternalUrls, vuln, isPart } = data || ''
+const VulnLinkDrawer = ({ data, isOpen, onClose }) => {
+  const { id, sbomId, externalUrls, currentExternalUrls, vuln, isPart } =
+    data || {}
   const [type, setType] = useState('')
   const [link, setLink] = useState('')
   const [externalData, setExternalData] = useState([])
@@ -25,8 +26,12 @@ const VulnLinkDrawer = ({ data, isOpen, onClose, sbomId }) => {
   const [error, setError] = useState('')
   const [linkError, setLinkError] = useState('')
 
-  const [addUrls, { loading }] = useMutation(ComponentVulnUpdate)
-  const [addPartsUrls] = useMutation(DispositionByParentUpdate)
+  const [addUrls, { loading }] = useMutation(ComponentVulnUpdate, {
+    refetchQueries: ['GetVulnProductDetails']
+  })
+  const [addPartsUrls] = useMutation(DispositionByParentUpdate, {
+    refetchQueries: ['GetVulnProductDetails']
+  })
 
   const { secondaryTextInverse, sameSecondaryText } = useThemeColor([
     'secondaryTextInverse',
