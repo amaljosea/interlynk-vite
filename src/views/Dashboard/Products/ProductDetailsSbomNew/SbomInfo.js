@@ -74,7 +74,7 @@ const SbomInfo = ({ data, error, loading }) => {
     <>
       <Stack spacing={5}>
         {data?.lifecycle === 'draft' && (
-          <Alert status='info' py={5} borderRadius={'15px'}>
+          <Alert status='warning' py={5} borderRadius={'15px'}>
             <Flex
               w='100%'
               alignItems={'center'}
@@ -83,13 +83,10 @@ const SbomInfo = ({ data, error, loading }) => {
               <Flex alignItems={'center'}>
                 <AlertIcon />
                 <Stack spacing={0}>
-                  <AlertTitle>
-                    This version has been created manually and is currently in
-                    the Draft mode.
-                  </AlertTitle>
+                  <AlertTitle>Draft Mode</AlertTitle>
                   <AlertDescription>
-                    Import actions will run on this version once it is
-                    finalized.
+                    This version was created manually and is currently in draft
+                    mode until it's finalized.
                   </AlertDescription>
                 </Stack>
               </Flex>
@@ -119,11 +116,11 @@ const SbomInfo = ({ data, error, loading }) => {
           onClose={LIFECYCLE.onClose}
           onConfirm={updateLifecycle}
           name={`${data?.project?.projectGroup?.name} - ${data?.projectVersion}`}
-          title='Finalize SBOM Build'
-          description='Finalizing this SBOM will:'
+          title='Finalize Draft'
+          description='Finalizing this draft will:'
           items={[
-            'Create a new version',
-            'Prevent any further edits (you will not be able to revert it to draft)'
+            'Create the new product version',
+            'Trigger import actions, including checks, automation, and analysis'
           ]}
         />
       )}

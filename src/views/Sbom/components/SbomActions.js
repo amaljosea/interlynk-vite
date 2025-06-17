@@ -236,9 +236,9 @@ const SbomActions = ({ sbom }) => {
             display={signedUrlParams || isFreeTier ? 'none' : 'flex'}
           />
         </Tooltip>
-        {/* CREATE ATTRIBUTION REPORTS */}
+        {/* LICENSE ATTRIBUTION REPORT */}
         {!isFreeTier && (
-          <Tooltip label='Create Attribution Reports'>
+          <Tooltip label='License Attribution Report'>
             <IconButton
               colorScheme='blue'
               icon={<LuClipboardList size={18} />}

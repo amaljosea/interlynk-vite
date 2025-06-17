@@ -269,7 +269,7 @@ const AttributionReportsDrawer = ({
   return (
     <>
       <LynkDrawer
-        title='Attribution Reports'
+        title='License Attribution Report'
         isOpen={isOpen}
         onClose={onModalClose}
         size='full'

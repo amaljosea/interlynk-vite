@@ -47,7 +47,7 @@ const LabelCreator = ({ onAddLabel }) => {
       <form onSubmit={handleSubmit}>
         <SimpleGrid columns={2} spacing={4}>
           <FormControl>
-            <FormLabel htmlFor='name'>Label name</FormLabel>
+            <FormLabel htmlFor='name'>Label Name</FormLabel>
             <Input
               value={name}
               name='name'

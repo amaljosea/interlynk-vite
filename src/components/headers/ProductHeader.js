@@ -105,13 +105,13 @@ const ProductHeader = (props) => {
               label={
                 isFreeTier && totalCount >= FREE_TIER_PRODUCT_LIMIT
                   ? 'Limit reached for free tier'
-                  : 'Add product'
+                  : 'Add Product'
               }
               isDisabled={false} // Ensure the tooltip is never disabled
             >
               <Box>
                 <AddButton
-                  aria-label='Add product'
+                  aria-label='Add Product'
                   onClick={() => action('update_product', null)}
                   isDisabled={
                     !canAddProduct ||
