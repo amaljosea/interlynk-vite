@@ -1,17 +1,10 @@
 import { Cell, Pie, PieChart } from 'recharts'
 
-import { Box, Circle, Flex, Stack, Text } from '@chakra-ui/react'
+import { Circle, Flex, Stack, Text } from '@chakra-ui/react'
 
 const MetricPieChart = ({ data }) => (
-  <Box
-    display='flex'
-    justifyContent='center'
-    alignItems='center'
-    minW='180px'
-    maxW='200px'
-    flexShrink={0}
-  >
-    <PieChart width={140} height={110}>
+  <Flex gap={5} justifyContent='center' alignItems='center' flexShrink={0}>
+    <PieChart width={110} height={110}>
       <Pie
         cx='50%'
         cy='50%'
@@ -40,7 +33,7 @@ const MetricPieChart = ({ data }) => (
         </Flex>
       ))}
     </Stack>
-  </Box>
+  </Flex>
 )
 
 export default MetricPieChart

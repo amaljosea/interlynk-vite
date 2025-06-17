@@ -19,7 +19,10 @@ import {
   Center,
   Checkbox,
   Flex,
+  Grid,
+  GridItem,
   Select,
+  SimpleGrid,
   Skeleton,
   Text,
   Wrap,
@@ -296,6 +299,7 @@ const ProgressOverviewCard = () => {
           Progress overview
         </Text>
         <Button
+          size={'sm'}
           leftIcon={<DownloadIcon color={secondaryTextColor} />}
           variant={'outline'}
           color={primaryTextColor}
@@ -359,25 +363,33 @@ const ProgressOverviewCard = () => {
           </Flex>
         </Flex>
 
-        <Flex gap={4} justifyContent='space-between'>
-          <MetricStat
-            label='Support status'
-            total={supportStatusData.currentTotal}
-            deltaPercent={supportStatusData.deltaPercent}
-            deltaDirection={supportStatusData.deltaDirection}
-          />
-          <MetricPieChart data={supportPieChartData} />
-        </Flex>
+        <Grid templateColumns='repeat(12, 1fr)'>
+          <GridItem colSpan={4}>
+            <MetricStat
+              label='Support status'
+              total={supportStatusData.currentTotal}
+              deltaPercent={supportStatusData.deltaPercent}
+              deltaDirection={supportStatusData.deltaDirection}
+            />
+          </GridItem>
+          <GridItem colSpan={8}>
+            <MetricPieChart data={supportPieChartData} />
+          </GridItem>
+        </Grid>
 
-        <Flex gap={4} justifyContent='space-between'>
-          <MetricStat
-            label='Vulnerabilities'
-            total={vulnerabilitiesData.currentTotal}
-            deltaPercent={vulnerabilitiesData.deltaPercent}
-            deltaDirection={vulnerabilitiesData.deltaDirection}
-          />
-          <MetricPieChart data={vulnPieChartData} />
-        </Flex>
+        <Grid templateColumns='repeat(12, 1fr)'>
+          <GridItem colSpan={4}>
+            <MetricStat
+              label='Vulnerabilities'
+              total={vulnerabilitiesData.currentTotal}
+              deltaPercent={vulnerabilitiesData.deltaPercent}
+              deltaDirection={vulnerabilitiesData.deltaDirection}
+            />
+          </GridItem>
+          <GridItem colSpan={8}>
+            <MetricPieChart data={vulnPieChartData} />
+          </GridItem>
+        </Grid>
 
         <Box>
           <Wrap spacing={4} mb={4}>

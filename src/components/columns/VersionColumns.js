@@ -46,18 +46,6 @@ import {
   LuSquareCheckBig
 } from 'react-icons/lu'
 
-const StatusInfo = ({ data }) => {
-  return (
-    <Stack w={'100%'} spacing={1} p={2}>
-      <Text>Unspecified: {data?.unspecifiedCount}</Text>
-      <Text>In Triage: {data?.inTriageCount}</Text>
-      <Text>Affected: {data?.affectedCount}</Text>
-      <Text>Not Afftected: {data?.notAffectedCount}</Text>
-      <Text>Fixed: {data?.fixedCount}</Text>
-    </Stack>
-  )
-}
-
 const SeverityInfo = ({ data, onClick }) => {
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =
     useProductUrlContext()
@@ -98,6 +86,60 @@ const SeverityInfo = ({ data, onClick }) => {
   )
 }
 
+const StatusInfo = ({ data }) => {
+  const { vulnerabilityMetrics } = data || {}
+  const {
+    unspecifiedCount,
+    inTriageCount,
+    affectedCount,
+    fixedCount,
+    notAffectedCount
+  } = vulnerabilityMetrics || {}
+
+  const vulnStatus = [
+    {
+      label: 'Unspecified',
+      color: 'gray',
+      value: unspecifiedCount || 0
+    },
+    {
+      label: 'In Triage',
+      color: 'cyan',
+      value: inTriageCount || 0
+    },
+    {
+      label: 'Affected',
+      color: 'red',
+      value: affectedCount || 0
+    },
+    {
+      label: 'Not Afftected',
+      color: 'blue',
+      value: notAffectedCount || 0
+    },
+    {
+      label: 'Fixed',
+      color: 'green',
+      value: fixedCount || 0
+    }
+  ]
+
+  return (
+    <Stack w={'fit-content'} spacing={2} py={1}>
+      {vulnStatus.map((item, index) => (
+        <Flex key={index} gap={2}>
+          <Text w={'130px'} fontSize={14} textTransform={'capitalize'}>
+            {item.label}
+          </Text>
+          <Tag colorScheme={item.color} w={'60px'}>
+            <TagLabel mx={'auto'}>{item.value}</TagLabel>
+          </Tag>
+        </Flex>
+      ))}
+    </Stack>
+  )
+}
+
 const VersionColumns = (props) => {
   const { action, retentionTime, onFilterSev, onSelectLicenses, onStartTour } =
     props
@@ -131,6 +173,7 @@ const VersionColumns = (props) => {
   })
 
   const [openPopoverId, setOpenPopoverId] = useState(null)
+  const [openStatusId, setOpenStatusId] = useState(null)
 
   const retention = retentionTime && Math.floor(retentionTime)
 
@@ -227,14 +270,14 @@ const VersionColumns = (props) => {
             </Stack>
           )
         },
-        width: '25%',
         wrap: true,
         sortable: true,
         sortFunction: (a, b) => {
           const dateA = new Date(a.updatedAt)
           const dateB = new Date(b.updatedAt)
           return dateA - dateB
-        }
+        },
+        width: '20%'
       },
       // COMPONENTS
       {
@@ -256,8 +299,7 @@ const VersionColumns = (props) => {
               </Tag>
             </Link>
           )
-        },
-        width: '13%'
+        }
       },
       // LICENSES
       {
@@ -274,14 +316,13 @@ const VersionColumns = (props) => {
               <TagLabel mx={'auto'}> {stats?.compLicenseCount}</TagLabel>
             </Tag>
           )
-        },
-        width: '10%'
+        }
+        // omit: true
       },
       // VULNERABILITIES
       {
         id: 'VULNERABILITIES',
         name: 'VULNERABILITIES',
-        width: '22%',
         selector: (row) => {
           const { id, stats, vulnRunStatus } = row
           const { vulnStats } = stats || {}
@@ -299,7 +340,7 @@ const VersionColumns = (props) => {
           )
 
           return (
-            <Flex gap={2} alignItems={'center'}>
+            <Flex gap={1} my={3} alignItems={'center'} flexWrap={'wrap'}>
               <VulnBadge
                 color='red'
                 label='Critical'
@@ -355,13 +396,13 @@ const VersionColumns = (props) => {
               )}
             </Flex>
           )
-        }
+        },
+        width: '16%'
       },
       // STATUSES
       {
         id: 'STATUSES',
         name: 'STATUSES',
-        width: '10%',
         selector: (row) => {
           const { vulnerabilityMetrics } = row
           const total = Number(
@@ -372,14 +413,40 @@ const VersionColumns = (props) => {
               vulnerabilityMetrics?.notAffectedCount
           )
           return (
-            <Tooltip label={<StatusInfo data={vulnerabilityMetrics} />}>
-              <Tag minW={'50px'} colorScheme='blue'>
-                <TagLabel mx={'auto'}> {total}</TagLabel>
-              </Tag>
-            </Tooltip>
+            <Popover
+              placement='right'
+              closeOnBlur={false}
+              returnFocusOnClose={false}
+              isOpen={openStatusId === row?.id}
+              onClose={() => setOpenStatusId(null)}
+            >
+              <PopoverTrigger>
+                <Tag
+                  minW={'60px'}
+                  colorScheme='blue'
+                  onMouseEnter={() => setOpenStatusId(row?.id)}
+                  onMouseLeave={() => setOpenStatusId(null)}
+                >
+                  <TagLabel mx={'auto'}>{total}</TagLabel>
+                </Tag>
+              </PopoverTrigger>
+              <Portal>
+                <PopoverContent
+                  zIndex={111}
+                  w={'230px'}
+                  overflow={'hidden'}
+                  color={primaryTextColor}
+                  onMouseEnter={() => setOpenStatusId(row?.id)}
+                  onMouseLeave={() => setOpenStatusId(null)}
+                >
+                  <PopoverBody w={'fit-content'}>
+                    <StatusInfo data={row} />
+                  </PopoverBody>
+                </PopoverContent>
+              </Portal>
+            </Popover>
           )
-        },
-        omit: true
+        }
       },
       // CREATED AT
       {
@@ -400,7 +467,6 @@ const VersionColumns = (props) => {
           )
         },
         wrap: true,
-        width: signedUrlParams ? 'auto' : '12%',
         right: 'true',
         sortable: true
       },
@@ -496,6 +562,7 @@ const VersionColumns = (props) => {
     onSelectLicenses,
     onStartTour,
     openPopoverId,
+    openStatusId,
     primaryBlueText,
     primaryErrorColor,
     primaryTextColor,
