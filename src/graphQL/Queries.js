@@ -113,19 +113,12 @@ export const GetUsers = gql`
 export const GetUserPermissions = gql`
   query GetUserPermissions {
     organization {
-      id
       currentUser {
-        id
         role {
-          id
           permissionsMap {
-            category
-            description
             key
-            name
-            supersededBy
             value
-            hidden
+            supersededBy
           }
         }
       }
