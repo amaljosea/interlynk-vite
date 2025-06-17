@@ -74,7 +74,8 @@ const Connections = ({ org }) => {
     teams: false,
     github: false,
     bitbucket: false,
-    linear: false
+    linear: false,
+    email: false
   })
 
   const [hostId, setHostId] = useState(null)
