@@ -57,7 +57,7 @@ const Parts = ({ data }) => {
     variables: { projectId: prodId, sbomId, first: 25 }
   })
 
-  const { sbomParts } = sbomData?.sbom || ''
+  const { sbomParts } = sbomData?.sbom || {}
 
   const signedUrlParams = getSignedUrlParams()
 
@@ -88,10 +88,9 @@ const Parts = ({ data }) => {
 
   const onSelectPart = () => partsContext.push()
 
-  const onFilterSev = (part, value, link) => {
-    prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
+  const onFilterSev = (value, id, link) => {
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
-    onSelectPart(part)
+    onSelectPart(id)
     navigate(link)
   }
 

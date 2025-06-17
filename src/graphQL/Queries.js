@@ -3157,11 +3157,11 @@ export const GetSbomParts = gql`
         partId
         part {
           id
-          lifecycle
           createdAt
           creationAt
           projectVersion
           vulnRunStatus
+          productLifeCycleStage
           project {
             id
             name
@@ -3182,11 +3182,12 @@ export const GetSbomParts = gql`
             purl
             cpes
           }
-          suppliers {
-            id
-            name
-            contactEmail
-            contactName
+          vulnerabilityMetrics {
+            affectedCount
+            notAffectedCount
+            fixedCount
+            unspecifiedCount
+            inTriageCount
           }
         }
       }

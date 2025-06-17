@@ -23,7 +23,6 @@ import {
   PopoverContent,
   PopoverTrigger,
   Portal,
-  SimpleGrid,
   Stack,
   Tag,
   TagLabel,
@@ -39,106 +38,9 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import {
-  LuFilePen,
-  LuMessageCircleOff,
-  LuRepeat,
-  LuSquareCheckBig
-} from 'react-icons/lu'
-
-const SeverityInfo = ({ data, onClick }) => {
-  const { generateProductVersionDetailPageUrlFromCurrentUrl } =
-    useProductUrlContext()
-
-  const { stats, id, vulnRunStatus } = data || {}
-  const notStarted = vulnRunStatus === 'NOT_STARTED'
-
-  const link = generateProductVersionDetailPageUrlFromCurrentUrl({
-    sbomid: id,
-    paramsObj: {
-      tab: 'vulnerabilities'
-    }
-  })
-
-  const vulnStats = [
-    { label: 'medium', color: 'yellow', value: stats?.vulnStats?.medium || 0 },
-    { label: 'low', color: 'green', value: stats?.vulnStats?.low || 0 },
-    { label: 'unknown', color: 'gray', value: stats?.vulnStats?.unknown || 0 }
-  ]
-
-  return (
-    <Stack w={'100%'} spacing={2} py={1}>
-      {vulnStats.map((item, index) => (
-        <SimpleGrid key={index} columns={2} gap={2}>
-          <Text fontSize={14} textTransform={'capitalize'}>
-            {item.label}
-          </Text>
-          <VulnBadge
-            color={item.color}
-            status={vulnRunStatus}
-            onClick={() => onClick([item.label], id, link)}
-          >
-            {notStarted ? '-' : item.value}
-          </VulnBadge>
-        </SimpleGrid>
-      ))}
-    </Stack>
-  )
-}
-
-const StatusInfo = ({ data }) => {
-  const { vulnerabilityMetrics } = data || {}
-  const {
-    unspecifiedCount,
-    inTriageCount,
-    affectedCount,
-    fixedCount,
-    notAffectedCount
-  } = vulnerabilityMetrics || {}
-
-  const vulnStatus = [
-    {
-      label: 'Unspecified',
-      color: 'gray',
-      value: unspecifiedCount || 0
-    },
-    {
-      label: 'In Triage',
-      color: 'cyan',
-      value: inTriageCount || 0
-    },
-    {
-      label: 'Affected',
-      color: 'red',
-      value: affectedCount || 0
-    },
-    {
-      label: 'Not Afftected',
-      color: 'blue',
-      value: notAffectedCount || 0
-    },
-    {
-      label: 'Fixed',
-      color: 'green',
-      value: fixedCount || 0
-    }
-  ]
-
-  return (
-    <Stack w={'fit-content'} spacing={2} py={1}>
-      {vulnStatus.map((item, index) => (
-        <Flex key={index} gap={2}>
-          <Text w={'130px'} fontSize={14} textTransform={'capitalize'}>
-            {item.label}
-          </Text>
-          <Tag colorScheme={item.color} w={'60px'}>
-            <TagLabel mx={'auto'}>{item.value}</TagLabel>
-          </Tag>
-        </Flex>
-      ))}
-    </Stack>
-  )
-}
+import { LuFilePen, LuMessageCircleOff, LuRepeat } from 'react-icons/lu'
+import SeverityInfo from 'components/Misc/SeverityInfo'
+import StatusInfo from 'components/Misc/StatusInfo'
 
 const VersionColumns = (props) => {
   const { action, retentionTime, onFilterSev, onSelectLicenses, onStartTour } =

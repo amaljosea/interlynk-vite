@@ -1,14 +1,25 @@
-import { useMemo } from 'react'
+/* eslint-disable no-unused-vars */
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { isValidPurl } from 'utils'
+import { isValidPurl, truncatedValue } from 'utils'
 import { GetIcon } from 'utils/styleUtils'
 
-import { Flex, Tag, TagLabel } from '@chakra-ui/react'
+import {
+  Flex,
+  Popover,
+  PopoverBody,
+  PopoverContent,
+  PopoverTrigger,
+  Tag,
+  TagLabel
+} from '@chakra-ui/react'
 import { IconButton, Link, Portal, Stack, Text } from '@chakra-ui/react'
 import { Grid, GridItem } from '@chakra-ui/react'
 import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 
 import LynkAction from 'components/Misc/LynkAction'
+import SeverityInfo from 'components/Misc/SeverityInfo'
+import StatusInfo from 'components/Misc/StatusInfo'
 import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -26,13 +37,21 @@ const PartsColumns = (
   onSelectPart,
   generateProductVersionDetailPageUrlFromCurrentUrl
 ) => {
-  const { primaryTextColor, primaryBlueText, inverseSecondaryBgColor } =
-    useThemeColor([
-      'primaryTextColor',
-      'primaryBlueText',
-      'inverseSecondaryBgColor'
-    ])
+  const {
+    primaryTextColor,
+    secondaryTextColor,
+    primaryBlueText,
+    inverseSecondaryBgColor
+  } = useThemeColor([
+    'primaryTextColor',
+    'secondaryTextColor',
+    'primaryBlueText',
+    'inverseSecondaryBgColor'
+  ])
   const navigate = useNavigate()
+
+  const [openPopoverId, setOpenPopoverId] = useState(null)
+  const [openStatusId, setOpenStatusId] = useState(null)
 
   return useMemo(() => {
     const columns = [
@@ -41,9 +60,16 @@ const PartsColumns = (
         name: 'NAME',
         selector: (row) => {
           const { part } = row
-          const { primaryComponent, projectVersion, suppliers } = part || ''
-          const { purl } = primaryComponent || ''
+          const {
+            primaryComponent,
+            project,
+            projectVersion,
+            productLifeCycleStage
+          } = part || {}
+          const { projectGroup } = project || {}
+          const { purl } = primaryComponent || {}
           const validPurl = isValidPurl(purl)
+          const lifestage = String(productLifeCycleStage)?.replaceAll(/_/g, ' ')
 
           const link = generateProductVersionDetailPageUrlFromCurrentUrl({
             productgroupid: part.project.projectGroup.id,
@@ -74,30 +100,40 @@ const PartsColumns = (
               </GridItem>
               <GridItem colSpan={6}>
                 <Stack spacing={1} direction='column'>
-                  <Link to={link} replace>
-                    <Text
-                      data-testid={`sbom_part`}
-                      sx={{ fontSize: 14, color: primaryBlueText }}
-                      onClick={() => {
-                        onSelectPart(part)
-                        navigate(link)
-                      }}
-                    >
-                      {part?.project?.projectGroup?.name}
-                    </Text>
-                  </Link>
-                  <Text color={primaryTextColor}>{projectVersion}</Text>
-                  {suppliers?.map((item, index) => (
-                    <Text hidden key={index} color={primaryTextColor}>
-                      {item?.name}
-                    </Text>
-                  ))}
+                  <Flex gap={2} alignItems={'center'} flexWrap={'wrap'}>
+                    <Link to={link} replace>
+                      <Text
+                        data-testid={`sbom_part`}
+                        sx={{ fontSize: 14, color: primaryBlueText }}
+                        onClick={() => {
+                          onSelectPart(part)
+                          navigate(link)
+                        }}
+                      >
+                        {truncatedValue(projectGroup?.name, 14)}
+                      </Text>
+                    </Link>
+                    {productLifeCycleStage && (
+                      <Tag
+                        fontSize={12}
+                        variant='subtle'
+                        w={'fit-content'}
+                        colorScheme='blue'
+                        textTransform={'capitalize'}
+                      >
+                        {lifestage}
+                      </Tag>
+                    )}
+                  </Flex>
+                  <Text color={secondaryTextColor}>
+                    {truncatedValue(projectVersion, 18)}
+                  </Text>
                 </Stack>
               </GridItem>
             </Grid>
           )
         },
-        width: '25%',
+        width: '20%',
         wrap: true
       },
       {
@@ -118,18 +154,12 @@ const PartsColumns = (
                 navigate(link)
               }}
             >
-              <Tag
-                size='md'
-                variant='subtle'
-                colorScheme={'blue'}
-                sx={{ w: 16, cursor: 'pointer' }}
-              >
-                <TagLabel mx={'auto'}>{part.stats.compCount}</TagLabel>
+              <Tag w={'50px'} colorScheme={'teal'}>
+                <TagLabel mx={'auto'}>{part?.stats?.compCount}</TagLabel>
               </Tag>
             </Link>
           )
-        },
-        width: '10%'
+        }
       },
       {
         id: 'LICENSES',
@@ -149,84 +179,141 @@ const PartsColumns = (
                 navigate(link)
               }}
             >
-              <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
+              <Tag w='50px ' colorScheme={'orange'}>
                 <TagLabel mx={'auto'}>{part.stats.compLicenseCount}</TagLabel>
               </Tag>
             </Link>
           )
-        },
-        width: '10%'
+        }
       },
       {
         id: 'VULNERABILITIES',
         name: 'VULNERABILITIES',
         selector: (row) => {
-          const { part, vulnRunStatus } = row
+          const { part } = row || {}
+          const { id, project, stats, vulnRunStatus } = part || {}
+          const { vulnStats } = stats || {}
+          const notStarted = vulnRunStatus === 'NOT_STARTED'
+          const { critical, high, ...rest } = vulnStats || {}
+          const total = Object.values(rest).reduce(
+            (sum, value) => sum + value,
+            0
+          )
           const link = generateProductVersionDetailPageUrlFromCurrentUrl({
-            productgroupid: part?.project?.projectGroup?.id,
-            productid: part?.project?.id,
-            sbomid: part?.id,
+            productgroupid: project?.projectGroup?.id,
+            productid: project?.id,
+            sbomid: id,
             paramsObj: { tab: 'vulnerabilities', parts: true }
           })
+
           return (
-            <Flex gap={1} flexWrap={'wrap'} my={4}>
+            <Flex gap={1} my={3} alignItems={'center'} flexWrap={'wrap'}>
               <VulnBadge
                 color='red'
                 label='Critical'
                 status={vulnRunStatus}
-                onClick={() => onFilterSev(part, ['critical'], link)}
+                onClick={() => onFilterSev(['critical'], id, link)}
               >
-                {part?.stats?.vulnStats?.critical || 0}
+                {notStarted ? '-' : stats?.vulnStats?.critical || 0}
               </VulnBadge>
               <VulnBadge
                 color='orange'
                 label='High'
                 status={vulnRunStatus}
-                onClick={() => onFilterSev(part, ['high'], link)}
+                onClick={() => onFilterSev(['high'], id, link)}
               >
-                {part?.stats?.vulnStats?.high || 0}
+                {notStarted ? '-' : stats?.vulnStats?.high || 0}
               </VulnBadge>
-              <VulnBadge
-                color='yellow'
-                label='Medium'
-                status={vulnRunStatus}
-                onClick={() => onFilterSev(part, ['medium'], link)}
-              >
-                {part?.stats?.vulnStats?.medium || 0}
-              </VulnBadge>
-              <VulnBadge
-                color='green'
-                label='Low'
-                status={vulnRunStatus}
-                onClick={() => onFilterSev(part, ['low'], link)}
-              >
-                {part?.stats?.vulnStats?.low || 0}
-              </VulnBadge>
-              <VulnBadge
-                color='gray'
-                label='Unknown'
-                status={vulnRunStatus}
-                onClick={() => onFilterSev(part, ['unknown'], link)}
-              >
-                {part?.stats?.vulnStats?.unknown || 0}
-              </VulnBadge>
+              {signedUrlParams && (
+                <Text color={primaryTextColor}>+{total}</Text>
+              )}
+              {vulnRunStatus === 'FINISHED' && total !== 0 && (
+                <Popover
+                  placement='right'
+                  closeOnBlur={false}
+                  returnFocusOnClose={false}
+                  isOpen={openPopoverId === part?.id}
+                  onClose={() => setOpenPopoverId(null)}
+                >
+                  <PopoverTrigger>
+                    <Tag
+                      minW={'60px'}
+                      colorScheme='gray'
+                      onMouseEnter={() => setOpenPopoverId(part?.id)}
+                      onMouseLeave={() => setOpenPopoverId(null)}
+                    >
+                      <TagLabel mx={'auto'}>+{total}</TagLabel>
+                    </Tag>
+                  </PopoverTrigger>
+                  <Portal>
+                    <PopoverContent
+                      zIndex={111}
+                      width={'200px'}
+                      overflow={'hidden'}
+                      color={primaryTextColor}
+                      onMouseEnter={() => setOpenPopoverId(part?.id)}
+                      onMouseLeave={() => setOpenPopoverId(null)}
+                    >
+                      <PopoverBody>
+                        <SeverityInfo data={part} onClick={onFilterSev} />
+                      </PopoverBody>
+                    </PopoverContent>
+                  </Portal>
+                </Popover>
+              )}
             </Flex>
           )
         },
-        width: '28%'
+        width: '16%'
       },
       {
-        id: 'STATUS',
-        name: 'STATUS',
+        id: 'STATUSES',
+        name: 'STATUSES',
         selector: (row) => {
           const { part } = row
-          return (
-            <Tag width={24} colorScheme='cyan' textTransform={'capitalize'}>
-              <TagLabel mx={'auto'}>{part.lifecycle}</TagLabel>
-            </Tag>
+          const { vulnerabilityMetrics } = part || {}
+          const total = Number(
+            vulnerabilityMetrics?.unspecifiedCount +
+              vulnerabilityMetrics?.inTriageCount +
+              vulnerabilityMetrics?.affectedCount +
+              vulnerabilityMetrics?.fixedCount +
+              vulnerabilityMetrics?.notAffectedCount
           )
-        },
-        width: '10%'
+          return (
+            <Popover
+              placement='right'
+              closeOnBlur={false}
+              returnFocusOnClose={false}
+              isOpen={openStatusId === row?.id}
+              onClose={() => setOpenStatusId(null)}
+            >
+              <PopoverTrigger>
+                <Tag
+                  minW={'60px'}
+                  colorScheme='blue'
+                  onMouseEnter={() => setOpenStatusId(row?.id)}
+                  onMouseLeave={() => setOpenStatusId(null)}
+                >
+                  <TagLabel mx={'auto'}>{total}</TagLabel>
+                </Tag>
+              </PopoverTrigger>
+              <Portal>
+                <PopoverContent
+                  zIndex={111}
+                  w={'230px'}
+                  overflow={'hidden'}
+                  color={primaryTextColor}
+                  onMouseEnter={() => setOpenStatusId(row?.id)}
+                  onMouseLeave={() => setOpenStatusId(null)}
+                >
+                  <PopoverBody w={'fit-content'}>
+                    <StatusInfo data={part} />
+                  </PopoverBody>
+                </PopoverContent>
+              </Portal>
+            </Popover>
+          )
+        }
       },
       {
         id: 'ACTION',
@@ -259,19 +346,22 @@ const PartsColumns = (
 
     return columns
   }, [
-    onFilterSev,
+    isArchived,
+    generateProductVersionDetailPageUrlFromCurrentUrl,
     colorMode,
     inverseSecondaryBgColor,
-    primaryTextColor,
     primaryBlueText,
-    updateSboms,
-    signedUrlParams,
-    onDeleteOpen,
-    isArchived,
-    setActiveRow,
-    generateProductVersionDetailPageUrlFromCurrentUrl,
+    secondaryTextColor,
     onSelectPart,
-    navigate
+    navigate,
+    signedUrlParams,
+    primaryTextColor,
+    openPopoverId,
+    onFilterSev,
+    openStatusId,
+    updateSboms,
+    setActiveRow,
+    onDeleteOpen
   ])
 }
 
