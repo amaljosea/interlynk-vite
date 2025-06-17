@@ -2,6 +2,8 @@
 import { jsPDF } from 'jspdf'
 import { attributionFilename } from 'utils/DownloadUtils/pdfUtils'
 
+import './fonts/roboMonoNormal'
+
 export const fetchLogo = async () => {
   try {
     const logoUrl = new URL('assets/img/logo.png', import.meta.url).href
@@ -30,19 +32,20 @@ export const generateAttributionPdf = async (
 ) => {
   const filename = attributionFilename(productName, productVersion)
   const pdfDoc = new jsPDF({ compress: true })
+
+  // This check will be needed in future while adding new fonts
+  /* console.log('Initial font list from doc instance:', pdfDoc.getFontList())  */
+
   const pageWidth = pdfDoc.internal.pageSize.getWidth()
   const pageHeight = pdfDoc.internal.pageSize.getHeight()
   const margin = 20
-  const headerHeight = 25
 
   const blackColor = '#000000'
 
   // --- TOC Destinations Array ---
-
   const tocDestinations = []
 
   // --- Store header info for each *content* page ---
-
   const contentPageHeaders = {}
 
   const logoBase64 = await fetchLogo()
@@ -50,7 +53,7 @@ export const generateAttributionPdf = async (
   pdfDoc.setPage(1)
 
   // Set font and color for general titles on the first page
-  pdfDoc.setFont('roboto', 'normal')
+  pdfDoc.setFont('RobotoMono-Regular', 'normal')
 
   // Page 1 title
   const titleText = 'Software Licenses'
@@ -64,7 +67,8 @@ export const generateAttributionPdf = async (
 
   // Product Name (subtitleText)
   const subtitleText = productName
-  pdfDoc.setFontSize(24) / pdfDoc.setTextColor('#555555') // Lighter than title, darker than revision
+  pdfDoc.setFontSize(24)
+  pdfDoc.setTextColor('#555555') // Lighter than title, darker than revision
   const subtitleTextWidth = pdfDoc.getTextWidth(subtitleText) // Get width for centering
   const subtitleX = (pageWidth - subtitleTextWidth) / 2 // Center align product name
   const subtitleY = titleY + 20
@@ -95,8 +99,9 @@ export const generateAttributionPdf = async (
     const interlynkLogoHeight = 15
     const textPreparedBy = 'Prepared by Interlynk Inc.'
 
-    pdfDoc.setFontSize(12) / pdfDoc.setTextColor('#555555')
-    pdfDoc.setFont('roboto', 'normal')
+    pdfDoc.setFontSize(12)
+    pdfDoc.setTextColor('#555555')
+    pdfDoc.setFont('RobotoMono-Regular', 'normal')
     const textWidth = pdfDoc.getTextWidth(textPreparedBy)
 
     const minimalGap = 2
@@ -127,9 +132,10 @@ export const generateAttributionPdf = async (
   }
 
   // --- Initialize Content Page Variables ---
-
   let relativeContentPageNumber = 1
-  let yPosition = margin + headerHeight
+  // Content starts at this Y position after the header area.
+  // This value remains consistent for all content pages.
+  let yPosition = margin + 20
 
   // Add the first page where content will be added (initially page 2 in the PDF)
   // This page will later shift due to TOC insertion.
@@ -154,7 +160,8 @@ export const generateAttributionPdf = async (
     tocDestinations.push({
       title: currentComponentName,
       page: relativeContentPageNumber,
-      y: yPosition // y position is relative to its own page's content area
+      // Adjust y for TOC link to account for new header positioning
+      y: yPosition
     })
 
     const source = sourcePreferences[comp.id] || 'sbom'
@@ -172,15 +179,16 @@ export const generateAttributionPdf = async (
         : comp.licensesExp || 'NA'
 
     const estimatedTitleHeight = 14
-    if (yPosition + estimatedTitleHeight > pageHeight - 30) {
+    // Adjusted check for page breaks to ensure content starts from yPosition
+    if (yPosition + estimatedTitleHeight > pageHeight - margin - 30) {
       relativeContentPageNumber++
       pdfDoc.addPage()
-      yPosition = margin + headerHeight
+      yPosition = margin + 20 // Consistent content start Y
     }
     yPosition += 10
 
     pdfDoc.setFontSize(14)
-    pdfDoc.setFont('roboto', 'bold')
+    pdfDoc.setFont('RobotoMono-Regular', 'bold')
     pdfDoc.setTextColor(blackColor) // Keeping black for component titles for contrast
     const titleLines = pdfDoc.splitTextToSize(
       currentComponentName,
@@ -190,7 +198,7 @@ export const generateAttributionPdf = async (
       if (yPosition > pageHeight - 30) {
         relativeContentPageNumber++
         pdfDoc.addPage()
-        yPosition = margin + headerHeight
+        yPosition = margin + 20 // Consistent content start Y
         // Store header info for the new page
         contentPageHeaders[relativeContentPageNumber] = {
           componentName: currentComponentName,
@@ -200,202 +208,20 @@ export const generateAttributionPdf = async (
       pdfDoc.text(line, margin, yPosition)
       // Underline for component title
       if (index === titleLines.length - 1) {
-        // Underline only the last line of the title
-        const textWidth = pdfDoc.getTextWidth(line)
-        const underlineY = yPosition + 1
-        pdfDoc.setLineWidth(0.1)
-        pdfDoc.setDrawColor('#000000')
-        pdfDoc.line(margin, underlineY, margin + textWidth, underlineY)
+        //
       }
       yPosition += 6
     })
     yPosition += 4
 
-    // Render Notice section
-    pdfDoc.setFontSize(11)
-    pdfDoc.setFont('roboto', 'normal')
-    pdfDoc.setTextColor('#333333')
-    const noticeSubtitleText = 'Notice'
-    pdfDoc.text(noticeSubtitleText, margin, yPosition)
-    // Underline for Notice subtitle
-    const noticeSubtitleWidth = pdfDoc.getTextWidth(noticeSubtitleText)
-    pdfDoc.setLineWidth(0.1)
-    pdfDoc.setDrawColor('#333333')
-    pdfDoc.line(
-      margin,
-      yPosition + 1,
-      margin + noticeSubtitleWidth,
-      yPosition + 1
-    )
-
-    pdfDoc.setFont('roboto', 'normal')
-    pdfDoc.setTextColor('#444444')
-    pdfDoc.setFontSize(10)
-    const noticeLines = pdfDoc.splitTextToSize(
-      noticeText,
-      pageWidth - 2 * margin
-    )
-    yPosition += 5
-    noticeLines.forEach((line) => {
-      if (yPosition > pageHeight - 30) {
-        relativeContentPageNumber++
-        pdfDoc.addPage()
-        yPosition = margin + headerHeight
-
-        contentPageHeaders[relativeContentPageNumber] = {
-          componentName: currentComponentName,
-          startingLetter: currentStartingLetter
-        }
-      }
-      pdfDoc.text(line, margin, yPosition)
-      yPosition += 5
-    })
-    yPosition += 5
-
-    // Render License section
-    pdfDoc.setFontSize(11)
-    pdfDoc.setFont('roboto', 'normal')
-    pdfDoc.setTextColor('#333333')
-    const licenseSubtitleText = 'License'
-    pdfDoc.text(licenseSubtitleText, margin, yPosition)
-    // Underline for License subtitle
-    const licenseSubtitleWidth = pdfDoc.getTextWidth(licenseSubtitleText)
-    pdfDoc.setLineWidth(0.1)
-    pdfDoc.setDrawColor('#333333')
-    pdfDoc.line(
-      margin,
-      yPosition + 1,
-      margin + licenseSubtitleWidth,
-      yPosition + 1
-    )
-
-    pdfDoc.setFont('roboto', 'normal')
-    pdfDoc.setTextColor('#444444')
-    pdfDoc.setFontSize(10)
-    const licenseExpLines = pdfDoc.splitTextToSize(
-      licenseText,
-      pageWidth - 2 * margin
-    )
-    yPosition += 5
-    licenseExpLines.forEach((line) => {
-      if (yPosition > pageHeight - 30) {
-        relativeContentPageNumber++
-        pdfDoc.addPage()
-        yPosition = margin + headerHeight
-
-        contentPageHeaders[relativeContentPageNumber] = {
-          componentName: currentComponentName,
-          startingLetter: currentStartingLetter
-        }
-      }
-      pdfDoc.text(line, margin, yPosition)
-      yPosition += 5
-    })
-    yPosition += 8
-
-    // Render License Text section
-    pdfDoc.setFontSize(11)
-    pdfDoc.setFont('roboto', 'normal')
-    pdfDoc.setTextColor('#333333')
-    const licenseTextSubtitleText = 'License Text'
-    pdfDoc.text(licenseTextSubtitleText, margin, yPosition)
-    // Underline for License Text subtitle
-    const licenseTextSubtitleWidth = pdfDoc.getTextWidth(
-      licenseTextSubtitleText
-    )
-    pdfDoc.setLineWidth(0.1)
-    pdfDoc.setDrawColor('#333333')
-    pdfDoc.line(
-      margin,
-      yPosition + 1,
-      margin + licenseTextSubtitleWidth,
-      yPosition + 1
-    )
-
-    yPosition += 10
-
-    if (Array.isArray(comp.licenseText) && comp.licenseText.length > 0) {
-      const validLicenses = comp.licenseText.filter(
-        (item) => item?.content?.text
-      )
-
-      if (validLicenses.length > 0) {
-        pdfDoc.setFont('roboto', 'normal')
-        pdfDoc.setTextColor('#323232')
-        validLicenses.forEach((licenseItem) => {
-          if (yPosition + 10 > pageHeight - 30) {
-            relativeContentPageNumber++
-            pdfDoc.addPage()
-            yPosition = margin + headerHeight
-
-            contentPageHeaders[relativeContentPageNumber] = {
-              componentName: currentComponentName,
-              startingLetter: currentStartingLetter
-            }
-          }
-          pdfDoc.setTextColor('#333333')
-          pdfDoc.setFont('roboto', 'normal')
-          pdfDoc.setFontSize(10)
-          const licenseItemSubtitleText = `${licenseItem?.content?.shortId || 'N/A'}`
-          pdfDoc.text(licenseItemSubtitleText, margin, yPosition)
-          pdfDoc.setFontSize(10)
-          pdfDoc.setFont('roboto', 'normal')
-          yPosition += 10
-          pdfDoc.setTextColor('#444444')
-          const licenseTextLines = pdfDoc.splitTextToSize(
-            licenseItem?.content?.text || 'N/A',
-            pageWidth - 2 * margin - 20
-          )
-          licenseTextLines.forEach((line) => {
-            if (yPosition > pageHeight - 30) {
-              relativeContentPageNumber++
-              pdfDoc.addPage()
-              yPosition = margin + headerHeight
-
-              contentPageHeaders[relativeContentPageNumber] = {
-                componentName: currentComponentName,
-                startingLetter: currentStartingLetter
-              }
-            }
-            pdfDoc.text(`${line}`, margin, yPosition)
-            yPosition += 5
-          })
-          yPosition += 5
-        })
-      } else {
-        pdfDoc.setFont('roboto', 'normal')
-        pdfDoc.setTextColor('#444444')
-        pdfDoc.setFontSize(10)
-        pdfDoc.text('N/A', margin, yPosition)
-        yPosition += 5
-      }
-    } else {
-      pdfDoc.setFont('roboto', 'normal')
-      pdfDoc.setTextColor('#444444')
-      pdfDoc.setFontSize(10)
-      pdfDoc.text('N/A', margin, yPosition)
-      yPosition += 5
-    }
-    yPosition += 5
-
     // Render Copyright section
     pdfDoc.setFontSize(11)
-    pdfDoc.setFont('roboto', 'normal')
+    pdfDoc.setFont('RobotoMono-Regular', 'normal')
     pdfDoc.setTextColor('#333333')
     const copyrightSubtitleText = 'Copyright'
     pdfDoc.text(copyrightSubtitleText, margin, yPosition)
-    // Underline for Copyright subtitle
-    const copyrightSubtitleWidth = pdfDoc.getTextWidth(copyrightSubtitleText)
-    pdfDoc.setLineWidth(0.1)
-    pdfDoc.setDrawColor('#333333')
-    pdfDoc.line(
-      margin,
-      yPosition + 1,
-      margin + copyrightSubtitleWidth,
-      yPosition + 1
-    )
 
-    pdfDoc.setFont('roboto', 'normal')
+    pdfDoc.setFont('RobotoMono-Regular', 'normal')
     pdfDoc.setTextColor('#444444')
     pdfDoc.setFontSize(10)
     const copyrightLines = pdfDoc.splitTextToSize(
@@ -407,7 +233,7 @@ export const generateAttributionPdf = async (
       if (yPosition > pageHeight - 30) {
         relativeContentPageNumber++
         pdfDoc.addPage()
-        yPosition = margin + headerHeight
+        yPosition = margin + 20 // Consistent content start Y
 
         contentPageHeaders[relativeContentPageNumber] = {
           componentName: currentComponentName,
@@ -417,12 +243,147 @@ export const generateAttributionPdf = async (
       pdfDoc.text(line, margin, yPosition)
       yPosition += 5
     })
+    yPosition += 5
+    // Render License section
+    pdfDoc.setFontSize(11)
+    pdfDoc.setFont('RobotoMono-Regular', 'normal')
+    pdfDoc.setTextColor('#333333')
+    const licenseSubtitleText = 'License'
+    pdfDoc.text(licenseSubtitleText, margin, yPosition)
+
+    pdfDoc.setFont('RobotoMono-Regular', 'normal')
+    pdfDoc.setTextColor('#444444')
+    pdfDoc.setFontSize(10)
+    const licenseExpLines = pdfDoc.splitTextToSize(
+      licenseText,
+      pageWidth - 2 * margin
+    )
+    yPosition += 5
+    licenseExpLines.forEach((line) => {
+      if (yPosition > pageHeight - 30) {
+        relativeContentPageNumber++
+        pdfDoc.addPage()
+        yPosition = margin + 20 // Consistent content start Y
+
+        contentPageHeaders[relativeContentPageNumber] = {
+          componentName: currentComponentName,
+          startingLetter: currentStartingLetter
+        }
+      }
+      pdfDoc.text(line, margin, yPosition)
+      yPosition += 5
+    })
+    yPosition += 5
+
+    // Render License Text section
+    pdfDoc.setFontSize(11)
+    pdfDoc.setFont('RobotoMono-Regular', 'normal')
+    pdfDoc.setTextColor('#333333')
+    const licenseTextSubtitleText = 'License Text'
+    pdfDoc.text(licenseTextSubtitleText, margin, yPosition)
+    yPosition += 5
+    if (Array.isArray(comp.licenseText) && comp.licenseText.length > 0) {
+      const validLicenses = comp.licenseText.filter(
+        (item) => item?.content?.text
+      )
+
+      if (validLicenses.length > 0) {
+        pdfDoc.setFont('RobotoMono-Regular', 'normal')
+        pdfDoc.setTextColor('#323232')
+        validLicenses.forEach((licenseItem) => {
+          if (yPosition + 10 > pageHeight - 30) {
+            relativeContentPageNumber++
+            pdfDoc.addPage()
+            yPosition = margin + 20 // Consistent content start Y
+
+            contentPageHeaders[relativeContentPageNumber] = {
+              componentName: currentComponentName,
+              startingLetter: currentStartingLetter
+            }
+          }
+          pdfDoc.setTextColor('#333333')
+          pdfDoc.setFont('RobotoMono-Regular', 'normal')
+          pdfDoc.setFontSize(10)
+          const licenseItemSubtitleText = `${licenseItem?.content?.shortId || 'N/A'}`
+          pdfDoc.text(licenseItemSubtitleText, margin, yPosition)
+          pdfDoc.setFontSize(10)
+          pdfDoc.setFont('RobotoMono-Regular', 'normal')
+          yPosition += 10
+          pdfDoc.setTextColor('#444444')
+          const licenseTextLines = pdfDoc.splitTextToSize(
+            licenseItem?.content?.text || 'N/A',
+            pageWidth - 2 * margin - 20
+          )
+          licenseTextLines.forEach((line) => {
+            if (yPosition > pageHeight - 30) {
+              relativeContentPageNumber++
+              pdfDoc.addPage()
+              yPosition = margin + 20 // Consistent content start Y
+
+              contentPageHeaders[relativeContentPageNumber] = {
+                componentName: currentComponentName,
+                startingLetter: currentStartingLetter
+              }
+            }
+            pdfDoc.text(`${line}`, margin, yPosition)
+            yPosition += 5
+          })
+          yPosition += 5
+
+          // Render Notice section
+          pdfDoc.setFontSize(11)
+          pdfDoc.setFont('RobotoMono-Regular', 'normal')
+          pdfDoc.setTextColor('#333333')
+          const noticeSubtitleText = 'Notice'
+          pdfDoc.text(noticeSubtitleText, margin, yPosition)
+
+          pdfDoc.setFont('RobotoMono-Regular', 'normal')
+          pdfDoc.setTextColor('#444444')
+          pdfDoc.setFontSize(10)
+          const noticeLines = pdfDoc.splitTextToSize(
+            noticeText,
+            pageWidth - 2 * margin
+          )
+          yPosition += 5
+          noticeLines.forEach((line) => {
+            if (yPosition > pageHeight - 30) {
+              relativeContentPageNumber++
+              pdfDoc.addPage()
+              yPosition = margin + 20 // Consistent content start Y
+
+              contentPageHeaders[relativeContentPageNumber] = {
+                componentName: currentComponentName,
+                startingLetter: currentStartingLetter
+              }
+            }
+            pdfDoc.text(line, margin, yPosition)
+            yPosition += 5
+          })
+          yPosition += 5
+        })
+      } else {
+        pdfDoc.setFont('RobotoMono-Regular', 'normal')
+        pdfDoc.setTextColor('#444444')
+        pdfDoc.setFontSize(10)
+        pdfDoc.text('N/A', margin, yPosition)
+        yPosition += 5
+      }
+    } else {
+      pdfDoc.setFont('RobotoMono-Regular', 'normal')
+      pdfDoc.setTextColor('#444444')
+      pdfDoc.setFontSize(10)
+      pdfDoc.text('N/A', margin, yPosition)
+      yPosition += 5
+    }
+    yPosition += 5
+
     yPosition += 15
 
-    if (yPosition > pageHeight - (margin + headerHeight + 50)) {
+    // Adjusted check for page breaks
+    if (yPosition > pageHeight - (margin + 50)) {
       relativeContentPageNumber++
       pdfDoc.addPage()
-      yPosition = margin + headerHeight
+      yPosition = margin + 20 // Consistent content start Y
     }
   })
 
@@ -495,18 +456,41 @@ export const generateAttributionPdf = async (
   const firstTocPhysicalPage = 2
   let currentTocPhysicalPage = firstTocPhysicalPage
   pdfDoc.setPage(currentTocPhysicalPage) // Go back to the first TOC page to render TOC
-  let tocRenderYPosition = margin
+  // Adjust tocRenderYPosition to move TOC header higher
+  let tocRenderYPosition = margin + 2
 
-  const renderTOCContent = () => {
+  const renderTOCContent = (currentPage) => {
     // "Contents" Heading
-    pdfDoc.setFontSize(18)
+    pdfDoc.setFontSize(14)
     pdfDoc.setTextColor('#111111')
-    pdfDoc.setFont('roboto', 'normal')
-    pdfDoc.text('Contents', margin, tocRenderYPosition + 10)
+    pdfDoc.setFont('RobotoMono-Regular', 'bold')
+
+    const pageNumText = `${currentPage}`
+    const pageNumWidth = pdfDoc.getTextWidth(pageNumText)
+    const verticalLineX = margin + pageNumWidth + 1.5
+    const contentsTextX = verticalLineX + 3
+
+    // Draw page number
+    pdfDoc.text(pageNumText, margin, tocRenderYPosition + 10)
+
+    // Draw vertical line
+    pdfDoc.setLineWidth(0.5)
+    pdfDoc.setDrawColor('#808080')
+    pdfDoc.line(
+      verticalLineX,
+      tocRenderYPosition + 5,
+      verticalLineX,
+      tocRenderYPosition + 15
+    )
+
+    // Draw "Contents" text
+    pdfDoc.text('Contents', contentsTextX, tocRenderYPosition + 10)
+
     tocRenderYPosition += 30
   }
 
-  renderTOCContent()
+  // Initial render of TOC header
+  renderTOCContent(currentTocPhysicalPage)
 
   currentTocAlphabet = ''
   let tocItemNumber = 1
@@ -522,7 +506,7 @@ export const generateAttributionPdf = async (
       currentTocAlphabet = firstChar
       // Alphabetical Grouping
       pdfDoc.setFontSize(10)
-      pdfDoc.setFont('roboto', 'normal')
+      pdfDoc.setFont('RobotoMono-Regular', 'normal')
       pdfDoc.setTextColor('#333333')
       pdfDoc.text(
         `${tocItemNumber}. ${currentTocAlphabet}`,
@@ -545,7 +529,7 @@ export const generateAttributionPdf = async (
       }
       pdfDoc.setPage(currentTocPhysicalPage)
       tocRenderYPosition = margin
-      renderTOCContent() // Re-render header on new TOC page
+      renderTOCContent(currentTocPhysicalPage) // Re-render header on new TOC page with updated page number
     }
 
     const titleText = item.title.slice(0, 70)
@@ -554,7 +538,7 @@ export const generateAttributionPdf = async (
 
     const titleX = margin + TOC_INDENT
     pdfDoc.setFontSize(10)
-    pdfDoc.setFont('roboto', 'normal')
+    pdfDoc.setFont('RobotoMono-Regular', 'normal')
     pdfDoc.setTextColor('#666666')
     const pageNumWidth = pdfDoc.getTextWidth(pageNumText)
     const pageNumX = pageWidth - margin - pageNumWidth
@@ -591,33 +575,27 @@ export const generateAttributionPdf = async (
   const firstContentPageAbsolute =
     2 + numTocPagesNeeded + blankPageAfterTocShift
 
-  const relativeToAbsolutePageMap = {}
-  let currentRelativePage = 1
-  for (let i = firstContentPageAbsolute; i <= totalPages; i++) {
-    relativeToAbsolutePageMap[currentRelativePage] = i
-    currentRelativePage++
-  }
-
-  const C_BOX_MARGIN_LEFT = margin
-  const HEADER_TEXT_Y = margin + 5
-
-  const BACK_TO_CONTENTS_TEXT = 'Back to contents page'
+  // Define constants for the new header layout
+  const PAGE_NUMBER_FONT_SIZE = 14
+  const STARTING_LETTER_FONT_SIZE_HEADER = 14
+  const COMPONENT_NAME_FONT_SIZE_HEADER = 10
   const BACK_TO_CONTENTS_FONT_SIZE = 9
-  const BACK_TO_CONTENTS_X = margin
-  const BACK_TO_CONTENTS_Y = HEADER_TEXT_Y - 5
+
+  // Y position for the top line of header text (page number, starting letter, back to contents link)
+  const HEADER_TEXT_BASELINE_Y = margin + 2
 
   for (let i = 1; i <= totalPages; i++) {
     pdfDoc.setPage(i)
 
     if (i === 1) {
-      continue
+      continue // Skip the first page (cover page)
     }
 
     let headerType = 'content'
     let componentName = ''
     let startingLetter = ''
 
-    // Check if the current page is a TOC page OR the blank page after TOC
+    // Determine if current page is a TOC page, blank page, or content page
     if (i >= firstTocPhysicalPage && i < firstContentPageAbsolute) {
       headerType = 'toc'
     } else {
@@ -626,14 +604,22 @@ export const generateAttributionPdf = async (
         componentName = contentPageHeaders[relativePage].componentName
         startingLetter = contentPageHeaders[relativePage].startingLetter
       }
+    }
 
+    // Only draw the "Back to contents page" link on content pages (not TOC or blank watermark page)
+    if (i !== blankPagePhysicalNumber && headerType !== 'toc') {
       pdfDoc.setFontSize(BACK_TO_CONTENTS_FONT_SIZE)
       pdfDoc.setTextColor('#3d71ee')
-      pdfDoc.setFont('roboto', 'normal')
+      pdfDoc.setFont('RobotoMono-Regular', 'normal')
+
+      const backToContentsText = 'Back to contents page'
+      const backToContentsTextWidth = pdfDoc.getTextWidth(backToContentsText)
+      const backToContentsX = pageWidth - margin - backToContentsTextWidth
+
       pdfDoc.textWithLink(
-        BACK_TO_CONTENTS_TEXT,
-        BACK_TO_CONTENTS_X,
-        BACK_TO_CONTENTS_Y,
+        backToContentsText,
+        backToContentsX,
+        HEADER_TEXT_BASELINE_Y,
         {
           pageNumber: firstTocPhysicalPage,
           top: margin
@@ -642,38 +628,54 @@ export const generateAttributionPdf = async (
     }
 
     if (i === blankPagePhysicalNumber) {
-      pdfDoc.text(`Page ${i}`, pageWidth - margin, HEADER_TEXT_Y, {
-        align: 'right'
-      })
-    } else {
+      // For the blank watermark page, only show "Page X" on the left
       pdfDoc.setFontSize(10)
       pdfDoc.setTextColor('#808080')
-      pdfDoc.setFont('roboto', 'normal')
+      pdfDoc.setFont('RobotoMono-Regular', 'normal')
+    } else if (headerType === 'content') {
+      // Header style for content pages
+      const pageNumText = `${i}`
 
-      pdfDoc.text(`Page ${i}`, pageWidth - margin, HEADER_TEXT_Y, {
-        align: 'right'
-      })
-    }
+      // Page Number (Left, larger, bold)
+      pdfDoc.setFontSize(PAGE_NUMBER_FONT_SIZE)
+      pdfDoc.setTextColor('#000000') // Black for page number
+      pdfDoc.setFont('RobotoMono-Regular', 'bold')
+      pdfDoc.text(pageNumText, margin, HEADER_TEXT_BASELINE_Y)
 
-    if (headerType === 'content') {
+      // Calculate position for the vertical line and starting letter
+      const pageNumWidth = pdfDoc.getTextWidth(pageNumText)
+      const verticalLineX = margin + pageNumWidth + 1.5 // Small gap after page number
+      const letterX = verticalLineX + 3 // Small gap after vertical line
+
+      // Draw vertical line
+      pdfDoc.setLineWidth(0.5) // Thicker line
+      pdfDoc.setDrawColor('#808080') // Grey color for the line
+      pdfDoc.line(
+        verticalLineX,
+        HEADER_TEXT_BASELINE_Y - 5, // Adjusted y-start for line to align with text
+        verticalLineX,
+        HEADER_TEXT_BASELINE_Y + 5 // Adjusted y-end for line to align with text
+      )
+
+      // Starting Letter (Right of vertical line, bold, vertically aligned with page number)
       if (startingLetter) {
-        pdfDoc.setFont('roboto', 'bold')
-        pdfDoc.setFontSize(10)
-
-        const letterX = BACK_TO_CONTENTS_X
-        pdfDoc.text(startingLetter, letterX, HEADER_TEXT_Y + 0.5)
+        pdfDoc.setFont('RobotoMono-Regular', 'bold')
+        pdfDoc.setFontSize(STARTING_LETTER_FONT_SIZE_HEADER)
+        pdfDoc.text(startingLetter, letterX, HEADER_TEXT_BASELINE_Y)
       }
 
-      pdfDoc.setFontSize(10)
-      pdfDoc.setTextColor(blackColor)
-      pdfDoc.setFont('roboto', 'normal')
-
-      pdfDoc.text(componentName, C_BOX_MARGIN_LEFT, HEADER_TEXT_Y + 5)
+      // Component Name (Below page number/starting letter, left-aligned with starting letter)
+      pdfDoc.setFontSize(COMPONENT_NAME_FONT_SIZE_HEADER)
+      pdfDoc.setTextColor(blackColor) // Black
+      pdfDoc.setFont('RobotoMono-Regular', 'normal')
+      // Reduced vertical gap to bring component name closer to the letter
+      const componentNameY = HEADER_TEXT_BASELINE_Y + 4
+      pdfDoc.text(componentName, letterX, componentNameY)
+    } else {
+      // headerType === 'toc'
+      // The TOC header is now handled within the renderTOCContent function
+      // This else block is no longer needed for drawing "Page X" on TOC pages.
     }
-
-    pdfDoc.setLineWidth(0.1)
-    pdfDoc.setDrawColor('#D3D3D3')
-    pdfDoc.line(margin, margin + 15, pageWidth - margin, margin + 15)
   }
 
   pdfDoc.save(`${filename}.pdf`)
