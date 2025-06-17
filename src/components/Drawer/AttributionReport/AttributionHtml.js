@@ -69,13 +69,13 @@ export const downloadAttributionHtml = async (
         <div class="header-divider"></div>
         <div class="component-content">
             <div class="component-name">${currentComponentName}</div>
-            <div class="item"><span class="label">Notice</span> <span class="value">${noticeText}</span></div>
-            <div class="item"><span class="label">License</span> <span class="value">${licenseExpText}</span></div>
+            <div class="item"><span class="subTitle">Copyright</span> <span class="value">${copyrightText}</span></div>
+            <div class="item"><span class="subTitle">License</span> <span class="value">${licenseExpText}</span></div>
             ${
               licenseExpText !== 'N/A'
                 ? `
                 <div class="license-text-container">
-                    <div class="license-text-label">License Text</div>
+                    <div class="subTitle">License Text</div>
                     ${
                       Array.isArray(comp.licenseText) &&
                       comp.licenseText.length > 0
@@ -94,9 +94,9 @@ export const downloadAttributionHtml = async (
                     }
                 </div>
             `
-                : `<div class="item"><span class="label">License Text:</span> <span class="value">N/A</span></div>`
+                : `<div class="item"><span class="subTitle">License Text</span> <span class="value">N/A</span></div>`
             }
-            <div class="item"><span class="label">Copyright</span> <span class="value">${copyrightText}</span></div>
+            <div class="item"><span class="subTitle">Notice</span> <span class="value">${noticeText}</span></div>
         </div>
       </div>
     `
@@ -243,7 +243,6 @@ export const downloadAttributionHtml = async (
         color: #000000;
     }
     .header-divider {
-      border-bottom: 1px solid #D3D3D3;
       margin-top: 10px;
       margin-bottom: 20px;
     }
@@ -253,15 +252,16 @@ export const downloadAttributionHtml = async (
     }
 
     .component-name { font-weight: bold; font-size: 18px; color: #000000; margin-bottom: 10px; }
-    .label { font-weight: bold; color: #000000; font-size: 16px; display: block; text-decoration: underline;}
+    .label { font-weight: bold; color: #000000; font-size: 16px; display: block;}
+    .subTitle { font-weight: normal; color: #222222; font-size: 14px; display: block;}
     .value { color: #323232; line-height: 1.4; font-size: 13.33px; display: block; }
     .item { margin-bottom: 15px; }
 
     .license-text-container { margin-top: 15px; margin-bottom: 15px; }
-    .license-text-label { font-weight: bold; font-size: 16px; color: #000000; margin-bottom: 10px; text-decoration: underline; }
+    .license-text-label { font-weight: bold; font-size: 16px; color: #000000; margin-bottom: 10px; }
     .license-text-content { font-size: 13.33px; color: #323232; line-height: 1.4; white-space: pre-wrap; word-wrap: break-word; max-width: 100%; }
     .license-item { margin-bottom: 8px; }
-    .license-short-id { font-weight: normal; color: #323232; font-size: 15px; text-decoration: underline;}
+    .license-short-id { font-weight: normal; color: #323232; font-size: 15px; }
 
  
     @media print {
