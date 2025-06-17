@@ -31,6 +31,8 @@ import {
 } from '@chakra-ui/react'
 
 import LynkAction from 'components/Misc/LynkAction'
+import SeverityInfo from 'components/Misc/SeverityInfo'
+import StatusInfo from 'components/Misc/StatusInfo'
 import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -39,8 +41,6 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { LuFilePen, LuMessageCircleOff, LuRepeat } from 'react-icons/lu'
-import SeverityInfo from 'components/Misc/SeverityInfo'
-import StatusInfo from 'components/Misc/StatusInfo'
 
 const VersionColumns = (props) => {
   const { action, retentionTime, onFilterSev, onSelectLicenses, onStartTour } =
@@ -260,7 +260,7 @@ const VersionColumns = (props) => {
                 {notStarted ? '-' : stats?.vulnStats?.high || 0}
               </VulnBadge>
               {signedUrlParams && (
-                <Text color={primaryTextColor}>+{total}</Text>
+                <Text ml={1} color={primaryTextColor}>+{total}</Text>
               )}
               {vulnRunStatus === 'FINISHED' && total !== 0 && (
                 <Popover
@@ -348,7 +348,8 @@ const VersionColumns = (props) => {
               </Portal>
             </Popover>
           )
-        }
+        },
+        omit: signedUrlParams
       },
       // CREATED AT
       {
