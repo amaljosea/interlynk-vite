@@ -18,8 +18,8 @@ test('Should add JIRA connection', async ({ page }) => {
   await settingsPage.openConnectionTab()
   await settingsPage.addConfig(
     'https://interlynk.atlassian.net',
-    'srijan.kpr@gmail.com',
-    'ATATT3xFfGF0-gLbHjLMZkunbAO3kePMBFN3UD-Jhy7y-4vBpAvLliI64V8OrvSFv-JPH5q5CHeJqcoB7KohO1FjAdm49GxfoGF2L4YtP-roc6dZwOrjdzl2S2bcJVcOBdNwbK5LpYjtfLTYJUfn41KqteZZC0e4xusX64wScP4Z9LmMf6oTN-Y=14A6ECBF'
+    'ritesh.noronha@interlynk.io',
+    'ATATT3xFfGF0oAMCHfZHcwpY36ERU5wLuZwL4VpXeGtfAbmCa2jB-Y41eh2_YMuHO6G_KIXGVr-kzyp4KYXnIr-XIZ_p4VOdnjh1lSgyd_8Nq5XPl-1je8ZOThNz3Lzkt1tZx2DLd0X5KmtUWV6X_0swfCUJO9xQ9UIqGkG48tSPTbsOojPYTBQ=6BEFBC06'
   )
   await settingsPage.saveConnection()
 })
