@@ -42,10 +42,10 @@ const RoleTable = () => {
   })
 
   const { data, loading } = useQuery(GetRoles, {
-    skip: !orgView ? true : activetab === 'roles' ? false : true
+    skip: !orgView || activetab !== 'roles'
   })
 
-  const { organizationRoles } = data?.organization || ''
+  const roles = data?.organization?.organizationRoles || []
 
   const [selectedRole, setSelectedRole] = useState(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -64,60 +64,54 @@ const RoleTable = () => {
     'primaryErrorColor'
   ])
 
-  const columns = [
-    // NAME
-    {
-      id: 'name',
-      name: 'NAME',
-      selector: (row) => (
-        <Text
-          fontSize={14}
-          color={primaryTextColor}
-          textTransform={'capitalize'}
-          my={2}
-        >
-          {row?.name}
-        </Text>
-      ),
-      wrap: true
-    },
-    // CREATED AT
-    {
-      id: 'createdAt',
-      name: 'CREATED',
-      selector: (row) => (
-        <Tooltip label={getFullDate(row?.createdAt)} placement='top'>
+  const columns = useMemo(
+    () => [
+      // NAME
+      {
+        id: 'name',
+        name: 'NAME',
+        selector: (row) => (
           <Text
             fontSize={14}
             color={primaryTextColor}
-            textTransform={'lowercase'}
+            textTransform='capitalize'
           >
-            {timeSince(row?.createdAt)}
+            {row?.name}
           </Text>
-        </Tooltip>
-      ),
-      right: 'true',
-      sortable: true,
-      sortFunction: (a, b) => {
-        const dateA = new Date(a.createdAt)
-        const dateB = new Date(b.createdAt)
-        return dateA - dateB // Sort in descending order
-      }
-    },
-    // PERMISSIONS
-    {
-      id: 'action',
-      name: 'ACTION',
-      selector: (row) => {
-        const { name } = row
-        return (
+        ),
+        wrap: true
+      },
+      // CREATED AT
+      {
+        id: 'createdAt',
+        name: 'CREATED',
+        selector: (row) => (
+          <Tooltip label={getFullDate(row?.createdAt)} placement='top'>
+            <Text
+              fontSize={14}
+              color={primaryTextColor}
+              textTransform='lowercase'
+            >
+              {timeSince(row?.createdAt)}
+            </Text>
+          </Tooltip>
+        ),
+        right: true,
+        sortable: true,
+        sortFunction: (a, b) => new Date(a.createdAt) - new Date(b.createdAt) // Sort in descending order
+      },
+      // PERMISSIONS
+      {
+        id: 'action',
+        name: 'ACTION',
+        selector: (row) => (
           <Menu>
             <LynkAction />
             <Portal>
               <MenuList fontSize={'sm'}>
                 <MenuItem
                   onClick={() => {
-                    setSelectedRole(name)
+                    setSelectedRole(row.name)
                     onOpen()
                   }}
                 >
@@ -136,16 +130,17 @@ const RoleTable = () => {
               </MenuList>
             </Portal>
           </Menu>
-        )
-      },
-      width: '10%',
-      right: 'true'
-    }
-  ]
+        ),
+        width: '10%',
+        right: true
+      }
+    ],
+    [primaryTextColor, primaryErrorColor, editUserRole, onOpen, onDelOpen]
+  )
 
   // HEADER SECTION
-  const subHeader = useMemo(() => {
-    return (
+  const subHeader = useMemo(
+    () => (
       <Flex
         width={'100%'}
         alignItems={'center'}
@@ -172,19 +167,20 @@ const RoleTable = () => {
           data-testid='add_role'
         />
       </Flex>
-    )
-  }, [updateOrgs, onRoleOpen, primaryTextColor])
+    ),
+    [primaryTextColor, updateOrgs, onRoleOpen]
+  )
 
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
         <LynkTable
-          subHeader
           columns={columns}
-          progressPending={loading}
-          defaultSortFieldId={'createdAt'}
-          data={organizationRoles || []}
+          data={roles}
+          subHeader
           subHeaderComponent={subHeader}
+          progressPending={loading}
+          defaultSortFieldId='createdAt'
         />
       </Flex>
 

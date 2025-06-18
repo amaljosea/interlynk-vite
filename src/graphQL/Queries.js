@@ -167,11 +167,6 @@ export const GetAllRoles = gql`
 export const GetRoles = gql`
   query GetRoles {
     organization {
-      currentUser {
-        role {
-          name
-        }
-      }
       organizationRoles {
         id
         name
