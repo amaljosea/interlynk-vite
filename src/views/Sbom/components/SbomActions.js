@@ -226,7 +226,9 @@ const SbomActions = ({ sbom }) => {
           />
         )}
         {/* DOWNLOAD SBOM */}
-        <SbomDownload sbom={sbom} primaryLoading={primaryCompLoading} />
+        {sbom?.lifecycle !== 'draft' && (
+          <SbomDownload sbom={sbom} primaryLoading={primaryCompLoading} />
+        )}
         {/* SYSTEM LOG */}
         <Tooltip label='System Log'>
           <IconButton
