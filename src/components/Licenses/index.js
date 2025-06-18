@@ -22,9 +22,7 @@ const Licenses = () => {
     {
       skip: !orgView,
       selector: 'organization.licenses',
-      variables: {
-        ...filters
-      }
+      variables: { ...filters }
     }
   )
 

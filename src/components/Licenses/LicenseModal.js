@@ -65,8 +65,14 @@ const LicenseModal = ({ isOpen, onClose, data, updateLic }) => {
   const [permitsModifications, setPermitsModifications] = useState('UNKNOWN')
   const [state, setState] = useState('UNSPECIFIED')
 
-  const [createLicense, { loading: createLoading }] = useMutation(CreateLicense)
-  const [updateLicense, { loading: updateLoading }] = useMutation(UpdateLicense)
+  const [createLicense, { loading: createLoading }] = useMutation(
+    CreateLicense,
+    { refetchQueries: ['GetLicensesTable'] }
+  )
+  const [updateLicense, { loading: updateLoading }] = useMutation(
+    UpdateLicense,
+    { refetchQueries: ['GetLicensesTable'] }
+  )
 
   const [isExpanded, setIsExpanded] = useState(false)
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])

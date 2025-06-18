@@ -49,7 +49,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
   const columns = [
     // NAME
     {
-      id: 'NAME',
+      id: 'ORGANIZATION_LICENSES_UPDATED_AT',
       name: 'NAME',
       width: '35%',
       wrap: true,
@@ -110,6 +110,12 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
             </GridItem>
           </Grid>
         )
+      },
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a.updatedAt)
+        const dateB = new Date(b.updatedAt)
+        return dateA - dateB
       }
     },
     // ATTRIBUTION
@@ -277,12 +283,12 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
       <Flex flexDir={'column'} width={'100%'}>
         <LynkTable
           subHeader
+          data={licenses}
+          columns={columns}
+          onSort={handleSort}
           progressPending={loading}
           subHeaderComponent={subHeaderComponent}
-          columns={columns}
-          data={licenses}
           defaultSortFieldId='ORGANIZATION_LICENSES_UPDATED_AT'
-          onSort={handleSort}
         />
       </Flex>
       {/* PAGINATION */}
