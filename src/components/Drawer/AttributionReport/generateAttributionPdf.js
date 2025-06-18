@@ -2,7 +2,9 @@
 import { jsPDF } from 'jspdf'
 import { attributionFilename } from 'utils/DownloadUtils/pdfUtils'
 
-import './fonts/roboMonoNormal'
+import './fonts/arialBold'
+import './fonts/arialLight'
+import './fonts/arialNormal'
 
 export const fetchLogo = async () => {
   try {
@@ -34,7 +36,7 @@ export const generateAttributionPdf = async (
   const pdfDoc = new jsPDF({ compress: true })
 
   // This check will be needed in future while adding new fonts
-  /* console.log('Initial font list from doc instance:', pdfDoc.getFontList())  */
+  /*   console.log('Initial font list from doc instance:', pdfDoc.getFontList()) */
 
   const pageWidth = pdfDoc.internal.pageSize.getWidth()
   const pageHeight = pdfDoc.internal.pageSize.getHeight()
@@ -53,12 +55,12 @@ export const generateAttributionPdf = async (
   pdfDoc.setPage(1)
 
   // Set font and color for general titles on the first page
-  pdfDoc.setFont('RobotoMono-Regular', 'normal')
+  pdfDoc.setFont('ARIAL', 'normal')
 
   // Page 1 title
   const titleText = 'Software Licenses'
   pdfDoc.setFontSize(36)
-  pdfDoc.setTextColor('#333333') // Darker grey for the title
+  pdfDoc.setTextColor('#444444') // Darker grey for the title
   const titleTextWidth = pdfDoc.getTextWidth(titleText)
   const titleX = (pageWidth - titleTextWidth) / 2 // Center alignment for the initial title
   const titleY = pageHeight / 2 - 50 // Adjust Y position
@@ -101,7 +103,7 @@ export const generateAttributionPdf = async (
 
     pdfDoc.setFontSize(12)
     pdfDoc.setTextColor('#555555')
-    pdfDoc.setFont('RobotoMono-Regular', 'normal')
+    pdfDoc.setFont('ARIAL', 'normal')
     const textWidth = pdfDoc.getTextWidth(textPreparedBy)
 
     const minimalGap = 2
@@ -136,6 +138,8 @@ export const generateAttributionPdf = async (
   // Content starts at this Y position after the header area.
   // This value remains consistent for all content pages.
   let yPosition = margin + 20
+
+  const CONTENT_LEFT_ALIGNMENT_X = 40 // Adjusted to ensure content aligns with the capital letter in the header
 
   // Add the first page where content will be added (initially page 2 in the PDF)
   // This page will later shift due to TOC insertion.
@@ -188,11 +192,11 @@ export const generateAttributionPdf = async (
     yPosition += 10
 
     pdfDoc.setFontSize(14)
-    pdfDoc.setFont('RobotoMono-Regular', 'bold')
+    pdfDoc.setFont('ARIALBD 1', 'normal')
     pdfDoc.setTextColor(blackColor) // Keeping black for component titles for contrast
     const titleLines = pdfDoc.splitTextToSize(
       currentComponentName,
-      pageWidth - 2 * margin
+      pageWidth - CONTENT_LEFT_ALIGNMENT_X - margin
     )
     titleLines.forEach((line, index) => {
       if (yPosition > pageHeight - 30) {
@@ -205,7 +209,7 @@ export const generateAttributionPdf = async (
           startingLetter: currentStartingLetter
         }
       }
-      pdfDoc.text(line, margin, yPosition)
+      pdfDoc.text(line, 28, yPosition)
       // Underline for component title
       if (index === titleLines.length - 1) {
         //
@@ -216,17 +220,17 @@ export const generateAttributionPdf = async (
 
     // Render Copyright section
     pdfDoc.setFontSize(11)
-    pdfDoc.setFont('RobotoMono-Regular', 'normal')
-    pdfDoc.setTextColor('#333333')
+    pdfDoc.setFont('ARIAL', 'normal')
+    pdfDoc.setTextColor('#444444')
     const copyrightSubtitleText = 'Copyright'
-    pdfDoc.text(copyrightSubtitleText, margin, yPosition)
+    pdfDoc.text(copyrightSubtitleText, CONTENT_LEFT_ALIGNMENT_X, yPosition)
 
-    pdfDoc.setFont('RobotoMono-Regular', 'normal')
+    pdfDoc.setFont('ARIAL', 'normal')
     pdfDoc.setTextColor('#444444')
     pdfDoc.setFontSize(10)
     const copyrightLines = pdfDoc.splitTextToSize(
       copyrightText,
-      pageWidth - 2 * margin
+      pageWidth - CONTENT_LEFT_ALIGNMENT_X - margin
     )
     yPosition += 5
     copyrightLines.forEach((line) => {
@@ -240,23 +244,23 @@ export const generateAttributionPdf = async (
           startingLetter: currentStartingLetter
         }
       }
-      pdfDoc.text(line, margin, yPosition)
+      pdfDoc.text(line, CONTENT_LEFT_ALIGNMENT_X, yPosition)
       yPosition += 5
     })
     yPosition += 5
     // Render License section
     pdfDoc.setFontSize(11)
-    pdfDoc.setFont('RobotoMono-Regular', 'normal')
-    pdfDoc.setTextColor('#333333')
+    pdfDoc.setFont('ARIAL', 'normal')
+    pdfDoc.setTextColor('#444444')
     const licenseSubtitleText = 'License'
-    pdfDoc.text(licenseSubtitleText, margin, yPosition)
+    pdfDoc.text(licenseSubtitleText, CONTENT_LEFT_ALIGNMENT_X, yPosition)
 
-    pdfDoc.setFont('RobotoMono-Regular', 'normal')
+    pdfDoc.setFont('ARIAL', 'normal')
     pdfDoc.setTextColor('#444444')
     pdfDoc.setFontSize(10)
     const licenseExpLines = pdfDoc.splitTextToSize(
       licenseText,
-      pageWidth - 2 * margin
+      pageWidth - CONTENT_LEFT_ALIGNMENT_X - margin
     )
     yPosition += 5
     licenseExpLines.forEach((line) => {
@@ -270,17 +274,17 @@ export const generateAttributionPdf = async (
           startingLetter: currentStartingLetter
         }
       }
-      pdfDoc.text(line, margin, yPosition)
+      pdfDoc.text(line, CONTENT_LEFT_ALIGNMENT_X, yPosition)
       yPosition += 5
     })
     yPosition += 5
 
     // Render License Text section
     pdfDoc.setFontSize(11)
-    pdfDoc.setFont('RobotoMono-Regular', 'normal')
-    pdfDoc.setTextColor('#333333')
+    pdfDoc.setFont('ARIAL', 'normal')
+    pdfDoc.setTextColor('#444444')
     const licenseTextSubtitleText = 'License Text'
-    pdfDoc.text(licenseTextSubtitleText, margin, yPosition)
+    pdfDoc.text(licenseTextSubtitleText, CONTENT_LEFT_ALIGNMENT_X, yPosition)
     yPosition += 5
     if (Array.isArray(comp.licenseText) && comp.licenseText.length > 0) {
       const validLicenses = comp.licenseText.filter(
@@ -288,7 +292,7 @@ export const generateAttributionPdf = async (
       )
 
       if (validLicenses.length > 0) {
-        pdfDoc.setFont('RobotoMono-Regular', 'normal')
+        pdfDoc.setFont('ARIAL', 'normal')
         pdfDoc.setTextColor('#323232')
         validLicenses.forEach((licenseItem) => {
           if (yPosition + 10 > pageHeight - 30) {
@@ -301,18 +305,22 @@ export const generateAttributionPdf = async (
               startingLetter: currentStartingLetter
             }
           }
-          pdfDoc.setTextColor('#333333')
-          pdfDoc.setFont('RobotoMono-Regular', 'normal')
+          pdfDoc.setTextColor('#444444')
+          pdfDoc.setFont('ARIAL', 'normal')
           pdfDoc.setFontSize(10)
           const licenseItemSubtitleText = `${licenseItem?.content?.shortId || 'N/A'}`
-          pdfDoc.text(licenseItemSubtitleText, margin, yPosition)
+          pdfDoc.text(
+            licenseItemSubtitleText,
+            CONTENT_LEFT_ALIGNMENT_X,
+            yPosition
+          )
           pdfDoc.setFontSize(10)
-          pdfDoc.setFont('RobotoMono-Regular', 'normal')
+          pdfDoc.setFont('ARIAL', 'normal')
           yPosition += 10
           pdfDoc.setTextColor('#444444')
           const licenseTextLines = pdfDoc.splitTextToSize(
             licenseItem?.content?.text || 'N/A',
-            pageWidth - 2 * margin - 20
+            pageWidth - CONTENT_LEFT_ALIGNMENT_X - margin - 20
           )
           licenseTextLines.forEach((line) => {
             if (yPosition > pageHeight - 30) {
@@ -325,56 +333,56 @@ export const generateAttributionPdf = async (
                 startingLetter: currentStartingLetter
               }
             }
-            pdfDoc.text(`${line}`, margin, yPosition)
-            yPosition += 5
-          })
-          yPosition += 5
-
-          // Render Notice section
-          pdfDoc.setFontSize(11)
-          pdfDoc.setFont('RobotoMono-Regular', 'normal')
-          pdfDoc.setTextColor('#333333')
-          const noticeSubtitleText = 'Notice'
-          pdfDoc.text(noticeSubtitleText, margin, yPosition)
-
-          pdfDoc.setFont('RobotoMono-Regular', 'normal')
-          pdfDoc.setTextColor('#444444')
-          pdfDoc.setFontSize(10)
-          const noticeLines = pdfDoc.splitTextToSize(
-            noticeText,
-            pageWidth - 2 * margin
-          )
-          yPosition += 5
-          noticeLines.forEach((line) => {
-            if (yPosition > pageHeight - 30) {
-              relativeContentPageNumber++
-              pdfDoc.addPage()
-              yPosition = margin + 20 // Consistent content start Y
-
-              contentPageHeaders[relativeContentPageNumber] = {
-                componentName: currentComponentName,
-                startingLetter: currentStartingLetter
-              }
-            }
-            pdfDoc.text(line, margin, yPosition)
+            pdfDoc.text(`${line}`, CONTENT_LEFT_ALIGNMENT_X, yPosition)
             yPosition += 5
           })
           yPosition += 5
         })
       } else {
-        pdfDoc.setFont('RobotoMono-Regular', 'normal')
+        pdfDoc.setFont('ARIAL', 'normal')
         pdfDoc.setTextColor('#444444')
         pdfDoc.setFontSize(10)
-        pdfDoc.text('N/A', margin, yPosition)
+        pdfDoc.text('N/A', CONTENT_LEFT_ALIGNMENT_X, yPosition)
         yPosition += 5
       }
     } else {
-      pdfDoc.setFont('RobotoMono-Regular', 'normal')
+      pdfDoc.setFont('ARIAL', 'normal')
       pdfDoc.setTextColor('#444444')
       pdfDoc.setFontSize(10)
-      pdfDoc.text('N/A', margin, yPosition)
+      pdfDoc.text('N/A', CONTENT_LEFT_ALIGNMENT_X, yPosition)
       yPosition += 5
     }
+    yPosition += 5
+
+    // Render Notice section
+    pdfDoc.setFontSize(11)
+    pdfDoc.setFont('ARIAL', 'normal')
+    pdfDoc.setTextColor('#444444')
+    const noticeSubtitleText = 'Notice'
+    pdfDoc.text(noticeSubtitleText, CONTENT_LEFT_ALIGNMENT_X, yPosition)
+
+    pdfDoc.setFont('ARIAL', 'normal')
+    pdfDoc.setTextColor('#444444')
+    pdfDoc.setFontSize(10)
+    const noticeLines = pdfDoc.splitTextToSize(
+      noticeText,
+      pageWidth - CONTENT_LEFT_ALIGNMENT_X - margin
+    )
+    yPosition += 5
+    noticeLines.forEach((line) => {
+      if (yPosition > pageHeight - 30) {
+        relativeContentPageNumber++
+        pdfDoc.addPage()
+        yPosition = margin + 20 // Consistent content start Y
+
+        contentPageHeaders[relativeContentPageNumber] = {
+          componentName: currentComponentName,
+          startingLetter: currentStartingLetter
+        }
+      }
+      pdfDoc.text(line, CONTENT_LEFT_ALIGNMENT_X, yPosition)
+      yPosition += 5
+    })
     yPosition += 5
 
     yPosition += 15
@@ -461,9 +469,9 @@ export const generateAttributionPdf = async (
 
   const renderTOCContent = (currentPage) => {
     // "Contents" Heading
-    pdfDoc.setFontSize(14)
+    pdfDoc.setFontSize(10)
     pdfDoc.setTextColor('#111111')
-    pdfDoc.setFont('RobotoMono-Regular', 'bold')
+    pdfDoc.setFont('ARIAL', 'normal')
 
     const pageNumText = `${currentPage}`
     const pageNumWidth = pdfDoc.getTextWidth(pageNumText)
@@ -472,9 +480,9 @@ export const generateAttributionPdf = async (
 
     // Draw page number
     pdfDoc.text(pageNumText, margin, tocRenderYPosition + 10)
-
-    // Draw vertical line
-    pdfDoc.setLineWidth(0.5)
+    pdfDoc.setFont('ARIAL', 'normal')
+    // Draw
+    pdfDoc.setLineWidth(0.2)
     pdfDoc.setDrawColor('#808080')
     pdfDoc.line(
       verticalLineX,
@@ -506,8 +514,8 @@ export const generateAttributionPdf = async (
       currentTocAlphabet = firstChar
       // Alphabetical Grouping
       pdfDoc.setFontSize(10)
-      pdfDoc.setFont('RobotoMono-Regular', 'normal')
-      pdfDoc.setTextColor('#333333')
+      pdfDoc.setFont('ARIAL', 'normal')
+      pdfDoc.setTextColor('#444444')
       pdfDoc.text(
         `${tocItemNumber}. ${currentTocAlphabet}`,
         margin,
@@ -538,7 +546,7 @@ export const generateAttributionPdf = async (
 
     const titleX = margin + TOC_INDENT
     pdfDoc.setFontSize(10)
-    pdfDoc.setFont('RobotoMono-Regular', 'normal')
+    pdfDoc.setFont('ARIAL', 'normal')
     pdfDoc.setTextColor('#666666')
     const pageNumWidth = pdfDoc.getTextWidth(pageNumText)
     const pageNumX = pageWidth - margin - pageNumWidth
@@ -576,13 +584,13 @@ export const generateAttributionPdf = async (
     2 + numTocPagesNeeded + blankPageAfterTocShift
 
   // Define constants for the new header layout
-  const PAGE_NUMBER_FONT_SIZE = 14
-  const STARTING_LETTER_FONT_SIZE_HEADER = 14
+  const PAGE_NUMBER_FONT_SIZE = 10
+  const STARTING_LETTER_FONT_SIZE_HEADER = 10
   const COMPONENT_NAME_FONT_SIZE_HEADER = 10
   const BACK_TO_CONTENTS_FONT_SIZE = 9
 
   // Y position for the top line of header text (page number, starting letter, back to contents link)
-  const HEADER_TEXT_BASELINE_Y = margin + 2
+  const HEADER_TEXT_BASELINE_Y = margin
 
   for (let i = 1; i <= totalPages; i++) {
     pdfDoc.setPage(i)
@@ -610,7 +618,7 @@ export const generateAttributionPdf = async (
     if (i !== blankPagePhysicalNumber && headerType !== 'toc') {
       pdfDoc.setFontSize(BACK_TO_CONTENTS_FONT_SIZE)
       pdfDoc.setTextColor('#3d71ee')
-      pdfDoc.setFont('RobotoMono-Regular', 'normal')
+      pdfDoc.setFont('ARIAL', 'normal')
 
       const backToContentsText = 'Back to contents page'
       const backToContentsTextWidth = pdfDoc.getTextWidth(backToContentsText)
@@ -631,24 +639,29 @@ export const generateAttributionPdf = async (
       // For the blank watermark page, only show "Page X" on the left
       pdfDoc.setFontSize(10)
       pdfDoc.setTextColor('#808080')
-      pdfDoc.setFont('RobotoMono-Regular', 'normal')
+      pdfDoc.setFont('ARIAL', 'normal')
     } else if (headerType === 'content') {
       // Header style for content pages
       const pageNumText = `${i}`
 
+      // We want the letterX to be CONTENT_LEFT_ALIGNMENT_X
+      const letterX = CONTENT_LEFT_ALIGNMENT_X
+
+      // Calculate verticalLineX based on fixed letterX
+      const verticalLineX = letterX - 5
+
+      // Calculate pageNumX based on fixed verticalLineX
+      const pageNumWidth = pdfDoc.getTextWidth(pageNumText)
+      const pageNumX = verticalLineX - 4 - pageNumWidth
+
       // Page Number (Left, larger, bold)
       pdfDoc.setFontSize(PAGE_NUMBER_FONT_SIZE)
       pdfDoc.setTextColor('#000000') // Black for page number
-      pdfDoc.setFont('RobotoMono-Regular', 'bold')
-      pdfDoc.text(pageNumText, margin, HEADER_TEXT_BASELINE_Y)
-
-      // Calculate position for the vertical line and starting letter
-      const pageNumWidth = pdfDoc.getTextWidth(pageNumText)
-      const verticalLineX = margin + pageNumWidth + 1.5 // Small gap after page number
-      const letterX = verticalLineX + 3 // Small gap after vertical line
+      pdfDoc.setFont('ARIAL', 'normal')
+      pdfDoc.text(pageNumText, pageNumX, HEADER_TEXT_BASELINE_Y)
 
       // Draw vertical line
-      pdfDoc.setLineWidth(0.5) // Thicker line
+      pdfDoc.setLineWidth(0.2) // Thicker line
       pdfDoc.setDrawColor('#808080') // Grey color for the line
       pdfDoc.line(
         verticalLineX,
@@ -659,15 +672,15 @@ export const generateAttributionPdf = async (
 
       // Starting Letter (Right of vertical line, bold, vertically aligned with page number)
       if (startingLetter) {
-        pdfDoc.setFont('RobotoMono-Regular', 'bold')
+        pdfDoc.setFont('ARIALBD 1', 'normal')
         pdfDoc.setFontSize(STARTING_LETTER_FONT_SIZE_HEADER)
         pdfDoc.text(startingLetter, letterX, HEADER_TEXT_BASELINE_Y)
       }
 
       // Component Name (Below page number/starting letter, left-aligned with starting letter)
       pdfDoc.setFontSize(COMPONENT_NAME_FONT_SIZE_HEADER)
-      pdfDoc.setTextColor(blackColor) // Black
-      pdfDoc.setFont('RobotoMono-Regular', 'normal')
+      pdfDoc.setTextColor('#444444') // Black
+      pdfDoc.setFont('ARIAL', 'normal')
       // Reduced vertical gap to bring component name closer to the letter
       const componentNameY = HEADER_TEXT_BASELINE_Y + 4
       pdfDoc.text(componentName, letterX, componentNameY)
