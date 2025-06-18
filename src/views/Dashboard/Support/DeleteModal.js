@@ -9,7 +9,9 @@ import ConfirmationModal from '../Products/components/ConfirmationModal'
 const DeleteModal = ({ isOpen, onClose, data }) => {
   const { id } = data
   const { showToast } = useCustomToast()
-  const [deleteSupport] = useMutation(DeleteCompSupportOverride)
+  const [deleteSupport, { loading }] = useMutation(DeleteCompSupportOverride, {
+    refetchQueries: ['GetSupportTab']
+  })
 
   const onDeleteSupport = async () => {
     await deleteSupport({ variables: { id } }).then((res) => {
@@ -29,6 +31,7 @@ const DeleteModal = ({ isOpen, onClose, data }) => {
     <ConfirmationModal
       isOpen={isOpen}
       onClose={onClose}
+      isLoading={loading}
       onConfirm={onDeleteSupport}
       title='Delete Support'
       description='Deleting this entry will:'

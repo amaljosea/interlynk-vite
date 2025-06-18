@@ -9,7 +9,9 @@ import ConfirmationModal from '../Products/components/ConfirmationModal'
 const StatusModal = ({ isOpen, onClose, data }) => {
   const { showToast } = useCustomToast()
   const { id, enabled } = data
-  const [updateSupport] = useMutation(UpdateCompSupportOverride)
+  const [updateSupport, { loading }] = useMutation(UpdateCompSupportOverride, {
+    refetchQueries: ['GetSupportTab']
+  })
 
   const onChangeStatus = async () => {
     await updateSupport({
@@ -33,6 +35,7 @@ const StatusModal = ({ isOpen, onClose, data }) => {
     <ConfirmationModal
       isOpen={isOpen}
       onClose={onClose}
+      isLoading={loading}
       onConfirm={onChangeStatus}
       title={`${status} Support`}
       description={`${enabled ? 'Disabling' : 'Enabling'} this entry will:`}

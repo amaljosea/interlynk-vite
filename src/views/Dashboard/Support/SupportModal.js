@@ -46,8 +46,12 @@ const SupportModal = ({ supports, data, isOpen, onClose }) => {
 
   const { idUri, name, version } = formData || {}
 
-  const [createSupport, { loading: crLoading }] = useMutation(CreateSupport)
-  const [updateSupport, { loading: upLoading }] = useMutation(UpdateSupport)
+  const [createSupport, { loading: crLoading }] = useMutation(CreateSupport, {
+    refetchQueries: ['GetSupportTab']
+  })
+  const [updateSupport, { loading: upLoading }] = useMutation(UpdateSupport, {
+    refetchQueries: ['GetSupportTab']
+  })
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
