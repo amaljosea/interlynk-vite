@@ -147,6 +147,22 @@ export const GetAllPermissions = gql`
   }
 `
 
+// GET ALL ROLES
+export const GetAllRoles = gql`
+  query GetAllRoles {
+    organization {
+      organizationRoles {
+        id
+        name
+        permissionsMap {
+          key
+          value
+        }
+      }
+    }
+  }
+`
+
 // GET ORG ROLES
 export const GetRoles = gql`
   query GetRoles {

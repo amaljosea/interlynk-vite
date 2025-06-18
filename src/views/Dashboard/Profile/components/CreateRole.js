@@ -11,7 +11,7 @@ import LynkModal from 'components/LynkModal'
 import { useSelect } from 'hooks/useSelect'
 
 import { OrgRoleCreate } from 'graphQL/Mutation'
-import { GetAllPermissions } from 'graphQL/Queries'
+import { GetAllRoles } from 'graphQL/Queries'
 
 import { LuUserPlus } from 'react-icons/lu'
 
@@ -21,13 +21,13 @@ const CreateRole = ({ isOpen, onClose }) => {
   const [error, setError] = useState('')
 
   const [createRole, { loading }] = useMutation(OrgRoleCreate)
-
   const { style } = useSelect('field')
 
   const psOptions = []
 
-  const { data } = useQuery(GetAllPermissions, {
-    skip: isOpen === true ? false : true
+  const { data } = useQuery(GetAllRoles, {
+    skip: !isOpen,
+    fetchPolicy: 'cache-first'
   })
 
   const { organizationRoles } = data?.organization || ''
@@ -87,13 +87,14 @@ const CreateRole = ({ isOpen, onClose }) => {
       disabled={isInvalid}
     >
       <Stack direction={'column'} alignItems={'flex-start'} spacing={4}>
-        {error !== '' && <LynkAlert msg={error} />}
-        {/* NAME */}
+        {error && <LynkAlert msg={error} />}
+        {/* NAME FIELD */}
         <FormControl isRequired>
           <FormLabel>Name</FormLabel>
           <Input type='text' value={roleName} onChange={onNameChange} />
         </FormControl>
-        {/* PERMISSIONS */}
+
+        {/* PERMISSIONS SELECT */}
         <FormControl isRequired>
           <FormLabel>Copy Permission From</FormLabel>
           <ReactSelect
@@ -103,9 +104,7 @@ const CreateRole = ({ isOpen, onClose }) => {
             options={psOptions}
             placeholder='Select'
             onChange={onPermissionChange}
-            components={{
-              IndicatorSeparator: () => null
-            }}
+            components={{ IndicatorSeparator: () => null }}
           />
         </FormControl>
       </Stack>
