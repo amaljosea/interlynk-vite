@@ -16,6 +16,7 @@ import LynkTable from 'components/LynkTable'
 import ArchiveSbom from 'components/Modal/ArchiveSbom'
 import AutomationWarning from 'components/Modal/AutomationWarning'
 import DeleteSbom from 'components/Modal/DeleteSbom'
+import DuplicateSBOM from 'components/Modal/DuplicateSBOM'
 import ReprocessSbom from 'components/Modal/ReprocessSbom'
 import SbomTransfer from 'components/Modal/SbomTransfer'
 import SupportAnalysis from 'components/Modal/SupportAnalysis'
@@ -100,6 +101,7 @@ const VersionsTable = (props) => {
   const AUTOMATION = useDisclosure()
   const SUPPORT = useDisclosure()
   const LIFECYCLE = useDisclosure()
+  const DUPLICATE = useDisclosure()
 
   const tab = useQueryParam('tab')
 
@@ -216,6 +218,8 @@ const VersionsTable = (props) => {
         return SBOM.onOpen()
       case 'archive_sbom':
         return ARCHIVE_SBOM.onOpen()
+      case 'duplicate_sbom':
+        return DUPLICATE.onOpen()
       case 'compare_version':
         return TOOL.onOpen()
       case 'show_archive_versions':
@@ -402,6 +406,14 @@ const VersionsTable = (props) => {
             group: projectGroup,
             sbom: activeRow
           }}
+        />
+      )}
+      {/* CLONE SBOM */}
+      {DUPLICATE.isOpen && (
+        <DuplicateSBOM
+          id={activeRow?.id}
+          isOpen={DUPLICATE.isOpen}
+          onClose={DUPLICATE.onClose}
         />
       )}
     </>

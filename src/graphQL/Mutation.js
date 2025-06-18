@@ -3075,3 +3075,18 @@ export const OrganizationPackageVersionDelete = gql`
     }
   }
 `
+
+export const sbomClone = gql`
+  mutation sbomClone(
+    $sbomId: Uuid!
+    $newVersion: String!
+    $options: SbomCloneOptionsInput!
+  ) {
+    sbomClone(
+      input: { sbomId: $sbomId, newVersion: $newVersion, options: $options }
+    ) {
+      success
+      errors
+    }
+  }
+`

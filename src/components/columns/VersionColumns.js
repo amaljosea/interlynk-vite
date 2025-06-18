@@ -378,11 +378,20 @@ const VersionColumns = (props) => {
         id: 'ACTION',
         name: '',
         selector: (row) => {
+          const { lifecycle } = row
           return (
             <Menu>
               <LynkAction aria-label={`sbom-${row?.projectVersion}-actions`} />
               <Portal>
                 <MenuList fontSize={'sm'}>
+                  <MenuItem
+                    isDisabled={!updateSbom}
+                    hidden={isFreeTier || lifecycle === 'draft'}
+                    onClick={() => action('duplicate_sbom', row)}
+                    aria-label={`sbom-${row?.projectVersion}-duplicate`}
+                  >
+                    Duplicate SBOM
+                  </MenuItem>
                   <MenuItem
                     isDisabled={!updateSbom}
                     onClick={() => action('set_lifecycle', row)}
