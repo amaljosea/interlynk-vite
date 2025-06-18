@@ -10,8 +10,10 @@ import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
 
-import { OrganizationPackageVersionUpdate } from 'graphQL/Mutation'
-import { OrganizationPackageVersionCreate } from 'graphQL/Mutation'
+import {
+  OrganizationPackageVersionCreate,
+  OrganizationPackageVersionUpdate
+} from 'graphQL/Mutation'
 
 import { LuPackage } from 'react-icons/lu'
 
@@ -33,10 +35,12 @@ const PackageVersionOverrideModal = ({ isOpen, onClose, data }) => {
   })
 
   const [createOverride, { loading: creating }] = useMutation(
-    OrganizationPackageVersionCreate
+    OrganizationPackageVersionCreate,
+    { refetchQueries: ['PackageVersionsTable'] }
   )
   const [updateOverride, { loading: updating }] = useMutation(
-    OrganizationPackageVersionUpdate
+    OrganizationPackageVersionUpdate,
+    { refetchQueries: ['PackageVersionsTable'] }
   )
 
   const isUpdating = Boolean(organizationPackageVersion)

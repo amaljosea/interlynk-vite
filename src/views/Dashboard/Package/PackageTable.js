@@ -46,7 +46,8 @@ const PackageTable = ({
   ])
 
   const [deleteOverride, { loading: deleting }] = useMutation(
-    OrganizationPackageVersionDelete
+    OrganizationPackageVersionDelete,
+    { refetchQueries: ['PackageVersionsTable'] }
   )
 
   const { isOpen, onOpen, onClose } = useDisclosure()

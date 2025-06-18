@@ -5921,7 +5921,7 @@ export const GetJiraConnections = gql`
 `
 
 export const PackageVersionsTable = gql`
-  query PackageVersions(
+  query PackageVersionsTable(
     $first: Int
     $after: String
     $last: Int
