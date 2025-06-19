@@ -49,8 +49,8 @@ const ProductDetails = () => {
     }
   })
 
-  const { projectGroup } = data?.shareLynkQuery || ''
-  const { name, description } = projectGroup || ''
+  const { projectGroup } = data?.shareLynkQuery || {}
+  const { name, description } = projectGroup || {}
 
   const [versionFilters, setVersionFilters] = useState({
     field: 'SBOMS_CREATED_AT',

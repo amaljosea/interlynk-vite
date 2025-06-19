@@ -377,14 +377,14 @@ export const GetProductTable = gql`
             color
           }
           enabled
-          sbomsCount
+          sbomsCount(productLifeCycleStage: $lifestage)
           defaultProject {
             id
           }
           projects {
             id
             name
-            sbomsCount
+            sbomsCount(productLifeCycleStage: $lifestage)
             sboms {
               productLifeCycleStage
               id

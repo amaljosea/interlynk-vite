@@ -23,7 +23,8 @@ import {
 
 const VersionLifestages = () => {
   const navigate = useNavigate()
-  const { organization, envName } = useGlobalState()
+  const { organization, envName, dispatch } = useGlobalState()
+  const { prodDispatch } = dispatch
   const { grayBorderColor, primaryBlueText } = useThemeColor([
     'grayBorderColor',
     'primaryBlueText'
@@ -97,8 +98,13 @@ const VersionLifestages = () => {
 
   const total = lifeStages?.reduce((sum, stage) => sum + stage.count, 0)
 
-  const handleFilter = (value) =>
-    navigate(`/vendor/products?lifestage=${value}`)
+  const handleFilter = (value) => {
+    prodDispatch({
+      type: 'PRODUCT_BY_LIFESTAGE',
+      payload: value ? [value] : []
+    })
+    navigate(`/vendor/products`)
+  }
 
   if (loading) return <LynkLoader />
 

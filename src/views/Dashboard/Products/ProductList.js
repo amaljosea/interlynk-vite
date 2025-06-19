@@ -15,7 +15,6 @@ import { GetProductTable } from 'graphQL/Queries'
 
 function ProductList() {
   const { setIsOpen } = useTour()
-  const filter = useQueryParam('lifestage')
   const productId = useQueryParam('id')
 
   const { dispatch, prodState } = useGlobalState()
@@ -27,11 +26,9 @@ function ProductList() {
     parentKey: 'view_product_group'
   })
 
-  const productLifestage = filter
-    ? [filter]
-    : !lifestage?.includes('none')
-      ? getUndefinedIfEmptyOrAll(lifestage)
-      : ['none']
+  const productLifestage = !lifestage?.includes('none')
+    ? getUndefinedIfEmptyOrAll(lifestage)
+    : ['none']
 
   const filters = {
     field,
@@ -62,13 +59,6 @@ function ProductList() {
       prodDispatch({ type: 'SET_TOTAL_PRODUCT', payload: nodes.totalCount })
     }
   }, [nodes, prodDispatch])
-
-  useEffect(() => {
-    prodDispatch({
-      type: 'PRODUCT_BY_LIFESTAGE',
-      payload: filter ? [filter] : []
-    })
-  }, [filter, prodDispatch])
 
   useEffect(() => {
     if (!productId) {
