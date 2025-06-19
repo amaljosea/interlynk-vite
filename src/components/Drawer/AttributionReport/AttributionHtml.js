@@ -21,8 +21,8 @@ export const downloadAttributionHtml = async (
   let currentTocAlphabet = ''
 
   components.forEach((comp) => {
-    const currentComponentName = `${comp.name || 'Unknown'} - ${comp.version || 'Unknown'}`
-    const componentId = `component-${comp.id}` // Unique ID for linking
+    const currentComponentName = `${comp.components?.[0]?.name || 'Unknown'} - ${comp.components?.[0]?.version || 'Unknown'}`
+    const componentId = `component-${comp.components?.[0].id}` // Unique ID for linking
 
     // Store TOC destination for this component
     const firstChar = currentComponentName.charAt(0).toUpperCase()
@@ -45,19 +45,42 @@ export const downloadAttributionHtml = async (
       id: componentId
     })
 
-    const source = sourcePreferences[comp.id] || 'sbom'
+    const source = sourcePreferences[comp.components?.[0].id] || 'sbom'
     const noticeText =
       source === 'library'
-        ? comp.enrichedContent?.packageVersion?.notice || 'N/A'
-        : comp.notice || 'N/A'
+        ? comp.attributionOverride?.notice || 'N/A'
+        : comp.attribution?.notice || 'N/A'
     const copyrightText =
       source === 'library'
-        ? comp.enrichedContent?.packageVersion?.copyright || 'N/A'
-        : comp.copyright || 'N/A'
+        ? comp.attributionOverride?.copyright || 'N/A'
+        : comp.attribution?.copyright || 'N/A'
     const licenseExpText =
       source === 'library'
-        ? comp.enrichedContent?.packageVersion?.licenseExp
-        : comp.licensesExp || 'N/A'
+        ? comp.attributionOverride?.licensesExp || 'N/A'
+        : comp.attribution?.licensesExp || 'N/A'
+
+    const licenseTextHtml = (() => {
+      let licenseTextArr = []
+      if (source === 'library') {
+        licenseTextArr = comp.attributionOverride?.licensesText || []
+      } else {
+        licenseTextArr = comp.attribution?.licensesText || []
+      }
+      if (Array.isArray(licenseTextArr) && licenseTextArr.length > 0) {
+        return licenseTextArr
+          .map(
+            (licenseObj) => `
+              <div class="license-item">
+                <span class="license-short-id">${licenseObj?.key || 'N/A'}</span>
+                <div class="license-text-content">${licenseObj?.value || 'N/A'}</div>
+              </div>
+            `
+          )
+          .join('')
+      } else {
+        return `<div class="license-text-content">N/A</div>`
+      }
+    })()
 
     contentHtml += `
       <div class="component-section" id="${componentId}">
@@ -71,31 +94,10 @@ export const downloadAttributionHtml = async (
             <div class="component-name">${currentComponentName}</div>
             <div class="item"><span class="subTitle">Copyright</span> <span class="value">${copyrightText}</span></div>
             <div class="item"><span class="subTitle">License</span> <span class="value">${licenseExpText}</span></div>
-            ${
-              licenseExpText !== 'N/A'
-                ? `
-                <div class="license-text-container">
-                    <div class="subTitle">License Text</div>
-                    ${
-                      Array.isArray(comp.licenseText) &&
-                      comp.licenseText.length > 0
-                        ? comp.licenseText
-                            .filter((item) => item?.content?.text)
-                            .map(
-                              (licenseItem) => `
-                                <div class="license-item">
-                                    <span class="license-short-id">${licenseItem?.content?.shortId || 'N/A'}</span>
-                                    <div class="license-text-content">${licenseItem?.content?.text || 'N/A'}</div>
-                                </div>
-                            `
-                            )
-                            .join('')
-                        : `<div class="license-text-content">N/A</div>`
-                    }
-                </div>
-            `
-                : `<div class="item"><span class="subTitle">License Text</span> <span class="value">N/A</span></div>`
-            }
+            <div class="license-text-container">
+                <div class="subTitle">License Text</div>
+                ${licenseTextHtml}
+            </div>
             <div class="item"><span class="subTitle">Notice</span> <span class="value">${noticeText}</span></div>
         </div>
       </div>

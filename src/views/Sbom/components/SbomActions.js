@@ -81,9 +81,6 @@ const SbomActions = ({ sbom }) => {
     }
   })
 
-  const productName = sbom?.project?.projectGroup?.name
-  const productVersion = sbom?.projectVersion
-
   const [deleteSbom] = useMutation(sbomDelete)
   const [healthRecheck] = useMutation(recheckHealth)
 
@@ -334,8 +331,7 @@ const SbomActions = ({ sbom }) => {
         <AttributionReportsDrawer
           isOpen={ATTRIBUTION.isOpen}
           onClose={ATTRIBUTION.onClose}
-          productName={productName}
-          productVersion={productVersion}
+          sbomData={sbom}
         />
       )}
     </>

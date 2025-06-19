@@ -146,7 +146,7 @@ export const generateAttributionPdf = async (
   pdfDoc.addPage()
 
   finalItems.forEach((comp) => {
-    const currentComponentName = `${comp.name || 'Unknown'} - ${comp.version || 'Unknown'}`
+    const currentComponentName = `${comp.components[0].name || 'Unknown'} - ${comp.components[0].version || 'Unknown'}`
     const currentStartingLetter = currentComponentName.charAt(0).toUpperCase()
 
     const headerCompText =
@@ -168,19 +168,19 @@ export const generateAttributionPdf = async (
       y: yPosition
     })
 
-    const source = sourcePreferences[comp.id] || 'sbom'
+    const source = sourcePreferences[comp.components[0].id] || 'sbom'
     const noticeText =
       source === 'library'
-        ? comp.enrichedContent?.packageVersion?.notice || 'N/A'
-        : comp.notice || 'N/A'
+        ? comp.attributionOverride?.notice || 'N/A'
+        : comp.attribution.notice || 'N/A'
     const copyrightText =
       source === 'library'
-        ? comp.enrichedContent?.packageVersion?.copyright || 'N/A'
-        : comp.copyright || 'N/A'
+        ? comp.attributionOverride?.copyright || 'N/A'
+        : comp.attribution.copyright || 'N/A'
     const licenseText =
       source === 'library'
-        ? comp.enrichedContent?.packageVersion?.licenseExp || 'N/A'
-        : comp.licensesExp || 'NA'
+        ? comp.attributionOverride?.licensesExp || 'N/A'
+        : comp.attribution.licensesExp || 'NA'
 
     const estimatedTitleHeight = 14
     // Adjusted check for page breaks to ensure content starts from yPosition
@@ -286,16 +286,42 @@ export const generateAttributionPdf = async (
     const licenseTextSubtitleText = 'License Text'
     pdfDoc.text(licenseTextSubtitleText, CONTENT_LEFT_ALIGNMENT_X, yPosition)
     yPosition += 5
-    if (Array.isArray(comp.licenseText) && comp.licenseText.length > 0) {
-      const validLicenses = comp.licenseText.filter(
-        (item) => item?.content?.text
-      )
 
-      if (validLicenses.length > 0) {
+    // New logic for license text based on source
+    let licenseTextArr = []
+    if (source === 'library') {
+      licenseTextArr = comp.attributionOverride?.licensesText || []
+    } else {
+      licenseTextArr = comp.attribution?.licensesText || []
+    }
+
+    if (Array.isArray(licenseTextArr) && licenseTextArr.length > 0) {
+      licenseTextArr.forEach((licenseObj) => {
+        const licenseKey = licenseObj?.key || 'N/A'
+        const licenseValue = licenseObj?.value || 'N/A'
+
+        if (yPosition + 10 > pageHeight - 30) {
+          relativeContentPageNumber++
+          pdfDoc.addPage()
+          yPosition = margin + 20 // Consistent content start Y
+
+          contentPageHeaders[relativeContentPageNumber] = {
+            componentName: currentComponentName,
+            startingLetter: currentStartingLetter
+          }
+        }
+        pdfDoc.setTextColor('#444444')
         pdfDoc.setFont('ARIAL', 'normal')
-        pdfDoc.setTextColor('#323232')
-        validLicenses.forEach((licenseItem) => {
-          if (yPosition + 10 > pageHeight - 30) {
+        pdfDoc.setFontSize(10)
+        pdfDoc.text(licenseKey, CONTENT_LEFT_ALIGNMENT_X, yPosition)
+        yPosition += 10
+        pdfDoc.setTextColor('#444444')
+        const licenseTextLines = pdfDoc.splitTextToSize(
+          licenseValue,
+          pageWidth - CONTENT_LEFT_ALIGNMENT_X - margin - 20
+        )
+        licenseTextLines.forEach((line) => {
+          if (yPosition > pageHeight - 30) {
             relativeContentPageNumber++
             pdfDoc.addPage()
             yPosition = margin + 20 // Consistent content start Y
@@ -305,46 +331,11 @@ export const generateAttributionPdf = async (
               startingLetter: currentStartingLetter
             }
           }
-          pdfDoc.setTextColor('#444444')
-          pdfDoc.setFont('ARIAL', 'normal')
-          pdfDoc.setFontSize(10)
-          const licenseItemSubtitleText = `${licenseItem?.content?.shortId || 'N/A'}`
-          pdfDoc.text(
-            licenseItemSubtitleText,
-            CONTENT_LEFT_ALIGNMENT_X,
-            yPosition
-          )
-          pdfDoc.setFontSize(10)
-          pdfDoc.setFont('ARIAL', 'normal')
-          yPosition += 10
-          pdfDoc.setTextColor('#444444')
-          const licenseTextLines = pdfDoc.splitTextToSize(
-            licenseItem?.content?.text || 'N/A',
-            pageWidth - CONTENT_LEFT_ALIGNMENT_X - margin - 20
-          )
-          licenseTextLines.forEach((line) => {
-            if (yPosition > pageHeight - 30) {
-              relativeContentPageNumber++
-              pdfDoc.addPage()
-              yPosition = margin + 20 // Consistent content start Y
-
-              contentPageHeaders[relativeContentPageNumber] = {
-                componentName: currentComponentName,
-                startingLetter: currentStartingLetter
-              }
-            }
-            pdfDoc.text(`${line}`, CONTENT_LEFT_ALIGNMENT_X, yPosition)
-            yPosition += 5
-          })
+          pdfDoc.text(`${line}`, CONTENT_LEFT_ALIGNMENT_X, yPosition)
           yPosition += 5
         })
-      } else {
-        pdfDoc.setFont('ARIAL', 'normal')
-        pdfDoc.setTextColor('#444444')
-        pdfDoc.setFontSize(10)
-        pdfDoc.text('N/A', CONTENT_LEFT_ALIGNMENT_X, yPosition)
         yPosition += 5
-      }
+      })
     } else {
       pdfDoc.setFont('ARIAL', 'normal')
       pdfDoc.setTextColor('#444444')

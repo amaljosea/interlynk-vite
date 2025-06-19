@@ -6515,3 +6515,68 @@ export const GetVulnDataForPdf = gql`
     }
   }
 `
+
+export const GetAttributionsData = gql`
+  query GetAttributionsData(
+    $sbomId: Uuid!
+    $visibility: AttributionVisibilityEnum
+    $licenseType: AttributionLicenseTypeEnum
+    $parts: Boolean
+    $dedupe: Boolean
+    $search: String
+    $orderBy: AttributionComponentOrderByInput
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
+    attributions(
+      sbomId: $sbomId
+      visibility: $visibility
+      licenseType: $licenseType
+      parts: $parts
+      dedupe: $dedupe
+      search: $search
+      orderBy: $orderBy
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+    ) {
+      totalCount
+      nodes {
+        attribution {
+          licensesExp
+          copyright
+          notice
+          licensesText {
+            key
+            value
+          }
+        }
+        attributionOverride {
+          licensesExp
+          copyright
+          notice
+          licensesText {
+            key
+            value
+          }
+        }
+        components {
+          id
+          name
+          version
+          sbomId
+        }
+        componentCount
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+        startCursor
+        hasPreviousPage
+      }
+    }
+  }
+`

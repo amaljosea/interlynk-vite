@@ -197,3 +197,36 @@ export const attributionFilename = (name, version) => {
   const formattedName = name.toLowerCase().replace(/[.\s]/g, '_')
   return `${formattedName}_${version}_${month}_${year}`
 }
+
+export const getAttributionFields = (comp, source) => {
+  const getFrom = (primary, fallback) =>
+    primary !== undefined ? primary : fallback
+
+  if (!comp) return {}
+
+  const attributionOverride = comp?.attributionOverride || {}
+  const attribution = comp?.attribution || {}
+
+  return {
+    notice: getFrom(
+      source === 'library' ? attributionOverride.notice : attribution.notice,
+      'N/A'
+    ),
+    copyright: getFrom(
+      source === 'library'
+        ? attributionOverride.copyright
+        : attribution.copyright,
+      'N/A'
+    ),
+    licensesExp: getFrom(
+      source === 'library'
+        ? attributionOverride.licensesExp
+        : attribution.licensesExp,
+      'N/A'
+    ),
+    licensesText:
+      source === 'library'
+        ? attributionOverride.licensesText || []
+        : attribution.licensesText || []
+  }
+}

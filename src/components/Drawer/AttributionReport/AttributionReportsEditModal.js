@@ -36,9 +36,7 @@ const AttributionReportsEditModal = ({
     sourcePreferences[rowData.id] === undefined
 
   useEffect(() => {
-    const source = isEditable
-      ? rowData
-      : rowData?.enrichedContent?.packageVersion
+    const source = isEditable ? rowData : rowData?.enrichedContent
 
     if (editingField === 'copyright') {
       setCopyrightValue(
@@ -163,7 +161,7 @@ const AttributionReportsEditModal = ({
             license={
               isEditable
                 ? rowData?.license
-                : rowData?.enrichedContent?.packageVersion?.licenseExp
+                : rowData?.enrichedContent?.licensesExp
             }
             disabled={!isEditable}
           />
