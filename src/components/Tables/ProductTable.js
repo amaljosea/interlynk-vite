@@ -30,10 +30,12 @@ import {
 } from 'graphQL/Queries'
 
 import Pagination from '../Pagination'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 
 const ProductTable = ({ data, reset, loading, paginationProps }) => {
   const navigate = useNavigate()
   const { setIsOpen } = useTour()
+  const { isCustomerView } = useRouteFlags()
   const { orgView, isFreeTier } = useGlobalQueryContext()
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
 
@@ -72,7 +74,7 @@ const ProductTable = ({ data, reset, loading, paginationProps }) => {
   const totalCount = prodData?.organization?.projectGroups?.totalCount || 0
 
   const { data: prodLabels, loading: labelLoading } = useQuery(GetLabels, {
-    skip: isFreeTier,
+    skip: isFreeTier || isCustomerView,
     variables: { first: 200 }
   })
   const productLabels = prodLabels?.labels?.nodes || []

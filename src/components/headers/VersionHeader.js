@@ -55,38 +55,40 @@ const VersionHeader = (props) => {
             onFilter={handleSearch}
           />
           {/* LIFE STAGE */}
-          <Menu closeOnSelect={false}>
-            <MenuHeading
-              title={'Lifestage'}
-              active={lifestage?.length !== 0 && !lifestage.includes('all')}
-            />
-            <MenuList
-              minW={'280px'}
-              maxW={'400px'}
-              minH='auto'
-              maxH={'320px'}
-              fontSize={'sm'}
-              overflowY={'scroll'}
-            >
-              <MenuOptionGroup
-                type={'checkbox'}
-                value={lifestage}
-                onChange={onFilterLifestage}
+          {!signedUrlParams && (
+            <Menu closeOnSelect={false}>
+              <MenuHeading
+                title={'Lifestage'}
+                active={lifestage?.length !== 0 && !lifestage.includes('all')}
+              />
+              <MenuList
+                minW={'280px'}
+                maxW={'400px'}
+                minH='auto'
+                maxH={'320px'}
+                fontSize={'sm'}
+                overflowY={'scroll'}
               >
-                <MenuItemOption value='all'>All</MenuItemOption>
-                {stages?.map((item, index) => (
-                  <MenuItemOption
-                    key={index}
-                    fontSize={'sm'}
-                    value={item?.value}
-                    textTransform={'capitalize'}
-                  >
-                    {item.label}
-                  </MenuItemOption>
-                ))}
-              </MenuOptionGroup>
-            </MenuList>
-          </Menu>
+                <MenuOptionGroup
+                  type={'checkbox'}
+                  value={lifestage}
+                  onChange={onFilterLifestage}
+                >
+                  <MenuItemOption value='all'>All</MenuItemOption>
+                  {stages?.map((item, index) => (
+                    <MenuItemOption
+                      key={index}
+                      fontSize={'sm'}
+                      value={item?.value}
+                      textTransform={'capitalize'}
+                    >
+                      {item.label}
+                    </MenuItemOption>
+                  ))}
+                </MenuOptionGroup>
+              </MenuList>
+            </Menu>
+          )}
           {selectedSbom?.length === 1 && (
             <Text fontSize={12} color={primaryBlueText} textAlign={'left'}>
               ** Select one more version to enable comparison
