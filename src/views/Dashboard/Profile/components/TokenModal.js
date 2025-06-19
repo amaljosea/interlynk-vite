@@ -171,6 +171,7 @@ const TokenModal = ({ data, isOpen, onClose }) => {
             onBlur={onTokenBlur}
             onChange={handleChange}
             isDisabled={token !== ''}
+            placeholder='Enter token name'
           />
           <FormErrorMessage>{error}</FormErrorMessage>
         </FormControl>

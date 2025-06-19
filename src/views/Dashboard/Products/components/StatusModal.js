@@ -12,7 +12,7 @@ const StatusModal = ({ isOpen, onClose, group }) => {
   const { id, enabled, name } = group || {}
 
   const [projectGroupUpdate, { loading }] = useMutation(UpdateProjectGroup, {
-    refetchQueries: ['GetProductTable']
+    refetchQueries: ['GetProductTable', 'GetProjectGroupDetails']
   })
 
   // TOGGLE STATUS
