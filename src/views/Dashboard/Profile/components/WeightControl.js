@@ -53,13 +53,15 @@ const WeightControl = () => {
     childKey: 'update_organization'
   })
 
-  const [updateScore, { loading: updateLoading }] =
-    useMutation(UpdateScoreSetting)
+  const [updateScore, { loading: updateLoading }] = useMutation(
+    UpdateScoreSetting,
+    { refetchQueries: ['GetScoreSetting'] }
+  )
 
   const { data, loading } = useQuery(GetScoreSetting, {
     skip: tab === 'health' ? false : true
   })
-  const { scoreSetting } = data?.organization || ''
+  const { scoreSetting } = data?.organization || {}
 
   const [ageWeight, setAgeWeight] = useState(30)
   const [securityWeight, setSecurityWeight] = useState(40)
