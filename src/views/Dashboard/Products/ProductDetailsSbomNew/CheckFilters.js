@@ -15,7 +15,7 @@ import MenuHeading from 'components/Misc/MenuHeading'
 import { useGlobalState } from 'hooks/useGlobalState'
 import useQueryParam from 'hooks/useQueryParam'
 
-import { GetOrgRules } from 'graphQL/Queries'
+import { GetOrgRulesForFilter } from 'graphQL/Queries'
 
 const CheckFilters = ({ filters, reset }) => {
   const activeTab = useQueryParam('tab')
@@ -24,7 +24,7 @@ const CheckFilters = ({ filters, reset }) => {
 
   const { checkId, category, severity, status } = sbomCheckState
 
-  const { data } = useQuery(GetOrgRules, {
+  const { data } = useQuery(GetOrgRulesForFilter, {
     skip: activeTab === 'checks' ? false : true,
     variables: {
       field: 'RULES_FRIENDLY_ID',

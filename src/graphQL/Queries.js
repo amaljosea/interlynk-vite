@@ -347,6 +347,22 @@ export const GetOrgRules = gql`
   }
 `
 
+export const GetOrgRulesForFilter = gql`
+  query GetOrgRules(
+    $field: OrganizationRuleOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    organization {
+      organizationRules(orderBy: { field: $field, direction: $direction }) {
+        rule {
+          shortDesc
+          friendlyId
+        }
+      }
+    }
+  }
+`
+
 // GET ORGANIZATION SETTINGS
 export const GetOrgSettings = gql`
   query GetOrgSettings {
