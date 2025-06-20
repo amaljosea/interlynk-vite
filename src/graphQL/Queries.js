@@ -161,7 +161,6 @@ export const GetAllPermissions = gql`
         permissionsMap {
           category
           hidden
-          description
           key
           name
           supersededBy
