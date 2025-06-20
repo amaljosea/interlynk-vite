@@ -85,7 +85,7 @@ const VersionColumns = (props) => {
     const columns = [
       // VERSION
       {
-        id: 'SBOMS_UPDATED_AT',
+        id: 'SBOMS_PROJECT_VERSION',
         name: 'VERSION',
         selector: (row, index) => {
           const {
@@ -166,19 +166,16 @@ const VersionColumns = (props) => {
                   </Tooltip>
                 )}
               </Flex>
-              <Tooltip label={getFullDate(updatedAt)} placement='top'>
-                <Text color={secondaryTextColor}>{timeSince(updatedAt)}</Text>
+              <Tooltip label={getFullDate(createdAt)} placement='top'>
+                <Text color={secondaryTextColor}>
+                  Added {timeSince(createdAt)}
+                </Text>
               </Tooltip>
             </Stack>
           )
         },
         wrap: true,
         sortable: true,
-        sortFunction: (a, b) => {
-          const dateA = new Date(a.updatedAt)
-          const dateB = new Date(b.updatedAt)
-          return dateA - dateB
-        },
         width: '20%'
       },
       // COMPONENTS
@@ -260,7 +257,9 @@ const VersionColumns = (props) => {
                 {notStarted ? '-' : stats?.vulnStats?.high || 0}
               </VulnBadge>
               {signedUrlParams && (
-                <Text ml={1} color={primaryTextColor}>+{total}</Text>
+                <Text ml={1} color={primaryTextColor}>
+                  +{total}
+                </Text>
               )}
               {vulnRunStatus === 'FINISHED' && total !== 0 && (
                 <Popover
@@ -353,25 +352,30 @@ const VersionColumns = (props) => {
       },
       // CREATED AT
       {
-        id: 'SBOMS_CREATED_AT',
-        name: 'IMPORTED',
+        id: 'SBOMS_UPDATED_AT',
+        name: 'UPDATED',
         selector: (row) => {
-          const { createdAt } = row
+          const { updatedAt } = row
           return (
-            <Tooltip label={getFullDate(createdAt)} placement='top'>
+            <Tooltip label={getFullDate(updatedAt)} placement='top'>
               <Text
                 color={secondaryTextColor}
                 textAlign={'right'}
                 fontSize={14}
               >
-                {timeSince(createdAt)}
+                {timeSince(updatedAt)}
               </Text>
             </Tooltip>
           )
         },
         wrap: true,
         right: 'true',
-        sortable: true
+        sortable: true,
+        sortFunction: (a, b) => {
+          const dateA = new Date(a.updatedAt)
+          const dateB = new Date(b.updatedAt)
+          return dateA - dateB
+        }
       },
       // ACTIONS
       {
