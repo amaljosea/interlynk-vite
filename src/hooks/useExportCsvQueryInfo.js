@@ -6,7 +6,7 @@ import {
   GetCompVulnData,
   GetGlobalVulnCSVData,
   GetSbomLicensesTable,
-  GetUsers,
+  GetUsersForExport,
   GetVulnDataForCSV
 } from 'graphQL/Queries'
 import { GetComponentDataForExport } from 'graphQL/Queries'
@@ -114,7 +114,7 @@ const useExportCsvQueryInfo = (tableType, rowsToExport, searchFilters) => {
 
       case 'Users':
         return {
-          query: GetUsers,
+          query: GetUsersForExport,
           variables: { ...searchFilters },
           skip: !organization ? true : activetab === 'users' ? false : true,
           selector: 'organization.users.nodes',

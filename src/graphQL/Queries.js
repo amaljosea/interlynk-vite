@@ -63,6 +63,33 @@ export const UserSettings = gql`
   }
 `
 
+export const GetUsersForExport = gql`
+  query GetUsers($first: Int, $last: Int, $after: String, $before: String) {
+    organization {
+      users(after: $after, before: $before, first: $first, last: $last) {
+        nodes {
+          id
+          name
+          email
+          role {
+            id
+            name
+            permissions
+          }
+          invitationAcceptedAt
+          invitationStatus
+        }
+        pageInfo {
+          endCursor
+          hasNextPage
+          hasPreviousPage
+          startCursor
+        }
+      }
+    }
+  }
+`
+
 // GET USERS
 export const GetUsers = gql`
   query GetUsers(
