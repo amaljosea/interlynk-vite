@@ -12,14 +12,20 @@ import { CreateProjectGroup, UpdateProjectGroup } from 'graphQL/Mutation'
 import { LuBox } from 'react-icons/lu'
 
 const ProductModal = ({ isOpen, onClose, data }) => {
-  const { id, name, description } = data || ''
-  const [projectGroupCreate, { loading: crLoading }] = useMutation(
+  const { id, name, description } = data || {}
+
+  const refetchQueries = [
+    'GetProductTable',
+    'GetProjectGroupDetails',
+    'GetTotalProduct'
+  ]
+  const [projectGroupCreate, { loading: creating }] = useMutation(
     CreateProjectGroup,
-    { refetchQueries: ['GetProductTable', 'GetTotalProduct'] }
+    { refetchQueries }
   )
-  const [projectGroupUpdate, { loading: upLoading }] = useMutation(
+  const [projectGroupUpdate, { loading: updating }] = useMutation(
     UpdateProjectGroup,
-    { refetchQueries: ['GetProductTable', 'GetTotalProduct'] }
+    { refetchQueries }
   )
 
   const initialData = { name: name || '', desc: description || '' }
@@ -76,7 +82,7 @@ const ProductModal = ({ isOpen, onClose, data }) => {
       Icon={LuBox}
       disabled={error !== ''}
       buttonText={data ? 'Update' : 'Save'}
-      isLoading={data ? upLoading : crLoading}
+      isLoading={data ? updating : creating}
       title={`${data ? 'Edit' : 'Add'} Product`}
       onSubmit={data ? updateProduct : handleSave}
     >
