@@ -33,13 +33,11 @@ export const GetApiKeys = gql`
       currentUser {
         apiKeys {
           id
-          rawToken
           tokenMask
           revoked
           expired
           createdAt
           updatedAt
-          revokedAt
           expiresAt
           tokenName
         }
