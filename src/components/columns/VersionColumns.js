@@ -390,14 +390,6 @@ const VersionColumns = (props) => {
                 <MenuList fontSize={'sm'}>
                   <MenuItem
                     isDisabled={!updateSbom}
-                    hidden={isFreeTier || lifecycle === 'draft'}
-                    onClick={() => action('duplicate_sbom', row)}
-                    aria-label={`sbom-${row?.projectVersion}-duplicate`}
-                  >
-                    Duplicate SBOM
-                  </MenuItem>
-                  <MenuItem
-                    isDisabled={!updateSbom}
                     onClick={() => action('set_lifecycle', row)}
                     aria-label={`sbom-${row?.projectVersion}-lifecycle`}
                   >
@@ -438,6 +430,14 @@ const VersionColumns = (props) => {
                     aria-label={`sbom-${row?.projectVersion}-list`}
                   >
                     View Alternates
+                  </MenuItem>
+                  <MenuItem
+                    isDisabled={!updateSbom}
+                    hidden={isFreeTier || lifecycle === 'draft'}
+                    onClick={() => action('duplicate_sbom', row)}
+                    aria-label={`sbom-${row?.projectVersion}-duplicate`}
+                  >
+                    Duplicate
                   </MenuItem>
                   <Divider />
                   <MenuItem

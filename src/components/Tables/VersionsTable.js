@@ -125,7 +125,7 @@ const VersionsTable = (props) => {
   const result = signedUrlParams
     ? data?.shareLynkQuery?.projectGroup
     : data?.project?.projectGroup
-  const { name, enabled } = result || ''
+  const { name, enabled } = result || {}
 
   const { nodes, paginationProps, loading, startPolling, stopPolling, reset } =
     usePaginatedQuery(signedUrlParams ? ShareVersionTable : GetVersionsTable, {
@@ -411,9 +411,13 @@ const VersionsTable = (props) => {
       {/* CLONE SBOM */}
       {DUPLICATE.isOpen && (
         <DuplicateSBOM
-          id={activeRow?.id}
           isOpen={DUPLICATE.isOpen}
           onClose={DUPLICATE.onClose}
+          data={{
+            projectGroup: name,
+            sbomId: activeRow?.id,
+            projectVersion: activeRow?.projectVersion
+          }}
         />
       )}
     </>

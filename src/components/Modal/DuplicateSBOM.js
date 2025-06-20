@@ -1,7 +1,14 @@
 import { useMutation } from '@apollo/client'
 import React, { useState } from 'react'
 
-import { Checkbox, FormControl, Input, Stack } from '@chakra-ui/react'
+import {
+  Checkbox,
+  FormControl,
+  Input,
+  Stack,
+  Tag,
+  Text
+} from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
 import LynkFormLabel from 'components/Misc/LynkLabel'
@@ -12,8 +19,11 @@ import { sbomClone } from 'graphQL/Mutation'
 
 import { LuCopyPlus } from 'react-icons/lu'
 
-const DuplicateSBOM = ({ id, isOpen, onClose }) => {
+const DuplicateSBOM = ({ data, isOpen, onClose }) => {
   const { showToast } = useCustomToast()
+
+  const { sbomId, projectGroup, projectVersion } = data || {}
+
   const [duplicate, { loading }] = useMutation(sbomClone, {
     refetchQueries: ['GetVersionsTable']
   })
@@ -37,7 +47,7 @@ const DuplicateSBOM = ({ id, isOpen, onClose }) => {
   const handleSubmit = () => {
     duplicate({
       variables: {
-        sbomId: id,
+        sbomId: sbomId,
         newVersion: formData?.version,
         options: {
           includeParts: formData?.includeParts,
@@ -51,7 +61,7 @@ const DuplicateSBOM = ({ id, isOpen, onClose }) => {
         showToast({ description: errors[0], status: 'error' })
       } else {
         showToast({
-          description: 'SBOM duplicated successfully',
+          description: 'Version duplication in progress',
           status: 'success'
         })
         onClose()
@@ -64,15 +74,20 @@ const DuplicateSBOM = ({ id, isOpen, onClose }) => {
       isOpen={isOpen}
       onClose={onClose}
       Icon={LuCopyPlus}
+      title={'Duplicate'}
       isLoading={loading}
       disabled={disabled}
       buttonText='Submit'
       onSubmit={handleSubmit}
-      title={'Duplicate SBOM'}
     >
       <Stack spacing={4}>
+        <Tag colorScheme='blue' w={'fit-content'}>
+          <Text fontWeight={400} wordBreak={'break-all'}>
+            {projectGroup} - {projectVersion || 'N/A'}
+          </Text>
+        </Tag>
         <FormControl isRequired>
-          <LynkFormLabel label='Version' htmlFor='version' />
+          <LynkFormLabel label='Duplicate as Version' htmlFor='version' />
           <Input
             name='version'
             placeholder='Enter version'
@@ -86,21 +101,21 @@ const DuplicateSBOM = ({ id, isOpen, onClose }) => {
             onChange={handleChange}
             isChecked={formData.includeParts}
           >
-            Include Parts
+            <Text fontSize={14}>Include Parts</Text>
           </Checkbox>
           <Checkbox
             onChange={handleChange}
             name='includeVulnerabilities'
             isChecked={formData.includeVulnerabilities}
           >
-            Include Vulnerabilities
+            <Text fontSize={14}>Include Vulnerabilities</Text>
           </Checkbox>
           <Checkbox
             name='includeJiraIssues'
             onChange={handleChange}
             isChecked={formData.includeJiraIssues}
           >
-            Include Jira Issues
+            <Text fontSize={14}>Include Jira Issues</Text>
           </Checkbox>
         </Stack>
       </Stack>
