@@ -1,4 +1,4 @@
-import { gql, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   getFullDate,
@@ -17,45 +17,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-export const GetLatestVersions = gql`
-  query GetOrgMetrics($env: String) {
-    organizationMetric(envName: $env) {
-      latestVersions {
-        id
-        createdAt
-        creationAt
-        updatedAt
-        projectId
-        projectVersion
-        project {
-          id
-          name
-          sboms {
-            id
-          }
-          projectGroup {
-            id
-            name
-            defaultProject {
-              id
-              name
-            }
-          }
-        }
-        primaryComponent {
-          id
-          name
-          version
-        }
-        stats {
-          compCount
-          compLicenseCount
-          vulnStats
-        }
-      }
-    }
-  }
-`
+import { GetLatestVersions } from 'graphQL/Queries'
 
 const ProductsOverview = () => {
   const navigate = useNavigate()

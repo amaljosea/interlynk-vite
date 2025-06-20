@@ -172,6 +172,32 @@ export const GetAllPermissions = gql`
   }
 `
 
+export const GetLatestVersions = gql`
+  query GetOrgMetrics($env: String) {
+    organizationMetric(envName: $env) {
+      latestVersions {
+        id
+        createdAt
+        projectId
+        projectVersion
+        project {
+          id
+          name
+          projectGroup {
+            id
+            name
+          }
+        }
+        stats {
+          compCount
+          compLicenseCount
+          vulnStats
+        }
+      }
+    }
+  }
+`
+
 // GET ALL ROLES
 export const GetAllRoles = gql`
   query GetAllRoles {
