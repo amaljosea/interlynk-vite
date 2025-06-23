@@ -70,6 +70,7 @@ const PurlField = ({ isOpen, onOpen, onClose }) => {
           onBlur={onBlur}
           onChange={onChange}
           value={identifiers?.purl}
+          placeholder={'e.g. pkg:npm/express@4.17.1'}
         />
         <CopyButton
           size={'md'}

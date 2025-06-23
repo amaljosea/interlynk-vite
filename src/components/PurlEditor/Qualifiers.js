@@ -10,6 +10,7 @@ const Qualifiers = ({ disabled, qualifiers, onChange, onBlur }) => {
         {...inputProps}
         value={qualifiers}
         data-testid={`purl_qualifiers`}
+        placeholder={`e.g. arch=amd64&os=linux`}
         onBlur={(e) => onBlur('qualifiers', e.target.value)}
         onChange={(e) => onChange('qualifiers', e.target.value)}
       />

@@ -65,18 +65,18 @@ const Version = ({ disabled, version, type, onChange, onBlur }) => {
       <FormLabel>Version</FormLabel>
       {isSearchable ? (
         <LynkSelect
+          value={value}
           name='version'
+          options={options}
           id='purl_version'
-          placeholder={''}
           isClearable={true}
           isSearchable={true}
           isLoading={loading}
-          value={value}
           onBlur={handleBlur}
+          isDisabled={disabled}
           onChange={handleChange}
           inputValue={searchInput}
-          options={options}
-          isDisabled={disabled}
+          placeholder={`e.g. 1.0.0`}
           noOptionsMessage={() => null}
           onInputChange={onInputChange}
         />
@@ -84,6 +84,7 @@ const Version = ({ disabled, version, type, onChange, onBlur }) => {
         <Input
           {...inputProps}
           value={version}
+          placeholder={`e.g. 1.0.0`}
           onBlur={(e) => onBlur('version', e.target.value)}
           onChange={(e) => onChange('version', e.target.value)}
         />

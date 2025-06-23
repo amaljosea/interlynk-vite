@@ -66,17 +66,17 @@ const Name = ({ disabled, name, type, onChange, onBlur }) => {
       {isSearchable ? (
         <LynkSelect
           name='name'
+          value={value}
           id='purl_name'
-          placeholder={''}
+          options={options}
           isClearable={true}
           isSearchable={true}
           isLoading={loading}
-          value={value}
           onBlur={handleBlur}
+          isDisabled={disabled}
           onChange={handleChange}
           inputValue={searchInput}
-          options={options}
-          isDisabled={disabled}
+          placeholder={`e.g. lynk`}
           noOptionsMessage={() => null}
           onInputChange={onInputChange}
         />
@@ -84,6 +84,7 @@ const Name = ({ disabled, name, type, onChange, onBlur }) => {
         <Input
           {...inputProps}
           value={name}
+          placeholder={`e.g. lynk`}
           onBlur={(e) => onBlur('name', e.target.value)}
           onChange={(e) => onChange('name', e.target.value)}
         />

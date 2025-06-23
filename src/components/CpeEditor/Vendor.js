@@ -68,19 +68,19 @@ const Vendor = ({ disabled, vendor, onChange, isValid }) => {
       <FormLabel>Vendor</FormLabel>
       <LynkSelect
         name='vendor'
+        value={value}
         id='cpe_vendor'
-        placeholder={''}
+        options={options}
         isClearable={true}
         isSearchable={true}
         isLoading={loading}
-        value={value}
+        onBlur={handleBlur}
+        isDisabled={disabled}
         onChange={handleChange}
         inputValue={searchInput}
-        options={options}
-        isDisabled={disabled}
         noOptionsMessage={() => null}
         onInputChange={onInputChange}
-        onBlur={handleBlur}
+        placeholder='Enter vendor name'
       />
       {!isValid && <FormErrorMessage>Invalid vendor format</FormErrorMessage>}
     </FormControl>

@@ -106,7 +106,6 @@ const CpeField = ({ isOpen, onOpen, onClose }) => {
           value={value}
           onBlur={onBlur}
           options={options}
-          placeholder={''}
           isSearchable={true}
           isLoading={loading}
           onChange={onChange}
@@ -116,6 +115,7 @@ const CpeField = ({ isOpen, onOpen, onClose }) => {
           noOptionsMessage={() => null}
           onInputChange={onInputChange}
           isClearable={isCustomerView ? false : true}
+          placeholder={'e.g. cpe:2.3:a:microsoft:windows_10:-:*:*:*:*:*:*:*'}
         />
         <CopyButton
           size={'md'}

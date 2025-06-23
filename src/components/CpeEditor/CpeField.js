@@ -22,6 +22,7 @@ const CpeField = ({
       <Input
         {...inputProps}
         value={value}
+        placeholder={`Enter ${label.toLowerCase()}`}
         onChange={(e) => onChange(name, e.target.value, index)}
       />
       {!isValid && (

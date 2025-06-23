@@ -126,34 +126,34 @@ const PurlEditor = ({ isOpen, onOpen, onClose, setSavePending }) => {
       <PackageType disabled={false} type={purlData?.type} onChange={onChange} />
 
       <Namespace
-        disabled={false}
         onBlur={onBlur}
-        type={purlData?.type}
+        disabled={false}
         onChange={onChange}
+        type={purlData?.type}
         namespace={purlData?.namespace}
       />
 
       <Name
         disabled={false}
         onBlur={onBlur}
-        type={purlData?.type}
         onChange={onChange}
+        type={purlData?.type}
         name={purlData?.name}
       />
 
       <Version
         disabled={false}
         onBlur={onBlur}
-        type={purlData?.type}
         onChange={onChange}
+        type={purlData?.type}
         version={purlData?.version}
       />
 
       <Qualifiers
-        disabled={false}
         onBlur={onBlur}
-        qualifiers={purlData?.qualifiers}
+        disabled={false}
         onChange={onChange}
+        qualifiers={purlData?.qualifiers}
       />
 
       {identifiers?.purlError && <LynkAlert msg={identifiers?.purlError} />}

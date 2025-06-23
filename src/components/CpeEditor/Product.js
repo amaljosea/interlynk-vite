@@ -68,20 +68,20 @@ const Product = ({ disabled, product, onChange, isValid, vendor }) => {
     <FormControl isRequired isDisabled={disabled} isInvalid={!isValid}>
       <FormLabel>Product</FormLabel>
       <LynkSelect
+        value={value}
         name='product'
         id='cpe_product'
-        placeholder={''}
+        options={options}
         isClearable={true}
         isSearchable={true}
         isLoading={loading}
-        value={value}
+        onBlur={handleBlur}
+        isDisabled={disabled}
         onChange={handleChange}
         inputValue={searchInput}
-        options={options}
-        isDisabled={disabled}
         noOptionsMessage={() => null}
         onInputChange={onInputChange}
-        onBlur={handleBlur}
+        placeholder='e.g. lynk-product'
       />
       {!isValid && <FormErrorMessage>Invalid product format</FormErrorMessage>}
     </FormControl>

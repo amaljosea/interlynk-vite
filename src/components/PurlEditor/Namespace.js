@@ -71,24 +71,25 @@ const Namespace = ({ disabled, namespace, type, onChange, onBlur }) => {
       <FormLabel>Namespace</FormLabel>
       {isSearchable ? (
         <LynkSelect
-          id='purl_namespace'
+          value={value}
           name='namespace'
-          placeholder={''}
+          options={options}
           isClearable={true}
           isSearchable={true}
           isLoading={loading}
-          value={value}
+          id='purl_namespace'
+          onBlur={handleBlur}
+          isDisabled={disabled}
           onChange={handleChange}
           inputValue={searchInput}
-          options={options}
-          isDisabled={disabled}
           noOptionsMessage={() => null}
           onInputChange={onInputChange}
-          onBlur={handleBlur}
+          placeholder={`e.g. com/example`}
         />
       ) : isSelectable ? (
         <LynkSelect
           {...inputProps}
+          placeholder={`e.g. com/example`}
           value={
             namespaceOptions[type]?.find((opt) => opt.value === namespace) ||
             null
@@ -101,6 +102,7 @@ const Namespace = ({ disabled, namespace, type, onChange, onBlur }) => {
         <Input
           {...inputProps}
           value={namespace}
+          placeholder={`e.g. com/example`}
           onBlur={(e) => onBlur('namespace', e.target.value)}
           onChange={(e) => onChange('namespace', e.target.value)}
         />

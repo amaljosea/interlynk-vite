@@ -68,20 +68,20 @@ const Version = ({ disabled, version, onChange, product }) => {
     <FormControl isRequired isDisabled={disabled}>
       <FormLabel>Version</FormLabel>
       <LynkSelect
+        value={value}
         name='version'
         id='cpe_version'
-        placeholder={''}
+        options={options}
         isClearable={true}
+        onBlur={handleBlur}
         isSearchable={true}
         isLoading={loading}
-        value={value}
+        isDisabled={disabled}
         onChange={handleChange}
         inputValue={searchInput}
-        options={options}
-        isDisabled={disabled}
+        placeholder='Enter version'
         noOptionsMessage={() => null}
         onInputChange={onInputChange}
-        onBlur={handleBlur}
       />
     </FormControl>
   )
