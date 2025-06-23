@@ -11,6 +11,9 @@ import {
   Flex,
   IconButton,
   Menu,
+  MenuItemOption,
+  MenuList,
+  MenuOptionGroup,
   Radio,
   RadioGroup,
   Select,
@@ -36,6 +39,14 @@ import { LuCircleCheck, LuCircleX, LuEye } from 'react-icons/lu'
 import { downloadAttributionHtml } from './AttributionHtml'
 import AttributionReportsEditModal from './AttributionReportsEditModal'
 import { generateAttributionPdf } from './generateAttributionPdf'
+
+const licenseTypes = {
+  All: 'all',
+  'SPDX Single': 'standard',
+  'SPDX Expression': 'expression',
+  Custom: 'custom',
+  'No License': 'blank'
+}
 
 const AttributionTable = ({
   isOpen,
@@ -253,6 +264,13 @@ const AttributionTable = ({
       setIsLoading(false)
     }
   }
+  const generateMenuItems = (availableFilters) => {
+    return Object.entries(availableFilters).map(([key, value]) => (
+      <MenuItemOption key={key} value={value} fontSize={'sm'}>
+        {key}
+      </MenuItemOption>
+    ))
+  }
 
   const columns = useMemo(
     () => [
@@ -431,12 +449,15 @@ const AttributionTable = ({
 
           <Menu closeOnSelect={true}>
             <MenuHeading title='License Type' active={!!filters.licenseType} />
-            <CustomList
-              type='radio'
-              options={['standard', 'custom', 'expression', 'blank']}
-              value={filters.licenseType?.toLowerCase() || 'all'}
-              onChange={handlelicenseTypeChange}
-            />
+            <MenuList>
+              <MenuOptionGroup
+                type='radio'
+                value={filters.licenseType?.toLowerCase() || 'all'}
+                onChange={handlelicenseTypeChange}
+              >
+                {generateMenuItems(licenseTypes)}
+              </MenuOptionGroup>
+            </MenuList>
           </Menu>
           <Checkbox
             name='includeParts'
