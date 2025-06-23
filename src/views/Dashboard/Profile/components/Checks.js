@@ -18,7 +18,7 @@ import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { orgRuleUpdate } from 'graphQL/Mutation'
-import { GetOrgRules } from 'graphQL/Queries'
+import { GetOrgRulesForChecks } from 'graphQL/Queries'
 
 const Checks = () => {
   const showToast = useCustomToast()
@@ -35,7 +35,7 @@ const Checks = () => {
     childKey: 'update_organization'
   })
 
-  const { data, loading } = useQuery(GetOrgRules, {
+  const { data, loading } = useQuery(GetOrgRulesForChecks, {
     skip: !orgView ? true : activetab === 'compliance' ? false : true,
     variables: {
       field: 'RULES_FRIENDLY_ID',

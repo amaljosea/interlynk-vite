@@ -314,6 +314,26 @@ export const GetOrgRules = gql`
   }
 `
 
+export const GetOrgRulesForChecks = gql`
+  query GetOrgRulesForChecks(
+    $field: OrganizationRuleOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    organization {
+      organizationRules(orderBy: { field: $field, direction: $direction }) {
+        id
+        enabled
+        severity
+        rule {
+          shortDesc
+          longDesc
+          friendlyId
+        }
+      }
+    }
+  }
+`
+
 export const GetOrgRulesForFilter = gql`
   query GetOrgRules(
     $field: OrganizationRuleOrderByFields!
