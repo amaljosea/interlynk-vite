@@ -49,7 +49,11 @@ const LabelList = ({ loading, labels, onDeleteLabel, onEditLabel }) => {
       <Text fontSize={'sm'} color={sameSecondaryText}>
         {labels?.length} Labels
       </Text>
-      <Stack pt={4} spacing={3}>
+      <Stack
+        spacing={3}
+        overflowY={'scroll'}
+        sx={{ pt: 4, pr: 2, minH: 'auto', maxH: '60vh' }}
+      >
         {sortedLabels?.map((label, index) => (
           <Flex flexDir={'column'} key={label.id}>
             <Flex

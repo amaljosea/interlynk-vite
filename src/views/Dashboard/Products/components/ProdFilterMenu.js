@@ -1,7 +1,14 @@
 import { useQuery } from '@apollo/client'
 import { useNavigate } from 'react-router-dom'
 
-import { Flex, Kbd, Stack, Text } from '@chakra-ui/react'
+import {
+  Flex,
+  Kbd,
+  MenuDivider,
+  MenuGroup,
+  Stack,
+  Text
+} from '@chakra-ui/react'
 import {
   Menu,
   MenuItemOption,
@@ -20,7 +27,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetLabels } from 'graphQL/Queries'
 
-import { LuCheck, LuDot } from 'react-icons/lu'
+import { LuCheck, LuCircleDot } from 'react-icons/lu'
 
 const stages = [
   'all',
@@ -40,17 +47,10 @@ const ProdFilterMenu = (props) => {
   const { reset, filterMode, setFilterMode, setSelectedTags } = props
 
   const { prodState, dispatch } = useGlobalState()
-  const { enabled, labelIds, lifestage } = prodState || ''
+  const { enabled, labelIds, lifestage } = prodState || {}
   const { prodDispatch } = dispatch
 
-  const {
-    primaryBgColor,
-    grayBorderColor,
-    inverseSecondaryBgColor,
-    secondaryTextColor
-  } = useThemeColor([
-    'primaryBgColor',
-    'grayBorderColor',
+  const { inverseSecondaryBgColor, secondaryTextColor } = useThemeColor([
     'inverseSecondaryBgColor',
     'secondaryTextColor'
   ])
@@ -116,6 +116,19 @@ const ProdFilterMenu = (props) => {
     }
   }
 
+  const Info = () => (
+    <Text fontWeight={'normal'}>
+      Use <Kbd>⇧</Kbd> + <Kbd>click/return</Kbd> for logical AND
+    </Text>
+  )
+
+  const checkIcon =
+    filterMode === 'AND' ? (
+      <LuCircleDot size={18} color={inverseSecondaryBgColor} />
+    ) : (
+      <LuCheck size={18} color={inverseSecondaryBgColor} />
+    )
+
   return (
     <Flex gap={2}>
       {/* ACTIVE */}
@@ -136,54 +149,30 @@ const ProdFilterMenu = (props) => {
       {!isFreeTier && !loading && prodLabels?.length > 1 && (
         <Menu closeOnSelect={false}>
           <MenuHeading title={'Labels'} active={labelIds?.length !== 0} />
-          <MenuList
-            minW={'280px'}
-            maxW={'400px'}
-            minH='auto'
-            maxH={'320px'}
-            fontSize={'sm'}
-            overflowY={'scroll'}
-          >
-            <MenuOptionGroup
-              type={'checkbox'}
-              value={labelIds}
-              onChange={onFilterLabel}
-            >
-              {prodLabels?.map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  fontSize={'sm'}
-                  value={item?.id}
-                  wordBreak={'break-all'}
-                  aria-label={`label${index}`}
-                  onClick={(e) => handleMenuClick(e, item?.name)}
-                  icon={
-                    filterMode === 'AND' ? (
-                      <LuDot size={18} color={inverseSecondaryBgColor} />
-                    ) : (
-                      <LuCheck size={18} color={inverseSecondaryBgColor} />
-                    )
-                  }
-                >
-                  <ProdLabel item={item} />
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-            <Stack
-              px={3}
-              py={2}
-              left={0}
-              right={0}
-              bottom={-8}
-              bg={primaryBgColor}
-              pos='absolute'
-              borderBottomRadius={5}
-              border={`1px solid ${grayBorderColor}`}
-            >
-              <Text fontSize={'xs'}>
-                Use <Kbd>⇧</Kbd> + <Kbd>click/return</Kbd> for logical AND
-              </Text>
+          <MenuList minW={'280px'} maxW={'400px'}>
+            <Stack minH='auto' maxH={'320px'} overflowY={'scroll'}>
+              <MenuOptionGroup
+                type={'checkbox'}
+                value={labelIds}
+                onChange={onFilterLabel}
+              >
+                {prodLabels?.map((item, index) => (
+                  <MenuItemOption
+                    key={index}
+                    fontSize={'sm'}
+                    icon={checkIcon}
+                    value={item?.id}
+                    wordBreak={'break-all'}
+                    aria-label={`label${index}`}
+                    onClick={(e) => handleMenuClick(e, item?.name)}
+                  >
+                    <ProdLabel item={item} />
+                  </MenuItemOption>
+                ))}
+              </MenuOptionGroup>
             </Stack>
+            <MenuDivider />
+            <MenuGroup title={<Info />}></MenuGroup>
           </MenuList>
         </Menu>
       )}
