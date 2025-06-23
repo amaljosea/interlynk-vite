@@ -35,9 +35,7 @@ const ExpandedComponent = ({ data, isArchived, action }) => {
       skip: !componentId,
       variables: isCustomerView
         ? { id: componentId }
-        : { id: componentId, sbomId },
-      fetchPolicy: 'cache-first',
-      nextFetchPolicy: 'cache-first'
+        : { id: componentId, sbomId }
     }
   )
 

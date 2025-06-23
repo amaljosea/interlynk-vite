@@ -56,11 +56,25 @@ const Support = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
     useMutation(AutomationRuleCreate)
   const [createSupport, { loading: createLoading }] = useMutation(
     componentSupportLevelCreate,
-    { onCompleted: () => recheck() }
+    {
+      onCompleted: () => recheck(),
+      refetchQueries: [
+        'GetComponentColumnData',
+        'GetCompSupportData',
+        'SingleSbomScore'
+      ]
+    }
   )
   const [updateSupport, { loading: updateLoading }] = useMutation(
     componentSupportLevelUpdate,
-    { onCompleted: () => recheck() }
+    {
+      onCompleted: () => recheck(),
+      refetchQueries: [
+        'GetComponentColumnData',
+        'GetCompSupportData',
+        'SingleSbomScore'
+      ]
+    }
   )
 
   const resolved = status === 'resolved'

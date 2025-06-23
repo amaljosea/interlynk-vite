@@ -261,15 +261,36 @@ const SupportForm = ({ data, reset, setEdit, handleClose }) => {
 
   const [createSupport, { loading: createLoading }] = useMutation(
     componentSupportLevelBulkCreate,
-    { onCompleted: () => reset() }
+    {
+      onCompleted: () => reset(),
+      refetchQueries: [
+        'GetComponentColumnData',
+        'GetCompSupportData',
+        'SingleSbomScore'
+      ]
+    }
   )
   const [updateSupport, { loading: updateLoading }] = useMutation(
     ComponentSupportLevelBulkUpdate,
-    { onCompleted: () => reset() }
+    {
+      onCompleted: () => reset(),
+      refetchQueries: [
+        'GetComponentColumnData',
+        'GetCompSupportData',
+        'SingleSbomScore'
+      ]
+    }
   )
   const [deleteSupport, { loading: deleteLoading }] = useMutation(
     ComponentSupportLevelBulkDelete,
-    { onCompleted: () => reset() }
+    {
+      onCompleted: () => reset(),
+      refetchQueries: [
+        'GetComponentColumnData',
+        'GetCompSupportData',
+        'SingleSbomScore'
+      ]
+    }
   )
 
   const handleDateChange = (newDate, field) => {

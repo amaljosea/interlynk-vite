@@ -3623,7 +3623,7 @@ export const GetSbomSupportTab = gql`
 `
 
 export const GetCompSupportData = gql`
-  query GetComponentSupportData(
+  query GetCompSupportData(
     $sbomId: Uuid
     $projectId: Uuid
     $first: Int
@@ -5152,36 +5152,6 @@ export const GetComponentVulns = gql`
             source
             vulnId
           }
-        }
-      }
-    }
-  }
-`
-
-export const GetComponentSupportData = gql`
-  query GetComponentExportData(
-    $projectId: Uuid!
-    $sbomId: Uuid!
-    $first: Int
-    $after: String
-    $includeParts: Boolean
-  ) {
-    sbom(projectId: $projectId, sbomId: $sbomId) {
-      components(
-        sbomId: $sbomId
-        first: $first
-        after: $after
-        includeParts: $includeParts
-      ) {
-        pageInfo {
-          endCursor
-          hasNextPage
-        }
-        nodes {
-          name
-          version
-          supportLevel
-          endOfSupport
         }
       }
     }

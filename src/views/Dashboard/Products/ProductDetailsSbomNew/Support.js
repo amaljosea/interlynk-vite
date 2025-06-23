@@ -77,10 +77,13 @@ const Support = ({ sbomData }) => {
     }
   }, [direction, field, exclude, isSortable, level, searchInput])
 
-  const { data: settings } = useQuery(GetSupportSettings, {
-    variables: { id: params?.productid },
-    skip: activeTab === 'support' ? false : true
-  })
+  const { data: settings, loading: loadSettings } = useQuery(
+    GetSupportSettings,
+    {
+      variables: { id: params?.productid },
+      skip: activeTab === 'support' ? false : true
+    }
+  )
   const { sboms, projectSetting } = settings?.project || {}
   const { enableSupportLevel } = projectSetting || {}
 
@@ -97,9 +100,11 @@ const Support = ({ sbomData }) => {
     }
   )
 
-  const [reRunSupport] = useMutation(ReRunSbomSupportLevel)
+  const [reRunSupport] = useMutation(ReRunSbomSupportLevel, {
+    refetchQueries: ['GetComponentColumnData', 'GetCompSupportData']
+  })
   const [updateSettings] = useMutation(ProjectSettingUpdate, {
-    onCompleted: () => reset()
+    refetchQueries: ['GetProjectSettings', 'GetSupportSettings']
   })
 
   const activeSbom = sboms?.find((sbom) => sbom?.id === sbomId)
@@ -229,7 +234,6 @@ const Support = ({ sbomData }) => {
           columns={columns}
           expandOnRowClicked
           onSort={handleSort}
-          progressPending={loading}
           defaultSortFieldId={field}
           subHeaderComponent={subHeader}
           selectableRows={editSupportLevel}
@@ -237,6 +241,7 @@ const Support = ({ sbomData }) => {
           className='data-table-container'
           onSelectedRowsChange={handleChange}
           data={enableSupportLevel ? nodes : []}
+          progressPending={loading || loadSettings}
           expandableRowsComponent={SupportExpanded}
           // selectableRowDisabled={(row) => row?.sbom?.id !== sbomId}
         />

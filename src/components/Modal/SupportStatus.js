@@ -33,11 +33,17 @@ const SupportStatus = ({
 
   const [createSupport, { loading: createLoading }] = useMutation(
     componentSupportLevelBulkCreate,
-    { onCompleted: () => handleClear() }
+    {
+      onCompleted: () => handleClear(),
+      refetchQueries: ['GetCompSupportData', 'SingleSbomScore']
+    }
   )
   const [updateSupport, { loading: updateLoading }] = useMutation(
     ComponentSupportLevelBulkUpdate,
-    { onCompleted: () => handleClear() }
+    {
+      onCompleted: () => handleClear(),
+      refetchQueries: ['GetCompSupportData', 'SingleSbomScore']
+    }
   )
 
   const defaultDate = new Date()
