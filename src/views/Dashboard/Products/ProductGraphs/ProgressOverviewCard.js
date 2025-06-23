@@ -22,7 +22,6 @@ import {
   Grid,
   GridItem,
   Select,
-  SimpleGrid,
   Skeleton,
   Text,
   Wrap,
@@ -408,7 +407,7 @@ const ProgressOverviewCard = () => {
           <ResponsiveContainer
             width='100%'
             height={250}
-            style={{ marginLeft: '-25px', marginTop: '20px' }}
+            style={{ marginTop: '20px' }}
           >
             <LineChart data={chartData.reverse()}>
               <CartesianGrid
@@ -417,14 +416,19 @@ const ProgressOverviewCard = () => {
               />
               <XAxis dataKey='version' tick={{ fontSize: 10 }}>
                 <Label
-                  value='versions'
                   offset={0}
-                  position='insideBottom'
+                  value='versions'
                   fontSize={13}
+                  position='insideBottom'
                 />
               </XAxis>
               <YAxis tick={{ fontSize: 12 }}>
-                <Label value='vulns' fontSize={13} angle={-90} />
+                <Label
+                  angle={-90}
+                  value='vulns'
+                  fontSize={13}
+                  position='insideLeft'
+                />
               </YAxis>
               {tooltipCustom}
               {visibleLines['Total'] && (
