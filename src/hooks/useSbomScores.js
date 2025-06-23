@@ -1,7 +1,6 @@
 import { gql, useQuery } from '@apollo/client'
 import { round } from 'lodash'
 import { useMemo } from 'react'
-import { getSignedUrlParams } from 'utils'
 import { getComponentHealthScoreFromLocalData } from 'utils/getComponentHealthScoreFromLocalData'
 
 const SingleSbomScore = gql`
@@ -9,6 +8,7 @@ const SingleSbomScore = gql`
     $projectId: Uuid!
     $sbomId: Uuid!
     $sbomIds: [ID!]!
+    $first: Int
     $reportFormat: ComplianceReportFormat
   ) {
     complianceReports(sbomIds: $sbomIds, reportFormat: $reportFormat) {
@@ -19,7 +19,7 @@ const SingleSbomScore = gql`
     }
     sbom(projectId: $projectId, sbomId: $sbomId) {
       id
-      components(sbomId: $sbomId, first: 999999999) {
+      components(sbomId: $sbomId, first: $first) {
         totalCount
         nodes {
           id
@@ -30,7 +30,6 @@ const SingleSbomScore = gql`
     }
   }
 `
-const signedUrlParams = getSignedUrlParams()
 
 export const calculateHealthScore = (sbom) => {
   if (!sbom) {
@@ -57,12 +56,13 @@ export const calculateHealthScore = (sbom) => {
   }
 }
 
-export const useSbomScores = ({ projectId, sbomId, format }) => {
+export const useSbomScores = ({ total, projectId, sbomId, format, skip }) => {
   const { data, loading } = useQuery(SingleSbomScore, {
-    skip: sbomId && !signedUrlParams ? false : true,
+    skip: skip,
     variables: {
-      projectId,
       sbomId,
+      projectId,
+      first: total,
       sbomIds: [sbomId],
       reportFormat: format
     }

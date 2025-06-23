@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client'
 import { useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
   getFullDate,
   getSignedUrlParams,
@@ -35,25 +35,19 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { usePartsContext } from 'hooks/usePartsContext'
 import { useProjectGroup } from 'hooks/useProjectGroup'
 import { useSbomScores } from 'hooks/useSbomScores'
-import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { ActiveCompliances } from 'graphQL/Queries'
+import { ActiveCompliances, GetTotalComponentsCount } from 'graphQL/Queries'
 
 import { LuArrowRight, LuPackage, LuSquarePen } from 'react-icons/lu'
 
 import LifecycleModal from '../../components/LifecycleModal'
 
 const SbomDetails = ({ sbomData }) => {
-  const params = useParams()
   const navigate = useNavigate()
   const partsContext = usePartsContext()
   const signedUrlParams = getSignedUrlParams()
   const { sbomHookData, isFreeTier } = useGlobalQueryContext()
-  const projectId = params.productid
-  const sbomId = params.sbomid
-
-  const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
 
   const {
     projectVersion,
@@ -78,6 +72,17 @@ const SbomDetails = ({ sbomData }) => {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
+  const { data: totalComponentsCountData, loading: counting } = useQuery(
+    GetTotalComponentsCount,
+    {
+      variables: { sbomId: sbomData?.id, projectId: sbomData?.project?.id },
+      skip: signedUrlParams ? true : false
+    }
+  )
+
+  const totalComponents =
+    totalComponentsCountData?.sbom?.components?.totalCount || 0
+
   const handlePart = () => {
     partsContext.pop()
   }
@@ -93,10 +98,13 @@ const SbomDetails = ({ sbomData }) => {
   const isUnspecified =
     result === undefined || result?.complianceType === 'unspecified'
 
+  const isLoading = complianceLoading || counting
+
   const { qualityScore, loading: scoreLoading } = useSbomScores({
-    sbomId,
-    projectId: projectId,
-    skip: !shouldShowDemoFeatures,
+    sbomId: sbomData?.id,
+    total: totalComponents,
+    projectId: sbomData?.project?.id,
+    skip: totalComponents === 0 || signedUrlParams || isLoading,
     format: isUnspecified ? undefined : result?.complianceType?.toUpperCase()
   })
 
@@ -107,9 +115,10 @@ const SbomDetails = ({ sbomData }) => {
       'secondaryTextInverse'
     ])
 
-  const { name: projectGroupName, loading } = useProjectGroup({
-    projectGroupId: params.productgroupid
-  })
+  const { name: projectGroupName, loading: projectGroupLoading } =
+    useProjectGroup({
+      projectGroupId: sbomData.project?.projectGroup?.id
+    })
 
   useEffect(() => {
     window.onpopstate = () => {
@@ -139,7 +148,7 @@ const SbomDetails = ({ sbomData }) => {
                   <LuArrowRight size={18} color={secondaryTextInverse} />
                 }
               >
-                {!loading &&
+                {!projectGroupLoading &&
                   partsContext.isParts &&
                   [
                     ...partsContext.parts,
@@ -253,8 +262,8 @@ const SbomDetails = ({ sbomData }) => {
             {!complianceLoading && !isFreeTier && (
               <GridItem colSpan={isUnspecified ? 8 : 4}>
                 <ProgressBar
+                  loading={false}
                   value={healthScore}
-                  loading={scoreLoading}
                   text='Version Health Score'
                 />
               </GridItem>
@@ -274,7 +283,7 @@ const SbomDetails = ({ sbomData }) => {
             <LifecycleModal
               isOpen={isOpen}
               onClose={onClose}
-              data={{ projectId: projectId, sbomId: sbomId }}
+              data={{ projectId: sbomData?.project?.id, sbomId: sbomData?.id }}
             />
           )}
         </Flex>

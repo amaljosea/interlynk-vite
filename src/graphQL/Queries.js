@@ -1771,6 +1771,16 @@ export const GetComponentData = gql`
   }
 `
 
+export const GetTotalComponentsCount = gql`
+  query GetTotalComponentsCount($projectId: Uuid!, $sbomId: Uuid!) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      components(sbomId: $sbomId) {
+        totalCount
+      }
+    }
+  }
+`
+
 export const GetComponentColumnData = gql`
   query GetComponentColumnData(
     $projectId: Uuid!
