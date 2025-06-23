@@ -590,6 +590,23 @@ export const GetProjectSettings = gql`
   }
 `
 
+// GET PROJECT SETTINGS FOR SBOM PROCESS
+export const GetProjectSettingsForSbomProcess = gql`
+  query GetProjectSettingsForSbomProcess($id: Uuid!) {
+    project(id: $id) {
+      projectSetting {
+        id
+        checksEnabled
+        enableAutoArchive
+        vulnScanningEnabled
+        internalCompMatchingEnabled
+        automatedFixesEnabled
+        enableSupportLevel
+      }
+    }
+  }
+`
+
 // GET MANUFACTURER NAME AND CONTACTS FOR A PRODUCT
 export const GetProductManufacturer = gql`
   query GetProductManufacturer($id: Uuid!) {

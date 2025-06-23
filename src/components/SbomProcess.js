@@ -6,7 +6,7 @@ import { Divider, Flex } from '@chakra-ui/react'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { GetProjectSettings } from 'graphQL/Queries'
+import { GetProjectSettingsForSbomProcess } from 'graphQL/Queries'
 
 import {
   LuActivity,
@@ -26,7 +26,7 @@ const SbomProcess = ({ lifecycle, hasFinished }) => {
   const { isFreeTier } = useGlobalQueryContext()
   const { sameSecondaryText } = useThemeColor(['sameSecondaryText'])
 
-  const { data: settings } = useQuery(GetProjectSettings, {
+  const { data: settings } = useQuery(GetProjectSettingsForSbomProcess, {
     variables: { id: params?.productid }
   })
 
