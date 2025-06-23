@@ -266,29 +266,12 @@ export const GetOrgMetrics = gql`
 
 // LIST CURRENT USER'S ORGANIZATIONS
 export const MyOrganizations = gql`
-  query MyOrganizations(
-    $first: Int
-    $last: Int
-    $after: String
-    $before: String
-    $invitationStatuses: [OrgUserInvitationStatuses!]
-  ) {
-    myOrganizations(
-      first: $first
-      last: $last
-      after: $after
-      before: $before
-      invitationStatuses: $invitationStatuses
-    ) {
+  query MyOrganizations($invitationStatuses: [OrgUserInvitationStatuses!]) {
+    myOrganizations(invitationStatuses: $invitationStatuses) {
       nodes {
         id
         name
-        email
-        status
         updatedAt
-        invitationStatus
-        url
-        tier
       }
     }
   }
