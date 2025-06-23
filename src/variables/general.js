@@ -80,17 +80,16 @@ export const vulnStatusTypes = [
 export const componentTypes = [
   { value: '', label: '-- Select --' },
   { value: 'application', label: 'Application' },
-  { value: 'container', label: 'Container' },
-  { value: 'data', label: 'Data' },
-  { value: 'device', label: 'Device' },
-  { value: 'device-driver', label: 'Device Driver' },
-  { value: 'file', label: 'File' },
-  { value: 'firmware', label: 'Firmware' },
-  { value: 'framework', label: 'Framework' },
   { value: 'library', label: 'Library' },
-  { value: 'machine-learning-model', label: 'Machine Learning Model' },
+  { value: 'container', label: 'Container' },
   { value: 'operating-system', label: 'Operating System' },
-  { value: 'platform', label: 'Platform' }
+  { value: 'firmware', label: 'Firmware' },
+  { value: 'device', label: 'Device' },
+  { value: 'model', label: 'Model' },
+  { value: 'file', label: 'File' },
+  { value: 'data', label: 'Data' },
+  { value: 'bom', label: 'Bill of Material' },
+  { value: 'other', label: 'Other' }
 ]
 
 export const namespaceOptions = {
