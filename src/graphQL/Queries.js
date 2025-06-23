@@ -279,27 +279,12 @@ export const MyOrganizations = gql`
 
 // LIST CURRENT USER'S ORGANIZATIONS
 export const AllOrganizations = gql`
-  query AllOrganizations(
-    $first: Int
-    $last: Int
-    $after: String
-    $before: String
-    $status: OrganizationStatusEnum
-  ) {
-    allOrganizations(
-      first: $first
-      last: $last
-      after: $after
-      before: $before
-      status: $status
-    ) {
+  query AllOrganizations($first: Int, $status: OrganizationStatusEnum) {
+    allOrganizations(first: $first, status: $status) {
       nodes {
         id
         name
-        email
-        status
         updatedAt
-        url
       }
     }
   }
