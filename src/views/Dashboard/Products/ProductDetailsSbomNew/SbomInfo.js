@@ -18,7 +18,6 @@ import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 
 import useCustomToast from 'hooks/useCustomToast'
-import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 
 import { sbomUpdate } from 'graphQL/Mutation'
 
@@ -31,7 +30,6 @@ const SbomInfo = ({ data, error, loading }) => {
   const LIFECYCLE = useDisclosure()
   const { showToast } = useCustomToast()
   const signedUrlParams = getSignedUrlParams()
-  const { isFreeTier } = useGlobalQueryContext()
 
   const [updateSbom, { loading: updating }] = useMutation(sbomUpdate)
 
@@ -86,15 +84,15 @@ const SbomInfo = ({ data, error, loading }) => {
                   <AlertTitle>Draft Mode</AlertTitle>
                   <AlertDescription>
                     This version was created manually and is currently in draft
-                    mode until it's finalized.
+                    mode until it is finalized.
                   </AlertDescription>
                 </Stack>
               </Flex>
               <Button
                 colorScheme='blue'
                 leftIcon={<LuFilePen />}
+                hidden={signedUrlParams}
                 onClick={() => LIFECYCLE.onOpen()}
-                hidden={signedUrlParams || isFreeTier}
               >
                 Finalize
               </Button>
