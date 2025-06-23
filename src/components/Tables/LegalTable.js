@@ -201,7 +201,7 @@ const LegalTable = () => {
           </Flex>
         )
       },
-      minWidth: '16%',
+      width: '16%',
       wrap: true
     },
     // CREATED AT

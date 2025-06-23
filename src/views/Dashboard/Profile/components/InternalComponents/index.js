@@ -124,7 +124,7 @@ export const InternalComponents = () => {
     {
       id: 'ACTION',
       name: 'ACTION',
-      right: true,
+      right: 'true',
       selector: (row) => {
         return (
           <DeleteInternalComponent

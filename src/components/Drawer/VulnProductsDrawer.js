@@ -87,7 +87,7 @@ const VulnProductsDrawer = ({ isOpen, onClose, data }) => {
         </Tooltip>
       ),
 
-      right: true,
+      right: 'true',
       wrap: true
     }
   ]

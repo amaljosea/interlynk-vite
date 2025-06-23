@@ -55,7 +55,7 @@ const ConnectedSbomDrawer = ({ data, isOpen, onClose }) => {
     {
       id: 'STATUS',
       name: 'STATUS',
-      right: true,
+      right: 'true',
       wrap: true,
       selector: (row) => {
         const { parentDispositionFrom } = row || {}

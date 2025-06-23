@@ -182,7 +182,7 @@ const TeamColumns = ({ action }) => {
             </Tag>
           )
         },
-        center: true,
+        center: 'true',
         width: '13%'
       },
       {

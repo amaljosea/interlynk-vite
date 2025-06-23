@@ -130,7 +130,7 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
     {
       id: 'IMPORTED',
       name: 'IMPORTED',
-      right: true,
+      right: 'true',
       wrap: true,
       selector: (row) => {
         const { createdAt } = row || {}
@@ -144,7 +144,7 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
     {
       id: 'UPDATED',
       name: 'UPDATED',
-      right: true,
+      right: 'true',
       wrap: true,
       selector: (row) => {
         const { updatedAt } = row || {}
@@ -158,7 +158,7 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
     {
       id: 'ACTIONS',
       name: 'ACTIONS',
-      right: true,
+      right: 'true',
       wrap: true,
       selector: (row) => (
         <Tooltip label={'Promote to version'} placement='top'>

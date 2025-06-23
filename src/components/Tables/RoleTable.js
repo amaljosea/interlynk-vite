@@ -96,7 +96,7 @@ const RoleTable = () => {
             </Text>
           </Tooltip>
         ),
-        right: true,
+        right: 'true',
         sortable: true,
         sortFunction: (a, b) => new Date(a.createdAt) - new Date(b.createdAt) // Sort in descending order
       },
@@ -132,7 +132,7 @@ const RoleTable = () => {
           </Menu>
         ),
         width: '10%',
-        right: true
+        right: 'true'
       }
     ],
     [primaryTextColor, primaryErrorColor, editUserRole, onOpen, onDelOpen]
