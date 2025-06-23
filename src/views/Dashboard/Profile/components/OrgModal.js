@@ -32,9 +32,13 @@ const OrgModal = ({ isOpen, onClose, shouldSwitchOrg = false }) => {
 
   const containsSpace = hasWhiteSpace(url)
 
-  const [registerOrg, { loading: regLoading }] =
-    useMutation(RegisterOrganization)
-  const [switchOrg] = useMutation(SwitchOrganization)
+  const [registerOrg, { loading: regLoading }] = useMutation(
+    RegisterOrganization,
+    { refetchQueries: ['MyOrganizations', 'AllOrganizations'] }
+  )
+  const [switchOrg] = useMutation(SwitchOrganization, {
+    refetchQueries: ['MyOrganizations', 'AllOrganizations']
+  })
 
   const handleCheckEmail = () => {
     if (!validateEmail(email)) {
@@ -69,13 +73,13 @@ const OrgModal = ({ isOpen, onClose, shouldSwitchOrg = false }) => {
     disableButtonTemporarily(setIsDisabled)
     registerOrg({
       variables: {
-        name,
-        url,
-        email,
+        name: name || undefined,
+        url: name || undefined,
+        email: name || undefined,
         awsRegistrationToken: awsToken || undefined
       }
     }).then((res) => {
-      const { errors } = res?.data?.RegisterOrganization || ''
+      const { errors } = res?.data?.RegisterOrganization || {}
       if (errors?.length > 0) {
         setError(errors[0])
       } else {
@@ -122,7 +126,7 @@ const OrgModal = ({ isOpen, onClose, shouldSwitchOrg = false }) => {
           <Input
             type='text'
             fontSize={14}
-            maxLength={'20'}
+            maxLength={'30'}
             value={name}
             onChange={(e) => {
               setName(e.target.value)

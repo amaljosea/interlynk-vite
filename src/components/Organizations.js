@@ -6,8 +6,8 @@ import { timeSince, truncatedValue } from 'utils'
 import { getItem } from 'utils/localStorageUtils'
 import OrgModal from 'views/Dashboard/Profile/components/OrgModal'
 
-import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
 import {
+  Input,
   Menu,
   MenuButton,
   MenuDivider,
@@ -15,7 +15,7 @@ import {
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  Tooltip
+  Stack
 } from '@chakra-ui/react'
 import { Button, SkeletonText, Text, useDisclosure } from '@chakra-ui/react'
 
@@ -29,7 +29,7 @@ import {
   MyOrganizations
 } from 'graphQL/Queries'
 
-import { LuBuilding } from 'react-icons/lu'
+import { LuBuilding, LuChevronDown, LuPlus } from 'react-icons/lu'
 
 const Organizations = () => {
   const navigate = useNavigate()
@@ -41,6 +41,7 @@ const Organizations = () => {
   const [switchOrg] = useMutation(SwitchOrganization)
 
   const [options, setOptions] = useState([])
+  const [searchInput, setSearchInput] = useState('')
   const { isOpen, onOpen, onClose } = useDisclosure()
   const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
 
@@ -81,6 +82,45 @@ const Organizations = () => {
         }
       })
     }
+    setSearchInput('')
+  }
+
+  const handleSearch = (e) => {
+    const { value } = e.target
+    setSearchInput(value)
+    if (value.trim() === '') {
+      handleFetch()
+    } else {
+      const filteredOptions = options.filter(
+        (item) =>
+          item.name.toLowerCase().includes(value.toLowerCase()) ||
+          item.id.toLowerCase().includes(value.toLowerCase())
+      )
+      setOptions(filteredOptions)
+    }
+  }
+
+  const OrgList = () => {
+    if (options?.length === 0) return null
+    return (
+      <Stack maxHeight='330px' overflowY='auto'>
+        {options?.map((item, index) => (
+          <MenuOptionGroup key={index} value={organization?.id} type='radio'>
+            <MenuItemOption value={item.id} onClick={() => onChange(item)}>
+              <Text fontSize={'sm'}>
+                {truncatedValue(item?.name, 20)}{' '}
+                {isSuperAdmin && `(${item?.id.slice(-5)})`}
+              </Text>
+              {isSuperAdmin && (
+                <Text fontSize={'xs'} color={secondaryTextColor}>
+                  {timeSince(item?.updatedAt)}
+                </Text>
+              )}
+            </MenuItemOption>
+          </MenuOptionGroup>
+        ))}
+      </Stack>
+    )
   }
 
   useEffect(() => {
@@ -92,29 +132,6 @@ const Organizations = () => {
       })
     }
   }, [getOrg, organization?.id, parsedOrg?.id, setOrganization])
-
-  const OrgList = () => {
-    if (options?.length === 0) return null
-    return (
-      <>
-        {options?.map((item, index) => (
-          <MenuOptionGroup key={index} value={organization?.id} type='radio'>
-            <MenuItemOption value={item.id} onClick={() => onChange(item)}>
-              <Text fontSize={'sm'}>
-                <Tooltip label={item?.name}>
-                  {truncatedValue(item?.name, 20)}{' '}
-                </Tooltip>
-                {isSuperAdmin && `(${item?.id.slice(-5)})`}
-              </Text>
-              {isSuperAdmin && (
-                <Text fontSize={'xs'}>{timeSince(item?.updatedAt)}</Text>
-              )}
-            </MenuItemOption>
-          </MenuOptionGroup>
-        ))}
-      </>
-    )
-  }
 
   return (
     <>
@@ -128,23 +145,40 @@ const Organizations = () => {
           data-testid='org_menu'
           onClick={handleFetch}
           isLoading={!organization?.name}
-          rightIcon={<ChevronDownIcon />}
+          rightIcon={<LuChevronDown />}
           leftIcon={<LuBuilding fontSize={20} color={secondaryTextColor} />}
         >
           {truncatedValue(organization?.name, 20)}
         </MenuButton>
-        <MenuList maxHeight='300px' overflowY='auto'>
-          <MenuItem
-            fontSize='sm'
-            icon={<AddIcon />}
-            onClick={onOpen}
-            data-testid='add_org'
-          >
-            Add organization
-          </MenuItem>
-          <MenuDivider />
+        <MenuList w={'280px'}>
+          <Stack w={'95%'} mx={'auto'}>
+            <MenuItem
+              w={'100%'}
+              fontSize='sm'
+              onClick={onOpen}
+              borderRadius={'md'}
+              data-testid='add_org'
+              icon={<LuPlus size={18} />}
+            >
+              Add Organization
+            </MenuItem>
+            {isSuperAdmin && (
+              <Input
+                value={searchInput}
+                onChange={handleSearch}
+                placeholder='Search organization'
+                hidden={options?.length === 0 || allOrgLoading || myOrgLoading}
+              />
+            )}
+          </Stack>
+          <MenuDivider hidden={options?.length === 0} />
           {allOrgLoading || myOrgLoading ? (
-            <SkeletonText mx='2' noOfLines={4} spacing='4' skeletonHeight='4' />
+            <SkeletonText
+              spacing='3'
+              noOfLines={6}
+              skeletonHeight='3'
+              sx={{ mt: 2, mx: '2' }}
+            />
           ) : (
             <OrgList />
           )}
