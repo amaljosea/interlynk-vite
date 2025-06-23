@@ -20,7 +20,6 @@ import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
 import LynkAction from 'components/Misc/LynkAction'
 import SeverityInfo from 'components/Misc/SeverityInfo'
 import StatusInfo from 'components/Misc/StatusInfo'
-import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -50,7 +49,6 @@ const PartsColumns = (
   ])
   const navigate = useNavigate()
 
-  const [openPopoverId, setOpenPopoverId] = useState(null)
   const [openStatusId, setOpenStatusId] = useState(null)
 
   return useMemo(() => {
@@ -191,78 +189,13 @@ const PartsColumns = (
         name: 'VULNERABILITIES',
         selector: (row) => {
           const { part } = row || {}
-          const { id, project, stats, vulnRunStatus } = part || {}
-          const { vulnStats } = stats || {}
-          const notStarted = vulnRunStatus === 'NOT_STARTED'
-          const { critical, high, ...rest } = vulnStats || {}
-          const total = Object.values(rest).reduce(
-            (sum, value) => sum + value,
-            0
-          )
           const link = generateProductVersionDetailPageUrlFromCurrentUrl({
-            productgroupid: project?.projectGroup?.id,
-            productid: project?.id,
-            sbomid: id,
+            productgroupid: part?.project?.projectGroup?.id,
+            productid: part?.project?.id,
+            sbomid: part?.id,
             paramsObj: { tab: 'vulnerabilities', parts: true }
           })
-
-          return (
-            <Flex gap={1} my={3} alignItems={'center'} flexWrap={'wrap'}>
-              <VulnBadge
-                color='red'
-                label='Critical'
-                status={vulnRunStatus}
-                onClick={() => onFilterSev(['critical'], id, link)}
-              >
-                {notStarted ? '-' : stats?.vulnStats?.critical || 0}
-              </VulnBadge>
-              <VulnBadge
-                color='orange'
-                label='High'
-                status={vulnRunStatus}
-                onClick={() => onFilterSev(['high'], id, link)}
-              >
-                {notStarted ? '-' : stats?.vulnStats?.high || 0}
-              </VulnBadge>
-              {signedUrlParams && (
-                <Text color={primaryTextColor}>+{total}</Text>
-              )}
-              {vulnRunStatus === 'FINISHED' && total !== 0 && (
-                <Popover
-                  placement='right'
-                  closeOnBlur={false}
-                  returnFocusOnClose={false}
-                  isOpen={openPopoverId === part?.id}
-                  onClose={() => setOpenPopoverId(null)}
-                >
-                  <PopoverTrigger>
-                    <Tag
-                      minW={'60px'}
-                      colorScheme='gray'
-                      onMouseEnter={() => setOpenPopoverId(part?.id)}
-                      onMouseLeave={() => setOpenPopoverId(null)}
-                    >
-                      <TagLabel mx={'auto'}>+{total}</TagLabel>
-                    </Tag>
-                  </PopoverTrigger>
-                  <Portal>
-                    <PopoverContent
-                      zIndex={111}
-                      width={'200px'}
-                      overflow={'hidden'}
-                      color={primaryTextColor}
-                      onMouseEnter={() => setOpenPopoverId(part?.id)}
-                      onMouseLeave={() => setOpenPopoverId(null)}
-                    >
-                      <PopoverBody>
-                        <SeverityInfo data={part} onClick={onFilterSev} />
-                      </PopoverBody>
-                    </PopoverContent>
-                  </Portal>
-                </Popover>
-              )}
-            </Flex>
-          )
+          return <SeverityInfo data={part} link={link} onFilter={onFilterSev} />
         },
         width: '16%'
       },
@@ -356,7 +289,6 @@ const PartsColumns = (
     navigate,
     signedUrlParams,
     primaryTextColor,
-    openPopoverId,
     onFilterSev,
     openStatusId,
     updateSboms,

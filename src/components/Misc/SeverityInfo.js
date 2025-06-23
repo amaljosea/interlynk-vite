@@ -1,46 +1,124 @@
-import { SimpleGrid, Stack, Text } from '@chakra-ui/react'
+/* eslint-disable no-unused-vars */
+import { useState } from 'react'
+import { getSignedUrlParams } from 'utils'
+
+import {
+  Flex,
+  Popover,
+  PopoverBody,
+  PopoverContent,
+  PopoverTrigger,
+  Portal,
+  SimpleGrid,
+  Stack,
+  Tag,
+  TagLabel,
+  Text
+} from '@chakra-ui/react'
+
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import VulnBadge from './VulnBadge'
 
-const { useProductUrlContext } = require('hooks/useProductUrlContext')
+const SeverityInfo = ({ data, link, isUnique = true, onFilter }) => {
+  const signedUrlParams = getSignedUrlParams()
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
-const SeverityInfo = ({ data, onClick }) => {
-  const { generateProductVersionDetailPageUrlFromCurrentUrl } =
-    useProductUrlContext()
+  const { id, stats, vulnRunStatus } = data || {}
+  const runStatus = vulnRunStatus || 'FINISHED'
+  const notStarted = runStatus === 'NOT_STARTED'
 
-  const { stats, id, vulnRunStatus } = data || {}
-  const notStarted = vulnRunStatus === 'NOT_STARTED'
+  const { vulnStats } = stats || {}
+  const { critical, high, ...rest } = vulnStats || {}
+  const total = Object.values(rest).reduce((sum, value) => sum + value, 0)
 
-  const link = generateProductVersionDetailPageUrlFromCurrentUrl({
-    sbomid: id,
-    paramsObj: {
-      tab: 'vulnerabilities'
+  const [openPopoverId, setOpenPopoverId] = useState(null)
+
+  const severities = [
+    {
+      label: 'medium',
+      color: 'yellow',
+      value: vulnStats?.medium || 0
+    },
+    { label: 'low', color: 'green', value: vulnStats?.low || 0 },
+    {
+      label: 'unknown',
+      color: 'gray',
+      value: vulnStats?.unknown || 0
     }
-  })
-
-  const vulnStats = [
-    { label: 'medium', color: 'yellow', value: stats?.vulnStats?.medium || 0 },
-    { label: 'low', color: 'green', value: stats?.vulnStats?.low || 0 },
-    { label: 'unknown', color: 'gray', value: stats?.vulnStats?.unknown || 0 }
   ]
 
   return (
-    <Stack w={'100%'} spacing={2} py={1}>
-      {vulnStats.map((item, index) => (
-        <SimpleGrid key={index} columns={2} gap={2}>
-          <Text fontSize={14} textTransform={'capitalize'}>
-            {item.label}
-          </Text>
-          <VulnBadge
-            color={item.color}
-            status={vulnRunStatus}
-            onClick={() => onClick([item.label], id, link)}
-          >
-            {notStarted ? '-' : item.value}
-          </VulnBadge>
-        </SimpleGrid>
-      ))}
-    </Stack>
+    <Flex gap={1} my={3} alignItems={'center'} flexWrap={'wrap'}>
+      <VulnBadge
+        color='red'
+        label='Critical'
+        status={vulnRunStatus}
+        onClick={() => (isUnique ? onFilter(['critical'], id, link) : null)}
+      >
+        {notStarted ? '-' : stats?.vulnStats?.critical || 0}
+      </VulnBadge>
+      <VulnBadge
+        color='orange'
+        label='High'
+        status={vulnRunStatus}
+        onClick={() => (isUnique ? onFilter(['high'], id, link) : null)}
+      >
+        {notStarted ? '-' : stats?.vulnStats?.high || 0}
+      </VulnBadge>
+      {signedUrlParams && <Text color={primaryTextColor}>+{total}</Text>}
+      {runStatus === 'FINISHED' && total !== 0 && (
+        <Popover
+          placement='right'
+          closeOnBlur={false}
+          returnFocusOnClose={false}
+          isOpen={openPopoverId === id}
+          onClose={() => setOpenPopoverId(null)}
+        >
+          <PopoverTrigger>
+            <Tag
+              minW={'60px'}
+              colorScheme='gray'
+              onMouseEnter={() => setOpenPopoverId(id)}
+              onMouseLeave={() => setOpenPopoverId(null)}
+            >
+              <TagLabel mx={'auto'}>+{total}</TagLabel>
+            </Tag>
+          </PopoverTrigger>
+          <Portal>
+            <PopoverContent
+              zIndex={111}
+              width={'200px'}
+              overflow={'hidden'}
+              color={primaryTextColor}
+              onMouseEnter={() => setOpenPopoverId(id)}
+              onMouseLeave={() => setOpenPopoverId(null)}
+            >
+              <PopoverBody>
+                <Stack w={'100%'} spacing={2} py={1}>
+                  {severities.map((item, index) => (
+                    <SimpleGrid key={index} columns={2} gap={2}>
+                      <Text fontSize={14} textTransform={'capitalize'}>
+                        {item.label}
+                      </Text>
+                      <VulnBadge
+                        color={item.color}
+                        status={runStatus}
+                        onClick={() =>
+                          isUnique ? onFilter([item.label], id, link) : null
+                        }
+                      >
+                        {notStarted ? '-' : item.value}
+                      </VulnBadge>
+                    </SimpleGrid>
+                  ))}
+                </Stack>
+              </PopoverBody>
+            </PopoverContent>
+          </Portal>
+        </Popover>
+      )}
+    </Flex>
   )
 }
 

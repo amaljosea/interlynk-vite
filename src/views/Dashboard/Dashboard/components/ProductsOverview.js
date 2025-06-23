@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useQuery } from '@apollo/client'
 import { Link, useNavigate } from 'react-router-dom'
 import {
@@ -7,11 +8,11 @@ import {
   truncatedValue
 } from 'utils'
 
-import { Flex, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
+import { Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 
 import LynkTable from 'components/LynkTable'
 import LynkLoader from 'components/Misc/LynkLoader'
-import VulnBadge from 'components/Misc/VulnBadge'
+import SeverityInfo from 'components/Misc/SeverityInfo'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
@@ -53,7 +54,7 @@ const ProductsOverview = () => {
     })
   }
 
-  const onFilterSev = (value, link) => {
+  const onFilterSev = (value, id, link) => {
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
     navigate(link)
   }
@@ -134,7 +135,6 @@ const ProductsOverview = () => {
                 my={2}
                 fontSize={14}
                 color={uniqueSbom ? primaryBlueText : secondaryTextInverse}
-                textAlign={'right'}
               >
                 {projectVersion ? truncatedValue(projectVersion, 12) : 'N/A'}
               </Text>
@@ -167,7 +167,7 @@ const ProductsOverview = () => {
               size='md'
               variant='subtle'
               width={16}
-              colorScheme={'blue'}
+              colorScheme={'teal'}
               cursor={'pointer'}
             >
               <TagLabel mx={'auto'}>{stats?.compCount || 0}</TagLabel>
@@ -196,7 +196,7 @@ const ProductsOverview = () => {
             })}
             style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
           >
-            <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
+            <Tag size='md' variant='subtle' width={16} colorScheme={'orange'}>
               <TagLabel mx={'auto'}>{stats?.compLicenseCount || 0}</TagLabel>
             </Tag>
           </Link>
@@ -207,54 +207,23 @@ const ProductsOverview = () => {
     {
       id: 'VULNERABILITIES',
       name: 'VULNERABILITIES',
-      width: '32%',
+      width: '25%',
       selector: (row) => {
-        const { id, project, stats } = row
-        const uniqueSbom = filteredData?.find((item) => item?.id === id)
+        const { id, project } = row
+        const uniqueSbom = filteredData?.some((item) => item?.id === id)
         const link = generateProductVersionDetailPageUrlFromCurrentUrl({
           productgroupid: project?.projectGroup?.id,
           productid: project?.id,
           sbomid: id,
-          paramsObj: {
-            tab: 'vulnerabilities'
-          }
+          paramsObj: { tab: 'vulnerabilities' }
         })
-        const getLink = (value) =>
-          uniqueSbom ? onFilterSev([value], link) : null
         return (
-          <Flex flexWrap={'wrap'} gap={1} my={3}>
-            <VulnBadge
-              color='red'
-              label='Critical'
-              onClick={() => getLink('critical')}
-            >
-              {stats?.vulnStats?.critical || 0}
-            </VulnBadge>
-            <VulnBadge
-              color='orange'
-              label='High'
-              onClick={() => getLink('high')}
-            >
-              {stats?.vulnStats?.high || 0}
-            </VulnBadge>
-            <VulnBadge
-              color='yellow'
-              label='Medium'
-              onClick={() => getLink('medium')}
-            >
-              {stats?.vulnStats?.medium || 0}
-            </VulnBadge>
-            <VulnBadge color='green' label='Low' onClick={() => getLink('low')}>
-              {stats?.vulnStats?.low || 0}
-            </VulnBadge>
-            <VulnBadge
-              color='gray'
-              label='Unknown'
-              onClick={() => getLink('unknown')}
-            >
-              {stats?.vulnStats?.unknown || 0}
-            </VulnBadge>
-          </Flex>
+          <SeverityInfo
+            data={row}
+            link={link}
+            isUnique={uniqueSbom}
+            onFilter={uniqueSbom ? onFilterSev : null}
+          />
         )
       }
     },

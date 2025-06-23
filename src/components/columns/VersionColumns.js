@@ -33,7 +33,6 @@ import {
 import LynkAction from 'components/Misc/LynkAction'
 import SeverityInfo from 'components/Misc/SeverityInfo'
 import StatusInfo from 'components/Misc/StatusInfo'
-import VulnBadge from 'components/Misc/VulnBadge'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useHasPermission } from 'hooks/useHasPermission'
@@ -74,7 +73,6 @@ const VersionColumns = (props) => {
     childKey: 'update_sbom'
   })
 
-  const [openPopoverId, setOpenPopoverId] = useState(null)
   const [openStatusId, setOpenStatusId] = useState(null)
 
   const retention = retentionTime && Math.floor(retentionTime)
@@ -223,80 +221,11 @@ const VersionColumns = (props) => {
         id: 'VULNERABILITIES',
         name: 'VULNERABILITIES',
         selector: (row) => {
-          const { id, stats, vulnRunStatus } = row
-          const { vulnStats } = stats || {}
-          const notStarted = vulnRunStatus === 'NOT_STARTED'
           const link = generateProductVersionDetailPageUrlFromCurrentUrl({
-            sbomid: id,
-            paramsObj: {
-              tab: 'vulnerabilities'
-            }
+            sbomid: row?.id,
+            paramsObj: { tab: 'vulnerabilities' }
           })
-          const { critical, high, ...rest } = vulnStats
-          const total = Object.values(rest).reduce(
-            (sum, value) => sum + value,
-            0
-          )
-
-          return (
-            <Flex gap={1} my={3} alignItems={'center'} flexWrap={'wrap'}>
-              <VulnBadge
-                color='red'
-                label='Critical'
-                status={vulnRunStatus}
-                onClick={() => onFilterSev(['critical'], id, link)}
-              >
-                {notStarted ? '-' : stats?.vulnStats?.critical || 0}
-              </VulnBadge>
-              <VulnBadge
-                color='orange'
-                label='High'
-                status={vulnRunStatus}
-                onClick={() => onFilterSev(['high'], id, link)}
-              >
-                {notStarted ? '-' : stats?.vulnStats?.high || 0}
-              </VulnBadge>
-              {signedUrlParams && (
-                <Text ml={1} color={primaryTextColor}>
-                  +{total}
-                </Text>
-              )}
-              {vulnRunStatus === 'FINISHED' && total !== 0 && (
-                <Popover
-                  placement='right'
-                  closeOnBlur={false}
-                  returnFocusOnClose={false}
-                  isOpen={openPopoverId === row?.id}
-                  onClose={() => setOpenPopoverId(null)}
-                >
-                  <PopoverTrigger>
-                    <Tag
-                      minW={'60px'}
-                      colorScheme='gray'
-                      onMouseEnter={() => setOpenPopoverId(row?.id)}
-                      onMouseLeave={() => setOpenPopoverId(null)}
-                    >
-                      <TagLabel mx={'auto'}>+{total}</TagLabel>
-                    </Tag>
-                  </PopoverTrigger>
-                  <Portal>
-                    <PopoverContent
-                      zIndex={111}
-                      width={'200px'}
-                      overflow={'hidden'}
-                      color={primaryTextColor}
-                      onMouseEnter={() => setOpenPopoverId(row?.id)}
-                      onMouseLeave={() => setOpenPopoverId(null)}
-                    >
-                      <PopoverBody>
-                        <SeverityInfo data={row} onClick={onFilterSev} />
-                      </PopoverBody>
-                    </PopoverContent>
-                  </Portal>
-                </Popover>
-              )}
-            </Flex>
-          )
+          return <SeverityInfo data={row} link={link} onFilter={onFilterSev} />
         },
         width: '16%'
       },
@@ -477,7 +406,6 @@ const VersionColumns = (props) => {
     onFilterSev,
     onSelectLicenses,
     onStartTour,
-    openPopoverId,
     openStatusId,
     primaryBlueText,
     primaryErrorColor,
