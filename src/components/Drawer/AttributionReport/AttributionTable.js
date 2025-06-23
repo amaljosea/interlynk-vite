@@ -18,7 +18,8 @@ import {
   RadioGroup,
   Select,
   Stack,
-  Text
+  Text,
+  Tooltip
 } from '@chakra-ui/react'
 
 import EditButton from 'components/Icons/EditButton'
@@ -35,6 +36,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { GetAttributionsData } from 'graphQL/Queries'
 
 import { LuCircleCheck, LuCircleX, LuEye } from 'react-icons/lu'
+import { LuCircleAlert } from 'react-icons/lu'
 
 import { downloadAttributionHtml } from './AttributionHtml'
 import AttributionReportsEditModal from './AttributionReportsEditModal'
@@ -75,12 +77,17 @@ const AttributionTable = ({
     license: ''
   })
 
-  const { primaryErrorColor, primarySuccessColor, primaryTextColor } =
-    useThemeColor([
-      'primaryErrorColor',
-      'primarySuccessColor',
-      'primaryTextColor'
-    ])
+  const {
+    primaryErrorColor,
+    primarySuccessColor,
+    primaryTextColor,
+    primaryBlueText
+  } = useThemeColor([
+    'primaryErrorColor',
+    'primarySuccessColor',
+    'primaryTextColor',
+    'primaryBlueText'
+  ])
 
   const productName = sbomData?.project?.projectGroup?.name
   const productVersion = sbomData?.projectVersion
@@ -318,28 +325,47 @@ const AttributionTable = ({
       {
         id: 'COMPONENTS_LICENSES_EXP',
         name: 'LICENSES',
-        selector: (row) => (
-          <Flex alignItems='center' gap={2}>
-            <IconButton
-              icon={
-                sourcePreferences[row.components[0].id] === 'library' ? (
-                  <LuEye size={16} />
-                ) : (
-                  <EditButton size={16} />
-                )
-              }
-              size='sm'
-              variant='ghost'
-              onClick={() => onEdit(row, 'license')}
-            />
-            <Text fontSize={14} color={primaryTextColor}>
-              {truncatedValue(
-                getValueFromSource(row, 'licensesExp') || 'N/A',
-                30
+        selector: (row) => {
+          const source = sourcePreferences[row.components[0].id] || 'sbom'
+
+          const showExclamation =
+            source === 'sbom' &&
+            (row.attribution['licensesExp'] || '') !==
+              (row.attributionOverride?.['licensesExp'] || '')
+
+          return (
+            <Flex alignItems='center' gap={2}>
+              <IconButton
+                icon={
+                  source === 'library' ? (
+                    <LuEye size={16} />
+                  ) : (
+                    <EditButton size={16} />
+                  )
+                }
+                size='sm'
+                variant='ghost'
+                onClick={() => onEdit(row, 'license')}
+              />
+              {showExclamation && (
+                <Tooltip
+                  label='The license in the SBOM differs from the license declared by the package library.'
+                  placement='top'
+                >
+                  <span style={{ cursor: 'pointer' }}>
+                    <LuCircleAlert size={16} color={primaryBlueText} />
+                  </span>
+                </Tooltip>
               )}
-            </Text>
-          </Flex>
-        ),
+              <Text fontSize={14} color={primaryTextColor}>
+                {truncatedValue(
+                  getValueFromSource(row, 'licensesExp') || 'N/A',
+                  20
+                )}
+              </Text>
+            </Flex>
+          )
+        },
         width: '20%',
         sortable: true
       },
