@@ -27,7 +27,7 @@ const StatusInfo = ({ data }) => {
       value: affectedCount || 0
     },
     {
-      label: 'Not Afftected',
+      label: 'Not Affected',
       color: 'blue',
       value: notAffectedCount || 0
     },
