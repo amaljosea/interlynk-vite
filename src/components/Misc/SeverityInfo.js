@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-vars */
 import { useState } from 'react'
-import { getSignedUrlParams } from 'utils'
 
 import {
   Flex,
@@ -21,7 +20,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import VulnBadge from './VulnBadge'
 
 const SeverityInfo = ({ data, link, isUnique = true, onFilter }) => {
-  const signedUrlParams = getSignedUrlParams()
   const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const { id, stats, vulnRunStatus } = data || {}
@@ -66,7 +64,7 @@ const SeverityInfo = ({ data, link, isUnique = true, onFilter }) => {
       >
         {notStarted ? '-' : stats?.vulnStats?.high || 0}
       </VulnBadge>
-      {signedUrlParams && <Text color={primaryTextColor}>+{total}</Text>}
+
       {runStatus === 'FINISHED' && total !== 0 && (
         <Popover
           placement='right'

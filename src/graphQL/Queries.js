@@ -1060,19 +1060,27 @@ export const GetVersionsTable = gql`
             contactEmail
             contactName
           }
-          stats {
-            compCount
-            compLicenseCount
-            vulnStats
-          }
-          vulnerabilityMetrics {
-            affectedCount
-            notAffectedCount
-            fixedCount
-            unspecifiedCount
-            inTriageCount
-          }
         }
+      }
+    }
+  }
+`
+
+// GET SBOM METRICS
+export const GetSbomMetrics = gql`
+  query GetSbomMetrics($projectId: Uuid!, $sbomId: Uuid!) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      stats {
+        compCount
+        compLicenseCount
+        vulnStats
+      }
+      vulnerabilityMetrics {
+        affectedCount
+        notAffectedCount
+        fixedCount
+        unspecifiedCount
+        inTriageCount
       }
     }
   }
@@ -1279,12 +1287,22 @@ export const ShareVersionTable = gql`
             updatedAt
             lifecycle
             projectVersion
-            stats {
-              compCount
-              compLicenseCount
-              vulnStats
-            }
           }
+        }
+      }
+    }
+  }
+`
+
+// GET SBOM METRICS
+export const GetShareSbomMetrics = gql`
+  query GetShareSbomMetrics($sbomId: Uuid!) {
+    shareLynkQuery {
+      sbom(id: $sbomId) {
+        stats {
+          compCount
+          compLicenseCount
+          vulnStats
         }
       }
     }

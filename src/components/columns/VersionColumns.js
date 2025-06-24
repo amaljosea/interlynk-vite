@@ -1,7 +1,7 @@
-/* eslint-disable no-unused-vars */
+import { useLazyQuery } from '@apollo/client'
 import { addDays, differenceInDays, parseISO } from 'date-fns'
-import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
 import {
   capitalizeFirstLetter,
   getFullDate,
@@ -23,6 +23,7 @@ import {
   PopoverContent,
   PopoverTrigger,
   Portal,
+  Spinner,
   Stack,
   Tag,
   TagLabel,
@@ -39,7 +40,194 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
+import { GetSbomMetrics, GetShareSbomMetrics } from 'graphQL/Queries'
+
 import { LuFilePen, LuMessageCircleOff, LuRepeat } from 'react-icons/lu'
+
+const useSbomMetrics = (sbomId) => {
+  const params = useParams()
+  const productId = params.productid
+
+  const signedUrlParams = getSignedUrlParams()
+
+  const [getMetrics, { data, loading, error }] = useLazyQuery(
+    signedUrlParams ? GetShareSbomMetrics : GetSbomMetrics,
+    {
+      variables: signedUrlParams
+        ? { sbomId }
+        : { projectId: productId, sbomId: sbomId }
+    }
+  )
+
+  const [metrics, setMetrics] = useState(null)
+
+  useEffect(() => {
+    if (data) {
+      setMetrics(signedUrlParams ? data.shareLynkQuery?.sbom : data.sbom)
+    }
+  }, [data, signedUrlParams])
+
+  return { getMetrics, metrics, loading, error }
+}
+
+const SbomComponentCount = ({
+  sbomId,
+  generateProductVersionDetailPageUrlFromCurrentUrl
+}) => {
+  const { getMetrics, metrics, loading } = useSbomMetrics(sbomId)
+
+  useEffect(() => {
+    getMetrics()
+  }, [getMetrics])
+
+  return (
+    <Link
+      to={generateProductVersionDetailPageUrlFromCurrentUrl({
+        sbomid: sbomId,
+        paramsObj: {
+          tab: 'components'
+        }
+      })}
+    >
+      <Tag minW={'50px'} colorScheme='teal'>
+        <TagLabel mx={'auto'}>
+          {loading ? (
+            <Spinner size='xs' mt={0.5} />
+          ) : (
+            metrics?.stats?.compCount || 0
+          )}
+        </TagLabel>
+      </Tag>
+    </Link>
+  )
+}
+
+const SbomLicenseCount = ({ sbomId, onSelectLicenses, rowData }) => {
+  const { getMetrics, metrics, loading } = useSbomMetrics(sbomId)
+
+  useEffect(() => {
+    getMetrics()
+  }, [getMetrics])
+
+  const handleClick = useCallback(() => {
+    onSelectLicenses(rowData)
+  }, [onSelectLicenses, rowData])
+
+  return (
+    <Tag minW={'50px'} colorScheme='orange' onClick={handleClick}>
+      <TagLabel mx={'auto'}>
+        {loading ? (
+          <Spinner size='xs' mt={0.5} />
+        ) : (
+          metrics?.stats?.compLicenseCount || 0
+        )}
+      </TagLabel>
+    </Tag>
+  )
+}
+
+const SbomVulnerabilities = ({
+  sbomId,
+  generateProductVersionDetailPageUrlFromCurrentUrl,
+  onFilterSev
+}) => {
+  const { getMetrics, metrics, loading } = useSbomMetrics(sbomId)
+
+  useEffect(() => {
+    getMetrics()
+  }, [getMetrics])
+
+  const link = generateProductVersionDetailPageUrlFromCurrentUrl({
+    sbomid: sbomId,
+    paramsObj: { tab: 'vulnerabilities' }
+  })
+
+  const renderLoadingTags = () => (
+    <Flex gap={2}>
+      <Tag minW='50px' colorScheme='red'>
+        <TagLabel mx='auto'>
+          <Spinner size='xs' mt={0.5} />
+        </TagLabel>
+      </Tag>
+      <Tag minW='50px' colorScheme='orange'>
+        <TagLabel mx='auto'>
+          <Spinner size='xs' mt={0.5} />
+        </TagLabel>
+      </Tag>
+    </Flex>
+  )
+
+  return loading ? (
+    renderLoadingTags()
+  ) : (
+    <SeverityInfo
+      data={metrics || {}}
+      link={link}
+      onFilter={onFilterSev}
+      loading={loading}
+    />
+  )
+}
+
+const SbomStatuses = ({
+  sbomId,
+  primaryTextColor,
+  openStatusId,
+  setOpenStatusId
+}) => {
+  const { getMetrics, metrics, loading } = useSbomMetrics(sbomId)
+
+  useEffect(() => {
+    getMetrics()
+  }, [getMetrics])
+
+  const vulnerabilityMetrics = metrics?.vulnerabilityMetrics || {}
+  const total =
+    Number(
+      vulnerabilityMetrics?.unspecifiedCount +
+        vulnerabilityMetrics?.inTriageCount +
+        vulnerabilityMetrics?.affectedCount +
+        vulnerabilityMetrics?.fixedCount +
+        vulnerabilityMetrics?.notAffectedCount
+    ) || 0
+
+  return (
+    <Popover
+      placement='right'
+      closeOnBlur={false}
+      returnFocusOnClose={false}
+      isOpen={openStatusId === sbomId}
+      onClose={() => setOpenStatusId(null)}
+    >
+      <PopoverTrigger>
+        <Tag
+          minW={'60px'}
+          colorScheme='blue'
+          onMouseEnter={() => setOpenStatusId(sbomId)}
+          onMouseLeave={() => setOpenStatusId(null)}
+        >
+          <TagLabel mx={'auto'}>
+            {loading ? <Spinner size='xs' mt={0.5} /> : total}
+          </TagLabel>
+        </Tag>
+      </PopoverTrigger>
+      <Portal>
+        <PopoverContent
+          zIndex={111}
+          w={'230px'}
+          overflow={'hidden'}
+          color={primaryTextColor}
+          onMouseEnter={() => setOpenStatusId(sbomId)}
+          onMouseLeave={() => setOpenStatusId(null)}
+        >
+          <PopoverBody w={'fit-content'}>
+            <StatusInfo data={metrics} loading={loading} />
+          </PopoverBody>
+        </PopoverContent>
+      </Portal>
+    </Popover>
+  )
+}
 
 const VersionColumns = (props) => {
   const { action, retentionTime, onFilterSev, onSelectLicenses, onStartTour } =
@@ -92,8 +280,7 @@ const VersionColumns = (props) => {
             alternatives,
             isReprocess,
             lifecycle,
-            productLifeCycleStage,
-            updatedAt
+            productLifeCycleStage
           } = row
           const currentDate = new Date()
           const parsedCreatedDate = parseISO(createdAt)
@@ -180,103 +367,54 @@ const VersionColumns = (props) => {
       {
         id: 'COMPONENTS',
         name: 'COMPONENTS',
-        selector: (row) => {
-          const { stats, id } = row
-          return (
-            <Link
-              to={generateProductVersionDetailPageUrlFromCurrentUrl({
-                sbomid: id,
-                paramsObj: {
-                  tab: 'components'
-                }
-              })}
-            >
-              <Tag minW={'50px'} colorScheme='teal'>
-                <TagLabel mx={'auto'}> {stats?.compCount}</TagLabel>
-              </Tag>
-            </Link>
-          )
-        }
+        selector: (row) => (
+          <SbomComponentCount
+            sbomId={row.id}
+            generateProductVersionDetailPageUrlFromCurrentUrl={
+              generateProductVersionDetailPageUrlFromCurrentUrl
+            }
+          />
+        )
       },
       // LICENSES
       {
         id: 'LICENSES',
         name: 'LICENSES',
-        selector: (row) => {
-          const { stats } = row
-          return (
-            <Tag
-              minW={'50px'}
-              colorScheme='orange'
-              onClick={() => onSelectLicenses(row)}
-            >
-              <TagLabel mx={'auto'}> {stats?.compLicenseCount}</TagLabel>
-            </Tag>
-          )
-        }
-        // omit: true
+        selector: (row) => (
+          <SbomLicenseCount
+            sbomId={row.id}
+            onSelectLicenses={onSelectLicenses}
+            rowData={row}
+          />
+        )
       },
       // VULNERABILITIES
       {
         id: 'VULNERABILITIES',
         name: 'VULNERABILITIES',
-        selector: (row) => {
-          const link = generateProductVersionDetailPageUrlFromCurrentUrl({
-            sbomid: row?.id,
-            paramsObj: { tab: 'vulnerabilities' }
-          })
-          return <SeverityInfo data={row} link={link} onFilter={onFilterSev} />
-        },
+        selector: (row) => (
+          <SbomVulnerabilities
+            sbomId={row.id}
+            generateProductVersionDetailPageUrlFromCurrentUrl={
+              generateProductVersionDetailPageUrlFromCurrentUrl
+            }
+            onFilterSev={onFilterSev}
+          />
+        ),
         width: '16%'
       },
       // STATUSES
       {
         id: 'STATUSES',
         name: 'STATUSES',
-        selector: (row) => {
-          const { vulnerabilityMetrics } = row
-          const total = Number(
-            vulnerabilityMetrics?.unspecifiedCount +
-              vulnerabilityMetrics?.inTriageCount +
-              vulnerabilityMetrics?.affectedCount +
-              vulnerabilityMetrics?.fixedCount +
-              vulnerabilityMetrics?.notAffectedCount
-          )
-          return (
-            <Popover
-              placement='right'
-              closeOnBlur={false}
-              returnFocusOnClose={false}
-              isOpen={openStatusId === row?.id}
-              onClose={() => setOpenStatusId(null)}
-            >
-              <PopoverTrigger>
-                <Tag
-                  minW={'60px'}
-                  colorScheme='blue'
-                  onMouseEnter={() => setOpenStatusId(row?.id)}
-                  onMouseLeave={() => setOpenStatusId(null)}
-                >
-                  <TagLabel mx={'auto'}>{total}</TagLabel>
-                </Tag>
-              </PopoverTrigger>
-              <Portal>
-                <PopoverContent
-                  zIndex={111}
-                  w={'230px'}
-                  overflow={'hidden'}
-                  color={primaryTextColor}
-                  onMouseEnter={() => setOpenStatusId(row?.id)}
-                  onMouseLeave={() => setOpenStatusId(null)}
-                >
-                  <PopoverBody w={'fit-content'}>
-                    <StatusInfo data={row} />
-                  </PopoverBody>
-                </PopoverContent>
-              </Portal>
-            </Popover>
-          )
-        },
+        selector: (row) => (
+          <SbomStatuses
+            sbomId={row.id}
+            primaryTextColor={primaryTextColor}
+            openStatusId={openStatusId}
+            setOpenStatusId={setOpenStatusId}
+          />
+        ),
         omit: signedUrlParams
       },
       // CREATED AT
@@ -407,6 +545,7 @@ const VersionColumns = (props) => {
     onSelectLicenses,
     onStartTour,
     openStatusId,
+    setOpenStatusId,
     primaryBlueText,
     primaryErrorColor,
     primaryTextColor,
