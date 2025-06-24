@@ -39,8 +39,8 @@ const ProductDetailsSbomNew = () => {
     variables: { id: productId }
   })
 
-  const { projectSetting } = settings?.project || ''
-  const { vulnScanningEnabled: vulnScan } = projectSetting || ''
+  const { projectSetting } = settings?.project || {}
+  const { vulnScanningEnabled: vulnScan } = projectSetting || {}
   const reScanVuln = vulnScan === true && vulnRunStatus !== 'FINISHED'
 
   const { data: policies } = useQuery(PolicyResultsType, {

@@ -1,9 +1,7 @@
-import { getFullDate } from 'utils'
-import { isSbomArchived } from 'utils'
+import { getFullDate, isSbomArchived } from 'utils'
 import { infoData } from 'variables/general'
 
-import { Flex, Skeleton, Stack, Text } from '@chakra-ui/react'
-import { Grid, GridItem } from '@chakra-ui/react'
+import { Grid, GridItem, Skeleton, Stack, Text } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -49,24 +47,38 @@ const General = ({ data, loading, error }) => {
     borderBottom: `1px solid ${grayBorderColor}`
   }
 
+  const Loader = ({ width }) => <Skeleton w={width} height='20px' />
+
   const sbomData = [
     {
       label: 'Created At',
-      value: <Text>{getFullDate(data?.creationAt)}</Text>
+      value: loading ? (
+        <Loader width={'150px'} />
+      ) : (
+        <Text>{getFullDate(data?.creationAt)}</Text>
+      )
     },
     {
       label: 'Phases',
-      value: <Phases data={data?.phases || []} permission={isArchived} />
+      value: loading ? (
+        <Loader width={'200px'} />
+      ) : (
+        <Phases data={data?.phases || []} permission={isArchived} />
+      )
     },
     {
       label: 'Creation Tool',
-      value: (
+      value: loading ? (
+        <Loader width={'250px'} />
+      ) : (
         <Tools data={data?.tools || []} permission={isArchived || !editSboms} />
       )
     },
     {
       label: 'Authors',
-      value: (
+      value: loading ? (
+        <Loader width={'140px'} />
+      ) : (
         <Authors
           data={data?.authors || []}
           permission={isArchived || !editSboms}
@@ -75,7 +87,9 @@ const General = ({ data, loading, error }) => {
     },
     {
       label: 'Supplier',
-      value: (
+      value: loading ? (
+        <Loader width={'180px'} />
+      ) : (
         <Supplier
           data={data?.suppliers || []}
           permission={isArchived || !editSboms}
@@ -84,21 +98,13 @@ const General = ({ data, loading, error }) => {
     },
     {
       label: 'Data License',
-      value: (
+      value: loading ? (
+        <Loader width={'200px'} />
+      ) : (
         <License data={licenseData} permission={isArchived || !editSboms} />
       )
     }
   ]
-
-  if (loading) {
-    return (
-      <Flex mt={4} width={'100%'} flexDir={'column'} gap={4}>
-        {[1, 2].map((_, index) => (
-          <Skeleton key={index} width={'100%'} height='20px' />
-        ))}
-      </Flex>
-    )
-  }
 
   if (error) {
     return (
