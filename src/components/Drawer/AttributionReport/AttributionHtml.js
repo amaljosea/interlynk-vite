@@ -1,10 +1,14 @@
 import { attributionFilename } from 'utils/DownloadUtils/pdfUtils'
 
+import { NO_COMPONENTS_FILTERED_MESSAGE } from './AttributionTable'
+
 export const downloadAttributionHtml = async (
   components,
   productName,
   productVersion,
-  sourcePreferences
+  sourcePreferences,
+  includeEmptyLicenses,
+  includeUnresolvedLicenses
 ) => {
   const filename = attributionFilename(productName, productVersion)
   const logoBase64 = await getBase64Logo()
@@ -23,6 +27,36 @@ export const downloadAttributionHtml = async (
   components.forEach((comp) => {
     const currentComponentName = `${comp.components?.[0]?.name || 'Unknown'} - ${comp.components?.[0]?.version || 'Unknown'}`
     const componentId = `component-${comp.components?.[0].id}` // Unique ID for linking
+
+    const source = sourcePreferences[comp.components?.[0].id] || 'sbom'
+    const isLibrarySource = source === 'library'
+    const override = comp.attributionOverride
+    const attribution = comp.attribution
+    const noticeText = isLibrarySource
+      ? override?.notice || 'N/A'
+      : attribution?.notice || 'N/A'
+    const copyrightText = isLibrarySource
+      ? override?.copyright || 'N/A'
+      : attribution?.copyright || 'N/A'
+    const licenseExpText = isLibrarySource
+      ? override?.licensesExp || 'N/A'
+      : attribution?.licensesExp || 'N/A'
+
+    // Filtering logic
+    const isEmptyLicense = () => {
+      if (Array.isArray(licenseExpText)) return licenseExpText.length === 0
+      return !licenseExpText || licenseExpText === 'N/A'
+    }
+    if (!includeEmptyLicenses && isEmptyLicense()) {
+      return // Skip this component due to empty license
+    }
+    if (
+      !includeUnresolvedLicenses &&
+      typeof licenseExpText === 'string' &&
+      licenseExpText.includes('OR')
+    ) {
+      return // Skip this component due to unresolved licenses
+    }
 
     // Store TOC destination for this component
     const firstChar = currentComponentName.charAt(0).toUpperCase()
@@ -44,20 +78,6 @@ export const downloadAttributionHtml = async (
       title: currentComponentName,
       id: componentId
     })
-
-    const source = sourcePreferences[comp.components?.[0].id] || 'sbom'
-    const noticeText =
-      source === 'library'
-        ? comp.attributionOverride?.notice || 'N/A'
-        : comp.attribution?.notice || 'N/A'
-    const copyrightText =
-      source === 'library'
-        ? comp.attributionOverride?.copyright || 'N/A'
-        : comp.attribution?.copyright || 'N/A'
-    const licenseExpText =
-      source === 'library'
-        ? comp.attributionOverride?.licensesExp || 'N/A'
-        : comp.attribution?.licensesExp || 'N/A'
 
     const licenseTextHtml = (() => {
       let licenseTextArr = []
@@ -103,6 +123,11 @@ export const downloadAttributionHtml = async (
       </div>
     `
   })
+
+  // Throw error if no components to export
+  if (tocDestinations.length === 0) {
+    throw new Error(NO_COMPONENTS_FILTERED_MESSAGE)
+  }
 
   //  Generate TOC HTML
   const tocHtml = `

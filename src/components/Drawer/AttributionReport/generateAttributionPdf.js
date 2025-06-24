@@ -2,6 +2,7 @@
 import { jsPDF } from 'jspdf'
 import { attributionFilename } from 'utils/DownloadUtils/pdfUtils'
 
+import { NO_COMPONENTS_FILTERED_MESSAGE } from './AttributionTable'
 import './fonts/arialBold'
 import './fonts/arialLight'
 import './fonts/arialNormal'
@@ -30,7 +31,9 @@ export const generateAttributionPdf = async (
   finalItems,
   productName,
   productVersion,
-  sourcePreferences
+  sourcePreferences,
+  includeEmptyLicenses,
+  includeUnresolvedLicenses
 ) => {
   const filename = attributionFilename(productName, productVersion)
   const pdfDoc = new jsPDF({ compress: true })
@@ -146,6 +149,38 @@ export const generateAttributionPdf = async (
   pdfDoc.addPage()
 
   finalItems.forEach((comp) => {
+    const componentId = comp.components[0].id
+    const source = sourcePreferences[componentId] || 'sbom'
+
+    const isLibrarySource = source === 'library'
+
+    const override = comp.attributionOverride
+    const attribution = comp.attribution
+
+    const noticeText = isLibrarySource
+      ? override?.notice || 'N/A'
+      : attribution.notice || 'N/A'
+
+    const copyrightText = isLibrarySource
+      ? override?.copyright || 'N/A'
+      : attribution.copyright || 'N/A'
+
+    const licenseText = isLibrarySource
+      ? override?.licensesExp || 'N/A'
+      : attribution.licensesExp || 'N/A'
+
+    const isEmptyLicense = () => {
+      if (Array.isArray(licenseText)) return licenseText.length === 0
+      return !licenseText || licenseText === 'N/A'
+    }
+
+    //when user does not want to include the components with empty licenses
+    if (!includeEmptyLicenses && isEmptyLicense()) {
+      return // Skip this component due to empty license
+    }
+    if (!includeUnresolvedLicenses && licenseText.includes('OR')) {
+      return // Skip this component due to unresolved licenses
+    }
     const currentComponentName = `${comp.components[0].name || 'Unknown'} - ${comp.components[0].version || 'Unknown'}`
     const currentStartingLetter = currentComponentName.charAt(0).toUpperCase()
 
@@ -167,20 +202,6 @@ export const generateAttributionPdf = async (
       // Adjust y for TOC link to account for new header positioning
       y: yPosition
     })
-
-    const source = sourcePreferences[comp.components[0].id] || 'sbom'
-    const noticeText =
-      source === 'library'
-        ? comp.attributionOverride?.notice || 'N/A'
-        : comp.attribution.notice || 'N/A'
-    const copyrightText =
-      source === 'library'
-        ? comp.attributionOverride?.copyright || 'N/A'
-        : comp.attribution.copyright || 'N/A'
-    const licenseText =
-      source === 'library'
-        ? comp.attributionOverride?.licensesExp || 'N/A'
-        : comp.attribution.licensesExp || 'NA'
 
     const estimatedTitleHeight = 14
     // Adjusted check for page breaks to ensure content starts from yPosition
@@ -494,6 +515,11 @@ export const generateAttributionPdf = async (
   currentTocAlphabet = ''
   let tocItemNumber = 1
   const TOC_INDENT = 10
+
+  //If there are no components to print due to the currently set filters
+  if (tocDestinations.length === 0) {
+    throw new Error(NO_COMPONENTS_FILTERED_MESSAGE)
+  }
 
   tocDestinations.forEach((item) => {
     const firstChar = item.title.charAt(0).toUpperCase()

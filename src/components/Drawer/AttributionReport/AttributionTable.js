@@ -12,6 +12,7 @@ import {
   IconButton,
   Kbd,
   Menu,
+  MenuButton,
   MenuDivider,
   MenuGroup,
   MenuItemOption,
@@ -50,6 +51,9 @@ import { downloadAttributionHtml } from './AttributionHtml'
 import AttributionReportsEditModal from './AttributionReportsEditModal'
 import { generateAttributionPdf } from './generateAttributionPdf'
 
+export const NO_COMPONENTS_FILTERED_MESSAGE =
+  'No components match your current export options. Please adjust the options and try again.'
+
 const licenseTypes = {
   All: 'all',
   'SPDX Single': 'standard',
@@ -87,6 +91,9 @@ const AttributionTable = ({
     copyright: '',
     license: ''
   })
+  const [includeEmptyLicenses, setIncludeEmptyLicenses] = useState(true)
+  const [includeUnresolvedLicenses, setIncludeUnresolvedLicenses] =
+    useState(true)
 
   const {
     primaryBlueText,
@@ -256,20 +263,29 @@ const AttributionTable = ({
           finalItems,
           productName,
           productVersion,
-          sourcePreferences
+          sourcePreferences,
+          includeEmptyLicenses,
+          includeUnresolvedLicenses
         )
       } else {
-        downloadAttributionHtml(
+        await downloadAttributionHtml(
           finalItems,
           productName,
           productVersion,
-          sourcePreferences
+          sourcePreferences,
+          includeEmptyLicenses,
+          includeUnresolvedLicenses
         )
       }
     } catch (error) {
+      const isPdfEmptyFromFilters =
+        error?.message === NO_COMPONENTS_FILTERED_MESSAGE
+
       showToast({
-        description: `Error downloading Attribution ${downloadType.toUpperCase()}. Please try again later.`,
-        status: 'error'
+        description: isPdfEmptyFromFilters
+          ? error.message
+          : `Error downloading Attribution ${downloadType.toUpperCase()}. Please try again later.`,
+        status: isPdfEmptyFromFilters ? '' : 'error'
       })
     } finally {
       setIsLoading(false)
@@ -489,7 +505,13 @@ const AttributionTable = ({
 
   const subHeader = useMemo(
     () => (
-      <Flex gap={2} width={'100%'} justifyContent={'space-between'}>
+      <Flex
+        gap={2}
+        width={'100%'}
+        justifyContent={'space-between'}
+        alignItems={'center'}
+        paddingBottom={2}
+      >
         <Flex gap={4} flexWrap={'wrap'}>
           <SearchFilter
             id='attribution'
@@ -566,6 +588,30 @@ const AttributionTable = ({
               <Radio value='html'>HTML</Radio>
             </Stack>
           </RadioGroup>
+          <Menu closeOnSelect={false}>
+            <MenuButton as={Button} fontWeight='medium'>
+              Export Options
+            </MenuButton>
+            <MenuList>
+              <Box px={3} py={2} display='flex' flexDirection='column' gap={2}>
+                <Checkbox
+                  isChecked={includeEmptyLicenses}
+                  onChange={(e) => setIncludeEmptyLicenses(e.target.checked)}
+                >
+                  Include Empty Licenses
+                </Checkbox>
+                <Checkbox
+                  isChecked={includeUnresolvedLicenses}
+                  onChange={(e) =>
+                    setIncludeUnresolvedLicenses(e.target.checked)
+                  }
+                >
+                  Include Unresolved Licenses
+                </Checkbox>
+              </Box>
+            </MenuList>
+          </Menu>
+
           <Button
             isLoading={isLoading}
             colorScheme='blue'
@@ -585,7 +631,9 @@ const AttributionTable = ({
       isLoading,
       selectedRowData,
       filters,
-      handleBulkSourceChange
+      handleBulkSourceChange,
+      includeEmptyLicenses,
+      includeUnresolvedLicenses
     ]
   )
 
