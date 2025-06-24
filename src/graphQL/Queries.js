@@ -4966,7 +4966,7 @@ export const GetProjectName = gql`
 `
 
 export const GetVersionName = gql`
-  query GetSbomName($projectId: Uuid!, $sbomId: Uuid!) {
+  query GetVersionName($projectId: Uuid!, $sbomId: Uuid!) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       id
       projectVersion

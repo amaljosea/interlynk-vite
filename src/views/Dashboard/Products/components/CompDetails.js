@@ -66,7 +66,8 @@ const CompDetails = ({ data, primaryComp }) => {
       'GetComponentColumnData',
       'GetComponentExpandedData',
       'GetProductData',
-      'GetPrimaryComponentData'
+      'GetPrimaryComponentData',
+      'GetSbomName'
     ]
   })
 
