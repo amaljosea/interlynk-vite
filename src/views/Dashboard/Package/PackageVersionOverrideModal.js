@@ -19,19 +19,19 @@ import { LuPackage } from 'react-icons/lu'
 
 const PackageVersionOverrideModal = ({ isOpen, onClose, data }) => {
   const {
-    id,
-    copyright,
-    notice,
-    organizationPackageVersion,
-    licenseExp,
-    package: pkg
+    effectiveCopyright,
+    effectiveNotice,
+    organizationPackageVersionId,
+    effectiveLicensesExp,
+    packageName: name,
+    version
   } = data
   const { tabData } = useContext(TabContext)
   const { showToast } = useCustomToast()
 
   const [formData, setFormData] = useState({
-    copyright: copyright || '',
-    notice: notice || ''
+    copyright: effectiveCopyright || '',
+    notice: effectiveNotice || ''
   })
 
   const [createOverride, { loading: creating }] = useMutation(
@@ -43,7 +43,7 @@ const PackageVersionOverrideModal = ({ isOpen, onClose, data }) => {
     { refetchQueries: ['PackageVersionsTable'] }
   )
 
-  const isUpdating = Boolean(organizationPackageVersion)
+  const isUpdating = Boolean(organizationPackageVersionId)
   const modalTitle = `${isUpdating ? 'Update' : 'Create'} Override`
 
   const handleChange = useCallback((e) => {
@@ -65,8 +65,8 @@ const PackageVersionOverrideModal = ({ isOpen, onClose, data }) => {
     const variables = {
       input: {
         ...(isUpdating
-          ? { id: organizationPackageVersion.id }
-          : { packageVersionId: id }),
+          ? { id: organizationPackageVersionId }
+          : { name, version }),
         copyrightOverride: formData.copyright,
         noticeOverride: formData.notice,
         licenseOverride: getLicenseOverride()
@@ -116,7 +116,7 @@ const PackageVersionOverrideModal = ({ isOpen, onClose, data }) => {
       <Text mb={4}>
         {isUpdating ? 'Updating' : 'Creating'} override for{' '}
         <Text as='span' fontStyle='italic'>
-          {pkg?.name}
+          {name}
         </Text>
       </Text>
 
@@ -141,7 +141,7 @@ const PackageVersionOverrideModal = ({ isOpen, onClose, data }) => {
       </FormControl>
 
       <FormControl mt={4}>
-        <LicenseField sbomView={false} license={licenseExp} />
+        <LicenseField sbomView={false} license={effectiveLicensesExp} />
       </FormControl>
     </LynkModal>
   )

@@ -5990,26 +5990,24 @@ export const PackageVersionsTable = gql`
     ) {
       totalCount
       nodes {
-        id
-        updatedAt
-        version
-        licenseExp
         copyright
+        copyrightOverride
+        ecosystem
+        effectiveCopyright
+        effectiveLicensesExp
+        effectiveNotice
+        id
+        licenseOverride
+        licensesExp
         notice
-        package {
-          name
-          ecosystem
-        }
-        organizationPackageVersion {
-          id
-          updatedAt
-        }
-      }
-      pageInfo {
-        endCursor
-        hasNextPage
-        hasPreviousPage
-        startCursor
+        noticeOverride
+        organizationPackageVersionId
+        # organizationPackageVersionUpdatedAt
+        packageName
+        publishedAt
+        sortUpdatedAt
+        sourceType
+        version
       }
     }
   }

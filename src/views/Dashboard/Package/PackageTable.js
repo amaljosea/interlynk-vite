@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { useCallback, useMemo, useState } from 'react'
-import { getFullDate, timeSince, truncatedValue } from 'utils'
+import { timeSince, truncatedValue } from 'utils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import {
@@ -40,10 +40,7 @@ const PackageTable = ({
   const [activeRow, setActiveRow] = useState(null)
   const [searchText, setSearchText] = useState(filters.search || '')
 
-  const { primaryTextColor, secondaryTextColor } = useThemeColor([
-    'primaryTextColor',
-    'secondaryTextColor'
-  ])
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const [deleteOverride, { loading: deleting }] = useMutation(
     OrganizationPackageVersionDelete,
@@ -113,41 +110,32 @@ const PackageTable = ({
   const columns = useMemo(
     () => [
       {
-        id: 'UPDATED_AT',
+        id: 'NAME',
         name: 'NAME',
         width: '25%',
         wrap: true,
         selector: (row) => (
-          <Flex gap={2} flexDirection={'column'} my={4}>
-            <Tooltip label={row?.package?.name}>
+          <Flex gap={2} flexDirection={'row'} my={6}>
+            <Tooltip label={row?.packageName}>
               <Text
                 fontSize={14}
                 fontWeight={'medium'}
                 color={primaryTextColor}
               >
-                {truncatedValue(row?.package?.name, 40)}
+                {truncatedValue(row?.packageName, 40)}
               </Text>
             </Tooltip>
+            {row?.organizationPackageVersionId && <LynkSeparator />}
+
             <Flex gap={2} alignItems={'center'} flexWrap={'wrap'}>
-              {row?.organizationPackageVersion && (
+              {row?.organizationPackageVersionId && (
                 <>
                   <LynkBadge color='blue' title='Override' />
-                  <LynkSeparator />
-                  <Tooltip
-                    label={getFullDate(
-                      row.organizationPackageVersion?.updatedAt
-                    )}
-                  >
-                    <Text fontSize={14} color={secondaryTextColor}>
-                      {timeSince(row.organizationPackageVersion?.updatedAt)}
-                    </Text>
-                  </Tooltip>
                 </>
               )}
             </Flex>
           </Flex>
-        ),
-        sortable: true
+        )
       },
       // ECOSYSTEM
       {
@@ -157,14 +145,14 @@ const PackageTable = ({
         selector: (row) => {
           return (
             <Text fontSize={14} color={primaryTextColor}>
-              {row?.package?.ecosystem || 'N/A'}
+              {row?.ecosystem || 'N/A'}
             </Text>
           )
         }
       },
       // VERSION
       {
-        id: 'PACKAGE_VERSIONS_VERSION',
+        id: 'VERSION',
         name: 'VERSION',
         wrap: true,
         selector: (row) => {
@@ -173,8 +161,7 @@ const PackageTable = ({
               {row?.version || 'N/A'}
             </Text>
           )
-        },
-        sortable: true
+        }
       },
       // LICENSE
       {
@@ -182,8 +169,11 @@ const PackageTable = ({
         name: 'LICENSE',
         wrap: true,
         selector: (row) => {
-          const { licenseExp } = row
-          if (licenseExp?.startsWith(' OR') || licenseExp?.startsWith('OR')) {
+          const { effectiveLicensesExp } = row
+          if (
+            effectiveLicensesExp?.startsWith(' OR') ||
+            effectiveLicensesExp?.startsWith('OR')
+          ) {
             return (
               <Text fontSize={14} color={primaryTextColor}>
                 N/A
@@ -191,9 +181,9 @@ const PackageTable = ({
             )
           }
           return (
-            <Tooltip label={licenseExp}>
+            <Tooltip label={effectiveLicensesExp}>
               <Text fontSize={14} color={primaryTextColor}>
-                {truncatedValue(licenseExp, 20) || 'N/A'}
+                {truncatedValue(effectiveLicensesExp, 20) || 'N/A'}
               </Text>
             </Tooltip>
           )
@@ -207,7 +197,7 @@ const PackageTable = ({
         selector: (row) => {
           return (
             <Text fontSize={14} color={primaryTextColor}>
-              {truncatedValue(row?.copyright, 20) || 'N/A'}
+              {truncatedValue(row?.effectiveCopyright, 20) || 'N/A'}
             </Text>
           )
         }
@@ -220,7 +210,7 @@ const PackageTable = ({
         selector: (row) => {
           return (
             <Text fontSize={14} color={primaryTextColor}>
-              {truncatedValue(row?.notice, 20) || 'N/A'}
+              {truncatedValue(row?.effectiveNotice, 20) || 'N/A'}
             </Text>
           )
         }
@@ -228,17 +218,18 @@ const PackageTable = ({
 
       // PUBLISHED
       {
-        id: 'PACKAGE_VERSIONS_PUBLISHED_AT',
-        name: 'PUBLISHED',
+        id: 'UPDATED_AT',
+        name: 'UPDATED',
         selector: (row) => {
           return (
             <Text fontSize={14} color={primaryTextColor}>
-              {timeSince(row.updatedAt)}
+              {timeSince(row.sortUpdatedAt)}
             </Text>
           )
         },
         sortable: true,
-        sortFunction: (a, b) => new Date(a.updatedAt) - new Date(b.updatedAt),
+        sortFunction: (a, b) =>
+          new Date(a.sortUpdatedAt) - new Date(b.sortUpdatedAt),
         wrap: true
       },
       {
@@ -251,7 +242,7 @@ const PackageTable = ({
               <MenuList fontSize='sm'>
                 <MenuItem
                   data-testid='create_override'
-                  hidden={row?.organizationPackageVersion}
+                  hidden={row?.organizationPackageVersionId}
                   onClick={() => {
                     setActiveRow(row)
                     onOpen()
@@ -261,7 +252,7 @@ const PackageTable = ({
                 </MenuItem>
                 <MenuItem
                   data-testid='update_override'
-                  hidden={!row?.organizationPackageVersion}
+                  hidden={!row?.organizationPackageVersionId}
                   onClick={() => {
                     setActiveRow(row)
                     onOpen()
@@ -271,9 +262,9 @@ const PackageTable = ({
                 </MenuItem>
                 <MenuItem
                   data-testid='delete_override'
-                  hidden={!row?.organizationPackageVersion}
+                  hidden={!row?.organizationPackageVersionId}
                   onClick={() =>
-                    handleDeleteOverride(row?.organizationPackageVersion.id)
+                    handleDeleteOverride(row?.organizationPackageVersionId)
                   }
                   isDisabled={deleting}
                 >
@@ -286,13 +277,7 @@ const PackageTable = ({
         right: 'true'
       }
     ],
-    [
-      primaryTextColor,
-      secondaryTextColor,
-      deleting,
-      handleDeleteOverride,
-      onOpen
-    ]
+    [primaryTextColor, deleting, handleDeleteOverride, onOpen]
   )
 
   const subHeader = useMemo(

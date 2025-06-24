@@ -3039,7 +3039,6 @@ export const OrganizationPackageVersionCreate = gql`
         licenseOverride
         noticeOverride
         organizationId
-        packageVersionId
         updatedAt
       }
       errors
