@@ -1,8 +1,9 @@
 import { gql, useLazyQuery } from '@apollo/client'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { capitalizeFirstLetter } from 'utils'
 
-import { Flex, Text } from '@chakra-ui/react'
+import { Flex, Kbd, MenuDivider, MenuGroup, Text } from '@chakra-ui/react'
 import {
   Menu,
   MenuItemOption,
@@ -10,13 +11,15 @@ import {
   MenuOptionGroup
 } from '@chakra-ui/react'
 
-import CustomList from 'components/Misc/CustomList'
 import LynkMenuList from 'components/Misc/LynkMenuList'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useRouteFlags } from 'hooks/useRouteFlags'
+import { useThemeColor } from 'hooks/useThemeColors'
+
+import { LuCheck, LuCircleSlash } from 'react-icons/lu'
 
 const GetEcosystems = gql`
   query GetEcosystems(
@@ -95,11 +98,13 @@ const CompFilters = ({ reset }) => {
   const productId = params?.productid
   const sbomId = params?.sbomid
   const { prodCompState, dispatch } = useGlobalState()
-  const { ecosystems, kinds, licenses, scope, direct, exclude } = prodCompState
+  const { ecosystems, kinds, licenses, scope, direct, exclude, filterMode } =
+    prodCompState
   const { prodCompDispatch } = dispatch
 
+  const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
+
   const [compEcosystems, setCompEcosystems] = useState(['All'])
-  // const [compSupport, setCompSupport] = useState(['All'])
   const [compLicenses, setCompLicenses] = useState(['All'])
   const [compKinds, setCompKinds] = useState(['All'])
 
@@ -202,6 +207,30 @@ const CompFilters = ({ reset }) => {
     reset()
   }
 
+  const handleMenuClick = (event, value) => {
+    if (event.shiftKey) {
+      prodCompDispatch({ type: 'SET_FILTER_MODE', payload: 'AND' })
+      prodCompDispatch({ type: 'FILTER_SCOPE', payload: `exclude_${value}` })
+    } else {
+      prodCompDispatch({ type: 'SET_FILTER_MODE', payload: 'OR' })
+      prodCompDispatch({ type: 'FILTER_SCOPE', payload: value })
+    }
+    reset()
+  }
+
+  const Info = () => (
+    <Text fontWeight={'normal'}>
+      Use <Kbd>⇧</Kbd> + <Kbd>click </Kbd> to apply exclude filter
+    </Text>
+  )
+
+  const checkIcon =
+    filterMode === 'AND' ? (
+      <LuCircleSlash size={18} color={inverseSecondaryBgColor} />
+    ) : (
+      <LuCheck size={18} color={inverseSecondaryBgColor} />
+    )
+
   return (
     <Flex gap={2} alignItems={'center'}>
       {/* ECOSYSTEM */}
@@ -249,20 +278,37 @@ const CompFilters = ({ reset }) => {
           options={compLicenses}
         />
       </Menu>
-      {/* TYPE */}
+      {/* VISIBILITY */}
       <Menu closeOnSelect={false}>
         <MenuHeading
           title={'Visibility'}
           active={scope !== '' && scope !== 'all'}
         />
-        <CustomList
-          type='radio'
-          options={['primary', 'internal']}
-          value={scope}
-          onChange={onFilterType}
-        />
+        <MenuList>
+          <MenuOptionGroup
+            value={scope}
+            type={'checkbox'}
+            onChange={onFilterType}
+          >
+            {['all', 'primary', 'internal'].map((item, index) => (
+              <MenuItemOption
+                key={index}
+                value={item}
+                fontSize={'sm'}
+                icon={checkIcon}
+                wordBreak={'break-all'}
+                onClick={(e) => handleMenuClick(e, item)}
+                isDisabled={filterMode === 'AND' && item === 'all'}
+              >
+                {capitalizeFirstLetter(item)}
+              </MenuItemOption>
+            ))}
+          </MenuOptionGroup>
+          <MenuDivider />
+          <MenuGroup title={<Info />}></MenuGroup>
+        </MenuList>
       </Menu>
-      {/* INCLUDE */}
+      {/* EXCLUDE */}
       <Menu closeOnSelect={false}>
         <MenuHeading title={'Exclude'} active={exclude?.length !== 0} />
         <MenuList fontSize={'sm'}>

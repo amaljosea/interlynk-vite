@@ -6570,7 +6570,8 @@ export const GetVulnDataForPdf = gql`
 export const GetAttributionsData = gql`
   query GetAttributionsData(
     $sbomId: Uuid!
-    $visibility: AttributionVisibilityEnum
+    $internal: Boolean
+    $primary: Boolean
     $licenseType: AttributionLicenseTypeEnum
     $parts: Boolean
     $dedupe: Boolean
@@ -6583,7 +6584,8 @@ export const GetAttributionsData = gql`
   ) {
     attributions(
       sbomId: $sbomId
-      visibility: $visibility
+      internal: $internal
+      primary: $primary
       licenseType: $licenseType
       parts: $parts
       dedupe: $dedupe

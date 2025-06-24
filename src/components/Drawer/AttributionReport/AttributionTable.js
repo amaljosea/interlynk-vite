@@ -1,7 +1,7 @@
 import { client } from 'context/ApolloWrapper'
 import { useCallback, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { truncatedValue } from 'utils'
+import { capitalizeFirstLetter, truncatedValue } from 'utils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import {
@@ -10,7 +10,10 @@ import {
   Checkbox,
   Flex,
   IconButton,
+  Kbd,
   Menu,
+  MenuDivider,
+  MenuGroup,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
@@ -26,7 +29,6 @@ import EditButton from 'components/Icons/EditButton'
 import LynkBadge from 'components/LynkBadge'
 import LynkDrawer from 'components/LynkDrawer'
 import LynkTable from 'components/LynkTable'
-import CustomList from 'components/Misc/CustomList'
 import MenuHeading from 'components/Misc/MenuHeading'
 import Pagination from 'components/Pagination'
 
@@ -35,8 +37,14 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetAttributionsData } from 'graphQL/Queries'
 
-import { LuCircleCheck, LuCircleX, LuEye } from 'react-icons/lu'
-import { LuCircleAlert } from 'react-icons/lu'
+import {
+  LuCheck,
+  LuCircleAlert,
+  LuCircleCheck,
+  LuCircleSlash,
+  LuCircleX,
+  LuEye
+} from 'react-icons/lu'
 
 import { downloadAttributionHtml } from './AttributionHtml'
 import AttributionReportsEditModal from './AttributionReportsEditModal'
@@ -64,7 +72,10 @@ const AttributionTable = ({
   const { showToast } = useCustomToast()
   const params = useParams()
 
-  const [searchText, setSearchText] = useState(filters.search || '')
+  const { search, primary, internal } = filters || {}
+
+  const [filterMode, setFilterMode] = useState('OR')
+  const [searchText, setSearchText] = useState(search || '')
   const [downloadType, setDownloadType] = useState('pdf')
   const [selectedRowData, setSelectedRowData] = useState([])
   const [isLoading, setIsLoading] = useState(false)
@@ -78,15 +89,17 @@ const AttributionTable = ({
   })
 
   const {
+    primaryBlueText,
     primaryErrorColor,
     primarySuccessColor,
     primaryTextColor,
-    primaryBlueText
+    inverseSecondaryBgColor
   } = useThemeColor([
+    'primaryBlueText',
     'primaryErrorColor',
     'primarySuccessColor',
     'primaryTextColor',
-    'primaryBlueText'
+    'inverseSecondaryBgColor'
   ])
 
   const productName = sbomData?.project?.projectGroup?.name
@@ -177,15 +190,6 @@ const AttributionTable = ({
       notice: row.attribution.notice,
       enrichedContent: row.attributionOverride
     })
-  }
-
-  const handleVisibilityChange = (value) => {
-    setFilters((prev) => ({
-      ...prev,
-      visibility:
-        value.toLowerCase() === 'all' ? undefined : value.toUpperCase()
-    }))
-    // reset()
   }
 
   const handlelicenseTypeChange = (value) => {
@@ -448,6 +452,41 @@ const AttributionTable = ({
     [sourcePreferences]
   )
 
+  const checkIcon =
+    filterMode === 'AND' ? (
+      <LuCircleSlash size={18} color={inverseSecondaryBgColor} />
+    ) : (
+      <LuCheck size={18} color={inverseSecondaryBgColor} />
+    )
+
+  const Info = () => (
+    <Text fontWeight={'normal'}>
+      Use <Kbd>⇧</Kbd> + <Kbd>click </Kbd> to apply exclude filter
+    </Text>
+  )
+
+  const handleMenuClick = (event, value) => {
+    if (event.shiftKey) {
+      setFilterMode('AND')
+      setFilters((prev) => ({
+        ...prev,
+        primary:
+          value === 'all' ? undefined : value === 'primary' ? false : undefined,
+        internal:
+          value === 'all' ? undefined : value === 'internal' ? false : undefined
+      }))
+    } else {
+      setFilterMode('OR')
+      setFilters((prev) => ({
+        ...prev,
+        primary:
+          value === 'all' ? undefined : value === 'primary' ? true : undefined,
+        internal:
+          value === 'all' ? undefined : value === 'internal' ? true : undefined
+      }))
+    }
+  }
+
   const subHeader = useMemo(
     () => (
       <Flex gap={2} width={'100%'} justifyContent={'space-between'}>
@@ -463,14 +502,27 @@ const AttributionTable = ({
           <Menu closeOnSelect={false}>
             <MenuHeading
               title={'Visibility'}
-              active={filters.visibility && filters.visibility !== 'ALL'}
+              active={primary || internal || filterMode === 'AND'}
             />
-            <CustomList
-              type='radio'
-              options={['internal', 'primary', 'direct']}
-              value={filters.visibility?.toLowerCase() || 'all'}
-              onChange={handleVisibilityChange}
-            />
+            <MenuList>
+              <MenuOptionGroup type={'radio'}>
+                {['all', 'primary', 'internal'].map((item, index) => (
+                  <MenuItemOption
+                    key={index}
+                    value={item}
+                    fontSize={'sm'}
+                    icon={checkIcon}
+                    wordBreak={'break-all'}
+                    onClick={(e) => handleMenuClick(e, item)}
+                    isDisabled={filterMode === 'AND' && item === 'all'}
+                  >
+                    {capitalizeFirstLetter(item)}
+                  </MenuItemOption>
+                ))}
+              </MenuOptionGroup>
+              <MenuDivider />
+              <MenuGroup title={<Info />}></MenuGroup>
+            </MenuList>
           </Menu>
 
           <Menu closeOnSelect={true}>

@@ -152,7 +152,8 @@ const GlobalStateProvider = ({ children }) => {
     expandedRows: [],
     purlString: '',
     exclude: [],
-    selectedComp: null
+    selectedComp: null,
+    filterMode: 'OR'
   })
   const [prodVulnState, prodVulnDispatch] = useReducer(prodVulnReducer, {
     field: 'COMPONENT_VULNS_UPDATED_AT',

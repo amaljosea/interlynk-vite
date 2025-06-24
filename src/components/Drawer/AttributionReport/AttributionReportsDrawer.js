@@ -8,6 +8,8 @@ import AttributionTable from './AttributionTable'
 
 const AttributionReportsDrawer = ({ isOpen, onClose, sbomData }) => {
   const [filters, setFilters] = useState({
+    primary: undefined,
+    internal: undefined,
     orderBy: { field: 'COMPONENTS_UPDATED_AT', direction: 'DESC' }
   })
 

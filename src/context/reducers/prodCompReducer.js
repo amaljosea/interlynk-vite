@@ -39,7 +39,8 @@ const prodCompReducer = (state, action) => {
         isCpeValid: true,
         purlString: '',
         exclude: [],
-        selectedComp: null
+        selectedComp: null,
+        filterMode: 'OR'
       }
     case 'CHANGE_SEARCH_INPUT':
       return {
@@ -131,7 +132,7 @@ const prodCompReducer = (state, action) => {
     case 'FILTER_SCOPE':
       return {
         ...state,
-        scope: payload,
+        scope: payload === 'all' ? '' : payload,
         pageIndex: 1,
         after: '',
         before: ''
@@ -194,6 +195,11 @@ const prodCompReducer = (state, action) => {
       return {
         ...state,
         selectedComp: payload
+      }
+    case 'SET_FILTER_MODE':
+      return {
+        ...state,
+        filterMode: payload
       }
     default:
       return state

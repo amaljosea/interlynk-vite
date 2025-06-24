@@ -66,14 +66,16 @@ const Components = ({ sbomData }) => {
   const [compSearch, setCompSearch] = useState(searchInput || '')
 
   const compData = useMemo(() => {
+    const resolveScopeFlag = (scope, key) =>
+      scope === key ? true : scope === `exclude_${key}` ? false : undefined
     return {
       direct: direct ? true : undefined,
       ecosystem: getUndefinedIfEmptyOrAll(ecosystems),
       kind: getUndefinedIfEmptyOrAll(kinds),
       licenses: getUndefinedIfEmptyOrAll(licenses),
       supplierName: getUndefinedIfEmptyOrAll(suppliers),
-      primary: scope === 'primary' ? true : undefined,
-      internal: scope === 'internal' ? true : undefined,
+      primary: resolveScopeFlag(scope, 'primary'),
+      internal: resolveScopeFlag(scope, 'internal'),
       supportLevel: getUndefinedIfEmptyOrAll(supportLevel),
       includeParts: exclude?.includes('parts') ? undefined : true
     }
