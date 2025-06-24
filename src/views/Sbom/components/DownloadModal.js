@@ -75,7 +75,9 @@ const DownloadModal = (props) => {
 
   const productDescription = data?.projectGroup.description
 
-  const { data: complianceData } = useQuery(ActiveCompliances)
+  const { data: complianceData } = useQuery(ActiveCompliances, {
+    skip: isCustomerView
+  })
 
   const activeCompliances =
     complianceData?.organization?.activeCompliances || []
