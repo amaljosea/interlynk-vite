@@ -29,7 +29,7 @@ import { updateBulkCompVex } from 'graphQL/Mutation'
 import {
   GetCdxResponses,
   GetCustomFields,
-  GetProjectGroup,
+  GetProjectGroupExists,
   getVexJustifications,
   getVexStatuses
 } from 'graphQL/Queries'
@@ -97,7 +97,7 @@ const VexModal = ({
     skip: statusName === 'Affected' ? false : true
   })
 
-  const { data: groups } = useQuery(GetProjectGroup, {
+  const { data: groups } = useQuery(GetProjectGroupExists, {
     skip: checkEquals ? false : true,
     variables: { id: selectedGroup }
   })

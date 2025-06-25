@@ -700,6 +700,15 @@ export const GetProjectGroup = gql`
   }
 `
 
+// GET IF PROJECT GROUP EXISTS
+export const GetProjectGroupExists = gql`
+  query GetProjectGroupExists($id: Uuid!) {
+    projectGroup(id: $id) {
+      id
+    }
+  }
+`
+
 // GET ACTIVCE PROJECT GROUP FOR PUBLIC VIEW
 export const ShareLynkProjectGroup = gql`
   query ShareLynkProjectGroup($id: Uuid!) {
