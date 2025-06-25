@@ -220,7 +220,7 @@ const CompFilters = ({ reset }) => {
 
   const Info = () => (
     <Text fontWeight={'normal'}>
-      Use <Kbd>⇧</Kbd> + <Kbd>click </Kbd> to apply exclude filter
+      Use <Kbd>⇧</Kbd> + <Kbd>click </Kbd> to exclude
     </Text>
   )
 
