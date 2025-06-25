@@ -23,7 +23,6 @@ const prodCompReducer = (state, action) => {
         ...state,
         field: 'COMPONENTS_UPDATED_AT',
         direction: 'DESC',
-        pageIndex: 1,
         searchInput: '',
         supportLevel: [],
         ecosystems: [],
@@ -45,39 +44,22 @@ const prodCompReducer = (state, action) => {
     case 'CHANGE_SEARCH_INPUT':
       return {
         ...state,
-        searchInput: payload,
-        pageIndex: 1
+        searchInput: payload
       }
     case 'FETCH_DATA_SUCCESS':
       return {
-        ...state,
-        pageIndex: 1
+        ...state
       }
     case 'CLEAR_SEARCH_INPUT':
       return {
         ...state,
-        searchInput: '',
-        pageIndex: 1
-      }
-    case 'DECREMENT_PAGE':
-      return {
-        ...state,
-        pageIndex: state.pageIndex !== 0 && state.pageIndex - 1,
-        before: payload
-      }
-    case 'INCREMENT_PAGE':
-      return {
-        ...state,
-        pageIndex:
-          state.pageIndex < Math.ceil(payload?.total) && state.pageIndex + 1,
-        after: payload?.after
+        searchInput: ''
       }
     case 'SET_SORT_ORDER':
       return {
         ...state,
         field: payload.field,
-        direction: payload.direction,
-        pageIndex: 1
+        direction: payload.direction
       }
     case 'SET_TOTAL_COMP':
       return {
@@ -92,66 +74,42 @@ const prodCompReducer = (state, action) => {
     case 'FILTER_ECOSYSTEM':
       return {
         ...state,
-        ecosystems: toggleSelection(state.ecosystems, payload),
-        pageIndex: 1,
-        after: '',
-        before: ''
+        ecosystems: toggleSelection(state.ecosystems, payload)
       }
     case 'FILTER_KIND':
       return {
         ...state,
-        kinds: toggleSelection(state.kinds, payload),
-        pageIndex: 1,
-        after: '',
-        before: ''
+        kinds: toggleSelection(state.kinds, payload)
       }
     case 'FILTER_LICENSE':
       return {
         ...state,
-        licenses: toggleSelection(state.licenses, payload),
-        pageIndex: 1,
-        after: '',
-        before: ''
+        licenses: toggleSelection(state.licenses, payload)
       }
     case 'FILTER_SUPPLIER':
       return {
         ...state,
-        suppliers: toggleSelection(state.suppliers, payload),
-        pageIndex: 1,
-        after: '',
-        before: ''
+        suppliers: toggleSelection(state.suppliers, payload)
       }
     case 'FILTER_SUPPORT':
       return {
         ...state,
-        supportLevel: [...payload]?.includes('all') ? [] : payload,
-        pageIndex: 1,
-        after: '',
-        before: ''
+        supportLevel: [...payload]?.includes('all') ? [] : payload
       }
     case 'FILTER_SCOPE':
       return {
         ...state,
-        scope: payload === 'all' ? '' : payload,
-        pageIndex: 1,
-        after: '',
-        before: ''
+        scope: payload === 'all' ? '' : payload
       }
     case 'FILTER_EXCLUDE':
       return {
         ...state,
-        exclude: payload,
-        pageIndex: 1,
-        after: '',
-        before: ''
+        exclude: payload
       }
     case 'FILTER_DIRECT':
       return {
         ...state,
-        direct: payload,
-        pageIndex: 1,
-        after: '',
-        before: ''
+        direct: payload
       }
     case 'CLEAR_LICENSES':
       return {

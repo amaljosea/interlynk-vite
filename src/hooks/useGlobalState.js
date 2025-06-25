@@ -116,7 +116,6 @@ const GlobalStateProvider = ({ children }) => {
     searchInput: '',
     labelIds: [],
     lifestage: [],
-    pageIndex: 1,
     enabled: 'yes',
     currentProduct: null
   })
@@ -125,18 +124,14 @@ const GlobalStateProvider = ({ children }) => {
     field: 'SBOMS_UPDATED_AT',
     direction: 'DESC',
     searchInput: '',
-    lifestage: [],
-    pageIndex: 1
+    lifestage: []
   })
 
   const [prodCompState, prodCompDispatch] = useReducer(prodCompReducer, {
     field: 'COMPONENTS_UPDATED_AT',
     direction: 'DESC',
-    after: '',
-    before: '',
     totalComp: 0,
     searchInput: '',
-    pageIndex: 1,
     ecosystems: [],
     kinds: [],
     licenses: [],
@@ -158,11 +153,8 @@ const GlobalStateProvider = ({ children }) => {
   const [prodVulnState, prodVulnDispatch] = useReducer(prodVulnReducer, {
     field: 'COMPONENT_VULNS_UPDATED_AT',
     direction: 'DESC',
-    after: '',
-    before: '',
     totalVuln: 0,
     searchInput: '',
-    pageIndex: 1,
     severities: [],
     components: [],
     statues: [],

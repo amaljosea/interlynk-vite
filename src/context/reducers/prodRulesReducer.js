@@ -3,15 +3,13 @@ const prodRulesReducer = (state, action) => {
   switch (type) {
     case 'FETCH_DATA_SUCCESS':
       return {
-        ...state,
-        pageIndex: 1
+        ...state
       }
     case 'SET_SORT_ORDER':
       return {
         ...state,
         field: payload.field,
-        direction: payload.direction,
-        pageIndex: 1
+        direction: payload.direction
       }
     default:
       return state

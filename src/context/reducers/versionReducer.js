@@ -7,51 +7,32 @@ const versionReducer = (state, action) => {
         field: 'SBOMS_UPDATED_AT',
         direction: 'DESC',
         searchInput: '',
-        lifestage: [],
-        pageIndex: 1
+        lifestage: []
       }
     case 'CHANGE_SEARCH_INPUT':
       return {
         ...state,
-        searchInput: payload,
-        pageIndex: 1
+        searchInput: payload
       }
     case 'FETCH_DATA_SUCCESS':
       return {
-        ...state,
-        pageIndex: 1
+        ...state
       }
     case 'CLEAR_SEARCH_INPUT':
       return {
         ...state,
-        searchInput: '',
-        pageIndex: 1
+        searchInput: ''
       }
     case 'FILTER_LIFESTAGE':
       return {
         ...state,
-        lifestage: [...payload]?.includes('all') ? [] : payload,
-        pageIndex: 1
-      }
-    case 'DECREMENT_PAGE':
-      return {
-        ...state,
-        pageIndex: state.pageIndex !== 0 && state.pageIndex - 1,
-        before: payload
-      }
-    case 'INCREMENT_PAGE':
-      return {
-        ...state,
-        pageIndex:
-          state.pageIndex < Math.ceil(payload.total) && state.pageIndex + 1,
-        after: payload.after
+        lifestage: [...payload]?.includes('all') ? [] : payload
       }
     case 'SET_SORT_ORDER':
       return {
         ...state,
         field: payload.field,
-        direction: payload.direction,
-        pageIndex: 1
+        direction: payload.direction
       }
     default:
       return state

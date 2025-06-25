@@ -6,10 +6,7 @@ const prodVulnReducer = (state, action) => {
         ...state,
         field: 'COMPONENT_VULNS_UPDATED_AT',
         direction: 'DESC',
-        after: '',
-        before: '',
         searchInput: '',
-        pageIndex: 1,
         severities: [],
         components: [],
         statues: [],
@@ -92,93 +89,61 @@ const prodVulnReducer = (state, action) => {
     case 'SET_UPSTREAM':
       return { ...state, upstream: payload }
     case 'CHANGE_SEARCH_INPUT':
-      return { ...state, searchInput: payload, pageIndex: 1 }
+      return { ...state, searchInput: payload }
     case 'FETCH_DATA_SUCCESS':
-      return { ...state, pageIndex: 1 }
+      return { ...state }
     case 'CLEAR_SEARCH_INPUT':
-      return { ...state, searchInput: '', pageIndex: 1 }
-    case 'DECREMENT_PAGE':
-      return {
-        ...state,
-        pageIndex: state.pageIndex !== 0 && state.pageIndex - 1,
-        before: payload
-      }
-    case 'INCREMENT_PAGE':
-      return {
-        ...state,
-        pageIndex:
-          state.pageIndex < Math.ceil(payload.total) && state.pageIndex + 1,
-        after: payload.after
-      }
+      return { ...state, searchInput: '' }
     case 'SET_SORT_ORDER':
       return {
         ...state,
         field: payload.field,
-        direction: payload.direction,
-        pageIndex: 1
+        direction: payload.direction
       }
     case 'SET_TOTAL_VULNS':
       return { ...state, totalVuln: payload }
     case 'ADD_FILTER_HEADS':
       return { ...state, filters: payload }
     case 'FILTER_SOURCE':
-      return { ...state, source: payload, pageIndex: 1, after: '', before: '' }
+      return { ...state, source: payload }
     case 'FILTER_COMPONENT':
       return {
         ...state,
-        components: [...payload]?.includes('all') ? [] : payload,
-        pageIndex: 1,
-        after: '',
-        before: ''
+        components: [...payload]?.includes('all') ? [] : payload
       }
     case 'FILTER_SEVERITY':
       return {
         ...state,
-        severities: [...payload]?.includes('all') ? [] : payload,
-        pageIndex: 1,
-        after: '',
-        before: ''
+        severities: [...payload]?.includes('all') ? [] : payload
       }
     case 'FILTER_STATUS':
       return {
         ...state,
-        statues: [...payload]?.includes('all') ? [] : payload,
-        pageIndex: 1,
-        after: '',
-        before: ''
+        statues: [...payload]?.includes('all') ? [] : payload
       }
     case 'FILTER_EXCLUDE':
       return {
         ...state,
         exclude: payload,
         source: [...payload]?.includes('parts') ? true : false,
-        retracted: [...payload]?.includes('retracted') ? true : false,
-        pageIndex: 1,
-        after: '',
-        before: ''
+        retracted: [...payload]?.includes('retracted') ? true : false
       }
     case 'FILTER_COMPLETE':
       return {
         ...state,
-        vexComplete: payload,
-        pageIndex: 1,
-        after: '',
-        before: ''
+        vexComplete: payload
       }
     case 'FILTER_KEV':
-      return { ...state, kev: payload, pageIndex: 1, after: '', before: '' }
+      return { ...state, kev: payload }
     case 'FILTER_EPSS':
       return {
         ...state,
         epss: payload,
-        pageIndex: 1,
-        after: '',
-        before: '',
         minEpss: 0,
         maxEpss: 0
       }
     case 'FILTER_DIRECT':
-      return { ...state, direct: payload, pageIndex: 1, after: '', before: '' }
+      return { ...state, direct: payload }
     case 'FILTER_RETRACTED':
       return { ...state, retracted: payload }
     case 'SET_EPSS':
