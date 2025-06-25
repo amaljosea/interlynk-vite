@@ -742,6 +742,17 @@ export const ShareLynkProjectGroup = gql`
   }
 `
 
+// GET IF SHARE PROJECT GROUP EXISTS
+export const ShareLynkProjectGroupExists = gql`
+  query ShareLynkProjectGroupExists($id: Uuid!) {
+    shareLynkQuery {
+      projectGroup(id: $id) {
+        id
+      }
+    }
+  }
+`
+
 // GET GLOBAL VULNERABILITIES
 export const GetGlobalVulns = gql`
   query GetGlobalVulns(

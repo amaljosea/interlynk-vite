@@ -3,7 +3,7 @@ import { Outlet, useNavigate, useParams } from 'react-router-dom'
 
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
-import { ShareLynkProjectGroup } from 'graphQL/Queries'
+import { ShareLynkProjectGroupExists } from 'graphQL/Queries'
 
 function Index() {
   const { generateProductDetailPageUrlFromCurrentUrl } = useProductUrlContext()
@@ -11,7 +11,7 @@ function Index() {
   const params = useParams()
   const productGroupId = params.productgroupid
 
-  useQuery(ShareLynkProjectGroup, {
+  useQuery(ShareLynkProjectGroupExists, {
     skip: productGroupId ? false : true,
     variables: { id: productGroupId },
     onCompleted: (data) => {
