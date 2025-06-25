@@ -3089,3 +3089,39 @@ export const sbomClone = gql`
     }
   }
 `
+
+export const PatchCreate = gql`
+  mutation PatchCreate($input: PatchCreateInput!) {
+    patchCreate(input: $input) {
+      patch {
+        id
+        content
+        url
+        kind
+      }
+    }
+  }
+`
+
+export const PatchUpdate = gql`
+  mutation PatchUpdate($input: PatchUpdateInput!) {
+    patchUpdate(input: $input) {
+      patch {
+        id
+        content
+        url
+        kind
+      }
+    }
+  }
+`
+
+export const PatchDelete = gql`
+  mutation PatchDelete($input: PatchDeleteInput!) {
+    patchDelete(input: $input) {
+      patch {
+        id
+      }
+    }
+  }
+`

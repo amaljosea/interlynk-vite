@@ -195,7 +195,8 @@ const AttributionTable = ({
       copyright: row.attribution.copyright,
       license: row.attribution.licensesExp,
       notice: row.attribution.notice,
-      enrichedContent: row.attributionOverride
+      enrichedContent: row.attributionOverride,
+      components: row.components[0]
     })
   }
 
@@ -325,7 +326,7 @@ const AttributionTable = ({
             </Flex>
           )
         },
-        width: '25%',
+        width: '20%',
         wrap: true,
         sortable: true
       },
@@ -443,6 +444,30 @@ const AttributionTable = ({
         ),
         width: '10%'
       },
+      // PATCHES
+      {
+        id: 'patches',
+        name: 'PATCHES',
+        selector: (row) => {
+          const patches = row?.components?.[0]?.patches || []
+          return (
+            <Flex alignItems='center' gap={2}>
+              <IconButton
+                icon={<EditButton size={16} />}
+                size='sm'
+                variant='ghost'
+                onClick={() => onEdit(row, 'patches')}
+              />
+              {patches.length === 0 ? (
+                <LuCircleX fontSize={20} color={primaryErrorColor} />
+              ) : (
+                <LuCircleCheck fontSize={20} color={primarySuccessColor} />
+              )}
+            </Flex>
+          )
+        },
+        width: '10%'
+      },
       // SOURCE
       {
         id: 'source',
@@ -461,7 +486,7 @@ const AttributionTable = ({
             <option value='library'>Library</option>
           </Select>
         ),
-        width: '20%'
+        width: '15%'
       }
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -669,15 +694,14 @@ const AttributionTable = ({
           )}
           <Pagination {...paginationProps} />
         </Box>
+        <AttributionReportsEditModal
+          isOpen={editingRow.id !== null}
+          onClose={handleEditClose}
+          rowData={editingRow}
+          setSelectedRowData={setSelectedRowData}
+          sourcePreferences={sourcePreferences}
+        />
       </LynkDrawer>
-
-      <AttributionReportsEditModal
-        isOpen={editingRow.id !== null}
-        onClose={handleEditClose}
-        rowData={editingRow}
-        setSelectedRowData={setSelectedRowData}
-        sourcePreferences={sourcePreferences}
-      />
     </>
   )
 }

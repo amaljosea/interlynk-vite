@@ -6667,6 +6667,12 @@ export const GetAttributionsData = gql`
         components {
           id
           name
+          patches {
+            id
+            url
+            content
+            kind
+          }
           version
           sbomId
         }

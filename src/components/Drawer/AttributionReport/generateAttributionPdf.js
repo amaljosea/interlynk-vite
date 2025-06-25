@@ -366,6 +366,79 @@ export const generateAttributionPdf = async (
     }
     yPosition += 5
 
+    // Render Patches section
+    pdfDoc.setFontSize(11)
+    pdfDoc.setFont('ARIAL', 'normal')
+    pdfDoc.setTextColor('#444444')
+    const patchesSubtitleText = 'Patches'
+    pdfDoc.text(patchesSubtitleText, CONTENT_LEFT_ALIGNMENT_X, yPosition)
+    yPosition += 5
+
+    const patchesArr = comp.components[0]?.patches || []
+    if (Array.isArray(patchesArr) && patchesArr.length > 0) {
+      patchesArr.forEach((patch) => {
+        // Content
+        pdfDoc.setFont('ARIAL', 'normal')
+        pdfDoc.setFontSize(10)
+        pdfDoc.setTextColor('#444444')
+        const contentText = patch.content || 'N/A'
+
+        const contentLines = pdfDoc.splitTextToSize(
+          contentText,
+          pageWidth - CONTENT_LEFT_ALIGNMENT_X - margin // Apply text wrapping
+        )
+
+        contentLines.forEach((line) => {
+          if (yPosition > pageHeight - 30) {
+            relativeContentPageNumber++
+            pdfDoc.addPage()
+            yPosition = margin + 20
+            contentPageHeaders[relativeContentPageNumber] = {
+              componentName: currentComponentName,
+              startingLetter: currentStartingLetter
+            }
+          }
+          pdfDoc.text(line, CONTENT_LEFT_ALIGNMENT_X, yPosition)
+          yPosition += 5 // Line height for wrapped text
+        })
+
+        yPosition += 2 // Add a small gap after the content lines and before the URL
+
+        if (patch.url) {
+          if (yPosition > pageHeight - 30) {
+            // Check for page break before adding URL
+            relativeContentPageNumber++
+            pdfDoc.addPage()
+            yPosition = margin + 20 // Consistent content start Y
+            contentPageHeaders[relativeContentPageNumber] = {
+              componentName: currentComponentName,
+              startingLetter: currentStartingLetter
+            }
+          }
+          pdfDoc.setFont('ARIAL', 'normal')
+          pdfDoc.setFontSize(9)
+          pdfDoc.setTextColor('#3d71ee')
+          pdfDoc.textWithLink(patch.url, CONTENT_LEFT_ALIGNMENT_X, yPosition, {
+            url:
+              patch.url &&
+              (patch.url.startsWith('http://') ||
+              patch.url.startsWith('https://')
+                ? patch.url
+                : `https://${patch.url}`)
+          })
+          yPosition += 5
+        }
+        yPosition += 2 // Small gap between each patch entry
+      })
+    } else {
+      pdfDoc.setFont('ARIAL', 'normal')
+      pdfDoc.setFontSize(10)
+      pdfDoc.setTextColor('#444444')
+      pdfDoc.text('N/A', CONTENT_LEFT_ALIGNMENT_X, yPosition)
+      yPosition += 5
+    }
+    yPosition += 5
+
     // Render Notice section
     pdfDoc.setFontSize(11)
     pdfDoc.setFont('ARIAL', 'normal')

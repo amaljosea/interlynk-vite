@@ -42,6 +42,24 @@ export const downloadAttributionHtml = async (
       ? override?.licensesExp || 'N/A'
       : attribution?.licensesExp || 'N/A'
 
+    const patchesArr = comp.components?.[0]?.patches || []
+    const patchesHtml = (() => {
+      if (Array.isArray(patchesArr) && patchesArr.length > 0) {
+        return patchesArr
+          .map(
+            (patch) => `
+              <div class="patch-item">
+                <div class="patch-content">${patch.content || 'N/A'}</div>
+                ${patch.url ? `<div class="patch-url"><a href="${patch.url.startsWith('http://') || patch.url.startsWith('https://') ? patch.url : `https://${patch.url}`}" target="_blank">${patch.url}</a></div>` : ''}
+              </div>
+            `
+          )
+          .join('')
+      } else {
+        return `<div class="patch-content">N/A</div>`
+      }
+    })()
+
     // Filtering logic
     const isEmptyLicense = () => {
       if (Array.isArray(licenseExpText)) return licenseExpText.length === 0
@@ -117,6 +135,10 @@ export const downloadAttributionHtml = async (
             <div class="license-text-container">
                 <div class="subTitle">License Text</div>
                 ${licenseTextHtml}
+            </div>
+            <div class="patches-container">
+              <div class="subTitle">Patches</div>
+              ${patchesHtml}
             </div>
             <div class="item"><span class="subTitle">Notice</span> <span class="value">${noticeText}</span></div>
         </div>
@@ -275,7 +297,16 @@ export const downloadAttributionHtml = async (
     }
 
     .component-content {
-        margin-top: 20px;
+      margin-top: 20px;
+    }
+
+    .patches-container{
+      margin-bottom: 20px;
+    }
+
+    .patch-item{
+     margin-bottom: 10px;
+     font-size: 13.33px
     }
 
     .component-name { font-weight: bold; font-size: 18px; color: #000000; margin-bottom: 10px; }
