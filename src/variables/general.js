@@ -88,8 +88,11 @@ export const componentTypes = [
   { value: 'model', label: 'Model' },
   { value: 'file', label: 'File' },
   { value: 'data', label: 'Data' },
-  { value: 'bom', label: 'Bill of Material' },
-  { value: 'other', label: 'Other' }
+  { value: 'bom', label: 'Bill of Materials' },
+  { value: 'other', label: 'Other' },
+  { value: 'platform', label: 'Platform' },
+  { value: 'framework', label: 'Framework' },
+  { value: 'cryptographic-asset', label: 'Cryptographic Asset' }
 ]
 
 export const namespaceOptions = {
