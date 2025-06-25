@@ -25,7 +25,6 @@ import VersionColumns from 'components/columns/VersionColumns'
 import VersionHeader from 'components/headers/VersionHeader'
 
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useGradualPolling } from 'hooks/useGradualPolling'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
@@ -127,8 +126,9 @@ const VersionsTable = (props) => {
     : data?.project?.projectGroup
   const { name, enabled } = result || {}
 
-  const { nodes, paginationProps, loading, startPolling, stopPolling, reset } =
-    usePaginatedQuery(signedUrlParams ? ShareVersionTable : GetVersionsTable, {
+  const { nodes, paginationProps, loading, reset } = usePaginatedQuery(
+    signedUrlParams ? ShareVersionTable : GetVersionsTable,
+    {
       skip: (tab === VERSIONS || tab === null) && !TOOL.isOpen ? false : true,
       selector: signedUrlParams
         ? 'shareLynkQuery.project.sbomVersions'
@@ -141,11 +141,8 @@ const VersionsTable = (props) => {
         search: searchInput === '' ? undefined : searchInput
       },
       onCompleted: () => setClearSelect(!clearSelect)
-    })
-
-  const shouldPoll = nodes?.some((item) => item?.vulnRunStatus !== 'FINISHED')
-
-  useGradualPolling({ shouldPoll, startPolling, stopPolling })
+    }
+  )
 
   const updateSbom = useHasPermission({
     parentKey: 'view_sbom',

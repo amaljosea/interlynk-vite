@@ -1076,7 +1076,6 @@ export const GetVersionsTable = gql`
           isReprocess
           licensesExp
           projectVersion
-          vulnRunStatus
           productLifeCycleStage
           alternatives {
             id
@@ -1101,6 +1100,8 @@ export const GetVersionsTable = gql`
 export const GetSbomMetrics = gql`
   query GetSbomMetrics($projectId: Uuid!, $sbomId: Uuid!) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
+      vulnRunStatus
       stats {
         compCount
         compLicenseCount

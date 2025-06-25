@@ -36,6 +36,7 @@ import SeverityInfo from 'components/Misc/SeverityInfo'
 import StatusInfo from 'components/Misc/StatusInfo'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
+import { useGradualPolling } from 'hooks/useGradualPolling'
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -50,14 +51,16 @@ const useSbomMetrics = (sbomId) => {
 
   const signedUrlParams = getSignedUrlParams()
 
-  const [getMetrics, { data, loading, error }] = useLazyQuery(
-    signedUrlParams ? GetShareSbomMetrics : GetSbomMetrics,
-    {
-      variables: signedUrlParams
-        ? { sbomId }
-        : { projectId: productId, sbomId: sbomId }
-    }
-  )
+  const Query = signedUrlParams ? GetShareSbomMetrics : GetSbomMetrics
+
+  const queryVariables = signedUrlParams
+    ? { sbomId }
+    : { projectId: productId, sbomId: sbomId }
+
+  const [getMetrics, { data, loading, error, startPolling, stopPolling }] =
+    useLazyQuery(Query, {
+      variables: queryVariables
+    })
 
   const [metrics, setMetrics] = useState(null)
 
@@ -67,7 +70,17 @@ const useSbomMetrics = (sbomId) => {
     }
   }, [data, signedUrlParams])
 
-  return { getMetrics, metrics, loading, error }
+  const shouldPoll =
+    !signedUrlParams && metrics && metrics.vulnRunStatus !== 'FINISHED'
+
+  useGradualPolling({ shouldPoll, startPolling, stopPolling })
+
+  return {
+    getMetrics,
+    metrics,
+    loading,
+    error
+  }
 }
 
 const SbomComponentCount = ({
