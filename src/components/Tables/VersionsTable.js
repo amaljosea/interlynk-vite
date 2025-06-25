@@ -311,7 +311,12 @@ const VersionsTable = (props) => {
         <LifecycleModal
           isOpen={LIFECYCLE.isOpen}
           onClose={LIFECYCLE.onClose}
-          data={{ projectId: productId, sbomId: activeRow?.id }}
+          data={{
+            projectGroup: name,
+            projectId: productId,
+            sbomId: activeRow?.id,
+            projectVersion: activeRow?.projectVersion
+          }}
         />
       )}
       {/* DELETE VERSION */}

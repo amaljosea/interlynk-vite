@@ -2,7 +2,7 @@ import { gql, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { stages } from 'variables/general'
 
-import { FormControl, FormLabel, Stack } from '@chakra-ui/react'
+import { FormControl, FormLabel, Stack, Tag, Text } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 import LynkDate from 'components/LynkDate'
@@ -55,9 +55,11 @@ const LifecycleModal = ({ data, isOpen, onClose }) => {
     refetchQueries: ['GetVersionsTable', 'GetProductData']
   })
 
+  const { projectId, sbomId, projectGroup, projectVersion } = data || {}
+
   const { data: sbomData } = useQuery(GetLifecycleData, {
     skip: isOpen ? false : true,
-    variables: { ...data }
+    variables: { projectId, sbomId }
   })
   const { sbom } = sbomData || {}
 
@@ -158,6 +160,11 @@ const LifecycleModal = ({ data, isOpen, onClose }) => {
       title={`${data?.sbomId ? 'Update' : 'Add'} Lifestage`}
     >
       <Stack spacing={4}>
+        <Tag colorScheme='blue' w={'fit-content'}>
+          <Text fontWeight={400} wordBreak={'break-all'}>
+            {projectGroup} - {projectVersion || 'N/A'}
+          </Text>
+        </Tag>
         {error && <LynkAlert msg={error} />}
         <FormControl isRequired>
           <FormLabel htmlFor='stage'>Stage</FormLabel>

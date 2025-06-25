@@ -283,7 +283,12 @@ const SbomDetails = ({ sbomData }) => {
             <LifecycleModal
               isOpen={isOpen}
               onClose={onClose}
-              data={{ projectId: sbomData?.project?.id, sbomId: sbomData?.id }}
+              data={{
+                sbomId: sbomData?.id,
+                projectVersion: projectVersion,
+                projectId: sbomData?.project?.id,
+                projectGroup: sbomData?.project?.projectGroup?.name
+              }}
             />
           )}
         </Flex>
