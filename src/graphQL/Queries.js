@@ -590,6 +590,17 @@ export const GetProjectSettings = gql`
   }
 `
 
+// GET VULN SCAN PROJECT SETTINGS
+export const GetVulnScanningSetting = gql`
+  query GetVulnScanningSetting($id: Uuid!) {
+    project(id: $id) {
+      projectSetting {
+        vulnScanningEnabled
+      }
+    }
+  }
+`
+
 // GET PROJECT SETTINGS FOR SBOM PROCESS
 export const GetProjectSettingsForSbomProcess = gql`
   query GetProjectSettingsForSbomProcess($id: Uuid!) {

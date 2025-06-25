@@ -14,7 +14,7 @@ import { useGradualPolling } from 'hooks/useGradualPolling'
 import { useShouldShowDemoFeatures } from 'hooks/useShouldShowDemoFeatures'
 
 import { GetProductData } from 'graphQL/Queries'
-import { GetProjectSettings, PolicyResultsType } from 'graphQL/Queries'
+import { GetVulnScanningSetting, PolicyResultsType } from 'graphQL/Queries'
 
 import SbomInfo from './SbomInfo'
 import SbomTable from './SbomTable'
@@ -35,7 +35,7 @@ const ProductDetailsSbomNew = () => {
 
   const { vulnRunStatus } = data?.sbom || {}
 
-  const { data: settings } = useQuery(GetProjectSettings, {
+  const { data: settings } = useQuery(GetVulnScanningSetting, {
     variables: { id: productId }
   })
 
