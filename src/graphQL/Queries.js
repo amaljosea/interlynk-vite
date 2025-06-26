@@ -171,8 +171,9 @@ export const GetAllPermissions = gql`
   }
 `
 
+// GET ORGANIZATION LATEST VERSIONS
 export const GetLatestVersions = gql`
-  query GetOrgMetrics($env: String) {
+  query GetLatestVersions($env: String) {
     organizationMetric(envName: $env) {
       latestVersions {
         id
@@ -187,11 +188,19 @@ export const GetLatestVersions = gql`
             name
           }
         }
-        stats {
-          compCount
-          compLicenseCount
-          vulnStats
-        }
+      }
+    }
+  }
+`
+
+// GET LATEST VERSIONS METRICS
+export const GetLatestSbomMetrics = gql`
+  query GetLatestSbomMetrics($projectId: Uuid!, $sbomId: Uuid!) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      stats {
+        compCount
+        compLicenseCount
+        vulnStats
       }
     }
   }
@@ -221,44 +230,6 @@ export const GetRoles = gql`
         id
         name
         createdAt
-      }
-    }
-  }
-`
-
-// GET ORGANIZATION METRICS
-export const GetOrgMetrics = gql`
-  query GetOrgMetrics($env: String) {
-    organizationMetric(envName: $env) {
-      projectCount
-      versionCount
-      componentCount
-      vulnsMetric
-      latestImports {
-        event
-        updated
-        changedBy
-      }
-      latestVulns {
-        vulnId
-        desc
-      }
-      latestProjects {
-        id
-        name
-        updatedAt
-        sboms {
-          id
-          primaryComponent {
-            name
-            version
-          }
-          stats {
-            compCount
-            compLicenseCount
-            vulnStats
-          }
-        }
       }
     }
   }

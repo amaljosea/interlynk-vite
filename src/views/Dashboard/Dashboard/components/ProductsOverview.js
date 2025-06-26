@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
-import { useQuery } from '@apollo/client'
+import { useLazyQuery, useQuery } from '@apollo/client'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   getFullDate,
@@ -8,7 +9,7 @@ import {
   truncatedValue
 } from 'utils'
 
-import { Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
+import { Flex, Spinner, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 
 import LynkTable from 'components/LynkTable'
 import LynkLoader from 'components/Misc/LynkLoader'
@@ -18,7 +19,130 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { GetLatestVersions } from 'graphQL/Queries'
+import { GetLatestSbomMetrics, GetLatestVersions } from 'graphQL/Queries'
+
+const useLatestSbomMetrics = (projectId, sbomId) => {
+  const [getMetrics, { data, loading, error }] = useLazyQuery(
+    GetLatestSbomMetrics,
+    {
+      variables: { projectId, sbomId }
+    }
+  )
+
+  const [metrics, setMetrics] = useState(null)
+
+  useEffect(() => {
+    if (data) {
+      setMetrics(data.sbom)
+    }
+  }, [data])
+
+  return {
+    getMetrics,
+    metrics,
+    loading,
+    error
+  }
+}
+
+const LatestSbomComponentCount = ({ sbomId, projectId, link, uniqueSbom }) => {
+  const { getMetrics, metrics, loading } = useLatestSbomMetrics(
+    projectId,
+    sbomId
+  )
+
+  useEffect(() => {
+    getMetrics()
+  }, [getMetrics])
+
+  return (
+    <Link to={link} style={{ pointerEvents: uniqueSbom ? '' : 'none' }}>
+      <Tag
+        size='md'
+        variant='subtle'
+        width={16}
+        colorScheme={'teal'}
+        cursor={'pointer'}
+      >
+        <TagLabel mx={'auto'}>
+          {loading ? (
+            <Spinner size='xs' mt={0.5} />
+          ) : (
+            metrics?.stats?.compCount || 0
+          )}
+        </TagLabel>
+      </Tag>
+    </Link>
+  )
+}
+
+const LatestSbomLicenseCount = ({ sbomId, projectId, link, uniqueSbom }) => {
+  const { getMetrics, metrics, loading } = useLatestSbomMetrics(
+    projectId,
+    sbomId
+  )
+
+  useEffect(() => {
+    getMetrics()
+  }, [getMetrics])
+
+  return (
+    <Link to={link} style={{ pointerEvents: uniqueSbom ? '' : 'none' }}>
+      <Tag size='md' variant='subtle' width={16} colorScheme={'orange'}>
+        <TagLabel mx={'auto'}>
+          {loading ? (
+            <Spinner size='xs' mt={0.5} />
+          ) : (
+            metrics?.stats?.compLicenseCount || 0
+          )}
+        </TagLabel>
+      </Tag>
+    </Link>
+  )
+}
+
+const LatestSbomVulnerabilities = ({
+  sbomId,
+  projectId,
+  link,
+  onFilterSev,
+  isUnique
+}) => {
+  const { getMetrics, metrics, loading } = useLatestSbomMetrics(
+    projectId,
+    sbomId
+  )
+
+  useEffect(() => {
+    getMetrics()
+  }, [getMetrics])
+
+  const renderLoadingTags = () => (
+    <Flex gap={2}>
+      <Tag minW='50px' colorScheme='red'>
+        <TagLabel mx='auto'>
+          <Spinner size='xs' mt={0.5} />
+        </TagLabel>
+      </Tag>
+      <Tag minW='50px' colorScheme='orange'>
+        <TagLabel mx='auto'>
+          <Spinner size='xs' mt={0.5} />
+        </TagLabel>
+      </Tag>
+    </Flex>
+  )
+
+  return loading && !metrics ? (
+    renderLoadingTags()
+  ) : (
+    <SeverityInfo
+      data={metrics || {}}
+      link={link}
+      isUnique={isUnique}
+      onFilter={isUnique ? onFilterSev : null}
+    />
+  )
+}
 
 const ProductsOverview = () => {
   const navigate = useNavigate()
@@ -41,25 +165,27 @@ const ProductsOverview = () => {
   })
   const { latestVersions } = data?.organizationMetric || {}
 
-  const handleClick = (prod) => {
-    const { id, projectId } = prod
+  const handleClick = useCallback(
+    (prod) => {
+      const { id, projectId } = prod
 
-    prodDispatch({
-      type: 'SET_CURRENT_PRODUCT',
-      payload: { id: projectId, sbomId: id }
-    })
-    prodDispatch({
-      type: 'SET_CURRENT_PRODUCT',
-      payload: { id: projectId, sbomId: id }
-    })
-  }
+      prodDispatch({
+        type: 'SET_CURRENT_PRODUCT',
+        payload: { id: projectId, sbomId: id }
+      })
+    },
+    [prodDispatch]
+  )
 
-  const onFilterSev = (value, id, link) => {
-    prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
-    navigate(link)
-  }
+  const onFilterSev = useCallback(
+    (value, id, link) => {
+      prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
+      navigate(link)
+    },
+    [prodVulnDispatch, navigate]
+  )
 
-  const removeDuplicates = (versions) => {
+  const removeDuplicates = useCallback((versions) => {
     const uniqueVersions = []
     versions?.forEach((version) => {
       const duplicateIndex = uniqueVersions.findIndex(
@@ -73,178 +199,186 @@ const ProductsOverview = () => {
       }
     })
     return uniqueVersions
-  }
+  }, [])
 
-  const filteredData =
-    latestVersions?.length > 0 && removeDuplicates(latestVersions)
+  const filteredData = useMemo(() => {
+    return latestVersions?.length > 0 ? removeDuplicates(latestVersions) : []
+  }, [latestVersions, removeDuplicates])
 
   // COLUMNS
-  const columns = [
-    // PRODUCT
-    {
-      id: 'PRODUCT',
-      name: 'PRODUCT',
-      wrap: true,
-      selector: (row) => {
-        const { id, project } = row
-        const uniqueSbom = filteredData?.find((item) => item?.id === id)
-        return (
-          <Tooltip placement='top' label={project?.projectGroup?.name}>
-            <Link
-              to={generateProductDetailPageUrlFromCurrentUrl({
-                productgroupid: project?.projectGroup?.id,
-                productid: project?.id
-              })}
-              style={{ pointerEvents: uniqueSbom ? 'inherit' : 'none' }}
-              onClick={() => handleClick(row)}
-            >
-              <Text
-                my={3}
-                fontSize={14}
-                color={uniqueSbom ? primaryBlueText : secondaryTextInverse}
+  const columns = useMemo(
+    () => [
+      // PRODUCT
+      {
+        id: 'PRODUCT',
+        name: 'PRODUCT',
+        wrap: true,
+        selector: (row) => {
+          const { id, project } = row
+          const uniqueSbom = filteredData?.find((item) => item?.id === id) // Use filteredData
+          return (
+            <Tooltip placement='top' label={project?.projectGroup?.name}>
+              <Link
+                to={generateProductDetailPageUrlFromCurrentUrl({
+                  productgroupid: project?.projectGroup?.id,
+                  productid: project?.id
+                })}
+                style={{ pointerEvents: uniqueSbom ? 'inherit' : 'none' }}
+                onClick={() => handleClick(row)}
               >
-                {truncatedValue(project?.projectGroup?.name, 16)}
-              </Text>
-            </Link>
-          </Tooltip>
-        )
-      }
-    },
-    // VERSION
-    {
-      id: 'VERSION',
-      name: 'VERSION',
-      wrap: true,
-      selector: (row) => {
-        const { id, project, projectVersion } = row
-        const uniqueSbom = filteredData?.find((item) => item?.id === id)
-        return (
-          <Tooltip placement='top' label={projectVersion}>
-            <Link
-              to={generateProductVersionDetailPageUrlFromCurrentUrl({
-                productgroupid: project?.projectGroup?.id,
-                productid: project?.id,
-                sbomid: id,
-                paramsObj: {
-                  tab: 'general'
-                }
-              })}
-              style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
-            >
-              <Text
-                my={2}
-                fontSize={14}
-                color={uniqueSbom ? primaryBlueText : secondaryTextInverse}
+                <Text
+                  my={3}
+                  fontSize={14}
+                  color={uniqueSbom ? primaryBlueText : secondaryTextInverse}
+                >
+                  {truncatedValue(project?.projectGroup?.name, 16)}
+                </Text>
+              </Link>
+            </Tooltip>
+          )
+        }
+      },
+      // VERSION
+      {
+        id: 'VERSION',
+        name: 'VERSION',
+        wrap: true,
+        selector: (row) => {
+          const { id, project, projectVersion } = row
+          const uniqueSbom = filteredData?.find((item) => item?.id === id) // Use filteredData
+          return (
+            <Tooltip placement='top' label={projectVersion}>
+              <Link
+                to={generateProductVersionDetailPageUrlFromCurrentUrl({
+                  productgroupid: project?.projectGroup?.id,
+                  productid: project?.id,
+                  sbomid: id,
+                  paramsObj: {
+                    tab: 'general'
+                  }
+                })}
+                style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
               >
-                {projectVersion ? truncatedValue(projectVersion, 12) : 'N/A'}
+                <Text
+                  my={2}
+                  fontSize={14}
+                  color={uniqueSbom ? primaryBlueText : secondaryTextInverse}
+                >
+                  {projectVersion ? truncatedValue(projectVersion, 12) : 'N/A'}
+                </Text>
+              </Link>
+            </Tooltip>
+          )
+        }
+      },
+      // COMPONENTS
+      {
+        id: 'COMPONENTS',
+        name: 'COMPONENTS',
+        wrap: true,
+        selector: (row) => {
+          const { id, project } = row
+          const uniqueSbom = filteredData?.find((item) => item?.id === id)
+          const link = generateProductVersionDetailPageUrlFromCurrentUrl({
+            productgroupid: project?.projectGroup?.id,
+            productid: project?.id,
+            sbomid: id,
+            paramsObj: {
+              tab: 'components'
+            }
+          })
+
+          return (
+            <LatestSbomComponentCount
+              sbomId={id}
+              projectId={project?.id}
+              link={link}
+              uniqueSbom={uniqueSbom}
+            />
+          )
+        }
+      },
+      // LICENSES
+      {
+        id: 'LICENSES',
+        name: 'LICENSES',
+        wrap: true,
+        selector: (row) => {
+          const { id, project } = row
+          const uniqueSbom = filteredData?.find((item) => item?.id === id)
+          const link = generateProductVersionDetailPageUrlFromCurrentUrl({
+            productgroupid: project?.projectGroup?.id,
+            productid: project?.id,
+            sbomid: id,
+            paramsObj: {
+              tab: 'licenses'
+            }
+          })
+
+          return (
+            <LatestSbomLicenseCount
+              sbomId={id}
+              projectId={project?.id}
+              link={link}
+              uniqueSbom={uniqueSbom}
+            />
+          )
+        }
+      },
+      // VULNERABILITIES
+      {
+        id: 'VULNERABILITIES',
+        name: 'VULNERABILITIES',
+        width: '25%',
+        selector: (row) => {
+          const { id, project } = row
+          const uniqueSbom = filteredData?.some((item) => item?.id === id)
+          const link = generateProductVersionDetailPageUrlFromCurrentUrl({
+            productgroupid: project?.projectGroup?.id,
+            productid: project?.id,
+            sbomid: id,
+            paramsObj: { tab: 'vulnerabilities' }
+          })
+          return (
+            <LatestSbomVulnerabilities
+              sbomId={id}
+              projectId={project?.id}
+              link={link}
+              onFilterSev={onFilterSev}
+              isUnique={uniqueSbom}
+            />
+          )
+        }
+      },
+      // IMPORTED
+      {
+        id: 'IMPORTED',
+        name: 'IMPORTED',
+        wrap: true,
+        right: 'true',
+        selector: (row) => {
+          const { createdAt } = row
+          return (
+            <Tooltip placement='top' label={getFullDate(createdAt)}>
+              <Text fontSize={14} color={primaryTextColor} textAlign={'right'}>
+                {timeSince(createdAt)}
               </Text>
-            </Link>
-          </Tooltip>
-        )
+            </Tooltip>
+          )
+        }
       }
-    },
-    // COMPONENTS
-    {
-      id: 'COMPONENTS',
-      name: 'COMPONENTS',
-      wrap: true,
-      selector: (row) => {
-        const { id, project, stats } = row
-        const uniqueSbom = filteredData?.find((item) => item?.id === id)
-        return (
-          <Link
-            to={generateProductVersionDetailPageUrlFromCurrentUrl({
-              productgroupid: project?.projectGroup?.id,
-              productid: project?.id,
-              sbomid: id,
-              paramsObj: {
-                tab: 'components'
-              }
-            })}
-            style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
-          >
-            <Tag
-              size='md'
-              variant='subtle'
-              width={16}
-              colorScheme={'teal'}
-              cursor={'pointer'}
-            >
-              <TagLabel mx={'auto'}>{stats?.compCount || 0}</TagLabel>
-            </Tag>
-          </Link>
-        )
-      }
-    },
-    // LICENSES
-    {
-      id: 'LICENSES',
-      name: 'LICENSES',
-      wrap: true,
-      selector: (row) => {
-        const { id, project, stats } = row
-        const uniqueSbom = filteredData?.find((item) => item?.id === id)
-        return (
-          <Link
-            to={generateProductVersionDetailPageUrlFromCurrentUrl({
-              productgroupid: project?.projectGroup?.id,
-              productid: project?.id,
-              sbomid: id,
-              paramsObj: {
-                tab: 'licenses'
-              }
-            })}
-            style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
-          >
-            <Tag size='md' variant='subtle' width={16} colorScheme={'orange'}>
-              <TagLabel mx={'auto'}>{stats?.compLicenseCount || 0}</TagLabel>
-            </Tag>
-          </Link>
-        )
-      }
-    },
-    // VULNERABILITIES
-    {
-      id: 'VULNERABILITIES',
-      name: 'VULNERABILITIES',
-      width: '25%',
-      selector: (row) => {
-        const { id, project } = row
-        const uniqueSbom = filteredData?.some((item) => item?.id === id)
-        const link = generateProductVersionDetailPageUrlFromCurrentUrl({
-          productgroupid: project?.projectGroup?.id,
-          productid: project?.id,
-          sbomid: id,
-          paramsObj: { tab: 'vulnerabilities' }
-        })
-        return (
-          <SeverityInfo
-            data={row}
-            link={link}
-            isUnique={uniqueSbom}
-            onFilter={uniqueSbom ? onFilterSev : null}
-          />
-        )
-      }
-    },
-    // IMPORTED
-    {
-      id: 'IMPORTED',
-      name: 'IMPORTED',
-      wrap: true,
-      right: 'true',
-      selector: (row) => {
-        const { createdAt } = row
-        return (
-          <Tooltip placement='top' label={getFullDate(createdAt)}>
-            <Text fontSize={14} color={primaryTextColor} textAlign={'right'}>
-              {timeSince(createdAt)}
-            </Text>
-          </Tooltip>
-        )
-      }
-    }
-  ]
+    ],
+    [
+      filteredData,
+      generateProductDetailPageUrlFromCurrentUrl,
+      generateProductVersionDetailPageUrlFromCurrentUrl,
+      handleClick,
+      onFilterSev,
+      primaryBlueText,
+      primaryTextColor,
+      secondaryTextInverse
+    ]
+  )
 
   if (loading) return <LynkLoader />
 

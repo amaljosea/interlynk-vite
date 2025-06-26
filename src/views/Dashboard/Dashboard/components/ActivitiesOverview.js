@@ -11,7 +11,7 @@ import ActivitiesOverviewRow from 'components/Tables/ActivitiesOverviewRow'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 export const GetLatestActivity = gql`
-  query GetOrgMetrics($env: String) {
+  query GetLatestActivity($env: String) {
     organizationMetric(envName: $env) {
       latestActivity {
         event
