@@ -2,6 +2,7 @@ import { useMutation } from '@apollo/client'
 import React, { useCallback, useMemo, useState } from 'react'
 import { getFullDate, timeSince } from 'utils'
 import { getStatusColor } from 'utils/styleUtils'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { Flex, Menu, Portal, Stack, Text } from '@chakra-ui/react'
 import { Tooltip, useDisclosure } from '@chakra-ui/react'
@@ -24,7 +25,6 @@ import ConfirmationModal from '../Products/components/ConfirmationModal'
 import Filters from './Filters'
 import RequestAcceptModal from './RequestAcceptModal'
 import RequestModal from './RequestModal'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 const RequestTable = (props) => {
   const { data, loading, filters, setFilters, paginationProps } = props

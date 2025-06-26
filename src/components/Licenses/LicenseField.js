@@ -19,7 +19,13 @@ import { useSelect } from 'hooks/useSelect'
 
 import { LicenseAutoComplete } from 'graphQL/Queries'
 
-const LicenseField = ({ resolved, sbomView, license, disabled }) => {
+const LicenseField = ({
+  resolved,
+  sbomView,
+  license,
+  disabled,
+  label = 'License'
+}) => {
   const { style } = useSelect('field')
   const { isCustomerView } = useRouteFlags()
   const { tabData, setTabData, handleChange } = useContext(TabContext)
@@ -199,7 +205,7 @@ const LicenseField = ({ resolved, sbomView, license, disabled }) => {
       <VStack spacing={4} alignItems={'flex-start'}>
         <FormControl isDisabled={isCustomerView}>
           <LynkFormLabel
-            label='License'
+            label={label}
             htmlFor={licenseType}
             info={!sbomView ? onCheck(`Component License`) : null}
           />

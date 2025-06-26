@@ -13,6 +13,7 @@ import {
   FormErrorMessage,
   HStack,
   Input,
+  Stack,
   Text,
   Textarea,
   VStack
@@ -393,15 +394,27 @@ const AttributionReportsEditModal = ({
           </Text>
         )}
         {editingField === 'license' && (
-          <LicenseField
-            sbomView={false}
-            license={
-              isEditable
-                ? rowData?.license
-                : rowData?.enrichedContent?.licensesExp
-            }
-            disabled={!isEditable}
-          />
+          <>
+            <LynkFormLabel label='Current value' />
+
+            <Textarea
+              value={
+                isEditable
+                  ? rowData?.license
+                  : rowData?.enrichedContent?.licensesExp
+              }
+              readOnly
+            />
+            <Box mt={4}>
+              {isEditable && (
+                <LicenseField
+                  label='Change license to'
+                  sbomView={false}
+                  disabled={!isEditable}
+                />
+              )}
+            </Box>
+          </>
         )}
         {(editingField === 'copyright' || editingField === 'notice') && (
           <FormControl>
@@ -410,7 +423,7 @@ const AttributionReportsEditModal = ({
               htmlFor={editingField === 'copyright' ? 'copyright' : 'notice'}
             />
             <Textarea
-              isDisabled={!isEditable}
+              readOnly={!isEditable}
               name={editingField === 'copyright' ? 'copyright' : 'notice'}
               value={
                 editingField === 'copyright' ? copyrightValue : noticeValue

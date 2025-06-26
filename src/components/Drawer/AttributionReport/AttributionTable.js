@@ -378,12 +378,17 @@ const AttributionTable = ({
                   </span>
                 </Tooltip>
               )}
-              <Text fontSize={14} color={primaryTextColor}>
-                {truncatedValue(
-                  getValueFromSource(row, 'licensesExp') || 'N/A',
-                  20
-                )}
-              </Text>
+              <Tooltip
+                label={getValueFromSource(row, 'licensesExp')}
+                placement={'top'}
+              >
+                <Text fontSize={14} color={primaryTextColor}>
+                  {truncatedValue(
+                    getValueFromSource(row, 'licensesExp') || 'N/A',
+                    20
+                  )}
+                </Text>
+              </Tooltip>
             </Flex>
           )
         },
