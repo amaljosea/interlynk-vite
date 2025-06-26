@@ -601,7 +601,7 @@ const AttributionTable = ({
 
           {selectedRowData.length > 0 && (
             <Select
-              placeholder={`Change source for selected items`}
+              placeholder={`Change source for ${selectedRowData.length} selected ${selectedRowData.length === 1 ? 'item' : 'items'}`}
               width='300px'
               onChange={(e) => handleBulkSourceChange(e.target.value)}
             >

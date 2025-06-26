@@ -6605,6 +6605,7 @@ export const GetAttributionsData = gql`
     ) {
       totalCount
       nodes {
+        id
         attribution {
           licensesExp
           copyright
