@@ -10,7 +10,6 @@ import { MenuItem, MenuList } from '@chakra-ui/react'
 
 import AddButton from 'components/Icons/AddButton'
 import RefreshBtn from 'components/Icons/RefreshBtn'
-import SearchFilter from 'components/Licenses/LicenseSearchFilter'
 import LynkTable from 'components/LynkTable'
 import LynkAction from 'components/Misc/LynkAction'
 
@@ -25,6 +24,7 @@ import ConfirmationModal from '../Products/components/ConfirmationModal'
 import Filters from './Filters'
 import RequestAcceptModal from './RequestAcceptModal'
 import RequestModal from './RequestModal'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 const RequestTable = (props) => {
   const { data, loading, filters, setFilters, paginationProps } = props

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import {
   Flex,
@@ -11,8 +12,6 @@ import {
 } from '@chakra-ui/react'
 
 import MenuHeading from 'components/Misc/MenuHeading'
-
-import SearchFilter from './Licenses/LicenseSearchFilter'
 
 export const AsyncFilter = ({ lazyDropDownProps, isActive }) => {
   const {
