@@ -65,7 +65,9 @@ const ViolationDrawer = ({ policy, activeRow, sbomId, isOpen, onClose }) => {
         const { violation, component } = row
         return (
           <Text color={primaryTextColor} my={3}>
-            {component?.version || violation?.primaryComponent?.version || ''}
+            {component?.version ||
+              violation?.primaryComponent?.version ||
+              'N/A'}
           </Text>
         )
       },

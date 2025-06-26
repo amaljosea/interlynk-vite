@@ -13,7 +13,7 @@ import { GoVersions } from 'react-icons/go'
 import CustomTag from './CustomTag'
 
 export const GetProductVersionData = gql`
-  query GetProductData($projectId: Uuid!, $sbomId: Uuid!) {
+  query GetProductVersionData($projectId: Uuid!, $sbomId: Uuid!) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       primaryComponent {
         name

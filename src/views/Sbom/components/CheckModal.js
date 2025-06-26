@@ -156,7 +156,8 @@ const CheckModal = (props) => {
   const [updateComponent, { loading: updating }] = useMutation(
     UpdateComponent,
     {
-      onCompleted: () => recheck()
+      onCompleted: () => recheck(),
+      refetchQueries: ['GetProductData']
     }
   )
 
