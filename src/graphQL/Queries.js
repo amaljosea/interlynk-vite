@@ -6018,6 +6018,12 @@ export const PackageVersionsTable = gql`
         sourceType
         version
       }
+      pageInfo {
+        endCursor
+        hasNextPage
+        startCursor
+        hasPreviousPage
+      }
     }
   }
 `
