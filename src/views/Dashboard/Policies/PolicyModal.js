@@ -372,7 +372,7 @@ const PolicyModal = ({ data, isOpen, onClose, plSubjects }) => {
       onClose={onClose}
       buttonText={data ? 'Update' : 'Save'}
       disabled={errorMessage || error !== ''}
-      isLoading={data ? creating : updating}
+      isLoading={data ? updating : creating}
       title={`${data ? 'Edit' : 'Create'} Policy`}
       onSubmit={data ? handleUpdate : handleCreate}
     >
