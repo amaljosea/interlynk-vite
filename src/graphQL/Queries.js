@@ -686,27 +686,15 @@ export const ShareLynkProjectGroup = gql`
     shareLynkQuery {
       projectGroup(id: $id) {
         description
-        enabled
         id
         name
-        organizationId
-        updatedAt
         defaultProject {
-          description
-          enabled
           id
-          name
-          projectGroupId
-          updatedAt
         }
         projects {
-          description
-          enabled
           id
           name
           sbomsCount
-          projectGroupId
-          updatedAt
         }
       }
     }
