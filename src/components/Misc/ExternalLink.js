@@ -1,7 +1,7 @@
 import { IconButton, Link, Tooltip } from '@chakra-ui/react'
 
 const ExternalLink = ({ link, ...rest }) => {
-  const { url } = link || ''
+  const { url } = link || {}
   return (
     <Tooltip placement='top' label={link?.name}>
       <Link

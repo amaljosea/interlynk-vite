@@ -300,7 +300,8 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
             (item) => item.name === 'issue-tracker'
           )
           const vcs = externalUrls?.find((item) => item.name === 'vcs')
-          const onCheck = (item) => (item ? primaryBlueText : primaryTextColor)
+          const onCheck = (item) =>
+            item?.url ? primaryBlueText : primaryTextColor
 
           const isPart = sbomId !== sbom?.id
 
