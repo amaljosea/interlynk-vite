@@ -1,51 +1,27 @@
 import { useLazyQuery } from '@apollo/client'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { areArraysEqual, getFullDate, timeSince } from 'utils'
-import { statusColor } from 'utils/styleUtils'
-import ExportCsv from 'views/Dashboard/Products/components/ExportCsv'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
+import { useCallback, useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import { areArraysEqual } from 'utils'
 
-import {
-  Flex,
-  IconButton,
-  Stack,
-  Tag,
-  TagLabel,
-  TagLeftIcon,
-  Text,
-  Tooltip,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Flex, useDisclosure } from '@chakra-ui/react'
 
 import ConnectedSbomDrawer from 'components/Drawer/ConnectedSbomDrawer'
 import LynkTable from 'components/LynkTable'
 import Pagination from 'components/Pagination'
+import ComponentVulnsColumns from 'components/columns/ComponentVulnsColumns'
+import ComponentVulnsHeader from 'components/headers/ComponentVulnsHeader'
 
-import { useHasPermission } from 'hooks/useHasPermission'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
-import { useProductUrlContext } from 'hooks/useProductUrlContext'
-import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetCompVulnData, GetConnectedSbom } from 'graphQL/Queries'
 
-import { LuBan, LuFolderTree, LuSquarePen } from 'react-icons/lu'
-
 import VexModal from './VexModal'
-import VulnFilters from './VulnsFilter'
 
 const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
   const params = useParams()
   const productGroupId = params?.productgroupid
-  const { primaryTextColor, secondaryTextColor, primaryBlueText } =
-    useThemeColor(['primaryTextColor', 'secondaryTextColor', 'primaryBlueText'])
 
   const { id, vulnId } = vuln || ''
-
-  const editVulns = useHasPermission({
-    parentKey: 'view_sbom',
-    childKey: 'edit_vulnerabilities'
-  })
 
   const [vulnState, setVulnState] = useState({
     vexComplete: undefined,
@@ -73,9 +49,6 @@ const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
   const [checkEquals, setCheckEquals] = useState(false)
   const [toggleClear, setToggleClear] = useState(false)
 
-  const { generateProductVersionDetailPageUrlFromCurrentUrl } =
-    useProductUrlContext()
-
   const handlePreview = async (row) => {
     const { id, component } = row
     await getSboms({
@@ -87,137 +60,6 @@ const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
       }
     }).then(() => SBOM.onOpen())
   }
-
-  // COLUMNS
-  const columns = [
-    // PRODUCTS
-    {
-      id: 'PRODUCT_GROUP',
-      name: 'PRODUCT',
-      selector: (row) => {
-        const { component } = row
-        return (
-          <Flex flexDir={'row'} my={3} gap={2} alignItems={'center'}>
-            <Tooltip label='Also affected'>
-              <IconButton
-                size='xs'
-                colorScheme='blue'
-                icon={<LuFolderTree size={16} />}
-                onClick={() => handlePreview(row)}
-                isDisabled={!component?.sbom?.hasConnectedSboms}
-              />
-            </Tooltip>
-            <Link
-              to={generateProductVersionDetailPageUrlFromCurrentUrl({
-                productgroupid: component?.sbom?.project?.projectGroup?.id,
-                productid: component?.sbom?.project?.id,
-                sbomid: component?.sbom?.id,
-                paramsObj: {
-                  tab: 'components'
-                },
-                replaceParams: true
-              })}
-            >
-              <Text fontSize={14} color={primaryBlueText}>
-                {component?.sbom?.project?.projectGroup?.name || 'N/A'}
-              </Text>
-            </Link>
-          </Flex>
-        )
-      },
-      wrap: true,
-      width: '15%',
-      omit: params?.name ? true : false
-    },
-    // VERSION
-    {
-      id: 'PRODUCT_VERSIONN',
-      name: 'VERSION',
-      selector: (row) => (
-        <Tooltip label={row?.component?.sbom?.projectVersion} placement='top'>
-          <Text fontSize={14} color={primaryTextColor} my={2}>
-            {row?.component?.sbom?.projectVersion}
-          </Text>
-        </Tooltip>
-      ),
-      wrap: true,
-      width: '14%'
-    },
-    // VULN COMPONENT
-    {
-      id: 'COMPONENTS_NAME',
-      name: 'COMPONENT',
-      selector: (row) => {
-        const { component } = row
-        return (
-          <Stack
-            my={3}
-            spacing={1}
-            direction='column'
-            alignItems={'flex-start'}
-          >
-            <Text fontSize={14} color={primaryTextColor}>
-              {component?.name || 'N/A'}
-            </Text>
-            <Text fontSize={14} color={secondaryTextColor}>
-              {component?.version || 'N/A'}
-            </Text>
-          </Stack>
-        )
-      },
-      wrap: true,
-      width: '26%'
-    },
-    // ENV
-    {
-      id: 'ENVIRONMENT',
-      name: 'ENVIRONMENT',
-      selector: (row) => {
-        const { component } = row
-        return (
-          <Text
-            fontSize={14}
-            color={primaryTextColor}
-            textTransform={'capitalize'}
-          >
-            {component?.sbom?.project?.name || 'N/A'}
-          </Text>
-        )
-      },
-      wrap: true,
-      width: '12%'
-    },
-    // STATUS
-    {
-      id: 'VEX_STATUSES_NAME',
-      name: 'STATUS',
-      selector: (row) => {
-        const { vexStatus, isComplete } = row
-        return (
-          <Tag
-            variant={'subtle'}
-            colorScheme={statusColor(vexStatus?.name || 'Unspecified')}
-          >
-            {isComplete === false && <TagLeftIcon boxSize='14px' as={LuBan} />}
-            <TagLabel>{vexStatus?.name || 'Unspecified'}</TagLabel>
-          </Tag>
-        )
-      },
-      wrap: true
-    },
-    // UPDATED AT
-    {
-      id: 'VEX_UPDATED_AT',
-      name: 'UPDATED',
-      selector: (row) => (
-        <Tooltip label={getFullDate(row?.updatedAt)} placement={'top'}>
-          <Text color={primaryTextColor}>{timeSince(row?.updatedAt)}</Text>
-        </Tooltip>
-      ),
-      right: 'true',
-      wrap: true
-    }
-  ]
 
   const setSearchFilter = useCallback(
     (value) => {
@@ -267,68 +109,6 @@ const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
     [handleClear]
   )
 
-  const subHeaderComponent = useMemo(() => {
-    return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
-        {/* FILTER */}
-        <Stack spacing={2} alignItems={'center'} direction={'row'}>
-          <SearchFilter
-            id='globalVulns'
-            filterText={filterInput}
-            onFilter={handleSearch}
-            onClear={handleClear}
-            onChange={onSearchInputChange}
-          />
-          <VulnFilters
-            prodGroups={prodGroups}
-            sbomVersions={sbomVersions}
-            setFilter={(newFilters) => {
-              setVulnState(newFilters)
-              reset()
-            }}
-          />
-        </Stack>
-        <Stack spacing={2} alignItems={'center'} direction={'row'}>
-          {/* EXPORT CSV */}
-          <ExportCsv
-            tableType={'Vulnerability Detail View'}
-            filters={{ ...vulnState }}
-          />
-          {/* UPDATE STATUES */}
-          {selectedVulns.length > 0 && (
-            <Tooltip label={'Set Status'}>
-              <IconButton
-                icon={<LuSquarePen size={18} />}
-                variant='solid'
-                colorScheme='blue'
-                fontWeight='normal'
-                title='Set vuln status'
-                onClick={STATUS.onOpen}
-                isDisabled={!editVulns}
-              />
-            </Tooltip>
-          )}
-        </Stack>
-      </Flex>
-    )
-  }, [
-    filterInput,
-    handleSearch,
-    handleClear,
-    onSearchInputChange,
-    prodGroups,
-    sbomVersions,
-    vulnState,
-    selectedVulns.length,
-    STATUS.onOpen,
-    editVulns,
-    reset
-  ])
-
   const handleChange = (state) => {
     setSelectedVulns(state?.selectedRows)
     const version =
@@ -347,6 +127,25 @@ const VulnProdTable = ({ vuln, sbomVersions, prodGroups }) => {
       setSelectedGroup('')
     }
   }
+
+  const onFilter = (newFilters) => {
+    setVulnState(newFilters)
+    reset()
+  }
+
+  const columns = ComponentVulnsColumns({ handlePreview })
+
+  const subHeaderComponent = ComponentVulnsHeader({
+    STATUS,
+    filterInput,
+    handleClear,
+    handleSearch,
+    onSearchInputChange,
+    selectedVulns,
+    onFilter,
+    prodGroups,
+    sbomVersions
+  })
 
   useEffect(() => {
     if (nodes) {

@@ -39,8 +39,8 @@ export const GetProjectVersions = gql`
   }
 `
 
-export const GetCompVulnData = gql`
-  query GetCompVulnData(
+export const GetCompVulnCount = gql`
+  query GetCompVulnCount(
     $id: Uuid!
     $projectGroupIds: [Uuid!]
     $projectIds: [Uuid!]
@@ -127,7 +127,7 @@ const VulnInfo = () => {
 
   const versionList = params?.productid ? productVersions : sbomVersions
 
-  const { data: vulns } = useQuery(GetCompVulnData, {
+  const { data: vulns } = useQuery(GetCompVulnCount, {
     skip: params?.productid ? false : true,
     variables: {
       id: id,

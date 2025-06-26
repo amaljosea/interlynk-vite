@@ -103,7 +103,7 @@ const VexModal = ({
   })
 
   const [compVexCreate, { loading }] = useMutation(updateBulkCompVex, {
-    refetchQueries: ['GetVulnProductDetails'],
+    refetchQueries: ['GetVulnProductDetails', 'GetCompVulnData'],
     onCompleted: (data) => {
       if (data) {
         setSelectedVulns([])
