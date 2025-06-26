@@ -1,6 +1,6 @@
 import { getHealthScore, getTotalHealthScore } from 'utils/healthScoreUtils'
 
-import { Box, Stack, Text, Tooltip } from '@chakra-ui/react'
+import { Box, Flex, Stack, Text, Tooltip } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -24,12 +24,21 @@ export const HealthScore = ({ value, scores, isComponent }) => {
 
     const finalScore = getTotalHealthScore(age, security, community)
 
+    const data = [
+      { label: 'Age Score', value: ageScore },
+      { label: 'Community Score', value: communityScore },
+      { label: 'Security Score', value: securityScore },
+      { label: 'Final Score', value: finalScore }
+    ]
+
     return (
-      <Stack spacing={0} p={1}>
-        <Text>Age Score: {ageScore}</Text>
-        <Text>Community Score: {communityScore}</Text>
-        <Text>Security Score: {securityScore}</Text>
-        <Text>Final Score: {finalScore}</Text>
+      <Stack w={'200px'} spacing={1} p={1}>
+        {data?.map((item, index) => (
+          <Flex key={index} gap={2} justifyContent={'space-between'}>
+            <Text w={'160px'}>{item?.label}:</Text>
+            <Text textAlign={'right'}>{item?.value}</Text>
+          </Flex>
+        ))}
       </Stack>
     )
   }
