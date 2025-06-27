@@ -144,7 +144,6 @@ export const UpdateInternalComponent = ({ onClose, internalComponent }) => {
               value={matchStr}
               placeholder='Org name'
               onChange={(e) => setMatchStr(e.target.value)}
-              fontSize={14}
             />
             {!!errorText && <FormErrorMessage>{errorText}</FormErrorMessage>}
           </FormControl>

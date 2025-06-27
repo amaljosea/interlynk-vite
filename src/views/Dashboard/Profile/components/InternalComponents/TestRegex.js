@@ -4,10 +4,12 @@ import { v4 as uuidv4 } from 'uuid'
 import {
   Box,
   Button,
+  Flex,
   FormLabel,
   Input,
   InputGroup,
   InputRightElement,
+  Spacer,
   Tooltip
 } from '@chakra-ui/react'
 
@@ -60,42 +62,33 @@ export const TextRegex = ({ regex, ignoreCase }) => {
     return { isMatch }
   }
 
+  const handleChange = (e, item) => {
+    setError('')
+    const newItems = items.map((oldItem) =>
+      oldItem.id === item.id ? { id: item.id, value: e.target.value } : oldItem
+    )
+    setItems(newItems)
+  }
+
   return (
     <div>
       <FormLabel>Test Expressions</FormLabel>
       {items.map((item) => {
         const { isMatch } = checkIsMatch({ regex, ignoreCase, item })
-        const color = isMatch ? 'green' : 'red'
+        const expressionInfo = isMatch
+          ? 'Matches regular expression'
+          : `Doesn't match regular expression`
         return (
-          <Box display='flex' key={item.id} m={1} alignItems='center' gap={2}>
+          <Flex gap={2} key={item.id} my={2}>
             <InputGroup>
               <Input
                 placeholder='Enter a string to check if it will match the expression.'
-                my={1}
-                fontSize={12}
-                onChange={(e) => {
-                  setError('')
-                  const newItems = items.map((oldItem) =>
-                    oldItem.id === item.id
-                      ? {
-                          id: item.id,
-                          value: e.target.value
-                        }
-                      : oldItem
-                  )
-                  setItems(newItems)
-                }}
+                onChange={(e) => handleChange(e, item)}
                 value={item.value}
               />
-              <InputRightElement width='3rem'>
-                <Tooltip
-                  label={
-                    isMatch
-                      ? 'Matches regular expression'
-                      : `Doesn't match regular expression`
-                  }
-                >
-                  <Box marginTop={2}>
+              <InputRightElement hidden={item.value === ''}>
+                <Tooltip label={expressionInfo}>
+                  <Box>
                     {isMatch ? <LuCheck size={18} /> : <LuX size={18} />}
                   </Box>
                 </Tooltip>
@@ -106,7 +99,7 @@ export const TextRegex = ({ regex, ignoreCase }) => {
               hidden={items.length === 1}
               onClick={() => handleDelete(item.id)}
             />
-          </Box>
+          </Flex>
         )
       })}
 
@@ -124,6 +117,7 @@ export const TextRegex = ({ regex, ignoreCase }) => {
       >
         Add more test
       </Button>
+      <Spacer my={2} />
       {error !== '' && <LynkAlert msg={error} />}
     </div>
   )
