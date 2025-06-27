@@ -18,7 +18,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import {
   GetProductData,
   GetProject,
-  GetProjectGroups,
+  GetProjectGroupForDropDown,
   GetSbomDrift
 } from 'graphQL/Queries'
 
@@ -277,7 +277,7 @@ const Compare = ({ selectedSboms }) => {
     disabled
   }
 
-  const { lazyDropDownProps } = useLazyDropDown(GetProjectGroups, {
+  const { lazyDropDownProps } = useLazyDropDown(GetProjectGroupForDropDown, {
     selector: 'organization.projectGroups',
     variables: {
       field: field,
