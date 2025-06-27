@@ -202,7 +202,8 @@ const ProductColumns = (props) => {
           const dateB = new Date(b.updatedAt)
           return dateA - dateB
         },
-        wrap: true
+        wrap: true,
+        right: 'true'
       },
       // ACTIONS
       {

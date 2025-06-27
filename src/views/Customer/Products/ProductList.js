@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { displayErrorMessage } from 'utils/errorUtils'
 
 import { WarningTwoIcon } from '@chakra-ui/icons'
@@ -7,26 +6,24 @@ import { Flex, Text } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import ProductTable from 'components/Tables/ProductTable'
 
+import { useGlobalState } from 'hooks/useGlobalState'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ShareLynkProjectGroups } from 'graphQL/Queries'
 
 const ProductList = () => {
-  const [filters, setFilters] = useState({
-    field: 'PROJECT_GROUPS_UPDATED_AT',
-    direction: 'DESC',
-    enabled: true
-  })
+  const { prodState } = useGlobalState()
   const { primaryBlueText } = useThemeColor(['primaryBlueText'])
+  const { field, direction, searchInput } = prodState
+
+  const filters = { field, direction, search: searchInput || undefined }
 
   const { nodes, paginationProps, reset, loading, error } = usePaginatedQuery(
     ShareLynkProjectGroups,
     {
       selector: 'shareLynkQuery.projectGroups',
-      variables: {
-        ...filters
-      }
+      variables: { ...filters }
     }
   )
 
@@ -46,14 +43,9 @@ const ProductList = () => {
   return (
     <ProductTable
       data={nodes}
+      reset={reset}
       loading={loading}
-      filters={filters}
-      reset={() => reset()}
       paginationProps={paginationProps}
-      setFilters={(newFilters) => {
-        setFilters(newFilters)
-        reset()
-      }}
     />
   )
 }
