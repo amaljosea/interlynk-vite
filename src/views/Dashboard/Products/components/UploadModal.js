@@ -37,6 +37,10 @@ const UploadModal = ({ isOpen, onClose, group }) => {
 
   const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
 
+  const [selectedEnv, setSelectedEnv] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
+  const [selectedFile, setSelectedFile] = useState(null)
+
   const { data, loading } = useQuery(GetProjectGroup, {
     skip: isOpen ? false : true,
     variables: { id: group?.id }
@@ -56,9 +60,13 @@ const UploadModal = ({ isOpen, onClose, group }) => {
     envName ? item?.name === envName : item?.name === 'default'
   )
 
-  const [selectedEnv, setSelectedEnv] = useState('')
-  const [errorMessage, setErrorMessage] = useState('')
-  const [selectedFile, setSelectedFile] = useState(null)
+  const projectOptions =
+    projects
+      ?.sort((a, b) => a?.name?.localeCompare(b?.name))
+      ?.map((item) => ({
+        value: item?.id,
+        label: capitalizeFirstLetter(item?.name)
+      })) || []
 
   const handleUpload = async () => {
     if (!selectedFile) {
@@ -86,19 +94,13 @@ const UploadModal = ({ isOpen, onClose, group }) => {
       .finally(() => onClose())
   }
 
+  const uploadInfo = `Interlynk supports importing CycloneDX versions 1.2 - 1.6 in JSON and XML formats and SPDX 2.2 and 2.3 in JSON format.`
+
   useEffect(() => {
     if (defaultENV) {
       setSelectedEnv(defaultENV?.id)
     }
   }, [defaultENV])
-
-  const projectOptions =
-    projects
-      ?.sort((a, b) => a?.name?.localeCompare(b?.name))
-      ?.map((item) => ({
-        value: item?.id,
-        label: capitalizeFirstLetter(item?.name)
-      })) || []
 
   return (
     <>
@@ -135,8 +137,7 @@ const UploadModal = ({ isOpen, onClose, group }) => {
                 }
               />
               <FormHelperText color={secondaryTextColor} fontSize={12}>
-                Interlynk supports importing CycloneDX versions 1.2-1.5 in JSON
-                and XML formats and SPDX 2.2 and 2.3 in JSON format.
+                {uploadInfo}
               </FormHelperText>
             </FormControl>
             <FileUpload
