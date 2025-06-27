@@ -26,7 +26,7 @@ import { SbomPartCreate } from 'graphQL/Mutation'
 import {
   CheckDeepParts,
   GetProject,
-  GetProjectGroups,
+  GetProjectGroupForDropDown,
   GetSbomParts
 } from 'graphQL/Queries'
 
@@ -101,7 +101,7 @@ const CreateParts = ({ parts, isOpen, onClose }) => {
     }
   }
 
-  const { lazyDropDownProps } = useLazyDropDown(GetProjectGroups, {
+  const { lazyDropDownProps } = useLazyDropDown(GetProjectGroupForDropDown, {
     skip: isOpen ? false : true,
     selector: 'organization.projectGroups',
     variables: {

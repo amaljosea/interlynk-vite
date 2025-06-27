@@ -520,6 +520,57 @@ export const GetProjectGroups = gql`
   }
 `
 
+// GET PROJECT GROUPS FOR DROPDOWN
+export const GetProjectGroupForDropDown = gql`
+  query GetProjectGroups(
+    $search: String
+    $enabled: Boolean
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $labelIds: [Uuid!]
+    $field: ProjectGroupOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    organization {
+      projectGroups(
+        search: $search
+        enabled: $enabled
+        labelIds: $labelIds
+        first: $first
+        last: $last
+        after: $after
+        before: $before
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
+          id
+          name
+          enabled
+          projects {
+            id
+            name
+            enabled
+            sboms {
+              id
+              projectVersion
+              createdAt
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 export const GetJiraSettings = gql`
   query GetJiraSettings($id: Uuid!) {
     project(id: $id) {
