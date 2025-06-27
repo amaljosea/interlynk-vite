@@ -192,20 +192,6 @@ export default function Customer() {
       )
     },
     {
-      selector: '.search-version',
-      content: (
-        <Flex flexDir={'column'} gap={2}>
-          <Text fontSize={16} fontWeight={'semibold'}>
-            Other Versions
-          </Text>
-          <Text>
-            To quickly switch to another version of the same product, use the
-            “Search Versions” control.
-          </Text>
-        </Flex>
-      )
-    },
-    {
       selector: '.download',
       content: (
         <Flex flexDir={'column'} gap={2}>
