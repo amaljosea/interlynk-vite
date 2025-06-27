@@ -17,7 +17,7 @@ import { useLazyDropDown } from 'hooks/useLazyDropDown'
 import { useSelect } from 'hooks/useSelect'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { GetProject, GetProjectGroups } from 'graphQL/Queries'
+import { GetProject, GetProjectGroupForDropDown } from 'graphQL/Queries'
 
 const StepOne = ({
   setSbomId,
@@ -56,7 +56,7 @@ const StepOne = ({
     setSelectedGroup({})
   }
 
-  const { lazyDropDownProps } = useLazyDropDown(GetProjectGroups, {
+  const { lazyDropDownProps } = useLazyDropDown(GetProjectGroupForDropDown, {
     selector: 'organization.projectGroups',
     variables: {
       labelIds: label ? [label?.value] : undefined,
