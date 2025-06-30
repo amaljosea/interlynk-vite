@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { getSignedUrlParams } from 'utils'
 import { FREE_TIER_PRODUCT_LIMIT } from 'variables/general'
 import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
-import ProductSearchFilter from 'views/Sbom/components/ProductSearchFilter'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import { Box, Flex, IconButton, Tooltip } from '@chakra-ui/react'
 
@@ -50,12 +50,12 @@ const ProductHeader = (props) => {
       >
         <Flex gap={2}>
           {/* SEARCH PRODUCTS */}
-          <ProductSearchFilter
+          <SearchFilter
             id='product'
-            filterText={filterText}
-            onChange={onSearchInputChange}
             onClear={handleClear}
             onFilter={handleSearch}
+            filterText={filterText}
+            onChange={onSearchInputChange}
           />
           {/* FILTER PRODUCTS */}
           {!signedUrlParams && (
