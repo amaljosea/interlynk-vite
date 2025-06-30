@@ -10,7 +10,7 @@ const ReprocessSbom = ({ isOpen, onClose, data, projectGroup }) => {
   const { id, projectVersion } = data || ''
 
   const [reprocessSbom, { loading }] = useMutation(SbomReprocess, {
-    refetchQueries: ['GetVersionsTable']
+    refetchQueries: ['GetVersionsTable', 'GetProjectGroupDetails']
   })
 
   const onReprocess = () => {

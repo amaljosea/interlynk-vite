@@ -13,7 +13,11 @@ const DeleteSbom = ({ isOpen, onClose, data, projectGroup }) => {
   const { setClearSelect } = useGlobalState()
 
   const [deleteSbom] = useMutation(sbomDelete, {
-    refetchQueries: ['GetVersionsTable', 'GetProjectDetails']
+    refetchQueries: [
+      'GetVersionsTable',
+      'GetProjectDetails',
+      'GetProjectGroupDetails'
+    ]
   })
 
   const [isLoading, setIsLoading] = useState(false)

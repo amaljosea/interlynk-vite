@@ -35,7 +35,9 @@ const SbomTransfer = ({ sbom, isOpen, onClose, productGroup }) => {
   })
   const { projects } = data?.projectGroup || ''
 
-  const [updateSbom, { loading }] = useMutation(sbomUpdate)
+  const [updateSbom, { loading }] = useMutation(sbomUpdate, {
+    refetchQueries: ['GetProjectGroupDetails', 'GetVersionsTable']
+  })
 
   const [value, setValue] = useState('')
   const [envList, setEnvList] = useState([])

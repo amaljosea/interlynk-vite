@@ -10,7 +10,7 @@ import { sbomUpdate } from 'graphQL/Mutation'
 
 const ArchiveSbom = ({ isOpen, onClose, data, projectGroup }) => {
   const { showToast } = useCustomToast()
-  const { id, spec, projectVersion } = data || ''
+  const { id, spec, projectVersion } = data || {}
   const { setClearSelect } = useGlobalState()
 
   const isArchived = isSbomArchived(data)
@@ -19,6 +19,7 @@ const ArchiveSbom = ({ isOpen, onClose, data, projectGroup }) => {
     refetchQueries: [
       'GetVersionsTable',
       'GetProjectDetails',
+      'GetProjectGroupDetails',
       'GetArchivedVersions'
     ]
   })

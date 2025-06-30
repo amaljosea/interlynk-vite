@@ -25,7 +25,7 @@ const DuplicateSBOM = ({ data, isOpen, onClose }) => {
   const { sbomId, projectGroup, projectVersion } = data || {}
 
   const [duplicate, { loading }] = useMutation(sbomClone, {
-    refetchQueries: ['GetVersionsTable']
+    refetchQueries: ['GetVersionsTable', 'GetProjectGroupDetails']
   })
 
   const [formData, setFormData] = useState({

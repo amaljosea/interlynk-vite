@@ -35,7 +35,6 @@ import { LuCircleCheckBig, LuClipboardList } from 'react-icons/lu'
 
 import CheckModal from './CheckModal'
 import CopyModal from './CopyModal'
-import SigningModal from './SigningModal'
 
 const SbomActions = ({ sbom }) => {
   const { showToast } = useCustomToast()
@@ -66,13 +65,11 @@ const SbomActions = ({ sbom }) => {
   const SBOM = useDisclosure()
   const LOGS = useDisclosure()
   const PRIMARY = useDisclosure()
-  const VERIFY = useDisclosure()
   const DELETE = useDisclosure()
   const ATTRIBUTION = useDisclosure()
 
-  const [status, setStatus] = useState('created')
+  const status = 'created'
   const [checks, setChecks] = useState(false)
-  const [signedData, setSignedData] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
 
   const { data } = useQuery(signedUrlParams ? ShareProject : GetProject, {
@@ -81,7 +78,9 @@ const SbomActions = ({ sbom }) => {
     }
   })
 
-  const [deleteSbom] = useMutation(sbomDelete)
+  const [deleteSbom] = useMutation(sbomDelete, {
+    refetchQueries: ['GetProjectGroupDetails', 'GetVersionsTable']
+  })
   const [healthRecheck] = useMutation(recheckHealth)
 
   const { isOpen: isCopied, onClose: onCopiedClose } = useDisclosure()
@@ -176,9 +175,7 @@ const SbomActions = ({ sbom }) => {
   const handleDelete = async () => {
     setIsLoading(true)
     await deleteSbom({
-      variables: {
-        id: sbomId
-      }
+      variables: { id: sbomId }
     }).then((res) => {
       if (res?.data) {
         setIsLoading(false)
@@ -281,21 +278,6 @@ const SbomActions = ({ sbom }) => {
           isOpen={SBOM.isOpen}
           onClose={SBOM.onClose}
           primaryComp={sbom?.primaryComponent}
-        />
-      )}
-
-      {/* VERIFY SBOM */}
-      {VERIFY.isOpen && (
-        <SigningModal
-          projectId={productId}
-          sbomId={sbomId}
-          status={status}
-          setStatus={setStatus}
-          signedData={signedData}
-          setSignedData={setSignedData}
-          isOpen={VERIFY.isOpen}
-          onClose={VERIFY.onClose}
-          sbomData={sbom}
         />
       )}
 

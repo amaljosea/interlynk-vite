@@ -34,7 +34,9 @@ const SbomList = ({ sbomId, projectGroup, isOpen, onClose }) => {
 
   const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
-  const [updateSbom, { loading: updateLoading }] = useMutation(sbomUpdate)
+  const [updateSbom, { loading: updateLoading }] = useMutation(sbomUpdate, {
+    refetchQueries: ['GetVersionsTable']
+  })
 
   const { data: sbomAlts, loading } = useQuery(GetSbomAlternatives, {
     skip: isOpen ? false : true,
