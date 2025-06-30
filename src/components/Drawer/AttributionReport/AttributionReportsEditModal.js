@@ -13,12 +13,13 @@ import {
   FormErrorMessage,
   HStack,
   Input,
-  Stack,
   Text,
   Textarea,
-  VStack
+  VStack,
+  useClipboard
 } from '@chakra-ui/react'
 
+import CopyButton from 'components/Icons/CopyButton'
 import DeleteButton from 'components/Icons/DeleteButton'
 import EditButton from 'components/Icons/EditButton'
 import LicenseField from 'components/Licenses/LicenseField'
@@ -367,6 +368,12 @@ const AttributionReportsEditModal = ({
     onClose()
   }
 
+  const licenseValue = isEditable
+    ? rowData?.license
+    : rowData?.enrichedContent?.licensesExp
+
+  const licenseString = useClipboard(licenseValue || '')
+
   return (
     <LynkModal
       isOpen={isOpen}
@@ -397,14 +404,19 @@ const AttributionReportsEditModal = ({
           <>
             <LynkFormLabel label='Current value' />
 
-            <Textarea
-              value={
-                isEditable
-                  ? rowData?.license
-                  : rowData?.enrichedContent?.licensesExp
-              }
-              readOnly
-            />
+            <Flex gap={2}>
+              <Input
+                isReadOnly
+                fontSize={'sm'}
+                defaultValue={licenseValue}
+                disabled
+              />
+              <CopyButton
+                onCopy={() => licenseString.onCopy()}
+                hasCopied={licenseString?.hasCopied}
+                size='md'
+              />
+            </Flex>
             <Box mt={4}>
               {isEditable && (
                 <LicenseField
