@@ -46,10 +46,6 @@ const PatchVelocityMetrics = gql`
           date
           statusAgeAffected
           statusAgeFixed
-          statusAgeInTriage
-          statusAgeNotAffected
-          statusAgeResolved
-          statusAgeUnspecified
         }
       }
     }

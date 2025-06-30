@@ -43,9 +43,7 @@ const IdentityVelocityMetrics = gql`
         nodes {
           date
           statusAgeAffected
-          statusAgeFixed
           statusAgeInTriage
-          statusAgeNotAffected
           statusAgeResolved
           statusAgeUnspecified
         }

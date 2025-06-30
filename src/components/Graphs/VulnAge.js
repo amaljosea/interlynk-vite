@@ -43,9 +43,7 @@ const VulnAgeMetrics = gql`
         nodes {
           date
           statusAgeAffected
-          statusAgeFixed
           statusAgeInTriage
-          statusAgeNotAffected
           statusAgeResolved
           statusAgeUnspecified
         }
