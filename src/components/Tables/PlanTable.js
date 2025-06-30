@@ -1,20 +1,12 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import {
   FREE_TIER_PRODUCT_LIMIT,
   FREE_TIER_USER_LIMIT
 } from 'variables/general'
 
-import {
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr
-} from '@chakra-ui/react'
-import { Box, Button, Flex, useDisclosure } from '@chakra-ui/react'
+import { Button, Flex, Stack, Text, useDisclosure } from '@chakra-ui/react'
 
+import LynkTable from 'components/LynkTable'
 import { UpgradePlanModal } from 'components/Modal/UpgradePlanModal'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
@@ -24,56 +16,65 @@ const PlanTable = () => {
   const { isFreeTier } = useGlobalQueryContext()
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const { headingTextColor, grayBorderColor } = useThemeColor([
-    'headingTextColor',
-    'grayBorderColor'
-  ])
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
-  const LynkTd = ({ children, ...props }) => (
-    <Td {...props} borderColor={grayBorderColor}>
-      {children}
-    </Td>
+  const data = [
+    {
+      plan: isFreeTier ? 'Free' : 'Enterprise',
+      products: isFreeTier ? FREE_TIER_PRODUCT_LIMIT : 'Unlimited',
+      users: isFreeTier ? FREE_TIER_USER_LIMIT : 'Unlimited',
+      renewalDate: 'N/A'
+    }
+  ]
+
+  const columns = useMemo(
+    () => [
+      {
+        id: 'plan',
+        name: 'PLAN',
+        selector: (row) => (
+          <Text fontSize={14} color={primaryTextColor}>
+            {row?.plan}
+          </Text>
+        )
+      },
+      {
+        id: 'products',
+        name: 'PRODUCTS',
+        selector: (row) => (
+          <Text fontSize={14} color={primaryTextColor}>
+            {row?.products}
+          </Text>
+        )
+      },
+      {
+        id: 'Users',
+        name: 'USERS',
+        selector: (row) => (
+          <Text fontSize={14} color={primaryTextColor}>
+            {row?.users}
+          </Text>
+        )
+      },
+      {
+        id: 'renewal_date',
+        name: 'RENEWAL DATE',
+        selector: (row) => (
+          <Text fontSize={14} color={primaryTextColor}>
+            {row?.renewalDate}
+          </Text>
+        )
+      }
+    ],
+    [primaryTextColor]
   )
 
-  const headStyle = {
-    fontWeight: 'bold',
-    color: headingTextColor,
-    borderColor: grayBorderColor
-  }
-
   return (
-    <Box>
-      {/* Plan Overview Section */}
-      <TableContainer>
-        <Table variant='simple'>
-          <Thead>
-            <Tr>
-              <Th sx={headStyle}>Plan</Th>
-              <Th sx={headStyle}>Products</Th>
-              <Th sx={headStyle}>Users</Th>
-              <Th sx={headStyle}>Renewal Date</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <LynkTd fontSize={14}>
-                {isFreeTier ? 'Free' : 'Enterprise'}
-              </LynkTd>
-              <LynkTd fontSize={14}>
-                {isFreeTier ? FREE_TIER_PRODUCT_LIMIT : 'Unlimited'}
-              </LynkTd>
-              <LynkTd fontSize={14}>
-                {isFreeTier ? FREE_TIER_USER_LIMIT : 'Unlimited'}
-              </LynkTd>
-              <LynkTd fontSize={14}>N/A</LynkTd>
-            </Tr>
-          </Tbody>
-        </Table>
-      </TableContainer>
+    <Stack w='100%' spacing={6}>
+      <LynkTable columns={columns} data={data} />
 
-      {/* Upgrade Modal Button */}
       {isFreeTier && (
-        <Flex justify='left' mt={6}>
+        <Flex justify='left'>
           <Button title='Upgrade plan' colorScheme='blue' onClick={onOpen}>
             Upgrade Plan
           </Button>
@@ -83,7 +84,7 @@ const PlanTable = () => {
       {isFreeTier && isOpen && (
         <UpgradePlanModal isOpen={isOpen} onClose={onClose} />
       )}
-    </Box>
+    </Stack>
   )
 }
 
