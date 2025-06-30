@@ -3502,7 +3502,7 @@ export const GetLicensesTable = gql`
 
 // GET DATA FOR SBOM LICENSE TABLE
 export const GetSbomLicensesTable = gql`
-  query GetSbomLicenseTable(
+  query GetSbomLicensesTable(
     $projectId: Uuid!
     $sbomId: Uuid!
     $first: Int
@@ -3527,13 +3527,8 @@ export const GetSbomLicensesTable = gql`
         }
         nodes {
           licenseExpression
-          licenses {
-            __typename
-            state
-          }
           components {
             name
-            version
           }
           derivedState
         }
