@@ -240,35 +240,37 @@ export const generateAttributionPdf = async (
     yPosition += 4
 
     // Render Copyright section
-    pdfDoc.setFontSize(11)
-    pdfDoc.setFont('ARIAL', 'normal')
-    pdfDoc.setTextColor('#444444')
-    const copyrightSubtitleText = 'Copyright'
-    pdfDoc.text(copyrightSubtitleText, CONTENT_LEFT_ALIGNMENT_X, yPosition)
+    if (copyrightText && copyrightText !== 'N/A') {
+      pdfDoc.setFontSize(11)
+      pdfDoc.setFont('ARIAL', 'normal')
+      pdfDoc.setTextColor('#444444')
+      const copyrightSubtitleText = 'Copyright'
+      pdfDoc.text(copyrightSubtitleText, CONTENT_LEFT_ALIGNMENT_X, yPosition)
 
-    pdfDoc.setFont('ARIAL', 'normal')
-    pdfDoc.setTextColor('#444444')
-    pdfDoc.setFontSize(10)
-    const copyrightLines = pdfDoc.splitTextToSize(
-      copyrightText,
-      pageWidth - CONTENT_LEFT_ALIGNMENT_X - margin
-    )
-    yPosition += 5
-    copyrightLines.forEach((line) => {
-      if (yPosition > pageHeight - 30) {
-        relativeContentPageNumber++
-        pdfDoc.addPage()
-        yPosition = margin + 20 // Consistent content start Y
-
-        contentPageHeaders[relativeContentPageNumber] = {
-          componentName: currentComponentName,
-          startingLetter: currentStartingLetter
-        }
-      }
-      pdfDoc.text(line, CONTENT_LEFT_ALIGNMENT_X, yPosition)
+      pdfDoc.setFont('ARIAL', 'normal')
+      pdfDoc.setTextColor('#444444')
+      pdfDoc.setFontSize(10)
+      const copyrightLines = pdfDoc.splitTextToSize(
+        copyrightText,
+        pageWidth - CONTENT_LEFT_ALIGNMENT_X - margin
+      )
       yPosition += 5
-    })
-    yPosition += 5
+      copyrightLines.forEach((line) => {
+        if (yPosition > pageHeight - 30) {
+          relativeContentPageNumber++
+          pdfDoc.addPage()
+          yPosition = margin + 20 // Consistent content start Y
+
+          contentPageHeaders[relativeContentPageNumber] = {
+            componentName: currentComponentName,
+            startingLetter: currentStartingLetter
+          }
+        }
+        pdfDoc.text(line, CONTENT_LEFT_ALIGNMENT_X, yPosition)
+        yPosition += 5
+      })
+      yPosition += 5
+    }
     // Render License section
     pdfDoc.setFontSize(11)
     pdfDoc.setFont('ARIAL', 'normal')
@@ -301,14 +303,6 @@ export const generateAttributionPdf = async (
     yPosition += 5
 
     // Render License Text section
-    pdfDoc.setFontSize(11)
-    pdfDoc.setFont('ARIAL', 'normal')
-    pdfDoc.setTextColor('#444444')
-    const licenseTextSubtitleText = 'License Text'
-    pdfDoc.text(licenseTextSubtitleText, CONTENT_LEFT_ALIGNMENT_X, yPosition)
-    yPosition += 5
-
-    // New logic for license text based on source
     let licenseTextArr = []
     if (source === 'library') {
       licenseTextArr = comp.attributionOverride?.licensesText || []
@@ -316,10 +310,26 @@ export const generateAttributionPdf = async (
       licenseTextArr = comp.attribution?.licensesText || []
     }
 
-    if (Array.isArray(licenseTextArr) && licenseTextArr.length > 0) {
-      licenseTextArr.forEach((licenseObj) => {
-        const licenseKey = licenseObj?.key || 'N/A'
-        const licenseValue = licenseObj?.value || 'N/A'
+    // Filter out empty or N/A license text entries
+    const filteredLicenseTextArr = Array.isArray(licenseTextArr)
+      ? licenseTextArr.filter(
+          (licenseObj) =>
+            (licenseObj?.key && licenseObj.key !== 'N/A') ||
+            (licenseObj?.value && licenseObj.value !== 'N/A')
+        )
+      : []
+
+    if (filteredLicenseTextArr.length > 0) {
+      pdfDoc.setFontSize(11)
+      pdfDoc.setFont('ARIAL', 'normal')
+      pdfDoc.setTextColor('#444444')
+      const licenseTextSubtitleText = 'License Text'
+      pdfDoc.text(licenseTextSubtitleText, CONTENT_LEFT_ALIGNMENT_X, yPosition)
+      yPosition += 5
+
+      filteredLicenseTextArr.forEach((licenseObj) => {
+        const licenseKey = licenseObj?.key || ''
+        const licenseValue = licenseObj?.value || ''
 
         if (yPosition + 10 > pageHeight - 30) {
           relativeContentPageNumber++
@@ -334,8 +344,10 @@ export const generateAttributionPdf = async (
         pdfDoc.setTextColor('#444444')
         pdfDoc.setFont('ARIAL', 'normal')
         pdfDoc.setFontSize(10)
-        pdfDoc.text(licenseKey, CONTENT_LEFT_ALIGNMENT_X, yPosition)
-        yPosition += 10
+        if (licenseKey) {
+          pdfDoc.text(licenseKey, CONTENT_LEFT_ALIGNMENT_X, yPosition)
+          yPosition += 10
+        }
         pdfDoc.setTextColor('#444444')
         const licenseTextLines = pdfDoc.splitTextToSize(
           licenseValue,
@@ -357,54 +369,50 @@ export const generateAttributionPdf = async (
         })
         yPosition += 5
       })
-    } else {
-      pdfDoc.setFont('ARIAL', 'normal')
-      pdfDoc.setTextColor('#444444')
-      pdfDoc.setFontSize(10)
-      pdfDoc.text('N/A', CONTENT_LEFT_ALIGNMENT_X, yPosition)
       yPosition += 5
     }
-    yPosition += 5
 
     // Render Patches section
-    pdfDoc.setFontSize(11)
-    pdfDoc.setFont('ARIAL', 'normal')
-    pdfDoc.setTextColor('#444444')
-    const patchesSubtitleText = 'Patches'
-    pdfDoc.text(patchesSubtitleText, CONTENT_LEFT_ALIGNMENT_X, yPosition)
-    yPosition += 5
-
     const patchesArr = comp.components[0]?.patches || []
     if (Array.isArray(patchesArr) && patchesArr.length > 0) {
+      pdfDoc.setFontSize(11)
+      pdfDoc.setFont('ARIAL', 'normal')
+      pdfDoc.setTextColor('#444444')
+      const patchesSubtitleText = 'Patches'
+      pdfDoc.text(patchesSubtitleText, CONTENT_LEFT_ALIGNMENT_X, yPosition)
+      yPosition += 5
       patchesArr.forEach((patch) => {
+        const hasContent = patch.content
+        const hasUrl = !!patch.url
+        if (!hasContent && !hasUrl) {
+          // Skip this patch if both content and url are empty or N/A
+          return
+        }
         // Content
-        pdfDoc.setFont('ARIAL', 'normal')
-        pdfDoc.setFontSize(10)
-        pdfDoc.setTextColor('#444444')
-        const contentText = patch.content || 'N/A'
-
-        const contentLines = pdfDoc.splitTextToSize(
-          contentText,
-          pageWidth - CONTENT_LEFT_ALIGNMENT_X - margin // Apply text wrapping
-        )
-
-        contentLines.forEach((line) => {
-          if (yPosition > pageHeight - 30) {
-            relativeContentPageNumber++
-            pdfDoc.addPage()
-            yPosition = margin + 20
-            contentPageHeaders[relativeContentPageNumber] = {
-              componentName: currentComponentName,
-              startingLetter: currentStartingLetter
+        if (hasContent) {
+          pdfDoc.setFont('ARIAL', 'normal')
+          pdfDoc.setFontSize(10)
+          pdfDoc.setTextColor('#444444')
+          const contentLines = pdfDoc.splitTextToSize(
+            patch.content,
+            pageWidth - CONTENT_LEFT_ALIGNMENT_X - margin // Apply text wrapping
+          )
+          contentLines.forEach((line) => {
+            if (yPosition > pageHeight - 30) {
+              relativeContentPageNumber++
+              pdfDoc.addPage()
+              yPosition = margin + 20
+              contentPageHeaders[relativeContentPageNumber] = {
+                componentName: currentComponentName,
+                startingLetter: currentStartingLetter
+              }
             }
-          }
-          pdfDoc.text(line, CONTENT_LEFT_ALIGNMENT_X, yPosition)
-          yPosition += 5 // Line height for wrapped text
-        })
-
-        yPosition += 2 // Add a small gap after the content lines and before the URL
-
-        if (patch.url) {
+            pdfDoc.text(line, CONTENT_LEFT_ALIGNMENT_X, yPosition)
+            yPosition += 5 // Line height for wrapped text
+          })
+          yPosition += 2 // Add a small gap after the content lines and before the URL
+        }
+        if (hasUrl) {
           if (yPosition > pageHeight - 30) {
             // Check for page break before adding URL
             relativeContentPageNumber++
@@ -430,46 +438,40 @@ export const generateAttributionPdf = async (
         }
         yPosition += 2 // Small gap between each patch entry
       })
-    } else {
-      pdfDoc.setFont('ARIAL', 'normal')
-      pdfDoc.setFontSize(10)
-      pdfDoc.setTextColor('#444444')
-      pdfDoc.text('N/A', CONTENT_LEFT_ALIGNMENT_X, yPosition)
       yPosition += 5
     }
-    yPosition += 5
-
     // Render Notice section
-    pdfDoc.setFontSize(11)
-    pdfDoc.setFont('ARIAL', 'normal')
-    pdfDoc.setTextColor('#444444')
-    const noticeSubtitleText = 'Notice'
-    pdfDoc.text(noticeSubtitleText, CONTENT_LEFT_ALIGNMENT_X, yPosition)
+    if (noticeText && noticeText !== 'N/A') {
+      pdfDoc.setFontSize(11)
+      pdfDoc.setFont('ARIAL', 'normal')
+      pdfDoc.setTextColor('#444444')
+      const noticeSubtitleText = 'Notice'
+      pdfDoc.text(noticeSubtitleText, CONTENT_LEFT_ALIGNMENT_X, yPosition)
 
-    pdfDoc.setFont('ARIAL', 'normal')
-    pdfDoc.setTextColor('#444444')
-    pdfDoc.setFontSize(10)
-    const noticeLines = pdfDoc.splitTextToSize(
-      noticeText,
-      pageWidth - CONTENT_LEFT_ALIGNMENT_X - margin
-    )
-    yPosition += 5
-    noticeLines.forEach((line) => {
-      if (yPosition > pageHeight - 30) {
-        relativeContentPageNumber++
-        pdfDoc.addPage()
-        yPosition = margin + 20 // Consistent content start Y
-
-        contentPageHeaders[relativeContentPageNumber] = {
-          componentName: currentComponentName,
-          startingLetter: currentStartingLetter
-        }
-      }
-      pdfDoc.text(line, CONTENT_LEFT_ALIGNMENT_X, yPosition)
+      pdfDoc.setFont('ARIAL', 'normal')
+      pdfDoc.setTextColor('#444444')
+      pdfDoc.setFontSize(10)
+      const noticeLines = pdfDoc.splitTextToSize(
+        noticeText,
+        pageWidth - CONTENT_LEFT_ALIGNMENT_X - margin
+      )
       yPosition += 5
-    })
-    yPosition += 5
+      noticeLines.forEach((line) => {
+        if (yPosition > pageHeight - 30) {
+          relativeContentPageNumber++
+          pdfDoc.addPage()
+          yPosition = margin + 20 // Consistent content start Y
 
+          contentPageHeaders[relativeContentPageNumber] = {
+            componentName: currentComponentName,
+            startingLetter: currentStartingLetter
+          }
+        }
+        pdfDoc.text(line, CONTENT_LEFT_ALIGNMENT_X, yPosition)
+        yPosition += 5
+      })
+      yPosition += 5
+    }
     yPosition += 15
 
     // Adjusted check for page breaks
