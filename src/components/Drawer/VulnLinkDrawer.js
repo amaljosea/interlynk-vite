@@ -3,9 +3,18 @@ import { useEffect, useState } from 'react'
 import { truncatedValue } from 'utils'
 import { hasWhiteSpace, validateUrl } from 'utils/formValidationUtils'
 
-import { Button, Flex, Input, Tag, Text, Tooltip } from '@chakra-ui/react'
-import { Table, Tbody, Td, Tr } from '@chakra-ui/react'
-import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
+import {
+  Button,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
+  Stack,
+  Tag,
+  Text,
+  Tooltip
+} from '@chakra-ui/react'
 
 import ConfirmDeleteButton from 'components/ConfirmDeleteButton'
 import LynkDrawer from 'components/LynkDrawer'
@@ -13,8 +22,10 @@ import LynkSelect from 'components/LynkSelect'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { ComponentVulnUpdate } from 'graphQL/Mutation'
-import { DispositionByParentUpdate } from 'graphQL/Mutation'
+import {
+  ComponentVulnUpdate,
+  DispositionByParentUpdate
+} from 'graphQL/Mutation'
 
 const VulnLinkDrawer = ({ data, isOpen, onClose }) => {
   const { id, sbomId, externalUrls, currentExternalUrls, vuln, isPart } =
@@ -33,10 +44,12 @@ const VulnLinkDrawer = ({ data, isOpen, onClose }) => {
     refetchQueries: ['GetVulnProductDetails']
   })
 
-  const { secondaryTextInverse, sameSecondaryText } = useThemeColor([
-    'secondaryTextInverse',
-    'sameSecondaryText'
-  ])
+  const { secondaryTextInverse, sameSecondaryText, grayBorderColor } =
+    useThemeColor([
+      'secondaryTextInverse',
+      'sameSecondaryText',
+      'grayBorderColor'
+    ])
 
   const containsSpace = hasWhiteSpace(link)
 
@@ -186,6 +199,12 @@ const VulnLinkDrawer = ({ data, isOpen, onClose }) => {
     { label: 'Documentation', value: 'documentation' },
     { label: 'Other', value: 'other' }
   ]
+
+  const vulnLinks = [...(externalData || []), ...(currentData || [])]
+
+  const divider =
+    vulnLinks.length === 1 ? `none` : `1px solid ${grayBorderColor}`
+
   //
   return (
     <LynkDrawer
@@ -247,59 +266,32 @@ const VulnLinkDrawer = ({ data, isOpen, onClose }) => {
             <Text size='md' my={2}>
               Existing Links
             </Text>
-            {externalData?.length > 0 || currentData?.length > 0 ? (
-              <Table variant='simple' size='sm' mt={4}>
-                <Tbody>
-                  {externalData?.length > 0 &&
-                    externalData?.map((item, index) => (
-                      <Tr
-                        key={index}
-                        display={'flex'}
-                        justifyContent={'space-between'}
-                      >
-                        <Td pl={0} wordBreak={'break-all'}>
-                          <Text>
-                            {item?.url ? (
-                              <Tooltip label={item.url}>
-                                {truncatedValue(item.url, 45)}
-                              </Tooltip>
-                            ) : null}
+            {vulnLinks.length > 0 ? (
+              <Stack mt={4} spacing={3}>
+                {vulnLinks.map((item) => (
+                  <Flex
+                    pb={2}
+                    align='flex-center'
+                    borderBottom={divider}
+                    justify='space-between'
+                    key={item?.id || item?.url}
+                  >
+                    <Stack spacing={0} flex='1' minW='0'>
+                      {item?.url && (
+                        <Tooltip label={item.url}>
+                          <Text w={'fit-content'} wordBreak='break-all'>
+                            {truncatedValue(item.url, 45)}
                           </Text>
-                          <Text mt={2} color={sameSecondaryText}>
-                            {item?.name}
-                          </Text>
-                        </Td>
-                        <Td pr={0} isNumeric>
-                          <DeleteAction id={item?.id} />
-                        </Td>
-                      </Tr>
-                    ))}
-                  {currentData?.length > 0 &&
-                    currentData?.map((item, index) => (
-                      <Tr
-                        display={'flex'}
-                        justifyContent={'space-between'}
-                        key={index}
-                      >
-                        <Td pl={0} wordBreak={'break-all'}>
-                          <Text>
-                            {item?.url ? (
-                              <Tooltip label={item.url}>
-                                {truncatedValue(item.url, 45)}
-                              </Tooltip>
-                            ) : null}
-                          </Text>
-                          <Text mt={2} color={sameSecondaryText}>
-                            {item?.name}
-                          </Text>
-                        </Td>
-                        <Td pr={0} isNumeric>
-                          <DeleteAction id={item?.id} />
-                        </Td>
-                      </Tr>
-                    ))}
-                </Tbody>
-              </Table>
+                        </Tooltip>
+                      )}
+                      {item?.name && (
+                        <Text color={sameSecondaryText}>{item.name}</Text>
+                      )}
+                    </Stack>
+                    <DeleteAction id={item?.id} />
+                  </Flex>
+                ))}
+              </Stack>
             ) : (
               <Text mt={4} color={secondaryTextInverse}>
                 No existing links
