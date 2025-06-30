@@ -42,24 +42,6 @@ export const downloadAttributionHtml = async (
       ? override?.licensesExp || 'N/A'
       : attribution?.licensesExp || 'N/A'
 
-    const patchesArr = comp.components?.[0]?.patches || []
-    const patchesHtml = (() => {
-      if (Array.isArray(patchesArr) && patchesArr.length > 0) {
-        return patchesArr
-          .map(
-            (patch) => `
-              <div class="patch-item">
-                <div class="patch-content">${patch.content || 'N/A'}</div>
-                ${patch.url ? `<div class="patch-url"><a href="${patch.url.startsWith('http://') || patch.url.startsWith('https://') ? patch.url : `https://${patch.url}`}" target="_blank">${patch.url}</a></div>` : ''}
-              </div>
-            `
-          )
-          .join('')
-      } else {
-        return `<div class="patch-content">N/A</div>`
-      }
-    })()
-
     // Filtering logic
     const isEmptyLicense = () => {
       if (Array.isArray(licenseExpText)) return licenseExpText.length === 0
@@ -97,28 +79,68 @@ export const downloadAttributionHtml = async (
       id: componentId
     })
 
-    const licenseTextHtml = (() => {
-      let licenseTextArr = []
-      if (source === 'library') {
-        licenseTextArr = comp.attributionOverride?.licensesText || []
+    // Only render Copyright if not empty or 'N/A'
+    const copyrightHtml =
+      copyrightText && copyrightText !== 'N/A'
+        ? `<div class="item"><span class="subTitle">Copyright</span> <span class="value">${copyrightText}</span></div>`
+        : ''
+
+    // Only render Notice if not empty or 'N/A'
+    const noticeHtml =
+      noticeText && noticeText !== 'N/A'
+        ? `<div class="item"><span class="subTitle">Notice</span> <span class="value">${noticeText}</span></div>`
+        : ''
+
+    // Only render Patches section if there are patches
+    const patchesArr = comp.components?.[0]?.patches || []
+    const patchesHtml = (() => {
+      if (Array.isArray(patchesArr) && patchesArr.length > 0) {
+        return (
+          `<div class="patches-container"><div class="subTitle">Patches</div>` +
+          patchesArr
+            .map(
+              (patch) => `
+                <div class="patch-item">
+                  <div class="patch-content">${patch.content || ''}</div>
+                  ${patch.url ? `<div class="patch-url"><a href="${patch.url.startsWith('http://') || patch.url.startsWith('https://') ? patch.url : `https://${patch.url}`}" target="_blank">${patch.url}</a></div>` : ''}
+                </div>
+              `
+            )
+            .join('') +
+          `</div>`
+        )
       } else {
-        licenseTextArr = comp.attribution?.licensesText || []
-      }
-      if (Array.isArray(licenseTextArr) && licenseTextArr.length > 0) {
-        return licenseTextArr
-          .map(
-            (licenseObj) => `
-              <div class="license-item">
-                <span class="license-short-id">${licenseObj?.key || 'N/A'}</span>
-                <div class="license-text-content">${licenseObj?.value || 'N/A'}</div>
-              </div>
-            `
-          )
-          .join('')
-      } else {
-        return `<div class="license-text-content">N/A</div>`
+        return ''
       }
     })()
+
+    // License Text section: only render if at least one non-empty entry
+    const licenseTextArr =
+      source === 'library'
+        ? comp.attributionOverride?.licensesText || []
+        : comp.attribution?.licensesText || []
+    const filteredLicenseTextArr = Array.isArray(licenseTextArr)
+      ? licenseTextArr.filter(
+          (licenseObj) =>
+            (licenseObj?.key && licenseObj.key !== 'N/A') ||
+            (licenseObj?.value && licenseObj.value !== 'N/A')
+        )
+      : []
+    const licenseTextHtml =
+      filteredLicenseTextArr.length > 0
+        ? `<div class="license-text-container"><div class="subTitle">License Text</div>` +
+          filteredLicenseTextArr
+            .map(
+              (licenseObj) => `
+              <div class="license-item">
+                <span class="license-short-id">${licenseObj?.key || ''}</span>
+                <div class="license-text-content">${licenseObj?.value || ''}</div>
+              </div>
+            `
+            )
+            .join('') +
+          `</div>`
+        : ''
 
     contentHtml += `
       <div class="component-section" id="${componentId}">
@@ -130,17 +152,11 @@ export const downloadAttributionHtml = async (
         <div class="header-divider"></div>
         <div class="component-content">
             <div class="component-name">${currentComponentName}</div>
-            <div class="item"><span class="subTitle">Copyright</span> <span class="value">${copyrightText}</span></div>
+            ${copyrightHtml}
             <div class="item"><span class="subTitle">License</span> <span class="value">${licenseExpText}</span></div>
-            <div class="license-text-container">
-                <div class="subTitle">License Text</div>
-                ${licenseTextHtml}
-            </div>
-            <div class="patches-container">
-              <div class="subTitle">Patches</div>
-              ${patchesHtml}
-            </div>
-            <div class="item"><span class="subTitle">Notice</span> <span class="value">${noticeText}</span></div>
+            ${licenseTextHtml}
+            ${patchesHtml}
+            ${noticeHtml}
         </div>
       </div>
     `
