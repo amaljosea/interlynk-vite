@@ -1,8 +1,13 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
-import { FormControl, FormLabel, Input } from '@chakra-ui/react'
-import { SimpleGrid, Stack } from '@chakra-ui/react'
+import {
+  FormControl,
+  FormLabel,
+  Input,
+  SimpleGrid,
+  Stack
+} from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
@@ -11,6 +16,7 @@ import LynkSelect from 'components/LynkSelect'
 import useCustomToast from 'hooks/useCustomToast'
 
 import { GetCustomFields } from 'graphQL/Queries'
+
 import { LuSquarePen } from 'react-icons/lu'
 
 const CreateField = gql`
@@ -69,8 +75,12 @@ const UpdateField = gql`
 
 const FieldModal = ({ data, isOpen, onClose }) => {
   const { showToast } = useCustomToast()
-  const [createField, { loading: crLoading }] = useMutation(CreateField)
-  const [updateField, { loading: upLoading }] = useMutation(UpdateField)
+  const [createField, { loading: creating }] = useMutation(CreateField, {
+    refetchQueries: ['GetCustomFields']
+  })
+  const [updateField, { loading: updating }] = useMutation(UpdateField, {
+    refetchQueries: ['GetCustomFields']
+  })
 
   const { data: customFields } = useQuery(GetCustomFields)
 
@@ -110,7 +120,7 @@ const FieldModal = ({ data, isOpen, onClose }) => {
     }))
   }
 
-  const { displayName, internalName, fieldType } = formData || ''
+  const { displayName, internalName, fieldType } = formData || {}
 
   const variables = {
     fieldType: fieldType,
@@ -124,7 +134,7 @@ const FieldModal = ({ data, isOpen, onClose }) => {
     createField({
       variables: { ...variables }
     }).then((res) => {
-      const { componentVulnCustomFieldDefinitionCreate } = res?.data || ''
+      const { componentVulnCustomFieldDefinitionCreate } = res?.data || {}
       if (componentVulnCustomFieldDefinitionCreate?.errors?.length > 0) {
         setError(componentVulnCustomFieldDefinitionCreate?.errors[0])
       } else {
@@ -141,7 +151,7 @@ const FieldModal = ({ data, isOpen, onClose }) => {
     updateField({
       variables: { id: data?.id, ...variables }
     }).then((res) => {
-      const { componentVulnCustomFieldDefinitionUpdate } = res?.data || ''
+      const { componentVulnCustomFieldDefinitionUpdate } = res?.data || {}
       if (componentVulnCustomFieldDefinitionUpdate?.errors?.length > 0) {
         setError(componentVulnCustomFieldDefinitionUpdate?.errors[0])
       } else {
@@ -188,9 +198,9 @@ const FieldModal = ({ data, isOpen, onClose }) => {
     <LynkModal
       isOpen={isOpen}
       onClose={onClose}
-      disabled={isInvalid}
       Icon={LuSquarePen}
-      isLoading={crLoading || upLoading}
+      disabled={isInvalid}
+      isLoading={creating || updating}
       buttonText={data?.id ? 'Update' : 'Save'}
       onSubmit={data?.id ? handleUpdate : handleCreate}
       title={`${data?.id ? 'Edit' : 'Add'} Custom Field`}
@@ -203,8 +213,9 @@ const FieldModal = ({ data, isOpen, onClose }) => {
           <Input
             type='text'
             name={'displayName'}
-            value={formData?.displayName}
             onChange={handleChange}
+            value={formData?.displayName}
+            placeholder='Enter display name'
           />
         </FormControl>
         {/* INTERNAL NAME */}
@@ -213,8 +224,9 @@ const FieldModal = ({ data, isOpen, onClose }) => {
           <Input
             type='text'
             name={'internalName'}
-            value={formData?.internalName}
             onChange={handleChange}
+            value={formData?.internalName}
+            placeholder='Enter internal name'
           />
         </FormControl>
         {/* FIELD TYPE */}
@@ -244,8 +256,9 @@ const FieldModal = ({ data, isOpen, onClose }) => {
               <Input
                 type='number'
                 name={'minValue'}
-                value={formData?.minValue}
                 onChange={handleChange}
+                value={formData?.minValue}
+                placeholder='Enter min value'
               />
             </FormControl>
             <FormControl>
@@ -253,8 +266,9 @@ const FieldModal = ({ data, isOpen, onClose }) => {
               <Input
                 type='number'
                 name={'maxValue'}
-                value={formData?.maxValue}
                 onChange={handleChange}
+                value={formData?.maxValue}
+                placeholder='Enter max value'
               />
             </FormControl>
           </SimpleGrid>

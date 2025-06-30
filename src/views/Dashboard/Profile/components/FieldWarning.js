@@ -25,7 +25,9 @@ const DeleteField = gql`
 const FieldWarning = ({ data, isOpen, onClose }) => {
   const { showToast } = useCustomToast()
 
-  const [deleteField, { loading }] = useMutation(DeleteField)
+  const [deleteField, { loading }] = useMutation(DeleteField, {
+    refetchQueries: ['GetCustomFields']
+  })
   const [error, setError] = useState('')
 
   const handleRemove = () => {
