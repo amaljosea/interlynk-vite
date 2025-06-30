@@ -71,7 +71,9 @@ function ComponentAddModal(props) {
 
   const [addRelation] = useMutation(CreateCompRelation)
 
-  const [createComponent, { loading }] = useMutation(CreateComponent)
+  const [createComponent, { loading }] = useMutation(CreateComponent, {
+    refetchQueries: ['GetComponentColumnData']
+  })
 
   const [allComponents, setAllComponents] = useState([])
   const [showPurl, setShowPurl] = useState(false)
