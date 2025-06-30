@@ -15,10 +15,10 @@ import { useSelect } from 'hooks/useSelect'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import {
+  GetArchivedVersions,
   GetProjectVersionLazyDropdownQuery,
   GetVersionName
 } from 'graphQL/Queries'
-import { GetArchivedVersions } from 'graphQL/Queries'
 
 const VersionBreadcrumb = () => {
   const navigate = useNavigate()

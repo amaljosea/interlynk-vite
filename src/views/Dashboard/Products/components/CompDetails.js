@@ -67,7 +67,7 @@ const CompDetails = ({ data, primaryComp }) => {
       'GetComponentExpandedData',
       'GetProductData',
       'GetPrimaryComponentData',
-      'GetSbomName'
+      'GetVersionName'
     ]
   })
 
