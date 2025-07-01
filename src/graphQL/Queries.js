@@ -6634,12 +6634,14 @@ export const GetAttributionsData = gql`
     $last: Int
     $after: String
     $before: String
+    $licenses: [String!]
   ) {
     attributions(
       sbomId: $sbomId
       internal: $internal
       primary: $primary
       licenseType: $licenseType
+      licenses: $licenses
       parts: $parts
       dedupe: $dedupe
       search: $search
