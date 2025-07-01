@@ -405,7 +405,7 @@ const AttributionReportsEditModal = ({
             <LynkFormLabel label='Current value' />
 
             <Flex gap={2}>
-              <Input
+              <Textarea
                 isReadOnly
                 fontSize={'sm'}
                 defaultValue={licenseValue}
