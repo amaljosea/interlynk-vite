@@ -1,37 +1,16 @@
-import { useCallback, useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { getFullDate, timeSince } from 'utils'
-import { getSupportStatusColor } from 'utils/styleUtils'
+import { useCallback, useState } from 'react'
 import DeleteModal from 'views/Dashboard/Support/DeleteModal'
 import StatusModal from 'views/Dashboard/Support/StatusModal'
 import SupportModal from 'views/Dashboard/Support/SupportModal'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import {
-  Flex,
-  Menu,
-  MenuItem,
-  MenuList,
-  Portal,
-  Stack,
-  Tag,
-  Text,
-  Tooltip,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Flex, useDisclosure } from '@chakra-ui/react'
 
-import AddButton from 'components/Icons/AddButton'
-import RefreshBtn from 'components/Icons/RefreshBtn'
 import LynkTable from 'components/LynkTable'
 import CpeCard from 'components/Misc/CpeCard'
-import LynkAction from 'components/Misc/LynkAction'
-import LynkSwitch from 'components/Misc/LynkSwitch'
 import PurlCard from 'components/Misc/PurlCard'
 import Pagination from 'components/Pagination'
-
-import { useHasPermission } from 'hooks/useHasPermission'
-import { useThemeColor } from 'hooks/useThemeColors'
-import { LuCircleCheck } from 'react-icons/lu'
+import GlobalSupportColumns from 'components/columns/GlobalSupportColumns'
+import GlobalSupportHeader from 'components/headers/GlobalSupportHeader'
 
 const SupportTable = ({
   data,
@@ -40,46 +19,31 @@ const SupportTable = ({
   filters,
   setFilters
 }) => {
-  const params = useParams()
+  const { search, field } = filters || {}
 
-  const sbomId = params.sbomid
-
-  const editSup = useHasPermission({
-    parentKey: 'view_support',
-    childKey: 'edit_support'
-  })
-
-  const archiveSup = useHasPermission({
-    parentKey: 'view_support',
-    childKey: 'delete_support'
-  })
-
-  const { primaryTextColor, primaryErrorColor } = useThemeColor([
-    'primaryTextColor',
-    'primaryErrorColor'
-  ])
-
-  const { search, field } = filters
-
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const {
-    isOpen: isActiveOpen,
-    onOpen: onActiveOpen,
-    onClose: onActiveClose
-  } = useDisclosure()
-  const {
-    isOpen: isDeleteOpen,
-    onOpen: onDeleteOpen,
-    onClose: onDeleteClose
-  } = useDisclosure()
-  const {
-    isOpen: isCardOpen,
-    onOpen: onCardOpen,
-    onClose: onCardClose
-  } = useDisclosure()
+  const UPDATE = useDisclosure()
+  const STATUS = useDisclosure()
+  const DELETE = useDisclosure()
+  const CARD = useDisclosure()
 
   const [activeRow, setActiveRow] = useState(null)
   const [filterText, setFilterText] = useState(search || '')
+
+  const action = (type, data) => {
+    setActiveRow(data)
+    switch (type) {
+      case 'update_status':
+        return STATUS.onOpen()
+      case 'view_id':
+        return CARD.onOpen()
+      case 'update_support':
+        return UPDATE.onOpen()
+      case 'delete_support':
+        return DELETE.onOpen()
+      default:
+        return UPDATE.onOpen()
+    }
+  }
 
   const setSearchFilter = useCallback(
     (value) => {
@@ -135,236 +99,17 @@ const SupportTable = ({
     }))
   }
 
+  // COLUMNS
+  const columns = GlobalSupportColumns({ action })
+
   // SUB HEADER
-  const subHeader = useMemo(() => {
-    return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
-        {/* SEARCH COMPONENTS */}
-        <SearchFilter
-          id='support'
-          filterText={filterText}
-          onChange={onSearchInputChange}
-          onClear={handleClear}
-          onFilter={handleSearch}
-        />
-        <Stack spacing={2} alignItems={'center'} direction={'row'}>
-          {!sbomId && (
-            <AddButton
-              label='Create Support'
-              aria-label='add_support'
-              isDisabled={!editSup}
-              onClick={() => {
-                setActiveRow(null)
-                onOpen()
-              }}
-            />
-          )}
-          <RefreshBtn />
-        </Stack>
-      </Flex>
-    )
-  }, [
-    editSup,
+  const subHeader = GlobalSupportHeader({
+    action,
     filterText,
-    onSearchInputChange,
     handleClear,
     handleSearch,
-    sbomId,
-
-    onOpen
-  ])
-
-  // COLUMNS
-  const columns = [
-    {
-      id: 'COMPONENT_SUPPORT_OVERRIDES_ENABLED',
-      name: 'ACTIVE',
-      selector: (row) => {
-        const { enabled } = row
-        return (
-          <LynkSwitch
-            size='md'
-            name={`support active ${row?.productName}`}
-            isDisabled={!editSup}
-            isChecked={enabled}
-            onChange={() => {
-              setActiveRow(row)
-              onActiveOpen()
-            }}
-          />
-        )
-      },
-      width: '8%',
-      omit: sbomId ? true : false,
-      sortable: true
-    },
-    {
-      id: 'COMPONENT_SUPPORT_OVERRIDES_PRODUCT_NAME',
-      name: 'PRODUCT',
-      selector: (row) => {
-        return (
-          <Stack my={4}>
-            <Text fontSize={14} color={primaryTextColor}>
-              {row?.productName}
-            </Text>
-            <Text color={primaryTextColor}>{row?.productVersion}</Text>
-          </Stack>
-        )
-      },
-      wrap: true,
-      width: '12%',
-      sortable: true
-    },
-    {
-      id: 'IDS',
-      name: 'IDS',
-      selector: (row) => (
-        <Text
-          my={4}
-          fontSize={14}
-          color={primaryTextColor}
-          cursor={'pointer'}
-          onClick={() => {
-            setActiveRow(row)
-            onCardOpen()
-          }}
-        >
-          {row?.idUri}
-        </Text>
-      ),
-      wrap: true,
-      width: '16%'
-    },
-    {
-      id: 'COMPONENT_SUPPORT_OVERRIDES_PRODUCT_VERSION',
-      name: 'VERSION',
-      selector: (row) => (
-        <Text fontSize={14} color={primaryTextColor}>
-          {row?.productVersion}
-        </Text>
-      ),
-      width: '10%',
-      wrap: true,
-      sortable: true,
-      omit: true
-    },
-    {
-      id: 'DEPRECATED',
-      name: 'DEPRECATED',
-      selector: (row) =>
-        row?.deprecated ? <LuCircleCheck color={primaryErrorColor} /> : '',
-      width: '10%',
-      wrap: true
-    },
-    {
-      id: 'OUTDATED',
-      name: 'OUTDATED',
-      selector: (row) =>
-        row?.outdated ? <LuCircleCheck color={primaryErrorColor} /> : '',
-      width: '9%',
-      wrap: true
-    },
-    {
-      id: 'EOL_INFOS_EOL_DATE',
-      name: 'END-OF-LIFE',
-      selector: (row) => {
-        const { eol } = row
-        return (
-          <Tag
-            variant='solid'
-            colorScheme={getSupportStatusColor(eol, 6)}
-            hidden={!eol}
-          >
-            {eol}
-          </Tag>
-        )
-      },
-      width: '12%',
-      wrap: true
-    },
-    {
-      id: 'EOL_INFOS_EOL_SUPPORT',
-      name: 'END-OF-SERVICE',
-      selector: (row) => {
-        const { eos } = row
-        return (
-          <Tag
-            variant='solid'
-            colorScheme={getSupportStatusColor(eos, 6)}
-            hidden={!eos}
-          >
-            {eos}
-          </Tag>
-        )
-      },
-      width: '12%',
-      wrap: true
-    },
-    // UPDATED AT
-    {
-      id: 'COMPONENT_SUPPORT_OVERRIDES_UPDATED_AT',
-      name: 'UPDATED',
-      selector: (row) => (
-        <Tooltip label={getFullDate(row.updatedAt)} placement={'top'}>
-          <Text fontSize={14} color={primaryTextColor}>
-            {timeSince(row.updatedAt)}
-          </Text>
-        </Tooltip>
-      ),
-      right: 'true',
-      wrap: true,
-      sortable: true,
-      sortFunction: (a, b) => {
-        const dateA = new Date(a.updatedAt)
-        const dateB = new Date(b.updatedAt)
-        return dateA - dateB
-      }
-    },
-    {
-      id: 'ACTION',
-      name: 'ACTION',
-      selector: (row) => {
-        return (
-          <Menu>
-            <LynkAction aria-label={`support action ${row?.productName}`} />
-            <Portal>
-              <MenuList fontSize={'sm'}>
-                {/* EDIT SUPPORT */}
-                <MenuItem
-                  aria-label={`support edit ${row?.productName}`}
-                  isDisabled={!editSup}
-                  onClick={() => {
-                    setActiveRow(row)
-                    onOpen()
-                  }}
-                >
-                  Edit Support
-                </MenuItem>
-                {/* DELETE SUPPORT  */}
-                <MenuItem
-                  aria-label={`support delete ${row?.productName}`}
-                  color={primaryErrorColor}
-                  isDisabled={!archiveSup}
-                  onClick={() => {
-                    setActiveRow(row)
-                    onDeleteOpen()
-                  }}
-                >
-                  Delete Support
-                </MenuItem>
-              </MenuList>
-            </Portal>
-          </Menu>
-        )
-      },
-      right: 'true',
-      omit: sbomId ? true : false
-    }
-  ]
+    onSearchInputChange
+  })
 
   return (
     <>
@@ -383,44 +128,44 @@ const SupportTable = ({
         <Pagination {...paginationProps} />
       </Flex>
 
-      {isOpen && (
+      {UPDATE.isOpen && (
         <SupportModal
           supports={data || []}
           data={activeRow}
-          isOpen={isOpen}
-          onClose={onClose}
+          isOpen={UPDATE.isOpen}
+          onClose={UPDATE.onClose}
         />
       )}
 
-      {isDeleteOpen && (
+      {DELETE.isOpen && (
         <DeleteModal
           data={activeRow}
-          isOpen={isDeleteOpen}
-          onClose={onDeleteClose}
+          isOpen={DELETE.isOpen}
+          onClose={DELETE.onClose}
         />
       )}
 
-      {isActiveOpen && (
+      {STATUS.isOpen && (
         <StatusModal
           data={activeRow}
-          isOpen={isActiveOpen}
-          onClose={onActiveClose}
+          isOpen={STATUS.isOpen}
+          onClose={STATUS.onClose}
         />
       )}
 
-      {isCardOpen && activeRow?.idUri?.startsWith('pkg') && (
+      {CARD.isOpen && activeRow?.idUri?.startsWith('pkg') && (
         <PurlCard
+          isOpen={CARD.isOpen}
+          onClose={CARD.onClose}
           value={activeRow?.idUri}
-          isOpen={isCardOpen}
-          onClose={onCardClose}
         />
       )}
 
-      {isCardOpen && activeRow?.idUri?.startsWith('cpe') && (
+      {CARD.isOpen && activeRow?.idUri?.startsWith('cpe') && (
         <CpeCard
+          isOpen={CARD.isOpen}
+          onClose={CARD.onClose}
           value={activeRow?.idUri}
-          isOpen={isCardOpen}
-          onClose={onCardClose}
         />
       )}
     </>
