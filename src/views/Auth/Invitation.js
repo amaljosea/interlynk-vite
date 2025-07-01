@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { clearData } from 'utils/authUtils'
 
-import { WarningIcon } from '@chakra-ui/icons'
 import { Button, Icon, Stack, Text } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
@@ -15,7 +14,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { AcceptInvitation, DeclineInvitation } from 'graphQL/Mutation'
 import { OrgUserInvitationInfo } from 'graphQL/Queries'
 
-import { LuCircleX } from 'react-icons/lu'
+import { LuCircleX, LuMessageCircleWarning } from 'react-icons/lu'
 
 const Invitation = () => {
   const { showToast } = useCustomToast()
@@ -92,7 +91,11 @@ const Invitation = () => {
   if (error?.length > 0) {
     return (
       <Stack minW={'auto'} maxW={'420px'}>
-        <Icon color={primaryErrorColor} boxSize={20} as={WarningIcon} />
+        <Icon
+          boxSize={20}
+          color={primaryErrorColor}
+          as={LuMessageCircleWarning}
+        />
         <Text my={6}>
           That did not work because of the following error:
           <br />

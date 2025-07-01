@@ -1,13 +1,12 @@
 import { useQuery } from '@apollo/client'
 
+import { InfoIcon } from '@chakra-ui/icons'
 import { Divider, Grid, Stack, Text } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 import LynkModal from 'components/LynkModal'
 
 import { GetSelectedUser } from 'graphQL/Queries'
-
-import { LuInfo } from 'react-icons/lu'
 
 import CustomTag from './CustomTag'
 
@@ -24,7 +23,7 @@ const UserCard = ({ name, isOpen, onClose }) => {
       isOpen={isOpen}
       onClose={onClose}
       title={'User Details'}
-      Icon={LuInfo}
+      Icon={InfoIcon}
       noFooter
     >
       {loading ? (

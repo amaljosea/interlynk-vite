@@ -8,7 +8,6 @@ import {
   validateEmail
 } from 'utils/formValidationUtils'
 
-import { CheckCircleIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -31,6 +30,8 @@ import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { RegisterUser } from 'graphQL/Mutation'
+
+import { LuCircleCheckBig } from 'react-icons/lu'
 
 import DividerWithText from './DividerWithText'
 import LynkAlert from './LynkAlert'
@@ -202,7 +203,7 @@ const RegistrationForm = () => {
         alignItems={'center'}
         justifyContent={'center'}
       >
-        <Icon color={primarySuccessColor} boxSize={16} as={CheckCircleIcon} />
+        <Icon color={primarySuccessColor} boxSize={16} as={LuCircleCheckBig} />
         <Stack spacing={1}>
           <Text fontSize={'20px'} fontWeight={'semibold'} textAlign={'center'}>
             Registration Successful

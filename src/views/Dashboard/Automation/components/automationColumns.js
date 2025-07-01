@@ -1,8 +1,12 @@
 import { useMutation } from '@apollo/client'
 import { useParams } from 'react-router-dom'
-import { timeSince, updatedValue } from 'utils'
-import { capitalizeFirstLetter, getFullDate } from 'utils'
-import { formatFieldValue } from 'utils'
+import {
+  capitalizeFirstLetter,
+  formatFieldValue,
+  getFullDate,
+  timeSince,
+  updatedValue
+} from 'utils'
 
 import { Flex, IconButton, List, ListItem } from '@chakra-ui/react'
 import { Portal, Text, Tooltip } from '@chakra-ui/react'
@@ -17,8 +21,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { AutomationRuleUpdate } from 'graphQL/Mutation'
 
-import { BiCube, BiLayer } from 'react-icons/bi'
-import { LuGripVertical } from 'react-icons/lu'
+import { LuBox, LuGripVertical, LuLayers } from 'react-icons/lu'
 
 export const useAutomationColumns = (
   setActiveRow,
@@ -72,8 +75,8 @@ export const useAutomationColumns = (
   }
 
   const automationIcon = {
-    component: <BiCube fontSize={18} />,
-    version: <BiLayer fontSize={18} />
+    component: <LuBox fontSize={18} />,
+    version: <LuLayers fontSize={18} />
   }
   return [
     // REORDER

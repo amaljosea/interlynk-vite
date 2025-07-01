@@ -1,5 +1,6 @@
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { IconButton } from '@chakra-ui/react'
+
+import { LuEye, LuEyeOff } from 'react-icons/lu'
 
 const ToggleVisibilityButton = ({ onClick, showPassword, ...props }) => {
   return (
@@ -10,7 +11,7 @@ const ToggleVisibilityButton = ({ onClick, showPassword, ...props }) => {
       variant='unstyled'
       position='absolute'
       onClick={onClick}
-      icon={!showPassword ? <ViewIcon /> : <ViewOffIcon />}
+      icon={!showPassword ? <LuEye /> : <LuEyeOff />}
       {...props}
     />
   )

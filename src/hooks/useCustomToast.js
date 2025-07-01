@@ -1,15 +1,10 @@
 /* eslint-disable */
 // only allowed to import useToast here
 // eslint-disable-next-line no-restricted-imports
+import { InfoIcon } from '@chakra-ui/icons'
 import { Box, Button, Flex, Text, useToast } from '@chakra-ui/react'
 
-import {
-  LuCircleAlert,
-  LuCircleCheck,
-  LuCircleX,
-  LuInfo,
-  LuX
-} from 'react-icons/lu'
+import { LuCircleAlert, LuCircleCheck, LuCircleX, LuX } from 'react-icons/lu'
 
 const ICON_COLORS = {
   success: '#38A169',
@@ -36,7 +31,7 @@ const ICON_COMPONENTS = {
   success: <LuCircleCheck color={ICON_COLORS.success} size={20} />,
   error: <LuCircleX color={ICON_COLORS.error} size={20} />,
   warning: <LuCircleAlert color={ICON_COLORS.warning} size={20} />,
-  info: <LuInfo color={ICON_COLORS.info} size={20} />
+  info: <InfoIcon color={ICON_COLORS.info} size={20} />
 }
 
 const getToastStyles = (status) => ({

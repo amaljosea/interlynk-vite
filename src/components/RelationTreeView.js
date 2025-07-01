@@ -1,9 +1,10 @@
 import { findShortestPath, truncatedValue } from 'utils'
 
-import { ArrowDownIcon } from '@chakra-ui/icons'
 import { Box, Stack, Tag, Text } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
+
+import { LuArrowDown } from 'react-icons/lu'
 
 const RelationTreeView = ({ compPath, data }) => {
   const { name, version } = data || ''
@@ -38,7 +39,7 @@ const RelationTreeView = ({ compPath, data }) => {
                   {item?.name} - {truncatedValue(item?.version, 20)}
                 </Tag>
                 {index !== shortestPath.path.length - 1 && (
-                  <ArrowDownIcon width={4} height={4} color={primaryBlueText} />
+                  <LuArrowDown width={4} height={4} color={primaryBlueText} />
                 )}
               </>
             ))

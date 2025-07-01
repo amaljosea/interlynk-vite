@@ -1,7 +1,8 @@
-import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons'
 import { Flex, Text, Tooltip } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
+
+import { LuChevronDown, LuChevronUp } from 'react-icons/lu'
 
 const EpssTag = ({ value }) => {
   const { primaryTextColor, primarySuccessColor, primaryErrorColor } =
@@ -23,14 +24,14 @@ const EpssTag = ({ value }) => {
               placement='top'
               label={`Up from ${(value[value?.length - 1] * 100).toFixed(3)} % last week`}
             >
-              <ChevronUpIcon w={5} h={5} color={primarySuccessColor} />
+              <LuChevronUp w={5} h={5} color={primarySuccessColor} />
             </Tooltip>
           ) : value[0] < value[value?.length - 1] ? (
             <Tooltip
               placement='top'
               label={`Down from ${(value[value?.length - 1] * 100).toFixed(3)} % last week`}
             >
-              <ChevronDownIcon w={5} h={5} color={primaryErrorColor} />
+              <LuChevronDown w={5} h={5} color={primaryErrorColor} />
             </Tooltip>
           ) : null
         ) : null}

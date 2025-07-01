@@ -4,8 +4,9 @@ import { getFullDate, timeSince } from 'utils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import LegalModal from 'views/Dashboard/Profile/components/LegalModal'
 
-import { EmailIcon, InfoIcon, PhoneIcon } from '@chakra-ui/icons'
+import { InfoIcon } from '@chakra-ui/icons'
 import {
+  Box,
   Flex,
   Portal,
   Stack,
@@ -28,6 +29,8 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { OrganizationManufacturerDelete } from 'graphQL/Mutation'
 import { GetOrgManufacturers } from 'graphQL/Queries'
+
+import { LuMail, LuPhone } from 'react-icons/lu'
 
 const LegalTable = () => {
   const { showToast } = useCustomToast()
@@ -185,12 +188,16 @@ const LegalTable = () => {
               <Flex key={index} alignItems={'center'} gap={4}>
                 {item?.email && (
                   <Tooltip placement='top' label={item?.email}>
-                    <EmailIcon color={primaryBlueText} boxSize={4} />
+                    <Box>
+                      <LuMail color={primaryBlueText} size={18} />
+                    </Box>
                   </Tooltip>
                 )}
                 {item?.phone && (
                   <Tooltip placement='top' label={item?.phone}>
-                    <PhoneIcon color={primaryBlueText} boxSize={3} />
+                    <Box>
+                      <LuPhone color={primaryBlueText} size={18} />
+                    </Box>
                   </Tooltip>
                 )}
                 <Text fontSize={14} color={primaryTextColor}>

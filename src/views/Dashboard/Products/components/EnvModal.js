@@ -2,7 +2,6 @@ import { useMutation } from '@apollo/client'
 import { useState } from 'react'
 import { errorMapping } from 'utils/errorUtils'
 
-import { PlusSquareIcon } from '@chakra-ui/icons'
 import { Flex, FormControl, FormLabel, Input } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
@@ -11,6 +10,8 @@ import LynkModal from 'components/LynkModal'
 import useCustomToast from 'hooks/useCustomToast'
 
 import { EnvCreate } from 'graphQL/Mutation'
+
+import { LuSquarePen } from 'react-icons/lu'
 
 const EnvModal = ({ groupId, isOpen, onClose }) => {
   const { showToast } = useCustomToast()
@@ -50,7 +51,7 @@ const EnvModal = ({ groupId, isOpen, onClose }) => {
       buttonText={'Save'}
       disabled={isInvalid}
       onSubmit={handleSave}
-      Icon={PlusSquareIcon}
+      Icon={LuSquarePen}
     >
       <Flex width={'100%'} direction={'column'} gap={4}>
         {error !== '' && <LynkAlert msg={error} />}

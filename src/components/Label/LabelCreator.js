@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { generateRandomColor } from 'utils/styleUtils'
 import { tagColors } from 'variables/general'
 
-import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
 import { Box, Button, Flex, IconButton, SimpleGrid } from '@chakra-ui/react'
 import { FormControl, FormLabel, Input } from '@chakra-ui/react'
 import {
@@ -13,6 +12,8 @@ import {
   PopoverTrigger,
   usePopoverContext
 } from '@chakra-ui/react'
+
+import { LuPlus, LuRepeat } from 'react-icons/lu'
 
 import ProdLabel from './ProdLabel'
 
@@ -59,7 +60,7 @@ const LabelCreator = ({ onAddLabel }) => {
           <FormControl>
             <FormLabel htmlFor='color'>Color</FormLabel>
             <Flex gap={2} alignItems={'center'}>
-              <IconButton icon={<RepeatIcon />} onClick={handleNewColor} />
+              <IconButton icon={<LuRepeat />} onClick={handleNewColor} />
               <Popover>
                 <PopoverTrigger>
                   <Input
@@ -85,7 +86,7 @@ const LabelCreator = ({ onAddLabel }) => {
           type='submit'
           variant='outline'
           colorScheme='blue'
-          leftIcon={<AddIcon />}
+          leftIcon={<LuPlus />}
           title='Add product label'
           isDisabled={name === '' || previewColor === ''}
           sx={{ mt: 4, w: 'fit-content', fontSize: 'sm' }}

@@ -2,7 +2,6 @@ import React from 'react'
 import { FixedSizeList as List } from 'react-window'
 import { truncatedValue } from 'utils'
 
-import { CheckIcon } from '@chakra-ui/icons'
 import {
   Box,
   Flex,
@@ -12,6 +11,7 @@ import {
   Stack,
   Text
 } from '@chakra-ui/react'
+import { LuCircleCheck } from 'react-icons/lu'
 
 const LynkMenuList = ({ type, options, value, loading, onFilter }) => {
   const itemCount = options?.length
@@ -43,7 +43,7 @@ const LynkMenuList = ({ type, options, value, loading, onFilter }) => {
               >
                 <Flex gap={2}>
                   <Box width={4}>
-                    {isSelected && <CheckIcon fontSize={11} />}
+                    {isSelected && <LuCircleCheck fontSize={11} />}
                   </Box>
                   <Text fontSize={'sm'} textTransform={'capitalize'}>
                     {truncatedValue(option?.replaceAll('_', ' '), 24)}

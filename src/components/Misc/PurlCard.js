@@ -1,6 +1,5 @@
 import { PackageURL } from 'packageurl-js'
 
-import { CheckCircleIcon, WarningIcon } from '@chakra-ui/icons'
 import { Flex, Input, Stack, Text } from '@chakra-ui/react'
 import { useClipboard } from '@chakra-ui/react'
 
@@ -9,7 +8,7 @@ import LynkModal from 'components/LynkModal'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { LuInfo } from 'react-icons/lu'
+import { LuCircleCheck, LuInfo, LuMessageCircleWarning } from 'react-icons/lu'
 
 import InfoTag from './InfoTag'
 
@@ -52,9 +51,9 @@ const PurlCard = ({ value, isOpen, onClose }) => {
       id: 6,
       label: 'validity',
       value: purlString() ? (
-        <CheckCircleIcon color={primarySuccessColor} />
+        <LuCircleCheck color={primarySuccessColor} />
       ) : (
-        <WarningIcon color={primaryErrorColor} />
+        <LuMessageCircleWarning color={primaryErrorColor} />
       )
     }
   ]

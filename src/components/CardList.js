@@ -6,7 +6,6 @@ import {
   allVulns
 } from 'utils/initDashboardData'
 
-import { HamburgerIcon } from '@chakra-ui/icons'
 import {
   Button,
   ButtonGroup,
@@ -20,6 +19,8 @@ import {
 } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+
+import { LuMenu } from 'react-icons/lu'
 
 const CardList = () => {
   const {
@@ -39,7 +40,7 @@ const CardList = () => {
         as={IconButton}
         colorScheme='blue'
         aria-label='Options'
-        icon={<HamburgerIcon />}
+        icon={<LuMenu size={18} />}
         variant='solid'
       />
       <MenuList

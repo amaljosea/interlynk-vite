@@ -2,7 +2,6 @@ import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 
-import { WarningIcon } from '@chakra-ui/icons'
 import {
   Box,
   Flex,
@@ -19,6 +18,8 @@ import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UserEmailConfirmation } from 'graphQL/Mutation'
+
+import { LuMessageCircleWarning } from 'react-icons/lu'
 
 const Confirmation = () => {
   const { showToast } = useCustomToast()
@@ -75,7 +76,11 @@ const Confirmation = () => {
                 justifyContent={'center'}
                 flexDir={'column'}
               >
-                <Icon color={primaryErrorColor} boxSize={20} as={WarningIcon} />
+                <Icon
+                  boxSize={20}
+                  color={primaryErrorColor}
+                  as={LuMessageCircleWarning}
+                />
                 <Text my={6}>{error[0]}</Text>
               </Box>
             )}

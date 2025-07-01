@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { complianceData } from 'variables/general'
 
-import { InfoIcon } from '@chakra-ui/icons'
 import {
   Box,
   Center,
@@ -31,6 +30,7 @@ import { recheckHealth } from 'graphQL/Mutation'
 import { ActiveCompliances } from 'graphQL/Queries'
 
 import { LuCircleCheck, LuCircleX } from 'react-icons/lu'
+import { InfoIcon } from '@chakra-ui/icons'
 
 const SBOM_CATEGORIES = ['Timestamp', 'Supplier Name', 'Unique ID', 'Author']
 

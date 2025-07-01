@@ -3,7 +3,6 @@ import { useMemo, useRef, useState } from 'react'
 import { timeSince } from 'utils'
 import { licenseStatusTypes } from 'variables/general'
 
-import { AddIcon } from '@chakra-ui/icons'
 import {
   Button,
   ButtonGroup,
@@ -27,6 +26,8 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ComponentLicenseStatusUpdate } from 'graphQL/Mutation'
 import { GetLicenseStatusHistory } from 'graphQL/Queries'
+
+import { LuPlus } from 'react-icons/lu'
 
 const LicenseStatus = ({ data, isOpen, onClose }) => {
   const { showToast } = useCustomToast()
@@ -175,7 +176,7 @@ const LicenseStatus = ({ data, isOpen, onClose }) => {
             mt={2}
             w={'full'}
             fontSize={'sm'}
-            leftIcon={<AddIcon />}
+            leftIcon={<LuPlus size={18} />}
             onClick={handleUpdate}
             data-testid='update_status'
           >

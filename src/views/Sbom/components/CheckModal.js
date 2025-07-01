@@ -6,7 +6,6 @@ import { disableButtonTemporarily, transformLicenseString } from 'utils'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import { componentTypes } from 'variables/general'
 
-import { InfoIcon } from '@chakra-ui/icons'
 import { Stack } from '@chakra-ui/react'
 import { Button, Flex, Icon, Text, Tooltip } from '@chakra-ui/react'
 import { FormControl, FormLabel, Input } from '@chakra-ui/react'
@@ -27,6 +26,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
 
 import { LuWrench } from 'react-icons/lu'
+import { InfoIcon } from '@chakra-ui/icons'
 
 const GetComponentData = gql`
   query GetComponentData(

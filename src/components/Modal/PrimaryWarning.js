@@ -4,12 +4,13 @@ import { useContext } from 'react'
 import { useParams } from 'react-router-dom'
 import { getSignedUrlParams } from 'utils'
 
-import { QuestionIcon } from '@chakra-ui/icons'
 import { Stack, Tag, Text } from '@chakra-ui/react'
 
 import LynkModal from 'components/LynkModal'
 
 import { GetAllSboms } from 'graphQL/Queries'
+
+import { LuMessageCircleQuestion } from 'react-icons/lu'
 
 const PrimaryWarning = ({ isOpen, onClose, primaryComp }) => {
   const params = useParams()
@@ -52,7 +53,7 @@ const PrimaryWarning = ({ isOpen, onClose, primaryComp }) => {
       onSubmit={handleSave}
       buttonText='Yes'
       buttonColor='red'
-      Icon={QuestionIcon}
+      Icon={LuMessageCircleQuestion}
     >
       <Stack spacing={6}>
         <Text>You are about to change primary component</Text>

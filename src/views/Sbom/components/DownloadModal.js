@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { csvToJson, getSignedUrlParams, truncatedValue } from 'utils'
 
-import { DownloadIcon } from '@chakra-ui/icons'
 import {
   Button,
   Divider,
@@ -36,6 +35,8 @@ import {
   GetVulnDataForPdf,
   SignedSbomDownload
 } from 'graphQL/Queries'
+
+import { LuDownload } from 'react-icons/lu'
 
 import ComplianceChecks from './ComplianceChecks'
 import { downloadSbomPdf } from './SbomPdf'
@@ -335,7 +336,7 @@ const DownloadModal = (props) => {
         onClose={onClose}
         onSubmit={handleDownload}
         title={`Download ${downloadType.toUpperCase()}`}
-        Icon={DownloadIcon}
+        Icon={LuDownload}
         isLoading={isLoading}
         buttonText={'Download'}
         disabled={prodDescLoading}

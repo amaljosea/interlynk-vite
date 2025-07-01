@@ -2,10 +2,11 @@ import { useLazyQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import { useContext, useState } from 'react'
 
-import { SearchIcon } from '@chakra-ui/icons'
 import { Button, FormControl, FormLabel, Input, Stack } from '@chakra-ui/react'
 
 import { GetPackageData } from 'graphQL/Queries'
+
+import { LuSearch } from 'react-icons/lu'
 
 import LynkAlert from './LynkAlert'
 import LynkSelect from './LynkSelect'
@@ -142,11 +143,11 @@ const PackageLookup = () => {
 
       <Button
         colorScheme='blue'
-        leftIcon={<SearchIcon />}
         isLoading={loading}
         isDisabled={isInvalid}
-        loadingText='Searching...'
         onClick={handleSearch}
+        loadingText='Loading...'
+        leftIcon={<LuSearch size={18} />}
       >
         Search
       </Button>

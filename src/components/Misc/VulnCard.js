@@ -8,7 +8,8 @@ import LynkModal from 'components/LynkModal'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { LuBug, LuInfo } from 'react-icons/lu'
+import { LuBug } from 'react-icons/lu'
+import { InfoIcon } from '@chakra-ui/icons'
 
 export const GetVulnData = gql`
   query GetVulnData(
@@ -82,7 +83,7 @@ const VulnCard = ({ value, isOpen, onClose }) => {
       isOpen={isOpen}
       onClose={onClose}
       title={'Vulnerability Details'}
-      Icon={LuInfo}
+      Icon={InfoIcon}
       noFooter
     >
       {loading ? (

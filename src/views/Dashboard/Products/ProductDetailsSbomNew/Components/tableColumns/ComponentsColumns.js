@@ -9,7 +9,6 @@ import {
 } from 'utils'
 import { GetIcon } from 'utils/styleUtils'
 
-import { ViewIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -41,7 +40,8 @@ import {
   LuLightbulb,
   LuListCheck,
   LuMapPin,
-  LuUser
+  LuUser,
+  LuView
 } from 'react-icons/lu'
 
 const ComponentsColumns = ({ totalComp, isArchived, action }) => {
@@ -418,7 +418,7 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
                 <IconButton
                   size='sm'
                   sx={{ ml: 2, color: primaryTextColor }}
-                  icon={<ViewIcon />}
+                  icon={<LuView />}
                   onClick={() => action(viewCompDetails, row)}
                 />
               )}

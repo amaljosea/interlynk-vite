@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { generateRandomColor, hexToRGBA } from 'utils/styleUtils'
 
-import { CheckIcon, CloseIcon, RepeatIcon } from '@chakra-ui/icons'
 import { Flex, IconButton, Stack, Text } from '@chakra-ui/react'
 import { Divider, Input, Spacer } from '@chakra-ui/react'
 
@@ -9,6 +8,8 @@ import ConfirmDeleteButton from 'components/ConfirmDeleteButton'
 import CustomLoader from 'components/CustomLoader'
 
 import { useThemeColor } from 'hooks/useThemeColors'
+
+import { LuCircleCheck, LuRepeat, LuX } from 'react-icons/lu'
 
 import ProdLabel from './ProdLabel'
 
@@ -88,14 +89,14 @@ const LabelList = ({ loading, labels, onDeleteLabel, onEditLabel }) => {
                       colorScheme='blue'
                       onClick={handleNewColor}
                       title='Generate new color'
-                      icon={<RepeatIcon size={18} />}
+                      icon={<LuRepeat size={18} />}
                     />
 
                     <IconButton
                       size='sm'
                       colorScheme='green'
                       title='Save changes'
-                      icon={<CheckIcon size={18} />}
+                      icon={<LuCircleCheck size={18} />}
                       onClick={() => saveEdit(label.id)}
                     />
 
@@ -104,7 +105,7 @@ const LabelList = ({ loading, labels, onDeleteLabel, onEditLabel }) => {
                       colorScheme='red'
                       title='Cancel editing'
                       onClick={cancelEditing}
-                      icon={<CloseIcon fontSize={12} />}
+                      icon={<LuX fontSize={12} />}
                       className='text-red-500 hover:text-red-700 focus:outline-none'
                     />
                   </Flex>

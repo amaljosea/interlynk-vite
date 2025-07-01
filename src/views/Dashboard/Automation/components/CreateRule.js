@@ -2,7 +2,6 @@ import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { disableButtonTemporarily } from 'utils'
 
-import { EditIcon } from '@chakra-ui/icons'
 import { Button, Flex, Input } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
 
@@ -12,7 +11,7 @@ import LynkModal from 'components/LynkModal'
 
 import { AutomationRuleCreate, AutomationRuleUpdate } from 'graphQL/Mutation'
 
-import { LuCirclePlus } from 'react-icons/lu'
+import { LuCirclePlus, LuSquarePen } from 'react-icons/lu'
 
 import RuleActions from './RuleActions'
 import RuleConditions from './RuleConditions'
@@ -361,7 +360,7 @@ const CreateRule = ({ data, isOpen, onClose, subOperators }) => {
   return (
     <LynkModal
       isOpen={isOpen}
-      Icon={EditIcon}
+      Icon={LuSquarePen}
       onClose={onClose}
       disabled={submitError}
       buttonText={data ? 'Update' : 'Create'}

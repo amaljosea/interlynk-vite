@@ -2,7 +2,6 @@ import { gql, useMutation, useQuery } from '@apollo/client'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { timeSince } from 'utils'
 
-import { AddIcon } from '@chakra-ui/icons'
 import { Divider, Textarea } from '@chakra-ui/react'
 import { Button, ButtonGroup } from '@chakra-ui/react'
 import { Flex, Stack, Text } from '@chakra-ui/react'
@@ -16,6 +15,8 @@ import CompInfo from 'components/Misc/CompInfo'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useThemeColor } from 'hooks/useThemeColors'
+
+import { LuPlus } from 'react-icons/lu'
 
 export const GetNotes = gql`
   query GetNotes($id: Uuid!, $sbomId: Uuid!) {
@@ -243,7 +244,7 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
               mt={2}
               w={'full'}
               fontSize={'sm'}
-              leftIcon={<AddIcon />}
+              leftIcon={<LuPlus size={18} />}
               onClick={() => {
                 setNoteId('')
                 setComment('')

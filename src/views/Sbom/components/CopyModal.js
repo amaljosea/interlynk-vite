@@ -1,7 +1,5 @@
-import { useEffect } from 'react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import { CopyIcon } from '@chakra-ui/icons'
 import {
   Flex,
   FormControl,
@@ -14,6 +12,8 @@ import {
 
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
+
+import { LuCopy } from 'react-icons/lu'
 
 const CopyModal = ({ isOpen, onClose, product, version }) => {
   const [message, setMessage] = useState('')
@@ -60,7 +60,7 @@ const CopyModal = ({ isOpen, onClose, product, version }) => {
       onSubmit={message === '' ? handleSave : handleSubmit}
       title={'Copy SBOM'}
       buttonText={message === '' ? 'Copy' : 'Yes'}
-      Icon={CopyIcon}
+      Icon={LuCopy}
     >
       <Text mt={2}>
         Copy{' '}

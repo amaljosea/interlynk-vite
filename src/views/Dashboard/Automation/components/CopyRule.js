@@ -2,7 +2,6 @@ import { useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { capitalizeFirstLetter, disableButtonTemporarily } from 'utils'
 
-import { CopyIcon } from '@chakra-ui/icons'
 import { Text, chakra } from '@chakra-ui/react'
 
 import LynkAlert from 'components/LynkAlert'
@@ -12,6 +11,8 @@ import useCustomToast from 'hooks/useCustomToast'
 
 import { AutomationRuleCreate } from 'graphQL/Mutation'
 import { GetAutomationNames } from 'graphQL/Queries'
+
+import { LuCopy } from 'react-icons/lu'
 
 const CopyRule = ({ isOpen, onClose, env, data }) => {
   const { showToast } = useCustomToast()
@@ -91,7 +92,7 @@ const CopyRule = ({ isOpen, onClose, env, data }) => {
       onSubmit={onSubmit}
       disabled={isDisabled || error !== ''}
       buttonText='Copy'
-      Icon={CopyIcon}
+      Icon={LuCopy}
     >
       {/* ERROR HANDLING */}
       {error !== '' && <LynkAlert msg={error} />}

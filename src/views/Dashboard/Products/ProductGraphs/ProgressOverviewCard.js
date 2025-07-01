@@ -12,7 +12,6 @@ import {
   YAxis
 } from 'recharts'
 
-import { DownloadIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -35,6 +34,8 @@ import CardHeader from 'components/Card/CardHeader'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ProductProgressMetrics } from 'graphQL/Queries'
+
+import { LuDownload } from 'react-icons/lu'
 
 import ProductComparisonPDF from './ProductComparisonPDF'
 import MetricPieChart from './components/MetricPieChart'
@@ -299,7 +300,7 @@ const ProgressOverviewCard = () => {
         </Text>
         <Button
           size={'sm'}
-          leftIcon={<DownloadIcon color={secondaryTextColor} />}
+          leftIcon={<LuDownload color={secondaryTextColor} />}
           variant={'outline'}
           color={primaryTextColor}
           fontWeight={'medium'}

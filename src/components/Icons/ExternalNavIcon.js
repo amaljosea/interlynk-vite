@@ -1,12 +1,12 @@
-import { ExternalLinkIcon } from '@chakra-ui/icons'
 import { Icon, Link } from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
+import { LuExternalLink } from 'react-icons/lu'
 
 const ExternalNavIcon = ({
   href,
   size = 4,
-  icon = ExternalLinkIcon,
+  icon = LuExternalLink,
   onClick,
   styles = {},
   color,

@@ -6,7 +6,6 @@ import { formatString, getSignedUrlParams } from 'utils'
 import { validateCPEString } from 'utils/cpeUtils'
 import { severityList } from 'variables/general'
 
-import { SearchIcon } from '@chakra-ui/icons'
 import {
   Flex,
   IconButton,
@@ -33,7 +32,7 @@ import {
   GetTotalComponents
 } from 'graphQL/Queries'
 
-import { LuBug } from 'react-icons/lu'
+import { LuBug, LuSearch } from 'react-icons/lu'
 
 const CustomVuln = ({ isOpen, onClose }) => {
   const params = useParams()
@@ -262,7 +261,7 @@ const CustomVuln = ({ isOpen, onClose }) => {
           <IconButton
             siz='sm'
             colorScheme='blue'
-            icon={<SearchIcon />}
+            icon={<LuSearch size={18} />}
             isLoading={cveLoading}
             onClick={handleSearch}
           />

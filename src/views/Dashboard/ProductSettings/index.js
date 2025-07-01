@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { getSettingsLabel } from 'utils'
 import { infoData } from 'variables/general'
 
-import { InfoIcon } from '@chakra-ui/icons'
 import {
   Flex,
   SimpleGrid,
@@ -26,7 +25,9 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ProjectSettingUpdate } from 'graphQL/Mutation'
 
+
 import ConfirmationModal from '../Products/components/ConfirmationModal'
+import { InfoIcon } from '@chakra-ui/icons'
 
 const Settings = ({ enabled, data, mfc }) => {
   const { isFreeTier } = useGlobalQueryContext()

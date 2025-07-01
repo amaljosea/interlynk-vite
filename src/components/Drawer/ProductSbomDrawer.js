@@ -5,7 +5,6 @@ import { hasWhiteSpace, validateUrl } from 'utils/formValidationUtils'
 import { validateEmail } from 'utils/formValidationUtils'
 import { componentTypes, infoData, sbomPhases } from 'variables/general'
 
-import { InfoIcon } from '@chakra-ui/icons'
 import { Button, Flex, Stack, Text, Tooltip } from '@chakra-ui/react'
 import { Checkbox, Divider, Input, Textarea } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
@@ -22,6 +21,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CreateComponent, sbomCreate, supplierCreate } from 'graphQL/Mutation'
 import { GetAllSboms, GetPrimaryComponent } from 'graphQL/Queries'
+import { InfoIcon } from '@chakra-ui/icons'
 
 function ProductSbomDrawer({ sbom, isOpen, onClose }) {
   const params = useParams()

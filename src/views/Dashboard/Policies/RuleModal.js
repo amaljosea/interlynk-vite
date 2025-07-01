@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 import { formatString, updatedValue } from 'utils'
 import { severityList } from 'variables/general'
 
-import { EditIcon } from '@chakra-ui/icons'
 import {
   Flex,
   FormControl,
@@ -23,6 +22,7 @@ import useCustomToast from 'hooks/useCustomToast'
 
 import { CreatePolicyRule, UpdatePolicyRule } from 'graphQL/Mutation'
 import { PolicySubjectOperators } from 'graphQL/Queries'
+import { LuSquarePen } from 'react-icons/lu'
 
 const RuleModal = ({ activeRow, data, isOpen, onClose }) => {
   const { showToast } = useCustomToast()
@@ -170,7 +170,7 @@ const RuleModal = ({ activeRow, data, isOpen, onClose }) => {
       buttonText={data ? 'Update' : 'Save'}
       disabled={isInvalid}
       onSubmit={data ? handleUpdate : handleCreate}
-      Icon={data ? EditIcon : createIcon}
+      Icon={data ? LuSquarePen : createIcon}
     >
       <Tag colorScheme='blue' mb={4} wordBreak={'break-all'}>
         {activeRow?.name}

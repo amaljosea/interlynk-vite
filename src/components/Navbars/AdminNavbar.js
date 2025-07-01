@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { permissionList, truncatedValue } from 'utils'
 
-import { ChevronRightIcon } from '@chakra-ui/icons'
 import { Grid, GridItem } from '@chakra-ui/react'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@chakra-ui/react'
 
@@ -16,6 +15,8 @@ import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { GetUserPermissions } from 'graphQL/Queries'
+
+import { LuChevronRight } from 'react-icons/lu'
 
 import AdminNavbarLinks from './AdminNavbarLinks'
 import ProjectGroupBreadcrumb from './ProjectGroupBreadcrumb'
@@ -107,7 +108,7 @@ export default function AdminNavbar(props) {
     >
       <GridItem colSpan={7}>
         <Breadcrumb
-          separator={<ChevronRightIcon color={sameSecondaryText} />}
+          separator={<LuChevronRight color={sameSecondaryText} />}
           fontSize={'sm'}
         >
           <BreadcrumbItem color={secondaryTextColor}>

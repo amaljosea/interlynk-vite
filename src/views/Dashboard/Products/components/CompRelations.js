@@ -23,7 +23,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { CreateCompRelation, DeleteCompRelation } from 'graphQL/Mutation'
 import { GetCompDependency } from 'graphQL/Queries'
 
-import { LuCirclePlus } from 'react-icons/lu'
+import { LuPlus } from 'react-icons/lu'
 
 import ActionButton from './ActionButton'
 
@@ -221,7 +221,7 @@ const CompRelations = ({ data, compPath }) => {
             title={'Add Relationship'}
             isDisabled={isInvalid}
             onClick={handleSubmit}
-            icon={<LuCirclePlus size={18} />}
+            icon={<LuPlus size={18} />}
           />
         </Stack>
         <Divider />

@@ -1,8 +1,6 @@
 import { allAnalytics } from 'utils/initDashboardData'
-import { setItem } from 'utils/localStorageUtils'
-import { getItem } from 'utils/localStorageUtils'
+import { setItem,getItem } from 'utils/localStorageUtils'
 
-import { HamburgerIcon } from '@chakra-ui/icons'
 import {
   IconButton,
   Menu,
@@ -13,6 +11,8 @@ import {
 } from '@chakra-ui/react'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+
+import { LuMenu } from 'react-icons/lu'
 
 const AnalyticsList = () => {
   const analytics = getItem('selectedAnalytics')
@@ -33,7 +33,7 @@ const AnalyticsList = () => {
         as={IconButton}
         colorScheme='blue'
         aria-label='Options'
-        icon={<HamburgerIcon />}
+        icon={<LuMenu size={18} />}
         variant='solid'
       />
       <MenuList

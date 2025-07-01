@@ -3,7 +3,6 @@ import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { getFullDate, timeSince } from 'utils'
 
-import { CheckIcon } from '@chakra-ui/icons'
 import { Box, Button, IconButton, Stack, Text, Tooltip } from '@chakra-ui/react'
 
 import SeverityTag from 'components/Misc/SeverityTag'
@@ -20,8 +19,7 @@ import { UpdateComponent } from 'graphQL/Mutation'
 import { sbomUpdate } from 'graphQL/Mutation'
 import { GetExistingRules } from 'graphQL/Queries'
 
-import { GoSkip } from 'react-icons/go'
-import { LuWrench } from 'react-icons/lu'
+import { LuBan, LuCircleCheck, LuWrench } from 'react-icons/lu'
 
 const ChecksColumns = (
   setActiveRow,
@@ -271,7 +269,7 @@ const ChecksColumns = (
                       variant='solid'
                       colorScheme='blue'
                       fontWeight='normal'
-                      icon={<GoSkip size={18} />}
+                      icon={<LuBan size={18} />}
                       onClick={() => updateIssue(id, 'ignored')}
                       disabled={isCustomerView || !editChecks || isArchived}
                     />
@@ -284,7 +282,7 @@ const ChecksColumns = (
                   size='sm'
                   fontSize={'xs'}
                   colorScheme='green'
-                  leftIcon={<CheckIcon />}
+                  leftIcon={<LuCircleCheck size={18} />}
                   title={isPrimary ? 'Fixed' : 'View'}
                   onClick={() => (isPrimary ? null : FIXED.onOpen())}
                   disabled={isCustomerView || !editChecks || isArchived}
@@ -299,7 +297,7 @@ const ChecksColumns = (
                   fontSize={'xs'}
                   colorScheme='green'
                   isDisabled={isArchived}
-                  leftIcon={<CheckIcon />}
+                  leftIcon={<LuCircleCheck size={18} />}
                   title={isPrimary ? 'Fixed' : 'View'}
                   onClick={() => (isPrimary ? null : onCheckOpen(row))}
                   isLoading={activeRow?.id === id && loadingRules}

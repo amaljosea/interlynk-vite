@@ -2,13 +2,11 @@ import { useMutation } from '@apollo/client'
 import { Fragment } from 'react'
 import { upgradePlanAllFeatures } from 'variables/general'
 
-import { CheckCircleIcon, CloseIcon } from '@chakra-ui/icons'
 import {
   Box,
   Icon,
   SimpleGrid,
   Text,
-  /* eslint-disable */
   useColorModeValue
 } from '@chakra-ui/react'
 
@@ -19,20 +17,18 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { EnterpriseUpgradeRequest } from 'graphQL/Mutation'
 
-import { GiScales } from 'react-icons/gi'
+import { LuCircleCheck, LuOctagonX, LuScale } from 'react-icons/lu'
 
 export const UpgradePlanModal = ({ isOpen, onClose }) => {
   const { showToast } = useCustomToast()
 
   const [sendRequest, { loading }] = useMutation(EnterpriseUpgradeRequest)
   const {
-    primaryBgColor,
     primaryErrorColor,
     primarySuccessColor,
     primaryBlueText,
     secondaryTextInverse
   } = useThemeColor([
-    'primaryBgColor',
     'primaryErrorColor',
     'primarySuccessColor',
     'primaryBlueText',
@@ -52,7 +48,7 @@ export const UpgradePlanModal = ({ isOpen, onClose }) => {
   }
 
   const BalanceIconComponent = () => {
-    return <Icon as={GiScales} boxSize={6} color={secondaryTextInverse} />
+    return <Icon as={LuScale} boxSize={6} color={secondaryTextInverse} />
   }
 
   const boxShadow = useColorModeValue(
@@ -167,29 +163,12 @@ export const UpgradePlanModal = ({ isOpen, onClose }) => {
                   display='flex'
                   alignItems='center'
                   h='30px'
-                  color={
-                    typeof item.val1 === 'boolean'
-                      ? item.val1
-                        ? primarySuccessColor
-                        : primaryErrorColor
-                      : 'inherit'
-                  }
                 >
                   {typeof item.val1 === 'boolean' ? (
                     item.val1 ? (
-                      <CheckCircleIcon />
+                      <LuCircleCheck color={primarySuccessColor} size={18} />
                     ) : (
-                      <Box
-                        display='flex'
-                        alignItems='center'
-                        justifyContent='center'
-                        bg={primaryErrorColor}
-                        borderRadius='full'
-                        width='16px'
-                        height='16px'
-                      >
-                        <CloseIcon color={primaryBgColor} boxSize='8px' />
-                      </Box>
+                      <LuOctagonX color={primaryErrorColor} size={18} />
                     )
                   ) : (
                     item.val1
@@ -239,29 +218,12 @@ export const UpgradePlanModal = ({ isOpen, onClose }) => {
                   display='flex'
                   alignItems='center'
                   h='30px'
-                  color={
-                    typeof item.val2 === 'boolean'
-                      ? item.val2
-                        ? primarySuccessColor
-                        : primaryErrorColor
-                      : 'inherit'
-                  }
                 >
                   {typeof item.val2 === 'boolean' ? (
                     item.val2 ? (
-                      <CheckCircleIcon />
+                      <LuCircleCheck color={primarySuccessColor} size={18} />
                     ) : (
-                      <Box
-                        display='flex'
-                        alignItems='center'
-                        justifyContent='center'
-                        bg={primaryErrorColor}
-                        borderRadius='full'
-                        width='16px'
-                        height='16px'
-                      >
-                        <CloseIcon color={primaryBgColor} boxSize='8px' />
-                      </Box>
+                      <LuOctagonX color={primaryErrorColor} size={18} />
                     )
                   ) : (
                     item.val2

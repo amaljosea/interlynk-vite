@@ -5,7 +5,6 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { getSignedUrlParams, transformLicenseString } from 'utils'
 import { componentTypes, infoData } from 'variables/general'
 
-import { InfoIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import { useDisclosure } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 import { Flex, Stack, Text, Tooltip } from '@chakra-ui/react'
@@ -35,7 +34,8 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { CreateCompRelation, CreateComponent } from 'graphQL/Mutation'
 import { GetAllComponents } from 'graphQL/Queries'
 
-import { LuComponent } from 'react-icons/lu'
+import { LuComponent, LuMessageCircleWarning } from 'react-icons/lu'
+import { InfoIcon } from '@chakra-ui/icons'
 
 function ComponentAddModal(props) {
   const navigate = useNavigate()
@@ -426,7 +426,11 @@ function ComponentAddModal(props) {
                 <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                   {shortDesc === 'Component Identifier' &&
                     purlString === '' && (
-                      <WarningTwoIcon w={4} h={4} color={primaryErrorColor} />
+                      <LuMessageCircleWarning
+                        w={4}
+                        h={4}
+                        color={primaryErrorColor}
+                      />
                     )}
                   <Text fontSize={'sm'} fontWeight={'medium'}>
                     Identifiers

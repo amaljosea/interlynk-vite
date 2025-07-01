@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { truncatedValue } from 'utils'
 
-import { ChevronDownIcon } from '@chakra-ui/icons'
 import {
   Avatar,
   Box,
@@ -34,7 +33,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UploadProfileImage } from 'graphQL/Mutation'
 
-import { LuBuilding2 } from 'react-icons/lu'
+import { LuBuilding2, LuChevronDown } from 'react-icons/lu'
 
 import OrgDrawer from './OrgDrawer'
 import PersonalDrawer from './PersonalDrawer'
@@ -187,7 +186,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
                 style={{ marginRight: '8px', fontSize: 20 }}
               />
               <Text fontSize='sm'>{activeTab?.name?.toLowerCase()}</Text>
-              <ChevronDownIcon ml='4px' boxSize='20px' />
+              <LuChevronDown ml='4px' boxSize='20px' />
             </Flex>
           </MenuButton>
           <MenuList fontSize={'sm'}>

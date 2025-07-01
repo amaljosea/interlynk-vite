@@ -7,7 +7,6 @@ import StatusModal from 'views/Dashboard/Support/StatusModal'
 import SupportModal from 'views/Dashboard/Support/SupportModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
-import { CheckIcon } from '@chakra-ui/icons'
 import {
   Flex,
   Menu,
@@ -32,6 +31,7 @@ import Pagination from 'components/Pagination'
 
 import { useHasPermission } from 'hooks/useHasPermission'
 import { useThemeColor } from 'hooks/useThemeColors'
+import { LuCircleCheck } from 'react-icons/lu'
 
 const SupportTable = ({
   data,
@@ -256,7 +256,7 @@ const SupportTable = ({
       id: 'DEPRECATED',
       name: 'DEPRECATED',
       selector: (row) =>
-        row?.deprecated ? <CheckIcon color={primaryErrorColor} /> : '',
+        row?.deprecated ? <LuCircleCheck color={primaryErrorColor} /> : '',
       width: '10%',
       wrap: true
     },
@@ -264,7 +264,7 @@ const SupportTable = ({
       id: 'OUTDATED',
       name: 'OUTDATED',
       selector: (row) =>
-        row?.outdated ? <CheckIcon color={primaryErrorColor} /> : '',
+        row?.outdated ? <LuCircleCheck color={primaryErrorColor} /> : '',
       width: '9%',
       wrap: true
     },

@@ -1,7 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { sevColor } from 'utils/styleUtils'
 
-import { ChevronDownIcon } from '@chakra-ui/icons'
 import { Button, Flex, Text } from '@chakra-ui/react'
 import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
@@ -19,6 +18,8 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { orgRuleUpdate } from 'graphQL/Mutation'
 import { GetOrgRulesForChecks } from 'graphQL/Queries'
+
+import { LuChevronDown } from 'react-icons/lu'
 
 const Checks = () => {
   const showToast = useCustomToast()
@@ -124,7 +125,7 @@ const Checks = () => {
               _hover={{ bg: 'auto' }}
               _active={{ bg: 'auto' }}
               _focus={{ boxShadow: 'none' }}
-              rightIcon={<ChevronDownIcon boxSize={5} />}
+              rightIcon={<LuChevronDown boxSize={5} />}
               colorScheme={sevColor(severity.toLowerCase()).btn}
             >
               {options.find((option) => option.value === severity)?.label ||

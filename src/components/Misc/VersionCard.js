@@ -8,7 +8,7 @@ import LynkModal from 'components/LynkModal'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { GoVersions } from 'react-icons/go'
+import { LuPackage } from 'react-icons/lu'
 
 import CustomTag from './CustomTag'
 
@@ -46,7 +46,7 @@ const VersionCard = ({ isOpen, onClose }) => {
       isOpen={isOpen}
       onClose={onClose}
       title='Version Details'
-      Icon={GoVersions}
+      Icon={LuPackage}
       noFooter={true}
     >
       {loading ? (

@@ -2,7 +2,6 @@
 import React, { useRef } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 
-import { HamburgerIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -21,6 +20,8 @@ import { SidebarHelp } from 'components/Sidebar/SidebarHelp'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useThemeColor } from 'hooks/useThemeColors'
+
+import { LuMenu } from 'react-icons/lu'
 
 function SidebarResponsive(props) {
   const { logoText, routes, secondary } = props
@@ -173,7 +174,7 @@ function SidebarResponsive(props) {
       ref={mainPanel}
       alignItems='center'
     >
-      <HamburgerIcon
+      <LuMenu
         cursor={'pointer'}
         color={hamburgerColor}
         w='18px'

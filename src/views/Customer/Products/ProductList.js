@@ -1,6 +1,5 @@
 import { displayErrorMessage } from 'utils/errorUtils'
 
-import { WarningTwoIcon } from '@chakra-ui/icons'
 import { Flex, Text } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
@@ -11,6 +10,8 @@ import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ShareLynkProjectGroups } from 'graphQL/Queries'
+
+import { LuMessageCircleWarning } from 'react-icons/lu'
 
 const ProductList = () => {
   const { prodState } = useGlobalState()
@@ -31,7 +32,7 @@ const ProductList = () => {
     return (
       <Card>
         <Flex alignItems={'center'} justifyContent={'center'}>
-          <WarningTwoIcon color={primaryBlueText} />
+          <LuMessageCircleWarning size={18} color={primaryBlueText} />
           <Text textAlign={'center'} fontSize={14}>
             {displayErrorMessage(error.networkError?.statusCode, error.message)}
           </Text>

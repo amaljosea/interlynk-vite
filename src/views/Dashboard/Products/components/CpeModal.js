@@ -4,7 +4,6 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { ProductDetailsTabs } from 'utils/TabsObjects'
 import { validateCpe, validateFields, validateLanguage } from 'utils/cpeUtils'
 
-import { InfoIcon } from '@chakra-ui/icons'
 import { Box, Button, Flex, Grid, Tag } from '@chakra-ui/react'
 import { FormControl, FormLabel } from '@chakra-ui/react'
 
@@ -24,6 +23,7 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
+import { InfoIcon } from '@chakra-ui/icons'
 
 const CpeModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
   const { status, component } = activeRow || ''

@@ -24,7 +24,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { UpdateCompLinks } from 'graphQL/Mutation'
 
-import { LuCirclePlus } from 'react-icons/lu'
+import { LuPlus } from 'react-icons/lu'
 
 import ActionButton from './ActionButton'
 
@@ -243,7 +243,7 @@ const CompLinks = ({ data }) => {
           title={'Add Link'}
           isDisabled={isInvalid}
           onClick={alert ? handleLinkAdd : handleSubmit}
-          icon={<LuCirclePlus size={18} />}
+          icon={<LuPlus size={18} />}
         />
         <Divider />
         {/* TABLE */}

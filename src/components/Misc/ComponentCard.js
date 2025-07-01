@@ -3,7 +3,6 @@ import { PackageURL } from 'packageurl-js'
 import { useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
-import { EditIcon } from '@chakra-ui/icons'
 import {
   Button,
   ButtonGroup,
@@ -22,8 +21,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { LuComponent, LuLayers } from 'react-icons/lu'
-import { PiTreeStructure } from 'react-icons/pi'
+import { LuComponent, LuLayers, LuNetwork, LuSquarePen } from 'react-icons/lu'
 
 const GetComponentData = gql`
   query GetComponentData($projectId: Uuid!, $sbomId: Uuid!, $search: String) {
@@ -189,14 +187,14 @@ const ComponentCard = ({ value: componentData, isOpen, onClose }) => {
               <Button
                 {...buttonStyle}
                 onClick={handleViewHierarchy}
-                leftIcon={<PiTreeStructure fontSize={16} />}
+                leftIcon={<LuNetwork size={18} />}
               >
                 Component Hierarchy
               </Button>
               <Button
                 {...buttonStyle}
                 onClick={handleEditComponent}
-                leftIcon={<EditIcon fontSize={16} />}
+                leftIcon={<LuSquarePen size={18} />}
               >
                 Edit Component
               </Button>

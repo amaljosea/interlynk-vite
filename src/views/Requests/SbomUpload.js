@@ -2,7 +2,6 @@ import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { CheckCircleIcon, CloseIcon } from '@chakra-ui/icons'
 import { Button, Flex, Icon, Stack, Text } from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
@@ -17,6 +16,8 @@ import {
   RequestUploadSbom,
   RequestValidate
 } from 'graphQL/Mutation'
+
+import { LuCircleCheck, LuCircleX } from 'react-icons/lu'
 
 const SbomUpload = () => {
   const [uploadSuccessView, setAUploadSuccessView] = useState(false)
@@ -179,7 +180,7 @@ const SbomUpload = () => {
         <Flex alignItems='center' justifyContent='center'>
           <Stack textAlign='center' gap={'20px'} alignItems='center'>
             <Icon
-              as={uploadSuccessView ? CheckCircleIcon : CloseIcon}
+              as={uploadSuccessView ? LuCircleCheck : LuCircleX}
               color={uploadSuccessView ? primarySuccessColor : 'white'}
               boxSize='64px'
               bg={uploadSuccessView ? 'white' : primaryErrorColor}

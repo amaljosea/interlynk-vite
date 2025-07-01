@@ -21,8 +21,8 @@ import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 
 import { AutomationRuleCreate, UpdateComponent } from 'graphQL/Mutation'
+import { InfoIcon } from '@chakra-ui/icons'
 
-import { LuInfo } from 'react-icons/lu'
 
 const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
   const { status, component } = activeRow || ''
@@ -254,7 +254,7 @@ const PurlModal = ({ isOpen, onClose, activeRow, ruleExists, recheck }) => {
       isOpen={isOpen}
       onClose={onClose}
       buttonText={'Save'}
-      Icon={LuInfo}
+      Icon={InfoIcon}
       isLoading={loading}
       disabled={isInvalid}
       title={'PURL Details'}

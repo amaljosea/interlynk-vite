@@ -4,7 +4,6 @@ import { filterEnvList, getFullDate, isDefaultEnv, timeSince } from 'utils'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import EnvModal from 'views/Dashboard/Products/components/EnvModal'
 
-import { AddIcon, CheckCircleIcon } from '@chakra-ui/icons'
 import {
   Flex,
   IconButton,
@@ -21,6 +20,8 @@ import LynkTable from 'components/LynkTable'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { EnvDelete } from 'graphQL/Mutation'
+
+import { LuCircleCheck, LuPlus } from 'react-icons/lu'
 
 const EnvironmentDrawer = ({
   data,
@@ -77,7 +78,7 @@ const EnvironmentDrawer = ({
           {/* ADD ENV */}
           <Tooltip label='Add Environment' placement='left'>
             <IconButton
-              icon={<AddIcon />}
+              icon={<LuPlus />}
               colorScheme='blue'
               variant='solid'
               isDisabled={!data?.projectGroup?.enabled}
@@ -104,7 +105,7 @@ const EnvironmentDrawer = ({
             <Text textTransform={isDefaultEnv(name) ? 'capitalize' : 'none'}>
               {name}
             </Text>
-            {id === activeEnv && <CheckCircleIcon color={primaryBlueText} />}
+            {id === activeEnv && <LuCircleCheck color={primaryBlueText} />}
           </Flex>
         )
       },
