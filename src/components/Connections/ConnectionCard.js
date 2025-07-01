@@ -1,6 +1,7 @@
 import { Button, Flex, Image, Text } from '@chakra-ui/react'
 
 import { useHasPermission } from 'hooks/useHasPermission'
+import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { LuCircleCheckBig } from 'react-icons/lu'
@@ -14,6 +15,8 @@ const ConnectionCard = ({
   isConnected,
   description
 }) => {
+  const tab = useQueryParam('tab')
+  const orgConnections = tab === 'integrations-org'
   const { primaryTextColor, secondaryTextInverse } = useThemeColor([
     'primaryTextColor',
     'secondaryTextInverse'
@@ -62,7 +65,7 @@ const ConnectionCard = ({
           title='Configure'
           width={'fit-content'}
           onClick={onConfigure}
-          isDisabled={!canUpdate}
+          isDisabled={orgConnections && !canUpdate}
           colorScheme={isConnected ? 'blue' : 'gray'}
           leftIcon={isConnected && <LuCircleCheckBig size={18} />}
         >

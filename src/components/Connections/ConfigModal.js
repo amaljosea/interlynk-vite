@@ -16,6 +16,7 @@ import LynkSelect from 'components/LynkSelect'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useHasPermission } from 'hooks/useHasPermission'
+import useQueryParam from 'hooks/useQueryParam'
 
 import { IoSettingsOutline } from 'react-icons/io5'
 import { LuCirclePlus } from 'react-icons/lu'
@@ -41,9 +42,12 @@ const ConfigModal = ({
   addressPlaceholder,
   greenCheckKey
 }) => {
+  const tab = useQueryParam('tab')
   const { showToast } = useCustomToast()
   const [error, setError] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+
+  const orgConnections = tab === 'integrations-org'
 
   const [updateConn, { loading: updateLoading }] = useMutation(updateConnection)
   const [createConn, { loading: createLoading }] = useMutation(createConnection)
@@ -62,6 +66,8 @@ const ConfigModal = ({
     parentKey: 'view_connections',
     childKey: 'edit_connections'
   })
+
+  const disabled = orgConnections && !updateCon
 
   const validateConfigs = () => {
     let isValid = true
@@ -333,7 +339,7 @@ const ConfigModal = ({
       buttonText='Save'
       isLoading={createLoading || updateLoading}
       onSubmit={data ? handleUpdate : handleSave}
-      disabled={!updateCon || errorMessage !== ''}
+      disabled={disabled || errorMessage !== ''}
     >
       <Stack spacing={4}>
         {configs.map((config, index) => {
@@ -345,7 +351,7 @@ const ConfigModal = ({
                 <Box position='relative'>
                   <Input
                     value={address}
-                    isDisabled={!updateCon}
+                    isDisabled={disabled}
                     placeholder={addressPlaceholder}
                     onChange={(e) =>
                       handleChange(index, 'address', e.target.value)
@@ -355,7 +361,7 @@ const ConfigModal = ({
                 </Box>
               </FormControl>
               <LynkSelect
-                isDisabled={!updateCon}
+                isDisabled={disabled}
                 value={options.find((opt) => opt.value === notificationType)}
                 onChange={(item) =>
                   handleChange(index, 'notificationType', item.value)
@@ -365,7 +371,7 @@ const ConfigModal = ({
                 styles={selectStyles}
               />
               <LynkSelect
-                isDisabled={!updateCon}
+                isDisabled={disabled}
                 value={{ value: frequency, label: frequency }}
                 onChange={(item) =>
                   handleChange(index, 'frequency', item.value)
@@ -374,11 +380,11 @@ const ConfigModal = ({
                 dropDown
                 styles={selectStyles}
               />
-              {updateCon && configs?.length > 1 && (
+              {configs?.length > 1 && (
                 <DeleteButton
-                  onClick={() => handleRemoveConfig(index)}
                   isLoading={deleteLoading}
                   aria-label={'Delete configuration'}
+                  onClick={() => handleRemoveConfig(index)}
                 />
               )}
             </HStack>
