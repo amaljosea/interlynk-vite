@@ -49,18 +49,11 @@ import {
 
 import { downloadAttributionHtml } from './AttributionHtml'
 import AttributionReportsEditModal from './AttributionReportsEditModal'
+import LicenseFilterMenu from './LicenseFilterMenu'
 import { generateAttributionPdf } from './generateAttributionPdf'
 
 export const NO_COMPONENTS_FILTERED_MESSAGE =
   'No components match your current export options. Please adjust the options and try again.'
-
-const licenseTypes = {
-  All: 'all',
-  'SPDX Single': 'standard',
-  'SPDX Expression': 'expression',
-  Custom: 'custom',
-  'No License': 'blank'
-}
 
 const AttributionTable = ({
   isOpen,
@@ -200,15 +193,6 @@ const AttributionTable = ({
     })
   }
 
-  const handlelicenseTypeChange = (value) => {
-    setFilters((prev) => ({
-      ...prev,
-      licenseType:
-        value.toLowerCase() === 'all' ? undefined : value.toUpperCase()
-    }))
-    // reset()
-  }
-
   const handleIncludeParts = (e) => {
     const { checked } = e.target
     setFilters((prev) => ({
@@ -291,13 +275,6 @@ const AttributionTable = ({
     } finally {
       setIsLoading(false)
     }
-  }
-  const generateMenuItems = (availableFilters) => {
-    return Object.entries(availableFilters).map(([key, value]) => (
-      <MenuItemOption key={key} value={value} fontSize={'sm'}>
-        {key}
-      </MenuItemOption>
-    ))
   }
 
   const columns = useMemo(
@@ -577,18 +554,7 @@ const AttributionTable = ({
             </MenuList>
           </Menu>
 
-          <Menu closeOnSelect={true}>
-            <MenuHeading title='License Type' active={!!filters.licenseType} />
-            <MenuList>
-              <MenuOptionGroup
-                type='radio'
-                value={filters.licenseType?.toLowerCase() || 'all'}
-                onChange={handlelicenseTypeChange}
-              >
-                {generateMenuItems(licenseTypes)}
-              </MenuOptionGroup>
-            </MenuList>
-          </Menu>
+          <LicenseFilterMenu filters={filters} setFilters={setFilters} />
           <Checkbox
             name='includeParts'
             onChange={handleIncludeParts}
