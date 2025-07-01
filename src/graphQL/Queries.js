@@ -4029,11 +4029,8 @@ export const PolicyResults = gql`
       nodes {
         id
         violationsCount
-        createdAt
         updatedAt
-        result
         resultType
-        resultWording
         sbom {
           id
           policyRunStatus
@@ -4049,7 +4046,6 @@ export const PolicyResults = gql`
             name
             category
             subject
-            operator
             operatorWording
             value
             policyRuleViolations(sbomId: $sbomId) {
