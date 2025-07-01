@@ -47,7 +47,7 @@ export class JiraIntegration {
     await this.page.locator("//a[@aria-label='products']").click()
     await this.page.waitForTimeout(3000)
 
-    await this.page.locator("//button[@aria-label='Add Product']").click()
+    await this.page.getByRole('button', { name: 'Add Product' }).click()
     await this.page.getByPlaceholder('Add product name').fill('Test')
     await this.page
       .getByPlaceholder('Add product description')

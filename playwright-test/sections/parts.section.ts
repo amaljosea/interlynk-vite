@@ -20,7 +20,7 @@ export default class PartsSection {
     try {
       await this.page.locator("//a[@aria-label='products']").click()
 
-      await this.page.locator("//button[@aria-label='Add product']").click()
+      await this.page.getByRole('button', { name: 'Add Product' }).click()
       await this.page.getByPlaceholder('Add product name').fill('TestOne')
       await this.page
         .getByPlaceholder('Add product description')
@@ -28,7 +28,7 @@ export default class PartsSection {
       await this.page.locator("button[type='submit']").click()
       await this.page.waitForTimeout(3000)
 
-      await this.page.locator("//button[@aria-label='Add product']").click()
+      await this.page.getByRole('button', { name: 'Add Product' }).click()
       await this.page.getByPlaceholder('Add product name').fill('TestTwo')
       await this.page
         .getByPlaceholder('Add product description')

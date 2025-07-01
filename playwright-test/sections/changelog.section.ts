@@ -19,7 +19,7 @@ export default class ChangelogSection {
     try {
       await this.page.locator("//a[@aria-label='products']").click()
 
-      await this.page.locator("//button[@aria-label='Add product']").click()
+      await this.page.getByRole('button', { name: 'Add Product' }).click()
       await this.page.getByPlaceholder('Add product name').fill('Test')
       await this.page
         .getByPlaceholder('Add product description')

@@ -158,7 +158,7 @@ export default class VulnsSection {
         await this.page.waitForTimeout(3000)
       } else {
         console.log('Product "test" does not exist. Creating it.')
-        await this.page.locator("//button[@aria-label='Add product']").click()
+        await this.page.getByRole('button', { name: 'Add Product' }).click()
         await this.page.getByPlaceholder('Add product name').fill('Test')
         await this.page
           .getByPlaceholder('Add product description')
