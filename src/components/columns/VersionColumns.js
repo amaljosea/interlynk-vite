@@ -482,13 +482,14 @@ const VersionColumns = (props) => {
                     aria-label={`sbom-${row?.projectVersion}-reprocess`}
                     onClick={() => action('rerun_import', row)}
                     isDisabled={!canReprocessSbom}
+                    hidden={lifecycle === 'draft'}
                   >
                     Rerun Import
                   </MenuItem>
                   <MenuItem
                     aria-label={`sbom-${row?.projectVersion}-automation`}
                     onClick={() => action('rerun_automation', row)}
-                    hidden={isFreeTier}
+                    hidden={isFreeTier || lifecycle === 'draft'}
                     isDisabled={!canReprocessSbom}
                   >
                     Rerun Automation
@@ -496,13 +497,14 @@ const VersionColumns = (props) => {
                   <MenuItem
                     aria-label={`sbom-${row?.projectVersion}-support-analysis`}
                     onClick={() => action('rerun_support_analysis', row)}
-                    hidden={isFreeTier}
+                    hidden={isFreeTier || lifecycle === 'draft'}
                     isDisabled={!canReprocessSbom}
                   >
                     Rerun Support Analysis
                   </MenuItem>
                   <MenuItem
                     isDisabled={!updateSbom}
+                    hidden={lifecycle === 'draft'}
                     onClick={() => action('switch_environment', row)}
                     aria-label={`sbom-${row?.projectVersion}-transfer`}
                   >
@@ -524,9 +526,10 @@ const VersionColumns = (props) => {
                   </MenuItem>
                   <Divider />
                   <MenuItem
-                    aria-label={`sbom-${row?.projectVersion}-archive`}
                     isDisabled={!archiveSbom}
+                    hidden={lifecycle === 'draft'}
                     onClick={() => action('archive_sbom', row)}
+                    aria-label={`sbom-${row?.projectVersion}-archive`}
                   >
                     Archive
                   </MenuItem>
