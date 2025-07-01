@@ -2908,7 +2908,6 @@ export const GetChangeLogs = gql`
           action
           orig
           updated
-          createdAt
           updatedAt
           changedBy
           loggablePrefix
@@ -3105,7 +3104,6 @@ export const GetProjectLogs = gql`
           action
           orig
           updated
-          createdAt
           updatedAt
           changedBy
         }
