@@ -3,15 +3,14 @@ import { TabContext } from 'context/TabContext'
 import { useContext, useState } from 'react'
 
 import { SearchIcon } from '@chakra-ui/icons'
-import { Button, Input, Stack } from '@chakra-ui/react'
-import { FormControl, FormLabel } from '@chakra-ui/react'
+import { Button, FormControl, FormLabel, Input, Stack } from '@chakra-ui/react'
 
 import { GetPackageData } from 'graphQL/Queries'
 
 import LynkAlert from './LynkAlert'
 import LynkSelect from './LynkSelect'
 
-const ecosystems = [
+const ECOSYSTEM_OPTIONS = [
   { value: '', label: '-- SELECT --' },
   { value: 'cargo', label: 'Cargo' },
   { value: 'go', label: 'Go' },
@@ -79,7 +78,7 @@ const PackageLookup = () => {
       const { packageLookup } = res?.data || ''
       if (packageLookup?.package) {
         const { package: pkg, packageVersion } = packageLookup || ''
-        const license = getLicense(packageVersion.license)
+        const license = getLicense(packageVersion?.license)
         setTabData((prev) => ({
           ...prev,
           details: {
@@ -104,33 +103,30 @@ const PackageLookup = () => {
   }
 
   return (
-    <Stack spacing={3}>
-      {error !== '' && <LynkAlert msg={error} />}
+    <Stack spacing={4}>
+      {error && <LynkAlert msg={error} />}
       <FormControl>
         <FormLabel htmlFor='ecosystem'>Ecosystem</FormLabel>
         <LynkSelect
           name='ecosystem'
           onChange={handleSelect}
-          value={
-            ecosystems.find((item) => item.value === formData?.ecosystem) || ''
-          }
-          options={ecosystems}
+          value={ECOSYSTEM_OPTIONS.find(
+            (item) => item.value === formData.ecosystem
+          )}
+          options={ECOSYSTEM_OPTIONS}
           isCreatable={false}
-          dropDown={true}
-          placeholder={
-            ecosystems.find((item) => item.value === formData?.ecosystem)
-              ?.label || '--SELECT--'
-          }
+          dropDown
+          placeholder='-- SELECT --'
         />
       </FormControl>
       <FormControl>
-        <FormLabel htmlFor='name'>Name</FormLabel>
+        <FormLabel htmlFor='name'>Package Name</FormLabel>
         <Input
           name='name'
           fontSize={'sm'}
-          value={formData?.name}
+          value={formData.name}
           onChange={handleChange}
-          placeholder='Enter package name (e.g. Fody)'
+          placeholder='e.g. Fody'
         />
       </FormControl>
       <FormControl>
@@ -138,19 +134,19 @@ const PackageLookup = () => {
         <Input
           name='version'
           fontSize={'sm'}
+          value={formData.version}
           onChange={handleChange}
-          value={formData?.version}
-          placeholder='Enter package version (e.g 6.8.2)'
+          placeholder='e.g. 6.8.2'
         />
       </FormControl>
+
       <Button
-        siz='sm'
         colorScheme='blue'
+        leftIcon={<SearchIcon />}
         isLoading={loading}
         isDisabled={isInvalid}
+        loadingText='Searching...'
         onClick={handleSearch}
-        loadingText='Loading...'
-        leftIcon={<SearchIcon />}
       >
         Search
       </Button>
