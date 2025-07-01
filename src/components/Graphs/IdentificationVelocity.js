@@ -1,5 +1,4 @@
-import { gql } from '@apollo/client'
-import { useMemo } from 'react'
+import { gql, useQuery } from '@apollo/client'
 import { SingleGraph } from 'views/Dashboard/Analytics/SingleGraph'
 import { getDays } from 'views/Dashboard/Analytics/utils'
 import { formatDate } from 'views/Dashboard/Analytics/utils'
@@ -9,7 +8,6 @@ import { useTheme } from '@chakra-ui/react'
 import LynkLoader from 'components/Misc/LynkLoader'
 
 import useDateRange from 'hooks/useDateRange'
-import useFetchAllNodes from 'hooks/useFetchAllNodes'
 
 const IdentityVelocityMetrics = gql`
   query IdentityVelocityMetrics(
@@ -58,22 +56,11 @@ const IdentityVelocity = () => {
 
   const { dates } = getDays({ startDate, endDate })
 
-  const variables = useMemo(
-    () => ({
-      endDate,
-      startDate
-      // labelIds: label?.length > 0 ? label : [],
-      // projectGroupIds: product?.length > 0 ? product?.map((p) => p.value) : []
-    }),
-    [endDate, startDate]
-  )
-
-  const { data, loading } = useFetchAllNodes({
-    query: IdentityVelocityMetrics,
-    variables,
-    selector: 'dailyMetrics.projectVulnMetrics',
+  const { data, loading } = useQuery(IdentityVelocityMetrics, {
+    variables: { endDate, startDate },
     skip: !startDate || !endDate
   })
+  const { nodes } = data?.dailyMetrics?.projectVulnMetrics || {}
 
   const processVulnMetricsByDate = (data) => {
     const result = {}
@@ -137,7 +124,7 @@ const IdentityVelocity = () => {
     }))
   }
 
-  const vulnMetrics = processVulnMetricsByDate(data)
+  const vulnMetrics = processVulnMetricsByDate(nodes)
 
   const lines = [
     {
