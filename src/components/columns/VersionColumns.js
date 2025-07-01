@@ -71,7 +71,10 @@ const useSbomMetrics = (sbomId) => {
   }, [data, signedUrlParams])
 
   const shouldPoll =
-    !signedUrlParams && metrics && metrics.vulnRunStatus !== 'FINISHED'
+    !signedUrlParams &&
+    metrics &&
+    metrics.vulnRunStatus !== 'FINISHED' &&
+    metrics.lifecycle !== 'draft'
 
   useGradualPolling({ shouldPoll, startPolling, stopPolling })
 

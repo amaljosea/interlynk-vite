@@ -1124,6 +1124,7 @@ export const GetSbomMetrics = gql`
         unspecifiedCount
         inTriageCount
       }
+      lifecycle
     }
   }
 `
