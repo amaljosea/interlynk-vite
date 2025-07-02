@@ -2992,11 +2992,8 @@ export const GetProjectAutomations = gql`
         totalCount
         nodes {
           active
-          createdAt
-          description
           id
           name
-          projectId
           updatedAt
           isSystem
           priority
@@ -3005,16 +3002,13 @@ export const GetProjectAutomations = gql`
             field
             subject
             value
-            automationRuleId
             operator
           }
           automationConditions {
-            automationRuleId
-            createdAt
+            id
             field
             operator
             value
-            id
             subject
           }
         }
