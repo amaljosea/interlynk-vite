@@ -6696,3 +6696,23 @@ export const GetAttributionsData = gql`
     }
   }
 `
+
+export const GetPatchManagerData = gql`
+  query GetPatchManagerData($sbomId: Uuid!, $search: String, $first: Int) {
+    attributions(sbomId: $sbomId, search: $search, first: $first) {
+      nodes {
+        id
+        components {
+          id
+          name
+          patches {
+            id
+            url
+            content
+            kind
+          }
+        }
+      }
+    }
+  }
+`

@@ -10,6 +10,7 @@ import { Flex, Text } from '@chakra-ui/react'
 import { useDisclosure } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
+import PatchManagerDrawer from 'components/Drawer/AttributionReport/PatchManagerDrawer'
 import ComponentNotes from 'components/Drawer/ComponentNotes'
 import ComponentVulns from 'components/Drawer/ComponentVulns'
 import LicenseStatus from 'components/Drawer/LicenseStatus'
@@ -132,10 +133,13 @@ const Components = ({ sbomData }) => {
   const VULNS = useDisclosure()
   const DELETE_SUPPLIER = useDisclosure()
   const LICENSE_STATUS = useDisclosure()
+  const PATCHES_EDIT = useDisclosure()
 
   const action = (type, data) => {
     setActiveRow(data)
     switch (type) {
+      case 'edit_patches':
+        return PATCHES_EDIT.onOpen()
       case 'create_component':
         return COMPONENT.onOpen()
       case 'edit_component':
@@ -398,6 +402,14 @@ const Components = ({ sbomData }) => {
           data={activeRow}
           isOpen={LICENSE_STATUS.isOpen}
           onClose={LICENSE_STATUS.onClose}
+        />
+      )}
+
+      {PATCHES_EDIT.isOpen && (
+        <PatchManagerDrawer
+          isOpen={PATCHES_EDIT.isOpen}
+          onClose={PATCHES_EDIT.onClose}
+          rowData={activeRow}
         />
       )}
     </>

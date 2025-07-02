@@ -9,6 +9,7 @@ import {
 } from 'utils'
 import { GetIcon } from 'utils/styleUtils'
 
+import { ViewIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -40,8 +41,7 @@ import {
   LuLightbulb,
   LuListCheck,
   LuMapPin,
-  LuUser,
-  LuView
+  LuUser
 } from 'react-icons/lu'
 
 const ComponentsColumns = ({ totalComp, isArchived, action }) => {
@@ -71,6 +71,7 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
   })
 
   const editComponent = 'edit_component'
+  const editPatches = 'edit_patches'
   const deleteComponent = 'delete_component'
   const viewCompDetails = 'view_component_details'
   const viewCompRelation = 'view_component_relation'
@@ -353,6 +354,13 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
                         Edit Component
                       </MenuItem>
                       <MenuItem
+                        data-testid='edit_patches'
+                        onClick={() => action(editPatches, row)}
+                        isDisabled={status === 'signed' || !updateComponent}
+                      >
+                        Edit Patches
+                      </MenuItem>
+                      <MenuItem
                         hidden={isFreeTier || isPart}
                         data-testid='edit_license_status'
                         onClick={() => action(editLicenseStatus, row)}
@@ -418,7 +426,7 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
                 <IconButton
                   size='sm'
                   sx={{ ml: 2, color: primaryTextColor }}
-                  icon={<LuView />}
+                  icon={<ViewIcon />}
                   onClick={() => action(viewCompDetails, row)}
                 />
               )}
