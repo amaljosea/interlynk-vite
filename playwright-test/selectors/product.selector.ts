@@ -1,7 +1,7 @@
 class ProductSelectors {
   public static productLink = "(//a[@href='/vendor/products'])[1]"
   public static productsHeader = "//a[text()='products']"
-  public static addProductButton = "//button[@aria-label='Add product']"
+  public static addProductButton = "//button[@aria-label='Add Product']"
   public static popup = "//section[contains(@id, 'chakra') and @role='dialog']"
   public static addProductName = "input[placeholder='Add product name']"
   public static addProductDescription =
@@ -20,7 +20,7 @@ class ProductSelectors {
     "(//div[@tabindex='-1']//button[text()='Delete Product' and @role='menuitem'])"
   public static deleteProductHeader = "//p[text()='Delete Product']"
   public static yesBtn = "//button[text()='Yes']"
-  public static productSearch = "//input[@placeholder='Search...']"
+  public static productSearch = "//input[@placeholder='Search']"
   public static closeBtn =
     "//button[contains(@class, 'chakra-modal__close-btn')]"
   public static noRecordMsg = "//div[text()='There are no records to display']"

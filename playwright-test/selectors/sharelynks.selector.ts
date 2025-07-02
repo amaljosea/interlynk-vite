@@ -1,7 +1,7 @@
 class ShareLynkSelectors {
   public static productLink = "a[href='/vendor/products']"
   public static productsHeader = "//a[text()='products']"
-  public static addProductButton = "//button[@aria-label='Add product']"
+  public static addProductButton = "//button[@aria-label='Add Product']"
   public static popup = "//section[contains(@id, 'chakra') and @role='dialog']"
   public static addProductName = "input[placeholder='Add product name']"
   public static addProductDescription =
@@ -12,7 +12,7 @@ class ShareLynkSelectors {
   }
   public static menuBtn =
     "(//div[@data-tag='allowRowEvents']//button[@aria-haspopup='menu'])[1]"
-  public static productSearch = "//input[@placeholder='Search...']"
+  public static productSearch = "//input[@placeholder='Search']"
   public static deleteBtn =
     "(//div[@tabindex='-1']//button[text()='Delete Product' and @role='menuitem'])"
   public static deleteProductHeader = "//p[text()='Delete Product']"
