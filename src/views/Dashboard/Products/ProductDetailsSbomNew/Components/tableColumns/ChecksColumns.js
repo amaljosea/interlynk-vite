@@ -19,7 +19,7 @@ import { UpdateComponent } from 'graphQL/Mutation'
 import { sbomUpdate } from 'graphQL/Mutation'
 import { GetExistingRules } from 'graphQL/Queries'
 
-import { LuBan, LuCircleCheck, LuWrench } from 'react-icons/lu'
+import { LuBan, LuCheck, LuWrench } from 'react-icons/lu'
 
 const ChecksColumns = (
   setActiveRow,
@@ -257,7 +257,7 @@ const ChecksColumns = (
                       variant='solid'
                       colorScheme='blue'
                       fontWeight='normal'
-                      icon={<LuWrench size={18} />}
+                      icon={<LuWrench size={16} />}
                       onClick={() => onCheckOpen(row)}
                       disabled={isCustomerView || !isEditable || isArchived}
                     />
@@ -269,7 +269,7 @@ const ChecksColumns = (
                       variant='solid'
                       colorScheme='blue'
                       fontWeight='normal'
-                      icon={<LuBan size={18} />}
+                      icon={<LuBan size={16} />}
                       onClick={() => updateIssue(id, 'ignored')}
                       disabled={isCustomerView || !editChecks || isArchived}
                     />
@@ -282,7 +282,7 @@ const ChecksColumns = (
                   size='sm'
                   fontSize={'xs'}
                   colorScheme='green'
-                  leftIcon={<LuCircleCheck size={18} />}
+                  leftIcon={<LuCheck size={16} />}
                   title={isPrimary ? 'Fixed' : 'View'}
                   onClick={() => (isPrimary ? null : FIXED.onOpen())}
                   disabled={isCustomerView || !editChecks || isArchived}
@@ -297,7 +297,7 @@ const ChecksColumns = (
                   fontSize={'xs'}
                   colorScheme='green'
                   isDisabled={isArchived}
-                  leftIcon={<LuCircleCheck size={18} />}
+                  leftIcon={<LuCheck size={16} />}
                   title={isPrimary ? 'Fixed' : 'View'}
                   onClick={() => (isPrimary ? null : onCheckOpen(row))}
                   isLoading={activeRow?.id === id && loadingRules}

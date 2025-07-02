@@ -51,9 +51,9 @@ const PurlCard = ({ value, isOpen, onClose }) => {
       id: 6,
       label: 'validity',
       value: purlString() ? (
-        <LuCircleCheck color={primarySuccessColor} />
+        <LuCircleCheck size={18} color={primarySuccessColor} />
       ) : (
-        <LuMessageCircleWarning color={primaryErrorColor} />
+        <LuMessageCircleWarning size={18} color={primaryErrorColor} />
       )
     }
   ]

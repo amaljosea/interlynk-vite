@@ -360,7 +360,7 @@ const VexModal = ({
             <IconButton
               size='xs'
               colorScheme={stagOne}
-              icon={<LuCheck size={18} />}
+              icon={<LuCheck size={16} />}
               isRound={true}
             />
             <Box w={'1px'} h={10} bg={headingTextSecondary} />
@@ -369,7 +369,7 @@ const VexModal = ({
               isRound={true}
               colorScheme={stagTwo}
               icon={
-                stagTwo === 'red' ? <LuX size={18} /> : <LuCheck size={18} />
+                stagTwo === 'red' ? <LuX size={16} /> : <LuCheck size={16} />
               }
             />
             <Box
@@ -380,7 +380,7 @@ const VexModal = ({
             />
             <IconButton
               size='xs'
-              icon={<LuCheck size={18} />}
+              icon={<LuCheck size={16} />}
               isRound={true}
               colorScheme={stagThree}
               hidden={!statusTitle || statusName === 'Fixed'}
@@ -397,7 +397,7 @@ const VexModal = ({
               colorScheme={stagCustom}
               hidden={!statusTitle || nodes?.length === 0}
               icon={
-                stagCustom === 'red' ? <LuX size={18} /> : <LuCheck size={18} />
+                stagCustom === 'red' ? <LuX size={16} /> : <LuCheck size={16} />
               }
             />
           </Stack>
