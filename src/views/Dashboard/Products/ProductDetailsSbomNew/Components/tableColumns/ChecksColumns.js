@@ -13,10 +13,12 @@ import { useHasPermission } from 'hooks/useHasPermission'
 import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-import { checkResultUpdate } from 'graphQL/Mutation'
-import { recheckHealth } from 'graphQL/Mutation'
-import { UpdateComponent } from 'graphQL/Mutation'
-import { sbomUpdate } from 'graphQL/Mutation'
+import {
+  UpdateComponent,
+  checkResultUpdate,
+  recheckHealth,
+  sbomUpdate
+} from 'graphQL/Mutation'
 import { GetExistingRules } from 'graphQL/Queries'
 
 import { LuBan, LuCheck, LuWrench } from 'react-icons/lu'
@@ -27,7 +29,8 @@ const ChecksColumns = (
   activeRow,
   FIXED,
   setRuleExists,
-  handleOpen
+  handleOpen,
+  isInDraft
 ) => {
   const { showToast } = useCustomToast()
   const params = useParams()
@@ -321,30 +324,32 @@ const ChecksColumns = (
             </>
           )
         },
+        omit: isInDraft,
         right: 'true'
       }
     ]
     return columns
   }, [
+    updateResult,
+    updateComponent,
+    sbomId,
+    healthRecheck,
+    showToast,
+    updateSbom,
     setActiveRow,
+    getRules,
+    productId,
+    setRuleExists,
+    handleOpen,
+    primaryTextColor,
     updateComp,
     editChecks,
+    isInDraft,
     isCustomerView,
     isArchived,
-    activeRow,
+    activeRow?.id,
     loadingRules,
-    FIXED,
-    primaryTextColor,
-    updateResult,
-    getRules,
-    healthRecheck,
-    productId,
-    sbomId,
-    setRuleExists,
-    showToast,
-    updateComponent,
-    updateSbom,
-    handleOpen
+    FIXED
   ])
 }
 

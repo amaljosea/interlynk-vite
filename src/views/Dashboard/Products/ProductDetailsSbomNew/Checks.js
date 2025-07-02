@@ -204,7 +204,8 @@ const Checks = ({ sbomData }) => {
     activeRow,
     FIXED,
     setRuleExists,
-    handleOpen
+    handleOpen,
+    isInDraft
   )
 
   // SUB HEADER
