@@ -312,9 +312,11 @@ const AttributionTable = ({
         id: 'COMPONENTS_VERSION',
         name: 'VERSION',
         selector: (row) => (
-          <Text my={4} fontSize={14} color={primaryTextColor}>
-            {row?.components[0]?.version || 'N/A'}
-          </Text>
+          <Tooltip label={row?.components[0]?.version} placement={'top'}>
+            <Text my={4} fontSize={14} color={primaryTextColor}>
+              {truncatedValue(row?.components[0]?.version) || 'N/A'}
+            </Text>
+          </Tooltip>
         ),
         width: '10%',
         sortable: true
