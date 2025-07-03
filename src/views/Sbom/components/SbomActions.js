@@ -227,8 +227,9 @@ const SbomActions = ({ sbom }) => {
         <Tooltip label='System Log'>
           <IconButton
             colorScheme='blue'
-            icon={<LuCircleCheckBig size={18} />}
             onClick={LOGS.onOpen}
+            icon={<LuCircleCheckBig size={18} />}
+            hidden={sbom?.lifecycle === 'draft'}
             display={signedUrlParams || isFreeTier ? 'none' : 'flex'}
           />
         </Tooltip>
