@@ -140,7 +140,7 @@ const GlobalStateProvider = ({ children }) => {
     scope: '',
     direct: false,
     filters: null,
-    licenseType: 'license_exp',
+    licenseType: 'all',
     expLicense: '',
     cpeString: '',
     isCpeValid: true,

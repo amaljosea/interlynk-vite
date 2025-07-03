@@ -1852,6 +1852,7 @@ export const GetComponentColumnData = gql`
     $before: String
     $search: String
     $licenses: [String!]
+    $licenseType: AttributionLicenseTypeEnum
     $supplierName: [String!]
     $ecosystem: [String!]
     $supportLevel: [String!]
@@ -1872,6 +1873,7 @@ export const GetComponentColumnData = gql`
         last: $last
         search: $search
         licenses: $licenses
+        licenseType: $licenseType
         supplierName: $supplierName
         ecosystem: $ecosystem
         kind: $kind

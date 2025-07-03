@@ -59,7 +59,8 @@ const Components = ({ sbomData }) => {
     totalComp,
     expandedRows,
     exclude,
-    selectedComp
+    selectedComp,
+    licenseType
   } = prodCompState
   const { prodCompDispatch } = dispatch
 
@@ -78,7 +79,11 @@ const Components = ({ sbomData }) => {
       primary: resolveScopeFlag(scope, 'primary'),
       internal: resolveScopeFlag(scope, 'internal'),
       supportLevel: getUndefinedIfEmptyOrAll(supportLevel),
-      includeParts: exclude?.includes('parts') ? undefined : true
+      includeParts: exclude?.includes('parts') ? undefined : true,
+      licenseType:
+        !licenseType || licenseType === 'all'
+          ? undefined
+          : licenseType.toUpperCase()
     }
   }, [
     direct,
@@ -88,7 +93,8 @@ const Components = ({ sbomData }) => {
     licenses,
     scope,
     suppliers,
-    supportLevel
+    supportLevel,
+    licenseType
   ])
 
   const isSortable = field !== '' && direction !== ''

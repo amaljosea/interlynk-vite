@@ -31,7 +31,7 @@ const prodCompReducer = (state, action) => {
         kinds: [],
         scope: '',
         direct: false,
-        licenseType: 'license_exp',
+        licenseType: 'all',
         licenseString: [],
         expLicense: '',
         cpeString: '',
@@ -81,11 +81,12 @@ const prodCompReducer = (state, action) => {
         ...state,
         kinds: toggleSelection(state.kinds, payload)
       }
-    case 'FILTER_LICENSE':
+    case 'FILTER_LICENSE': {
       return {
         ...state,
-        licenses: toggleSelection(state.licenses, payload)
+        licenses: payload
       }
+    }
     case 'FILTER_SUPPLIER':
       return {
         ...state,
@@ -158,6 +159,11 @@ const prodCompReducer = (state, action) => {
       return {
         ...state,
         filterMode: payload
+      }
+    case 'FILTER_LICENSE_TYPE':
+      return {
+        ...state,
+        licenseType: payload
       }
     default:
       return state

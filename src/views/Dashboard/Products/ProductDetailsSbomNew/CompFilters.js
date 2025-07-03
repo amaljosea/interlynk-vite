@@ -3,7 +3,15 @@ import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { capitalizeFirstLetter } from 'utils'
 
-import { Flex, Kbd, MenuDivider, MenuGroup, Text } from '@chakra-ui/react'
+import {
+  Flex,
+  Kbd,
+  MenuDivider,
+  MenuGroup,
+  Skeleton,
+  Stack,
+  Text
+} from '@chakra-ui/react'
 import {
   Menu,
   MenuItemOption,
@@ -91,6 +99,14 @@ const GetShareLynkLicenses = gql`
   }
 `
 
+const licenseTypes = [
+  { label: 'All', value: 'all' },
+  { label: 'SPDX Single', value: 'standard' },
+  { label: 'SPDX Expression', value: 'expression' },
+  { label: 'Custom', value: 'custom' },
+  { label: 'No License', value: 'blank' }
+]
+
 const CompFilters = ({ reset }) => {
   const params = useParams()
   const { isCustomerView } = useRouteFlags()
@@ -98,8 +114,16 @@ const CompFilters = ({ reset }) => {
   const productId = params?.productid
   const sbomId = params?.sbomid
   const { prodCompState, dispatch } = useGlobalState()
-  const { ecosystems, kinds, licenses, scope, direct, exclude, filterMode } =
-    prodCompState
+  const {
+    ecosystems,
+    kinds,
+    licenses,
+    scope,
+    direct,
+    exclude,
+    filterMode,
+    licenseType
+  } = prodCompState
   const { prodCompDispatch } = dispatch
 
   const { inverseSecondaryBgColor } = useThemeColor(['inverseSecondaryBgColor'])
@@ -180,28 +204,22 @@ const CompFilters = ({ reset }) => {
   const onFilter = (type, value) => {
     switch (type) {
       case 'Ecosystem':
-        prodCompDispatch({
-          type: 'FILTER_ECOSYSTEM',
-          payload: value
-        })
+        prodCompDispatch({ type: 'FILTER_ECOSYSTEM', payload: value })
         break
       case 'Kind':
-        prodCompDispatch({
-          type: 'FILTER_KIND',
-          payload: value
-        })
+        prodCompDispatch({ type: 'FILTER_KIND', payload: value })
         break
       case 'Licenses':
+        prodCompDispatch({ type: 'FILTER_LICENSE', payload: value })
+        break
+      case 'LicenseType':
         prodCompDispatch({
-          type: 'FILTER_LICENSE',
-          payload: value
+          type: 'FILTER_LICENSE_TYPE',
+          payload: value === 'all' ? undefined : value.toUpperCase()
         })
         break
       case 'Suppliers':
-        prodCompDispatch({
-          type: 'FILTER_SUPPLIER',
-          payload: value
-        })
+        prodCompDispatch({ type: 'FILTER_SUPPLIER', payload: value })
         break
     }
     reset()
@@ -230,6 +248,26 @@ const CompFilters = ({ reset }) => {
     ) : (
       <LuCheck size={18} color={inverseSecondaryBgColor} />
     )
+
+  const handleLicenseTypeChange = (value) => {
+    onFilter('LicenseType', value)
+  }
+
+  const handleLicenseValuesChange = (selected) => {
+    if (selected?.includes('All')) {
+      onFilter('Licenses', [])
+    } else {
+      onFilter('Licenses', selected?.length === 0 ? [] : selected)
+    }
+  }
+
+  // Helper to determine if the license filter is active
+  const isLicenseFilterActive = (licenseType, licenses) => {
+    return (
+      (licenseType !== undefined && licenseType !== 'all') ||
+      licenses?.length > 0
+    )
+  }
 
   return (
     <Flex gap={2} alignItems={'center'}>
@@ -266,17 +304,63 @@ const CompFilters = ({ reset }) => {
       {/* LICENSES */}
       <Menu closeOnSelect={false}>
         <MenuHeading
-          title={'Licenses'}
-          active={licenses?.length !== 0}
+          title='Licenses'
+          active={isLicenseFilterActive(licenseType, licenses)}
           onClick={() => onCheckFilters('License')}
         />
-        <LynkMenuList
-          type='Licenses'
-          value={licenses}
-          onFilter={onFilter}
-          loading={licLoading}
-          options={compLicenses}
-        />
+        <MenuList
+          minH={'auto'}
+          maxH={'300px'}
+          fontSize={'sm'}
+          overflow={'hidden'}
+          overflowY={'scroll'}
+          minW={'250px'}
+          maxW={'250px'}
+        >
+          <MenuOptionGroup
+            title='Types'
+            type='radio'
+            value={licenseType ? licenseType.toLowerCase() : 'all'}
+            onChange={handleLicenseTypeChange}
+            textAlign={'left'}
+          >
+            {licenseTypes.map((type) => (
+              <MenuItemOption
+                key={type.value}
+                value={type.value}
+                fontSize={'sm'}
+              >
+                {type.label}
+              </MenuItemOption>
+            ))}
+          </MenuOptionGroup>
+          <MenuDivider />
+          <MenuOptionGroup
+            title='Values'
+            type='checkbox'
+            value={licenses || []}
+            onChange={handleLicenseValuesChange}
+            textAlign={'left'}
+          >
+            {licLoading ? (
+              <Stack spacing={2} px={2}>
+                {[1, 2, 3, 4, 5].map((item) => (
+                  <Skeleton key={item} width={'230px'} height={4} />
+                ))}
+              </Stack>
+            ) : compLicenses && compLicenses.length > 0 ? (
+              compLicenses.map((license) => (
+                <MenuItemOption key={license} value={license}>
+                  {license.replaceAll('_', ' ')}
+                </MenuItemOption>
+              ))
+            ) : (
+              <MenuItemOption key={'All'} value={'All'}>
+                All
+              </MenuItemOption>
+            )}
+          </MenuOptionGroup>
+        </MenuList>
       </Menu>
       {/* VISIBILITY */}
       <Menu closeOnSelect={false}>
