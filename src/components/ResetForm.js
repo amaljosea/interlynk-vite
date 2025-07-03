@@ -149,7 +149,7 @@ const ResetForm = () => {
 
   if (success) {
     return (
-      <Stack minW={'auto'} maxW={'420px'}>
+      <Stack w={'400px'}>
         <Text fontSize={'xl'} textAlign={'center'} fontWeight={'medium'}>
           Check your email
         </Text>
@@ -175,7 +175,7 @@ const ResetForm = () => {
 
   if (token) {
     return (
-      <Stack minW={'auto'} maxW={'420px'}>
+      <Stack w={'400px'}>
         <Text fontSize={'xl'} fontWeight={'medium'}>
           Reset your password
         </Text>
@@ -259,7 +259,7 @@ const ResetForm = () => {
   }
 
   return (
-    <Stack minW={'auto'} maxW={'420px'}>
+    <Stack w={'400px'}>
       <Text fontSize={'20px'} textAlign={'center'} fontWeight={'semibold'}>
         Reset your password
       </Text>
