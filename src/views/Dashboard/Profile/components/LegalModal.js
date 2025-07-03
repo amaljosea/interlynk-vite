@@ -7,7 +7,14 @@ import {
   validateUrl
 } from 'utils/formValidationUtils'
 
-import { Button, Flex, Heading, Input, Stack } from '@chakra-ui/react'
+import {
+  Button,
+  Flex,
+  Heading,
+  Input,
+  SimpleGrid,
+  Stack
+} from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import DeleteButton from 'components/Icons/DeleteButton'
@@ -31,10 +38,12 @@ const LegalModal = ({ data, isOpen, onClose }) => {
   const [deletedContacts, setDeletedContacts] = useState([])
 
   const [createMfc, { loading: crLoading }] = useMutation(
-    OrganizationManufacturerCreate
+    OrganizationManufacturerCreate,
+    { refetchQueries: ['GetOrgManufacturers'] }
   )
   const [updateMfc, { loading: upLoading }] = useMutation(
-    OrganizationManufacturerUpdate
+    OrganizationManufacturerUpdate,
+    { refetchQueries: ['GetOrgManufacturers'] }
   )
 
   const containsSpace = hasWhiteSpace(url)
@@ -64,6 +73,9 @@ const LegalModal = ({ data, isOpen, onClose }) => {
   }
 
   const emptyRow = checkEmptyValues(contacts)
+
+  const disabled =
+    errorMessage || (url !== '' && isValidUrl !== '') || orgName === ''
 
   const handleCreate = () => {
     if (url !== '' && !validateUrl(url)) {
@@ -264,42 +276,43 @@ const LegalModal = ({ data, isOpen, onClose }) => {
 
   return (
     <LynkModal
+      maxW={'650px'}
       Icon={LuUsers}
       isOpen={isOpen}
       onClose={onClose}
+      disabled={disabled}
       isLoading={crLoading || upLoading}
       buttonText={data ? 'Update' : 'Save'}
       onSubmit={data ? handleUpdate : handleCreate}
       title={`${data ? 'Edit' : 'Add'} Manufacturer`}
-      disabled={
-        errorMessage || (url !== '' && isValidUrl !== '') || orgName === ''
-      }
     >
       <Stack w={'100%'} spacing={5}>
-        <FormControl isRequired>
-          <FormLabel>Organization Name</FormLabel>
-          <Input
-            type='text'
-            fontSize={14}
-            value={orgName}
-            onChange={(e) => {
-              setOrgName(e.target.value)
-              setError('')
-            }}
-            placeholder='Add organization name'
-          />
-        </FormControl>
-        <FormControl isInvalid={isValidUrl !== '' || containsSpace}>
-          <FormLabel>URL</FormLabel>
-          <Input
-            type='text'
-            value={url}
-            fontSize={14}
-            onChange={onChangeUrl}
-            placeholder='Add URL'
-          />
-          <FormErrorMessage>{isValidUrl}</FormErrorMessage>
-        </FormControl>
+        <SimpleGrid columns={2} gap={2}>
+          <FormControl isRequired>
+            <FormLabel>Organization Name</FormLabel>
+            <Input
+              type='text'
+              fontSize={14}
+              value={orgName}
+              onChange={(e) => {
+                setOrgName(e.target.value)
+                setError('')
+              }}
+              placeholder='Add organization name'
+            />
+          </FormControl>
+          <FormControl isInvalid={isValidUrl !== '' || containsSpace}>
+            <FormLabel>URL</FormLabel>
+            <Input
+              type='text'
+              value={url}
+              fontSize={14}
+              onChange={onChangeUrl}
+              placeholder='Add URL'
+            />
+            <FormErrorMessage>{isValidUrl}</FormErrorMessage>
+          </FormControl>
+        </SimpleGrid>
         <Stack spacing={2}>
           <Heading fontWeight={500} fontSize={12}>
             Contacts
@@ -316,7 +329,6 @@ const LegalModal = ({ data, isOpen, onClose }) => {
                     onChange={(e) =>
                       handleChange(e.target.value, item.id, 'name')
                     }
-                    fontSize={12}
                   />
                 </FormControl>
                 <FormControl
@@ -330,7 +342,6 @@ const LegalModal = ({ data, isOpen, onClose }) => {
                     onChange={(e) =>
                       handleChange(e.target.value, item.id, 'email')
                     }
-                    fontSize={12}
                   />
                   {item?.email !== '' && item?.emailError !== '' && (
                     <FormErrorMessage fontSize='xs'>
@@ -349,7 +360,6 @@ const LegalModal = ({ data, isOpen, onClose }) => {
                     onChange={(e) =>
                       handleChange(e.target.value, item.id, 'phone')
                     }
-                    fontSize={12}
                   />
                   {item?.phone !== '' && item?.phError !== '' && (
                     <FormErrorMessage fontSize='xs'>

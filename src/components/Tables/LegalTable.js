@@ -50,7 +50,7 @@ const LegalTable = () => {
     skip: !orgView ? true : activetab === 'legal' ? false : true
   })
 
-  const { nodes } = data?.organizationManufacturers || ''
+  const { nodes } = data?.organizationManufacturers || {}
 
   const EDIT = useDisclosure()
   const ARCHIVE = useDisclosure()
@@ -59,7 +59,9 @@ const LegalTable = () => {
     item?.organizationName?.toLowerCase()
   )
 
-  const [deleteMfc] = useMutation(OrganizationManufacturerDelete)
+  const [deleteMfc] = useMutation(OrganizationManufacturerDelete, {
+    refetchQueries: ['GetOrgManufacturers']
+  })
 
   const handleDelete = async (id) => {
     await deleteMfc({
