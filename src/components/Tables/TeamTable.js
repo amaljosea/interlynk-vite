@@ -36,9 +36,13 @@ const TeamTable = () => {
   const [activeRow, setActiveRow] = useState(null)
   const [searchInput, setSearchInput] = useState('')
   const [filterText, setFilterText] = useState('')
-  const [deleteUser, { loading: deleteLoading }] = useMutation(deleteOrgUser)
+  const [deleteUser, { loading: deleteLoading }] = useMutation(deleteOrgUser, {
+    refetchQueries: ['GetUsers']
+  })
 
-  const [inviteUsers] = useMutation(InviteUser)
+  const [inviteUsers] = useMutation(InviteUser, {
+    refetchQueries: ['GetUsers']
+  })
 
   const { nodes, loading, paginationProps } = usePaginatedQuery(GetUsers, {
     selector: 'organization.users',
@@ -51,13 +55,13 @@ const TeamTable = () => {
   const onResendInvite = async (row) => {
     await inviteUsers({
       variables: {
-        email: row?.email.toLowerCase(),
+        email: row?.email,
         roleId: row?.role?.id
       }
     }).then((res) => {
-      if (res.data.organizationUserInvite.errors.length > 0) {
+      if (res?.data?.organizationUserInvite?.errors?.length > 0) {
         showToast({
-          description: res.data.organizationUserInvite.errors[0],
+          description: res?.data?.organizationUserInvite?.errors[0],
           status: 'error'
         })
       } else {
@@ -77,7 +81,7 @@ const TeamTable = () => {
       case 'revoke_invitation':
         return USER.onOpen()
       case 'resend_invite':
-        return onResendInvite()
+        return onResendInvite(data)
       case 'add_user':
         return TEAM.onOpen()
     }
