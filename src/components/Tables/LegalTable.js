@@ -1,48 +1,25 @@
 import { useMutation, useQuery } from '@apollo/client'
-import React, { useMemo, useState } from 'react'
-import { getFullDate, timeSince } from 'utils'
+import React, { useState } from 'react'
 import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationModal'
 import LegalModal from 'views/Dashboard/Profile/components/LegalModal'
 
-import { InfoIcon } from '@chakra-ui/icons'
-import {
-  Box,
-  Flex,
-  Portal,
-  Stack,
-  Text,
-  Tooltip,
-  useDisclosure
-} from '@chakra-ui/react'
-import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
+import { Flex, useDisclosure } from '@chakra-ui/react'
 
-import AddButton from 'components/Icons/AddButton'
-import ExternalNavIcon from 'components/Icons/ExternalNavIcon'
 import LynkTable from 'components/LynkTable'
-import LynkAction from 'components/Misc/LynkAction'
+import ManufacturerColumns from 'components/columns/ManufacturerColumns'
+import ManufacturerHeader from 'components/headers/ManufacturerHeader'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
-import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
-import { useThemeColor } from 'hooks/useThemeColors'
 
 import { OrganizationManufacturerDelete } from 'graphQL/Mutation'
 import { GetOrgManufacturers } from 'graphQL/Queries'
-
-import { LuMail, LuPhone } from 'react-icons/lu'
 
 const LegalTable = () => {
   const { showToast } = useCustomToast()
   const activetab = useQueryParam('tab')
   const { orgView } = useGlobalQueryContext()
-  const { primaryTextColor, primaryErrorColor, primaryBlueText } =
-    useThemeColor(['primaryTextColor', 'primaryErrorColor', 'primaryBlueText'])
-
-  const updateOrg = useHasPermission({
-    parentKey: 'view_organization',
-    childKey: 'update_organization'
-  })
 
   const [activeRow, setActiveRow] = useState(null)
 
@@ -81,220 +58,21 @@ const LegalTable = () => {
     })
   }
 
-  // SUB HEADER
-  const subHeader = useMemo(() => {
-    const info = `For compliance, an SBOM may require the product manufacturer's name and contact information. A large corporation might have multiple legal names, including its subsidiaries.`
+  const handleUpdate = (row) => {
+    setActiveRow(row)
+    EDIT.onOpen()
+  }
 
-    return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
-        <Flex flexDirection={'column'}>
-          <Stack direction={'row'} alignItems={'center'}>
-            <Text fontSize='lg' color={primaryTextColor} fontWeight='bold'>
-              Manufacturer Identities
-            </Text>
-            <Tooltip label={info}>
-              <InfoIcon cursor={'pointer'} color={primaryBlueText} />
-            </Tooltip>
-          </Stack>
-          <Text fontSize={'sm'}>
-            View and manage the identities of manufacturers, ensuring
-            authenticity and compliance across the supply chain.
-          </Text>
-        </Flex>
-        <AddButton
-          label='Add Manufacturer'
-          tooltipPlacement='left'
-          isDisabled={!updateOrg}
-          onClick={() => {
-            setActiveRow(null)
-            EDIT.onOpen()
-          }}
-          aria-label='add_manufacturer'
-        />
-      </Flex>
-    )
-  }, [primaryTextColor, primaryBlueText, updateOrg, EDIT])
+  const handleArchive = (row) => {
+    setActiveRow(row)
+    ARCHIVE.onOpen()
+  }
+
+  // SUB HEADER
+  const subHeader = ManufacturerHeader({ handleUpdate })
 
   // COLUMNS
-  const columns = [
-    // ORGANIZATION NAME
-    {
-      id: 'ORG_NAME',
-      name: 'ORGANIZATION NAME',
-      selector: (row) => (
-        <Text
-          fontSize={14}
-          color={primaryTextColor}
-          textTransform={'capitalize'}
-        >
-          {row?.organizationName}
-        </Text>
-      ),
-      wrap: true
-    },
-    // URL
-    {
-      id: 'URL',
-      name: 'URL',
-      selector: (row) => {
-        if (!row?.url) {
-          return (
-            <Text fontSize={14} color={primaryTextColor}>
-              N/A
-            </Text>
-          )
-        }
-
-        return (
-          <Flex direction='row' alignItems={'center'} gap={2} my={3}>
-            <ExternalNavIcon
-              href={
-                row?.url.startsWith('http') ? row.url : `https://${row.url}`
-              }
-            />
-            <Text fontSize={14} color={primaryTextColor}>
-              {row?.url.startsWith('http') ? row.url : `https://${row.url}`}
-            </Text>
-          </Flex>
-        )
-      },
-      wrap: true
-    },
-    // CONTACTS
-    {
-      id: 'CONTACTS',
-      name: 'CONTACTS',
-      selector: (row) => {
-        const { organizationContacts } = row
-
-        if (organizationContacts?.length === 0) {
-          return (
-            <Text fontSize={14} color={primaryTextColor}>
-              N/A
-            </Text>
-          )
-        }
-
-        return (
-          <Flex
-            flexDirection={'column'}
-            alignItems={'flex-start'}
-            gap={3}
-            my={4}
-          >
-            {organizationContacts?.map((item, index) => (
-              <Flex key={index} alignItems={'center'} gap={4}>
-                {item?.email && (
-                  <Tooltip placement='top' label={item?.email}>
-                    <Box>
-                      <LuMail color={primaryBlueText} size={18} />
-                    </Box>
-                  </Tooltip>
-                )}
-                {item?.phone && (
-                  <Tooltip placement='top' label={item?.phone}>
-                    <Box>
-                      <LuPhone color={primaryBlueText} size={18} />
-                    </Box>
-                  </Tooltip>
-                )}
-                <Text fontSize={14} color={primaryTextColor}>
-                  {item?.name || ''}
-                </Text>
-              </Flex>
-            ))}
-          </Flex>
-        )
-      },
-      width: '16%',
-      wrap: true
-    },
-    // CREATED AT
-    {
-      id: 'CREATED_AT',
-      name: 'CREATED',
-      selector: (row) => {
-        const { createdAt } = row
-        return (
-          <Tooltip label={getFullDate(createdAt)} placement='top'>
-            <Text fontSize={14} color={primaryTextColor}>
-              {timeSince(createdAt)}
-            </Text>
-          </Tooltip>
-        )
-      },
-      right: 'true',
-      sortable: false,
-      sortFunction: (a, b) => {
-        const dateA = new Date(a.createdAt)
-        const dateB = new Date(b.createdAt)
-        return dateA - dateB
-      }
-    },
-    // UPDATED AT
-    {
-      id: 'UPDATED_AT',
-      name: 'UPDATED',
-      selector: (row) => {
-        const { updatedAt } = row
-        return (
-          <Tooltip label={getFullDate(updatedAt)} placement='top'>
-            <Text fontSize={14} color={primaryTextColor}>
-              {timeSince(updatedAt)}
-            </Text>
-          </Tooltip>
-        )
-      },
-      sortable: true,
-      sortFunction: (a, b) => {
-        const dateA = new Date(a.updatedAt)
-        const dateB = new Date(b.updatedAt)
-        return dateA - dateB
-      },
-      right: 'true'
-    },
-    // ACTIONS
-    {
-      id: 'ACTION',
-      name: 'ACTION',
-      selector: (row) => {
-        return (
-          <Menu>
-            <LynkAction />
-            <Portal>
-              <MenuList fontSize={'sm'}>
-                <MenuItem
-                  isDisabled={!updateOrg}
-                  onClick={() => {
-                    setActiveRow(row)
-                    EDIT.onOpen()
-                  }}
-                >
-                  Update Manufacturer
-                </MenuItem>
-                <MenuItem
-                  isDisabled={!updateOrg}
-                  color={primaryErrorColor}
-                  onClick={() => {
-                    setActiveRow(row)
-                    ARCHIVE.onOpen()
-                  }}
-                >
-                  Archive Manufacturer
-                </MenuItem>
-              </MenuList>
-            </Portal>
-          </Menu>
-        )
-      },
-      width: '10%',
-      right: 'true'
-    }
-  ]
+  const columns = ManufacturerColumns({ handleUpdate, handleArchive })
 
   return (
     <>
