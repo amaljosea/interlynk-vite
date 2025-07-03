@@ -196,7 +196,8 @@ const ExpandedComponent = ({ data, isArchived, action }) => {
                       }
                     >
                       <Text wordBreak={'break-all'}>
-                        {comp.toComp.name}-{comp.toComp.version}
+                        {comp.toComp.name}{' '}
+                        {comp.toComp.version && `- ${comp.toComp.version}`}
                       </Text>
                     </Tag>
                   ))}
@@ -223,7 +224,8 @@ const ExpandedComponent = ({ data, isArchived, action }) => {
                     }
                   >
                     <Text wordBreak={'break-all'}>
-                      {comp.fromComp.name}-{comp.fromComp.version}
+                      {comp.fromComp.name}{' '}
+                      {comp.fromComp.version && `- ${comp.fromComp.version}`}
                     </Text>
                   </Tag>
                 ))}

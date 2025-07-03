@@ -207,7 +207,7 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
         name: 'VERSION',
         selector: (row) => (
           <Text my={4} fontSize={14} color={primaryTextColor}>
-            {row?.version}
+            {row?.version || 'N/A'}
           </Text>
         ),
         wrap: true,
@@ -237,6 +237,8 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
         name: 'IDENTIFIERS',
         selector: (row) => {
           const { purl, cpes } = row
+          if (cpes?.length === 0 && !purl)
+            return <Text color={primaryTextColor}>N/A</Text>
           return (
             <Flex gap={2}>
               {cpes?.length > 0 && (
