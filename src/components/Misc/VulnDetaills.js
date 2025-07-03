@@ -10,7 +10,7 @@ import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import { useRouteFlags } from 'hooks/useRouteFlags'
 import { useThemeColor } from 'hooks/useThemeColors'
 
-const VulnIDetaills = ({ index, data }) => {
+const VulnDetaills = ({ index, data }) => {
   const params = useParams()
   const navigate = useNavigate()
   const partsContext = usePartsContext()
@@ -64,7 +64,7 @@ const VulnIDetaills = ({ index, data }) => {
         <Tooltip label='View at NVD'>
           <Box>
             <ExternalNavIcon
-              href={linkURl('nvd', vulnId)}
+              href={linkURl('nvd', nvdAliasId)}
               onClick={() => (params?.sbomid ? partsContext.push() : null)}
             />
           </Box>
@@ -81,4 +81,4 @@ const VulnIDetaills = ({ index, data }) => {
   )
 }
 
-export default VulnIDetaills
+export default VulnDetaills
