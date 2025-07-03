@@ -1,6 +1,6 @@
-import { useThemeColor } from 'hooks/useThemeColors'
+import { CheckIcon } from '@chakra-ui/icons'
 
-import { LuCircleCheck } from 'react-icons/lu'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 const CheckMark = ({ zIndex }) => {
   const { primaryBlueText, secondaryBlueBorder } = useThemeColor([
@@ -8,7 +8,7 @@ const CheckMark = ({ zIndex }) => {
     'secondaryBlueBorder'
   ])
   return (
-    <LuCircleCheck
+    <CheckIcon
       w={5}
       h={5}
       bg={'white'}
