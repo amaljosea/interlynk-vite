@@ -6449,6 +6449,8 @@ export const GetVulnProductDetails = gql`
               kev
               cwes
               advisories
+              epssScore
+              epssScores
             }
           }
           component {
