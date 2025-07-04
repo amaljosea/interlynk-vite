@@ -6035,11 +6035,9 @@ export const PackageVersionsTable = gql`
     $last: Int
     $before: String
     $search: String
-    $orderBy: PackageVersionOrderByInput
   ) {
     packageVersions(
-      packageName: $search
-      orderBy: $orderBy
+      search: $search
       first: $first
       last: $last
       after: $after
@@ -6047,24 +6045,26 @@ export const PackageVersionsTable = gql`
     ) {
       totalCount
       nodes {
-        copyright
-        copyrightOverride
-        ecosystem
-        effectiveCopyright
-        effectiveLicensesExp
-        effectiveNotice
-        id
-        licenseOverride
-        licensesExp
-        notice
-        noticeOverride
-        organizationPackageVersionId
-        # organizationPackageVersionUpdatedAt
-        packageName
-        publishedAt
-        sortUpdatedAt
-        sourceType
-        version
+        ... on PackageVersion {
+          packageName
+          version
+          ecosystem
+          licensesExp
+          copyright
+          notice
+          updatedAt
+          __typename
+        }
+        ... on SbomComponent {
+          packageName
+          version
+          ecosystem
+          licensesExp
+          copyright
+          notice
+          updatedAt
+          __typename
+        }
       }
       pageInfo {
         endCursor
@@ -6075,6 +6075,89 @@ export const PackageVersionsTable = gql`
     }
   }
 `
+
+export const PackageData = gql`
+  fragment PageInfo on PageInfo {
+    endCursor
+    hasNextPage
+    startCursor
+    hasPreviousPage
+  }
+
+  fragment PackageVersionFields on PackageVersion {
+    id
+    packageName
+    version
+    ecosystem
+    licensesExp
+    copyright
+    notice
+    updatedAt
+    __typename
+  }
+
+  fragment SbomComponentFields on SbomComponent {
+    id
+    packageName
+    version
+    ecosystem
+    licensesExp
+    copyright
+    notice
+    updatedAt
+    __typename
+  }
+
+  query PackageData(
+    $first: Int
+    $after: String
+    $last: Int
+    $before: String
+    $search: String
+    $isOverrides: Boolean!
+  ) {
+    packageVersions(
+      search: $search
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+    ) @skip(if: $isOverrides) {
+      totalCount
+      nodes {
+        ...PackageVersionFields
+        ...SbomComponentFields
+      }
+      pageInfo {
+        ...PageInfo
+      }
+    }
+    packageOverrides(
+      search: $search
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+    ) @include(if: $isOverrides) {
+      totalCount
+      nodes {
+        id
+        packageName
+        version
+        ecosystem
+        licenseOverride
+        copyrightOverride
+        noticeOverride
+        updatedAt
+        __typename
+      }
+      pageInfo {
+        ...PageInfo
+      }
+    }
+  }
+`
+
 export const GetComponentDataForExport = gql`
   query GetComponentDataForExport(
     $projectId: Uuid!

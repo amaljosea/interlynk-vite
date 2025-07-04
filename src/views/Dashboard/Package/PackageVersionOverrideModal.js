@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
-import { useCallback, useContext, useState } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { transformLicenseString } from 'utils'
 
 import { FormControl, FormLabel, Text, Textarea } from '@chakra-ui/react'
@@ -17,34 +17,52 @@ import {
 
 import { LuPackage } from 'react-icons/lu'
 
-const PackageVersionOverrideModal = ({ isOpen, onClose, data }) => {
-  const {
-    effectiveCopyright,
-    effectiveNotice,
-    organizationPackageVersionId,
-    effectiveLicensesExp,
-    packageName: name,
-    version
-  } = data
+const PackageVersionOverrideModal = ({ isOpen, onClose, data, isOverride }) => {
   const { tabData } = useContext(TabContext)
   const { showToast } = useCustomToast()
 
+  const initialData = useMemo(() => {
+    if (isOverride) {
+      return {
+        copyright: data.copyrightOverride || '',
+        notice: data.noticeOverride || '',
+        license: data.licenseOverride || ''
+      }
+    }
+    return {
+      copyright: data.copyright || '',
+      notice: data.notice || '',
+      license: data.licensesExp || ''
+    }
+  }, [data, isOverride])
+
   const [formData, setFormData] = useState({
-    copyright: effectiveCopyright || '',
-    notice: effectiveNotice || ''
+    copyright: initialData.copyright,
+    notice: initialData.notice
   })
+
+  useEffect(() => {
+    setFormData({
+      copyright: initialData.copyright,
+      notice: initialData.notice
+    })
+  }, [initialData])
 
   const [createOverride, { loading: creating }] = useMutation(
     OrganizationPackageVersionCreate,
-    { refetchQueries: ['PackageVersionsTable'] }
-  )
-  const [updateOverride, { loading: updating }] = useMutation(
-    OrganizationPackageVersionUpdate,
-    { refetchQueries: ['PackageVersionsTable'] }
+    {
+      refetchQueries: ['PackageData']
+    }
   )
 
-  const isUpdating = Boolean(organizationPackageVersionId)
-  const modalTitle = `${isUpdating ? 'Update' : 'Create'} Override`
+  const [updateOverride, { loading: updating }] = useMutation(
+    OrganizationPackageVersionUpdate,
+    {
+      refetchQueries: ['PackageData']
+    }
+  )
+
+  const modalTitle = `${isOverride ? 'Update' : 'Create'} Override`
 
   const handleChange = useCallback((e) => {
     const { name, value } = e.target
@@ -54,19 +72,21 @@ const PackageVersionOverrideModal = ({ isOpen, onClose, data }) => {
   const getLicenseOverride = () => {
     const hasLicense = tabData.details?.licenses?.length > 0
     const license = hasLicense ? tabData.details.licenses[0] : null
-    if (license?.type === 'Custom License') {
+    if (!license) return ''
+
+    if (license.type === 'Custom License') {
       return transformLicenseString(license.value)
     }
-    return license?.value || ''
+    return license.value || ''
   }
 
   const handleSubmit = async () => {
-    const mutation = isUpdating ? updateOverride : createOverride
+    const mutation = isOverride ? updateOverride : createOverride
     const variables = {
       input: {
-        ...(isUpdating
-          ? { id: organizationPackageVersionId }
-          : { name, version }),
+        ...(isOverride
+          ? { id: data.id }
+          : { name: data.packageName, version: data.version }),
         copyrightOverride: formData.copyright,
         noticeOverride: formData.notice,
         licenseOverride: getLicenseOverride()
@@ -74,22 +94,22 @@ const PackageVersionOverrideModal = ({ isOpen, onClose, data }) => {
     }
 
     try {
-      const { data } = await mutation({ variables })
-      const responseKey = isUpdating
+      const result = await mutation({ variables })
+      const responseKey = isOverride
         ? 'organizationPackageVersionUpdate'
         : 'organizationPackageVersionCreate'
-      const response = data[responseKey]
+      const response = result.data[responseKey]
 
       if (response.errors?.length) {
         showToast({
-          title: `${isUpdating ? 'Update' : 'Creation'} failed`,
+          title: `${isOverride ? 'Update' : 'Creation'} failed`,
           description: response.errors.join(', '),
           status: 'error'
         })
       } else {
         showToast({
-          title: `Override ${isUpdating ? 'updated' : 'created'}`,
-          description: `The override has been successfully ${isUpdating ? 'updated' : 'created'}.`,
+          title: `Override ${isOverride ? 'updated' : 'created'}`,
+          description: `The override has been successfully ${isOverride ? 'updated' : 'created'}.`,
           status: 'success'
         })
         onClose()
@@ -110,13 +130,13 @@ const PackageVersionOverrideModal = ({ isOpen, onClose, data }) => {
       onSubmit={handleSubmit}
       title={modalTitle}
       Icon={LuPackage}
-      buttonText={isUpdating ? 'Update' : 'Create'}
+      buttonText={isOverride ? 'Update' : 'Create'}
       isLoading={creating || updating}
     >
       <Text mb={4}>
-        {isUpdating ? 'Updating' : 'Creating'} override for{' '}
+        {isOverride ? 'Updating' : 'Creating'} override for{' '}
         <Text as='span' fontStyle='italic'>
-          {name}
+          {data.packageName} ({data.version})
         </Text>
       </Text>
 
@@ -141,7 +161,7 @@ const PackageVersionOverrideModal = ({ isOpen, onClose, data }) => {
       </FormControl>
 
       <FormControl mt={4}>
-        <LicenseField sbomView={false} license={effectiveLicensesExp} />
+        <LicenseField sbomView={false} license={initialData.license} />
       </FormControl>
     </LynkModal>
   )

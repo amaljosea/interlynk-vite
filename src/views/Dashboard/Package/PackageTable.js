@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { timeSince, truncatedValue } from 'utils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -33,7 +33,8 @@ const PackageTable = ({
   loading,
   filters,
   setFilters,
-  paginationProps
+  paginationProps,
+  isOverrides
 }) => {
   const { showToast } = useCustomToast()
 
@@ -41,13 +42,18 @@ const PackageTable = ({
   const [searchText, setSearchText] = useState(filters.search || '')
 
   const { primaryTextColor } = useThemeColor(['primaryTextColor'])
+  const { isOpen, onOpen, onClose } = useDisclosure()
+
+  useEffect(() => {
+    setSearchText(filters.search || '')
+  }, [filters.search])
 
   const [deleteOverride, { loading: deleting }] = useMutation(
     OrganizationPackageVersionDelete,
-    { refetchQueries: ['PackageVersionsTable'] }
+    {
+      refetchQueries: ['PackageData']
+    }
   )
-
-  const { isOpen, onOpen, onClose } = useDisclosure()
 
   const handleClear = useCallback(() => {
     setSearchText('')
@@ -115,7 +121,7 @@ const PackageTable = ({
         width: '25%',
         wrap: true,
         selector: (row) => (
-          <Flex gap={2} flexDirection={'row'} my={6}>
+          <Flex gap={2} flexDirection={'row'} my={6} alignItems='center'>
             <Tooltip label={row?.packageName}>
               <Text
                 fontSize={14}
@@ -125,15 +131,12 @@ const PackageTable = ({
                 {truncatedValue(row?.packageName, 40)}
               </Text>
             </Tooltip>
-            {row?.organizationPackageVersionId && <LynkSeparator />}
-
-            <Flex gap={2} alignItems={'center'} flexWrap={'wrap'}>
-              {row?.organizationPackageVersionId && (
-                <>
-                  <LynkBadge color='blue' title='Override' />
-                </>
-              )}
-            </Flex>
+            {isOverrides && (
+              <>
+                <LynkSeparator />
+                <LynkBadge color='blue' title='Override' />
+              </>
+            )}
           </Flex>
         )
       },
@@ -169,21 +172,11 @@ const PackageTable = ({
         name: 'LICENSE',
         wrap: true,
         selector: (row) => {
-          const { effectiveLicensesExp } = row
-          if (
-            effectiveLicensesExp?.startsWith(' OR') ||
-            effectiveLicensesExp?.startsWith('OR')
-          ) {
-            return (
-              <Text fontSize={14} color={primaryTextColor}>
-                N/A
-              </Text>
-            )
-          }
+          const license = isOverrides ? row.licenseOverride : row.licensesExp
           return (
-            <Tooltip label={effectiveLicensesExp}>
+            <Tooltip label={license}>
               <Text fontSize={14} color={primaryTextColor}>
-                {truncatedValue(effectiveLicensesExp, 20) || 'N/A'}
+                {truncatedValue(license, 20) || 'N/A'}
               </Text>
             </Tooltip>
           )
@@ -195,9 +188,10 @@ const PackageTable = ({
         name: 'COPYRIGHT',
         wrap: true,
         selector: (row) => {
+          const copyright = isOverrides ? row.copyrightOverride : row.copyright
           return (
             <Text fontSize={14} color={primaryTextColor}>
-              {truncatedValue(row?.effectiveCopyright, 20) || 'N/A'}
+              {truncatedValue(copyright, 20) || 'N/A'}
             </Text>
           )
         }
@@ -208,9 +202,10 @@ const PackageTable = ({
         name: 'NOTICE',
         wrap: true,
         selector: (row) => {
+          const notice = isOverrides ? row.noticeOverride : row.notice
           return (
             <Text fontSize={14} color={primaryTextColor}>
-              {truncatedValue(row?.effectiveNotice, 20) || 'N/A'}
+              {truncatedValue(notice, 20) || 'N/A'}
             </Text>
           )
         }
@@ -223,13 +218,10 @@ const PackageTable = ({
         selector: (row) => {
           return (
             <Text fontSize={14} color={primaryTextColor}>
-              {timeSince(row.sortUpdatedAt)}
+              {timeSince(row.updatedAt)}
             </Text>
           )
         },
-        sortable: true,
-        sortFunction: (a, b) =>
-          new Date(a.sortUpdatedAt) - new Date(b.sortUpdatedAt),
         wrap: true
       },
       {
@@ -242,7 +234,7 @@ const PackageTable = ({
               <MenuList fontSize='sm'>
                 <MenuItem
                   data-testid='create_override'
-                  hidden={row?.organizationPackageVersionId}
+                  hidden={isOverrides}
                   onClick={() => {
                     setActiveRow(row)
                     onOpen()
@@ -252,7 +244,7 @@ const PackageTable = ({
                 </MenuItem>
                 <MenuItem
                   data-testid='update_override'
-                  hidden={!row?.organizationPackageVersionId}
+                  hidden={!isOverrides}
                   onClick={() => {
                     setActiveRow(row)
                     onOpen()
@@ -262,10 +254,8 @@ const PackageTable = ({
                 </MenuItem>
                 <MenuItem
                   data-testid='delete_override'
-                  hidden={!row?.organizationPackageVersionId}
-                  onClick={() =>
-                    handleDeleteOverride(row?.organizationPackageVersionId)
-                  }
+                  hidden={!isOverrides}
+                  onClick={() => handleDeleteOverride(row.id)}
                   isDisabled={deleting}
                 >
                   Delete override
@@ -277,7 +267,7 @@ const PackageTable = ({
         right: 'true'
       }
     ],
-    [primaryTextColor, deleting, handleDeleteOverride, onOpen]
+    [primaryTextColor, deleting, handleDeleteOverride, onOpen, isOverrides]
   )
 
   const subHeader = useMemo(
@@ -317,6 +307,7 @@ const PackageTable = ({
           onClose={onClose}
           isOpen={isOpen}
           data={activeRow}
+          isOverride={isOverrides}
         />
       )}
     </>
