@@ -1,5 +1,6 @@
 import { gql, useLazyQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
+import { truncatedValue } from 'utils'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
@@ -48,7 +49,7 @@ export const ProductSelect = ({ value, onChange }) => {
       if (!nodes) return
 
       const newOptions = nodes?.map((item) => ({
-        label: item?.label,
+        label: truncatedValue(item?.label, 50),
         value: item?.value,
         projects: item?.projects?.map((project) => ({
           label: project?.name,

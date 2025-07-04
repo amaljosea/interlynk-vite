@@ -107,6 +107,11 @@ export const useLazyDropDown = (
     ? [defaultFirstOption, ...(filteredNodes || [])]
     : filteredNodes || []
 
+  const filterOptions = defaultOptions?.map((item) => ({
+    ...item,
+    name: truncatedValue(item?.name, 50)
+  }))
+
   return {
     lazyDropDownProps: {
       nodes,
@@ -123,7 +128,7 @@ export const useLazyDropDown = (
       placeholder,
       onChange,
       components,
-      defaultOptions
+      defaultOptions: filterOptions
     }
   }
 }
