@@ -34,6 +34,9 @@ export default class ComponentSection {
 
     await this.page.getByTestId(`product_Test`).click()
     await this.page.waitForTimeout(1000)
+
+    await this.page.reload()
+    await this.page.waitForTimeout(5000)
     await this.page.reload()
 
     const version = this.page.getByTestId('version').nth(0)
@@ -482,14 +485,13 @@ export default class ComponentSection {
           await this.page.getByRole('tab', { name: 'components' }).click()
 
           await this.page.waitForTimeout(5000)
-
-          await this.page.getByRole('button', { name: 'Visibility' }).click()
+          await this.page.getByTestId('filter_Visibility').click()
           await this.page.waitForTimeout(1000)
           await this.page
-            .getByRole('menuitemradio', { name: 'primary' })
+            .getByRole('menuitemcheckbox', { name: 'Primary' })
             .click()
 
-          await this.page.waitForTimeout(2000)
+          await this.page.waitForTimeout(5000)
 
           const result = await this.page
             .getByLabel('component_name')
