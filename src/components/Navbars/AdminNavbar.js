@@ -156,7 +156,7 @@ export default function AdminNavbar(props) {
                 projectGroupName={projectGroupName}
                 defaultFirstOption={{
                   id,
-                  name: projectGroupName
+                  name: truncatedValue(projectGroupName, 20)
                 }}
               />
             </BreadcrumbItem>
