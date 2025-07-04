@@ -74,15 +74,15 @@ const CompRelations = ({ data, compPath }) => {
   } = useDisclosure()
 
   const list = dependsOnList?.filter(
-    (item) => item?.toComp?.id === component?.value
+    (item) => item?.toComp?.id === component?.id
   )
 
   const handleAdd = () => {
     const isDependsOn = type === 'depends_on'
     addRelation({
       variables: {
-        from: isDependsOn ? id : component?.value,
-        to: isDependsOn ? component?.value : id,
+        from: isDependsOn ? id : component?.id,
+        to: isDependsOn ? component?.id : id,
         relType: 'depends_on'
       }
     }).then((res) => {
@@ -201,7 +201,7 @@ const CompRelations = ({ data, compPath }) => {
             />
           </FormControl>
           {/* RELATION TO */}
-          <FormControl isInvalid={list?.length > 0}>
+          <FormControl isInvalid={list?.length > 0 || component?.name === name}>
             <FormLabel htmlFor='relationTo' color={headingTextColor}>
               Component
             </FormLabel>
@@ -213,7 +213,9 @@ const CompRelations = ({ data, compPath }) => {
             />
             <FormErrorMessage>
               <FormErrorIcon />
-              Component dependency already exists
+              {list?.length > 0
+                ? 'Component dependency already exists'
+                : `Cannot add ${name} as a dependency to itself.`}
             </FormErrorMessage>
           </FormControl>
           {/* ACTION */}

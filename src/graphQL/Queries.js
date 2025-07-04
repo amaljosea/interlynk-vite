@@ -2380,6 +2380,8 @@ export const GetAllComponents = gql`
     $last: Int
     $after: String
     $before: String
+    $search: String
+    $orderBy: ComponentOrderByInput
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       id
@@ -2389,6 +2391,8 @@ export const GetAllComponents = gql`
         before: $before
         first: $first
         last: $last
+        search: $search
+        orderBy: $orderBy
       ) {
         nodes {
           id
@@ -2396,6 +2400,13 @@ export const GetAllComponents = gql`
           version
           primary
         }
+        pageInfo {
+          endCursor
+          hasNextPage
+          hasPreviousPage
+          startCursor
+        }
+        totalCount
       }
     }
   }

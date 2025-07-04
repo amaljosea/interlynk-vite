@@ -1,20 +1,20 @@
-import { useQuery } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
-import { useContext, useEffect, useState } from 'react'
+import { useContext } from 'react'
 import { useParams } from 'react-router-dom'
+import AsyncSelect from 'react-select/async'
 
-import useQueryParam from 'hooks/useQueryParam'
+import { useLazyDropDown } from 'hooks/useLazyDropDown'
+import { useSelect } from 'hooks/useSelect'
 
-import { GetAllComponents, GetTotalComponents } from 'graphQL/Queries'
+import { GetAllComponents } from 'graphQL/Queries'
 
-import LynkSelect from './LynkSelect'
+import CustomDropdownIndicator from './Misc/CustomDropdownIndicator'
 
-const ComponentList = ({ id, name, value, setValue }) => {
+const ComponentList = ({ id, value, setValue }) => {
   const params = useParams()
-  const activeTab = useQueryParam('tab')
-  const { tab, tabData, setTabData, handleChange } = useContext(TabContext)
 
-  const [options, setOptions] = useState([])
+  const { tab, handleChange, tabData } = useContext(TabContext)
+  const { style } = useSelect('lynkSelect')
   const { relationships } = tabData
 
   const compState = {
@@ -24,65 +24,40 @@ const ComponentList = ({ id, name, value, setValue }) => {
     direction: 'DESC'
   }
 
-  const { data: compData } = useQuery(GetTotalComponents, {
+  const { lazyDropDownProps } = useLazyDropDown(GetAllComponents, {
     skip: tab === 'relationships' ? false : true,
-    fetchPolicy: activeTab === 'components' ? false : true,
-    variables: {
-      ...compState
-    }
-  })
-
-  const { data: allComponents, loading } = useQuery(GetAllComponents, {
-    skip: compData ? false : true,
+    selector: 'sbom.components',
     variables: {
       ...compState,
-      first: compData?.sbom?.components?.totalCount
-    },
-    onCompleted: (data) => {
-      if (data) {
-        setTabData((prev) => ({
-          ...prev,
-          relationships: { to: '', relType: '' }
-        }))
+      first: 5,
+      orderBy: {
+        direction: relationships?.relType === 'dependency_of' ? 'DESC' : 'ASC',
+        field: 'COMPONENTS_NAME'
       }
+    },
+    onChange: (item) => {
+      setValue(item)
+      handleChange('relationships', 'to', item?.id ?? '')
+    },
+    optionLabel: (item) => `${item.name} - ${item.version}`,
+    optionValue: 'id',
+    selectedItem: value?.id,
+    components: {
+      IndicatorSeparator: () => null,
+      DropdownIndicator: CustomDropdownIndicator
     }
   })
-  const { nodes } = allComponents?.sbom?.components || ''
-
-  const onChange = (item) => {
-    setValue(item)
-    handleChange('relationships', 'to', item?.value)
-  }
-
-  useEffect(() => {
-    if (nodes?.length > 0) {
-      const result = [...nodes]
-        .filter((com) => com?.name !== name)
-        .sort((a, b) =>
-          relationships?.relType === 'dependency_of'
-            ? b?.name?.localeCompare(a?.name)
-            : a?.name?.localeCompare(b?.name)
-        )
-        .map((item) => ({
-          label: `${item?.name} - ${item?.version}`,
-          value: item?.id
-        }))
-      setOptions(result)
-    }
-  }, [name, nodes, relationships?.relType])
 
   return (
-    <LynkSelect
-      inputId={id}
-      value={value}
-      options={options}
-      isClearable={true}
-      isSearchable={true}
-      onChange={onChange}
-      isLoading={loading}
-      isDisabled={loading}
-      placeholder={' --Select Component-- '}
-      dropDown
+    <AsyncSelect
+      {...{
+        ...lazyDropDownProps,
+        value,
+        styles: style,
+        id,
+        isDisabled: lazyDropDownProps.isLoading,
+        placeholder: ' --Select Component-- '
+      }}
     />
   )
 }

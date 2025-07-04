@@ -94,9 +94,12 @@ export const useLazyDropDown = (
     ? (item) => item[optionValue]
     : (item) => item?.id
 
-  const getOptionLabel = optionLabel
-    ? (item) => item[optionLabel]
-    : (item) => item?.name
+  const getOptionLabel =
+    typeof optionLabel === 'function'
+      ? optionLabel
+      : optionLabel
+        ? (item) => item[optionLabel]
+        : (item) => item?.name
 
   const placeholder = truncatedValue(selectedItem, isBreadcrumb ? 18 : 40)
 

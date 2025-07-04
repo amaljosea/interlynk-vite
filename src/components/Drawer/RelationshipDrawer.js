@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import AsyncSelect from 'react-select/async'
 
 import { Button, Divider, Stack, Text } from '@chakra-ui/react'
 import {
@@ -18,25 +19,26 @@ import LynkAlert from 'components/LynkAlert'
 import LynkDrawer from 'components/LynkDrawer'
 import LynkSelect from 'components/LynkSelect'
 import CompInfo from 'components/Misc/CompInfo'
+import CustomDropdownIndicator from 'components/Misc/CustomDropdownIndicator'
 import RelationTreeView from 'components/RelationTreeView'
 
 import { useGlobalState } from 'hooks/useGlobalState'
-import useQueryParam from 'hooks/useQueryParam'
+import { useLazyDropDown } from 'hooks/useLazyDropDown'
+import { useSelect } from 'hooks/useSelect'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CreateCompRelation } from 'graphQL/Mutation'
 import {
   GetAllComponents,
   GetCompDependency,
-  GetComponentPath,
-  GetTotalComponents
+  GetComponentPath
 } from 'graphQL/Queries'
 
 const RelationshipDrawer = (props) => {
   const { isOpen, onClose, activeRow, recheck } = props
-
+  const { style } = useSelect('lynkSelect')
   const params = useParams()
-  const activeTab = useQueryParam('tab')
+
   const { prodCompState } = useGlobalState()
   const { headingTextColor } = useThemeColor(['headingTextColor'])
 
@@ -47,12 +49,11 @@ const RelationshipDrawer = (props) => {
   const { id: compId, name: compName, version: compVersion } = comp || ''
   const { shortDesc } = activeRow?.organizationRule?.rule || ''
   const resolved = status === 'resolved'
-
   const [error, setError] = useState('')
   const [dependencyOfList, setDependencyOfList] = useState([])
   const [dependsOnList, setDependsOnList] = useState([])
   const [relation, setRelation] = useState('')
-  const [component, setComponent] = useState('')
+  const [component, setComponent] = useState(null)
 
   const compState = {
     projectId: productId,
@@ -70,29 +71,35 @@ const RelationshipDrawer = (props) => {
   )
   const { pathToPrimary } = compRelation?.component || ''
 
-  const { data: compData } = useQuery(GetTotalComponents, {
-    skip: isOpen ? false : true,
-    fetchPolicy: activeTab === 'components' ? false : true,
-    variables: {
-      ...compState
-    }
-  })
-
-  const { data: allComponents } = useQuery(GetAllComponents, {
-    skip: compData ? false : true,
+  const { lazyDropDownProps } = useLazyDropDown(GetAllComponents, {
+    selector: 'sbom.components',
     variables: {
       ...compState,
-      first: compData?.sbom?.components?.totalCount
+      first: 5,
+      orderBy: {
+        direction: 'ASC',
+        field: 'COMPONENTS_NAME'
+      }
     },
+    onChange: (item) => {
+      setComponent(item)
+    },
+    optionLabel: (item) => `${item.name} - ${item.version}`,
+    optionValue: 'id',
+    components: {
+      IndicatorSeparator: () => null,
+      DropdownIndicator: CustomDropdownIndicator
+    },
+    selectedItem: component?.name,
     onCompleted: (data) => {
       if (data) {
         setRelation('')
-        setComponent('')
+        setComponent(null)
       }
     }
   })
 
-  const isLoading = props?.comPathLoading || !allComponents
+  const isLoading = props?.comPathLoading || lazyDropDownProps.isLoading
 
   const [addRelation, { loading: createLoading }] = useMutation(
     CreateCompRelation,
@@ -104,19 +111,25 @@ const RelationshipDrawer = (props) => {
     variables: { compId: compId || activeRow?.id, sbomId: activeRow?.sbomId }
   })
 
-  const list = dependsOnList?.filter((item) => item?.toComp?.id === component)
+  const list = dependsOnList?.filter(
+    (item) => item?.toComp?.id === component?.id
+  )
 
   const compInfo = {
     name: compName || '',
     version: activeRow?.version || compVersion
   }
 
-  const disabled = relation === '' || component === '' || list.length > 0
+  const disabled =
+    relation === '' ||
+    component === '' ||
+    list.length > 0 ||
+    compId === component?.id
 
   const handleAdd = async () => {
     await addRelation({
       variables: {
-        to: component,
+        to: component?.id,
         relType: relation,
         from: compId || activeRow?.id
       }
@@ -133,7 +146,7 @@ const RelationshipDrawer = (props) => {
       })
       .finally(() => {
         setRelation('')
-        setComponent('')
+        setComponent(null)
         onClose()
       })
   }
@@ -149,34 +162,6 @@ const RelationshipDrawer = (props) => {
     { label: '-- Select --', value: '' },
     { label: 'Depends On', value: 'depends_on' }
   ]
-
-  const componentOptions = [
-    { label: '-- Select --', value: '' },
-    ...(allComponents?.sbom?.components?.nodes
-      ?.filter((com) =>
-        shortDesc ? com?.name !== compName : com?.name !== name
-      )
-      ?.sort((a, b) => a?.name?.localeCompare(b?.name))
-      ?.map((item) => ({
-        label: `${item.name}-${item.version}${item.primary ? ' [Primary Component]' : ''}`,
-        value: item.id
-      })) || [])
-  ]
-
-  const componentValue = component
-    ? {
-        label: allComponents.sbom.components.nodes.find(
-          (com) => com.id === component
-        )
-          ? `${allComponents.sbom.components.nodes.find((com) => com.id === component).name}-${
-              allComponents.sbom.components.nodes.find(
-                (com) => com.id === component
-              ).version
-            }${allComponents.sbom.components.nodes.find((com) => com.id === component).primary ? ' [Primary Component]' : ''}`
-          : '-- Select --',
-        value: component
-      }
-    : { label: '-- Select --', value: '' }
 
   return (
     <LynkDrawer
@@ -221,27 +206,31 @@ const RelationshipDrawer = (props) => {
                     dropDown
                   />
                 </FormControl>
-                {allComponents && (
-                  <FormControl isInvalid={list.length > 0}>
+                {lazyDropDownProps?.nodes && (
+                  <FormControl
+                    isInvalid={list.length > 0 || compId === component?.id}
+                  >
                     <FormLabel htmlFor='component' color={headingTextColor}>
                       Component
                     </FormLabel>
-                    <LynkSelect
-                      id='component'
-                      value={componentValue}
-                      onChange={(selectedOption) =>
-                        setComponent(selectedOption.value)
-                      }
-                      options={componentOptions}
-                      dropDown
+                    <AsyncSelect
+                      {...{
+                        ...lazyDropDownProps,
+                        styles: style,
+                        isDisabled: lazyDropDownProps.isLoading,
+                        placeholder: ' --Select Component-- ',
+                        value: component
+                      }}
                     />
 
-                    {list.length !== 0 && (
+                    {
                       <FormErrorMessage>
                         <FormErrorIcon />
-                        Component dependency already exists
+                        {compId === component?.id
+                          ? `Cannot add ${compName} as a dependency to itself.`
+                          : 'Component dependency already exists'}
                       </FormErrorMessage>
-                    )}
+                    }
                   </FormControl>
                 )}
                 {error !== '' && <LynkAlert msg={error} />}
