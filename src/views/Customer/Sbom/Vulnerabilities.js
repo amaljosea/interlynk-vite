@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getSignedUrlParams } from 'utils'
 import { parseEpssRange } from 'utils'
@@ -110,15 +110,11 @@ const Vulnerabilities = ({ sbomData }) => {
     }
   })
 
-  const {
-    isOpen: isCvssOpen,
-    onOpen: onCvssOpen,
-    onClose: onCvssClose
-  } = useDisclosure()
+  const CVSS = useDisclosure()
 
   const handleCvssOpen = (data) => {
     setActiveRow(data)
-    onCvssOpen()
+    CVSS.onOpen()
   }
 
   const isArchived = isSbomArchived(sbomData)
@@ -208,10 +204,10 @@ const Vulnerabilities = ({ sbomData }) => {
       {<Pagination {...paginationProps} />}
 
       {/* CVSS CARD */}
-      {isCvssOpen && (
+      {CVSS.isOpen && (
         <CvssCard
-          isOpen={isCvssOpen}
-          onClose={onCvssClose}
+          isOpen={CVSS.isOpen}
+          onClose={CVSS.onClose}
           value={activeRow?.vuln?.cvssVector}
         />
       )}

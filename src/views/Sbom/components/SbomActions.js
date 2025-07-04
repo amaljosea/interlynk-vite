@@ -83,7 +83,7 @@ const SbomActions = ({ sbom }) => {
   })
   const [healthRecheck] = useMutation(recheckHealth)
 
-  const { isOpen: isCopied, onClose: onCopiedClose } = useDisclosure()
+  const COPY = useDisclosure()
 
   const uniqVersions = []
   const uniqShareVersions = []
@@ -283,10 +283,10 @@ const SbomActions = ({ sbom }) => {
       )}
 
       {/* COPY SBOM */}
-      {isCopied && (
+      {COPY.isOpen && (
         <CopyModal
-          isOpen={isCopied}
-          onClose={onCopiedClose}
+          isOpen={COPY.isOpen}
+          onClose={COPY.onClose}
           product={sbom?.project?.name}
           version={sbom?.projectVersion}
         />

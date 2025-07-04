@@ -70,11 +70,7 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
 
   const { sbomArchived } = data?.project || { sbomArchived: [] }
 
-  const {
-    isOpen: isWarnOpen,
-    onOpen: onWarnOpen,
-    onClose: onWarnClose
-  } = useDisclosure()
+  const WARNING = useDisclosure()
 
   const handleRestore = (row) => {
     const isExists = nodes?.some(
@@ -89,7 +85,7 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
       })
     } else {
       setActiveRow(row)
-      onWarnOpen()
+      WARNING.onOpen()
     }
   }
 
@@ -185,11 +181,11 @@ const ArchivedVersions = ({ isOpen, onClose, projectGroup }) => {
       </LynkDrawer>
 
       {/* ARCHIVE VERSION */}
-      {isWarnOpen && (
+      {WARNING.isOpen && (
         <ArchiveSbom
           data={activeRow}
-          isOpen={isWarnOpen}
-          onClose={onWarnClose}
+          isOpen={WARNING.isOpen}
+          onClose={WARNING.onClose}
           projectGroup={{ name: projectGroup?.name }}
         />
       )}

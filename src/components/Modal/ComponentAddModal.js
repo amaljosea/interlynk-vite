@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { getSignedUrlParams, transformLicenseString } from 'utils'
 import { componentTypes, infoData } from 'variables/general'
 
+import { InfoIcon } from '@chakra-ui/icons'
 import { useDisclosure } from '@chakra-ui/react'
 import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 import { Flex, Stack, Text, Tooltip } from '@chakra-ui/react'
@@ -35,7 +36,6 @@ import { CreateCompRelation, CreateComponent } from 'graphQL/Mutation'
 import { GetAllComponents } from 'graphQL/Queries'
 
 import { LuComponent, LuMessageCircleWarning } from 'react-icons/lu'
-import { InfoIcon } from '@chakra-ui/icons'
 
 function ComponentAddModal(props) {
   const navigate = useNavigate()
@@ -149,11 +149,7 @@ function ComponentAddModal(props) {
     }
   })
 
-  const {
-    isOpen: isWarningOpen,
-    onOpen: onWarningOpen,
-    onClose: onWarningClose
-  } = useDisclosure()
+  const WARNING = useDisclosure()
 
   const handleCreateCom = () => {
     const hasLicense = details?.licenses?.length > 0
@@ -527,7 +523,7 @@ function ComponentAddModal(props) {
                       size='sm'
                       name='primary'
                       colorScheme='blue'
-                      onChange={onWarningOpen}
+                      onChange={() => WARNING.onOpen()}
                       isChecked={details?.primary}
                     >
                       Primary component
@@ -614,10 +610,10 @@ function ComponentAddModal(props) {
       </LynkModal>
 
       {/* PRIMARY COMPONENT WARNING */}
-      {isWarningOpen && (
+      {WARNING.isOpen && (
         <PrimaryWarning
-          isOpen={isWarningOpen}
-          onClose={onWarningClose}
+          isOpen={WARNING.isOpen}
+          onClose={WARNING.onClose}
           primaryComp={primaryComp}
         />
       )}

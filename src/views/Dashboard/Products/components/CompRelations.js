@@ -67,11 +67,7 @@ const CompRelations = ({ data, compPath }) => {
     variables: { compId: id, sbomId: sbomId }
   })
 
-  const {
-    isOpen: isDelOpen,
-    onOpen: onDelOpen,
-    onClose: onDelClose
-  } = useDisclosure()
+  const DELETE = useDisclosure()
 
   const list = dependsOnList?.filter(
     (item) => item?.toComp?.id === component?.id
@@ -141,12 +137,12 @@ const CompRelations = ({ data, compPath }) => {
           })
         }
       })
-      .finally(() => onDelClose())
+      .finally(() => DELETE.onClose())
   }
 
   const handleDelete = (comp) => {
     setActiveComp(comp)
-    onDelOpen()
+    DELETE.onOpen()
   }
 
   const isInvalid = !type || list.length > 0 || !component
@@ -249,10 +245,10 @@ const CompRelations = ({ data, compPath }) => {
         </Stack>
       </Stack>
 
-      {isDelOpen && activeComp && (
+      {DELETE.isOpen && activeComp && (
         <RelDeleteModal
-          isOpen={isDelOpen}
-          onClose={onDelClose}
+          isOpen={DELETE.isOpen}
+          onClose={DELETE.onClose}
           loading={deleteLoading}
           activeComp={activeComp}
           handleRemove={handleRemove}

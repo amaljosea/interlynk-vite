@@ -25,11 +25,7 @@ const ChangelogTable = ({ activeEnv }) => {
   const [searchInput, setSearchInput] = useState('')
   const [activeRow, setActiveRow] = useState('')
 
-  const {
-    isOpen: isUserOpen,
-    onOpen: onUserOpen,
-    onClose: onUserClose
-  } = useDisclosure()
+  const USER = useDisclosure()
 
   const tab = useQueryParam('tab')
 
@@ -52,7 +48,7 @@ const ChangelogTable = ({ activeEnv }) => {
     setActiveRow(data)
     switch (type) {
       case 'view_user':
-        return onUserOpen()
+        return USER.onOpen()
     }
   }
 
@@ -170,11 +166,11 @@ const ChangelogTable = ({ activeEnv }) => {
         <Pagination {...paginationProps} />
       </Flex>
 
-      {isUserOpen && (
+      {USER.isOpen && (
         <UserCard
           name={activeRow?.changedBy}
-          isOpen={isUserOpen}
-          onClose={onUserClose}
+          isOpen={USER.isOpen}
+          onClose={USER.onClose}
         />
       )}
     </>

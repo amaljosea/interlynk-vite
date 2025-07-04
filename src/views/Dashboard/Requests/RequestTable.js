@@ -47,17 +47,8 @@ const RequestTable = (props) => {
   const { search } = filters
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const {
-    isOpen: isAcceptOpen,
-    onOpen: onAcceptOpen,
-    onClose: onAcceptClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isWarningOpen,
-    onOpen: onWarningOpen,
-    onClose: onWarningClose
-  } = useDisclosure()
+  const ACCEPT = useDisclosure()
+  const WARNING = useDisclosure()
 
   const [filterText, setFilterText] = useState(search || '')
   const [activeRow, setActiveRow] = useState(null)
@@ -192,7 +183,7 @@ const RequestTable = (props) => {
   }
 
   const handleAccept = (row) => {
-    onAcceptOpen()
+    ACCEPT.onOpen()
     setActiveRow(row)
   }
 
@@ -293,7 +284,7 @@ const RequestTable = (props) => {
                   aria-label={`cancel req ${row?.email}`}
                   color={primaryErrorColor}
                   onClick={() => {
-                    onWarningOpen()
+                    WARNING.onOpen()
                     setActiveRow(row)
                   }}
                 >
@@ -327,23 +318,23 @@ const RequestTable = (props) => {
 
       {isOpen && <RequestModal isOpen={isOpen} onClose={onClose} data={null} />}
 
-      {isAcceptOpen && (
+      {ACCEPT.isOpen && (
         <RequestAcceptModal
-          isOpen={isAcceptOpen}
-          onClose={onAcceptClose}
+          isOpen={ACCEPT.isOpen}
+          onClose={ACCEPT.onClose}
           data={activeRow}
         />
       )}
 
-      {isWarningOpen && (
+      {WARNING.isOpen && (
         <ConfirmationModal
-          isOpen={isWarningOpen}
-          onClose={onWarningClose}
+          isOpen={WARNING.isOpen}
+          onClose={WARNING.onClose}
           title='Cancel Request'
           description={`This will cancel the request by ${activeRow.email}`}
           onConfirm={() => {
             handleCancel(activeRow)
-            onWarningClose()
+            WARNING.onClose()
           }}
         />
       )}

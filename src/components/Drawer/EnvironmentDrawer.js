@@ -30,17 +30,8 @@ const EnvironmentDrawer = ({
   activeEnv,
   setActiveEnv
 }) => {
-  const {
-    isOpen: isProdOpen,
-    onOpen: onProdOpen,
-    onClose: onProdClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isWarningOpen,
-    onOpen: onWarningOpen,
-    onClose: onWarningClose
-  } = useDisclosure()
+  const ENV = useDisclosure()
+  const WARNING = useDisclosure()
 
   const [activeRow, setActiveRow] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -64,7 +55,7 @@ const EnvironmentDrawer = ({
 
         setTimeout(() => {
           setLoading(false)
-          onWarningClose()
+          WARNING.onClose()
         }, 1000)
       }
     })
@@ -83,14 +74,14 @@ const EnvironmentDrawer = ({
               variant='solid'
               isDisabled={!data?.projectGroup?.enabled}
               onClick={() => {
-                onProdOpen()
+                ENV.onOpen()
               }}
             />
           </Tooltip>
         </Stack>
       </Flex>
     )
-  }, [data?.projectGroup?.enabled, onProdOpen])
+  }, [ENV, data?.projectGroup?.enabled])
 
   // COLUMNS
   const columns = [
@@ -142,7 +133,7 @@ const EnvironmentDrawer = ({
             isDisabled={isDefaultEnv(name)}
             onClick={() => {
               setActiveRow(row)
-              onWarningOpen()
+              WARNING.onOpen()
             }}
           />
         )
@@ -177,10 +168,10 @@ const EnvironmentDrawer = ({
       </LynkDrawer>
 
       {/* ADD PROJECT */}
-      {isProdOpen && (
+      {ENV.isOpen && (
         <EnvModal
-          isOpen={isProdOpen}
-          onClose={onProdClose}
+          isOpen={ENV.isOpen}
+          onClose={ENV.onClose}
           groupId={data?.projectGroup?.id}
         />
       )}
@@ -188,8 +179,8 @@ const EnvironmentDrawer = ({
       {/* DELETE WARNING */}
       {
         <ConfirmationModal
-          isOpen={isWarningOpen}
-          onClose={onWarningClose}
+          isOpen={WARNING.isOpen}
+          onClose={WARNING.onClose}
           onConfirm={() => handleDelete(activeRow?.id)}
           isLoading={loading}
           name={activeRow?.name}

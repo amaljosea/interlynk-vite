@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { getSettingsLabel } from 'utils'
 import { infoData } from 'variables/general'
 
+import { InfoIcon } from '@chakra-ui/icons'
 import {
   Flex,
   SimpleGrid,
@@ -25,9 +26,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ProjectSettingUpdate } from 'graphQL/Mutation'
 
-
 import ConfirmationModal from '../Products/components/ConfirmationModal'
-import { InfoIcon } from '@chakra-ui/icons'
 
 const Settings = ({ enabled, data, mfc }) => {
   const { isFreeTier } = useGlobalQueryContext()
@@ -64,9 +63,8 @@ const Settings = ({ enabled, data, mfc }) => {
     refetchQueries: ['GetProjectSettings', 'GetProjectInfo']
   })
 
-  const { isOpen: isChecksOpen, onClose: onChecksClose } = useDisclosure()
-
-  const { isOpen: isCompOpen, onClose: onCompClose } = useDisclosure()
+  const CHECKS = useDisclosure()
+  const COMPONENT = useDisclosure()
 
   const onUpdate = async (val, field) => {
     await updateSettings({
@@ -258,13 +256,13 @@ const Settings = ({ enabled, data, mfc }) => {
       </CardBody>
 
       {/* CHECKS */}
-      {isChecksOpen && (
+      {CHECKS.isOpen && (
         <ConfirmationModal
-          isOpen={isChecksOpen}
-          onClose={onChecksClose}
+          isOpen={CHECKS.isOpen}
+          onClose={CHECKS.onClose}
           onConfirm={() => {
             setChecks(!checks)
-            onChecksClose()
+            CHECKS.onClose()
           }}
           title={`${checks ? 'Disable' : 'Enable'} Checks`}
           description={`${checks ? 'Disabling' : 'Enabling'} this will${' '}
@@ -274,13 +272,13 @@ const Settings = ({ enabled, data, mfc }) => {
       )}
 
       {/* INTERNAL COMPONENT */}
-      {isCompOpen && (
+      {COMPONENT.isOpen && (
         <ConfirmationModal
-          isOpen={isCompOpen}
-          onClose={onCompClose}
+          isOpen={COMPONENT.isOpen}
+          onClose={COMPONENT.onClose}
           onConfirm={() => {
             setInternalComp(!internalComp)
-            onCompClose()
+            COMPONENT.onClose()
           }}
           title={`${internalComp ? 'Disable' : 'Enable'} Component`}
           description={`${internalComp ? 'Disabling' : 'Enabling'} this check will${' '}

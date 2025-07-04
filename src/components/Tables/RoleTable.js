@@ -48,17 +48,10 @@ const RoleTable = () => {
   const roles = data?.organization?.organizationRoles || []
 
   const [selectedRole, setSelectedRole] = useState(null)
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const {
-    isOpen: isDelOpen,
-    onOpen: onDelOpen,
-    onClose: onDelClose
-  } = useDisclosure()
-  const {
-    isOpen: isRoleOpen,
-    onOpen: onRoleOpen,
-    onClose: onRoleClose
-  } = useDisclosure()
+  const VIEW = useDisclosure()
+  const DELETE = useDisclosure()
+  const ROLE = useDisclosure()
+
   const { primaryTextColor, primaryErrorColor } = useThemeColor([
     'primaryTextColor',
     'primaryErrorColor'
@@ -112,7 +105,7 @@ const RoleTable = () => {
                 <MenuItem
                   onClick={() => {
                     setSelectedRole(row.name)
-                    onOpen()
+                    VIEW.onOpen()
                   }}
                 >
                   View Permissions
@@ -122,7 +115,7 @@ const RoleTable = () => {
                   isDisabled={!editUserRole}
                   onClick={() => {
                     setSelectedRole(row)
-                    onDelOpen()
+                    DELETE.onOpen()
                   }}
                 >
                   Delete Role
@@ -135,7 +128,7 @@ const RoleTable = () => {
         right: 'true'
       }
     ],
-    [primaryTextColor, primaryErrorColor, editUserRole, onOpen, onDelOpen]
+    [primaryTextColor, primaryErrorColor, editUserRole, VIEW, DELETE]
   )
 
   // HEADER SECTION
@@ -162,13 +155,13 @@ const RoleTable = () => {
         </Flex>
         <AddButton
           label='Add Role'
-          onClick={onRoleOpen}
+          onClick={() => ROLE.onOpen()}
           isDisabled={!updateOrgs}
           data-testid='add_role'
         />
       </Flex>
     ),
-    [primaryTextColor, updateOrgs, onRoleOpen]
+    [primaryTextColor, updateOrgs, ROLE]
   )
 
   return (
@@ -184,20 +177,22 @@ const RoleTable = () => {
         />
       </Flex>
 
-      {isOpen && (
+      {VIEW.isOpen && (
         <PermissionDrawer
-          isOpen={isOpen}
-          onClose={onClose}
+          isOpen={VIEW.isOpen}
+          onClose={VIEW.onClose}
           selectedRole={selectedRole}
         />
       )}
 
-      {isRoleOpen && <CreateRole isOpen={isRoleOpen} onClose={onRoleClose} />}
+      {ROLE.isOpen && (
+        <CreateRole isOpen={ROLE.isOpen} onClose={ROLE.onClose} />
+      )}
 
-      {isDelOpen && (
+      {DELETE.isOpen && (
         <DeleteRole
-          isOpen={isDelOpen}
-          onClose={onDelClose}
+          isOpen={DELETE.isOpen}
+          onClose={DELETE.onClose}
           activeRole={selectedRole}
         />
       )}
