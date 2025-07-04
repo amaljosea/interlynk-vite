@@ -2,14 +2,15 @@ import { useMutation } from '@apollo/client'
 import Cookies from 'js-cookie'
 import { useState } from 'react'
 import { disableButtonTemporarily } from 'utils'
-import {
-  hasWhiteSpace,
-  validateEmail,
-  validateUrl
-} from 'utils/formValidationUtils'
+import { validateEmail, validateUrl } from 'utils/formValidationUtils'
 
-import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
-import { Flex, Input } from '@chakra-ui/react'
+import {
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
+  Stack
+} from '@chakra-ui/react'
 
 import { RegisterOrganizationIcon } from 'components/Icons/Icons'
 import LynkAlert from 'components/LynkAlert'
@@ -21,24 +22,34 @@ import { RegisterOrganization, SwitchOrganization } from 'graphQL/Mutation'
 
 const OrgModal = ({ isOpen, onClose, shouldSwitchOrg = false }) => {
   const { showToast } = useCustomToast()
+
   const [error, setError] = useState('')
-  const [name, setName] = useState('')
-  const [url, setUrl] = useState('')
   const [urlError, setUrlError] = useState('')
-  const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
   const [isDisabled, setIsDisabled] = useState(false)
   const awsToken = sessionStorage.getItem('awsToken')
 
-  const containsSpace = hasWhiteSpace(url)
-
-  const [registerOrg, { loading: regLoading }] = useMutation(
-    RegisterOrganization,
-    { refetchQueries: ['MyOrganizations', 'AllOrganizations'] }
-  )
-  const [switchOrg] = useMutation(SwitchOrganization, {
-    refetchQueries: ['MyOrganizations', 'AllOrganizations']
+  const [formData, setFormData] = useState({
+    name: '',
+    url: '',
+    email: ''
   })
+  const { name, url, email } = formData
+
+  const isInvalidEmail = email !== '' && !validateEmail(email)
+  const isInvalidURL = url !== '' && !validateUrl(url)
+
+  const handleChange = (event) => {
+    const { name, value } = event.target
+    const trimmedValue = ['email', 'url'].includes(name) ? value.trim() : value
+    setFormData((prev) => ({ ...prev, [name]: trimmedValue }))
+    setError('')
+    if (name === 'url') {
+      setUrlError('')
+    } else if (name === 'email') {
+      setEmailError('')
+    }
+  }
 
   const handleCheckEmail = () => {
     if (!validateEmail(email)) {
@@ -51,6 +62,14 @@ const OrgModal = ({ isOpen, onClose, shouldSwitchOrg = false }) => {
       setUrlError('Please enter a valid URL')
     }
   }
+
+  const [registerOrg, { loading: regLoading }] = useMutation(
+    RegisterOrganization,
+    { refetchQueries: ['MyOrganizations', 'AllOrganizations'] }
+  )
+  const [switchOrg] = useMutation(SwitchOrganization, {
+    refetchQueries: ['MyOrganizations', 'AllOrganizations']
+  })
 
   const handleSwitchOrg = (orgId, orgName) => {
     switchOrg({
@@ -101,11 +120,7 @@ const OrgModal = ({ isOpen, onClose, shouldSwitchOrg = false }) => {
     })
   }
 
-  const isInvalid =
-    isDisabled ||
-    name === '' ||
-    (email !== '' && emailError !== '') ||
-    (url !== '' && !validateUrl(url))
+  const isInvalid = isDisabled || name === '' || isInvalidEmail || isInvalidURL
 
   return (
     <LynkModal
@@ -118,60 +133,46 @@ const OrgModal = ({ isOpen, onClose, shouldSwitchOrg = false }) => {
       title={'Register Organization'}
       Icon={RegisterOrganizationIcon}
     >
-      <Flex width={'100%'} direction={'column'} gap={4}>
-        {error !== '' && <LynkAlert msg={error} />}
-        {/* NAME */}
+      <Stack width={'100%'} spacing={4}>
         <FormControl isRequired>
           <FormLabel>Name</FormLabel>
           <Input
             type='text'
-            fontSize={14}
-            maxLength={'30'}
+            name='name'
             value={name}
-            onChange={(e) => {
-              setName(e.target.value)
-              setError('')
-            }}
+            maxLength={'30'}
+            onChange={handleChange}
             placeholder='Enter name'
           />
         </FormControl>
-        {/* URL */}
-        <FormControl
-          isInvalid={(url !== '' && !validateUrl(url)) || containsSpace}
-        >
+        <FormControl isInvalid={isInvalidURL}>
           <FormLabel>URL</FormLabel>
           <Input
+            name='url'
             type='text'
-            fontSize={14}
             value={url}
-            onBlur={handleCheckUrl}
-            onChange={(e) => {
-              setUrl(e.target.value)
-              setUrlError('')
-            }}
             placeholder='Enter URL'
+            onChange={handleChange}
+            onBlur={handleCheckUrl}
           />
           {urlError !== '' && <FormErrorMessage>{urlError}</FormErrorMessage>}
         </FormControl>
-        {/* EMAIL */}
-        <FormControl isInvalid={email !== '' && !validateEmail(email)}>
+        <FormControl isRequired isInvalid={isInvalidEmail}>
           <FormLabel>Email</FormLabel>
           <Input
-            type='text'
-            fontSize={14}
+            name='email'
+            type='email'
             value={email}
+            onChange={handleChange}
             onBlur={handleCheckEmail}
-            onChange={(e) => {
-              setEmail(e.target.value)
-              setEmailError('')
-            }}
             placeholder='Enter Email Address'
           />
           {emailError !== '' && (
             <FormErrorMessage>{emailError}</FormErrorMessage>
           )}
         </FormControl>
-      </Flex>
+        {error !== '' && <LynkAlert msg={error} />}
+      </Stack>
     </LynkModal>
   )
 }
