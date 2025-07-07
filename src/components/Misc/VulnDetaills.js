@@ -60,16 +60,14 @@ const VulnDetaills = ({ index, data }) => {
           </Link>
         )}
       </Tooltip>
-      {nvdAliasId && (
-        <Tooltip label='View at NVD'>
-          <Box>
-            <ExternalNavIcon
-              href={linkURl('nvd', nvdAliasId)}
-              onClick={() => (params?.sbomid ? partsContext.push() : null)}
-            />
-          </Box>
-        </Tooltip>
-      )}
+      <Tooltip label='View at NVD'>
+        <Box>
+          <ExternalNavIcon
+            href={linkURl('nvd', vulnId)}
+            onClick={() => (params?.sbomid ? partsContext.push() : null)}
+          />
+        </Box>
+      </Tooltip>
       {nvdAliasId && (
         <Tooltip label='View at OSV'>
           <Box>
