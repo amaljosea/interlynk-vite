@@ -237,8 +237,12 @@ export const GetRoles = gql`
 
 // LIST CURRENT USER'S ORGANIZATIONS
 export const MyOrganizations = gql`
-  query MyOrganizations($invitationStatuses: [OrgUserInvitationStatuses!]) {
-    myOrganizations(invitationStatuses: $invitationStatuses) {
+  query MyOrganizations(
+    $first: Int
+    $invitationStatuses: [OrgUserInvitationStatuses!]
+  ) {
+    myOrganizations(first: $first, invitationStatuses: $invitationStatuses) {
+      totalCount
       nodes {
         id
         name
@@ -252,6 +256,7 @@ export const MyOrganizations = gql`
 export const AllOrganizations = gql`
   query AllOrganizations($first: Int, $status: OrganizationStatusEnum) {
     allOrganizations(first: $first, status: $status) {
+      totalCount
       nodes {
         id
         name

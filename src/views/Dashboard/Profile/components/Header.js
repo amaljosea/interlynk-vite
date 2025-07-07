@@ -76,11 +76,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   const handleTabChange = (name) => {
     setSelectedTab(name)
     if (name === 'PERSONAL') {
-      if (activeOrgTier === 'free') {
-        navigate('/vendor/settings?tab=integrations')
-      } else {
-        navigate('/vendor/settings?tab=security tokens')
-      }
+      navigate('/vendor/settings?tab=organizations')
     } else {
       navigate('/vendor/settings?tab=users')
     }

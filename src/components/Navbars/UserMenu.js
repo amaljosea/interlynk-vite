@@ -67,7 +67,7 @@ export const UserMenu = ({ handleLogout }) => {
       <MenuList fontSize='sm'>
         <MenuGroup>
           <MenuItem hidden={!currentUser}>
-            <Link to={`/vendor/settings?tab=security tokens`}>
+            <Link to={`/vendor/settings?tab=organizations`}>
               <Flex flexDirection='row' alignItems='flex-start' gap={3}>
                 <Icon as={LuUser} fontSize={18} />
                 <Stack spacing={0}>

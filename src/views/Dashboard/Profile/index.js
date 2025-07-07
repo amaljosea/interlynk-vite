@@ -6,6 +6,7 @@ import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import LegalTable from 'components/Tables/LegalTable'
+import OrganizationTable from 'components/Tables/OrganizationTable'
 import PlanTable from 'components/Tables/PlanTable'
 import RoleTable from 'components/Tables/RoleTable'
 import TeamTable from 'components/Tables/TeamTable'
@@ -48,7 +49,7 @@ function Profile() {
     'risks'
   ]
 
-  const psTabs = ['security tokens', 'integrations']
+  const psTabs = ['organizations', 'security tokens', 'integrations']
 
   const navigate = useNavigate()
   const activeTab = useQueryParam('tab')
@@ -228,7 +229,12 @@ function Profile() {
               ))}
             </TabList>
             <TabPanels>
-              <TabPanel px={0}>{<TokenInfo />}</TabPanel>
+              <TabPanel px={0}>
+                <OrganizationTable />
+              </TabPanel>
+              <TabPanel px={0}>
+                <TokenInfo />
+              </TabPanel>
               <TabPanel px={0}>
                 <Connections org={false} />
               </TabPanel>

@@ -17,11 +17,14 @@ import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
 
 import useCustomToast from 'hooks/useCustomToast'
+import { useGlobalState } from 'hooks/useGlobalState'
 
 import { RegisterOrganization, SwitchOrganization } from 'graphQL/Mutation'
 
 const OrgModal = ({ isOpen, onClose, shouldSwitchOrg = false }) => {
   const { showToast } = useCustomToast()
+  const { organization } = useGlobalState()
+  const isSuperAdmin = organization?.currentUser?.superAdmin
 
   const [error, setError] = useState('')
   const [urlError, setUrlError] = useState('')
@@ -63,12 +66,16 @@ const OrgModal = ({ isOpen, onClose, shouldSwitchOrg = false }) => {
     }
   }
 
+  const queries = isSuperAdmin
+    ? ['AllOrganizations', 'GetAllOrganizations']
+    : ['MyOrganizations', 'GetMyOrganizations']
+
   const [registerOrg, { loading: regLoading }] = useMutation(
     RegisterOrganization,
-    { refetchQueries: ['MyOrganizations', 'AllOrganizations'] }
+    { refetchQueries: queries }
   )
   const [switchOrg] = useMutation(SwitchOrganization, {
-    refetchQueries: ['MyOrganizations', 'AllOrganizations']
+    refetchQueries: queries
   })
 
   const handleSwitchOrg = (orgId, orgName) => {
@@ -93,8 +100,8 @@ const OrgModal = ({ isOpen, onClose, shouldSwitchOrg = false }) => {
     registerOrg({
       variables: {
         name: name || undefined,
-        url: name || undefined,
-        email: name || undefined,
+        url: url || undefined,
+        email: email || undefined,
         awsRegistrationToken: awsToken || undefined
       }
     }).then((res) => {

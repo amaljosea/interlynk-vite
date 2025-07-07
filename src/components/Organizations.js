@@ -7,7 +7,10 @@ import { getItem } from 'utils/localStorageUtils'
 import OrgModal from 'views/Dashboard/Profile/components/OrgModal'
 
 import {
+  Center,
   Input,
+  InputGroup,
+  InputRightElement,
   Menu,
   MenuButton,
   MenuDivider,
@@ -15,6 +18,7 @@ import {
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
+  SimpleGrid,
   Stack
 } from '@chakra-ui/react'
 import { Button, SkeletonText, Text, useDisclosure } from '@chakra-ui/react'
@@ -29,7 +33,13 @@ import {
   MyOrganizations
 } from 'graphQL/Queries'
 
-import { LuBuilding, LuChevronDown, LuPlus } from 'react-icons/lu'
+import {
+  LuBuilding,
+  LuChevronDown,
+  LuExternalLink,
+  LuPlus,
+  LuX
+} from 'react-icons/lu'
 
 const Organizations = () => {
   const navigate = useNavigate()
@@ -40,6 +50,7 @@ const Organizations = () => {
 
   const [switchOrg] = useMutation(SwitchOrganization)
 
+  const [total, setTotal] = useState(0)
   const [options, setOptions] = useState([])
   const [searchInput, setSearchInput] = useState('')
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -65,32 +76,39 @@ const Organizations = () => {
   }
 
   const handleFetch = async () => {
+    setSearchInput('')
     if (isSuperAdmin) {
-      await getAllOrg({ variables: { first: 100, status: 'approved' } }).then(
+      await getAllOrg({ variables: { first: 10, status: 'approved' } }).then(
         (res) => {
           if (res?.data?.allOrganizations?.nodes?.length > 0) {
+            setTotal(res?.data?.allOrganizations?.totalCount || 0)
             setOptions(res?.data?.allOrganizations?.nodes)
           }
         }
       )
     } else {
       await getMyOrg({
-        variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }
+        variables: { first: 10, invitationStatuses: ['ACCEPTED', 'INVITED'] }
       }).then((res) => {
         if (res?.data?.myOrganizations?.nodes?.length > 0) {
+          setTotal(res?.data?.myOrganizations?.totalCount || 0)
           setOptions(res?.data?.myOrganizations?.nodes)
         }
       })
     }
-    setSearchInput('')
   }
 
   const handleSearch = (e) => {
     const { value } = e.target
     setSearchInput(value)
-    if (value.trim() === '') {
+    if (value === '') {
       handleFetch()
-    } else {
+    }
+  }
+
+  const handleFilter = (e) => {
+    const { value } = e.target
+    if (e.key === 'Enter') {
       const filteredOptions = options.filter(
         (item) =>
           item.name.toLowerCase().includes(value.toLowerCase()) ||
@@ -103,7 +121,7 @@ const Organizations = () => {
   const OrgList = () => {
     if (options?.length === 0) return null
     return (
-      <Stack maxHeight='330px' overflowY='auto'>
+      <Stack maxHeight='300px' overflowY='auto'>
         {options?.map((item, index) => (
           <MenuOptionGroup key={index} value={organization?.id} type='radio'>
             <MenuItemOption value={item.id} onClick={() => onChange(item)}>
@@ -122,6 +140,10 @@ const Organizations = () => {
       </Stack>
     )
   }
+
+  const isLoading = allOrgLoading || myOrgLoading
+  const showAll = total > 10
+  const link = '/vendor/settings?tab=organizations'
 
   useEffect(() => {
     if (organization?.id !== parsedOrg?.id) {
@@ -150,29 +172,46 @@ const Organizations = () => {
         >
           {truncatedValue(organization?.name, 20)}
         </MenuButton>
-        <MenuList w={'280px'}>
+        <MenuList w={isSuperAdmin ? '280px' : '250px'}>
           <Stack w={'95%'} mx={'auto'}>
-            <MenuItem
-              w={'100%'}
-              fontSize='sm'
-              onClick={onOpen}
-              borderRadius={'md'}
-              data-testid='add_org'
-              icon={<LuPlus size={18} />}
-            >
-              Add Organization
-            </MenuItem>
+            <SimpleGrid gap={2} columns={showAll ? 2 : 1}>
+              <MenuItem
+                as={Button}
+                fontSize={'sm'}
+                onClick={onOpen}
+                variant='outline'
+                data-testid='add_org'
+                leftIcon={<LuPlus size={18} />}
+              >
+                Add {!showAll && 'Organizaton'}
+              </MenuItem>
+              <MenuItem
+                as={Button}
+                fontSize={'sm'}
+                hidden={!showAll}
+                variant={'outline'}
+                onClick={() => navigate(link)}
+                rightIcon={<LuExternalLink size={18} />}
+              >
+                View all
+              </MenuItem>
+            </SimpleGrid>
             {isSuperAdmin && (
-              <Input
-                value={searchInput}
-                onChange={handleSearch}
-                placeholder='Search organization'
-                hidden={options?.length === 0 || allOrgLoading || myOrgLoading}
-              />
+              <InputGroup>
+                <Input
+                  value={searchInput}
+                  onChange={handleSearch}
+                  onKeyDown={handleFilter}
+                  placeholder='Search organization'
+                />
+                <InputRightElement hidden={searchInput === ''}>
+                  <LuX size={18} onClick={() => setSearchInput('')} />
+                </InputRightElement>
+              </InputGroup>
             )}
           </Stack>
-          <MenuDivider hidden={options?.length === 0} />
-          {allOrgLoading || myOrgLoading ? (
+          <MenuDivider mt={2} hidden={isLoading} />
+          {isLoading ? (
             <SkeletonText
               spacing='3'
               noOfLines={6}
@@ -180,12 +219,20 @@ const Organizations = () => {
               sx={{ mt: 2, mx: '2' }}
             />
           ) : (
-            <OrgList />
+            <>
+              {options?.length > 0 ? (
+                <OrgList />
+              ) : (
+                <Center py={2} fontSize={'sm'} color={secondaryTextColor}>
+                  No record to display
+                </Center>
+              )}
+            </>
           )}
         </MenuList>
       </Menu>
 
-      {isOpen && <OrgModal isOpen={isOpen} onClose={onClose} />}
+      {isOpen && <OrgModal data={null} isOpen={isOpen} onClose={onClose} />}
     </>
   )
 }
