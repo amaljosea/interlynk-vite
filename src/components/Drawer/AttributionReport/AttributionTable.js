@@ -87,6 +87,7 @@ const AttributionTable = ({
   const [includeEmptyLicenses, setIncludeEmptyLicenses] = useState(true)
   const [includeUnresolvedLicenses, setIncludeUnresolvedLicenses] =
     useState(true)
+  const [includeTitlePage, setIncludeTitlePage] = useState(false)
 
   const {
     primaryBlueText,
@@ -259,7 +260,8 @@ const AttributionTable = ({
           productVersion,
           sourcePreferences,
           includeEmptyLicenses,
-          includeUnresolvedLicenses
+          includeUnresolvedLicenses,
+          includeTitlePage
         )
       }
     } catch (error) {
@@ -606,6 +608,14 @@ const AttributionTable = ({
                 >
                   Include Unresolved Licenses
                 </Checkbox>
+                {downloadType === 'html' && (
+                  <Checkbox
+                    isChecked={includeTitlePage}
+                    onChange={(e) => setIncludeTitlePage(e.target.checked)}
+                  >
+                    Include Title Page (HTML)
+                  </Checkbox>
+                )}
               </Box>
             </MenuList>
           </Menu>
@@ -631,7 +641,8 @@ const AttributionTable = ({
       filters,
       handleBulkSourceChange,
       includeEmptyLicenses,
-      includeUnresolvedLicenses
+      includeUnresolvedLicenses,
+      includeTitlePage
     ]
   )
 
