@@ -68,5 +68,8 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Sync directory to S3
-      run: aws s3 sync build/ s3://staging.interlynk.io --acl public-read
+    - name: Empty the S3 bucket
+      run: aws s3 rm s3://staging.interlynk.io --recursive
+
+    - name: Upload build to S3
+      run: aws s3 cp build/ s3://staging.interlynk.io --recursive --acl public-read
