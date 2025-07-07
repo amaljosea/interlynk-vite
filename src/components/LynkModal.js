@@ -1,9 +1,10 @@
+/* eslint-disable no-unused-vars */
 import {
   Box,
   Button,
   ButtonGroup,
   Divider,
-  Flex, // eslint-disable-next-line no-restricted-imports
+  Flex,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -71,13 +72,10 @@ const LynkModal = ({
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} scrollBehavior='inside'>
       <ModalOverlay />
-      <ModalContent
-        borderRadius='16px'
-        sx={{ maxW: maxW || '600px', maxH: maxH || '' }}
-      >
-        <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
+        <ModalContent borderRadius='16px' sx={{ maxW: maxW || '600px' }}>
           <ModalHeader paddingInline={'16px'}>
             <Flex alignItems='center' gap={3}>
               {Icon && <Icon color={headingTextColor} fontSize={20} />}
@@ -133,8 +131,8 @@ const LynkModal = ({
               </ButtonGroup>
             </Flex>
           </ModalFooter>
-        </form>
-      </ModalContent>
+        </ModalContent>
+      </form>
     </Modal>
   )
 }
