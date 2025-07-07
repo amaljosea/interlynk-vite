@@ -9,6 +9,7 @@ import {
   MenuItem,
   MenuList,
   Portal,
+  Stack,
   Tag,
   TagLabel,
   Text,
@@ -23,7 +24,10 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 const TeamColumns = ({ action }) => {
   const { organization } = useGlobalState()
-  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
+  const { primaryTextColor, secondaryTextColor } = useThemeColor([
+    'primaryTextColor',
+    'secondaryTextColor'
+  ])
 
   const inviteUser = useHasPermission({
     parentKey: 'view_users',
@@ -58,58 +62,42 @@ const TeamColumns = ({ action }) => {
     // COLUMNS
     const columns = [
       {
-        id: 'email',
-        name: 'EMAIL',
+        id: 'user',
+        name: 'USER',
         selector: (row) => {
           const { profileImage } = row
           return (
-            <Flex
-              justifyContent={'center'}
-              sx={{
-                w: '100%',
-                px: 0,
-                py: '.8rem',
-                gap: 2,
-                alignItems: 'center'
-              }}
-            >
+            <Flex gap={3} my={4} alignItems={'center'}>
               <Avatar
                 size={'sm'}
                 name={row?.name || 'User'}
                 src={profileImage && `${SERVER_URL}/${profileImage?.url}`}
               />
-              <Text fontSize={14} color={primaryTextColor} my={2}>
-                {row?.email}
-              </Text>
+              <Stack spacing={1}>
+                <Flex
+                  gap={row?.name !== '' ? 2 : 0}
+                  sx={{ alignItems: 'center' }}
+                >
+                  <Text
+                    color={primaryTextColor}
+                    sx={{ fontSize: 14, w: 'fit-content' }}
+                  >
+                    {row.name ? truncatedValue(row.name, 20) : 'N/A'}
+                  </Text>
+                  {row.email === email && (
+                    <Badge variant='outline' colorScheme='blue'>
+                      You
+                    </Badge>
+                  )}
+                </Flex>
+                <Text fontSize={14} color={secondaryTextColor}>
+                  {row?.email}
+                </Text>
+              </Stack>
             </Flex>
           )
         },
-        width: '32%',
-        wrap: true
-      },
-      {
-        id: 'name',
-        name: 'NAME',
-        selector: (row) => (
-          <Flex gap={row.name !== '' ? 2 : 0} sx={{ alignItems: 'center' }}>
-            <Text
-              color={primaryTextColor}
-              sx={{ fontSize: 14, w: 'fit-content' }}
-            >
-              {row.name ? truncatedValue(row.name, 20) : 'N/A'}
-            </Text>
-            {row.email === email && (
-              <Badge
-                variant='outline'
-                colorScheme='blue'
-                sx={{ py: 1, px: 2, borderRadius: 4 }}
-              >
-                You
-              </Badge>
-            )}
-          </Flex>
-        ),
-        width: '21%',
+        width: '40%',
         wrap: true
       },
       {
@@ -124,38 +112,7 @@ const TeamColumns = ({ action }) => {
             {row?.role?.name || ''}
           </Text>
         ),
-        width: '8%'
-      },
-      {
-        id: 'joinedDate',
-        name: 'JOINED',
-        selector: (row) => {
-          const timeStart = userTimeStart(row)
-          return (
-            <Tooltip label={getFullDate(timeStart)} placement={'top'}>
-              <Text
-                fontSize={14}
-                color={primaryTextColor}
-                textTransform={'capitalize'}
-              >
-                {timeStart ? timeSince(timeStart) : ''}
-              </Text>
-            </Tooltip>
-          )
-        },
-        center: 'true',
-        sortable: true,
-        sortFunction: (a, b) => {
-          const aUserStart = userTimeStart(a)
-          const bUserStart = userTimeStart(b)
-          if (!aUserStart && !bUserStart) return 0
-          if (!aUserStart) return 1
-          if (!bUserStart) return -1
-          const dateA = new Date(aUserStart)
-          const dateB = new Date(bUserStart)
-          return dateA - dateB // Sort in descending order
-        },
-        width: '16%'
+        width: '10%'
       },
       {
         id: 'status',
@@ -182,8 +139,34 @@ const TeamColumns = ({ action }) => {
             </Tag>
           )
         },
-        center: 'true',
         width: '13%'
+      },
+      {
+        id: 'joinedDate',
+        name: 'JOINED',
+        selector: (row) => {
+          const timeStart = userTimeStart(row)
+          return (
+            <Tooltip label={getFullDate(timeStart)} placement={'top'}>
+              <Text fontSize={14} color={primaryTextColor}>
+                {timeStart ? timeSince(timeStart) : 'N/A'}
+              </Text>
+            </Tooltip>
+          )
+        },
+        sortable: true,
+        sortFunction: (a, b) => {
+          const aUserStart = userTimeStart(a)
+          const bUserStart = userTimeStart(b)
+          if (!aUserStart && !bUserStart) return 0
+          if (!aUserStart) return 1
+          if (!bUserStart) return -1
+          const dateA = new Date(aUserStart)
+          const dateB = new Date(bUserStart)
+          return dateA - dateB // Sort in descending order
+        },
+        right: 'true',
+        width: '16%'
       },
       {
         id: 'action',
@@ -236,7 +219,8 @@ const TeamColumns = ({ action }) => {
     inviteUser,
     organization,
     primaryTextColor,
-    removeUser
+    removeUser,
+    secondaryTextColor
   ])
 }
 
