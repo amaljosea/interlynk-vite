@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import AsyncSelect from 'react-select/async'
 import { severityListSelect } from 'variables/general'
 
 import {
@@ -18,22 +19,21 @@ import LynkAlert from 'components/LynkAlert'
 import LynkDate from 'components/LynkDate'
 import LynkDrawer from 'components/LynkDrawer'
 import LynkSelect from 'components/LynkSelect'
+import CustomDropdownIndicator from 'components/Misc/CustomDropdownIndicator'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useLazyDropDown } from 'hooks/useLazyDropDown'
+import { useSelect } from 'hooks/useSelect'
 
 import { CustomVulnUpdate } from 'graphQL/Mutation'
-import {
-  GetAllComponents,
-  GetTotalComponents,
-  verfifyCustomVuln
-} from 'graphQL/Queries'
+import { GetAllComponents, verfifyCustomVuln } from 'graphQL/Queries'
 
 const VulnDrawer = ({ data, isOpen, onClose }) => {
   const params = useParams()
   const { showToast } = useCustomToast()
   const { prodCompState } = useGlobalState()
-
+  const { style } = useSelect('lynkSelect')
   const { vuln } = data || ''
 
   const [updateVuln, { loading }] = useMutation(CustomVulnUpdate)
@@ -44,6 +44,13 @@ const VulnDrawer = ({ data, isOpen, onClose }) => {
 
   const { customVuln } = vulnData || {}
   const { customVulnSboms } = customVuln || ''
+
+  const firstSbom = customVulnSboms && customVulnSboms[0]
+  const firstSbomComponent = firstSbom?.component
+  const firstSbomComponentId = firstSbom?.componentId
+  const firstSbomComponentName = firstSbomComponent?.name
+  const firstSbomComponentVersion = firstSbomComponent?.version
+  const firstSbomComponentPrimary = firstSbomComponent?.primary
 
   const [error, setError] = useState('')
   const [compId, setCompId] = useState('')
@@ -66,32 +73,37 @@ const VulnDrawer = ({ data, isOpen, onClose }) => {
     direction: direction
   }
 
-  const { data: compData } = useQuery(GetTotalComponents, {
+  const { lazyDropDownProps } = useLazyDropDown(GetAllComponents, {
     skip: isOpen && params?.sbomid ? false : true,
-    variables: { ...compState }
-  })
-
-  const { data: allComponents, loading: compLoading } = useQuery(
-    GetAllComponents,
-    {
-      skip: isOpen && params?.sbomid ? false : true,
-      variables: {
-        ...compState,
-        first: compData?.sbom?.components?.totalCount
+    selector: 'sbom.components',
+    variables: {
+      ...compState,
+      first: 5,
+      orderBy: {
+        direction: 'ASC',
+        field: 'COMPONENTS_NAME'
       }
+    },
+    onChange: (selectedOption) => {
+      setCompId(selectedOption?.id || '')
+      setError('')
+    },
+    optionLabel: (item) =>
+      `${item.name} - ${item.version}${item.primary ? ' [primary component]' : ''}`,
+    optionValue: 'id',
+    defaultFirstOption:
+      customVuln && firstSbom
+        ? {
+            id: firstSbomComponentId,
+            name: firstSbomComponentName,
+            version: `${firstSbomComponentVersion}${firstSbomComponentPrimary ? ' [primary component]' : ''}`
+          }
+        : undefined,
+    components: {
+      IndicatorSeparator: () => null,
+      DropdownIndicator: CustomDropdownIndicator
     }
-  )
-
-  const { components } = allComponents?.sbom || ''
-  const { nodes } = components || ''
-
-  const formattedNodes =
-    nodes
-      ?.sort((a, b) => a?.name?.localeCompare(b?.name))
-      .map((item) => ({
-        value: item?.id,
-        label: `${item?.name}-${item?.version}${item?.primary ? ' [Primary Component]' : ''}`
-      })) || []
+  })
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -258,22 +270,20 @@ const VulnDrawer = ({ data, isOpen, onClose }) => {
               placeholder='Ex. cpe:2.3:a:examplevendor:uniqueproduct:1.0.0:*:*:*:*:*:*:*'
             />
           </FormControl>
-          {!compLoading && nodes ? (
+          {!lazyDropDownProps.isLoading && lazyDropDownProps.nodes ? (
             <FormControl>
               <FormLabel htmlFor='componentId'>Component</FormLabel>
-              <LynkSelect
+              <AsyncSelect
                 name='componentId'
-                value={
-                  formattedNodes.find((option) => option.value === compId) ||
-                  null
-                }
-                onChange={(selectedOption) => {
-                  setCompId(selectedOption?.value || '')
-                  setError('')
+                {...{
+                  ...lazyDropDownProps,
+                  styles: style,
+                  isDisabled: lazyDropDownProps.isLoading,
+                  placeholder:
+                    firstSbomComponentName && firstSbomComponentVersion
+                      ? `${firstSbomComponentName}-${firstSbomComponentVersion}${firstSbomComponentPrimary ? ' [primary component]' : ''}`
+                      : undefined
                 }}
-                options={formattedNodes}
-                placeholder='-- Select --'
-                dropDown
                 menuPlacement='top'
               />
             </FormControl>

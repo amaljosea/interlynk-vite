@@ -5498,6 +5498,11 @@ export const verfifyCustomVuln = gql`
         id
         sbomId
         componentId
+        component {
+          name
+          version
+          primary
+        }
       }
       createdAt
       updatedAt

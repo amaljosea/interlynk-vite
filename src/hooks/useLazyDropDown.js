@@ -87,6 +87,8 @@ export const useLazyDropDown = (
 
   // Filter out the selected item from the nodes list
   const filteredNodes = resource?.nodes?.filter((node) => {
+    // Exclude the defaultFirstOption from the rest of the list
+    if (defaultFirstOption && node.id === defaultFirstOption.id) return false
     return !Object.values(node).some((value) => value === selectedItem)
   })
 
