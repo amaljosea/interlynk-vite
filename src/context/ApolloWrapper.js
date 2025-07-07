@@ -144,9 +144,9 @@ const errorLink = onError(({ graphQLErrors, operation, forward }) => {
   }
 })
 
-export const refetchActiveQueries = async () => {
+export const refetchActiveQueries = async (queries) => {
   await client.refetchQueries({
-    include: 'active'
+    include: queries
   })
 }
 

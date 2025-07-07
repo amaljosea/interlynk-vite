@@ -6,13 +6,7 @@ import RefreshBtn from 'components/Icons/RefreshBtn'
 
 import { LuTextSearch } from 'react-icons/lu'
 
-const PolicySubHeader = (
-  reset,
-  isArchived,
-  handleRefresh,
-  policyRun,
-  isInDraft
-) => {
+const PolicySubHeader = (isArchived, handleRefresh, policyRun, isInDraft) => {
   const subHeader = useMemo(() => {
     return (
       <Flex
@@ -32,10 +26,10 @@ const PolicySubHeader = (
             />
           </Tooltip>
         )}
-        <RefreshBtn onClick={reset} />
+        <RefreshBtn queries={['PolicyResults']} />
       </Flex>
     )
-  }, [isInDraft, isArchived, handleRefresh, policyRun, reset])
+  }, [isInDraft, isArchived, handleRefresh, policyRun])
 
   return subHeader
 }

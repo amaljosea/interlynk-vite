@@ -37,7 +37,7 @@ const ChangeLogSubHeader = (
           />
         </Flex>
 
-        <RefreshBtn />
+        <RefreshBtn queries={['GetChangeLogs']} />
       </Flex>
     )
   }, [

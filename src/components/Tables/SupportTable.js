@@ -102,7 +102,6 @@ const SupportTable = ({
   // COLUMNS
   const columns = GlobalSupportColumns({ action })
 
-  // SUB HEADER
   const subHeader = GlobalSupportHeader({
     action,
     filterText,

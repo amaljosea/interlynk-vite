@@ -20,7 +20,11 @@ const LicensesSubHeader = () => {
         {/* EXPORT CSV */}
         {!isCustomerView && <ExportCsv tableType='SBOM License View' />}
 
-        <RefreshBtn />
+        <RefreshBtn
+          queries={[
+            isCustomerView ? 'GetShareLicensesTable' : 'GetSbomLicensesTable'
+          ]}
+        />
       </Flex>
     )
   }, [isCustomerView])

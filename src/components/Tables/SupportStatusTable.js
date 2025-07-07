@@ -122,7 +122,6 @@ const SupportStatusTable = ({
   const columns = ProjectSupportColumns()
 
   const subHeader = ProjectSupportHeader({
-    reset,
     supportData,
     searchInput,
     handleClear,

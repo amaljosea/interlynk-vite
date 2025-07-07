@@ -27,7 +27,7 @@ const PartsSubHeader = (
           aria-label='add_part'
           isDisabled={disabled}
         />
-        <RefreshBtn />
+        <RefreshBtn queries={['GetSbomParts']} />
       </Flex>
     )
   }, [isArchived, onOpen, sbomParts?.length, signedUrlParams, updateSboms])

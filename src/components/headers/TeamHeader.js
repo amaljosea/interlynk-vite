@@ -76,7 +76,7 @@ const TeamHeader = ({
               </Box>
             </Tooltip>
           </Box>
-          <RefreshBtn />
+          <RefreshBtn queries={['GetUsers']} />
         </Flex>
       </Flex>
     )

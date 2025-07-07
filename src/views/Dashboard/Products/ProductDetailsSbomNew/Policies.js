@@ -90,7 +90,6 @@ const Policies = ({ sbomData }) => {
 
   // SUB HEADER
   const subHeader = PolicySubHeader(
-    reset,
     isArchived,
     handleRefresh,
     policyRun,

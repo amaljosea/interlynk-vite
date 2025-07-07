@@ -133,7 +133,11 @@ const VersionHeader = (props) => {
               onClick={() => action('build_sbom', null)}
             />
           </Tooltip>
-          <RefreshBtn />
+          <RefreshBtn
+            queries={[
+              signedUrlParams ? 'ShareVersionTable' : 'GetVersionsTable'
+            ]}
+          />
         </Stack>
       </Flex>
     )

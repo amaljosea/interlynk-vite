@@ -118,7 +118,7 @@ const BitbucketProjects = ({ isOpen, onClose }) => {
           filterText={searchInput}
           onChange={onSearchInputChange}
         />
-        <RefreshBtn />
+        <RefreshBtn queries={['BitbucketRepositories']} />
       </Flex>
     )
   }, [handleClear, handleSearch, searchInput, onSearchInputChange])

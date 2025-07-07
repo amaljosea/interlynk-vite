@@ -45,7 +45,7 @@ const GlobalSupportHeader = (props) => {
               onClick={() => action('add_support', null)}
             />
           )}
-          <RefreshBtn />
+          <RefreshBtn queries={['GetSupportTab']} />
         </Stack>
       </Flex>
     )

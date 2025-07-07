@@ -137,7 +137,7 @@ const ChangelogTable = ({ activeEnv }) => {
           />
         </Flex>
 
-        <RefreshBtn onClick={() => reset()} />
+        <RefreshBtn queries={['GetProjectLogs']} />
       </Flex>
     )
   }, [

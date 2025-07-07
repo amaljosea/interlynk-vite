@@ -9,11 +9,11 @@ import WarnModal from 'views/Dashboard/Policies/WarnModal'
 import { Stack, useDisclosure } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
-import GlobalPolicyColumns from 'components/columns/GlobalPolicyColumns'
-import GlobalPolicyHeader from 'components/headers/GlobalPolicyHeader'
 import LynkTable from 'components/LynkTable'
 import Pagination from 'components/Pagination'
+import GlobalPolicyColumns from 'components/columns/GlobalPolicyColumns'
 import GlobalPolicyExpand from 'components/expand-view/GlobalPolicyExpand'
+import GlobalPolicyHeader from 'components/headers/GlobalPolicyHeader'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { usePaginatedQuery } from 'hooks/usePaginatedQuery'
@@ -69,7 +69,7 @@ const PolicyTable = () => {
     reset
   } = usePaginatedQuery(GetPolicies, {
     selector: 'policies',
-    variables: { ...filters },
+    variables: { ...filters, search: search !== '' ? search : undefined },
     skip: tab === POLICIES ? true : false
   })
 

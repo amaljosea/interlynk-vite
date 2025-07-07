@@ -77,7 +77,7 @@ const SupportSubHeader = ({
               filters={{ ...supportData }}
             />
           )}
-          <RefreshBtn onClick={() => reset()} />
+          <RefreshBtn queries={['GetCompSupportData']} />
         </Stack>
       </Flex>
     )

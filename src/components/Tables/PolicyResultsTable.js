@@ -69,7 +69,7 @@ const PolicyResultsTable = () => {
     return (
       <Flex w={'100%'} alignItems={'center'} justifyContent={'space-between'}>
         <Filters filters={filters} setFilters={onFilter} />
-        <RefreshBtn />
+        <RefreshBtn queries={['GetPolicyResults']} />
       </Flex>
     )
   }, [filters, reset])

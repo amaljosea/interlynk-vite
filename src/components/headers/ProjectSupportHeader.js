@@ -20,7 +20,6 @@ import { useRouteFlags } from 'hooks/useRouteFlags'
 import { LuSquarePen } from 'react-icons/lu'
 
 const ProjectSupportHeader = ({
-  reset,
   supportData,
   searchInput,
   handleClear,
@@ -101,7 +100,7 @@ const ProjectSupportHeader = ({
               />
             </Tooltip>
           )}
-          <RefreshBtn onClick={() => reset()} />
+          <RefreshBtn queries={['GetCompSupportData']} />
         </Flex>
       </Flex>
     )
@@ -114,7 +113,6 @@ const ProjectSupportHeader = ({
     onFilterInclude,
     onFilterSupport,
     onSearchInputChange,
-    reset,
     searchInput,
     selectedItems?.length,
     supportLevel

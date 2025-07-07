@@ -123,7 +123,11 @@ const ProductHeader = (props) => {
             </Tooltip>
           </Box>
           {/* REFRESH */}
-          <RefreshBtn />
+          <RefreshBtn
+            queries={[
+              signedUrlParams ? 'ShareLynkProjectGroups' : 'GetProductTable'
+            ]}
+          />
         </Flex>
       </Flex>
     )

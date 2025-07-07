@@ -138,7 +138,7 @@ const RequestTable = (props) => {
             }}
             aria-label='request_sbom'
           />
-          <RefreshBtn />
+          <RefreshBtn queries={['GetRequests']} />
         </Stack>
       </Flex>
     )

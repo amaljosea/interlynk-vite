@@ -122,7 +122,7 @@ const AutomationSubHeader = ({ RULE, RULE_IMPORT, setActiveRow, projects }) => {
             aria-label='add_automation_rule'
             isDisabled={!canEditAutomations}
           />
-          <RefreshBtn />
+          <RefreshBtn queries={['GetProjectAutomations']} />
         </Stack>
       </Flex>
     )

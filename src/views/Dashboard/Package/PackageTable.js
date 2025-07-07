@@ -280,7 +280,7 @@ const PackageTable = ({
           onClear={handleClear}
           onChange={(e) => setSearchText(e.target.value)}
         />
-        <RefreshBtn />
+        <RefreshBtn queries={['PackageVersionsTable']} />
       </Flex>
     ),
     [searchText, handleSearch, handleClear]

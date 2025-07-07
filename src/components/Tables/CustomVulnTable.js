@@ -80,11 +80,10 @@ const CustomVulnTable = () => {
             />
           </Tooltip>
         )}
-        <RefreshBtn />
+        <RefreshBtn queries={['GetCustomVulns']} />
       </Flex>
     )
   }, [editVulns, isFreeTier, EDIT.onOpen])
-  
 
   const columns = CustomVulnColumns({ handleWarning })
 

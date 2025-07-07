@@ -134,7 +134,7 @@ const ChecksSubHeader = (reset, isArchived, isInDraft) => {
               />
             </Tooltip>
           )}
-          <RefreshBtn />
+          <RefreshBtn queries={['GetCheckResults']} />
         </Flex>
       </Flex>
     )

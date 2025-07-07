@@ -11,7 +11,7 @@ export const SubHeaderComponent = ({
   onOpen,
   updateLic,
   setActiveRow,
-  setFilters,
+  setFilters
 }) => {
   return useMemo(() => {
     return (
@@ -30,7 +30,7 @@ export const SubHeaderComponent = ({
             }}
             aria-label='add_license'
           />
-          <RefreshBtn />
+          <RefreshBtn queries={['GetLicensesTable']} />
         </Flex>
       </Flex>
     )

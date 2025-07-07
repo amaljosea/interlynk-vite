@@ -45,7 +45,7 @@ const GlobalLicenseHeader = (props) => {
             onClick={() => action('add_license', null)}
             aria-label='add_license'
           />
-          <RefreshBtn />
+          <RefreshBtn queries={['GetLicensesTable']} />
         </Flex>
       </Flex>
     )

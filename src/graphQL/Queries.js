@@ -62,7 +62,7 @@ export const UserSettings = gql`
 `
 
 export const GetUsersForExport = gql`
-  query GetUsers($first: Int, $last: Int, $after: String, $before: String) {
+  query GetUsersForExport($first: Int, $last: Int, $after: String, $before: String) {
     organization {
       users(after: $after, before: $before, first: $first, last: $last) {
         nodes {
@@ -6582,7 +6582,7 @@ export const GetVulnProductDetails = gql`
   }
 `
 export const GetGlobalVulnerabilityList = gql`
-  query GetGlobalVulns(
+  query GetGlobalVulnerabilityList(
     $first: Int
     $last: Int
     $after: String

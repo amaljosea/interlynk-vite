@@ -88,7 +88,11 @@ const ComponentsSubHeader = ({
           )}
 
           {/* REFRESH */}
-          <RefreshBtn onClick={reset} />
+          <RefreshBtn
+            queries={[
+              signedUrlParams ? 'ShareComponentData' : 'GetComponentColumnData'
+            ]}
+          />
         </Flex>
       </Flex>
     )

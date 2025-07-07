@@ -48,7 +48,11 @@ const GlobalPolicyHeader = ({
             isDisabled={!updatePolicy}
             onClick={() => action('create_policy', null)}
           />
-          <RefreshBtn />
+          <RefreshBtn
+            queries={[
+              params?.productgroupid ? 'GetProjectPolicies' : 'GetPolicies'
+            ]}
+          />
         </Stack>
       </Flex>
     )
@@ -58,6 +62,7 @@ const GlobalPolicyHeader = ({
     handleClear,
     handleSearch,
     onSearchInputChange,
+    params?.productgroupid,
     productId,
     updatePolicy
   ])

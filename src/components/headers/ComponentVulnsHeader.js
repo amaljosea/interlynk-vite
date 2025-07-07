@@ -70,7 +70,7 @@ const ComponentVulnsHeader = ({
               />
             </Tooltip>
           )}
-          <RefreshBtn />
+          <RefreshBtn queries={['GetCompVulnData']} />
         </Stack>
       </Flex>
     )
