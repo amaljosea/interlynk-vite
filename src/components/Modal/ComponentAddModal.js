@@ -1,7 +1,8 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { TabContext } from 'context/TabContext'
 import React, { useContext, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import AsyncSelect from 'react-select/async'
 import { getSignedUrlParams, transformLicenseString } from 'utils'
 import { componentTypes, infoData } from 'variables/general'
 
@@ -19,6 +20,7 @@ import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
 import LynkSelect from 'components/LynkSelect'
 import CompInfo from 'components/Misc/CompInfo'
+import CustomDropdownIndicator from 'components/Misc/CustomDropdownIndicator'
 import LynkFormLabel from 'components/Misc/LynkLabel'
 import PrimaryWarning from 'components/Modal/PrimaryWarning'
 import PackageLookup from 'components/PackageLookup'
@@ -27,9 +29,11 @@ import PurlField from 'components/PurlField'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useLazyDropDown } from 'hooks/useLazyDropDown'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import useQueryParam from 'hooks/useQueryParam'
 import { useRouteFlags } from 'hooks/useRouteFlags'
+import { useSelect } from 'hooks/useSelect'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CreateCompRelation, CreateComponent } from 'graphQL/Mutation'
@@ -65,8 +69,9 @@ function ComponentAddModal(props) {
     useThemeColor(['primaryErrorColor', 'primaryBlueText', 'headingTextColor'])
 
   const { isOpen, onClose, data, primaryComp, shortDesc } = props
+
   const { prodCompState, dispatch } = useGlobalState()
-  const { purlString, totalComp } = prodCompState
+  const { purlString } = prodCompState
   const { prodCompDispatch } = dispatch
 
   const [addRelation] = useMutation(CreateCompRelation)
@@ -75,7 +80,6 @@ function ComponentAddModal(props) {
     refetchQueries: ['GetComponentColumnData']
   })
 
-  const [allComponents, setAllComponents] = useState([])
   const [showPurl, setShowPurl] = useState(false)
   const [showCpe, setShowCpe] = useState(false)
   const [purlValue, setPurlValue] = useState('')
@@ -84,6 +88,7 @@ function ComponentAddModal(props) {
   const defaultDate = new Date()
   defaultDate.setDate(defaultDate.getDate() + 90)
   const [isValidDate, setIsValidDate] = useState(true)
+  const { style } = useSelect('lynkSelect')
 
   const scopeOptions = [
     { value: '', label: '-- Select --' },
@@ -105,18 +110,6 @@ function ComponentAddModal(props) {
     { value: 'depends_on', label: 'Depends On' }
   ]
 
-  const componentOptions = [...allComponents]
-    ?.sort((a, b) => a?.name?.localeCompare(b?.name))
-    .map((item) => ({
-      value: item.id,
-      label: `${item.name}-${item.version}`
-    }))
-
-  componentOptions.unshift({
-    value: '',
-    label: '-- Select --'
-  })
-
   const handleDateChange = (newDate) => {
     const isValidDate = newDate && !isNaN(newDate)
     setTabData((prev) => ({
@@ -132,16 +125,29 @@ function ComponentAddModal(props) {
     }
   }
 
-  useQuery(GetAllComponents, {
-    fetchPolicy: 'network-only',
+  const { lazyDropDownProps } = useLazyDropDown(GetAllComponents, {
     skip: activeTab === 'components' && signedUrlParams === null ? false : true,
+    selector: 'sbom.components',
     variables: {
       projectId: productId,
       sbomId: sbomId,
-      first: totalComp
+      first: 5,
+      orderBy: {
+        direction: 'ASC',
+        field: 'COMPONENTS_NAME'
+      }
     },
-    onCompleted: (data) => {
-      data && setAllComponents(data?.sbom?.components?.nodes)
+    onChange: (selectedOption) => {
+      handleChange('relationships', 'to', selectedOption?.id)
+    },
+    optionLabel: (item) => `${item.name} - ${item.version}`,
+    optionValue: 'id',
+
+    components: {
+      IndicatorSeparator: () => null,
+      DropdownIndicator: CustomDropdownIndicator
+    },
+    onCompleted: () => {
       setTabData((prev) => ({
         ...prev,
         relationships: { relType: '', to: '' }
@@ -149,7 +155,11 @@ function ComponentAddModal(props) {
     }
   })
 
-  const WARNING = useDisclosure()
+  const {
+    isOpen: isWarningOpen,
+    onOpen: onWarningOpen,
+    onClose: onWarningClose
+  } = useDisclosure()
 
   const handleCreateCom = () => {
     const hasLicense = details?.licenses?.length > 0
@@ -523,7 +533,7 @@ function ComponentAddModal(props) {
                       size='sm'
                       name='primary'
                       colorScheme='blue'
-                      onChange={() => WARNING.onOpen()}
+                      onChange={onWarningOpen}
                       isChecked={details?.primary}
                     >
                       Primary component
@@ -587,20 +597,14 @@ function ComponentAddModal(props) {
                   <FormLabel htmlFor='component' color={headingTextColor}>
                     Component
                   </FormLabel>
-                  <LynkSelect
-                    size='md'
+                  <AsyncSelect
                     id='component'
-                    value={
-                      componentOptions.find(
-                        (item) => item.value === relationships?.to
-                      ) || ''
-                    }
-                    onChange={(selectedOption) =>
-                      handleChange('relationships', 'to', selectedOption?.value)
-                    }
-                    options={componentOptions}
-                    isCreatable={false}
-                    dropDown={true}
+                    {...{
+                      ...lazyDropDownProps,
+                      styles: style,
+                      isDisabled: lazyDropDownProps.isLoading,
+                      placeholder: ' --Select Component-- '
+                    }}
                   />
                 </FormControl>
               </Stack>
@@ -610,10 +614,10 @@ function ComponentAddModal(props) {
       </LynkModal>
 
       {/* PRIMARY COMPONENT WARNING */}
-      {WARNING.isOpen && (
+      {isWarningOpen && (
         <PrimaryWarning
-          isOpen={WARNING.isOpen}
-          onClose={WARNING.onClose}
+          isOpen={isWarningOpen}
+          onClose={onWarningClose}
           primaryComp={primaryComp}
         />
       )}
