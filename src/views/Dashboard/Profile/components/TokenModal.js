@@ -3,16 +3,24 @@ import { isValid } from 'date-fns'
 import { useEffect, useState } from 'react'
 import { truncatedValue } from 'utils'
 
-import { Progress, Stack, Text, Tooltip, useClipboard } from '@chakra-ui/react'
-import { Checkbox, Input } from '@chakra-ui/react'
-import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
+import {
+  Checkbox,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
+  Progress,
+  Stack,
+  Text,
+  Tooltip,
+  useClipboard
+} from '@chakra-ui/react'
 
 import CopyButton from 'components/Icons/CopyButton'
 import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
 
-import { createApiToken } from 'graphQL/Mutation'
-import { updateApiToken } from 'graphQL/Mutation'
+import { createApiToken, updateApiToken } from 'graphQL/Mutation'
 
 import { LuKey } from 'react-icons/lu'
 
@@ -28,8 +36,12 @@ const TokenModal = ({ data, isOpen, onClose }) => {
   const [isValidDate, setIsValidDate] = useState(true)
   const [selectedDate, setSelectedDate] = useState(defaultDate)
 
-  const [generateToken] = useMutation(createApiToken)
-  const [updateToken] = useMutation(updateApiToken)
+  const [generateToken, { loading: creating }] = useMutation(createApiToken, {
+    refetchQueries: ['GetApiKeys']
+  })
+  const [updateToken, { loading: updating }] = useMutation(updateApiToken, {
+    refetchQueries: ['GetApiKeys']
+  })
 
   const key = useClipboard(token)
 
@@ -146,13 +158,14 @@ const TokenModal = ({ data, isOpen, onClose }) => {
 
   return (
     <LynkModal
+      Icon={LuKey}
       isOpen={isOpen}
       onClose={onClose}
-      onSubmit={onSubmit}
       title={modalTitle}
-      Icon={LuKey}
-      disabled={isButtonDisabled}
+      onSubmit={onSubmit}
       buttonText={buttonName}
+      disabled={isButtonDisabled}
+      isLoading={creating || updating}
     >
       {!data && (
         <FormControl

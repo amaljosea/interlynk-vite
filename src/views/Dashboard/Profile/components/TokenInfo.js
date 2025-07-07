@@ -1,270 +1,71 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { useMemo, useRef, useState } from 'react'
-import { getFullDate, truncatedValue } from 'utils'
+import { useRef, useState } from 'react'
 
-import {
-  Flex,
-  IconButton,
-  Portal,
-  Text,
-  Tooltip,
-  useDisclosure
-} from '@chakra-ui/react'
-import { Tag, TagLabel } from '@chakra-ui/react'
-import { Menu, MenuItem, MenuList } from '@chakra-ui/react'
+import { Flex, useDisclosure } from '@chakra-ui/react'
 
 import LynkTable from 'components/LynkTable'
-import LynkAction from 'components/Misc/LynkAction'
+import SecurityTokenColumns from 'components/columns/SecurityTokenColumns'
+import SecurityTokenHeader from 'components/headers/SecurityTokenHeader'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import useQueryParam from 'hooks/useQueryParam'
-import { useThemeColor } from 'hooks/useThemeColors'
 
 import { deleteApiToken, updateApiToken } from 'graphQL/Mutation'
 import { GetApiKeys } from 'graphQL/Queries'
-
-import { LuCirclePlus } from 'react-icons/lu'
 
 import TokenModal from './TokenModal'
 
 const TokenInfo = () => {
   const activetab = useQueryParam('tab')
   const { orgView } = useGlobalQueryContext()
+  const TOKEN = useDisclosure()
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const tokenRef = useRef(null)
+  const [activeRow, setActiveRow] = useState(null)
 
-  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
+  const [deleteToken] = useMutation(deleteApiToken, {
+    refetchQueries: ['GetApiKeys']
+  })
+  const [updateToken] = useMutation(updateApiToken, {
+    refetchQueries: ['GetApiKeys']
+  })
 
   const { data, loading } = useQuery(GetApiKeys, {
     skip: !orgView || activetab !== 'security tokens'
   })
+  const { apiKeys } = data?.organization?.currentUser || {}
 
-  const { apiKeys } = data?.organization?.currentUser || ''
-
-  const tokenRef = useRef(null)
-
-  const [activeRow, setActiveRow] = useState(null)
-
-  const [deleteToken] = useMutation(deleteApiToken)
-  const [updateToken] = useMutation(updateApiToken)
-
-  const handleDelete = (id) => {
-    deleteToken({
-      variables: {
-        apiKeyId: id
-      }
-    }).then((res) => res && onClose())
+  const handleDelete = () => {
+    deleteToken({ variables: { apiKeyId: activeRow?.id } }).then(
+      (res) => res && TOKEN.onClose()
+    )
   }
 
   const handleRevoked = (id) => {
     updateToken({
-      variables: {
-        id: id,
-        revoked: new Date().toISOString()
-      }
-    }).then((res) => res?.data && onClose())
+      variables: { id: id, revoked: new Date().toISOString() }
+    }).then((res) => res?.data && TOKEN.onClose())
   }
 
-  const onEdit = (row) => {
-    setActiveRow(row)
-    onOpen()
-  }
-
-  // HEADER SECTION
-  const subHeaderComponent = useMemo(() => {
-    const onCreate = () => {
-      setActiveRow(null)
-      onOpen()
+  const action = (type, data) => {
+    setActiveRow(data)
+    switch (type) {
+      case 'revoke_token':
+        return handleRevoked(data?.id)
+      case 'update_token':
+        return TOKEN.onOpen()
+      case 'delete_token':
+        return handleDelete()
+      default:
+        return TOKEN.onOpen()
     }
+  }
 
-    return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
-        <Flex flexDirection={'column'}>
-          <Text
-            fontSize='lg'
-            color={primaryTextColor}
-            fontWeight='bold'
-            textAlign={'start'}
-          >
-            Security Tokens
-          </Text>
-          <Text fontSize={'sm'}>
-            Secure your organization with essential tokens for data protection
-          </Text>
-        </Flex>
-
-        {/* NER TOKEN */}
-        <Tooltip label='New Token'>
-          <IconButton
-            ref={tokenRef}
-            onClick={onCreate}
-            data-testid='new_token'
-            icon={<LuCirclePlus size={18} />}
-            colorScheme='blue'
-            variant='solid'
-            fontWeight='normal'
-            fontSize={'sm'}
-          />
-        </Tooltip>
-      </Flex>
-    )
-  }, [primaryTextColor, onOpen])
+  // HEADER
+  const subHeader = SecurityTokenHeader({ action, tokenRef })
 
   // COLUMNS
-  const columns = [
-    // NAME
-    {
-      id: 'name',
-      name: 'TOKEN NAME',
-      wrap: true,
-      selector: (row) => (
-        <Tooltip label={row?.tokenName} placement='top'>
-          <Text color={primaryTextColor} my={2}>
-            {truncatedValue(row?.tokenName, 30)}
-          </Text>
-        </Tooltip>
-      )
-    },
-    // TOKEN MASK
-    {
-      id: 'tokenMask',
-      name: 'TOKEN MASK',
-      selector: (row) => (
-        <Text color={primaryTextColor} my={2}>
-          {row.tokenMask}
-        </Text>
-      ),
-      wrap: true
-    },
-    // CREATED
-    {
-      id: 'created',
-      name: 'CREATED',
-      selector: (row) => (
-        <Text color={primaryTextColor}>{getFullDate(row.createdAt)}</Text>
-      ),
-      sortable: true,
-      sortFunction: (a, b) => {
-        const dateA = new Date(a.createdAt)
-        const dateB = new Date(b.createdAt)
-        return dateA - dateB
-      },
-      wrap: true,
-      right: 'true'
-    },
-    // UPDATED
-    {
-      id: 'updated',
-      name: 'UPDATED',
-      selector: (row) => (
-        <Text color={primaryTextColor}>{getFullDate(row.updatedAt)}</Text>
-      ),
-      sortable: true,
-      sortFunction: (a, b) => {
-        const dateA = new Date(a.updatedAt)
-        const dateB = new Date(b.updatedAt)
-        return dateA - dateB
-      },
-      wrap: true,
-      right: 'true'
-    },
-    // EXPIRES
-    {
-      id: 'expires',
-      name: 'EXPIRES',
-      selector: (row) => (
-        <Text color={primaryTextColor}>
-          {row.expiresAt ? getFullDate(row.expiresAt) : 'No Expiration'}
-        </Text>
-      ),
-      wrap: true,
-      right: 'true'
-    },
-    // STATUS
-    {
-      id: 'status',
-      name: 'STATUS',
-      selector: (row) => {
-        const { revoked, expired } = row
-
-        const color = () => {
-          if (!revoked && !expired) {
-            return 'green'
-          } else if (revoked) {
-            return 'blue'
-          } else {
-            return 'red'
-          }
-        }
-
-        return (
-          <Tag
-            size='md'
-            key='md'
-            variant='subtle'
-            colorScheme={color()}
-            textTransform={'capitalize'}
-            width={'100%'}
-            borderRadius={'6px'}
-            alignItems={'center'}
-            justifyContent={'center'}
-          >
-            <TagLabel px={1}>
-              {!revoked && !expired
-                ? 'Active'
-                : revoked
-                  ? 'Revoked'
-                  : 'Expired'}
-            </TagLabel>
-          </Tag>
-        )
-      },
-      right: 'true'
-    },
-    // ACTIONS
-    {
-      id: 'actions',
-      name: 'ACTIONS',
-      selector: (row, index) => {
-        const { revoked } = row
-        return (
-          <Menu>
-            <LynkAction data-testid={`token_actions_${index}`} />
-            <Portal>
-              <MenuList fontSize={'sm'}>
-                <MenuItem
-                  hidden={row?.revoked === true}
-                  onClick={() => handleRevoked(row.id)}
-                  data-testid={`token_revoke_${index}`}
-                >
-                  Revoke Token
-                </MenuItem>
-                <MenuItem
-                  isDisabled={revoked}
-                  onClick={() => onEdit(row)}
-                  data-testid={`token_edit_${index}`}
-                >
-                  Edit Expiration
-                </MenuItem>
-                <MenuItem
-                  onClick={() => handleDelete(row.id)}
-                  data-testid={`token_delete_${index}`}
-                >
-                  Delete
-                </MenuItem>
-              </MenuList>
-            </Portal>
-          </Menu>
-        )
-      },
-      right: 'true',
-      width: '120px'
-    }
-  ]
+  const columns = SecurityTokenColumns({ action })
 
   return (
     <>
@@ -275,12 +76,16 @@ const TokenInfo = () => {
           data={apiKeys || []}
           progressPending={loading}
           defaultSortFieldId={'updated'}
-          subHeaderComponent={subHeaderComponent}
+          subHeaderComponent={subHeader}
         />
       </Flex>
 
-      {isOpen && (
-        <TokenModal data={activeRow} isOpen={isOpen} onClose={onClose} />
+      {TOKEN.isOpen && (
+        <TokenModal
+          data={activeRow}
+          isOpen={TOKEN.isOpen}
+          onClose={TOKEN.onClose}
+        />
       )}
     </>
   )
