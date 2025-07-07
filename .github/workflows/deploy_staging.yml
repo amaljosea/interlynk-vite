@@ -55,6 +55,7 @@ jobs:
         REACT_APP_REFRESH_TOKEN_URL: https://staging-api.interlynk.io/refresh_token
         REACT_APP_SERVER: https://staging-api.interlynk.io
         REACT_APP_VENDOR_RESET_URL: https://staging-api.interlynk.io/password
+        GENERATE_SOURCEMAP: false
         CI: ""
         NODE_OPTIONS: --max_old_space_size=4096 
 
@@ -69,4 +70,4 @@ jobs:
         aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Sync directory to S3
-      run: aws s3 sync build/ s3://staging.interlynk.io --acl public-read
+      run: aws s3 sync build/ s3://staging.interlynk.io --acl public-read --delete
