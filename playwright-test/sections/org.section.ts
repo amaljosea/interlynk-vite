@@ -7,6 +7,7 @@ dotenv.config({ path: '.env' })
 
 const errors: string[] = []
 const orgName = randomProductName()
+const orgEmail = 'test@example.com'
 
 export default class OrgSection {
   page: Page
@@ -22,6 +23,9 @@ export default class OrgSection {
       await this.page.waitForTimeout(2000)
 
       await this.page.getByPlaceholder('Enter name').fill(orgName)
+      await this.page.waitForTimeout(2000)
+
+      await this.page.getByPlaceholder('Enter email address').fill(orgEmail)
       await this.page.waitForTimeout(2000)
 
       await this.page.locator("button[type='submit']").click()

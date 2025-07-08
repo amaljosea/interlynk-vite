@@ -172,7 +172,7 @@ const OrgModal = ({ isOpen, onClose, shouldSwitchOrg = false }) => {
             value={email}
             onChange={handleChange}
             onBlur={handleCheckEmail}
-            placeholder='Enter Email Address'
+            placeholder='Enter email address'
           />
           {emailError !== '' && (
             <FormErrorMessage>{emailError}</FormErrorMessage>
