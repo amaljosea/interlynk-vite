@@ -1,6 +1,6 @@
 import { gql, useMutation } from '@apollo/client'
 import Cookies from 'js-cookie'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import OrgModal from 'views/Dashboard/Profile/components/OrgModal'
 
@@ -51,10 +51,11 @@ const GetMyOrganizations = gql`
   }
 `
 const GetAllOrganizations = gql`
-  query AllOrganizations(
+  query GetAllOrganizations(
     $status: OrganizationStatusEnum
     $tier: OrganizationTierEnum
     $orderBy: OrganizationOrderByInput
+    $search: String
     $after: String
     $before: String
     $first: Int
@@ -64,6 +65,7 @@ const GetAllOrganizations = gql`
       status: $status
       tier: $tier
       orderBy: $orderBy
+      search: $search
       after: $after
       before: $before
       first: $first
@@ -94,16 +96,20 @@ const OrganizationTable = () => {
   const { organization } = useGlobalState()
   const isSuperAdmin = organization?.currentUser?.superAdmin
   const CREATE = useDisclosure()
+
+  const [searchInput, setSearchInput] = useState('')
   const [filters, setFilters] = useState({
     tier: '',
     status: '',
+    search: '',
     orderBy: { field: 'ORGANIZATIONS_CREATED_AT', direction: 'DESC' }
   })
-  const { tier, status, orderBy } = filters || {}
+  const { search, tier, status, orderBy } = filters || {}
 
   const [switchOrg] = useMutation(SwitchOrganization)
 
   const {
+    reset,
     nodes: allOrgs,
     loading: allOrgLoading,
     paginationProps: allPaginationProps
@@ -113,6 +119,7 @@ const OrganizationTable = () => {
     variables: {
       orderBy,
       tier: tier !== '' ? tier : undefined,
+      search: search !== '' ? search : undefined,
       status: status !== '' ? status : undefined
     }
   })
@@ -157,6 +164,34 @@ const OrganizationTable = () => {
     }
   }
 
+  const handleClear = useCallback(async () => {
+    setSearchInput('')
+    setFilters((prev) => ({ ...prev, search: '' }))
+  }, [])
+
+  const onSearchInputChange = useCallback(
+    (e) => {
+      const { value } = e.target
+      if (value === '') {
+        handleClear()
+      } else {
+        setSearchInput(value)
+      }
+    },
+    [handleClear]
+  )
+
+  const handleSearch = useCallback(
+    async (event) => {
+      const { value } = event.target
+      if (event.key === 'Enter') {
+        setFilters((prev) => ({ ...prev, search: value }))
+        reset()
+      }
+    },
+    [reset]
+  )
+
   const handleSort = (column, sortDirection) => {
     setFilters((prev) => ({
       ...prev,
@@ -168,7 +203,15 @@ const OrganizationTable = () => {
   }
 
   const columns = OrganizationColumns({ action })
-  const subHeader = OrganizationHeader({ action, filters, setFilters })
+  const subHeader = OrganizationHeader({
+    action,
+    filters,
+    setFilters,
+    searchInput,
+    handleClear,
+    handleSearch,
+    onSearchInputChange
+  })
 
   return (
     <>

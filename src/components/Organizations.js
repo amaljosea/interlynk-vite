@@ -75,17 +75,21 @@ const Organizations = () => {
       })
   }
 
+  const allOrgVariables = {
+    first: 10,
+    status: 'approved',
+    orderBy: { field: 'ORGANIZATIONS_CREATED_AT', direction: 'DESC' }
+  }
+
   const handleFetch = async () => {
     setSearchInput('')
     if (isSuperAdmin) {
-      await getAllOrg({ variables: { first: 10, status: 'approved' } }).then(
-        (res) => {
-          if (res?.data?.allOrganizations?.nodes?.length > 0) {
-            setTotal(res?.data?.allOrganizations?.totalCount || 0)
-            setOptions(res?.data?.allOrganizations?.nodes)
-          }
+      await getAllOrg({ variables: { ...allOrgVariables } }).then((res) => {
+        if (res?.data?.allOrganizations?.nodes?.length > 0) {
+          setTotal(res?.data?.allOrganizations?.totalCount || 0)
+          setOptions(res?.data?.allOrganizations?.nodes)
         }
-      )
+      })
     } else {
       await getMyOrg({
         variables: { first: 10, invitationStatuses: ['ACCEPTED', 'INVITED'] }
@@ -109,12 +113,13 @@ const Organizations = () => {
   const handleFilter = (e) => {
     const { value } = e.target
     if (e.key === 'Enter') {
-      const filteredOptions = options.filter(
-        (item) =>
-          item.name.toLowerCase().includes(value.toLowerCase()) ||
-          item.id.toLowerCase().includes(value.toLowerCase())
-      )
-      setOptions(filteredOptions)
+      getAllOrg({
+        variables: { ...allOrgVariables, search: value }
+      }).then((res) => {
+        if (res?.data?.allOrganizations?.nodes?.length > 0) {
+          setOptions(res?.data?.allOrganizations?.nodes)
+        }
+      })
     }
   }
 
@@ -204,8 +209,11 @@ const Organizations = () => {
                   onKeyDown={handleFilter}
                   placeholder='Search organization'
                 />
-                <InputRightElement hidden={searchInput === ''}>
-                  <LuX size={18} onClick={() => setSearchInput('')} />
+                <InputRightElement
+                  cursor={'pointer'}
+                  hidden={searchInput === ''}
+                >
+                  <LuX size={18} onClick={() => handleFetch()} />
                 </InputRightElement>
               </InputGroup>
             )}

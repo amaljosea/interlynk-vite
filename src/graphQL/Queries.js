@@ -62,7 +62,12 @@ export const UserSettings = gql`
 `
 
 export const GetUsersForExport = gql`
-  query GetUsersForExport($first: Int, $last: Int, $after: String, $before: String) {
+  query GetUsersForExport(
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
     organization {
       users(after: $after, before: $before, first: $first, last: $last) {
         nodes {
@@ -254,8 +259,18 @@ export const MyOrganizations = gql`
 
 // LIST CURRENT USER'S ORGANIZATIONS
 export const AllOrganizations = gql`
-  query AllOrganizations($first: Int, $status: OrganizationStatusEnum) {
-    allOrganizations(first: $first, status: $status) {
+  query AllOrganizations(
+    $search: String
+    $first: Int
+    $status: OrganizationStatusEnum
+    $orderBy: OrganizationOrderByInput
+  ) {
+    allOrganizations(
+      first: $first
+      status: $status
+      search: $search
+      orderBy: $orderBy
+    ) {
       totalCount
       nodes {
         id

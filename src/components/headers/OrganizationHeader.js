@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 import {
   Flex,
@@ -15,7 +16,15 @@ import MenuHeading from 'components/Misc/MenuHeading'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 
-const OrganizationHeader = ({ action, filters, setFilters }) => {
+const OrganizationHeader = ({
+  action,
+  filters,
+  setFilters,
+  searchInput,
+  handleClear,
+  handleSearch,
+  onSearchInputChange
+}) => {
   const { organization } = useGlobalState()
   const isSuperAdmin = organization?.currentUser?.superAdmin
 
@@ -37,6 +46,10 @@ const OrganizationHeader = ({ action, filters, setFilters }) => {
       overflowY: 'scroll'
     }
 
+    const refetch = [
+      isSuperAdmin ? 'GetAllOrganizations' : 'GetMyOrganizations'
+    ]
+
     return (
       <Flex
         w={'100%'}
@@ -49,6 +62,15 @@ const OrganizationHeader = ({ action, filters, setFilters }) => {
           alignItems={'center'}
           hidden={!isSuperAdmin}
         >
+          {isSuperAdmin && (
+            <SearchFilter
+              id='organization'
+              onClear={handleClear}
+              onFilter={handleSearch}
+              filterText={searchInput}
+              onChange={onSearchInputChange}
+            />
+          )}
           <Menu closeOnSelect={false} isLazy>
             <MenuHeading title={'Tier'} active={tier !== ''} />
             <MenuList sx={menuListStyle}>
@@ -98,11 +120,21 @@ const OrganizationHeader = ({ action, filters, setFilters }) => {
             aria-label='add_organization'
             onClick={() => action('add_organization', null)}
           />
-          <RefreshBtn />
+          <RefreshBtn queries={refetch} />
         </Stack>
       </Flex>
     )
-  }, [action, isSuperAdmin, setFilters, status, tier])
+  }, [
+    action,
+    handleClear,
+    handleSearch,
+    isSuperAdmin,
+    onSearchInputChange,
+    searchInput,
+    setFilters,
+    status,
+    tier
+  ])
 }
 
 export default OrganizationHeader
