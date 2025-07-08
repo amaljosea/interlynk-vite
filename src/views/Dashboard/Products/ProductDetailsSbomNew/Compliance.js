@@ -1,25 +1,29 @@
+/* eslint-disable no-unused-vars */
 import { useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { isSbomArchived } from 'utils'
-import { complianceList } from 'variables/general'
+import { isSbomArchived, truncatedValue } from 'utils'
+import { COMPLIANCES } from 'variables/general'
 import ComplianceChecks from 'views/Sbom/components/ComplianceChecks'
 
 import {
   Box,
   Button,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
   Flex,
   Img,
   Link,
   SimpleGrid,
+  SkeletonCircle,
+  SkeletonText,
   Spinner,
   Text,
   chakra,
   useDisclosure
 } from '@chakra-ui/react'
-
-import Card from 'components/Card/Card'
-import LynkLoader from 'components/Misc/LynkLoader'
 
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -60,9 +64,9 @@ const Compliance = ({ sbomData }) => {
     }
   )
 
-  const { activeCompliances } = compliances?.organization || ''
-  const { nodes: ntiaData } = ntiaResult?.complianceReports || ''
-  const { nodes: fdaData } = fdaResult?.complianceReports || ''
+  const { activeCompliances } = compliances?.organization || {}
+  const { nodes: ntiaData } = ntiaResult?.complianceReports || {}
+  const { nodes: fdaData } = fdaResult?.complianceReports || {}
   const fda = fdaData?.length > 0 ? fdaData[0] : []
   const ntia = ntiaData?.length > 0 ? ntiaData[0] : []
 
@@ -71,47 +75,56 @@ const Compliance = ({ sbomData }) => {
     onOpen()
   }
 
-  const filterData = activeCompliances?.filter(
-    (item) => item?.complianceType !== 'unspecified'
-  )
+  // const filterData = activeCompliances?.filter(
+  //   (item) => item?.complianceType !== 'unspecified'
+  // )
+
+  // const getTitle = (type) =>
+  //   COMPLIANCES?.find((item) => item?.slug === type)?.title
+
+  // const getDesc = (type) =>
+  //   COMPLIANCES?.find((item) => item?.slug === type)?.desc
+
+  // const getIcon = (type) =>
+  //   COMPLIANCES?.find((item) => item?.slug === type)?.logo
 
   const getScore = (type) => {
     switch (type) {
-      case 'fda':
+      case 'FDA Cybersecurity Compliance':
         return fdaLoading ? (
           <Spinner size='xs' />
         ) : (
           `${fda?.score === '0 %' || fda?.score === 'NaN %' ? 'N/A' : Math.round(fda?.score)} %`
         )
-      case 'ntia':
+      case 'NTIA Minimum Elements':
         return ntiaLoading ? (
           <Spinner size='xs' />
         ) : (
           `${ntia?.score === '0 %' || ntia?.score === 'NaN %' ? 'N/A' : Math.round(ntia?.score)} %`
         )
       case 'bsi':
-        return ''
+        return 'N/A'
+      default:
+        return 'N/A'
     }
   }
 
-  const getTitle = (type) =>
-    complianceList?.find((item) => item?.slug === type)?.title
-
-  const getDesc = (type) =>
-    complianceList?.find((item) => item?.slug === type)?.desc
-
-  const getIcon = (type) =>
-    complianceList?.find((item) => item?.slug === type)?.img
-
-  const getLink = (type) =>
-    complianceList?.find((item) => item?.slug === type)?.url
+  const active = ['NTIA Minimum Elements', 'FDA Cybersecurity Compliance']
 
   if (loading) {
     return (
       <SimpleGrid columns={3} spacing={5} mt={2}>
-        {[1, 2, 3].map((item) => (
+        {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
           <Card key={item} border={`1px solid ${grayBorderColor}`}>
-            <LynkLoader />
+            <CardBody>
+              <SkeletonCircle size='10' />
+              <SkeletonText
+                mt='4'
+                noOfLines={4}
+                spacing='4'
+                skeletonHeight='2'
+              />
+            </CardBody>
           </Card>
         ))}
       </SimpleGrid>
@@ -120,17 +133,30 @@ const Compliance = ({ sbomData }) => {
 
   return (
     <>
-      <SimpleGrid columns={3} spacing={5} mt={2}>
-        {filterData?.map((item, index) => (
-          <Card key={index} gap={6} border={`1px solid ${grayBorderColor}`}>
-            <Flex gap={4} alignItems={'center'} justifyContent={'flex-start'}>
+      <SimpleGrid columns={4} spacing={5} mt={2}>
+        {COMPLIANCES?.map((item, index) => (
+          <Card
+            size={'sm'}
+            key={index}
+            variant={'filled'}
+            border={`1px solid ${grayBorderColor}`}
+          >
+            <CardHeader
+              pb={2}
+              gap={4}
+              as={Flex}
+              alignItems={'center'}
+              justifyContent={'flex-start'}
+            >
               <Box>
                 <Img
                   alt='NTIA'
                   mr={'auto'}
+                  height={10}
                   objectFit={'contain'}
-                  src={getIcon(item?.complianceType)}
-                  height={item?.complianceType ? '44px' : '46px'}
+                  src={item?.logo}
+                  // filter={'invert(1) brightness(1.2);'}
+                  // height={item?.complianceType ? '44px' : '46px'}
                 />
               </Box>
               <Text
@@ -139,37 +165,41 @@ const Compliance = ({ sbomData }) => {
                 fontWeight={'medium'}
                 _hover={{ color: primaryBlueText }}
               >
-                {getTitle(item?.complianceType) || ''}
+                {item?.title}
               </Text>
-            </Flex>
-            <Text height={28} fontSize={'14px'} color={headingTextColor}>
-              {getDesc(item?.complianceType) || ''}
-              <chakra.span fontSize={'14px'} color={headingTextColor}>
-                <Link
-                  href={getLink(item?.complianceType)}
-                  isExternal
-                  color={primaryBlueText}
-                >
-                  {' '}
-                  Read more
-                </Link>{' '}
-              </chakra.span>
-            </Text>
-            <Flex alignItems={'center'} justifyContent={'space-between'}>
+            </CardHeader>
+            <CardBody>
+              <Text fontSize={'14px'} color={headingTextColor}>
+                {truncatedValue(item?.desc, 150)}
+                <chakra.span fontSize={'14px'} color={headingTextColor}>
+                  <Link isExternal href={item?.link} color={primaryBlueText}>
+                    {' '}
+                    Read more
+                  </Link>{' '}
+                </chakra.span>
+              </Text>
+            </CardBody>
+            <CardFooter
+              as={Flex}
+              alignItems={'center'}
+              justifyContent={'space-between'}
+            >
               <Text fontSize={'sm'} fontWeight={'medium'}>
-                {item?.complianceType === 'bsi' ? 'Coming soon...' : 'Score'}
+                {active?.includes(item?.title) ? 'Score' : 'Coming soon...'}
               </Text>
               <Button
                 size='sm'
                 fontSize={'xs'}
+                colorScheme='blue'
+                variant={'outline'}
                 isDisabled={isArchived}
                 title='Compliance score'
                 onClick={() => onCheck(index)}
                 hidden={item?.complianceType === 'bsi'}
               >
-                {getScore(item?.complianceType)}
+                {getScore(item?.title)}
               </Button>
-            </Flex>
+            </CardFooter>
           </Card>
         ))}
       </SimpleGrid>

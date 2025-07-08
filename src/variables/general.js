@@ -1,6 +1,11 @@
-import BSI from 'assets/img/bsi_logo.png'
-import FDA from 'assets/img/fda_logo.png'
-import NTIA from 'assets/img/ntia_logo.png'
+import BSI from 'assets/compliance/bsi.svg'
+import CERT from 'assets/compliance/certin.svg'
+import CRA from 'assets/compliance/cra.svg'
+import FDA from 'assets/compliance/fda.svg'
+import NIST from 'assets/compliance/nist.svg'
+import NTIA from 'assets/compliance/ntia.svg'
+import OPENCHAIN from 'assets/compliance/openchain.svg'
+import SEBI from 'assets/compliance/sebi.svg'
 import {
   calculateExpiryDate,
   capitalizeFirstLetter,
@@ -11,6 +16,65 @@ import {
 } from 'utils'
 
 import { Stack, Text } from '@chakra-ui/react'
+
+export const COMPLIANCES = [
+  {
+    id: 1,
+    title: 'NTIA Minimum Elements',
+    desc: `The NTIA (National Telecommunications and Information Administration) Minimum Elements for a Software Bill of Materials (SBOM) are a set of guidelines and recommendations that define the essential information an SBOM should contain.`,
+    link: 'https://www.ntia.doc.gov/files/ntia/publications/sbom_minimum_elements_report.pdf',
+    logo: NTIA
+  },
+  {
+    id: 2,
+    title: 'FDA Cybersecurity Compliance',
+    desc: `SBOM requirements from FDA issued the final guidance Cybersecurity in Medical Devices: Quality System Considerations and Content of Premarket Submissions.`,
+    link: 'https://www.fda.gov/media/119933/download',
+    logo: FDA
+  },
+  {
+    id: 3,
+    title: 'Cyber Resilience Act',
+    desc: `SBOM requirements from Cyber Resilience Act (CRA) to enhance cybersecurity standards of products that contain a digital component, requiring manufacturers and retailers to ensure cybersecurity throughout the lifecycle of their products.`,
+    link: 'https://digital-strategy.ec.europa.eu/en/policies/cyber-resilience-act',
+    logo: CRA
+  },
+  {
+    id: 4,
+    title: 'OpenChain Telco SBOM Guide',
+    desc: `OpenChain Telco SBOM Guide aims to outline certain requirements related to how an entity creates, delivers, and consumes Software Bill of Materials (SBOM) for the streamlining of tools and processes for generating and consuming SBOMs.`,
+    link: 'https://github.com/OpenChain-Project/Telco-WG/blob/main/OpenChain-Telco-SBOM-Guide_1.0_EN.md',
+    logo: OPENCHAIN
+  },
+  {
+    id: 5,
+    title: 'NIST PQC Standardization',
+    desc: `NIST PQC (Post-Quantum Cryptography) compliance refers to the adoption and implementation of cryptographic algorithms designed to be secure against attacks from both classical and future quantum computers. The National Institute of Standards and Technology (NIST) has been leading the effort to standardize these algorithms through a public process.`,
+    link: 'https://csrc.nist.gov/Projects/post-quantum-cryptography/publications',
+    logo: NIST
+  },
+  {
+    id: 6,
+    title: 'BSI TR-03183 v2.0.0',
+    desc: `The Technical Guideline TR-03183: Cyber Resilience Requirements for Manufacturers and Products aims to provide manufacturers with advance access to the type of requirements that will be imposed on them by the future Cyber Resilience Act (CRA) of the EU.`,
+    link: 'https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/TechGuidelines/TR03183/BSI-TR-03183-2.pdf?__blob=publicationFile&v=5',
+    logo: BSI
+  },
+  {
+    id: 7,
+    title: 'SEBI CSCRF',
+    desc: `SEBI had issued Cybersecurity and Cyber resilience framework for Market Infrastructure Institutions (MIIs) in 2015. Subsequently, SEBI had issued other Cybersecurity and Cyber resilience frameworks in line with MIIs circular of 2015 for following REs.`,
+    link: 'https://www.sebi.gov.in/legal/circulars/aug-2024/cybersecurity-and-cyber-resilience-framework-cscrf-for-sebi-regulated-entities-res-_85964.html',
+    logo: SEBI
+  },
+  {
+    id: 8,
+    title: 'CERT-In SBOM Guidelines',
+    desc: `CERT-In SBOM guidelines offer a structured approach to creating, managing, and sharing detailed SBOMs, facilitating improved vulnerability management and risk mitigation. They are intended for use by suppliers, developers, and software-consuming organizations.`,
+    link: 'https://www.cert-in.org.in/PDF/SBOM_Guidelines.pdf',
+    logo: CERT
+  }
+]
 
 export const componentLinkTypes = [
   'vcs',
