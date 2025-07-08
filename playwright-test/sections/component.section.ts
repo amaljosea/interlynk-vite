@@ -341,7 +341,11 @@ export default class ComponentSection {
           await this.page.keyboard.press('Enter')
           await this.page.waitForTimeout(1000)
 
-          this.page.locator('input#relationTo').fill('antlr')
+          await this.page
+            .locator('#relationTo div')
+            .filter({ hasText: '--Select Component--' })
+            .nth(1)
+            .click()
           await this.page.waitForTimeout(1000)
           await this.page.keyboard.press('Enter')
 
