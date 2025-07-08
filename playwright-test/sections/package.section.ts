@@ -65,20 +65,24 @@ export default class Package {
     await this.page.locator("//a[@aria-label='package']").click()
     await this.page.waitForTimeout(3000)
 
-    await this.page.keyboard.press('ControlOrMeta+/')
-    await this.page
-      .getByPlaceholder('Search', { exact: true })
-      .fill('classmate')
-    await this.page.getByPlaceholder('Search', { exact: true }).press('Enter')
+    await this.page.reload()
     await this.page.waitForTimeout(3000)
 
-    await this.page.getByTestId('package_actions').first().click()
-    await this.page.getByTestId('create_override').first().click()
+    await this.page.getByRole('textbox', { name: 'Search' }).click()
+    await this.page.getByRole('textbox', { name: 'Search' }).fill('classmate')
+    await this.page.getByRole('textbox', { name: 'Search' }).press('Enter')
+    await this.page.waitForTimeout(3000)
+
+    await this.page
+      .getByRole('row', { name: 'classmate maven 1.5.1 Apache-' })
+      .getByTestId('package_actions')
+      .click()
+    await this.page.getByRole('menuitem', { name: 'Create override' }).click()
     await this.page.waitForTimeout(3000)
 
     await this.page.getByRole('textbox', { name: 'Copyright' }).fill('Testing')
     await this.page.getByRole('textbox', { name: 'Notice' }).fill('Testing')
-    await this.page.getByRole('combobox').fill('mit')
+    await this.page.getByRole('combobox').fill('apache')
     await this.page.waitForTimeout(3000)
     await this.page.keyboard.press('Enter')
 
@@ -90,8 +94,14 @@ export default class Package {
     await this.page.locator("//a[@aria-label='package']").click()
     await this.page.waitForTimeout(3000)
 
-    await this.page.getByTestId('package_actions').first().click()
-    await this.page.getByTestId('update_override').first().click()
+    await this.page.getByRole('tab', { name: 'Package Overrides' }).click()
+    await this.page.waitForTimeout(3000)
+
+    await this.page
+      .getByRole('row', { name: 'classmate • Override maven 1.' })
+      .getByTestId('package_actions')
+      .click()
+    await this.page.getByRole('menuitem', { name: 'Update override' }).click()
     await this.page.waitForTimeout(3000)
 
     await this.page
@@ -112,8 +122,14 @@ export default class Package {
     await this.page.locator("//a[@aria-label='package']").click()
     await this.page.waitForTimeout(3000)
 
-    await this.page.getByTestId('package_actions').first().click()
-    await this.page.getByTestId('delete_override').first().click()
+    await this.page.getByRole('tab', { name: 'Package Overrides' }).click()
+    await this.page.waitForTimeout(3000)
+
+    await this.page
+      .getByRole('row', { name: 'classmate • Override maven 1.' })
+      .getByTestId('package_actions')
+      .click()
+    await this.page.getByRole('menuitem', { name: 'Delete override' }).click()
     await this.page.waitForTimeout(3000)
   }
 
