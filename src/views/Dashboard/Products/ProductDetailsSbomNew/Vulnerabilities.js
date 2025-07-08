@@ -502,6 +502,7 @@ const Vulnerabilities = ({ sbomData }) => {
         <CustomVuln
           isOpen={CUSTOM_VULNS.isOpen}
           onClose={CUSTOM_VULNS.onClose}
+          primaryComponent={sbomData?.primaryComponent}
         />
       )}
 

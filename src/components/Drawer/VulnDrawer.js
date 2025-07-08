@@ -25,6 +25,7 @@ import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useLazyDropDown } from 'hooks/useLazyDropDown'
 import { useSelect } from 'hooks/useSelect'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CustomVulnUpdate } from 'graphQL/Mutation'
 import { GetAllComponents, verfifyCustomVuln } from 'graphQL/Queries'
@@ -104,6 +105,8 @@ const VulnDrawer = ({ data, isOpen, onClose }) => {
       DropdownIndicator: CustomDropdownIndicator
     }
   })
+
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -277,7 +280,15 @@ const VulnDrawer = ({ data, isOpen, onClose }) => {
                 name='componentId'
                 {...{
                   ...lazyDropDownProps,
-                  styles: style,
+                  styles: {
+                    ...style,
+                    placeholder: (provided, state) => ({
+                      ...(style && style.placeholder
+                        ? style.placeholder(provided, state)
+                        : provided),
+                      color: primaryTextColor
+                    })
+                  },
                   isDisabled: lazyDropDownProps.isLoading,
                   placeholder:
                     firstSbomComponentName && firstSbomComponentVersion

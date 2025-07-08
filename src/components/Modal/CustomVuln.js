@@ -1,7 +1,8 @@
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { useLazyQuery, useMutation } from '@apollo/client'
 import { PackageURL } from 'packageurl-js'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import AsyncSelect from 'react-select/async'
 import { formatString, getSignedUrlParams } from 'utils'
 import { validateCPEString } from 'utils/cpeUtils'
 import { severityList } from 'variables/general'
@@ -21,24 +22,26 @@ import LynkAlert from 'components/LynkAlert'
 import LynkDate from 'components/LynkDate'
 import LynkModal from 'components/LynkModal'
 import LynkSelect from 'components/LynkSelect'
+import CustomDropdownIndicator from 'components/Misc/CustomDropdownIndicator'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useLazyDropDown } from 'hooks/useLazyDropDown'
+import { useSelect } from 'hooks/useSelect'
+import { useThemeColor } from 'hooks/useThemeColors'
 
 import { CustomVulnCreate } from 'graphQL/Mutation'
-import {
-  CveLookup,
-  GetAllComponents,
-  GetTotalComponents
-} from 'graphQL/Queries'
+import { CveLookup, GetAllComponents } from 'graphQL/Queries'
 
 import { LuBug, LuSearch } from 'react-icons/lu'
 
-const CustomVuln = ({ isOpen, onClose }) => {
+const CustomVuln = ({ isOpen, onClose, primaryComponent }) => {
   const params = useParams()
   const { showToast } = useCustomToast()
   const { prodCompState } = useGlobalState()
   const signedUrlParams = getSignedUrlParams()
+  const { style } = useSelect('lynkSelect')
+  const { primaryTextColor } = useThemeColor(['primaryTextColor'])
 
   const { field, direction } = prodCompState
   const compState = {
@@ -50,24 +53,6 @@ const CustomVuln = ({ isOpen, onClose }) => {
 
   const [createVuln, { loading }] = useMutation(CustomVulnCreate)
   const [lookup, { loading: cveLoading }] = useLazyQuery(CveLookup)
-  const { data: compData } = useQuery(GetTotalComponents, {
-    skip: isOpen && params?.sbomid ? false : true,
-    variables: { ...compState }
-  })
-
-  const { data: allComponents, loading: compLoading } = useQuery(
-    GetAllComponents,
-    {
-      skip: isOpen && params?.sbomid ? false : true,
-      variables: {
-        ...compState,
-        first: compData?.sbom?.components?.totalCount
-      }
-    }
-  )
-
-  const { components } = allComponents?.sbom || {}
-  const { nodes } = components || {}
 
   const [error, setError] = useState('')
   const [cve, setCve] = useState('')
@@ -87,6 +72,36 @@ const CustomVuln = ({ isOpen, onClose }) => {
     cvssVector: undefined,
     advisories: []
   })
+
+  const { lazyDropDownProps } = useLazyDropDown(GetAllComponents, {
+    skip: isOpen && params?.sbomid ? false : true,
+    selector: 'sbom.components',
+    variables: {
+      ...compState,
+      first: 5,
+      orderBy: {
+        direction: 'ASC',
+        field: 'COMPONENTS_NAME'
+      }
+    },
+    onChange: (selected) => onChangeComponent(selected),
+    optionLabel: (item) =>
+      `${item.name} - ${item.version}${item.primary ? ' [primary component]' : ''}`,
+    optionValue: 'id',
+    defaultFirstOption: primaryComponent
+      ? {
+          id: primaryComponent.id,
+          name: primaryComponent.name,
+          version: `${primaryComponent.version}${primaryComponent ? ' [primary component]' : ''}`
+        }
+      : undefined,
+    components: {
+      IndicatorSeparator: () => null,
+      DropdownIndicator: CustomDropdownIndicator
+    }
+  })
+
+  const { isLoading, nodes } = lazyDropDownProps
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -162,8 +177,12 @@ const CustomVuln = ({ isOpen, onClose }) => {
     }
   }
 
+  useEffect(() => {
+    setCompId(primaryComponent?.id)
+  }, [primaryComponent])
+
   const onChangeComponent = (selectedItem) => {
-    setCompId(selectedItem.value)
+    setCompId(selectedItem.id)
     setError('')
   }
 
@@ -197,15 +216,6 @@ const CustomVuln = ({ isOpen, onClose }) => {
     purlError !== '' ||
     cpeError !== ''
 
-  useEffect(() => {
-    if (components?.nodes?.length > 0) {
-      const component = components?.nodes?.find(
-        (item) => item?.primary === true
-      )
-      setCompId(component?.id)
-    }
-  }, [components])
-
   const sevOptions = [
     { label: '-- Select --', value: '' },
     ...severityList.map((item) => ({
@@ -213,24 +223,6 @@ const CustomVuln = ({ isOpen, onClose }) => {
       value: item
     }))
   ]
-  const compOptions = [
-    { label: '-- Select --', value: '' },
-    ...(nodes ?? []) // Ensures nodes is always an array
-      .sort((a, b) => (a?.name || '').localeCompare(b?.name || ''))
-      .map((item) => ({
-        label: `${item?.name}-${item?.version}${item?.primary ? ' [Primary Component]' : ''}`,
-        value: item?.id
-      }))
-  ]
-
-  const CompValue = nodes?.find((item) => item.id === compId)
-    ? {
-        label: `${nodes?.find((item) => item.id === compId).name}-${
-          nodes?.find((item) => item.id === compId).version
-        }${nodes?.find((item) => item.id === compId).primary ? ' [Primary Component]' : ''}`,
-        value: compId
-      }
-    : null
 
   return (
     <LynkModal
@@ -351,17 +343,28 @@ const CustomVuln = ({ isOpen, onClose }) => {
           />
           <FormErrorMessage>{cpeError}</FormErrorMessage>
         </FormControl>
-        {!compLoading && nodes && (
+        {!isLoading && nodes && (
           <FormControl>
             <FormLabel htmlFor='componentId'>Component</FormLabel>
-            <LynkSelect
+            <AsyncSelect
               name='componentId'
-              value={CompValue}
-              onChange={(selected) => onChangeComponent(selected)}
-              options={compOptions}
-              dropDown
+              {...{
+                ...lazyDropDownProps,
+                styles: {
+                  ...style,
+                  placeholder: (provided, state) => ({
+                    ...(style && style.placeholder
+                      ? style.placeholder(provided, state)
+                      : provided),
+                    color: primaryTextColor
+                  })
+                },
+                isDisabled: lazyDropDownProps.isLoading,
+                placeholder: primaryComponent
+                  ? `${primaryComponent.name}-${primaryComponent.version}${primaryComponent ? ' [primary component]' : ''}`
+                  : undefined
+              }}
               menuPlacement='top'
-              placeholder={'-- Select --'}
             />
           </FormControl>
         )}
