@@ -23,6 +23,9 @@ export default class TokenSection {
 
       await this.page.getByRole('menuitemradio', { name: 'personal' }).click()
 
+      await this.page.getByRole('tab', { name: 'Security Tokens' }).click()
+      await this.page.waitForTimeout(3000)
+
       await this.page.getByTestId('new_token').click()
 
       await this.page.getByLabel('Token Name*').fill(tokenName)
