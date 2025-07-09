@@ -343,7 +343,7 @@ const CustomVuln = ({ isOpen, onClose, primaryComponent }) => {
           />
           <FormErrorMessage>{cpeError}</FormErrorMessage>
         </FormControl>
-        {!isLoading && nodes && (
+        {params?.sbomid && !isLoading && nodes && (
           <FormControl>
             <FormLabel htmlFor='componentId'>Component</FormLabel>
             <AsyncSelect
