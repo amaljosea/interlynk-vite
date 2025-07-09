@@ -135,7 +135,7 @@ export const downloadAttributionHtml = async (
               (licenseObj) => `
               <div class="license-item">
                 <span class="license-short-id">${licenseObj?.key || ''}</span>
-                <div class="license-text-content">${licenseObj?.value || ''}</div>
+                <pre class="license-text-content">${licenseObj?.value || ''}</pre>
               </div>
             `
             )
@@ -285,20 +285,18 @@ export const downloadAttributionHtml = async (
     .toc-group-header h3 { font-size: 16px; font-weight: bold; margin-top: 20px; margin-bottom: 5px; color: #000000; }
 
     /* Component Section Styles */
-    .component-section {
-      padding: 40px;
-      break-before: page; /* For printing */
-    }
+  
     .component-header {
         display: flex;
         align-items: center;
         border-bottom: 1px solid #D3D3D3;
         padding-bottom: 10px;
-        margin-bottom: 20px;
+       
         position: sticky; /* Make header sticky when scrolling */
         top: 0;
         background-color: #fff;
         z-index: 10;
+        margin: 10px 40px;
     }
     .back-to-contents {
         font-size: 0.9em;
@@ -322,7 +320,7 @@ export const downloadAttributionHtml = async (
     }
 
     .component-content {
-      margin-top: 20px;
+     margin: 40px;
     }
 
     .patches-container{
@@ -342,7 +340,7 @@ export const downloadAttributionHtml = async (
 
     .license-text-container { margin-top: 15px; margin-bottom: 15px; }
     .license-text-label { font-weight: bold; font-size: 16px; color: #000000; margin-bottom: 10px; }
-    .license-text-content { font-size: 13.33px; color: #323232; line-height: 1.4; white-space: pre-wrap; word-wrap: break-word; max-width: 100%; }
+    .license-text-content { font-size: 13.33px; color: #323232; line-height: 1.4; overflow-wrap: anywhere; word-wrap: break-word; max-width: 100%; white-space: normal; font-family: Arial, Helvetica, sans-serif;  }
     .license-item { margin-bottom: 8px; }
     .license-short-id { font-weight: normal; color: #323232; font-size: 15px; }
 
