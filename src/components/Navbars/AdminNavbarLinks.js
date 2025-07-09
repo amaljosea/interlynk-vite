@@ -9,7 +9,7 @@ import { Button, Flex, IconButton, useColorMode } from '@chakra-ui/react'
 import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
 
 import Loading from 'components/Misc/Loading'
-import Organizations from 'components/Organizations'
+import OrgMenu from 'components/OrgMenu'
 // Custom Components
 import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 
@@ -109,7 +109,7 @@ export default function AdminNavbarLinks(props) {
       </Menu>
 
       {/* ORGANIZATIONS */}
-      {!signedUrlParams && organization && <Organizations />}
+      {!signedUrlParams && organization && <OrgMenu />}
 
       {/* USER MENU */}
       {!signedUrlParams && <UserMenu handleLogout={handleLogout} />}
