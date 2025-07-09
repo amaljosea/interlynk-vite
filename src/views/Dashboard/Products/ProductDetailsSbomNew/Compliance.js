@@ -113,7 +113,7 @@ const Compliance = ({ sbomData }) => {
 
   if (loading) {
     return (
-      <SimpleGrid columns={3} spacing={5} mt={2}>
+      <SimpleGrid columns={4} spacing={5} mt={2}>
         {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
           <Card key={item} border={`1px solid ${grayBorderColor}`}>
             <CardBody>
@@ -135,12 +135,7 @@ const Compliance = ({ sbomData }) => {
     <>
       <SimpleGrid columns={4} spacing={5} mt={2}>
         {COMPLIANCES?.map((item, index) => (
-          <Card
-            size={'sm'}
-            key={index}
-            variant={'filled'}
-            border={`1px solid ${grayBorderColor}`}
-          >
+          <Card key={index} variant={'outline'}>
             <CardHeader
               pb={2}
               gap={4}
@@ -150,11 +145,11 @@ const Compliance = ({ sbomData }) => {
             >
               <Box>
                 <Img
-                  alt='NTIA'
                   mr={'auto'}
                   height={10}
-                  objectFit={'contain'}
                   src={item?.logo}
+                  alt={item?.title}
+                  objectFit={'contain'}
                   // filter={'invert(1) brightness(1.2);'}
                   // height={item?.complianceType ? '44px' : '46px'}
                 />

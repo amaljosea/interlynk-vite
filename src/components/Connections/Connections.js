@@ -1,7 +1,14 @@
 import { useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
-import { Flex, Text, useColorMode, useDisclosure } from '@chakra-ui/react'
+import {
+  Box,
+  SimpleGrid,
+  Stack,
+  Text,
+  useColorMode,
+  useDisclosure
+} from '@chakra-ui/react'
 
 import CustomLoader from 'components/CustomLoader'
 
@@ -23,9 +30,6 @@ import githubBlackPng from '../../assets/img/github-black.png'
 import githubWhitePng from '../../assets/img/github-white.png'
 import linearDark from '../../assets/img/linear_dark.png'
 import linearLight from '../../assets/img/linear_light.png'
-import Card from '../Card/Card'
-import CardBody from '../Card/CardBody'
-import CardHeader from '../Card/CardHeader'
 import BitbucketConfigModal from './BitbucketConfigModal'
 import ConnectionCard from './ConnectionCard'
 import EmailConfigModal from './EmailConfigModal'
@@ -176,8 +180,8 @@ const Connections = ({ org }) => {
 
   return (
     <>
-      <Card p={0} boxShadow='none'>
-        <CardHeader mb={'16px'} display={'flex'} flexDirection={'column'}>
+      <Stack spacing={6}>
+        <Box>
           <Text fontSize='lg' color={primaryTextColor} fontWeight='bold'>
             Manage Integrations
           </Text>
@@ -185,78 +189,74 @@ const Connections = ({ org }) => {
             Manage integration with other applications to streamline workflows
             and notifications
           </Text>
-        </CardHeader>
-        <CardBody>
-          <Flex wrap='wrap' gap={'20px'}>
-            {org && !isFreeTier && (
-              <ConnectionCard
-                name='Bitbucket'
-                iconSrc={bitbucketPng}
-                color={primaryBlueText}
-                onConfigure={BITBUCKET.onOpen}
-                isConnected={greenCheck.bitbucket}
-                description={getDescription('BitBucket')}
-              />
-            )}
-            {org && !isFreeTier && (
-              <ConnectionCard
-                iconSrc={jiraPng}
-                name='Jira'
-                onConfigure={JIRA.onOpen}
-                isConnected={greenCheck.jira}
-                description={getDescription('Jira')}
-              />
-            )}
-            {org && !isFreeTier && (
-              <ConnectionCard
-                name='Linear'
-                onConfigure={LINEAR.onOpen}
-                isConnected={greenCheck.linear}
-                description={getDescription('Linear')}
-                iconSrc={colorMode === 'light' ? linearDark : linearLight}
-              />
-            )}
-            {!isFreeTier && (
-              <ConnectionCard
-                iconSrc={slackPng}
-                name='Slack'
-                onConfigure={SLACK.onOpen}
-                isConnected={greenCheck.slack}
-                description={getDescription('Slack')}
-              />
-            )}
-            {!isFreeTier && (
-              <ConnectionCard
-                iconSrc={teamsPng}
-                name='Teams'
-                onConfigure={TEAM.onOpen}
-                isConnected={greenCheck.teams}
-                description={getDescription('Teams')}
-              />
-            )}
+        </Box>
+        <SimpleGrid columns={4} gap={4}>
+          {org && !isFreeTier && (
             <ConnectionCard
-              iconSrc={mailPng}
-              name='Email'
-              onConfigure={EMAIL.onOpen}
-              isConnected={greenCheck.email}
-              description={getDescription('Email')}
+              name='Bitbucket'
+              iconSrc={bitbucketPng}
+              color={primaryBlueText}
+              onConfigure={BITBUCKET.onOpen}
+              isConnected={greenCheck.bitbucket}
+              description={getDescription('BitBucket')}
             />
-            {org && shouldShowDemoFeatures && (
-              <ConnectionCard
-                name='Github'
-                onConfigure={GITHUB.onOpen}
-                isConnected={greenCheck.github}
-                isDisabled={!updateCon}
-                color={primaryTextColor}
-                description={getDescription('Github')}
-                iconSrc={
-                  colorMode === 'light' ? githubBlackPng : githubWhitePng
-                }
-              />
-            )}
-          </Flex>
-        </CardBody>
-      </Card>
+          )}
+          {org && !isFreeTier && (
+            <ConnectionCard
+              iconSrc={jiraPng}
+              name='Jira'
+              onConfigure={JIRA.onOpen}
+              isConnected={greenCheck.jira}
+              description={getDescription('Jira')}
+            />
+          )}
+          {org && !isFreeTier && (
+            <ConnectionCard
+              name='Linear'
+              onConfigure={LINEAR.onOpen}
+              isConnected={greenCheck.linear}
+              description={getDescription('Linear')}
+              iconSrc={colorMode === 'light' ? linearDark : linearLight}
+            />
+          )}
+          {!isFreeTier && (
+            <ConnectionCard
+              iconSrc={slackPng}
+              name='Slack'
+              onConfigure={SLACK.onOpen}
+              isConnected={greenCheck.slack}
+              description={getDescription('Slack')}
+            />
+          )}
+          {!isFreeTier && (
+            <ConnectionCard
+              iconSrc={teamsPng}
+              name='Teams'
+              onConfigure={TEAM.onOpen}
+              isConnected={greenCheck.teams}
+              description={getDescription('Teams')}
+            />
+          )}
+          <ConnectionCard
+            iconSrc={mailPng}
+            name='Email'
+            onConfigure={EMAIL.onOpen}
+            isConnected={greenCheck.email}
+            description={getDescription('Email')}
+          />
+          {org && shouldShowDemoFeatures && (
+            <ConnectionCard
+              name='Github'
+              onConfigure={GITHUB.onOpen}
+              isConnected={greenCheck.github}
+              isDisabled={!updateCon}
+              color={primaryTextColor}
+              description={getDescription('Github')}
+              iconSrc={colorMode === 'light' ? githubBlackPng : githubWhitePng}
+            />
+          )}
+        </SimpleGrid>
+      </Stack>
 
       {BITBUCKET.isOpen && (
         <BitbucketConfigModal

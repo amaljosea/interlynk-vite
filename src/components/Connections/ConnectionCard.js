@@ -1,12 +1,19 @@
-import { Button, Flex, Image, Text } from '@chakra-ui/react'
+import {
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Flex,
+  Image,
+  Text
+} from '@chakra-ui/react'
 
 import { useHasPermission } from 'hooks/useHasPermission'
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { LuCircleCheckBig } from 'react-icons/lu'
-
-import Card from '../Card/Card'
 
 const ConnectionCard = ({
   iconSrc,
@@ -28,15 +35,8 @@ const ConnectionCard = ({
   })
 
   return (
-    <Card
-      width='320px'
-      borderWidth='1px'
-      borderRadius='lg'
-      overflow='hidden'
-      position='relative'
-      padding={'20px'}
-    >
-      <Flex direction='column' height='100%' gap={'16px'}>
+    <Card variant={'outline'}>
+      <CardHeader pb={0}>
         <Flex align='center'>
           <Image
             src={iconSrc}
@@ -54,12 +54,13 @@ const ConnectionCard = ({
             {name}
           </Text>
         </Flex>
-
-        <Text height={'54px'} fontSize={'12px'} color={secondaryTextInverse}>
+      </CardHeader>
+      <CardBody pb={0}>
+        <Text fontSize={'sm'} color={secondaryTextInverse}>
           {description}
         </Text>
-
-        {/* Button */}
+      </CardBody>
+      <CardFooter>
         <Button
           fontSize='sm'
           title='Configure'
@@ -71,7 +72,7 @@ const ConnectionCard = ({
         >
           {isConnected ? 'Configured' : 'Configure'}
         </Button>
-      </Flex>
+      </CardFooter>
     </Card>
   )
 }
