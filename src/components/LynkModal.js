@@ -72,7 +72,7 @@ const LynkModal = ({
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} scrollBehavior='inside'>
+    <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <form onSubmit={handleSubmit}>
         <ModalContent borderRadius='16px' sx={{ maxW: maxW || '600px' }}>
