@@ -6759,6 +6759,17 @@ export const GetVulnProductDetails = gql`
             id
             name
           }
+          componentVulnCustomFields {
+            id
+            componentVulnCustomFieldDefinition {
+              displayName
+            }
+            componentVulnCustomFieldDefinitionId
+            value
+          }
+          componentVulnLogs {
+            updatedAt
+          }
           cdxResponse {
             id
             name
