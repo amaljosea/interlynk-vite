@@ -3,12 +3,11 @@ import { useTour } from '@reactour/tour'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { Flex, Skeleton, Text, useDisclosure } from '@chakra-ui/react'
+import { Flex, Skeleton, Text } from '@chakra-ui/react'
 import { Grid, GridItem } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
-import EnvironmentDrawer from 'components/Drawer/EnvironmentDrawer'
 
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useGradualPolling } from 'hooks/useGradualPolling'
@@ -77,8 +76,6 @@ const ProductDetailsMain = () => {
   )
 
   useGradualPolling({ shouldPoll, startPolling, stopPolling })
-
-  const ENV = useDisclosure()
 
   useEffect(() => {
     if (sbomId === null) {
@@ -203,17 +200,6 @@ const ProductDetailsMain = () => {
           </Flex>
         )}
       </Flex>
-
-      {/* ENV LIST */}
-      {ENV.isOpen && (
-        <EnvironmentDrawer
-          data={data}
-          isOpen={ENV.isOpen}
-          onClose={ENV.onClose}
-          activeEnv={activeEnv}
-          setActiveEnv={setActiveEnv}
-        />
-      )}
     </>
   )
 }
