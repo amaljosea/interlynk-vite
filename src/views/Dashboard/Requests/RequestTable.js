@@ -1,28 +1,18 @@
 import { useMutation } from '@apollo/client'
-import React, { useCallback, useMemo, useState } from 'react'
-import { getFullDate, timeSince } from 'utils'
-import { getStatusColor } from 'utils/styleUtils'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
+import React, { useCallback, useState } from 'react'
 
-import { Flex, Menu, Portal, Stack, Text } from '@chakra-ui/react'
-import { Tooltip, useDisclosure } from '@chakra-ui/react'
-import { Tag, TagLabel } from '@chakra-ui/react'
-import { MenuItem, MenuList } from '@chakra-ui/react'
+import { Stack, useDisclosure } from '@chakra-ui/react'
 
-import AddButton from 'components/Icons/AddButton'
-import RefreshBtn from 'components/Icons/RefreshBtn'
 import LynkTable from 'components/LynkTable'
-import LynkAction from 'components/Misc/LynkAction'
+import RequestColumns from 'components/columns/RequestColumns'
+import RequestHeader from 'components/headers/RequestHeader'
 
 import useCustomToast from 'hooks/useCustomToast'
-import { useHasPermission } from 'hooks/useHasPermission'
-import { useThemeColor } from 'hooks/useThemeColors'
 
 import { RequestCancel, RequestResend } from 'graphQL/Mutation'
 
 import Pagination from '../../../components/Pagination'
 import ConfirmationModal from '../Products/components/ConfirmationModal'
-import Filters from './Filters'
 import RequestAcceptModal from './RequestAcceptModal'
 import RequestModal from './RequestModal'
 
@@ -31,22 +21,12 @@ const RequestTable = (props) => {
 
   const { showToast } = useCustomToast()
 
-  const addReq = useHasPermission({
-    parentKey: 'view_requests',
-    childKey: 'edit_requests'
-  })
-
-  const { primaryTextColor, primaryErrorColor } = useThemeColor([
-    'primaryTextColor',
-    'primaryErrorColor'
-  ])
-
   const [resendRequest] = useMutation(RequestResend)
   const [cancelRequest] = useMutation(RequestCancel)
 
   const { search } = filters
-  const { isOpen, onOpen, onClose } = useDisclosure()
 
+  const REQUEST = useDisclosure()
   const ACCEPT = useDisclosure()
   const WARNING = useDisclosure()
 
@@ -55,10 +35,7 @@ const RequestTable = (props) => {
 
   const setSearchFilter = useCallback(
     (value) => {
-      setFilters((oldFilter) => ({
-        ...oldFilter,
-        search: value
-      }))
+      setFilters((oldFilter) => ({ ...oldFilter, search: value }))
     },
     [setFilters]
   )
@@ -66,20 +43,14 @@ const RequestTable = (props) => {
   // CLEAR SERACH
   const handleClear = useCallback(() => {
     setFilterText('')
-    setFilters((oldFilter) => ({
-      ...oldFilter,
-      search: undefined
-    }))
+    setFilters((oldFilter) => ({ ...oldFilter, search: undefined }))
   }, [setFilters])
 
   // SEARCH COMPONENT
   const handleSearch = useCallback(
     (event) => {
-      const {
-        key,
-        target: { value }
-      } = event
-      if (key === 'Enter') {
+      const { value } = event.target
+      if (event?.key === 'Enter') {
         setSearchFilter(value)
       }
     },
@@ -108,76 +79,18 @@ const RequestTable = (props) => {
     }
   }
 
-  // SUB HEADER
-  const subHeader = useMemo(() => {
-    return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
-        <Stack spacing={3} alignItems={'center'} direction={'row'}>
-          {/* SEARCH COMPONENTS */}
-          <SearchFilter
-            id='support'
-            filterText={filterText}
-            onChange={onSearchInputChange}
-            onClear={handleClear}
-            onFilter={handleSearch}
-          />
-          {/* FILTERS */}
-          <Filters setFilters={setFilters} />
-        </Stack>
-        <Stack spacing={2} alignItems={'center'} direction={'row'}>
-          <AddButton
-            label='Request SBOM'
-            isDisabled={!addReq}
-            onClick={() => {
-              setActiveRow(null)
-              onOpen()
-            }}
-            aria-label='request_sbom'
-          />
-          <RefreshBtn queries={['GetRequests']} />
-        </Stack>
-      </Flex>
-    )
-  }, [
-    addReq,
-    filterText,
-    handleClear,
-    handleSearch,
-    onOpen,
-    onSearchInputChange,
-    setFilters
-  ])
-
   const handleResend = (row) => {
-    resendRequest({
-      variables: {
-        id: row.id
-      }
-    }).then((res) => {
+    resendRequest({ variables: { id: row?.id } }).then((res) => {
       if (res?.data?.requestResend?.errors?.length === 0) {
-        showToast({
-          description: 'Request Resent',
-          status: 'success'
-        })
+        showToast({ description: 'Request Resent', status: 'success' })
       }
     })
   }
 
   const handleCancel = (row) => {
-    cancelRequest({
-      variables: {
-        id: row.id
-      }
-    }).then((res) => {
+    cancelRequest({ variables: { id: row?.id } }).then((res) => {
       if (res?.data?.requestCancel?.errors?.length === 0) {
-        showToast({
-          description: 'Request Canceled',
-          status: 'success'
-        })
+        showToast({ description: 'Request Canceled', status: 'success' })
       }
     })
   }
@@ -187,150 +100,71 @@ const RequestTable = (props) => {
     setActiveRow(row)
   }
 
-  // COLUMNS
-  const columns = [
-    {
-      id: 'EMAIL',
-      name: 'EMAIL',
-      selector: (row) => (
-        <Text fontSize={14} color={primaryTextColor} data-testid='request_id'>
-          {row?.email}
-        </Text>
-      )
-    },
-    {
-      id: 'PRODUCT',
-      name: 'PRODUCT',
-      selector: (row) => {
-        return (
-          <Stack my={4}>
-            <Text fontSize={14} color={primaryTextColor}>
-              {row?.productName}
-            </Text>
-            <Text color={primaryTextColor}>{row?.productVersion}</Text>
-          </Stack>
-        )
-      },
-      wrap: true
-    },
-    {
-      id: 'REQUESTED',
-      name: 'REQUESTED',
-      selector: (row) => (
-        <Tooltip label={getFullDate(row?.requestedAt)} placement={'top'}>
-          <Text fontSize={14} color={primaryTextColor}>
-            {timeSince(row?.requestedAt)}
-          </Text>
-        </Tooltip>
-      ),
-      wrap: true
-    },
-    {
-      id: 'RESPONDED',
-      name: 'RESPONDED',
-      selector: (row) => {
-        const { uploadedAt } = row
-        return (
-          <Tooltip placement={'top'} label={getFullDate(row?.uploadedAt)}>
-            <Text fontSize={14} color={primaryTextColor}>
-              {uploadedAt ? timeSince(row?.uploadedAt) : ''}
-            </Text>
-          </Tooltip>
-        )
-      },
-      wrap: true
-    },
-    {
-      id: 'STATUS',
-      name: 'STATUS',
-      selector: (row) => (
-        <Tag colorScheme={getStatusColor(row?.status)} width={'100px'}>
-          <TagLabel mx={'auto'}>{row?.status}</TagLabel>
-        </Tag>
-      ),
-      width: '10%',
-      wrap: true
-    },
-    {
-      id: 'ACTION',
-      name: 'ACTION',
-      selector: (row) => {
-        return (
-          <Menu>
-            <LynkAction aria-label={`req action for ${row?.email}`} />
-            <Portal>
-              <MenuList fontSize={'sm'}>
-                <MenuItem
-                  isDisabled={!row.blob || !addReq}
-                  onClick={() => handleAccept(row)}
-                  hidden={row.status === 'Accepted'}
-                >
-                  Accept
-                </MenuItem>
-                <MenuItem
-                  isDisabled={!addReq}
-                  aria-label={`resend req ${row?.email}`}
-                  onClick={() => handleResend(row)}
-                >
-                  Resend
-                </MenuItem>
-                <MenuItem
-                  isDisabled={
-                    !addReq ||
-                    row.blob ||
-                    row.status === 'Canceled' ||
-                    row.status === 'Declined'
-                  }
-                  aria-label={`cancel req ${row?.email}`}
-                  color={primaryErrorColor}
-                  onClick={() => {
-                    WARNING.onOpen()
-                    setActiveRow(row)
-                  }}
-                >
-                  Cancel
-                </MenuItem>
-              </MenuList>
-            </Portal>
-          </Menu>
-        )
-      },
-      right: 'true'
+  const action = (type, data) => {
+    setActiveRow(data)
+    switch (type) {
+      case 'request':
+        return REQUEST.onOpen()
+      case 'accept':
+        return handleAccept()
+      case 'resend':
+        return handleResend(data)
+      case 'cancel':
+        return WARNING.onOpen()
+      default:
+        return REQUEST.onOpen()
     }
-  ]
+  }
+
+  const columns = RequestColumns({ action })
+
+  const subHeader = RequestHeader({
+    action,
+    setFilters,
+    filterText,
+    handleClear,
+    handleSearch,
+    onSearchInputChange
+  })
 
   return (
     <>
-      <Flex flexDir={'column'} width={'100%'}>
+      <Stack width={'100%'}>
         <LynkTable
-          columns={columns}
-          data={data}
-          onSort={handleSort}
-          defaultSortFieldId='REQUESTS_REQUESTED_AT'
-          progressPending={loading}
-          persistTableHead
           subHeader
+          data={data}
+          persistTableHead
+          columns={columns}
+          onSort={handleSort}
+          progressPending={loading}
           subHeaderComponent={subHeader}
+          defaultSortFieldId='REQUESTS_REQUESTED_AT'
         />
-      </Flex>
 
-      <Pagination {...paginationProps} />
+        <Pagination {...paginationProps} />
+      </Stack>
 
-      {isOpen && <RequestModal isOpen={isOpen} onClose={onClose} data={null} />}
+      {REQUEST.isOpen && (
+        <RequestModal
+          data={null}
+          isOpen={REQUEST.isOpen}
+          onClose={REQUEST.onClose}
+        />
+      )}
 
       {ACCEPT.isOpen && (
         <RequestAcceptModal
+          data={activeRow}
           isOpen={ACCEPT.isOpen}
           onClose={ACCEPT.onClose}
-          data={activeRow}
         />
       )}
 
       {WARNING.isOpen && (
         <ConfirmationModal
+          title='Cancel Request'
           isOpen={WARNING.isOpen}
           onClose={WARNING.onClose}
-          title='Cancel Request'
           description={`This will cancel the request by ${activeRow.email}`}
           onConfirm={() => {
             handleCancel(activeRow)
