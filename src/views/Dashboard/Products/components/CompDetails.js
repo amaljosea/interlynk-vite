@@ -67,7 +67,9 @@ const CompDetails = ({ data, primaryComp }) => {
       'GetComponentExpandedData',
       'GetProductData',
       'GetPrimaryComponentData',
-      'GetVersionName'
+      'GetVersionName',
+      'GetProjectVersionLazyDropdownQuery',
+      ''
     ]
   })
 

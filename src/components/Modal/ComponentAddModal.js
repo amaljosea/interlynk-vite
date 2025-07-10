@@ -74,10 +74,19 @@ function ComponentAddModal(props) {
   const { purlString } = prodCompState
   const { prodCompDispatch } = dispatch
 
-  const [addRelation] = useMutation(CreateCompRelation)
+  const [addRelation] = useMutation(CreateCompRelation, {
+    refetchQueries: ['SingleSbomScore']
+  })
 
   const [createComponent, { loading }] = useMutation(CreateComponent, {
-    refetchQueries: ['GetComponentColumnData']
+    refetchQueries: [
+      'GetComponentColumnData',
+      'GetComponentExpandedData',
+      'GetProductData',
+      'GetPrimaryComponentData',
+      'GetVersionName',
+      'GetProjectVersionLazyDropdownQuery'
+    ]
   })
 
   const [showPurl, setShowPurl] = useState(false)

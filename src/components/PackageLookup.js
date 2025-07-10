@@ -76,9 +76,9 @@ const PackageLookup = () => {
         ecosystem: formData?.ecosystem
       }
     }).then((res) => {
-      const { packageLookup } = res?.data || ''
+      const { packageLookup } = res?.data || {}
       if (packageLookup?.package) {
-        const { package: pkg, packageVersion } = packageLookup || ''
+        const { package: pkg, packageVersion } = packageLookup || {}
         const license = getLicense(packageVersion?.license)
         setTabData((prev) => ({
           ...prev,
