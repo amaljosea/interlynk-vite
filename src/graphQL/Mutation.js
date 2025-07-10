@@ -3125,3 +3125,45 @@ export const PatchDelete = gql`
     }
   }
 `
+
+export const CryptoPropertyCreate = gql`
+  mutation CryptoPropertyCreate(
+    $componentId: Uuid!
+    $cryptoProperty: CryptoPropertyInput!
+  ) {
+    cryptoPropertyCreate(
+      input: { componentId: $componentId, cryptoProperty: $cryptoProperty }
+    ) {
+      cryptoProperty {
+        id
+        assetType
+        oid
+      }
+      errors
+    }
+  }
+`
+
+export const CryptoPropertyUpdate = gql`
+  mutation CryptoPropertyUpdate(
+    $id: Uuid!
+    $cryptoProperty: CryptoPropertyInput!
+  ) {
+    cryptoPropertyUpdate(input: { id: $id, cryptoProperty: $cryptoProperty }) {
+      cryptoProperty {
+        id
+        assetType
+        oid
+      }
+      errors
+    }
+  }
+`
+
+export const CryptoPropertyDelete = gql`
+  mutation CryptoPropertyDelete($id: Uuid!) {
+    cryptoPropertyDelete(input: { id: $id }) {
+      errors
+    }
+  }
+`

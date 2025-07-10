@@ -1986,7 +1986,157 @@ export const GetComponentColumnData = gql`
             name
             url
           }
+          cryptoProperty {
+            id
+            assetType
+            oid
+            algorithmProperty {
+              primitive
+              parameterSetIdentifier
+              curve
+              executionEnvironment
+              implementationPlatform
+              certificationLevel
+              mode
+              padding
+              cryptoFunctions
+              classicalSecurityLevel
+              nistQuantumSecurityLevel
+            }
+            certificateProperty {
+              subjectName
+              issuerName
+              notValidBefore
+              notValidAfter
+              signatureAlgorithmRef
+              subjectPublicKeyRef
+              certificateFormat
+              certificateExtension
+            }
+            relatedCryptoMaterialProperty {
+              type
+              materialId
+              state
+              algorithmRef
+              creationDate
+              activationDate
+              updateDate
+              expirationDate
+              value
+              size
+              format
+            }
+            protocolProperty {
+              type
+              version
+              cipherSuites {
+                name
+                algorithms
+                identifiers
+              }
+              ikev2TransformTypes
+            }
+          }
         }
+      }
+    }
+  }
+`
+
+export const GetCryptoData = gql`
+  query GetCryptoData(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $search: String
+    $kind: [String!]
+    $internal: Boolean
+    $primary: Boolean
+    $direct: Boolean
+    $includeParts: Boolean
+    $orderBy: ComponentOrderByInput
+    $first: Int
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
+      components(
+        sbomId: $sbomId
+        search: $search
+        kind: $kind
+        internal: $internal
+        primary: $primary
+        direct: $direct
+        orderBy: $orderBy
+        includeParts: $includeParts
+        first: $first
+      ) {
+        totalCount
+        nodes {
+          id
+          name
+          version
+          cryptoProperty {
+            id
+            assetType
+            oid
+            algorithmProperty {
+              primitive
+              parameterSetIdentifier
+              curve
+              executionEnvironment
+              implementationPlatform
+              certificationLevel
+              mode
+              padding
+              cryptoFunctions
+              classicalSecurityLevel
+              nistQuantumSecurityLevel
+            }
+            certificateProperty {
+              subjectName
+              issuerName
+              notValidBefore
+              notValidAfter
+              signatureAlgorithmRef
+              subjectPublicKeyRef
+              certificateFormat
+              certificateExtension
+            }
+            relatedCryptoMaterialProperty {
+              type
+              materialId
+              state
+              algorithmRef
+              creationDate
+              activationDate
+              updateDate
+              expirationDate
+              value
+              size
+              format
+            }
+            protocolProperty {
+              type
+              version
+              cipherSuites {
+                name
+                algorithms
+                identifiers
+              }
+              ikev2TransformTypes
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+export const HasCryptoAssets = gql`
+  query HasCryptoAssets($projectId: Uuid!, $sbomId: Uuid!, $kind: [String!]) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
+      components(sbomId: $sbomId, kind: $kind, first: 0) {
+        totalCount
       }
     }
   }

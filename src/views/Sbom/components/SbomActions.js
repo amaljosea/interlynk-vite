@@ -8,6 +8,7 @@ import ConfirmationModal from 'views/Dashboard/Products/components/ConfirmationM
 import { Flex, IconButton, Tooltip, useDisclosure } from '@chakra-ui/react'
 
 import AttributionReportsDrawer from 'components/Drawer/AttributionReport/AttributionReportsDrawer'
+import CBOMAnalysisDrawer from 'components/Drawer/Cryptography/CbomAnalysisDrawer'
 import SystemLogs from 'components/Drawer/SystemLogs'
 import DeleteButton from 'components/Icons/DeleteButton'
 import EditButton from 'components/Icons/EditButton'
@@ -28,10 +29,11 @@ import {
   GetCheckResults,
   GetPrimaryComponentData,
   GetProject,
+  HasCryptoAssets,
   ShareProject
 } from 'graphQL/Queries'
 
-import { LuCircleCheckBig, LuClipboardList } from 'react-icons/lu'
+import { LuBinary, LuCircleCheckBig, LuClipboardList } from 'react-icons/lu'
 
 import CheckModal from './CheckModal'
 import CopyModal from './CopyModal'
@@ -67,14 +69,36 @@ const SbomActions = ({ sbom }) => {
   const PRIMARY = useDisclosure()
   const DELETE = useDisclosure()
   const ATTRIBUTION = useDisclosure()
+  const CBOM = useDisclosure()
 
   const status = 'created'
   const [checks, setChecks] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [hasCryptoAssets, setHasCryptoAssets] = useState(false)
 
   const { data } = useQuery(signedUrlParams ? ShareProject : GetProject, {
     variables: {
       id: productId
+    }
+  })
+
+  const { loading: cryptoAssetsCheckLoading } = useQuery(HasCryptoAssets, {
+    variables: {
+      sbomId: sbomId,
+      projectId: productId,
+      kind: ['cryptographic-asset']
+    },
+    fetchPolicy: 'cache-and-network',
+    onCompleted: (data) => {
+      if (data?.sbom?.components?.totalCount > 0) {
+        setHasCryptoAssets(true)
+      } else {
+        setHasCryptoAssets(false)
+      }
+    },
+    onError: (err) => {
+      console.error('Error fetching crypto asset check:', err)
+      setHasCryptoAssets(false)
     }
   })
 
@@ -193,9 +217,23 @@ const SbomActions = ({ sbom }) => {
     return null
   }
 
+  const showCbomButton = !cryptoAssetsCheckLoading && hasCryptoAssets
+
   return (
     <>
       <Flex gap={2} alignItems={'center'} justifyContent={'flex-end'}>
+        {/* CBOM ANALYSIS */}
+        {showCbomButton && (
+          <Tooltip label='CBOM Analysis'>
+            <IconButton
+              colorScheme='blue'
+              onClick={CBOM.onOpen}
+              icon={<LuBinary size={18} />}
+              hidden={sbom?.lifecycle === 'draft'}
+              display={signedUrlParams || isFreeTier ? 'none' : 'flex'}
+            />
+          </Tooltip>
+        )}
         {/* UPDATE PRIMARY COMPONENT */}
         <EditButton
           size={'md'}
@@ -316,6 +354,11 @@ const SbomActions = ({ sbom }) => {
           onClose={ATTRIBUTION.onClose}
           sbomData={sbom}
         />
+      )}
+
+      {/* CBOM Analysis Drawer */}
+      {CBOM.isOpen && (
+        <CBOMAnalysisDrawer isOpen={CBOM.isOpen} onClose={CBOM.onClose} />
       )}
     </>
   )

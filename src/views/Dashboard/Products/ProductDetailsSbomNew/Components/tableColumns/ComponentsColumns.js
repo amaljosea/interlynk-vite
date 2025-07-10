@@ -80,6 +80,7 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
   const viewInsights = 'view_insights'
   const editLicenseStatus = 'edit_license_status'
   const editNotes = 'edit_notes'
+  const editCryptography = 'edit_cryptography'
   const viewCompVulnerabilities = 'view_component_vulnerabilities'
 
   return useMemo(() => {
@@ -377,6 +378,13 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
                         isDisabled={status === 'signed' || !updateComponent}
                       >
                         Edit Notes
+                      </MenuItem>
+                      <MenuItem
+                        hidden={isFreeTier || isPart}
+                        onClick={() => action(editCryptography, row)}
+                        isDisabled={status === 'signed' || !updateComponent}
+                      >
+                        Edit Cryptography
                       </MenuItem>
                       <MenuItem
                         data-testid='view_component_vulns'

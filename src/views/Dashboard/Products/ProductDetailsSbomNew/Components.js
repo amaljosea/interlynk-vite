@@ -13,6 +13,7 @@ import Card from 'components/Card/Card'
 import PatchManagerDrawer from 'components/Drawer/AttributionReport/PatchManagerDrawer'
 import ComponentNotes from 'components/Drawer/ComponentNotes'
 import ComponentVulns from 'components/Drawer/ComponentVulns'
+import CryptographyDrawer from 'components/Drawer/Cryptography/CryptographyDrawer'
 import LicenseStatus from 'components/Drawer/LicenseStatus'
 import LynkTable from 'components/LynkTable'
 import CpeCard from 'components/Misc/CpeCard'
@@ -140,6 +141,7 @@ const Components = ({ sbomData }) => {
   const DELETE_SUPPLIER = useDisclosure()
   const LICENSE_STATUS = useDisclosure()
   const PATCHES_EDIT = useDisclosure()
+  const CRYPTOGRAPHY = useDisclosure()
 
   const action = (type, data) => {
     setActiveRow(data)
@@ -166,6 +168,8 @@ const Components = ({ sbomData }) => {
         return LICENSE_STATUS.onOpen()
       case 'edit_notes':
         return NOTES.onOpen()
+      case 'edit_cryptography':
+        return CRYPTOGRAPHY.onOpen()
       case 'view_component_vulnerabilities':
         return VULNS.onOpen()
       case 'view_health_map':
@@ -416,6 +420,14 @@ const Components = ({ sbomData }) => {
           isOpen={PATCHES_EDIT.isOpen}
           onClose={PATCHES_EDIT.onClose}
           rowData={activeRow}
+        />
+      )}
+
+      {CRYPTOGRAPHY.isOpen && (
+        <CryptographyDrawer
+          isOpen={CRYPTOGRAPHY.isOpen}
+          onClose={CRYPTOGRAPHY.onClose}
+          data={activeRow}
         />
       )}
     </>
