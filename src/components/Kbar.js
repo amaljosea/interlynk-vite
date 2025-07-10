@@ -167,7 +167,9 @@ const Kbar = () => {
                       productgroupid: item?.id,
                       productid: project?.id,
                       sbomid: version?.id,
-                      paramsObj: { tab: 'general' }
+                      // Always replace params to avoid carrying over unwanted query params
+                      replaceParams: true,
+                      paramsObj: { tab: 'general', replaceParams: true }
                     })
                   handleVersionClick(project?.name)
                   navigate(link)
