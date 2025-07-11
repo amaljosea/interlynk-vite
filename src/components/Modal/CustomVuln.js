@@ -42,11 +42,11 @@ const CustomVuln = ({ isOpen, onClose, primaryComponent }) => {
   const signedUrlParams = getSignedUrlParams()
   const { style } = useSelect('lynkSelect')
   const { primaryTextColor } = useThemeColor(['primaryTextColor'])
-
+  const currentSbomId = params?.sbomid
   const { field, direction } = prodCompState
   const compState = {
     projectId: params?.productid || undefined,
-    sbomId: params?.sbomid || undefined,
+    sbomId: currentSbomId || undefined,
     field: field,
     direction: direction
   }
@@ -74,7 +74,7 @@ const CustomVuln = ({ isOpen, onClose, primaryComponent }) => {
   })
 
   const { lazyDropDownProps } = useLazyDropDown(GetAllComponents, {
-    skip: isOpen && params?.sbomid ? false : true,
+    skip: isOpen && currentSbomId ? false : true,
     selector: 'sbom.components',
     variables: {
       ...compState,
@@ -188,7 +188,7 @@ const CustomVuln = ({ isOpen, onClose, primaryComponent }) => {
 
   const handleSubmit = async () => {
     const attribute = {
-      sbomId: params?.sbomid,
+      sbomId: currentSbomId,
       componentId: compId !== '' ? compId : undefined
     }
     await createVuln({
@@ -343,7 +343,7 @@ const CustomVuln = ({ isOpen, onClose, primaryComponent }) => {
           />
           <FormErrorMessage>{cpeError}</FormErrorMessage>
         </FormControl>
-        {params?.sbomid && !isLoading && nodes && (
+        {!isLoading && nodes && currentSbomId && (
           <FormControl>
             <FormLabel htmlFor='componentId'>Component</FormLabel>
             <AsyncSelect

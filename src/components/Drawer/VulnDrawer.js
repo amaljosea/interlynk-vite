@@ -295,7 +295,6 @@ const VulnDrawer = ({ data, isOpen, onClose }) => {
                       ? `${firstSbomComponentName}-${firstSbomComponentVersion}${firstSbomComponentPrimary ? ' [primary component]' : ''}`
                       : undefined
                 }}
-                menuPlacement='top'
               />
             </FormControl>
           ) : (

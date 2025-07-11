@@ -614,6 +614,7 @@ function ComponentAddModal(props) {
                       isDisabled: lazyDropDownProps.isLoading,
                       placeholder: ' --Select Component-- '
                     }}
+                    menuPlacement={'top'}
                   />
                 </FormControl>
               </Stack>
