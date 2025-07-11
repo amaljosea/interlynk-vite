@@ -24,7 +24,6 @@ const prodCompReducer = (state, action) => {
         field: 'COMPONENTS_UPDATED_AT',
         direction: 'DESC',
         searchInput: '',
-        supportLevel: [],
         ecosystems: [],
         suppliers: [],
         licenses: [],
@@ -39,7 +38,8 @@ const prodCompReducer = (state, action) => {
         purlString: '',
         exclude: [],
         selectedComp: null,
-        filterMode: 'OR'
+        filterMode: 'OR',
+        status: []
       }
     case 'CHANGE_SEARCH_INPUT':
       return {
@@ -92,10 +92,10 @@ const prodCompReducer = (state, action) => {
         ...state,
         suppliers: toggleSelection(state.suppliers, payload)
       }
-    case 'FILTER_SUPPORT':
+    case 'FILTER_STATUS':
       return {
         ...state,
-        supportLevel: [...payload]?.includes('all') ? [] : payload
+        status: [...payload]?.includes('ALL') ? [] : payload
       }
     case 'FILTER_SCOPE':
       return {

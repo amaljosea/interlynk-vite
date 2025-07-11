@@ -136,7 +136,7 @@ const GlobalStateProvider = ({ children }) => {
     kinds: [],
     licenses: [],
     suppliers: [],
-    supportLevel: [],
+    status: [],
     scope: '',
     direct: false,
     filters: null,

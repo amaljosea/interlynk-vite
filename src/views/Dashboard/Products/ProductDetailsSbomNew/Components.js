@@ -51,7 +51,6 @@ const Components = ({ sbomData }) => {
     direction,
     searchInput,
     ecosystems,
-    supportLevel,
     kinds,
     licenses,
     suppliers,
@@ -60,6 +59,7 @@ const Components = ({ sbomData }) => {
     totalComp,
     expandedRows,
     exclude,
+    status,
     selectedComp,
     licenseType
   } = prodCompState
@@ -79,7 +79,7 @@ const Components = ({ sbomData }) => {
       supplierName: getUndefinedIfEmptyOrAll(suppliers),
       primary: resolveScopeFlag(scope, 'primary'),
       internal: resolveScopeFlag(scope, 'internal'),
-      supportLevel: getUndefinedIfEmptyOrAll(supportLevel),
+      healthStatus: getUndefinedIfEmptyOrAll(status),
       includeParts: exclude?.includes('parts') ? undefined : true,
       licenseType:
         !licenseType || licenseType === 'all'
@@ -89,12 +89,12 @@ const Components = ({ sbomData }) => {
   }, [
     direct,
     ecosystems,
-    exclude,
     kinds,
     licenses,
-    scope,
     suppliers,
-    supportLevel,
+    scope,
+    status,
+    exclude,
     licenseType
   ])
 

@@ -116,6 +116,7 @@ const CompFilters = ({ reset }) => {
   const { prodCompState, dispatch } = useGlobalState()
   const {
     ecosystems,
+    status,
     kinds,
     licenses,
     scope,
@@ -163,6 +164,11 @@ const CompFilters = ({ reset }) => {
 
   const onFilterExclude = (value) => {
     prodCompDispatch({ type: 'FILTER_EXCLUDE', payload: value })
+    reset()
+  }
+
+  const onFilterStatus = (value) => {
+    prodCompDispatch({ type: 'FILTER_STATUS', payload: value })
     reset()
   }
 
@@ -286,21 +292,42 @@ const CompFilters = ({ reset }) => {
           options={compEcosystems}
         />
       </Menu>
-      {/* KIND */}
+      {/* EXCLUDE */}
       <Menu closeOnSelect={false}>
-        <MenuHeading
-          title={'Type'}
-          active={kinds?.length !== 0}
-          onClick={() => onCheckFilters('Kind')}
-        />
-        <LynkMenuList
-          type='Kind'
-          value={kinds}
-          onFilter={onFilter}
-          options={compKinds}
-          loading={kindLoading}
-        />
+        <MenuHeading title={'Exclude'} active={exclude?.length !== 0} />
+        <MenuList fontSize={'sm'}>
+          <MenuOptionGroup
+            type='checkbox'
+            value={exclude}
+            onChange={onFilterExclude}
+          >
+            <MenuItemOption value={'parts'} fontSize={'sm'}>
+              Parts
+            </MenuItemOption>
+          </MenuOptionGroup>
+        </MenuList>
       </Menu>
+      {/* STATUS */}
+      {!isCustomerView && (
+        <Menu closeOnSelect={false}>
+          <MenuHeading title={'Health'} active={status?.length !== 0} />
+          <MenuList fontSize={'sm'}>
+            <MenuOptionGroup
+              type='checkbox'
+              value={status}
+              onChange={onFilterStatus}
+            >
+              {['ALL', 'OUTDATED', 'VULNERABLE', 'DEPRECATED'].map(
+                (item, index) => (
+                  <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                    {capitalizeFirstLetter(item)}
+                  </MenuItemOption>
+                )
+              )}
+            </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      )}
       {/* LICENSES */}
       <Menu closeOnSelect={false}>
         <MenuHeading
@@ -362,6 +389,21 @@ const CompFilters = ({ reset }) => {
           </MenuOptionGroup>
         </MenuList>
       </Menu>
+      {/* KIND */}
+      <Menu closeOnSelect={false}>
+        <MenuHeading
+          title={'Type'}
+          active={kinds?.length !== 0}
+          onClick={() => onCheckFilters('Kind')}
+        />
+        <LynkMenuList
+          type='Kind'
+          value={kinds}
+          onFilter={onFilter}
+          options={compKinds}
+          loading={kindLoading}
+        />
+      </Menu>
       {/* VISIBILITY */}
       <Menu closeOnSelect={false}>
         <MenuHeading
@@ -390,21 +432,6 @@ const CompFilters = ({ reset }) => {
           </MenuOptionGroup>
           <MenuDivider />
           <MenuGroup title={<Info />}></MenuGroup>
-        </MenuList>
-      </Menu>
-      {/* EXCLUDE */}
-      <Menu closeOnSelect={false}>
-        <MenuHeading title={'Exclude'} active={exclude?.length !== 0} />
-        <MenuList fontSize={'sm'}>
-          <MenuOptionGroup
-            type='checkbox'
-            value={exclude}
-            onChange={onFilterExclude}
-          >
-            <MenuItemOption value={'parts'} fontSize={'sm'}>
-              Parts
-            </MenuItemOption>
-          </MenuOptionGroup>
         </MenuList>
       </Menu>
       {/* DIRECT */}

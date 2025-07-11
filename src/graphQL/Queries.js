@@ -1898,6 +1898,7 @@ export const GetComponentColumnData = gql`
     $primary: Boolean
     $direct: Boolean
     $includeParts: Boolean
+    $healthStatus: [ComponentHealthStatusEnum!]
     $orderBy: ComponentOrderByInput
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
@@ -1918,6 +1919,7 @@ export const GetComponentColumnData = gql`
         primary: $primary
         direct: $direct
         orderBy: $orderBy
+        healthStatus: $healthStatus
         supportLevel: $supportLevel
         includeParts: $includeParts
       ) {
@@ -1943,6 +1945,7 @@ export const GetComponentColumnData = gql`
           enrichedContent {
             packageVersion {
               version
+              isOutdated
               isDeprecated
             }
             latestPackageVersion {

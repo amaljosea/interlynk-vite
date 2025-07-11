@@ -283,7 +283,7 @@ const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
         </FormControl>
         <FormControl>
           <Checkbox isChecked={noExpire} onChange={handleExpireChange}>
-            No Expiration
+            <Text fontSize={'sm'}>No Expiration</Text>
           </Checkbox>
         </FormControl>
         <Flex gap={2} justifyContent={'flex-end'} alignItems={'center'}>

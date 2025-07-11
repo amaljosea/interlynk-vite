@@ -90,10 +90,7 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
         name: 'NAME',
         selector: (row) => {
           const { purl, name, primary, internal, sbomId: bomId, sbom } = row
-          const { latestPackageVersion, packageVersion } =
-            row?.enrichedContent || {}
-          const isOutdated =
-            latestPackageVersion?.version !== packageVersion?.version
+          const { packageVersion } = row?.enrichedContent || {}
           const { projectVersion, project } = sbom || {}
           const { projectGroup } = project || {}
           const isPart = sbomId !== bomId
@@ -149,14 +146,14 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
                     />
                   )}
                   <LynkSeparator hidden={!internal} />
-                  {isOutdated && (
+                  {packageVersion?.isOutdated === true && (
                     <LynkBadge
                       color='yellow'
                       title='Outdated'
                       action={() => action(viewInsights, row)}
                     />
                   )}
-                  <LynkSeparator hidden={!isOutdated} />
+                  <LynkSeparator hidden={!packageVersion?.isOutdated} />
                   {isVulnerable && !isAllVulnsNotAffected && (
                     <LynkBadge
                       color='red'
