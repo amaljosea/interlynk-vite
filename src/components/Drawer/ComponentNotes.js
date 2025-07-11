@@ -204,7 +204,7 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
           {edit ? (
             <Stack spacing={4} ref={noteForm}>
               {/* NOTE COMMENT */}
-              <FormControl>
+              <FormControl isRequired>
                 <FormLabel>Comment</FormLabel>
                 <Textarea
                   value={comment}
@@ -220,8 +220,8 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
                 <Button
                   w={'24'}
                   fontSize={'sm'}
-                  variant='outline'
-                  colorScheme='blue'
+                  variant='solid'
+                  colorScheme='gray'
                   onClick={() => setEdit(false)}
                 >
                   Cancel
@@ -229,7 +229,7 @@ const ComponentNotes = ({ data, isOpen, onClose }) => {
                 <Button
                   w={'24'}
                   fontSize={'sm'}
-                  variant='solid'
+                  variant='outline'
                   colorScheme='blue'
                   isDisabled={comment === ''}
                   onClick={handleSubmit}

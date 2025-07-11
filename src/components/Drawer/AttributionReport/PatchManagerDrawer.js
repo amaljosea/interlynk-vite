@@ -32,6 +32,8 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { PatchCreate, PatchDelete, PatchUpdate } from 'graphQL/Mutation'
 import { GetPatchManagerData } from 'graphQL/Queries'
 
+import { LuPlus } from 'react-icons/lu'
+
 const PATCH_KIND_OPTIONS = [
   { value: 'UN_OFFICIAL', label: 'Unofficial' },
   { value: 'MONKEY', label: 'Monkey' },
@@ -98,25 +100,31 @@ const PatchFormActions = ({
   isPrimaryDisabled,
   isCancelDisabled
 }) => {
-  const isAddPatch = primaryText === '+ Add Patch'
+  const isAddPatch = primaryText === 'Add Patch'
   return (
     <HStack mt={2} spacing={2} align='start'>
+      {onCancel && (
+        <Button
+          onClick={onCancel}
+          isDisabled={isCancelDisabled}
+          minW='60px'
+          fontSize={'sm'}
+        >
+          Cancel
+        </Button>
+      )}
       <Button
-        colorScheme={'blue'}
-        variant={'solid'}
+        colorScheme={isAddPatch ? 'gray' : 'blue'}
+        variant={isAddPatch ? 'solid' : 'outline'}
         onClick={onPrimary}
         isDisabled={isPrimaryDisabled}
         isLoading={isPrimaryLoading}
         minW={isAddPatch ? 'full' : '60px'}
-        minH={isAddPatch && '48PX'}
+        fontSize={'sm'}
+        leftIcon={isAddPatch && <LuPlus size={18} />}
       >
         {primaryText}
       </Button>
-      {onCancel && (
-        <Button onClick={onCancel} isDisabled={isCancelDisabled} minW='60px'>
-          Cancel
-        </Button>
-      )}
     </HStack>
   )
 }
@@ -380,7 +388,7 @@ const PatchManagerDrawer = ({ isOpen, onClose, rowData }) => {
               validateUrlBlur={() => validatePatchUrl(newPatch.url, 'new')}
             />
             <PatchFormActions
-              primaryText='+ Add Patch'
+              primaryText='Add Patch'
               onPrimary={handleAddPatch}
               isPrimaryLoading={patchLoading}
               isPrimaryDisabled={!newPatch.content || editingPatch.id}

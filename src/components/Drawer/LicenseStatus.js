@@ -112,7 +112,7 @@ const LicenseStatus = ({ data, isOpen, onClose }) => {
         {edit ? (
           <Stack spacing={4} ref={noteForm}>
             {/* STATUS */}
-            <FormControl>
+            <FormControl isRequired>
               <FormLabel htmlFor='licenseStatus'>Status</FormLabel>
               <LynkSelect
                 name='licenseStatus'
@@ -135,7 +135,7 @@ const LicenseStatus = ({ data, isOpen, onClose }) => {
               />
             </FormControl>
             {/* NOTE */}
-            <FormControl>
+            <FormControl isRequired>
               <FormLabel htmlFor='licenseNotes'>Note</FormLabel>
               <Textarea
                 maxLength={512}
@@ -152,8 +152,8 @@ const LicenseStatus = ({ data, isOpen, onClose }) => {
               <Button
                 w={'24'}
                 fontSize={'sm'}
-                variant='outline'
-                colorScheme='blue'
+                variant='solid'
+                colorScheme='gray'
                 onClick={() => setEdit(false)}
               >
                 Cancel
@@ -161,7 +161,7 @@ const LicenseStatus = ({ data, isOpen, onClose }) => {
               <Button
                 w={'24'}
                 fontSize={'sm'}
-                variant='solid'
+                variant='outline'
                 colorScheme='blue'
                 onClick={handleSubmit}
                 isDisabled={isDisabled}
