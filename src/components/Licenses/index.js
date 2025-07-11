@@ -13,7 +13,6 @@ const Licenses = () => {
   const { orgView } = useGlobalQueryContext()
 
   const [filters, setFilters] = useState({
-    search: '',
     orderBy: { field: 'ORGANIZATION_LICENSES_UPDATED_AT', direction: 'DESC' }
   })
 

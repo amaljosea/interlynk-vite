@@ -46,7 +46,7 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
       target: { value }
     } = event
     if (key === 'Enter' && value !== '') {
-      setSearchFilter(value)
+      setSearchFilter(value.trim())
     }
   }
 
@@ -54,10 +54,9 @@ const LicenseTable = ({ licenses, paginationProps, setFilters, loading }) => {
   const onSearchInputChange = useCallback(
     (e) => {
       const { value } = e.target
+      setFilterText(value)
       if (value === '') {
         handleClear()
-      } else {
-        setFilterText(value)
       }
     },
     [handleClear]
