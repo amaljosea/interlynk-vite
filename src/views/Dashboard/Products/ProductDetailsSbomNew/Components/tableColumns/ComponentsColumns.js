@@ -306,6 +306,8 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
 
           const isPart = sbomId !== sbom?.id
 
+          const isCryptoAssest = row?.kind === 'cryptographic-asset'
+
           return (
             <Stack direction={'row'} alignItems={'center'}>
               {/* WEBSITE */}
@@ -377,7 +379,7 @@ const ComponentsColumns = ({ totalComp, isArchived, action }) => {
                         Edit Notes
                       </MenuItem>
                       <MenuItem
-                        hidden={isFreeTier || isPart}
+                        hidden={!isCryptoAssest || isFreeTier || isPart}
                         onClick={() => action(editCryptography, row)}
                         isDisabled={status === 'signed' || !updateComponent}
                       >
