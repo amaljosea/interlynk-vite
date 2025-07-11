@@ -398,7 +398,7 @@ const CryptographyDrawer = ({ data, isOpen, onClose }) => {
 
   return (
     <LynkDrawer
-      title={isEditMode ? 'Edit Cryptography' : 'Create Cryptography'}
+      title={'Edit Cryptography'}
       subtitle={data && <CompInfo data={data} />}
       isOpen={isOpen}
       onClose={onClose}

@@ -31,7 +31,7 @@ const PrimaryTreeView = ({ updateSboms, status, noPrimaryComp }) => {
 
   return (
     <>
-      <Tooltip label={'Relationships'}>
+      <Tooltip label={'View Relationships'}>
         <IconButton
           colorScheme='blue'
           isLoading={loading}

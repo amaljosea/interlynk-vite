@@ -365,7 +365,7 @@ const PatchManagerDrawer = ({ isOpen, onClose, rowData }) => {
     <LynkDrawer
       isOpen={isOpen}
       onClose={handleDrawerClose}
-      title={'Manage Patches'}
+      title={'Edit Patches'}
       subtitle={rowData && <CompInfo data={rowData} />}
       noFooter
       onSubmit={onSubmit}

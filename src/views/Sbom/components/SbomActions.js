@@ -211,7 +211,7 @@ const SbomActions = ({ sbom }) => {
 
   const updateLabel = noPrimaryComp
     ? 'No primary component for this SBOM to edit'
-    : 'Edit'
+    : 'Edit Component'
 
   if (error) {
     return null

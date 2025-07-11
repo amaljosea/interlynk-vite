@@ -104,7 +104,7 @@ const ComponentVulns = ({ data, isOpen, onClose }) => {
 
   return (
     <LynkDrawer
-      title={'Vulnerabilities'}
+      title={'View Vulnerabilities'}
       subtitle={data && <CompInfo data={data} />}
       size='lg'
       isOpen={isOpen}

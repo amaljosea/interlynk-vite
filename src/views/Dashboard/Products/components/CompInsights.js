@@ -262,7 +262,7 @@ const CompInsights = ({ isOpen, onClose, data }) => {
 
   return (
     <LynkDrawer
-      title={'Insights'}
+      title={'View Insights'}
       subtitle={
         loading ? (
           <Skeleton mt={2} w={'50%'} h={3} />

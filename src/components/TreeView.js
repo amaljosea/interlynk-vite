@@ -314,7 +314,7 @@ const TreeView = ({ isOpen, onClose, component }) => {
 
   return (
     <LynkDrawer
-      title={'Relationships'}
+      title={'View Relationships'}
       subtitle={
         <Flex alignItems={'center'} gap={3}>
           {component && <CompInfo data={component} />}
