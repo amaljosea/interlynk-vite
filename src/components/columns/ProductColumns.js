@@ -146,19 +146,15 @@ const ProductColumns = (props) => {
               <Stack spacing={1}>
                 <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
                   <Text
-                    fontSize={14}
-                    color={primaryBlueText}
                     cursor={'pointer'}
-                    width={'fit-content'}
+                    wordBreak={'break-all'}
+                    color={primaryBlueText}
                     aria-label='product_name'
                     data-testid={`product_${name}`}
                     onClick={() => handleClick(row)}
+                    sx={{ w: 'fit-content', fontSize: 14 }}
                   >
-                    {name?.length > 54 ? (
-                      <Tooltip label={name}>{truncatedValue(name, 54)}</Tooltip>
-                    ) : (
-                      name
-                    )}
+                    {truncatedValue(name, 50)}
                   </Text>
                   {labels?.map((item, index) => (
                     <ProdLabel key={index} item={item} />

@@ -94,6 +94,7 @@ const ProductModal = ({ isOpen, onClose, data }) => {
           <Input
             name='name'
             type='text'
+            maxLength={50}
             value={formData?.name}
             onChange={handleChange}
             placeholder={`Add product name`}

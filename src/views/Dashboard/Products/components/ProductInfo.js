@@ -95,9 +95,15 @@ const ProductInfo = ({ settings = {}, data = {} }) => {
       <Icon h={'64px'} w={'64px'} as={LuBox} color={secondaryBlueText} />
       <Flex gap={1} direction={'column'} alignItems={'flex-start'}>
         {/* PRODUCT TITLE */}
-        <Text fontWeight={'semibold'} fontSize={22} lineHeight={1.2}>
-          <Tooltip label={name}>{truncatedValue(name, 50)}</Tooltip>
-        </Text>
+        <Tooltip label={name}>
+          <Text
+            wordBreak={'break-all'}
+            fontWeight={'semibold'}
+            sx={{ fontSize: 22, lineHeight: 1.2 }}
+          >
+            {truncatedValue(name, 50)}
+          </Text>
+        </Tooltip>
         {/* PRODUCT DESCRIPTION */}
         <ExpandableText text={description || ''} fontSize={'sm'} />
         {/* SETTINGS */}
