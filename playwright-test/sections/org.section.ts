@@ -32,12 +32,13 @@ export default class OrgSection {
       await this.page.waitForTimeout(2000)
 
       await this.page.getByTestId('org_menu').click()
-      await this.page.getByRole('menuitemradio', { name: orgName }).click()
+      await this.page.getByRole('listitem').filter({ hasText: orgName }).click()
       await this.page.waitForTimeout(5000)
 
       await this.page.getByTestId('org_menu').click()
       await this.page
-        .getByRole('menuitemradio', { name: 'Test Interlynk' })
+        .getByRole('listitem')
+        .filter({ hasText: 'Test Interlynk' })
         .click()
       await this.page.waitForTimeout(5000)
 

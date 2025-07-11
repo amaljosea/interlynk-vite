@@ -236,6 +236,7 @@ const OrgMenu = () => {
             size={'sm'}
             onClick={onToggle}
             variant={'outline'}
+            data-testid='org_menu'
             rightIcon={<LuChevronDown />}
             leftIcon={<LuBuilding fontSize={20} color={secondaryTextColor} />}
           >
