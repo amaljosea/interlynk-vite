@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import { jsPDF } from 'jspdf'
+import { parseLicenseString } from 'utils'
 import { attributionFilename } from 'utils/DownloadUtils/pdfUtils'
 
 import { NO_COMPONENTS_FILTERED_MESSAGE } from './AttributionTable'
@@ -33,7 +34,8 @@ export const generateAttributionPdf = async (
   productVersion,
   sourcePreferences,
   includeEmptyLicenses,
-  includeUnresolvedLicenses
+  includeUnresolvedLicenses,
+  removeLicenseRefInterlynk
 ) => {
   const filename = attributionFilename(productName, productVersion)
   const pdfDoc = new jsPDF({ compress: true })
@@ -165,9 +167,25 @@ export const generateAttributionPdf = async (
       ? override?.copyright || 'N/A'
       : attribution.copyright || 'N/A'
 
-    const licenseText = isLibrarySource
+    let licenseText = isLibrarySource
       ? override?.licensesExp || 'N/A'
       : attribution.licensesExp || 'N/A'
+    if (typeof licenseText === 'string' && removeLicenseRefInterlynk) {
+      licenseText = licenseText
+        .split(/(\s+AND\s+|\s+OR\s+)/)
+        .map((part) => {
+          if (part.trim() === 'AND' || part.trim() === 'OR') return part
+          if (part.includes('LicenseRef-interlynk')) {
+            return parseLicenseString(part.trim())
+              .replace(/\s{2,}/g, ' ')
+              .trim()
+          }
+          return part
+        })
+        .join('')
+        .replace(/\s{2,}/g, ' ')
+        .trim()
+    }
 
     const isEmptyLicense = () => {
       if (Array.isArray(licenseText)) return licenseText.length === 0
@@ -328,7 +346,16 @@ export const generateAttributionPdf = async (
       yPosition += 5
 
       filteredLicenseTextArr.forEach((licenseObj) => {
-        const licenseKey = licenseObj?.key || ''
+        let licenseKey = licenseObj?.key || ''
+        if (typeof licenseKey === 'string' && removeLicenseRefInterlynk) {
+          if (licenseKey.startsWith('LicenseRef-interlynk')) {
+            licenseKey = parseLicenseString(licenseKey)
+              .replace(/\s{2,}/g, ' ')
+              .trim()
+          } else if (licenseKey.startsWith('interlynk-')) {
+            licenseKey = licenseKey.slice('interlynk-'.length)
+          }
+        }
         const licenseValue = licenseObj?.value || ''
 
         if (yPosition + 10 > pageHeight - 30) {

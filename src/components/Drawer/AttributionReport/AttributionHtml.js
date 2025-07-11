@@ -1,3 +1,4 @@
+import { parseLicenseString } from 'utils'
 import { attributionFilename } from 'utils/DownloadUtils/pdfUtils'
 
 import { NO_COMPONENTS_FILTERED_MESSAGE } from './AttributionTable'
@@ -9,7 +10,8 @@ export const downloadAttributionHtml = async (
   sourcePreferences,
   includeEmptyLicenses,
   includeUnresolvedLicenses,
-  includeTitlePage
+  includeTitlePage,
+  removeLicenseRefInterlynk
 ) => {
   const filename = attributionFilename(productName, productVersion)
   const logoBase64 = await getBase64Logo()
@@ -39,9 +41,30 @@ export const downloadAttributionHtml = async (
     const copyrightText = isLibrarySource
       ? override?.copyright || 'N/A'
       : attribution?.copyright || 'N/A'
-    const licenseExpText = isLibrarySource
+    let licenseExpText = isLibrarySource
       ? override?.licensesExp || 'N/A'
       : attribution?.licensesExp || 'N/A'
+    if (typeof licenseExpText === 'string' && removeLicenseRefInterlynk) {
+      // Remove all LicenseRef-interlynk- occurrences in complex expressions
+      // Split by common SPDX operators, process each part, and rejoin
+      licenseExpText = licenseExpText
+        .split(/(\s+AND\s+|\s+OR\s+)/)
+        .map((part) => {
+          // Only process license tokens, not operators
+          if (part.trim() === 'AND' || part.trim() === 'OR') return part
+          // Remove LicenseRef-interlynk- prefix if present
+          if (part.includes('LicenseRef-interlynk')) {
+            // Remove prefix and any trailing/leading whitespace
+            return parseLicenseString(part.trim())
+              .replace(/\s{2,}/g, ' ')
+              .trim()
+          }
+          return part
+        })
+        .join('')
+        .replace(/\s{2,}/g, ' ')
+        .trim()
+    }
 
     // Filtering logic
     const isEmptyLicense = () => {
@@ -131,14 +154,24 @@ export const downloadAttributionHtml = async (
       filteredLicenseTextArr.length > 0
         ? `<div class="license-text-container"><div class="subTitle">License Text</div>` +
           filteredLicenseTextArr
-            .map(
-              (licenseObj) => `
-              <div class="license-item">
-                <span class="license-short-id">${licenseObj?.key || ''}</span>
-                <pre class="license-text-content">${licenseObj?.value || ''}</pre>
-              </div>
-            `
-            )
+            .map((licenseObj) => {
+              let licenseKey = licenseObj?.key || ''
+              if (typeof licenseKey === 'string' && removeLicenseRefInterlynk) {
+                if (licenseKey.startsWith('LicenseRef-interlynk')) {
+                  licenseKey = parseLicenseString(licenseKey)
+                    .replace(/\s{2,}/g, ' ')
+                    .trim()
+                } else if (licenseKey.startsWith('interlynk-')) {
+                  licenseKey = licenseKey.slice('interlynk-'.length)
+                }
+              }
+              return `
+                  <div class="license-item">
+                    <span class="license-short-id">${licenseKey}</span>
+                    <pre class="license-text-content">${licenseObj?.value || ''}</pre>
+                  </div>
+                `
+            })
             .join('') +
           `</div>`
         : ''

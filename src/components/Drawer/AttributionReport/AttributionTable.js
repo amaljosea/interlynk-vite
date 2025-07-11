@@ -88,6 +88,8 @@ const AttributionTable = ({
   const [includeUnresolvedLicenses, setIncludeUnresolvedLicenses] =
     useState(true)
   const [includeTitlePage, setIncludeTitlePage] = useState(false)
+  const [removeLicenseRefInterlynk, setRemoveLicenseRefInterlynk] =
+    useState(true)
 
   const {
     primaryBlueText,
@@ -251,7 +253,8 @@ const AttributionTable = ({
           productVersion,
           sourcePreferences,
           includeEmptyLicenses,
-          includeUnresolvedLicenses
+          includeUnresolvedLicenses,
+          removeLicenseRefInterlynk
         )
       } else {
         await downloadAttributionHtml(
@@ -261,7 +264,8 @@ const AttributionTable = ({
           sourcePreferences,
           includeEmptyLicenses,
           includeUnresolvedLicenses,
-          includeTitlePage
+          includeTitlePage,
+          removeLicenseRefInterlynk
         )
       }
     } catch (error) {
@@ -616,6 +620,14 @@ const AttributionTable = ({
                     Include Title Page (HTML)
                   </Checkbox>
                 )}
+                <Checkbox
+                  isChecked={removeLicenseRefInterlynk}
+                  onChange={(e) =>
+                    setRemoveLicenseRefInterlynk(e.target.checked)
+                  }
+                >
+                  Remove LicenseRef-interlynk
+                </Checkbox>
               </Box>
             </MenuList>
           </Menu>
@@ -642,7 +654,8 @@ const AttributionTable = ({
       handleBulkSourceChange,
       includeEmptyLicenses,
       includeUnresolvedLicenses,
-      includeTitlePage
+      includeTitlePage,
+      removeLicenseRefInterlynk
     ]
   )
 
