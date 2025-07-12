@@ -116,13 +116,21 @@ const AttributionTable = ({
   const handleSearch = useCallback(
     (e) => {
       if (e.key === 'Enter') {
-        setFilters((prev) => ({
-          ...prev,
-          search: searchText.trim() || undefined
-        }))
+        setFilters((prev) => ({ ...prev, search: e.target.value }))
       }
     },
-    [setFilters, searchText]
+    [setFilters]
+  )
+
+  const onSearchInputChange = useCallback(
+    (e) => {
+      const { value } = e.target
+      setSearchText(value)
+      if (value === '') {
+        handleClear()
+      }
+    },
+    [handleClear]
   )
 
   const handleSort = useCallback(
@@ -533,7 +541,7 @@ const AttributionTable = ({
             filterText={searchText}
             onFilter={handleSearch}
             onClear={handleClear}
-            onChange={(e) => setSearchText(e.target.value)}
+            onChange={onSearchInputChange}
           />
 
           <Menu closeOnSelect={false}>
