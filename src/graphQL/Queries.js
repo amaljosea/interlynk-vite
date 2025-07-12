@@ -891,12 +891,14 @@ export const GetGlobalVulnData = gql`
       cvssScore
       cvssVector
       publishedAt
+      nvdAliasId
       lastModifiedAt
       sev
       vulnInfo {
         id
         kev
         epssScore
+        epssScores
         epssPercentile
         cwes
       }

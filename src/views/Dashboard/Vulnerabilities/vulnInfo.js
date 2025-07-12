@@ -1,7 +1,7 @@
 import { gql, useQuery } from '@apollo/client'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getFullDate, linkURl, truncatedValue } from 'utils'
+import { getFullDate, truncatedValue } from 'utils'
 
 import { SkeletonText, chakra } from '@chakra-ui/react'
 import { Grid, GridItem } from '@chakra-ui/react'
@@ -11,11 +11,12 @@ import { Stat, StatLabel, StatNumber } from '@chakra-ui/react'
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import CweList from 'components/CweList'
-import ExternalNavIcon from 'components/Icons/ExternalNavIcon'
 import IconBox from 'components/Icons/IconBox'
 import { CustomText } from 'components/Misc/CustomText'
 import CvssCard from 'components/Misc/CvssCard'
+import EpssTag from 'components/Misc/EpssTag'
 import SeverityTag from 'components/Misc/SeverityTag'
+import VulnDetaills from 'components/Misc/VulnDetaills'
 
 import useQueryParam from 'hooks/useQueryParam'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -120,7 +121,7 @@ const VulnInfo = () => {
     cvssScore
   } = vuln || {}
 
-  const { kev, epssScore, epssPercentile, cwes } = vulnInfo || ''
+  const { kev, epssScore, epssScores, epssPercentile, cwes } = vulnInfo || {}
 
   const productList =
     projectGroups?.nodes?.length > 0 ? projectGroups?.nodes : []
@@ -170,15 +171,7 @@ const VulnInfo = () => {
                 color={secondaryBlueText}
               />
               <Flex width={'100%'} direction={'column'} gap={0.5}>
-                <Flex gap={3} alignItems={'center'}>
-                  <Text fontSize={22} fontWeight={'semibold'}>
-                    {vuln?.vulnId}
-                  </Text>
-                  <ExternalNavIcon
-                    size={6}
-                    href={linkURl(source, vuln.vulnId)}
-                  />
-                </Flex>
+                <VulnDetaills index={0} data={vuln} />
                 {desc !== '' && (
                   <Text fontSize={'sm'} my={0.5}>
                     {expand ? desc : truncatedValue(desc, 300)}{' '}
@@ -219,7 +212,11 @@ const VulnInfo = () => {
                   {/*   EPSS Percentile */}
                   <Stack spacing={1} fontSize={'sm'}>
                     <CustomText>EPSS :</CustomText>
-                    <Text>{epssScore || 'N/A'}</Text>
+                    {epssScore === 0 ? (
+                      <Text>0 %</Text>
+                    ) : (
+                      <EpssTag value={epssScores} />
+                    )}
                   </Stack>
                   {/*   EPSS Percentile */}
                   <Stack spacing={1} fontSize={'sm'}>
