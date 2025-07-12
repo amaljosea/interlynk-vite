@@ -95,18 +95,13 @@ const RequestTable = (props) => {
     })
   }
 
-  const handleAccept = (row) => {
-    ACCEPT.onOpen()
-    setActiveRow(row)
-  }
-
   const action = (type, data) => {
     setActiveRow(data)
     switch (type) {
       case 'request':
         return REQUEST.onOpen()
       case 'accept':
-        return handleAccept()
+        return ACCEPT.onOpen()
       case 'resend':
         return handleResend(data)
       case 'cancel':

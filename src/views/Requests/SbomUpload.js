@@ -2,9 +2,16 @@ import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { Button, Flex, Icon, Stack, Text } from '@chakra-ui/react'
+import {
+  Button,
+  Flex,
+  Icon,
+  SkeletonText,
+  Spacer,
+  Stack,
+  Text
+} from '@chakra-ui/react'
 
-import CustomLoader from 'components/CustomLoader'
 import FileUpload from 'components/FileUpload'
 
 import useCustomToast from 'hooks/useCustomToast'
@@ -102,13 +109,18 @@ const SbomUpload = () => {
     )
   }
 
-  if (vrLoading) return <CustomLoader />
+  if (vrLoading)
+    return (
+      <Stack w={'450px'}>
+        <SkeletonText mt='4' noOfLines={6} spacing='4' skeletonHeight='2' />
+      </Stack>
+    )
 
   return (
-    <Flex alignItems='center' justifyContent='center'>
+    <Flex w={'450px'} alignItems='center' justifyContent='center'>
       {!uploadSuccessView && !uploadFailureView && (
         <Flex alignItems='center' justifyContent='center'>
-          <Stack w={'100%'} textAlign='center' gap={'20px'}>
+          <Stack textAlign='center' gap={'20px'}>
             <Stack>
               <Text
                 fontSize='20px'
@@ -139,6 +151,7 @@ const SbomUpload = () => {
                 .
               </Text>
             </Stack>
+            <Spacer />
             <Stack minHeight='165px'>
               <FileUpload
                 selectedFile={selectedFile}
@@ -149,7 +162,6 @@ const SbomUpload = () => {
                 setErrorMessage={setErrorMessage}
               />
             </Stack>
-
             <Stack>
               <Button
                 title='Upload SBOM'
@@ -181,9 +193,10 @@ const SbomUpload = () => {
           <Stack textAlign='center' gap={'20px'} alignItems='center'>
             <Icon
               as={uploadSuccessView ? LuCircleCheck : LuCircleX}
-              color={uploadSuccessView ? primarySuccessColor : 'white'}
+              color={
+                uploadSuccessView ? primarySuccessColor : primaryErrorColor
+              }
               boxSize='64px'
-              bg={uploadSuccessView ? 'white' : primaryErrorColor}
               borderRadius='full'
               padding={uploadFailureView && 2}
             />
@@ -210,7 +223,6 @@ const SbomUpload = () => {
 
             <Stack>
               <Text
-                fontSize='12px'
                 fontWeight='500'
                 textColor={primaryBlueText}
                 cursor={'pointer'}
