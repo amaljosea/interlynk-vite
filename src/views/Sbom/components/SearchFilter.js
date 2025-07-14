@@ -1,19 +1,21 @@
-import { useCallback, useEffect, useRef } from 'react'
+/* eslint-disable no-unused-vars */
+import { motion } from 'framer-motion'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import {
   Box,
+  Flex,
+  IconButton,
   Input,
   InputGroup,
-  InputLeftElement,
   InputRightElement
 } from '@chakra-ui/react'
 
-import { useThemeColor } from 'hooks/useThemeColors'
-
 import { LuSearch, LuX } from 'react-icons/lu'
 
+const MotionBox = motion(Box)
+
 const SearchFilter = ({ id, filterText, onChange, onFilter, onClear }) => {
-  const { secondaryTextColor } = useThemeColor(['secondaryTextColor'])
   const searchInputRef = useRef()
   const focusSearchInput = () => {
     if (searchInputRef?.current) {
@@ -21,8 +23,11 @@ const SearchFilter = ({ id, filterText, onChange, onFilter, onClear }) => {
     }
   }
 
+  const [isOpen, setIsOpen] = useState(false)
+
   const handleKeyPress = useCallback((e) => {
     if (e.ctrlKey && e.key === '/') {
+      setIsOpen(true)
       focusSearchInput()
     }
   }, [])
@@ -34,28 +39,52 @@ const SearchFilter = ({ id, filterText, onChange, onFilter, onClear }) => {
     }
   }, [handleKeyPress])
 
+  useEffect(() => {
+    if (isOpen && searchInputRef?.current) {
+      searchInputRef.current.focus()
+    }
+  }, [isOpen])
+
   return (
-    <Box pos={'relative'} width={'300px'}>
-      <InputGroup>
-        <InputLeftElement pointerEvents='none'>
-          <LuSearch fontSize={18} color={secondaryTextColor} />
-        </InputLeftElement>
-        <Input
-          id={id}
-          name={id}
-          type='text'
-          fontSize='sm'
-          placeholder='Search'
-          ref={searchInputRef}
-          value={filterText}
-          onChange={onChange}
-          onKeyDown={onFilter}
-        />
-        <InputRightElement hidden={filterText === ''}>
-          <LuX onClick={onClear} fontSize={18} cursor={'pointer'} />
-        </InputRightElement>
-      </InputGroup>
-    </Box>
+    <Flex align='center'>
+      <MotionBox
+        initial={{ width: 0, opacity: 0 }}
+        animate={
+          isOpen ? { width: '220px', opacity: 1 } : { width: 0, opacity: 0 }
+        }
+        transition={{ duration: 0.3 }}
+        overflow='hidden'
+      >
+        <InputGroup>
+          <Input
+            id={id}
+            name={id}
+            type='text'
+            fontSize='sm'
+            placeholder='Search'
+            ref={searchInputRef}
+            value={filterText}
+            onChange={onChange}
+            onKeyDown={onFilter}
+          />
+          <InputRightElement>
+            <LuX
+              fontSize={18}
+              cursor={'pointer'}
+              onClick={() => setIsOpen((prev) => !prev)}
+            />
+          </InputRightElement>
+        </InputGroup>
+      </MotionBox>
+      <IconButton
+        hidden={isOpen}
+        icon={<LuSearch />}
+        variant={'outline'}
+        onClick={() => setIsOpen((prev) => !prev)}
+        colorScheme={filterText !== '' ? 'blue' : 'gray'}
+        aria-label={isOpen ? 'Close search' : 'Open search'}
+      />
+    </Flex>
   )
 }
 
