@@ -81,8 +81,8 @@ const PolicyResultsTable = () => {
       name: 'PRODUCT',
       selector: (row) => {
         return (
-          <Text color={primaryTextColor}>
-            {row?.sbom?.project?.projectGroup?.name || ''}
+          <Text color={primaryTextColor} my={4}>
+            {row?.sbom?.project?.projectGroup?.name || 'N/A'}
           </Text>
         )
       },
@@ -95,11 +95,10 @@ const PolicyResultsTable = () => {
       name: 'VERSION',
       selector: (row) => (
         <Text color={primaryTextColor} my={2} textAlign={'right'}>
-          {row?.sbom?.projectVersion}
+          {row?.sbom?.projectVersion || 'N/A'}
         </Text>
       ),
       wrap: true,
-      right: 'true'
     },
     // ENV
     {
@@ -108,7 +107,7 @@ const PolicyResultsTable = () => {
       selector: (row) => {
         return (
           <Text color={primaryTextColor} textTransform={'capitalize'}>
-            {row?.sbom?.project?.name || ''}
+            {row?.sbom?.project?.name || 'N/A'}
           </Text>
         )
       },
