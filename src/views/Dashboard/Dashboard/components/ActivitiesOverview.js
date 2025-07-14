@@ -1,7 +1,7 @@
 import { gql, useQuery } from '@apollo/client'
 import { useState } from 'react'
 
-import { Box, Flex, useDisclosure } from '@chakra-ui/react'
+import { Box, Center, Flex, Text, useDisclosure } from '@chakra-ui/react'
 
 import CpeCard from 'components/Misc/CpeCard'
 import LynkLoader from 'components/Misc/LynkLoader'
@@ -40,6 +40,14 @@ const ActivitiesOverview = () => {
   const CPE = useDisclosure()
 
   if (loading) return <LynkLoader />
+
+  if (latestActivity?.length === 0) {
+    return (
+      <Center h='100%'>
+        <Text>There are no records to display</Text>
+      </Center>
+    )
+  }
 
   return (
     <>

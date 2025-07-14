@@ -90,7 +90,7 @@ function Activities() {
           items={filteredActivityCards}
           strategy={rectSortingStrategy}
         >
-          <Grid templateColumns='repeat(12, 1fr)' gap={5}>
+          <Grid h={'100%'} templateColumns='repeat(12, 1fr)' gap={5}>
             {filteredActivityCards?.map((card) => (
               <GridItem
                 w='100%'

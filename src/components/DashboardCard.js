@@ -1,7 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import React from 'react'
-import { useLocation } from 'react-router-dom'
 
 import {
   Card,
@@ -18,10 +17,6 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { LuGripVertical, LuX } from 'react-icons/lu'
 
 export function DashboardCard({ id, type, title, content, desc, onDelete }) {
-  const location = useLocation()
-
-  const isAnalytics = location.pathname === '/vendor/analytics'
-
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id })
 
@@ -40,6 +35,7 @@ export function DashboardCard({ id, type, title, content, desc, onDelete }) {
     <Card
       style={style}
       rounded='lg'
+      height={'100%'}
       ref={setNodeRef}
       overflow={'hidden'}
       bg={lightAndDarkBgColor}
