@@ -5,7 +5,13 @@ import NotFound from 'assets/svg/not-found.svg'
 import Cookies from 'js-cookie'
 import { KBarProvider } from 'kbar'
 import React, { useEffect } from 'react'
-import { Outlet, useNavigate, useParams } from 'react-router-dom'
+import {
+  Navigate,
+  Outlet,
+  useLocation,
+  useNavigate,
+  useParams
+} from 'react-router-dom'
 import { displayErrorMessage } from 'utils/errorUtils'
 import { getItem, setItem } from 'utils/localStorageUtils'
 import { tourStyles } from 'utils/tourUtils'
@@ -36,6 +42,7 @@ export default function Admin() {
   const params = useParams()
 
   const { steps } = useTour()
+  const location = useLocation()
   const navigate = useNavigate()
   const {
     setOrganization,
@@ -168,7 +175,6 @@ export default function Admin() {
       sessionStorage.removeItem('awsToken')
       sessionStorage.removeItem('signedUrlParams')
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -186,6 +192,10 @@ export default function Admin() {
       setOrganization(null)
     }
   }, [data, setOrganization])
+
+  if (!authToken) {
+    return <Navigate to='/auth' state={{ from: location }} replace />
+  }
 
   if (error) {
     return (
