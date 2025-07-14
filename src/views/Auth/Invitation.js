@@ -3,9 +3,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { clearData } from 'utils/authUtils'
 
-import { Button, Icon, Stack, Text } from '@chakra-ui/react'
-
-import CustomLoader from 'components/CustomLoader'
+import { Button, Icon, SkeletonText, Stack, Text } from '@chakra-ui/react'
 
 import useCustomToast from 'hooks/useCustomToast'
 import useQueryParam from 'hooks/useQueryParam'
@@ -86,7 +84,12 @@ const Invitation = () => {
     })
   }
 
-  if (loading) return <CustomLoader />
+  if (loading)
+    return (
+      <Stack w={'420px'}>
+        <SkeletonText mt='4' noOfLines={6} spacing='4' skeletonHeight='2' />
+      </Stack>
+    )
 
   if (error?.length > 0) {
     return (
