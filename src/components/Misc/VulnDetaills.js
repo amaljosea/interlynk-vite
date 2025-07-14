@@ -67,25 +67,22 @@ const VulnDetaills = ({ index, data }) => {
           </Link>
         )}
       </Tooltip>
-      <Tooltip label='View at NVD'>
-        <Box>
-          <ExternalNavIcon
-            size={!ID ? 4 : 5}
-            href={linkURl('nvd', vulnId)}
-            onClick={() => (params?.sbomid ? partsContext.push() : null)}
-          />
-        </Box>
-      </Tooltip>
       {nvdAliasId && (
-        <Tooltip label='View at OSV'>
+        <Tooltip label='View at NVD'>
           <Box>
             <ExternalNavIcon
               size={!ID ? 4 : 5}
-              href={linkURl('osv', nvdAliasId)}
+              href={linkURl('nvd', nvdAliasId)}
+              onClick={() => (params?.sbomid ? partsContext.push() : null)}
             />
           </Box>
         </Tooltip>
       )}
+      <Tooltip label='View at OSV'>
+        <Box>
+          <ExternalNavIcon size={!ID ? 4 : 5} href={linkURl('osv', vulnId)} />
+        </Box>
+      </Tooltip>
     </Flex>
   )
 }
