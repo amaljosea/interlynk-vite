@@ -23,6 +23,7 @@ import { UserResendConfirmationEmail } from 'graphQL/Mutation'
 import DividerWithText from './DividerWithText'
 import ToggleVisibilityButton from './Misc/ToggleVisibilityButton'
 import PolicyTerms from './PolicyTerms'
+import SSOBtn from './SSO/SSOBtn'
 import SocialLogin from './SocialLogin'
 
 const LoginForm = () => {
@@ -219,6 +220,7 @@ const LoginForm = () => {
           </Stack>
           <DividerWithText text='Or Login With' />
           <SocialLogin />
+          <SSOBtn />
           <PolicyTerms />
         </Stack>
       </form>

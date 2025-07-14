@@ -5,6 +5,7 @@ import { Divider, Stack } from '@chakra-ui/react'
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card'
+import SSOConnection from 'components/Connections/SSOConnection'
 import LegalTable from 'components/Tables/LegalTable'
 import OrganizationTable from 'components/Tables/OrganizationTable'
 import PlanTable from 'components/Tables/PlanTable'
@@ -31,6 +32,7 @@ import WeightControl from './components/WeightControl'
 
 function Profile() {
   const { organization } = useGlobalState()
+  const isSuperAdmin = organization?.currentUser?.superAdmin
   const isFreeTier = organization?.tier === 'free'
 
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()
@@ -43,6 +45,7 @@ function Profile() {
     'lists',
     'legal',
     'integrations-org',
+    'SSO',
     'plan',
     'health',
     'custom-fields',
@@ -145,6 +148,7 @@ function Profile() {
                   display={getDisplay(item)}
                   textTransform={'capitalize'}
                   _focus={{ outline: 'none' }}
+                  hidden={!isSuperAdmin && item === 'SSO'}
                 >
                   {item === 'integrations-org'
                     ? 'Integrations'
@@ -184,6 +188,11 @@ function Profile() {
               <TabPanel px={0}>
                 <Connections org={true} />
               </TabPanel>
+              {isSuperAdmin && (
+                <TabPanel px={0}>
+                  <SSOConnection />
+                </TabPanel>
+              )}
               <TabPanel px={0}>
                 <PlanTable />
               </TabPanel>

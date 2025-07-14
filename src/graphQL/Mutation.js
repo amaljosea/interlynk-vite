@@ -3167,3 +3167,42 @@ export const CryptoPropertyDelete = gql`
     }
   }
 `
+
+export const CreateSamlConfig = gql`
+  mutation CreateSamlConfig(
+    $metadataUrl: String!
+    $assertionConsumerServiceUrl: String!
+    $tenant: String!
+  ) {
+    samlConfigCreate(
+      input: {
+        metadataUrl: $metadataUrl
+        assertionConsumerServiceUrl: $assertionConsumerServiceUrl
+        tenant: $tenant
+      }
+    ) {
+      samlConfig {
+        id
+        idpSsoServiceUrl
+        issuer
+        idpCert
+        nameIdentifierFormat
+        tenant
+        metadataUrl
+        enabled
+      }
+      errors
+    }
+  }
+`
+
+export const DeleteSamlConfig = gql`
+  mutation DeleteSamlConfig($id: ID!) {
+    samlConfigDelete(input: { id: $id }) {
+      samlConfig {
+        id
+      }
+      errors
+    }
+  }
+`

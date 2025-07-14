@@ -6,6 +6,7 @@ import Auth from 'layouts/Auth.js'
 import Callback from 'layouts/Callback.js'
 import PageNotFound from 'layouts/PageNotFound.js'
 import Reset from 'layouts/Reset'
+import SSO from 'layouts/SSO.js'
 import Success from 'layouts/Success'
 import React from 'react'
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
@@ -63,6 +64,7 @@ export const MainRoutes = () => {
           <Route path='' element={<Navigate replace to={URL} />} />
           <Route path={`auth`} element={<Login />} />
           <Route path={`reset_password`} element={<Reset />} />
+          <Route path={`sso`} element={<SSO />} />
           <Route path={`register`} element={<Register />} />
           <Route path={`accept-user-invitation`} element={<Success />} />
           <Route path={`confirmation`} element={<Success />} />

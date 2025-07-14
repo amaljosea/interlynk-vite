@@ -61,7 +61,7 @@ const SocialLogin = () => {
         onClick={() => onAuth('google')}
         leftIcon={<FcGoogle fontSize={18} />}
       >
-        Google
+        Log in with Google
       </Button>
       <Button
         width={'100%'}
@@ -70,7 +70,7 @@ const SocialLogin = () => {
         leftIcon={<LuGithub />}
         onClick={() => onAuth('github')}
       >
-        Github
+        Log in with Github
       </Button>
     </Stack>
   )

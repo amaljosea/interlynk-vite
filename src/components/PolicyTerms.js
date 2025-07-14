@@ -10,7 +10,7 @@ const PolicyTerms = () => {
     'primaryBlueText'
   ])
   return (
-    <Stack pb={10}>
+    <Stack>
       <Text fontSize={'xs'} color={sameSecondaryText} textAlign={'center'}>
         By logging in, you acknowledge that you have read and agree to the
         <chakra.span color={primaryBlueText}>
