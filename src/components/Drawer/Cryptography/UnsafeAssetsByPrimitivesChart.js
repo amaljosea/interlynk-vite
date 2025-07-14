@@ -1,30 +1,34 @@
 import { schemeCategory10, schemeSet3 } from 'd3-scale-chromatic'
-import {
-  Cell,
-  Legend,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip
-} from 'recharts'
+import { Cell, Pie, PieChart } from 'recharts'
 
-import { Box, Skeleton, Text } from '@chakra-ui/react'
+import {
+  Box,
+  Flex,
+  Heading,
+  SimpleGrid,
+  Skeleton,
+  Text,
+  VStack
+} from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { QUANTUM_UNSAFE_BLACKLIST } from './AllAssetsQuantumSafetyChart'
 
-const UnsafeAssetsByPrimitivesChart = ({ data }) => {
-  const { primaryBgColor } = useThemeColor(['primaryBgColor'])
+const UnsafeAssetsByPrimitivesChart = ({ data, loading }) => {
+  const { primaryBgColor, grayBorderColor } = useThemeColor([
+    'primaryBgColor',
+    'grayBorderColor'
+  ])
 
   const D3_FALLBACK_COLORS = [...schemeCategory10, ...schemeSet3]
 
-  const getPrimitiveColor = (primitiveValue, index) => {
+  const getPrimitiveColor = (index) => {
     return D3_FALLBACK_COLORS[index % D3_FALLBACK_COLORS.length]
   }
 
-  if (!data) {
-    return <Skeleton height='400px' borderRadius='lg' shadow='sm' />
+  if (loading) {
+    return <Skeleton minHeight='300px' borderRadius='lg' shadow='sm' />
   }
 
   const unsafeAssetsGroupedByPrimitive = data?.sbom?.components?.nodes.reduce(
@@ -41,7 +45,7 @@ const UnsafeAssetsByPrimitivesChart = ({ data }) => {
         if (primitive) {
           acc[primitive] = (acc[primitive] || 0) + 1
         } else {
-          acc['unknown'] = (acc['unknown'] || 0) + 1
+          acc['unknown-primitive'] = (acc['unknown-primitive'] || 0) + 1
         }
       }
       return acc
@@ -50,24 +54,32 @@ const UnsafeAssetsByPrimitivesChart = ({ data }) => {
   )
 
   const chartData = Object.keys(unsafeAssetsGroupedByPrimitive).map(
-    (primitiveKey) => ({
-      name: primitiveKey.replace(/-/g, ' ').replace(/\b\w/g, (char) => char),
-      value: unsafeAssetsGroupedByPrimitive[primitiveKey]
+    (primitiveKey, index) => ({
+      name:
+        primitiveKey === 'unknown-primitive'
+          ? 'Unknown Primitive'
+          : primitiveKey.replace(/-/g, ' ').replace(/\b\w/g, (char) => char),
+      value: unsafeAssetsGroupedByPrimitive[primitiveKey],
+      color: getPrimitiveColor(index)
     })
   )
 
   chartData.sort((a, b) => b.value - a.value)
 
+  const totalAssets = chartData.reduce((sum, entry) => sum + entry.value, 0)
+
   if (!chartData.length) {
     return (
       <Box
         p={4}
-        borderRadius='md'
-        bg={primaryBgColor}
-        minH='300px'
+        borderWidth='1px'
+        borderRadius='lg'
+        shadow='sm'
+        minHeight='300px'
         display='flex'
         alignItems='center'
         justifyContent='center'
+        bg={primaryBgColor}
       >
         <Text>
           No unsafe cryptographic assets with defined primitives found based on
@@ -78,44 +90,71 @@ const UnsafeAssetsByPrimitivesChart = ({ data }) => {
   }
 
   return (
-    <Box p={4} borderWidth='1px' borderRadius='lg' shadow='sm' height='400px'>
-      <Text fontSize='xl' fontWeight='semibold' mb={4} textAlign='center'>
+    <Box
+      p={4}
+      borderWidth='1px'
+      borderRadius='lg'
+      shadow='sm'
+      minHeight='300px'
+    >
+      <Heading size='sm' mb={4}>
         Unsafe Assets by Primitive
-      </Text>
-      <ResponsiveContainer width='100%' height='80%'>
-        <PieChart>
-          <Pie
-            data={chartData}
-            cx='50%'
-            cy='50%'
-            innerRadius={60}
-            outerRadius={90}
-            paddingAngle={5}
-            dataKey='value'
-            label={({ name, percent }) =>
-              `${name} (${(percent * 100).toFixed(0)}%)`
-            }
-            labelLine={false}
-          >
-            {chartData.map((entry, index) => (
-              <Cell
-                key={`cell-${entry.name}`}
-                fill={getPrimitiveColor(
-                  entry.name.toLowerCase().replace(/ /g, '-'),
-                  index
-                )}
-              />
-            ))}
-          </Pie>
-          <Tooltip formatter={(value, name) => [`${value} assets`, name]} />
-          <Legend
-            layout='vertical'
-            align='right'
-            verticalAlign='middle'
-            wrapperStyle={{ paddingLeft: '20px' }}
-          />
-        </PieChart>
-      </ResponsiveContainer>
+      </Heading>
+
+      <SimpleGrid w={'100%'} columns={2} alignItems={'center'}>
+        <Flex justify='center' align='center' position='relative'>
+          <PieChart width={180} height={180}>
+            <Pie
+              cx='50%'
+              cy='50%'
+              data={chartData}
+              dataKey='value'
+              innerRadius={50}
+              outerRadius={70}
+              paddingAngle={0}
+            >
+              {chartData.map((entry) => (
+                <Cell key={`cell-${entry.name}`} fill={entry.color} />
+              ))}
+            </Pie>
+          </PieChart>
+          <Box position='absolute' textAlign='center'>
+            <Text fontSize='lg' fontWeight='bold'>
+              {totalAssets || 0}
+            </Text>
+            <Text fontSize='sm' color='gray'>
+              Total
+            </Text>
+          </Box>
+        </Flex>
+
+        <VStack spacing={2} align='start' mt={4}>
+          {chartData.map((item) => (
+            <Flex
+              gap={4}
+              width={'90%'}
+              key={item.name}
+              align='center'
+              justifyContent={'space-between'}
+              borderBottom={`1px solid ${grayBorderColor}`}
+            >
+              <Flex align='center' w={'130px'}>
+                <Box
+                  mr='2'
+                  w='10px'
+                  h='10px'
+                  bg={item.color}
+                  borderRadius='full'
+                />
+                <Text fontSize={'sm'}>{item.name}</Text>
+              </Flex>
+              <Text fontSize={'md'} fontWeight='semibold'>
+                {item.value}
+              </Text>
+            </Flex>
+          ))}
+        </VStack>
+      </SimpleGrid>
     </Box>
   )
 }

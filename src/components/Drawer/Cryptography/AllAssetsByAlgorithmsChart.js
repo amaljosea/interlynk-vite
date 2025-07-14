@@ -1,24 +1,30 @@
 import { schemeCategory10, schemePaired, schemeSet3 } from 'd3-scale-chromatic'
-import {
-  Cell,
-  Legend,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip
-} from 'recharts'
+import { Cell, Pie, PieChart } from 'recharts'
 
-import { Box, Skeleton, Text } from '@chakra-ui/react'
+import {
+  Box,
+  Flex,
+  Heading,
+  SimpleGrid,
+  Skeleton,
+  Text,
+  VStack
+} from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
-const AllAssetsByAlgorithmsChart = ({ data }) => {
-  const { primaryBgColor } = useThemeColor(['primaryBgColor'])
+const AllAssetsByAlgorithmsChart = ({ data, loading }) => {
+  const { primaryBgColor, grayBorderColor } = useThemeColor([
+    'primaryBgColor',
+    'grayBorderColor'
+  ])
 
   const D3_COLORS = [...schemeCategory10, ...schemeSet3, ...schemePaired]
 
-  if (!data) {
-    return <Skeleton height='400px' borderRadius='lg' shadow='sm' />
+  const getDynamicColor = (index) => D3_COLORS[index % D3_COLORS.length]
+
+  if (loading) {
+    return <Skeleton minHeight='300px' borderRadius='lg' shadow='sm' />
   }
 
   const algorithmCounts = data?.sbom?.components?.nodes.reduce(
@@ -35,72 +41,114 @@ const AllAssetsByAlgorithmsChart = ({ data }) => {
     {}
   )
 
-  const chartData = algorithmCounts
-    ? Object.keys(algorithmCounts)
-        .map((name) => ({
-          name: name,
-          value: algorithmCounts[name]
-        }))
-        .sort((a, b) => b.value - a.value)
-    : []
+  const chartData = Object.keys(algorithmCounts || {})
+    .map((name, index) => ({
+      name: name,
+      value: algorithmCounts[name],
+      color: getDynamicColor(index)
+    }))
+    .sort((a, b) => b.value - a.value)
+    .filter((item) => item.value > 0)
 
-  const getDynamicColor = (index) => D3_COLORS[index % D3_COLORS.length]
+  const totalAlgorithms = chartData.reduce((sum, entry) => sum + entry.value, 0)
 
   if (!chartData.length) {
     return (
       <Box
         p={4}
-        borderRadius='md'
-        bg={primaryBgColor}
-        minH='300px'
+        borderWidth='1px'
+        borderRadius='lg'
+        shadow='sm'
+        minHeight='300px'
         display='flex'
         alignItems='center'
         justifyContent='center'
+        bg={primaryBgColor}
       >
         <Text>No cryptographic algorithms found to display.</Text>
       </Box>
     )
   }
 
-  const displayChartData = chartData
-
   return (
-    <Box p={4} borderWidth='1px' borderRadius='lg' shadow='sm' height='400px'>
-      <Text fontSize='xl' fontWeight='semibold' mb={4} textAlign='center'>
+    <Box
+      p={4}
+      borderWidth='1px'
+      borderRadius='lg'
+      shadow='sm'
+      minHeight='300px'
+    >
+      <Heading size='sm' mb={4}>
         All Assets by Algorithms
-      </Text>
-      <ResponsiveContainer width='100%' height='80%'>
-        <PieChart>
-          <Pie
-            data={displayChartData}
-            cx='50%'
-            cy='50%'
-            innerRadius={60}
-            outerRadius={90}
-            paddingAngle={1}
-            dataKey='value'
-            // label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-            // labelLine={false}
-          >
-            {displayChartData.map((entry, index) => (
-              <Cell key={`cell-${entry.name}`} fill={getDynamicColor(index)} />
+      </Heading>
+
+      <SimpleGrid w={'100%'} columns={2} alignItems={'flex-start'}>
+        <Flex justify='center' align='center' position='relative'>
+          <PieChart width={180} height={180}>
+            <Pie
+              cx='50%'
+              cy='50%'
+              data={chartData}
+              dataKey='value'
+              innerRadius={50}
+              outerRadius={70}
+              paddingAngle={0}
+            >
+              {chartData.map((entry) => (
+                <Cell key={`cell-${entry.name}`} fill={entry.color} />
+              ))}
+            </Pie>
+          </PieChart>
+          <Box position='absolute' textAlign='center'>
+            <Text fontSize='lg' fontWeight='bold'>
+              {totalAlgorithms || 0}
+            </Text>
+            <Text fontSize='sm' color='gray'>
+              Total
+            </Text>
+          </Box>
+        </Flex>
+        <Box mt={4} maxHeight='200px' overflowY='auto' pr={2} flexGrow={1}>
+          <VStack spacing={2} align='start' w='100%'>
+            {chartData.map((item) => (
+              <Flex
+                gap={4}
+                width={'100%'}
+                key={item.name}
+                align='center'
+                justifyContent={'space-between'}
+                borderBottom={`1px solid ${grayBorderColor}`}
+                pb={1}
+              >
+                <Flex align='center' flex={1} minW={0}>
+                  <Box
+                    mr='2'
+                    minW='10px'
+                    h='10px'
+                    bg={item.color}
+                    borderRadius='full'
+                  />
+                  <Text
+                    fontSize={'sm'}
+                    whiteSpace='normal'
+                    wordBreak='break-word'
+                  >
+                    {item.name}
+                  </Text>
+                </Flex>
+                <Text
+                  fontSize={'md'}
+                  fontWeight='semibold'
+                  flexShrink={0}
+                  ml={2}
+                >
+                  {item.value}
+                </Text>
+              </Flex>
             ))}
-          </Pie>
-          <Tooltip formatter={(value, name) => [`${value} algorithms`, name]} />
-          <Legend
-            layout='horizontal'
-            verticalAlign='bottom'
-            align='center'
-            wrapperStyle={{
-              paddingTop: '10px',
-              width: '100%',
-              maxHeight: '100px',
-              overflowY: 'auto',
-              fontSize: '14px'
-            }}
-          />
-        </PieChart>
-      </ResponsiveContainer>
+          </VStack>
+        </Box>
+      </SimpleGrid>
     </Box>
   )
 }

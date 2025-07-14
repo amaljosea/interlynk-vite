@@ -17,7 +17,7 @@ const CBOMAnalysisDrawer = ({ isOpen, onClose }) => {
   const productId = params.productid
   const sbomId = params.sbomid
 
-  const { data, error } = useQuery(GetCryptoData, {
+  const { data, loading, error } = useQuery(GetCryptoData, {
     skip: !isOpen,
     variables: {
       sbomId: sbomId,
@@ -33,8 +33,7 @@ const CBOMAnalysisDrawer = ({ isOpen, onClose }) => {
       isOpen={isOpen}
       onClose={onClose}
       noFooter
-      size='xl'
-      placement='bottom'
+      size='2xl'
     >
       <Box p={6}>
         {error && (
@@ -45,10 +44,10 @@ const CBOMAnalysisDrawer = ({ isOpen, onClose }) => {
 
         {!error && (
           <SimpleGrid columns={{ base: 1, md: 2, lg: 2 }} spacing={6}>
-            <AllAssetsByTypeChart data={data} />
-            <AllAssetsQuantumSafetyChart data={data} />
-            <UnsafeAssetsByPrimitivesChart data={data} />
-            <AllAssetsByAlgorithmsChart data={data} />
+            <AllAssetsByTypeChart data={data} loading={loading} />
+            <AllAssetsQuantumSafetyChart data={data} loading={loading} />
+            <UnsafeAssetsByPrimitivesChart data={data} loading={loading} />
+            <AllAssetsByAlgorithmsChart data={data} loading={loading} />
           </SimpleGrid>
         )}
       </Box>

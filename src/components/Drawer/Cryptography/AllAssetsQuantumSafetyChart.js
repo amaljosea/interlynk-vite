@@ -1,13 +1,14 @@
-import {
-  Cell,
-  Legend,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip
-} from 'recharts'
+import { Cell, Pie, PieChart } from 'recharts'
 
-import { Box, Skeleton, Text } from '@chakra-ui/react'
+import {
+  Box,
+  Flex,
+  Heading,
+  SimpleGrid,
+  Skeleton,
+  Text,
+  VStack
+} from '@chakra-ui/react'
 
 import { useThemeColor } from 'hooks/useThemeColors'
 
@@ -76,30 +77,28 @@ const QUANTUM_NOT_APPLICABLE_LIST = [
   'RAW'
 ]
 
-const AllAssetsQuantumSafetyChart = ({ data }) => {
+const AllAssetsQuantumSafetyChart = ({ data, loading }) => {
   const {
     lynkGreenColor, // SAFE
     primaryErrorColor, // UNSAFE
-    lynkOrange, // UNKNOWN
+    lynkYellowColor, // UNKNOWN
     grayHeaderColor, // NOT_APPLICABLE
-    primaryBgColor
+    primaryBgColor,
+    grayBorderColor
   } = useThemeColor([
     'lynkGreenColor',
     'primaryErrorColor',
-    'lynkOrange',
+    'lynkYellowColor',
     'grayHeaderColor',
-    'primaryBgColor'
+    'primaryBgColor',
+    'grayBorderColor'
   ])
 
-  const COLORS = {
-    SAFE: lynkGreenColor,
-    UNSAFE: primaryErrorColor,
-    UNKNOWN: lynkOrange,
-    NOT_APPLICABLE: grayHeaderColor
-  }
-
-  if (!data) {
-    return <Skeleton height='400px' borderRadius='lg' shadow='sm' />
+  const STATUS_MAP = {
+    SAFE: { name: 'Safe', color: lynkGreenColor },
+    UNSAFE: { name: 'Unsafe', color: primaryErrorColor },
+    UNKNOWN: { name: 'Unknown', color: lynkYellowColor },
+    NOT_APPLICABLE: { name: 'Not applicable', color: grayHeaderColor }
   }
 
   const quantumSafetyCounts = data?.sbom?.components?.nodes.reduce(
@@ -122,28 +121,43 @@ const AllAssetsQuantumSafetyChart = ({ data }) => {
     {}
   )
 
-  const chartData = Object.keys(quantumSafetyCounts).map((status) => ({
-    name:
-      status.charAt(0).toUpperCase() +
-      status.slice(1).toLowerCase().replace(/_/g, ' '),
-    value: quantumSafetyCounts[status]
-  }))
+  const chartData = Object.keys(quantumSafetyCounts || {})
+    .map((statusKey) => {
+      const mappedInfo = STATUS_MAP[statusKey]
+      return {
+        name: mappedInfo.name,
+        value: quantumSafetyCounts[statusKey],
+        color: mappedInfo.color
+      }
+    })
+    .filter((item) => item.value > 0)
 
   const desiredOrder = ['Safe', 'Unsafe', 'Unknown', 'Not applicable']
   const sortedChartData = desiredOrder
-    .map((category) => chartData.find((item) => item.name === category))
+    .map((categoryName) => chartData.find((item) => item.name === categoryName))
     .filter(Boolean)
+
+  const totalAssets = sortedChartData.reduce(
+    (sum, entry) => sum + entry.value,
+    0
+  )
+
+  if (loading) {
+    return <Skeleton minHeight='300px' borderRadius='lg' shadow='sm' />
+  }
 
   if (!sortedChartData.length) {
     return (
       <Box
         p={4}
-        borderRadius='md'
-        bg={primaryBgColor}
-        minH='300px'
+        borderWidth='1px'
+        borderRadius='lg'
+        shadow='sm'
+        minHeight='300px'
         display='flex'
         alignItems='center'
         justifyContent='center'
+        bg={primaryBgColor}
       >
         <Text>No cryptographic assets found for quantum safety analysis.</Text>
       </Box>
@@ -151,41 +165,74 @@ const AllAssetsQuantumSafetyChart = ({ data }) => {
   }
 
   return (
-    <Box p={4} borderWidth='1px' borderRadius='lg' shadow='sm' height='400px'>
-      <Text fontSize='xl' fontWeight='semibold' mb={4} textAlign='center'>
+    <Box
+      p={4}
+      borderWidth='1px'
+      borderRadius='lg'
+      shadow='sm'
+      minHeight='300px'
+    >
+      <Heading size='sm' mb={4}>
         All Assets Quantum Safety
-      </Text>
-      <ResponsiveContainer width='100%' height='80%'>
-        <PieChart>
-          <Pie
-            data={sortedChartData}
-            cx='50%'
-            cy='50%'
-            innerRadius={60}
-            outerRadius={90}
-            paddingAngle={5}
-            dataKey='value'
-            label={({ name, percent }) =>
-              `${name} (${(percent * 100).toFixed(0)}%)`
-            }
-            labelLine={false}
-          >
-            {sortedChartData.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={COLORS[entry.name.toUpperCase().replace(/ /g, '_')]}
-              />
-            ))}
-          </Pie>
-          <Tooltip formatter={(value, name) => [`${value} assets`, name]} />
-          <Legend
-            layout='vertical'
-            align='right'
-            verticalAlign='middle'
-            wrapperStyle={{ paddingLeft: '0px' }}
-          />
-        </PieChart>
-      </ResponsiveContainer>
+      </Heading>
+
+      <SimpleGrid w={'100%'} columns={2} alignItems={'center'}>
+        <Flex justify='center' align='center' position='relative'>
+          <PieChart width={180} height={180}>
+            <Pie
+              cx='50%'
+              cy='50%'
+              data={sortedChartData}
+              dataKey='value'
+              innerRadius={50}
+              outerRadius={70}
+              paddingAngle={0}
+            >
+              {sortedChartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
+              ))}
+            </Pie>
+          </PieChart>
+
+          <Box position='absolute' textAlign='center'>
+            <Text fontSize='lg' fontWeight='bold'>
+              {totalAssets || 0}
+            </Text>
+            <Text fontSize='sm' color='gray'>
+              Total
+            </Text>
+          </Box>
+        </Flex>
+
+        <VStack spacing={2} align='start' mt={4}>
+          {sortedChartData.map((item) => (
+            <Flex
+              gap={4}
+              width={'90%'}
+              key={item.name}
+              align='center'
+              justifyContent={'space-between'}
+              borderBottom={`1px solid ${grayBorderColor}`}
+            >
+              <Flex align='center' w={'130px'}>
+                <Box
+                  mr='2'
+                  w='10px'
+                  h='10px'
+                  bg={item.color}
+                  borderRadius='full'
+                />
+                <Text fontSize={'sm'} textTransform={'capitalize'}>
+                  {item.name}
+                </Text>
+              </Flex>
+              <Text fontSize={'md'} fontWeight='semibold'>
+                {item.value}
+              </Text>
+            </Flex>
+          ))}
+        </VStack>
+      </SimpleGrid>
     </Box>
   )
 }
