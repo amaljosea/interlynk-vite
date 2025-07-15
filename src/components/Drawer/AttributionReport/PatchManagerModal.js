@@ -6,7 +6,7 @@ import { hasWhiteSpace, validateUrl } from 'utils/formValidationUtils'
 import {
   Box,
   Button,
-  Select as ChakraSelect,
+  Divider,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -21,6 +21,8 @@ import {
 import ConfirmDeleteButton from 'components/ConfirmDeleteButton'
 import LynkAlert from 'components/LynkAlert'
 import LynkModal from 'components/LynkModal'
+import LynkSelect from 'components/LynkSelect'
+import LynkFormLabel from 'components/Misc/LynkLabel'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -69,19 +71,17 @@ const PatchFormFields = ({
         {!!errors.url && <FormErrorMessage>{errors.url}</FormErrorMessage>}
       </FormControl>
       <FormControl>
-        <FormLabel htmlFor='patch-kind'>Kind</FormLabel>
-        <ChakraSelect
-          value={patch.kind}
-          onChange={(e) => onChange('kind', e.target.value)}
+        <LynkFormLabel label='Kind' />
+        <LynkSelect
+          placeholder='-- SELECT --'
+          value={
+            PATCH_KIND_OPTIONS.find((opt) => opt.value === patch.kind) || null
+          }
+          onChange={(selected) => onChange('kind', selected?.value || '')}
+          options={PATCH_KIND_OPTIONS}
           isDisabled={disabled}
-          minW='120px'
-        >
-          {PATCH_KIND_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </ChakraSelect>
+          dropDown
+        />
       </FormControl>
     </>
   )
@@ -150,9 +150,9 @@ const PatchManagerModal = ({ isOpen, onClose, rowData }) => {
   const [deletePatch, { loading: deletePatchLoading }] =
     useMutation(PatchDelete)
 
-  const { secondaryBgColor, primaryBlueText } = useThemeColor([
-    'secondaryBgColor',
-    'primaryBlueText'
+  const { primaryBlueText, secondaryTextInverse } = useThemeColor([
+    'primaryBlueText',
+    'secondaryTextInverse'
   ])
 
   useEffect(() => {
@@ -353,7 +353,9 @@ const PatchManagerModal = ({ isOpen, onClose, rowData }) => {
               status='info'
             />
           )}
-          <Text fontWeight='bold'>Add New Patch</Text>
+          <Text fontWeight={'medium'} color={secondaryTextInverse}>
+            Add New Patch
+          </Text>
           <Box display='flex' flexDirection='column' gap={2} mb={4}>
             <PatchFormFields
               patch={newPatch}
@@ -369,20 +371,14 @@ const PatchManagerModal = ({ isOpen, onClose, rowData }) => {
               isPrimaryDisabled={!newPatch.content || editingPatch.id}
             />
           </Box>
-          <Text mt={4} fontWeight='bold'>
+          <Text fontWeight={'medium'} color={secondaryTextInverse}>
             Patch Records
           </Text>
           {patches?.length > 0 ? (
             <>
               {patches.map((patch) => (
-                <Box
-                  key={patch.id}
-                  mb={4}
-                  p={4}
-                  borderRadius='md'
-                  bg={secondaryBgColor}
-                >
-                  <Flex align='flex-start' justify='space-between'>
+                <Box key={patch.id} p={4} borderRadius='md'>
+                  <Flex align='flex-start' justify='space-between' mb={4}>
                     <Box flex='1'>
                       {editingPatch.id === patch.id ? (
                         <Box
@@ -512,13 +508,13 @@ const PatchManagerModal = ({ isOpen, onClose, rowData }) => {
                             onClick: () => handleEditPatch(patch),
                             isDisabled: updatePatchLoading,
                             ariaLabel: 'Edit Patch',
-                            size: 'md',
-                            type: 'primary'
+                            size: 'md'
                           }}
                         />
                       </HStack>
                     </Box>
                   </Flex>
+                  <Divider />
                 </Box>
               ))}
             </>
