@@ -263,7 +263,7 @@ const VulnLinkDrawer = ({ data, isOpen, onClose }) => {
           </Button>
           {/* TABLE */}
           <Flex width={'100%'} flexDir={'column'}>
-            <Text size='md' my={2}>
+            <Text my={2} fontWeight={'medium'} color={secondaryTextInverse}>
               Existing Links
             </Text>
             {vulnLinks.length > 0 ? (

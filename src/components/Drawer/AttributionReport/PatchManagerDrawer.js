@@ -3,15 +3,15 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { truncatedValue } from 'utils'
 import { hasWhiteSpace, validateUrl } from 'utils/formValidationUtils'
+import ActionButton from 'views/Dashboard/Products/components/ActionButton'
 
 import {
   Box,
   Button,
-  Select as ChakraSelect,
+  Divider,
   Flex,
   FormControl,
   FormErrorMessage,
-  FormLabel,
   HStack,
   Input,
   Stack,
@@ -24,7 +24,9 @@ import ConfirmDeleteButton from 'components/ConfirmDeleteButton'
 import CustomLoader from 'components/CustomLoader'
 import LynkAlert from 'components/LynkAlert'
 import LynkDrawer from 'components/LynkDrawer'
+import LynkSelect from 'components/LynkSelect'
 import CompInfo from 'components/Misc/CompInfo'
+import LynkFormLabel from 'components/Misc/LynkLabel'
 
 import useCustomToast from 'hooks/useCustomToast'
 import { useThemeColor } from 'hooks/useThemeColors'
@@ -51,7 +53,7 @@ const PatchFormFields = ({
   return (
     <Stack gap={4}>
       <FormControl isRequired>
-        <FormLabel htmlFor='patch-content'>Content</FormLabel>
+        <LynkFormLabel label='Content' />
         <Textarea
           placeholder='Enter patch content here'
           value={patch.content}
@@ -63,7 +65,7 @@ const PatchFormFields = ({
         />
       </FormControl>
       <FormControl isInvalid={!!errors.url}>
-        <FormLabel htmlFor='patch-url'>URL</FormLabel>
+        <LynkFormLabel label='URL' />
         <Input
           placeholder='Enter URL for the patch (optional)'
           value={patch.url}
@@ -74,19 +76,17 @@ const PatchFormFields = ({
         {!!errors.url && <FormErrorMessage>{errors.url}</FormErrorMessage>}
       </FormControl>
       <FormControl>
-        <FormLabel htmlFor='patch-kind'>Kind</FormLabel>
-        <ChakraSelect
-          value={patch.kind}
-          onChange={(e) => onChange('kind', e.target.value)}
+        <LynkFormLabel label='Kind' />
+        <LynkSelect
+          placeholder='-- SELECT --'
+          value={
+            PATCH_KIND_OPTIONS.find((opt) => opt.value === patch.kind) || null
+          }
+          onChange={(selected) => onChange('kind', selected?.value || '')}
+          options={PATCH_KIND_OPTIONS}
           isDisabled={disabled}
-          minW='120px'
-        >
-          {PATCH_KIND_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </ChakraSelect>
+          dropDown
+        />
       </FormControl>
     </Stack>
   )
@@ -101,6 +101,7 @@ const PatchFormActions = ({
   isCancelDisabled
 }) => {
   const isAddPatch = primaryText === 'Add Patch'
+
   return (
     <HStack mt={2} spacing={2} align='start'>
       {onCancel && (
@@ -113,18 +114,28 @@ const PatchFormActions = ({
           Cancel
         </Button>
       )}
-      <Button
-        colorScheme={isAddPatch ? 'gray' : 'blue'}
-        variant={isAddPatch ? 'solid' : 'outline'}
-        onClick={onPrimary}
-        isDisabled={isPrimaryDisabled}
-        isLoading={isPrimaryLoading}
-        minW={isAddPatch ? 'full' : '60px'}
-        fontSize={'sm'}
-        leftIcon={isAddPatch && <LuPlus size={18} />}
-      >
-        {primaryText}
-      </Button>
+
+      {isAddPatch ? (
+        <ActionButton
+          title='Add Patch'
+          onClick={onPrimary}
+          isDisabled={isPrimaryDisabled}
+          isLoading={isPrimaryLoading}
+          icon={<LuPlus size={18} />}
+        />
+      ) : (
+        <Button
+          colorScheme='blue'
+          variant='outline'
+          onClick={onPrimary}
+          isDisabled={isPrimaryDisabled}
+          isLoading={isPrimaryLoading}
+          minW='60px'
+          fontSize='sm'
+        >
+          {primaryText}
+        </Button>
+      )}
     </HStack>
   )
 }
@@ -174,9 +185,9 @@ const PatchManagerDrawer = ({ isOpen, onClose, rowData }) => {
   const [deletePatch, { loading: deletePatchLoading }] =
     useMutation(PatchDelete)
 
-  const { secondaryBgColor, primaryBlueText } = useThemeColor([
-    'secondaryBgColor',
-    'primaryBlueText'
+  const { primaryBlueText, secondaryTextInverse } = useThemeColor([
+    'primaryBlueText',
+    'secondaryTextInverse'
   ])
 
   useEffect(() => {
@@ -371,14 +382,16 @@ const PatchManagerDrawer = ({ isOpen, onClose, rowData }) => {
       onSubmit={onSubmit}
     >
       <Box>
-        <VStack align='stretch' spacing={2} mt={6}>
+        <VStack align='stretch' spacing={2} mt={4}>
           {editingPatch.id && (
             <LynkAlert
               msg='You are currently editing a patch. Please save or cancel your changes before adding a new patch.'
               status='info'
             />
           )}
-          <Text fontWeight='bold'>Add New Patch</Text>
+          <Text fontWeight={'medium'} color={secondaryTextInverse}>
+            Add New Patch
+          </Text>
           <Box display='flex' flexDirection='column' gap={2} mb={4}>
             <PatchFormFields
               patch={newPatch}
@@ -394,7 +407,8 @@ const PatchManagerDrawer = ({ isOpen, onClose, rowData }) => {
               isPrimaryDisabled={!newPatch.content || editingPatch.id}
             />
           </Box>
-          <Text mt={4} fontWeight='bold'>
+          <Divider />
+          <Text fontWeight={'medium'} color={secondaryTextInverse}>
             Patch Records
           </Text>
           {queryLoading ? (
@@ -402,14 +416,8 @@ const PatchManagerDrawer = ({ isOpen, onClose, rowData }) => {
           ) : patches?.length > 0 ? (
             <>
               {patches.map((patch) => (
-                <Box
-                  key={patch.id}
-                  mb={4}
-                  p={4}
-                  borderRadius='md'
-                  bg={secondaryBgColor}
-                >
-                  <Flex align='flex-start' justify='space-between'>
+                <Box key={patch.id} p={4} borderRadius='md'>
+                  <Flex align='flex-start' justify='space-between' mb={4}>
                     <Box flex='1'>
                       {editingPatch.id === patch.id ? (
                         <Box
@@ -539,13 +547,13 @@ const PatchManagerDrawer = ({ isOpen, onClose, rowData }) => {
                             onClick: () => handleEditPatch(patch),
                             isDisabled: updatePatchLoading,
                             ariaLabel: 'Edit Patch',
-                            size: 'md',
-                            type: 'primary'
+                            size: 'md'
                           }}
                         />
                       </HStack>
                     </Box>
                   </Flex>
+                  <Divider />
                 </Box>
               ))}
             </>
