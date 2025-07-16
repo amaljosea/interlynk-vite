@@ -19,7 +19,6 @@ import {
   MenuOptionGroup
 } from '@chakra-ui/react'
 
-import LynkMenuList from 'components/Misc/LynkMenuList'
 import LynkSwitch from 'components/Misc/LynkSwitch'
 import MenuHeading from 'components/Misc/MenuHeading'
 
@@ -267,6 +266,22 @@ const CompFilters = ({ reset }) => {
     }
   }
 
+  const handleEcosystemChange = (selected) => {
+    if (selected?.includes('All')) {
+      onFilter('Ecosystem', [])
+    } else {
+      onFilter('Ecosystem', selected?.length === 0 ? [] : selected)
+    }
+  }
+
+  const handleTypeChange = (selected) => {
+    if (selected?.includes('All')) {
+      onFilter('Kind', [])
+    } else {
+      onFilter('Kind', selected?.length === 0 ? [] : selected)
+    }
+  }
+
   // Helper to determine if the license filter is active
   const isLicenseFilterActive = (licenseType, licenses) => {
     return (
@@ -284,13 +299,27 @@ const CompFilters = ({ reset }) => {
           active={ecosystems?.length !== 0}
           onClick={() => onCheckFilters('Ecosystem')}
         />
-        <LynkMenuList
-          type='Ecosystem'
-          value={ecosystems}
-          onFilter={onFilter}
-          loading={ecoLoading}
-          options={compEcosystems}
-        />
+        <MenuList fontSize={'sm'}>
+          <MenuOptionGroup
+            type='checkbox'
+            value={ecosystems || []}
+            onChange={handleEcosystemChange}
+          >
+            {ecoLoading ? (
+              <Stack spacing={2} px={2}>
+                {[1, 2, 3, 4, 5].map((item) => (
+                  <Skeleton key={item} width={'230px'} height={4} />
+                ))}
+              </Stack>
+            ) : (
+              compEcosystems.map((item, index) => (
+                <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                  {capitalizeFirstLetter(item)}
+                </MenuItemOption>
+              ))
+            )}
+          </MenuOptionGroup>
+        </MenuList>
       </Menu>
       {/* EXCLUDE */}
       <Menu closeOnSelect={false}>
@@ -396,13 +425,27 @@ const CompFilters = ({ reset }) => {
           active={kinds?.length !== 0}
           onClick={() => onCheckFilters('Kind')}
         />
-        <LynkMenuList
-          type='Kind'
-          value={kinds}
-          onFilter={onFilter}
-          options={compKinds}
-          loading={kindLoading}
-        />
+        <MenuList fontSize={'sm'}>
+          <MenuOptionGroup
+            type='checkbox'
+            value={kinds || []}
+            onChange={handleTypeChange}
+          >
+            {kindLoading ? (
+              <Stack spacing={2} px={2}>
+                {[1, 2, 3, 4, 5].map((item) => (
+                  <Skeleton key={item} width={'230px'} height={4} />
+                ))}
+              </Stack>
+            ) : (
+              compKinds.map((item, index) => (
+                <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                  {capitalizeFirstLetter(item)}
+                </MenuItemOption>
+              ))
+            )}
+          </MenuOptionGroup>
+        </MenuList>
       </Menu>
       {/* VISIBILITY */}
       <Menu closeOnSelect={false}>

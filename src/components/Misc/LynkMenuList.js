@@ -11,6 +11,7 @@ import {
   Stack,
   Text
 } from '@chakra-ui/react'
+
 import { LuCircleCheck } from 'react-icons/lu'
 
 const LynkMenuList = ({ type, options, value, loading, onFilter }) => {

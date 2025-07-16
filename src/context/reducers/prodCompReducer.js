@@ -74,12 +74,12 @@ const prodCompReducer = (state, action) => {
     case 'FILTER_ECOSYSTEM':
       return {
         ...state,
-        ecosystems: toggleSelection(state.ecosystems, payload)
+        ecosystems: payload
       }
     case 'FILTER_KIND':
       return {
         ...state,
-        kinds: toggleSelection(state.kinds, payload)
+        kinds: payload
       }
     case 'FILTER_LICENSE': {
       return {
