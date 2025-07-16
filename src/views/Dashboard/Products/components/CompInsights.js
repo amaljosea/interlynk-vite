@@ -279,15 +279,15 @@ const CompInsights = ({ isOpen, onClose, data }) => {
           <CustomLoader />
         </Box>
       ) : (
-        <Tabs
-          position={'fixed'}
-          w={'100%'}
-          left={0}
-          top={!insights ? '60px' : '90px'}
-          isFitted
-          defaultIndex={1}
-        >
-          <TabList bg={secondaryBgColor} zIndex={11}>
+        <Tabs isFitted defaultIndex={1}>
+          <TabList
+            left={0}
+            right={0}
+            zIndex={11}
+            position={'fixed'}
+            bg={secondaryBgColor}
+            top={!data ? '60px' : '96px'}
+          >
             {tabs.map((item, index) => (
               <Tab
                 key={index}
@@ -299,9 +299,9 @@ const CompInsights = ({ isOpen, onClose, data }) => {
               </Tab>
             ))}
           </TabList>
-          <TabPanels>
+          <TabPanels pos={'relative'} top={12} overflowX={'hidden'} p={0}>
             {/* PACKAGE */}
-            <TabPanel>
+            <TabPanel px={0}>
               {enrichedContent?.package ? (
                 <Stack>
                   {packageData?.map((item) => (
@@ -318,7 +318,7 @@ const CompInsights = ({ isOpen, onClose, data }) => {
               )}
             </TabPanel>
             {/* PACKAGE VERSION */}
-            <TabPanel>
+            <TabPanel px={0}>
               {packageVersion ? (
                 <Stack>
                   {packageVersionData?.map((item) => (
@@ -335,7 +335,7 @@ const CompInsights = ({ isOpen, onClose, data }) => {
               )}
             </TabPanel>
             {/* SOURCE CODE */}
-            <TabPanel>
+            <TabPanel px={0}>
               {repository ? (
                 <Stack>
                   {sourceCodeData?.map((item) => (
@@ -352,7 +352,7 @@ const CompInsights = ({ isOpen, onClose, data }) => {
               )}
             </TabPanel>
             {/* HEALTH SCORE */}
-            <TabPanel>
+            <TabPanel px={0}>
               <HealthScore scores={scores} />
             </TabPanel>
           </TabPanels>
