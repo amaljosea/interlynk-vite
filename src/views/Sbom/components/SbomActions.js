@@ -83,6 +83,7 @@ const SbomActions = ({ sbom }) => {
   })
 
   const { loading: cryptoAssetsCheckLoading } = useQuery(HasCryptoAssets, {
+    skip: signedUrlParams,
     variables: {
       sbomId: sbomId,
       projectId: productId,
