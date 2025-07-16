@@ -53,7 +53,9 @@ function SidebarResponsive(props) {
   const filteredRoutes = isFreeTier
     ? routes.filter(
         ({ name }) =>
-          !['Requests', 'Licenses', 'Analytics', 'Support'].includes(name)
+          !['Requests', 'Licenses', 'Analytics', 'Support', 'Package'].includes(
+            name
+          )
       )
     : routes
 

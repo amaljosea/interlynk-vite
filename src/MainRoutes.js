@@ -104,7 +104,10 @@ export const MainRoutes = () => {
             path='licenses'
             element={<ConditionalRoute element={Licenses} />}
           />
-          <Route path={`package`} element={<Package />} />
+          <Route
+            path={`package`}
+            element={<ConditionalRoute element={Package} />}
+          />
           <Route
             path='analytics'
             element={<ConditionalRoute element={Analytics} />}

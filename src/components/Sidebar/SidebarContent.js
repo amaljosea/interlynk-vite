@@ -31,9 +31,13 @@ const SidebarContent = ({ routes }) => {
       isFreeTier || !organization
         ? routes.filter(
             (route) =>
-              !['Requests', 'Licenses', 'Analytics', 'Support'].includes(
-                route.name
-              )
+              ![
+                'Requests',
+                'Licenses',
+                'Analytics',
+                'Support',
+                'Package'
+              ].includes(route.name)
           )
         : routes
     setFilteredRoutes(updatedRoutes)
