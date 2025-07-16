@@ -10,6 +10,14 @@
   background-color: darkgrey;
 }
 
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 input::placeholder,
 textarea::placeholder {
   color: #a0aec0;

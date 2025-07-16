@@ -96,12 +96,12 @@ const CompDrawer = ({ isOpen, onClose, data, primaryComp }) => {
     >
       <Tabs px={0} isFitted onChange={onTabChange}>
         <TabList
-          position={'fixed'}
-          bg={secondaryBgColor}
-          zIndex={11}
           left={0}
           right={0}
-          top={!data ? '60px' : '90px'}
+          zIndex={11}
+          position={'fixed'}
+          bg={secondaryBgColor}
+          top={!data ? '60px' : '96px'}
         >
           {tabs.map((item, index) => (
             <Tab

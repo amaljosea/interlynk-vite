@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 import {
   Box,
   Divider, // eslint-disable-next-line no-restricted-imports
@@ -33,16 +35,28 @@ const LynkDrawer = ({
   children
 }) => {
   const { secondaryTextInverse } = useThemeColor(['secondaryTextInverse'])
+
+  const handleClose = () => {
+    document.body.style.overflow = 'auto'
+    onClose()
+  }
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    }
+  }, [isOpen])
+
   return (
     <Drawer
       size={size}
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       closeOnOverlayClick={false}
       placement={placement}
     >
       <DrawerOverlay />
-      <DrawerContent>
+      <DrawerContent pos={'relative'}>
         <DrawerCloseButton mt={'7px'} aria-label='comp_close' />
         <DrawerHeader
           fontWeight='500'
@@ -57,13 +71,7 @@ const LynkDrawer = ({
         <DrawerBody
           paddingInline={'16px'}
           overflowX={'hidden'}
-          sx={{
-            '&::-webkit-scrollbar': {
-              display: 'none'
-            },
-            '-ms-overflow-style': 'none',
-            'scrollbar-width': 'none'
-          }}
+          className='hide-scrollbar'
         >
           {children}
         </DrawerBody>
