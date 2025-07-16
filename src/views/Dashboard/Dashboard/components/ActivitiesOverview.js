@@ -43,7 +43,7 @@ const ActivitiesOverview = () => {
 
   if (latestActivity?.length === 0) {
     return (
-      <Center h='100%'>
+      <Center h='100%' py={12}>
         <Text>There are no records to display</Text>
       </Center>
     )

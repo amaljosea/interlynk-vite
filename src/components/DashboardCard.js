@@ -33,9 +33,8 @@ export function DashboardCard({ id, type, title, content, desc, onDelete }) {
 
   return (
     <Card
-      style={style}
       rounded='lg'
-      height={'100%'}
+      style={style}
       ref={setNodeRef}
       overflow={'hidden'}
       bg={lightAndDarkBgColor}
