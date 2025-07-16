@@ -1,6 +1,5 @@
 import { useQuery } from '@apollo/client'
 import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import {
   getFullDate,
   getSignedUrlParams,
@@ -11,9 +10,6 @@ import {
 import SbomActions from 'views/Sbom/components/SbomActions'
 
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
   Flex,
   Grid,
   GridItem,
@@ -28,26 +24,25 @@ import {
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
+import PartsBreadcrumbs from 'components/Misc/PartsBreadcrumbs'
 import { ProgressBar } from 'components/ProgressBar'
 import SbomProcess from 'components/SbomProcess'
 
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { usePartsContext } from 'hooks/usePartsContext'
-import { useProjectGroup } from 'hooks/useProjectGroup'
 import { useSbomScores } from 'hooks/useSbomScores'
 import { useThemeColor } from 'hooks/useThemeColors'
 
 import { ActiveCompliances, GetTotalComponentsCount } from 'graphQL/Queries'
 
-import { LuArrowRight, LuPackage, LuSquarePen } from 'react-icons/lu'
+import { LuPackage, LuSquarePen } from 'react-icons/lu'
 
 import LifecycleModal from '../../components/LifecycleModal'
 
 const SbomDetails = ({ sbomData }) => {
-  const navigate = useNavigate()
   const partsContext = usePartsContext()
   const signedUrlParams = getSignedUrlParams()
-  const { sbomHookData, isFreeTier } = useGlobalQueryContext()
+  const { isFreeTier } = useGlobalQueryContext()
 
   const {
     projectVersion,
@@ -108,17 +103,7 @@ const SbomDetails = ({ sbomData }) => {
     format: isUnspecified ? undefined : result?.complianceType?.toUpperCase()
   })
 
-  const { primaryBlueText, secondaryBlueText, secondaryTextInverse } =
-    useThemeColor([
-      'primaryBlueText',
-      'secondaryBlueText',
-      'secondaryTextInverse'
-    ])
-
-  const { name: projectGroupName, loading: projectGroupLoading } =
-    useProjectGroup({
-      projectGroupId: sbomData.project?.projectGroup?.id
-    })
+  const { secondaryBlueText } = useThemeColor(['secondaryBlueText'])
 
   useEffect(() => {
     window.onpopstate = () => {
@@ -142,45 +127,11 @@ const SbomDetails = ({ sbomData }) => {
             templateColumns='repeat(12, 1fr)'
           >
             <GridItem colSpan={8}>
-              <Breadcrumb
-                fontSize={'sm'}
-                separator={
-                  <LuArrowRight size={18} color={secondaryTextInverse} />
-                }
-              >
-                {!projectGroupLoading &&
-                  partsContext.isParts &&
-                  [
-                    ...partsContext.parts,
-                    {
-                      projectGroupName: projectGroupName,
-                      versionName: sbomHookData.versionName,
-                      url: null
-                    }
-                  ].map((part, index) => {
-                    return (
-                      <BreadcrumbItem
-                        isCurrentPage={!!part.url}
-                        key={part.url}
-                        color={primaryBlueText}
-                        cursor={'pointer'}
-                      >
-                        <BreadcrumbLink
-                          onClick={() => {
-                            if (part.url) {
-                              partsContext.goTo(index)
-                              navigate(part.url)
-                            }
-                          }}
-                          _hover={{ textDecoration: 'none' }}
-                        >
-                          {truncatedValue(part.projectGroupName)} (
-                          {truncatedValue(part.versionName)})
-                        </BreadcrumbLink>
-                      </BreadcrumbItem>
-                    )
-                  })}
-              </Breadcrumb>
+              {sbomData && (
+                <PartsBreadcrumbs
+                  projectGroupId={sbomData?.project?.projectGroup?.id}
+                />
+              )}
               <Flex
                 alignItems={'center'}
                 sx={{ gap: 2, fontWeight: 'semibold', flexWrap: 'wrap' }}
