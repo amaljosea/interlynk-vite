@@ -2,9 +2,9 @@ import { useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { truncatedValue } from 'utils'
 import { hasWhiteSpace, validateUrl } from 'utils/formValidationUtils'
+import ActionButton from 'views/Dashboard/Products/components/ActionButton'
 
 import {
-  Button,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -26,6 +26,8 @@ import {
   ComponentVulnUpdate,
   DispositionByParentUpdate
 } from 'graphQL/Mutation'
+
+import { LuPlus } from 'react-icons/lu'
 
 const VulnLinkDrawer = ({ data, isOpen, onClose }) => {
   const { id, sbomId, externalUrls, currentExternalUrls, vuln, isPart } =
@@ -215,91 +217,85 @@ const VulnLinkDrawer = ({ data, isOpen, onClose }) => {
       onSubmit={handleSave}
       isLoading={loading}
     >
-      <form onSubmit={handleLinkAdd}>
-        <Flex
-          alignItems={'flex-start'}
-          sx={{ mt: 4, gap: 3, flexDir: 'column' }}
-        >
-          {/* NAME */}
-          <FormControl isRequired isInvalid={error !== ''}>
-            <FormLabel>Type</FormLabel>
-            <LynkSelect
-              value={typeOptions.find((option) => option.value === type)}
-              onChange={(selectedOption) => handleTypeChange(selectedOption)}
-              options={typeOptions}
-              dropDown
-            />
+      <Flex alignItems={'flex-start'} sx={{ mt: 4, gap: 3, flexDir: 'column' }}>
+        {/* NAME */}
+        <FormControl isRequired isInvalid={error !== ''}>
+          <FormLabel>Type</FormLabel>
+          <LynkSelect
+            value={typeOptions.find((option) => option.value === type)}
+            onChange={(selectedOption) => handleTypeChange(selectedOption)}
+            options={typeOptions}
+            dropDown
+          />
 
-            <FormErrorMessage data-testid='vuln_link_error'>
-              {error}
-            </FormErrorMessage>
-          </FormControl>
-          {/* URL */}
-          <FormControl
-            isRequired
-            isInvalid={
-              (linkError !== '' && link !== '' && !validateUrl(link.trim())) ||
-              containsSpace
-            }
-          >
-            <FormLabel>Link</FormLabel>
-            <Input
-              value={link}
-              fontSize={'sm'}
-              placeholder='Add URL'
-              onBlur={handleCheckUrl}
-              onChange={handleLinkChange}
-            />
-            <FormErrorMessage>{linkError}</FormErrorMessage>
-          </FormControl>
-          {/* ACTIONS */}
-          <Button
-            type='submit'
-            title='Add link'
-            colorScheme='blue'
-            isDisabled={isDisabled}
-          >
-            Add
-          </Button>
-          {/* TABLE */}
-          <Flex width={'100%'} flexDir={'column'}>
-            <Text my={2} fontWeight={'medium'} color={secondaryTextInverse}>
-              Existing Links
+          <FormErrorMessage data-testid='vuln_link_error'>
+            {error}
+          </FormErrorMessage>
+        </FormControl>
+        {/* URL */}
+        <FormControl
+          isRequired
+          isInvalid={
+            (linkError !== '' && link !== '' && !validateUrl(link.trim())) ||
+            containsSpace
+          }
+        >
+          <FormLabel>Link</FormLabel>
+          <Input
+            value={link}
+            fontSize={'sm'}
+            placeholder='Add URL'
+            onBlur={handleCheckUrl}
+            onChange={handleLinkChange}
+          />
+          <FormErrorMessage>{linkError}</FormErrorMessage>
+        </FormControl>
+        {/* ACTIONS */}
+        <ActionButton
+          type='submit'
+          title={'Add link'}
+          isDisabled={isDisabled}
+          onClick={handleLinkAdd}
+          icon={<LuPlus size={18} />}
+        />
+        {/* TABLE */}
+        <Flex width={'100%'} flexDir={'column'}>
+          <Text my={2} fontWeight={'medium'} color={secondaryTextInverse}>
+            Existing Links
+          </Text>
+          {vulnLinks.length > 0 ? (
+            <Stack mt={4} spacing={3}>
+              {vulnLinks.map((item) => (
+                <Flex
+                  pb={2}
+                  align='flex-center'
+                  borderBottom={divider}
+                  justify='space-between'
+                  key={item?.id || item?.url}
+                >
+                  <Stack spacing={0} flex='1' minW='0'>
+                    {item?.url && (
+                      <Tooltip label={item.url}>
+                        <Text w={'fit-content'} wordBreak='break-all'>
+                          {truncatedValue(item.url, 45)}
+                        </Text>
+                      </Tooltip>
+                    )}
+                    {item?.name && (
+                      <Text color={sameSecondaryText}>{item.name}</Text>
+                    )}
+                  </Stack>
+                  <DeleteAction id={item?.id} />
+                </Flex>
+              ))}
+            </Stack>
+          ) : (
+            <Text mt={4} color={secondaryTextInverse}>
+              No existing links
             </Text>
-            {vulnLinks.length > 0 ? (
-              <Stack mt={4} spacing={3}>
-                {vulnLinks.map((item) => (
-                  <Flex
-                    pb={2}
-                    align='flex-center'
-                    borderBottom={divider}
-                    justify='space-between'
-                    key={item?.id || item?.url}
-                  >
-                    <Stack spacing={0} flex='1' minW='0'>
-                      {item?.url && (
-                        <Tooltip label={item.url}>
-                          <Text w={'fit-content'} wordBreak='break-all'>
-                            {truncatedValue(item.url, 45)}
-                          </Text>
-                        </Tooltip>
-                      )}
-                      {item?.name && (
-                        <Text color={sameSecondaryText}>{item.name}</Text>
-                      )}
-                    </Stack>
-                    <DeleteAction id={item?.id} />
-                  </Flex>
-                ))}
-              </Stack>
-            ) : (
-              <Text mt={4} color={secondaryTextInverse}>
-                No existing links
-              </Text>
-            )}
-          </Flex>
+          )}
         </Flex>
-      </form>
+      </Flex>
     </LynkDrawer>
   )
 }

@@ -51,7 +51,10 @@ const CompRelations = ({ data, compPath }) => {
   const [component, setComponent] = useState(null)
   const [type, setType] = useState(null)
 
-  const { headingTextColor } = useThemeColor(['headingTextColor'])
+  const { headingTextColor, secondaryTextInverse } = useThemeColor([
+    'headingTextColor',
+    'secondaryTextInverse'
+  ])
 
   const [addRelation] = useMutation(CreateCompRelation, {
     refetchQueries: [
@@ -235,7 +238,7 @@ const CompRelations = ({ data, compPath }) => {
         <Divider />
         {/* PATHS */}
         <Stack>
-          <Text fontWeight={'medium'} mt={2}>
+          <Text my={2} fontWeight={'medium'} color={secondaryTextInverse}>
             Tree View
           </Text>
           <RelationTreeView

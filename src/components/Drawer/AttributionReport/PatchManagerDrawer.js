@@ -382,7 +382,7 @@ const PatchManagerDrawer = ({ isOpen, onClose, rowData }) => {
       onSubmit={onSubmit}
     >
       <Box>
-        <VStack align='stretch' spacing={2} mt={4}>
+        <VStack align='stretch' spacing={2} my={2}>
           {editingPatch.id && (
             <LynkAlert
               msg='You are currently editing a patch. Please save or cancel your changes before adding a new patch.'
