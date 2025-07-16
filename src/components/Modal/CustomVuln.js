@@ -1,6 +1,6 @@
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { PackageURL } from 'packageurl-js'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import AsyncSelect from 'react-select/async'
 import { formatString, getSignedUrlParams } from 'utils'
@@ -9,13 +9,15 @@ import { severityList } from 'variables/general'
 
 import {
   Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
   IconButton,
   Input,
   Stack,
   Text,
   Textarea
 } from '@chakra-ui/react'
-import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react'
 
 import DividerWithText from 'components/DividerWithText'
 import LynkAlert from 'components/LynkAlert'
@@ -58,7 +60,17 @@ const CustomVuln = ({ isOpen, onClose, primaryComponent }) => {
   const [cve, setCve] = useState('')
   const [purlError, setPurlError] = useState('')
   const [cpeError, setCpeError] = useState('')
-  const [compId, setCompId] = useState('')
+
+  const [selectedComponent, setSelectedComponent] = useState(
+    primaryComponent
+      ? {
+          id: primaryComponent.id,
+          name: primaryComponent.name,
+          version: `${primaryComponent.version}${primaryComponent.primary ? ' [primary component]' : ''}`
+        }
+      : null
+  )
+
   const [formData, setFormData] = useState({
     vulnIdentifier: '',
     desc: '',
@@ -72,6 +84,11 @@ const CustomVuln = ({ isOpen, onClose, primaryComponent }) => {
     cvssVector: undefined,
     advisories: []
   })
+
+  const onChangeComponent = (selectedItem) => {
+    setSelectedComponent(selectedItem)
+    setError('')
+  }
 
   const { lazyDropDownProps } = useLazyDropDown(GetAllComponents, {
     skip: isOpen && currentSbomId ? false : true,
@@ -88,13 +105,7 @@ const CustomVuln = ({ isOpen, onClose, primaryComponent }) => {
     optionLabel: (item) =>
       `${item.name} - ${item.version}${item.primary ? ' [primary component]' : ''}`,
     optionValue: 'id',
-    defaultFirstOption: primaryComponent
-      ? {
-          id: primaryComponent.id,
-          name: primaryComponent.name,
-          version: `${primaryComponent.version}${primaryComponent ? ' [primary component]' : ''}`
-        }
-      : undefined,
+
     components: {
       IndicatorSeparator: () => null,
       DropdownIndicator: CustomDropdownIndicator
@@ -177,24 +188,17 @@ const CustomVuln = ({ isOpen, onClose, primaryComponent }) => {
     }
   }
 
-  useEffect(() => {
-    setCompId(primaryComponent?.id)
-  }, [primaryComponent])
-
-  const onChangeComponent = (selectedItem) => {
-    setCompId(selectedItem.id)
-    setError('')
-  }
-
   const handleSubmit = async () => {
+    const componentIdToSubmit = selectedComponent?.id || undefined
+
     const attribute = {
       sbomId: currentSbomId,
-      componentId: compId !== '' ? compId : undefined
+      componentId: componentIdToSubmit
     }
     await createVuln({
       variables: {
         ...formData,
-        customVulnSbomsAttributes: compId ? [attribute] : undefined
+        customVulnSbomsAttributes: componentIdToSubmit ? [attribute] : undefined
       }
     }).then((res) => {
       if (res?.data?.customVulnCreate?.errors?.length > 0) {
@@ -251,7 +255,6 @@ const CustomVuln = ({ isOpen, onClose, primaryComponent }) => {
             />
           </FormControl>
           <IconButton
-            siz='sm'
             colorScheme='blue'
             icon={<LuSearch size={18} />}
             isLoading={cveLoading}
@@ -348,6 +351,7 @@ const CustomVuln = ({ isOpen, onClose, primaryComponent }) => {
             <FormLabel htmlFor='componentId'>Component</FormLabel>
             <AsyncSelect
               name='componentId'
+              value={selectedComponent}
               {...{
                 ...lazyDropDownProps,
                 styles: {
@@ -360,9 +364,7 @@ const CustomVuln = ({ isOpen, onClose, primaryComponent }) => {
                   })
                 },
                 isDisabled: lazyDropDownProps.isLoading,
-                placeholder: primaryComponent
-                  ? `${primaryComponent.name}-${primaryComponent.version}${primaryComponent ? ' [primary component]' : ''}`
-                  : undefined
+                placeholder: 'Select a component...'
               }}
               menuPlacement='top'
             />
