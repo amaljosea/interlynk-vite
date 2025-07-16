@@ -52,7 +52,8 @@ const UploadModal = ({ isOpen, onClose, group }) => {
     refetchQueries: [
       'GetProductTable',
       'GetProjectGroupDetails',
-      'GetVersionsTable'
+      'GetVersionsTable',
+      'GetProjectGroupAndVersionDetails'
     ]
   })
 

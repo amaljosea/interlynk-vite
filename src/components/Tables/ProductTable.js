@@ -21,6 +21,7 @@ import ProductHeader from 'components/headers/ProductHeader'
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
+import { useRouteFlags } from 'hooks/useRouteFlags'
 
 import { DeleteProjectGroup } from 'graphQL/Mutation'
 import {
@@ -30,7 +31,6 @@ import {
 } from 'graphQL/Queries'
 
 import Pagination from '../Pagination'
-import { useRouteFlags } from 'hooks/useRouteFlags'
 
 const ProductTable = ({ data, reset, loading, paginationProps }) => {
   const navigate = useNavigate()
@@ -81,7 +81,13 @@ const ProductTable = ({ data, reset, loading, paginationProps }) => {
 
   const [deleteProjectGroup, { loading: deleting }] = useMutation(
     DeleteProjectGroup,
-    { refetchQueries: ['GetProductTable', 'GetTotalProduct'] }
+    {
+      refetchQueries: [
+        'GetProductTable',
+        'GetTotalProduct',
+        'GetProjectGroupAndVersionDetails'
+      ]
+    }
   )
 
   const action = (type, data) => {

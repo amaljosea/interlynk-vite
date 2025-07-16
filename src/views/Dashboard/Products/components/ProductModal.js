@@ -18,8 +18,10 @@ const ProductModal = ({ isOpen, onClose, data }) => {
     'GetProductTable',
     'GetProjectGroupDetails',
     'GetTotalProduct',
-    'GetProjectsVendor'
+    'GetProjectsVendor',
+    'GetProjectGroupAndVersionDetails'
   ]
+  
   const [projectGroupCreate, { loading: creating }] = useMutation(
     CreateProjectGroup,
     { refetchQueries }

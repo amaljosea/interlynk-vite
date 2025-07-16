@@ -72,7 +72,6 @@ const Kbar = () => {
   ])
 
   const { data: productData } = useQuery(GetProjectGroupAndVersionDetails, {
-    fetchPolicy: 'cache-first',
     variables: {
       first: 200,
       field: 'PROJECT_GROUPS_UPDATED_AT',
