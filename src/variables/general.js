@@ -967,6 +967,10 @@ export const infoData = [
     desc: `This setting lets you choose how long the SBOM data is kept before it's deleted. Once it's gone, you can't get it back.`
   },
   {
+    title: `Interpret License List as "AND" expression.`,
+    desc: `"By default, imported license lists are interpreted as an 'OR' SPDX expression. Enable this setting to treat them as an 'AND' expression instead"`
+  },
+  {
     title: `Manufacturer`,
     desc: (
       <Stack>

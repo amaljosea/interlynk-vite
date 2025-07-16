@@ -704,5 +704,7 @@ export const getSettingsLabel = (type) => {
       return 'Auto Archive'
     case 'enableKeepPartsUpdated':
       return 'Parts check'
+    case 'enableLicenseListAsAndQuery':
+      return 'License'
   }
 }

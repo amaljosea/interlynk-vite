@@ -48,8 +48,7 @@ const ProductTabs = (props) => {
   const [selectedItems, setSelectedItems] = useState([])
 
   const { data, settings } = props
-
-  const { enabled, projects } = data || ''
+  const { enabled, projects } = data || {}
 
   const { VULNERABILITIES, SETTINGS } = ProductDetailsTabs
 

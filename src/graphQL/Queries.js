@@ -640,6 +640,7 @@ export const GetProjectSettings = gql`
         jiraProject
         enableSupportLevel
         enableKeepPartsUpdated
+        enableLicenseListAsAndQuery
         organizationManufacturer {
           id
           organizationName

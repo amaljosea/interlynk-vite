@@ -112,7 +112,7 @@ const ProductDetailsMain = () => {
     }
   )
 
-  const { projectSetting } = settings?.project || ''
+  const { projectSetting } = settings?.project || {}
 
   const completedSboms =
     matchingProject?.sboms?.filter(
@@ -181,7 +181,7 @@ const ProductDetailsMain = () => {
           {/* TAB SECTION */}
           <Card
             display={data ? 'block' : 'none'}
-            minHeight={showProductProgress && 'calc(100vh - 260px)'}
+            // minHeight={showProductProgress && 'calc(100vh - 260px)'}
           >
             <CardBody>
               <ProductTabs
@@ -195,7 +195,7 @@ const ProductDetailsMain = () => {
         </Flex>
         {/* PRODUCT PROGRESS OVERVIEW */}
         {showProductProgress && (
-          <Flex minHeight={'calc(100vh - 110px)'}>
+          <Flex pos={'sticky'} top={20} h={'fit-content'}>
             <ProgressOverviewCard />
           </Flex>
         )}

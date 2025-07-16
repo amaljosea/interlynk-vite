@@ -377,6 +377,7 @@ export const ProjectSettingUpdate = gql`
     $enableSupportLevel: Boolean
     $enableAutoArchive: Boolean
     $enableKeepPartsUpdated: Boolean
+    $enableLicenseListAsAndQuery: Boolean
   ) {
     projectSettingUpdate(
       input: {
@@ -395,6 +396,7 @@ export const ProjectSettingUpdate = gql`
         enableSupportLevel: $enableSupportLevel
         enableAutoArchive: $enableAutoArchive
         enableKeepPartsUpdated: $enableKeepPartsUpdated
+        enableLicenseListAsAndQuery: $enableLicenseListAsAndQuery
       }
     ) {
       projectSetting {

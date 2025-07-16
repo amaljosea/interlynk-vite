@@ -5,8 +5,10 @@ import { infoData } from 'variables/general'
 
 import { InfoIcon } from '@chakra-ui/icons'
 import {
+  Divider,
   Flex,
   SimpleGrid,
+  Spacer,
   Stack,
   Text,
   Tooltip,
@@ -42,7 +44,8 @@ const Settings = ({ enabled, data, mfc }) => {
     copyVexFromPrevious,
     vulnScanningEnabled,
     enableSupportLevel,
-    enableKeepPartsUpdated
+    enableKeepPartsUpdated,
+    enableLicenseListAsAndQuery
   } = data || {}
 
   const { showToast } = useCustomToast()
@@ -84,7 +87,9 @@ const Settings = ({ enabled, data, mfc }) => {
         pkgUpdateThreshold:
           field === 'pkgUpdateThreshold' ? Number(val) : undefined,
         repoUpdateThreshold:
-          field === 'repoUpdateThreshold' ? Number(val) : undefined
+          field === 'repoUpdateThreshold' ? Number(val) : undefined,
+        enableLicenseListAsAndQuery:
+          field === 'enableLicenseListAsAndQuery' ? val : undefined
       }
     })
       .then((res) => res.data)
@@ -104,29 +109,32 @@ const Settings = ({ enabled, data, mfc }) => {
   const ProductSetting = ({ id, label, value }) => {
     if (id === 'enableSupportLevel' && isFreeTier) return null
     return (
-      <Flex gap={4} align='center' justifyContent={'space-between'}>
-        <Flex align='center'>
-          <Tooltip label={onCheck(`${label}`)}>
-            <InfoIcon mr={2} fontSize={'sm'} color={primaryBlueText} />
-          </Tooltip>
-          <Text
-            noOfLines={1}
-            color={sameSecondaryText}
-            fontSize={14}
-            fontWeight='400'
-          >
-            {label}
-          </Text>
+      <Stack spacing={2}>
+        <Flex gap={4} align='flex-start' justifyContent={'space-between'}>
+          <Flex align='center'>
+            <Tooltip label={onCheck(`${label}`)} placement='right'>
+              <InfoIcon mr={2} fontSize={'sm'} color={primaryBlueText} />
+            </Tooltip>
+            <Text
+              fontSize={14}
+              fontWeight='400'
+              wordBreak={'break-all'}
+              color={sameSecondaryText}
+            >
+              {label}
+            </Text>
+          </Flex>
+          <LynkSwitch
+            id={id}
+            size='md'
+            me='10px'
+            isChecked={value || false}
+            isDisabled={!enabled || !editControls}
+            onChange={(e) => onUpdate(e.target.checked, id)}
+          />
         </Flex>
-        <LynkSwitch
-          id={id}
-          size='md'
-          me='10px'
-          isChecked={value || false}
-          isDisabled={!enabled || !editControls}
-          onChange={(e) => onUpdate(e.target.checked, id)}
-        />
-      </Flex>
+        <Divider />
+      </Stack>
     )
   }
 
@@ -148,10 +156,11 @@ const Settings = ({ enabled, data, mfc }) => {
       <CardBody py={4}>
         <SimpleGrid w={'100%'} columns={3} gap={[6, 12]}>
           {/* COLUMNS 1 */}
-          <Stack spacing={5}>
+          <Stack spacing={3}>
             <Text fontSize={14} fontWeight={'semibold'}>
               Import Actions
             </Text>
+            <Spacer />
             {/* APPLY CHECK */}
             <ProductSetting
               id={'checks'}
@@ -199,6 +208,12 @@ const Settings = ({ enabled, data, mfc }) => {
               id={'copyVexFromPrevious'}
               value={copyVexFromPrevious}
               label={'Retain Vulnerability Status with Version'}
+            />
+            {/* INTERPRET LICENSE LIST AS AND EXPRESSION */}
+            <ProductSetting
+              id={'enableLicenseListAsAndQuery'}
+              value={enableLicenseListAsAndQuery}
+              label={'Interpret License List as "AND" expression.'}
             />
           </Stack>
           {/* COLUMN 2 */}
