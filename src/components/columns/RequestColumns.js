@@ -39,7 +39,8 @@ const RequestColumns = ({ action }) => {
           <Text fontSize={14} color={primaryTextColor} data-testid='request_id'>
             {row?.email}
           </Text>
-        )
+        ),
+        wrap: true
       },
       {
         id: 'PRODUCT',
