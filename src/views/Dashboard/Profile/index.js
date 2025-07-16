@@ -169,7 +169,7 @@ function Profile() {
               <TabPanel px={0}>
                 <Feeds />
               </TabPanel>
-              {/* RULES */}
+              {/* COMPLIANCE */}
               <TabPanel px={0}>
                 <Stack spacing={5}>
                   {!isFreeTier && <Compliance />}
@@ -185,27 +185,37 @@ function Profile() {
               <TabPanel px={0}>
                 <LegalTable />
               </TabPanel>
+              {/* INTEGRATIONS */}
               <TabPanel px={0}>
-                <Connections org={true} />
+                <Connections org />
               </TabPanel>
-              {isSuperAdmin && (
+              {/* SSO */}
+              {isSuperAdmin ? (
                 <TabPanel px={0}>
                   <SSOConnection />
                 </TabPanel>
+              ) : (
+                <TabPanel px={0} />
               )}
+              {/* PLAN */}
               <TabPanel px={0}>
                 <PlanTable />
               </TabPanel>
+              {/* HEALTH */}
               <TabPanel px={0}>
                 <WeightControl />
               </TabPanel>
+              {/* CUSTOM FIELDS */}
               <TabPanel px={0}>
                 <CustomFields />
               </TabPanel>
-              {shouldShowDemoFeatures && (
+              {/* RISKS */}
+              {shouldShowDemoFeatures ? (
                 <TabPanel px={0}>
                   <RiskFields />
                 </TabPanel>
+              ) : (
+                <TabPanel px={0} />
               )}
             </TabPanels>
           </Tabs>

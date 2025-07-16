@@ -317,6 +317,18 @@ export const settingActions = [
     path: '/vendor/settings?tab=plan'
   },
   {
+    id: 'custom-fields',
+    name: 'Custom Fields',
+    section: 'Organization',
+    path: '/vendor/settings?tab=custom-fields'
+  },
+  {
+    id: 'organizations',
+    name: 'Organizations',
+    section: 'Personal',
+    path: '/vendor/settings?tab=organizations'
+  },
+  {
     id: 'integrations',
     name: 'Integrations',
     section: 'Personal',
@@ -327,18 +339,6 @@ export const settingActions = [
     name: 'Security Tokens',
     section: 'Personal',
     path: '/vendor/settings?tab=security tokens'
-  },
-  {
-    id: 'organizations',
-    name: 'Organizations',
-    section: 'Personal',
-    path: '/vendor/settings?tab=organizations'
-  },
-  {
-    id: 'custom-fields',
-    name: 'Custom Fields',
-    section: 'Organization',
-    path: '/vendor/settings?tab=custom-fields'
   }
 ]
 
