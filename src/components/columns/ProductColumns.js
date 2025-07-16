@@ -110,7 +110,7 @@ const ProductColumns = (props) => {
           )
         },
         width: '100px',
-        sortable: true
+        sortable: !signedUrlParams
       },
       // PRODUCT
       {
@@ -167,7 +167,7 @@ const ProductColumns = (props) => {
         },
         width: '54%',
         wrap: true,
-        sortable: true
+        sortable: !signedUrlParams
       },
       // ENVIRONMENT
       {

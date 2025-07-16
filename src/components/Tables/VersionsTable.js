@@ -64,9 +64,7 @@ export const GetProjectDetails = gql`
   }
 `
 
-const VersionsTable = (props) => {
-  const { retentionTime } = props
-
+const VersionsTable = ({ retentionTime }) => {
   const navigate = useNavigate()
   const params = useParams()
   const productId = params.productid

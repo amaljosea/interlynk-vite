@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { truncatedValue } from 'utils'
 import SBOM from 'views/Customer/Sbom'
@@ -19,6 +19,15 @@ import { ShareLynkProjectGroup } from 'graphQL/Queries'
 
 import { LuBox, LuLock } from 'react-icons/lu'
 
+const tabs = [
+  'versions',
+  'vulnerabilities',
+  'automation rules',
+  'settings',
+  'policies',
+  'change log'
+]
+
 const ProductDetails = () => {
   const params = useParams()
   const productGroupId = params.productgroupid
@@ -28,15 +37,6 @@ const ProductDetails = () => {
     'secondaryBlueText',
     'secondaryTextInverse'
   ])
-
-  const tabs = [
-    'versions',
-    'vulnerabilities',
-    'automation rules',
-    'settings',
-    'policies',
-    'change log'
-  ]
 
   const { dispatch } = useGlobalState()
 
@@ -52,25 +52,11 @@ const ProductDetails = () => {
   const { projectGroup } = data?.shareLynkQuery || {}
   const { name, description } = projectGroup || {}
 
-  const [versionFilters, setVersionFilters] = useState({
-    field: 'SBOMS_CREATED_AT',
-    direction: 'DESC',
-    lifestage: []
-  })
-
   useEffect(() => {
-    if (sbomId === null) {
+    if (!sbomId) {
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     }
   }, [prodVulnDispatch, sbomId])
-
-  const handleSort = (column, sortDirection) => {
-    setVersionFilters((oldFilters) => ({
-      ...oldFilters,
-      field: column?.id,
-      direction: sortDirection.toUpperCase()
-    }))
-  }
 
   if (loading) {
     return (
@@ -153,7 +139,7 @@ const ProductDetails = () => {
                   key={index}
                   _focus={{ outline: 'none' }}
                   textTransform={'capitalize'}
-                  isDisabled={item === 'versions' ? false : true}
+                  isDisabled={item !== 'versions'}
                 >
                   {item !== 'versions' && (
                     <LuLock
@@ -169,13 +155,7 @@ const ProductDetails = () => {
             <TabPanels>
               {/* VERSIONS */}
               <TabPanel px={0}>
-                <VersionsTable
-                  handleSort={handleSort}
-                  retentionTime={null}
-                  filters={versionFilters}
-                  projectGroup={projectGroup}
-                  setFilters={setVersionFilters}
-                />
+                <VersionsTable />
               </TabPanel>
             </TabPanels>
           </Tabs>
