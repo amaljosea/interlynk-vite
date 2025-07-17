@@ -14,7 +14,7 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "@react-pdf/renderer": "^4.3.0",
     "@reactour/tour": "^3.7.0",
     "@sentry/cli": "^2.42.5",
