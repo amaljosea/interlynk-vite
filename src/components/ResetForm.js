@@ -25,7 +25,7 @@ const ResetForm = () => {
   const emailId = useQueryParam('id')
   const token = useQueryParam('reset_password_token')
 
-  const resetURL = process.env.REACT_APP_VENDOR_RESET_URL
+  const resetURL = import.meta.env.VITE_VENDOR_RESET_URL
 
   const [email, setEmail] = useState(emailId ? emailId : '')
   const [showPassword, setShowPassword] = useState(false)

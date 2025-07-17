@@ -20,7 +20,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { LuBuilding, LuLogOut, LuNavigation, LuUser } from 'react-icons/lu'
 
-const SERVER_URL = process.env.REACT_APP_SERVER
+const SERVER_URL = import.meta.env.VITE_SERVER
 
 export const UserMenu = ({ handleLogout }) => {
   const { shouldShowDemoFeatures } = useShouldShowDemoFeatures()

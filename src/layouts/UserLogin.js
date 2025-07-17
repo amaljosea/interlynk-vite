@@ -3,26 +3,26 @@ import Cookies from 'js-cookie'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import {
+  Box,
+  Button,
+  Checkbox,
+  Flex,
+  FormControl,
+  FormLabel,
+  Image,
+  Input,
+  Text
+} from '@chakra-ui/react'
+
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import LynkAlert from 'components/LynkAlert'
 
 import useQueryParam from 'hooks/useQueryParam'
 
-const {
-  Button,
-  Text,
-  FormControl,
-  Input,
-  FormLabel,
-  Checkbox,
-  Flex,
-  Box,
-  Image
-} = require('@chakra-ui/react')
-
 const Login = () => {
-  const userLoginURL = process.env.REACT_APP_USER_LOGIN_URL
+  const userLoginURL = import.meta.env.VITE_USER_LOGIN_URL
 
   const navigate = useNavigate()
 

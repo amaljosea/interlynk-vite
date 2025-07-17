@@ -149,7 +149,7 @@ function SidebarResponsive(props) {
   const brand = (
     <Box pt='35px' mb='8px'>
       <Link
-        href={`${process.env.PUBLIC_URL}/#/`}
+        href={`${import.meta.env.PUBLIC_URL}/#/`}
         target='_blank'
         display='flex'
         lineHeight='100%'

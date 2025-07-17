@@ -19,7 +19,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 import { UpdateUserPassword, updateOrgUser } from 'graphQL/Mutation'
 
 const PersonalDrawer = ({ isOpen, onClose, inputRef }) => {
-  const SERVER_URL = process.env.REACT_APP_SERVER
+  const SERVER_URL = import.meta.env.VITE_SERVER
 
   const [updateUser, { loading: userLoading }] = useMutation(updateOrgUser)
   const [updatePassword, { loading: passLoading }] =

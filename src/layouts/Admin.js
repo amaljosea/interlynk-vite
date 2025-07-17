@@ -4,7 +4,7 @@ import { TourProvider, useTour } from '@reactour/tour'
 import NotFound from 'assets/svg/not-found.svg'
 import Cookies from 'js-cookie'
 import { KBarProvider } from 'kbar'
-import React, { useEffect } from 'react'
+import React, { Suspense, useEffect } from 'react'
 import {
   Navigate,
   Outlet,
@@ -292,7 +292,9 @@ export default function Admin() {
               />
             </Box>
             <Box my={4} px={5}>
-              {data?.organization ? <Outlet /> : <OrgRegister />}
+              <Suspense fallback={<Loading type='login' />}>
+                {data?.organization ? <Outlet /> : <OrgRegister />}
+              </Suspense>
             </Box>
           </Flex>
         </TourProvider>

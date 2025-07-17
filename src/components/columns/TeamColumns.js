@@ -45,7 +45,7 @@ const TeamColumns = ({ action }) => {
   })
 
   return useMemo(() => {
-    const SERVER_URL = process.env.REACT_APP_SERVER
+    const SERVER_URL = import.meta.env.VITE_SERVER
     const { currentUser } = organization || {}
     const { email } = currentUser || {}
 

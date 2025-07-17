@@ -4,7 +4,7 @@
 
 1. Create an organization
 2. Next you need copy the ORG ID and paste it inside the .env file
-3. name REACT_APP_ORGID, just remove the existing id and paste the new ID
+3. name VITE_ORGID, just remove the existing id and paste the new ID
 4. After that run the project
 5. Now you can test the new api integration for updating and creating connections
 

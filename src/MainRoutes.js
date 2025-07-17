@@ -2,47 +2,66 @@ import { GlobalQueryContextWrapper } from 'context/GlobalQueryContext.js'
 import { PartsContextWrapper } from 'context/PartsContext.js'
 import { ProductUrlContextWrapper } from 'context/ProductUrlContext.js'
 import Cookies from 'js-cookie'
+import AdminLayout from 'layouts/Admin.js'
+// Critical components - loaded immediately
 import Auth from 'layouts/Auth.js'
-import Callback from 'layouts/Callback.js'
+import CustomerLayout from 'layouts/Customer.js'
+import Login from 'layouts/Login.js'
 import PageNotFound from 'layouts/PageNotFound.js'
-import Reset from 'layouts/Reset'
-import SSO from 'layouts/SSO.js'
-import Success from 'layouts/Success'
-import React from 'react'
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
-import PubProducts from 'views/Customer/Products'
-import PubProductDetails from 'views/Customer/Products/ProductDetails'
-import PubProductList from 'views/Customer/Products/ProductList'
-import PubSbomDetails from 'views/Customer/Sbom/index.js'
-import Analytics from 'views/Dashboard/Analytics/index.js'
-import Dashboard from 'views/Dashboard/Dashboard'
-import Package from 'views/Dashboard/Package/index.js'
-import Policies from 'views/Dashboard/Policies'
-import PolicyDetails from 'views/Dashboard/Policies/PolicyDetails.js'
-import Products from 'views/Dashboard/Products'
-import ProductDetailsMain from 'views/Dashboard/Products/ProductDetailsMain.js'
-import ProductDetailsSbomNew from 'views/Dashboard/Products/ProductDetailsSbomNew/index.js'
-import ProductDetailsVul from 'views/Dashboard/Products/ProductDetailsVul.js'
-import ProductList from 'views/Dashboard/Products/ProductList'
-import Profile from 'views/Dashboard/Profile'
-import Requests from 'views/Dashboard/Requests/index.js'
-import Support from 'views/Dashboard/Support'
-import Tools from 'views/Dashboard/Tools'
-import Vulnerabilities from 'views/Dashboard/Vulnerabilities'
-import ColorDisplay from 'views/Dashboard/colors/index.js'
+import { lazyImport } from 'utils/lazyImport.js'
 
 import ConditionalRoute from 'components/ConditionalRoute.js'
 import Licenses from 'components/Licenses'
 import { SentryTest } from 'components/SentryTest.js'
 import PolicyTable from 'components/Tables/PolicyTable.js'
 
-import AdminLayout from './layouts/Admin.js'
-import CustomerLayout from './layouts/Customer.js'
-import Login from './layouts/Login.js'
-import Register from './layouts/Register.js'
-import RequestSbomUpload from './layouts/RequestSbomUpload'
-import LoginLayout from './layouts/UserLogin.js'
 import './main.css'
+import PubProductList from './views/Customer/Products/ProductList.js'
+
+// Non-critical layout components - can be lazy loaded
+const Register = lazyImport(() => import('./layouts/Register.js'))
+const LoginLayout = lazyImport(() => import('./layouts/UserLogin.js'))
+const Callback = lazyImport(() => import('layouts/Callback.js'))
+const Reset = lazyImport(() => import('layouts/Reset'))
+const SSO = lazyImport(() => import('layouts/SSO.js'))
+const Success = lazyImport(() => import('layouts/Success.js'))
+const RequestSbomUpload = lazyImport(
+  () => import('./layouts/RequestSbomUpload')
+)
+const PubProducts = lazyImport(() => import('views/Customer/Products/index.js'))
+const PubProductDetails = lazyImport(
+  () => import('./views/Customer/Products/ProductDetails.js')
+)
+const PubSbomDetails = lazyImport(() => import('views/Customer/Sbom/index.js'))
+const Analytics = lazyImport(() => import('views/Dashboard/Analytics/index.js'))
+const Package = lazyImport(() => import('views/Dashboard/Package/index.js'))
+const Policies = lazyImport(() => import('views/Dashboard/Policies/index.js'))
+const PolicyDetails = lazyImport(
+  () => import('views/Dashboard/Policies/PolicyDetails.js')
+)
+const Products = lazyImport(() => import('views/Dashboard/Products/index.js'))
+const ProductDetailsMain = lazyImport(
+  () => import('views/Dashboard/Products/ProductDetailsMain.js')
+)
+const ProductDetailsSbomNew = lazyImport(
+  () => import('views/Dashboard/Products/ProductDetailsSbomNew/index.js')
+)
+const ProductDetailsVul = lazyImport(
+  () => import('views/Dashboard/Products/ProductDetailsVul.js')
+)
+const ProductList = lazyImport(
+  () => import('views/Dashboard/Products/ProductList.js')
+)
+const Profile = lazyImport(() => import('views/Dashboard/Profile/index.js'))
+const Requests = lazyImport(() => import('views/Dashboard/Requests/index.js'))
+const Support = lazyImport(() => import('views/Dashboard/Support/index.js'))
+const Tools = lazyImport(() => import('views/Dashboard/Tools/index.js'))
+const Vulnerabilities = lazyImport(
+  () => import('views/Dashboard/Vulnerabilities/index.js')
+)
+const ColorDisplay = lazyImport(() => import('views/Dashboard/colors/index.js'))
+const Dashboard = lazyImport(() => import('views/Dashboard/Dashboard/index.js'))
 
 const authToken = Cookies.get('authToken')
 

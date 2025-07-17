@@ -1,8 +1,8 @@
+import { createContext, useEffect, useState } from 'react'
+
 import { useGlobalQueryContext } from 'hooks/useGlobalQueryContext'
 import { useProductUrlContext } from 'hooks/useProductUrlContext'
 import useQueryParam from 'hooks/useQueryParam'
-
-const { createContext, useEffect, useState } = require('react')
 
 export const useProductParts = () => {
   const { generateProductVersionDetailPageUrlFromCurrentUrl } =

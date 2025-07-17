@@ -4,7 +4,7 @@ import { FcGoogle } from 'react-icons/fc'
 import { LuGithub } from 'react-icons/lu'
 
 const SocialLogin = () => {
-  const serverURL = process.env.REACT_APP_SERVER
+  const serverURL = import.meta.env.VITE_SERVER
 
   const signIn = async (provider, token) => {
     const path = provider === 'google' ? 'google_oauth2' : 'github'

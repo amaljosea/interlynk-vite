@@ -59,7 +59,7 @@ const Header = ({ selectedTab, setSelectedTab, tabs }) => {
   const [uploadProfile] = useMutation(UploadProfileImage)
 
   const inputRef = useRef(null)
-  const SERVER_URL = process.env.REACT_APP_SERVER
+  const SERVER_URL = import.meta.env.VITE_SERVER
 
   const [profileImage, setProfileImage] = useState(null)
   const [dpLoading, setDpLoading] = useState(false)

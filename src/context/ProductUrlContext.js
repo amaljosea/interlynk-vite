@@ -1,8 +1,7 @@
 import { noop } from 'lodash'
+import { createContext } from 'react'
 import { useParams } from 'react-router-dom'
 import { appendParams, getUserType } from 'utils/url'
-
-const { createContext } = require('react')
 
 export const useProductUrls = () => {
   const params = useParams()

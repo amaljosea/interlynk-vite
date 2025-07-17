@@ -37,7 +37,7 @@ const LoginForm = () => {
   const cards = getItem('selectedCards')
   const analytics = getItem('selectedAnalytics')
 
-  const loginURL = process.env.REACT_APP_VENDOR_LOGIN_URL
+  const loginURL = import.meta.env.VITE_VENDOR_LOGIN_URL
 
   const [error, setError] = useState('')
   const [password, setPassword] = useState('')

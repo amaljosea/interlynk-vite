@@ -20,7 +20,7 @@ export const clearData = () => {
 export const logoutUser = async () => {
   logError() // Added for debugging random logouts
 
-  const logoutURL = process.env.REACT_APP_VENDOR_LOGOUT_URL
+  const logoutURL = import.meta.env.VITE_VENDOR_LOGOUT_URL
   const authToken = Cookies.get('authToken')
 
   try {

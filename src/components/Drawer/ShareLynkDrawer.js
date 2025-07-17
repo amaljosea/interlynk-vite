@@ -38,7 +38,7 @@ import { LuFileSymlink } from 'react-icons/lu'
 const ShareLynkDrawer = ({ isOpen, onClose, prodData }) => {
   const { showToast } = useCustomToast()
 
-  const BACKEND_URL = process.env.REACT_APP_SERVER
+  const BACKEND_URL = import.meta.env.VITE_SERVER
 
   const { name, id: groupId } = prodData || {}
 

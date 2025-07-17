@@ -1,11 +1,8 @@
 import * as Sentry from '@sentry/react'
-import { MainRoutes } from 'MainRoutes.js'
-import { ApolloWrapper } from 'context/ApolloWrapper.js'
-import React from 'react'
+import React, { Suspense } from 'react'
 import ReactDOM from 'react-dom/client'
 import ReactGA from 'react-ga4'
 import { BrowserRouter } from 'react-router-dom'
-import theme, { config } from 'theme/theme.js'
 
 import {
   ChakraProvider,
@@ -14,11 +11,15 @@ import {
 } from '@chakra-ui/react'
 
 import ChatbotPreview from 'components/ChatbotPreview'
-import ScrollToTop from 'components/ScrollToTop.js'
+import Loading from 'components/Misc/Loading'
+import ScrollToTop from 'components/ScrollToTop'
 
 import { GlobalStateProvider } from 'hooks/useGlobalState'
 
+import { MainRoutes } from './MainRoutes'
+import { ApolloWrapper } from './context/ApolloWrapper'
 import './main.css'
+import theme, { config } from './theme/theme'
 
 const { hostname } = window.location
 
@@ -59,11 +60,13 @@ root.render(
             initialColorMode={config?.initialColorMode}
             storageKey='chakra-ui-color-mode'
           />
-          <ChatbotPreview />
-          <ScrollToTop />
-          <ApolloWrapper>
-            <MainRoutes />
-          </ApolloWrapper>
+          <Suspense fallback={<Loading type='login' />}>
+            <ChatbotPreview />
+            <ScrollToTop />
+            <ApolloWrapper>
+              <MainRoutes />
+            </ApolloWrapper>
+          </Suspense>
         </ChakraProvider>
       </GlobalStateProvider>
     </BrowserRouter>

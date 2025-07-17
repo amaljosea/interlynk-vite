@@ -18,12 +18,12 @@ import useCustomToast from 'hooks/useCustomToast'
 
 let toastCache
 
-const graphqlAPI = process.env.REACT_APP_GRAPHQL_API
+const graphqlAPI = import.meta.env.VITE_GRAPHQL_API
 
 const uploadLink = createUploadLink({
   uri: graphqlAPI
 })
-const env = process.env.NODE_ENV
+const env = import.meta.env.NODE_ENV
 
 // Function to refresh token
 const refreshToken = async () => {
@@ -34,7 +34,7 @@ const refreshToken = async () => {
     }
 
     const response = await fetch(
-      `${process.env.REACT_APP_REFRESH_TOKEN_URL}?refresh_token=${refreshToken}`,
+      `${import.meta.env.VITE_REFRESH_TOKEN_URL}?refresh_token=${refreshToken}`,
       {
         method: 'POST',
         credentials: 'include' // To include cookies

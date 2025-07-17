@@ -49,6 +49,24 @@ const Compare = ({ selectedSboms }) => {
     fetchPolicy: 'network-only'
   })
 
+  const { lazyDropDownProps } = useLazyDropDown(GetProjectGroupForDropDown, {
+    selector: 'organization.projectGroups',
+    variables: {
+      field: field,
+      direction: direction,
+      first: 5
+    },
+    selectorForActualCount: 'organization.projectGroups',
+    styles: style,
+    components: {
+      IndicatorSeparator: () => null,
+      DropdownIndicator: CustomDropdownIndicator
+    },
+    optionLabel: 'name'
+  })
+
+  const { nodes, loading } = lazyDropDownProps
+
   // -------------- SBOM 1 --------------
   const [selectedGroupOne, setSelectedGroupOne] = useState('')
   const [selectedProdOne, setSelectedProdOne] = useState({})
@@ -58,6 +76,15 @@ const Compare = ({ selectedSboms }) => {
   const [firstSbomInfo, setFirstSbomInfo] = useState(null)
   const [disabled, setDisabled] = useState(false)
   const [isSbomOneLoading, setIsSbomOneLoading] = useState(false)
+
+  // ------------- SBOM 2 --------------
+  const [selectedGroupTwo, setSelectedGroupTwo] = useState('')
+  const [selectedProdTwo, setSelectedProdTwo] = useState({})
+  const [selectedVersionTwo, setSelectedVersionTwo] = useState(null)
+  const [uniqVersionsTwo, setUniqVersionsTwo] = useState([])
+  const [productListTwo, setProductListTwo] = useState([])
+  const [secondSbomInfo, setSecondSbomInfo] = useState(null)
+  const [isSbomTwoLoading, setIsSbomTwoLoading] = useState(false)
 
   const onSelectGroupOne = (group) => {
     setSelectedGroupOne(group)
@@ -127,15 +154,6 @@ const Compare = ({ selectedSboms }) => {
       })
     }
   }, [getProduct, selectedProdOne, selectedVersionOne, selectedVersionTwo])
-
-  // ------------- SBOM 2 --------------
-  const [selectedGroupTwo, setSelectedGroupTwo] = useState('')
-  const [selectedProdTwo, setSelectedProdTwo] = useState({})
-  const [selectedVersionTwo, setSelectedVersionTwo] = useState(null)
-  const [uniqVersionsTwo, setUniqVersionsTwo] = useState([])
-  const [productListTwo, setProductListTwo] = useState([])
-  const [secondSbomInfo, setSecondSbomInfo] = useState(null)
-  const [isSbomTwoLoading, setIsSbomTwoLoading] = useState(false)
 
   const onSelectGroupTwo = (group) => {
     setSelectedGroupTwo(group)
@@ -276,24 +294,6 @@ const Compare = ({ selectedSboms }) => {
     selectedVersionTwo,
     disabled
   }
-
-  const { lazyDropDownProps } = useLazyDropDown(GetProjectGroupForDropDown, {
-    selector: 'organization.projectGroups',
-    variables: {
-      field: field,
-      direction: direction,
-      first: 5
-    },
-    selectorForActualCount: 'organization.projectGroups',
-    styles: style,
-    components: {
-      IndicatorSeparator: () => null,
-      DropdownIndicator: CustomDropdownIndicator
-    },
-    optionLabel: 'name'
-  })
-
-  const { nodes, loading } = lazyDropDownProps
 
   return (
     <Flex flexDirection='column' gap={6}>
