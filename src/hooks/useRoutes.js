@@ -1,13 +1,6 @@
 // example icons
 import { useMemo } from 'react'
-import CustomerProducts from 'views/Customer/Products'
-import Dashboard from 'views/Dashboard/Dashboard'
-import Package from 'views/Dashboard/Package'
-import Policies from 'views/Dashboard/Policies'
-import Products from 'views/Dashboard/Products'
-import Profile from 'views/Dashboard/Profile'
-import Support from 'views/Dashboard/Support'
-import Vulnerabilities from 'views/Dashboard/Vulnerabilities'
+import { lazyImport } from 'utils/lazyImport.js'
 
 import Licenses from 'components/Licenses'
 
@@ -25,6 +18,17 @@ import {
   LuSettings,
   LuShieldCheck
 } from 'react-icons/lu'
+
+const CustomerProducts = lazyImport(() => import('views/Customer/Products'))
+const Dashboard = lazyImport(() => import('views/Dashboard/Dashboard'))
+const Package = lazyImport(() => import('views/Dashboard/Package'))
+const Policies = lazyImport(() => import('views/Dashboard/Policies'))
+const Products = lazyImport(() => import('views/Dashboard/Products'))
+const Profile = lazyImport(() => import('views/Dashboard/Profile'))
+const Support = lazyImport(() => import('views/Dashboard/Support'))
+const Vulnerabilities = lazyImport(
+  () => import('views/Dashboard/Vulnerabilities')
+)
 
 export function useRoutes() {
   const vendorRoutes = useMemo(

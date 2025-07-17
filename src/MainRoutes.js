@@ -29,11 +29,16 @@ const Success = lazyImport(() => import('layouts/Success.js'))
 const RequestSbomUpload = lazyImport(
   () => import('./layouts/RequestSbomUpload')
 )
+
+// Customer route components - lazy loaded
 const PubProducts = lazyImport(() => import('views/Customer/Products/index.js'))
 const PubProductDetails = lazyImport(
   () => import('./views/Customer/Products/ProductDetails.js')
 )
 const PubSbomDetails = lazyImport(() => import('views/Customer/Sbom/index.js'))
+
+// Dashboard components - lazy loaded
+const Dashboard = lazyImport(() => import('views/Dashboard/Dashboard/index.js'))
 const Analytics = lazyImport(() => import('views/Dashboard/Analytics/index.js'))
 const Package = lazyImport(() => import('views/Dashboard/Package/index.js'))
 const Policies = lazyImport(() => import('views/Dashboard/Policies/index.js'))
@@ -61,7 +66,6 @@ const Vulnerabilities = lazyImport(
   () => import('views/Dashboard/Vulnerabilities/index.js')
 )
 const ColorDisplay = lazyImport(() => import('views/Dashboard/colors/index.js'))
-const Dashboard = lazyImport(() => import('views/Dashboard/Dashboard/index.js'))
 
 const authToken = Cookies.get('authToken')
 
