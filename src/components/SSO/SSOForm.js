@@ -18,7 +18,7 @@ import { useThemeColor } from 'hooks/useThemeColors'
 
 import { LuLogIn } from 'react-icons/lu'
 
-const serverURL = import.meta.env.REACT_APP_SERVER
+const serverURL = import.meta.env.VITE_SERVER
 
 const SSOForm = () => {
   const { headingTextColor, primaryTextColor } = useThemeColor([
